@@ -383,7 +383,7 @@ def convert_to_bytes(string_to_convert):
 def recursively_convert_to_str(value):
     """Convert all elements in a data structure to str. This is required for the
     yaml.safe_dump() function to work as it only works for unicode and str and
-    not bytes nor builtins.str(UNICODE). See:
+    not builtins.bytes nor builtins.str(UNICODE). See:
     https://stackoverflow.com/a/1950399/11755830
 
     Args:

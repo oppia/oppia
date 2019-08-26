@@ -49,17 +49,17 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
         and ROLE_ACTIONS are string.
         """
         for role_name in self.PARENT_ROLES:
-            self.assertTrue(isinstance(role_name, python_utils.BASESTRING))
+            self.assertTrue(isinstance(role_name, python_utils.UNICODE))
 
             for role in self.PARENT_ROLES[role_name]:
-                self.assertTrue(isinstance(role, python_utils.BASESTRING))
+                self.assertTrue(isinstance(role, python_utils.UNICODE))
 
         for role_name in self.ACTIONS:
-            self.assertTrue(isinstance(role_name, python_utils.BASESTRING))
+            self.assertTrue(isinstance(role_name, python_utils.UNICODE))
 
             for action_name in self.ACTIONS[role_name]:
                 self.assertTrue(
-                    isinstance(action_name, python_utils.BASESTRING))
+                    isinstance(action_name, python_utils.UNICODE))
 
     def test_valid_parents(self):
         """Test that all the roles present in value list for any key in
