@@ -22,7 +22,6 @@ from core.controllers import base
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import user_services
-from core.platform import models
 import feconf
 import python_utils
 
