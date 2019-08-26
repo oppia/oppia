@@ -94,7 +94,8 @@ describe('Test solicit answer details feature', function() {
     workflow.publishExploration();
 
     adminPage.editConfigProperty(
-      'Always ask learners for answer details while playing exploration.',
+      'Always ask learners for answer details while playing exploration. ' +
+      '(For testing only -- DO NOT USE)',
       'Boolean',
       function(elem) {
         elem.setValue(true);
@@ -135,7 +136,8 @@ describe('Test solicit answer details feature', function() {
     users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
     adminPage.get();
     adminPage.editConfigProperty(
-      'Always ask learners for answer details while playing exploration.',
+      'Always ask learners for answer details while playing exploration. ' +
+      '(For testing only -- DO NOT USE)',
       'Boolean',
       function(elem) {
         elem.setValue(false);
