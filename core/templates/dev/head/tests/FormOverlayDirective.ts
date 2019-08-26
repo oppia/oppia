@@ -18,6 +18,9 @@
 
 require('App.ts');
 
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+
 angular.module('oppia').directive('formOverlay', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',

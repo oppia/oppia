@@ -18,6 +18,10 @@
 
 require('App.ts');
 
+require('base_components/BaseContentDirective.ts');
+require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
+require('tests/FormOverlayDirective.ts');
+
 angular.module('oppia').controller('FormBuilderTestPage', [
   '$scope', function($scope) {
     $scope.testText = 'abc{{paramUnicode1}}';

@@ -62,6 +62,7 @@ module.exports = {
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.scripts.ts',
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
+    console_errors: commonPrefix + '/tests/console_errors.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
       'creator-dashboard-page.scripts.ts',
@@ -196,6 +197,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['console_errors'],
       filename: 'console_errors.html',
       template: commonPrefix + '/tests/console_errors.html',
       minify: htmlMinifyConfig,
