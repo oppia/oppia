@@ -129,6 +129,9 @@ describe('Test solicit answer details feature', function() {
     explorationEditorImprovementsTab.verifyAnswerDetails(
       'I liked this choi...');
     users.logout();
+  });
+
+  afterAll(function() {
     users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
     adminPage.get();
     adminPage.editConfigProperty(
@@ -145,9 +148,6 @@ describe('Test solicit answer details feature', function() {
         elem.setValue(false);
       });
     users.logout();
-  });
-
-  afterEach(function() {
     general.checkForConsoleErrors([]);
   });
 });
