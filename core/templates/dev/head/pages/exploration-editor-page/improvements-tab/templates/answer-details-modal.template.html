@@ -18,7 +18,7 @@
           <angular-html-bind html-data="getLearnerAnswerHtml(learnerAnswerInfo)">
           </angular-html-bind>
         </td>
-        <td ng-click="changeView(learnerAnswerInfo)" class="protractor-answer-details">
+        <td ng-click="changeView(learnerAnswerInfo)" class="protractor-test-answer-details">
           <div><[getAnswerDetails(learnerAnswerInfo) | truncate:20]></div>
         </td>
         <td ng-click="changeView(learnerAnswerInfo)">
@@ -37,7 +37,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-danger modal-button oppia-delete-select" ng-disabled="!selectedLearnerAnswerInfo.length" ng-click="deleteSelectedLearnerAnswerInfo()">Delete selected items</button>
-    <button class="btn btn-default modal-button protractor-close-answer-details" ng-click="close()">Close</button>
+    <button class="btn btn-default modal-button protractor-test-close-answer-details" ng-click="close()">Close</button>
   </div>
 </div>
 <style>
