@@ -47,7 +47,7 @@ describe('Learner answer details service', function() {
         state_name: 'fakeStateName',
         interaction_id: 'fakeInteractionId',
         customization_args: 'fakeCustomizationArgs',
-        learner_answer_info_dict_list: [{
+        learner_answer_info_dicts: [{
           id: '123',
           answer: 'My answer',
           answer_details: 'My answer details',

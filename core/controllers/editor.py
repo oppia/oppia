@@ -789,7 +789,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
                         'interaction_id': learner_answer_details.interaction_id,
                         'customization_args': exp.states[state_name].interaction
                                               .to_dict()['customization_args'],
-                        'learner_answer_info_dict_list': [
+                        'learner_answer_info_dicts': [
                             learner_answer_info.to_dict() for
                             learner_answer_info in
                             learner_answer_details.learner_answer_info_list]
@@ -801,14 +801,14 @@ class LearnerAnswerInfoHandler(EditorHandler):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
             if learner_answer_details is not None:
-                learner_answer_info_dict_list = [
+                learner_answer_info_dicts = [
                     learner_answer_info.to_dict() for learner_answer_info in
                     learner_answer_details.learner_answer_info_list]
             learner_answer_info_data = {
                 'interaction_id': learner_answer_details.interaction_id,
                 'customization_args': question.question_state_data.interaction
                                       .to_dict()['customization_args'],
-                'learner_answer_info_dict_list': learner_answer_info_dict_list
+                'learner_answer_info_dicts': learner_answer_info_dicts
             }
 
         self.render_json({
