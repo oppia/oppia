@@ -43,7 +43,7 @@
 
       <div style="float: right;" class="col-lg-5 col-md-5 col-sm-5">
         <div class="pull-right">
-          <span ng-if="$ctrl.activeThread.stateName" class="label label-info">
+          <span ng-if="$ctrl.activeThread.stateName" class="label label-info protractor-test-oppia-feedback-status-name">
             state: <[$ctrl.activeThread.stateName]>
           </span>
           <span ng-class="$ctrl.getLabelClass($ctrl.activeThread.status)">
@@ -116,7 +116,7 @@
         <div>
           <span ng-show="$ctrl.isExplorationEditable() && !$ctrl.activeThread.isSuggestionThread()">
             Change status (optional):
-            <select ng-model="$ctrl.tmpMessage.status"
+            <select class="protractor-test-oppia-feedback-status-menu" ng-model="$ctrl.tmpMessage.status"
                     ng-options="choice.id as choice.text for choice in $ctrl.STATUS_CHOICES"
                     ng-disabled="$ctrl.messageSendingInProgress">
             </select>

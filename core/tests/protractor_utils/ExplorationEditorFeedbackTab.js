@@ -39,6 +39,8 @@ var ExplorationEditorFeedbackTab = function() {
     by.css('.protractor-test-suggestion-commit-message'));
   var suggestionReviewMessageInput = element(
     by.css('.protractor-test-suggestion-review-message'));
+  var feedbackStatusDropdown = element(
+    by.css('.protractor-test-oppia-feedback-status-menu'));
   /*
    * Buttons
    */
@@ -139,6 +141,21 @@ var ExplorationEditorFeedbackTab = function() {
       first().click();
     feedbackResponseTextArea.sendKeys(feedbackResponse);
     feedbackSendResponseButton.click();
+  };
+
+  this.changeFeedbackStatus = function(feedbackStatus, feedbackResponse) {
+    element.all(by.css('.protractor-test-oppia-feedback-tab-row')).
+      first().click();
+    feedbackResponseTextArea.sendKeys(feedbackResponse);
+    feedbackStatusDropdown.click();
+    element(by.css('option[label="' + feedbackStatus + '"]')).click();
+    feedbackSendResponseButton.click();
+  };
+
+  this.expectToHaveFeedbackStatusName = function(feedbackStatus) {
+    var feedbackStatusElement = element(
+      by.css('.protractor-test-oppia-feedback-status-name'));
+    expect(feedbackStatusElement.getText()).toEqual(feedbackStatus);
   };
 };
 

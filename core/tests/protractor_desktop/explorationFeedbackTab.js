@@ -104,6 +104,53 @@ describe('ExplorationFeedback', function() {
     users.logout();
   });
 
+  it('changes status of feedback thread', function() {
+    var feedback = 'Hey! This exploration looks awesome';
+    var feedbackResponse = 'Thanks for the feedback!';
+
+    // Creator creates and publishes an exploration.
+    users.login('user1@ExplorationFeedback.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE,
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
+    creatorDashboardPage.get();
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(0);
+    users.logout();
+
+    // Learner plays the exploration and submits a feedback.
+    users.login('user2@ExplorationFeedback.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    explorationPlayerPage.submitFeedback(feedback);
+    users.logout();
+
+    // Creator reads the feedback and responds.
+    users.login('user1@ExplorationFeedback.com');
+    creatorDashboardPage.get();
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(1);
+    creatorDashboardPage.navigateToExplorationEditor();
+
+    explorationEditorPage.navigateToFeedbackTab();
+    explorationEditorFeedbackTab.expectToHaveFeedbackThread();
+    explorationEditorFeedbackTab.readFeedbackMessages()
+      .then(function(messages) {
+        expect(messages.length).toEqual(1);
+        expect(messages[0]).toEqual(feedback);
+      });
+    explorationEditorPage.navigateToFeedbackTab();
+    explorationEditorFeedbackTab.changeFeedbackStatus(
+      'Fixed', feedbackResponse);
+
+    users.logout();
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });
