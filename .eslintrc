@@ -149,6 +149,7 @@
     "no-multi-str": [
       "error"
     ],
+    "no-prototype-builtins": "off",
     "no-redeclare": [
       "off"
     ],

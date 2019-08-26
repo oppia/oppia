@@ -26,10 +26,10 @@ require('domain/exploration/WrittenTranslationsObjectFactory.ts');
 angular.module('oppia').factory('StateObjectFactory', [
   'InteractionObjectFactory', 'ParamChangesObjectFactory',
   'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',
-  'WrittenTranslationsObjectFactory', function(
+  'WrittenTranslationsObjectFactory', 'NEW_STATE_TEMPLATE', function(
       InteractionObjectFactory, ParamChangesObjectFactory,
       RecordedVoiceoversObjectFactory, SubtitledHtmlObjectFactory,
-      WrittenTranslationsObjectFactory) {
+      WrittenTranslationsObjectFactory, NEW_STATE_TEMPLATE) {
     var State = function(name, classifierModelId, content, interaction,
         paramChanges, recordedVoiceovers, solicitAnswerDetails,
         writtenTranslations) {
@@ -77,7 +77,7 @@ angular.module('oppia').factory('StateObjectFactory', [
     /* eslint-disable dot-notation */
     State['createDefaultState'] = function(newStateName) {
     /* eslint-enable dot-notation */
-      var newStateTemplate = angular.copy(constants.NEW_STATE_TEMPLATE);
+      var newStateTemplate = angular.copy(NEW_STATE_TEMPLATE);
       var newState = this.createFromBackendDict(newStateName, {
         classifier_model_id: newStateTemplate.classifier_model_id,
         content: newStateTemplate.content,

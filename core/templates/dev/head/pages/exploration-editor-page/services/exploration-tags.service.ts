@@ -20,8 +20,8 @@ require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
 angular.module('oppia').factory('ExplorationTagsService', [
-  'ExplorationPropertyService',
-  function(ExplorationPropertyService) {
+  'ExplorationPropertyService', 'TAG_REGEX',
+  function(ExplorationPropertyService, TAG_REGEX) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'tags';
     child._normalize = function(value) {
@@ -34,7 +34,7 @@ angular.module('oppia').factory('ExplorationTagsService', [
     child._isValid = function(value) {
       // Every tag should match the TAG_REGEX.
       for (var i = 0; i < value.length; i++) {
-        var tagRegex = new RegExp(constants.TAG_REGEX);
+        var tagRegex = new RegExp(TAG_REGEX);
         if (!value[i].match(tagRegex)) {
           return false;
         }
