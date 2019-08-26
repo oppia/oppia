@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the topic viewer page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -33,7 +34,7 @@ class TopicViewerPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        self.render_template('dist/topic-viewer-page.mainpage.html')
+        self.render_template('topic-viewer-page.mainpage.html')
 
 
 class TopicPageDataHandler(base.BaseHandler):

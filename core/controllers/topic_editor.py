@@ -15,6 +15,7 @@
 """Controllers for the topics editor, from where topics are edited and stories
 are created.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -125,11 +126,10 @@ class TopicEditorPage(base.BaseHandler):
 
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
-        self.render_template('dist/topic-editor-page.mainpage.html')
+        self.render_template('topic-editor-page.mainpage.html')
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):

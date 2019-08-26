@@ -13,7 +13,7 @@
  * @fileoverview Initializes constants for the Oppia codebase.
  */
 
-var constants = {
+export = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
@@ -608,6 +608,13 @@ var constants = {
 
   // eslint-disable-next-line max-len
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
+
+  "OPPORTUNITY_TYPE_TRANSLATION": "translation",
+  "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
+
+  // The bucket name is set to None-resources to enable it to be used
+  // in prod mode when the resource bucket name is not allowed to be null.
+  "GCS_RESOURCE_BUCKET_NAME": "None-resources",
 
   "DEV_MODE": true
 };

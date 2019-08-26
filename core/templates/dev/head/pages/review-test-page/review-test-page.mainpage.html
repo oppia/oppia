@@ -6,9 +6,7 @@
     <script type="text/javascript">
       var GLOBALS = {
         ADDITIONAL_ANGULAR_MODULES: JSON.parse(
-          '{{additional_angular_modules|js_string}}'),
-        GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
-        INTERACTION_SPECS: JSON.parse('{{INTERACTION_SPECS|js_string}}')
+          '{{additional_angular_modules|js_string}}')
       }
     </script>
   </head>
@@ -31,7 +29,6 @@
       </base-content>
     </div>
     <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
-    <script src="/templates/dev/head/mathjaxConfig.js"></script>
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     @require('../footer_js_libs.html')
     {{ dependencies_html }}

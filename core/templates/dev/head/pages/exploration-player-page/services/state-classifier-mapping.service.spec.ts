@@ -16,26 +16,20 @@
  * @fileoverview Unit tests for the State classifier mapping service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// state-classifier-mapping.service.ts is upgraded to Angular 8.
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require(
-  'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
 
-describe('State classifier mapping service', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('State classifier mapping service', () => {
+  describe('Test correct retrieval of classifier details', () => {
+    let mappingService: StateClassifierMappingService;
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [StateClassifierMappingService]
+      });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-  }));
-
-  describe('Test correct retrieval of classifier details', function() {
-    var mappingService;
-    beforeEach(angular.mock.inject(function($injector) {
-      mappingService = $injector.get('StateClassifierMappingService');
+      mappingService = TestBed.get(StateClassifierMappingService);
 
       mappingService.init({
         stateName1: {
@@ -44,9 +38,9 @@ describe('State classifier mapping service', function() {
           data_schema_version: 1
         }
       });
-    }));
+    });
 
-    it('should return correct classifier details.', function() {
+    it('should return correct classifier details.', () => {
       var stateName = 'stateName1';
       var retrievedClassifier = mappingService.getClassifier(stateName);
 

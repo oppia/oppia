@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Models for Oppia suggestions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -133,6 +134,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """General suggestion needs to be pseudonymized for the user."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def create(

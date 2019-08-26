@@ -17,6 +17,12 @@
  */
 
 // This directive can only be used in the context of an exploration.
+require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/AssetsBackendApiService.ts');
+require('services/ContextService.ts');
 require('services/CsrfTokenService.ts');
 
 angular.module('oppia').directive('filepathEditor', [

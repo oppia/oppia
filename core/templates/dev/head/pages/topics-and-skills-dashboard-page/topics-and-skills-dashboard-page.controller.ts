@@ -29,6 +29,9 @@ require(
 
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts.ts');
+require('components/rubrics-editor/rubrics-editor.directive.ts');
+
+require('domain/skill/RubricObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
   'TopicsAndSkillsDashboardBackendApiService.ts'
@@ -53,22 +56,22 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$scope', '$uibModal', '$window',
-        'AlertsService', 'SkillCreationService',
+        'AlertsService', 'RubricObjectFactory', 'SkillCreationService',
         'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
         'UrlInterpolationService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
-        'FATAL_ERROR_CODES',
+        'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
         function(
             $http, $rootScope, $scope, $uibModal, $window,
-            AlertsService, SkillCreationService,
+            AlertsService, RubricObjectFactory, SkillCreationService,
             TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
             UrlInterpolationService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
-            FATAL_ERROR_CODES) {
+            FATAL_ERROR_CODES, SKILL_DIFFICULTIES) {
           var ctrl = this;
           ctrl.TAB_NAME_TOPICS = 'topics';
           ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
@@ -137,6 +140,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             TopicCreationService.createNewTopic();
           };
           ctrl.createSkill = function() {
+            var rubrics = [];
+            for (var idx in SKILL_DIFFICULTIES) {
+              rubrics.push(
+                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], '')
+              );
+            }
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -146,9 +155,33 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.newSkillDescription = '';
+                  $scope.rubrics = rubrics;
+                  $scope.allRubricsAdded = false;
+
+                  var areAllRubricsPresent = function() {
+                    for (var idx in $scope.rubrics) {
+                      if ($scope.rubrics[idx].getExplanation() === '') {
+                        $scope.allRubricsAdded = false;
+                        return;
+                      }
+                    }
+                    $scope.allRubricsAdded = true;
+                  };
+
+
+                  $scope.onSaveRubric = function(difficulty, explanation) {
+                    for (var idx in $scope.rubrics) {
+                      if ($scope.rubrics[idx].getDifficulty() === difficulty) {
+                        $scope.rubrics[idx].setExplanation(explanation);
+                      }
+                    }
+                    areAllRubricsPresent();
+                  };
+
                   $scope.createNewSkill = function() {
                     $uibModalInstance.close({
-                      description: $scope.newSkillDescription
+                      description: $scope.newSkillDescription,
+                      rubrics: $scope.rubrics
                     });
                   };
 
@@ -158,7 +191,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 }
               ]
             }).result.then(function(result) {
-              SkillCreationService.createNewSkill(result.description);
+              SkillCreationService.createNewSkill(
+                result.description, result.rubrics, []);
             });
           };
 

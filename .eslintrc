@@ -119,8 +119,10 @@
     ],
     "max-len": [
       "error",
-      "code": 80,
-      "ignoreUrls": true
+      {
+        "code": 80,
+        "ignoreUrls": true
+      }
     ],
     "no-compare-neg": "off",
     "no-console": [
@@ -147,6 +149,7 @@
     "no-multi-str": [
       "error"
     ],
+    "no-prototype-builtins": "off",
     "no-redeclare": [
       "off"
     ],
@@ -214,6 +217,13 @@
       {
         "words": true,
         "nonwords": false,
+      }
+    ],
+    "switch-colon-spacing": [
+      "error",
+      {
+        "after": true,
+        "before": false
       }
     ],
     "@typescript-eslint/semi": ["error"],

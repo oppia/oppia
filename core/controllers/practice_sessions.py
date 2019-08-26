@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the practice sessions page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -22,6 +23,7 @@ from core.domain import interaction_registry
 from core.domain import skill_services
 from core.domain import topic_fetchers
 import feconf
+
 import jinja2
 
 
@@ -46,10 +48,9 @@ class PracticeSessionsPage(base.BaseHandler):
 
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
         })
-        self.render_template('dist/practice-session-page.mainpage.html')
+        self.render_template('practice-session-page.mainpage.html')
 
 
 class PracticeSessionsPageDataHandler(base.BaseHandler):
@@ -68,7 +69,7 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         topic = topic_fetchers.get_topic_by_name(topic_name)
         try:
             skills = skill_services.get_multi_skills(topic.get_all_skill_ids())
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
         skill_descriptions = {}
         for skill in skills:

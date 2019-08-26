@@ -68,11 +68,13 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
     var version = UrlService.getExplorationVersionFromUrl();
-    ReadOnlyExplorationBackendApiService
-      .loadExploration(explorationId, version)
-      .then(function(exploration) {
-        version = exploration.version;
-      });
+    if (!questionPlayerMode) {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    }
 
     var storyId = UrlService.getStoryIdInPlayer();
 
@@ -146,7 +148,9 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       setQuestionPlayerMode();
       QuestionBackendApiService.fetchQuestions(
         questionPlayerConfig.skillList,
-        questionPlayerConfig.questionCount).then(function(questionData) {
+        questionPlayerConfig.questionCount,
+        questionPlayerConfig.questionsSortedByDifficulty
+      ).then(function(questionData) {
         $rootScope.$broadcast('totalQuestionsReceived', questionData.length);
         initializeQuestionPlayerServices(questionData, callback);
       });

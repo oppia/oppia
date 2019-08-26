@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -60,7 +61,7 @@ class ConsoleErrorPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/console_errors.html')
+        self.render_template('console_errors.html')
 
 
 class MaintenancePage(base.BaseHandler):
@@ -69,4 +70,4 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        self.render_template('dist/maintenance-page.mainpage.html')
+        self.render_template('maintenance-page.mainpage.html')
