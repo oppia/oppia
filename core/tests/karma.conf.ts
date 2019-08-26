@@ -145,7 +145,7 @@ module.exports = function(config) {
       mode: 'development',
       resolve: {
         modules: [
-          'core/tests/data/dummy_assets/assets',
+          'core/tests/data',
           'assets',
           'core/templates/dev/head',
           'extensions',

@@ -825,7 +825,7 @@ def save_hashes_to_file(file_hashes):
     ensure_directory_exists(HASHES_TS_FILEPATH)
     with python_utils.open_file(HASHES_TS_FILEPATH, 'w+') as hashes_json_file:
         hashes_json_file.write(
-            unicode(json.dumps(filtered_hashes, ensure_ascii=False)))
+            python_utils.STR(json.dumps(filtered_hashes, ensure_ascii=False)))
         hashes_json_file.write(u'\n')
 
 
