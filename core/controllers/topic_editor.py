@@ -109,7 +109,7 @@ class TopicEditorPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        self.render_template('dist/topic-editor-page.mainpage.html')
+        self.render_template('topic-editor-page.mainpage.html')
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):

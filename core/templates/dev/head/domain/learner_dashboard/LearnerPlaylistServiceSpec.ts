@@ -24,7 +24,7 @@ describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
   var $httpBackend = null;
   var $rootScope = null;
-  var activityType = constants.ACTIVITY_TYPE_EXPLORATION;
+  var activityType = null;
   var UrlInterpolationService = null;
   var activityId = '1';
   var addToLearnerPlaylistUrl = '';
@@ -42,6 +42,7 @@ describe('Learner playlist service factory', function() {
     LearnerPlaylistService = $injector.get(
       'LearnerPlaylistService');
     $rootScope = $injector.get('$rootScope');
+    activityType = $injector.get('ACTIVITY_TYPE_EXPLORATION');
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     AlertsService = $injector.get('AlertsService');
     spyOn(AlertsService, 'addInfoMessage').and.callThrough();

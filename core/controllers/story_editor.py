@@ -33,7 +33,7 @@ class StoryEditorPage(base.BaseHandler):
     def get(self, _):
         """Handles GET requests."""
 
-        self.render_template('dist/story-editor-page.mainpage.html')
+        self.render_template('story-editor-page.mainpage.html')
 
 
 class EditableStoryDataHandler(base.BaseHandler):

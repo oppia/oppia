@@ -63,7 +63,7 @@ class SkillEditorPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
-        self.render_template('dist/skill-editor-page.mainpage.html')
+        self.render_template('skill-editor-page.mainpage.html')
 
 
 def check_can_edit_skill_description(user):

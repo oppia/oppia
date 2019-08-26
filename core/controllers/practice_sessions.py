@@ -33,7 +33,7 @@ class PracticeSessionsPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        self.render_template('dist/practice-session-page.mainpage.html')
+        self.render_template('practice-session-page.mainpage.html')
 
 
 class PracticeSessionsPageDataHandler(base.BaseHandler):

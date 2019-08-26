@@ -33,7 +33,7 @@ class ReviewTestsPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        self.render_template('dist/review-test-page.mainpage.html')
+        self.render_template('review-test-page.mainpage.html')
 
 
 class ReviewTestsPageDataHandler(base.BaseHandler):

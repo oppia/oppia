@@ -71,7 +71,7 @@ class ExplorationPage(EditorHandler):
     def get(self, unused_exploration_id):
         """Handles GET requests."""
 
-        self.render_template('dist/exploration-editor-page.mainpage.html')
+        self.render_template('exploration-editor-page.mainpage.html')
 
 
 class ExplorationHandler(EditorHandler):
