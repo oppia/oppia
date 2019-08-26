@@ -101,8 +101,7 @@ def pip_install(package, version, install_path):
     else:
         import pip._internal
         pip._internal.main(args=[  # pylint: disable=protected-access
-            'install', '%s==%s' % (package, version), '--target', install_path,
-            '--user'])
+            'install', '%s==%s' % (package, version), '--target', install_path])
 
 
 def install_skulpt(argv):
