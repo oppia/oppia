@@ -264,7 +264,7 @@ angular.module('oppia').directive('preferencesPage', [
                 .then(function() {
                   // The reload is needed in order to update the profile picture
                   // in the top-right corner.
-                  $window.reload();
+                  $window.location.reload();
                 });
             });
           };
