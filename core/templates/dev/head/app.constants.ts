@@ -37,9 +37,6 @@ export class AppConstants {
 
   public static RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
 
-  public static FEEDBACK_SUBJECT_MAX_CHAR_LIMIT =
-    constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT;
-
   /* Called always when learner moves to a new card.
      Also called when card is selected by clicking on progress dots */
   public static EVENT_ACTIVE_CARD_CHANGED = 'activeCardChanged';
@@ -157,5 +154,7 @@ export class AppConstants {
     SUBTOPIC: 'subtopic'
   };
 }
+
+const constants = require('constants.ts');
 
 Object.assign(AppConstants, constants);

@@ -51,7 +51,7 @@ class AdminPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
-        self.render_template('dist/admin-page.mainpage.html')
+        self.render_template('admin-page.mainpage.html')
 
 
 class AdminHandler(base.BaseHandler):

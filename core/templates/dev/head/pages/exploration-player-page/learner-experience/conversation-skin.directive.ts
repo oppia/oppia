@@ -369,7 +369,7 @@ angular.module('oppia').directive('conversationSkin', [
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'FEEDBACK_POPOVER_PATH',
         'INTERACTION_DISPLAY_MODE_INLINE',
         'INTERACTION_SPECS', 'NUM_EXPLORATIONS_PER_REVIEW_TEST',
-        'PAGE_CONTEXT', 'TWO_CARD_THRESHOLD_PX',
+        'PAGE_CONTEXT', 'SUPPORTED_SITE_LANGUAGES', 'TWO_CARD_THRESHOLD_PX',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
             $http, $location, $q, $rootScope, $scope, $timeout,
@@ -403,7 +403,7 @@ angular.module('oppia').directive('conversationSkin', [
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, FEEDBACK_POPOVER_PATH,
             INTERACTION_DISPLAY_MODE_INLINE,
             INTERACTION_SPECS, NUM_EXPLORATIONS_PER_REVIEW_TEST,
-            PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX,
+            PAGE_CONTEXT, SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
@@ -730,7 +730,7 @@ angular.module('oppia').directive('conversationSkin', [
             // If the exploration is embedded, use the exploration language
             // as site language. If the exploration language is not supported
             // as site language, English is used as default.
-            var langCodes = constants.SUPPORTED_SITE_LANGUAGES.map(
+            var langCodes = SUPPORTED_SITE_LANGUAGES.map(
               function(language) {
                 return language.id;
               });

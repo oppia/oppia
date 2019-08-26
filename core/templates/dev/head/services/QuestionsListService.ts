@@ -23,9 +23,9 @@ require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionsListService', [
   '$rootScope', 'QuestionBackendApiService',
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', function(
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'NUM_QUESTIONS_PER_PAGE', function(
       $rootScope, QuestionBackendApiService,
-      EVENT_QUESTION_SUMMARIES_INITIALIZED) {
+      EVENT_QUESTION_SUMMARIES_INITIALIZED, NUM_QUESTIONS_PER_PAGE) {
     var _questionSummaries = [];
     var _nextCursorForQuestions = '';
 
@@ -60,7 +60,7 @@ angular.module('oppia').factory('QuestionsListService', [
       isLastQuestionBatch: function(index) {
         return (
           _nextCursorForQuestions === null &&
-          (index + 1) * constants.NUM_QUESTIONS_PER_PAGE >=
+          (index + 1) * NUM_QUESTIONS_PER_PAGE >=
             _questionSummaries.length);
       },
 
@@ -71,7 +71,7 @@ angular.module('oppia').factory('QuestionsListService', [
           _nextCursorForQuestions = '';
         }
 
-        var num = constants.NUM_QUESTIONS_PER_PAGE;
+        var num = NUM_QUESTIONS_PER_PAGE;
 
         if (skillIds === undefined || skillIds.length === 0) {
           return [];

@@ -76,8 +76,7 @@ class LibraryPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-
-        self.render_template('dist/library-page.mainpage.html')
+        self.render_template('library-page.mainpage.html')
 
 
 class LibraryIndexHandler(base.BaseHandler):
@@ -150,7 +149,7 @@ class LibraryGroupPage(base.BaseHandler):
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
         })
-        self.render_template('dist/library-page.mainpage.html')
+        self.render_template('library-page.mainpage.html')
 
 
 class LibraryGroupIndexHandler(base.BaseHandler):

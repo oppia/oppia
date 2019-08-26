@@ -15,8 +15,6 @@ module.exports = function(config) {
     files: [
       'local_compiled_js/core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      'local_compiled_js/assets/constants.js',
-      'local_compiled_js/assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.4.1/jquery.min.js',
@@ -147,6 +145,8 @@ module.exports = function(config) {
       mode: 'development',
       resolve: {
         modules: [
+          'core/tests/data/dummy_assets/assets',
+          'assets',
           'core/templates/dev/head',
           'extensions',
           'node_modules',

@@ -67,6 +67,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
         'SuggestionModalForCreatorDashboardService', 'SuggestionObjectFactory',
         'SuggestionThreadObjectFactory', 'ThreadStatusDisplayService',
         'UrlInterpolationService', 'UserService',
+        'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
         'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
         'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
@@ -80,6 +81,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
             SuggestionModalForCreatorDashboardService, SuggestionObjectFactory,
             SuggestionThreadObjectFactory, ThreadStatusDisplayService,
             UrlInterpolationService, UserService,
+            ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
             EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
             HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS,
@@ -93,7 +95,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
           };
 
           var userDashboardDisplayPreference =
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
+            ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
 
           ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
           ctrl.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
@@ -270,7 +272,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
               // exploration list is shown only in
               // the card view and can't be switched to list view.
               ctrl.myExplorationsView = (
-                constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
+                ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
               ctrl.publishText = EXP_PUBLISH_TEXTS.smText;
             } else {
               // For computer users or users operating in larger screen size

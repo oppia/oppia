@@ -58,11 +58,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'ExplorationDiffService', 'ExplorationInitStateNameService',
   'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
   'ExplorationRightsService', 'ExplorationStatesService',
-  'ExplorationTagsService',
-  'ExplorationTitleService', 'ExplorationWarningsService',
-  'FocusManagerService',
-  'RouterService', 'SiteAnalyticsService', 'StatesObjectFactory',
-  'UrlInterpolationService',
+  'ExplorationTagsService', 'ExplorationTitleService',
+  'ExplorationWarningsService', 'FocusManagerService', 'RouterService',
+  'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
+  'DEFAULT_LANGUAGE_CODE',
   function(
       $log, $q, $rootScope, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
@@ -70,10 +69,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
       ExplorationDiffService, ExplorationInitStateNameService,
       ExplorationLanguageCodeService, ExplorationObjectiveService,
       ExplorationRightsService, ExplorationStatesService,
-      ExplorationTagsService,
-      ExplorationTitleService, ExplorationWarningsService, FocusManagerService,
-      RouterService, SiteAnalyticsService, StatesObjectFactory,
-      UrlInterpolationService) {
+      ExplorationTagsService, ExplorationTitleService,
+      ExplorationWarningsService, FocusManagerService, RouterService,
+      SiteAnalyticsService, StatesObjectFactory, UrlInterpolationService,
+      DEFAULT_LANGUAGE_CODE) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
@@ -90,7 +89,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
         !ExplorationObjectiveService.savedMemento ||
         !ExplorationCategoryService.savedMemento ||
         ExplorationLanguageCodeService.savedMemento ===
-          constants.DEFAULT_LANGUAGE_CODE ||
+          DEFAULT_LANGUAGE_CODE ||
         ExplorationTagsService.savedMemento.length === 0);
     };
 
@@ -327,12 +326,14 @@ angular.module('oppia').factory('ExplorationSaveService', [
             controller: [
               '$scope', '$uibModalInstance', 'ExplorationObjectiveService',
               'ExplorationTitleService', 'ExplorationCategoryService',
-              'ExplorationStatesService', 'ALL_CATEGORIES',
-              'ExplorationLanguageCodeService', 'ExplorationTagsService',
+              'ExplorationStatesService', 'ExplorationLanguageCodeService',
+              'ExplorationTagsService', 'ALL_CATEGORIES',
+              'DEFAULT_LANGUAGE_CODE', 'TAG_REGEX',
               function($scope, $uibModalInstance, ExplorationObjectiveService,
                   ExplorationTitleService, ExplorationCategoryService,
-                  ExplorationStatesService, ALL_CATEGORIES,
-                  ExplorationLanguageCodeService, ExplorationTagsService) {
+                  ExplorationStatesService, ExplorationLanguageCodeService,
+                  ExplorationTagsService, ALL_CATEGORIES,
+                  DEFAULT_LANGUAGE_CODE, TAG_REGEX) {
                 $scope.explorationTitleService = ExplorationTitleService;
                 $scope.explorationObjectiveService =
                   ExplorationObjectiveService;
@@ -353,11 +354,11 @@ angular.module('oppia').factory('ExplorationSaveService', [
                   !ExplorationCategoryService.savedMemento);
                 $scope.askForLanguageCheck = (
                   ExplorationLanguageCodeService.savedMemento ===
-                  constants.DEFAULT_LANGUAGE_CODE);
+                  DEFAULT_LANGUAGE_CODE);
                 $scope.askForTags = (
                   ExplorationTagsService.savedMemento.length === 0);
 
-                $scope.TAG_REGEX = constants.TAG_REGEX;
+                $scope.TAG_REGEX = TAG_REGEX;
 
                 $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 

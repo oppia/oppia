@@ -96,17 +96,16 @@ angular.module('oppia').directive('explorationSummaryTile', [
       controller: [
         '$scope', '$http', '$window', 'DateTimeFormatService',
         'RatingComputationService', 'UrlService', 'UserService',
-        'WindowDimensionsService',
+        'WindowDimensionsService', 'ACTIVITY_TYPE_EXPLORATION',
         function(
             $scope, $http, $window, DateTimeFormatService,
             RatingComputationService, UrlService, UserService,
-            WindowDimensionsService) {
+            WindowDimensionsService, ACTIVITY_TYPE_EXPLORATION) {
           $scope.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.userIsLoggedIn = userInfo.isLoggedIn();
           });
-          $scope.ACTIVITY_TYPE_EXPLORATION = (
-            constants.ACTIVITY_TYPE_EXPLORATION);
+          $scope.ACTIVITY_TYPE_EXPLORATION = ACTIVITY_TYPE_EXPLORATION;
           var contributorsSummary = $scope.getContributorsSummary() || {};
           $scope.contributors = Object.keys(
             contributorsSummary).sort(

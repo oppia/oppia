@@ -89,18 +89,18 @@ done
 
 if [[ "$FORCE_PROD_MODE" == "True" ]]; then
   constants_env_variable="\"DEV_MODE\": false"
-  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
   $PYTHON_CMD scripts/build.py --prod_env --enable_watcher
   APP_YAML_FILEPATH="app.yaml"
 else
   constants_env_variable="\"DEV_MODE\": true"
-  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
   $PYTHON_CMD scripts/build.py --enable_watcher
   APP_YAML_FILEPATH="app_dev.yaml"
 fi
 
 # Delete the modified feconf.py file(-i.bak)
-rm assets/constants.js.bak
+rm assets/constants.ts.bak
 
 # Set up a local dev instance.
 # TODO(sll): do this in a new shell.
@@ -112,8 +112,8 @@ if ! [[ "$FORCE_PROD_MODE" == "True" ]]; then
   ($NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js watch)&
   # In prod mode webpack is launched through scripts/build.py
   echo Compiling webpack...
-  $NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts
   ($NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts --watch)&
+  sleep 10 # Give webpack few seconds to do the initíal compilation
 fi
 echo Starting GAE development server
 (python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py $CLEAR_DATASTORE_ARG $ENABLE_CONSOLE_ARG --admin_host 0.0.0.0 --admin_port 8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true $APP_YAML_FILEPATH)&

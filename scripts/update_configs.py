@@ -34,7 +34,7 @@ FECONF_CONFIG_PATH = os.path.join(
 CONSTANTS_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
 LOCAL_FECONF_PATH = os.path.join(os.getcwd(), 'feconf.py')
-LOCAL_CONSTANTS_PATH = os.path.join(os.getcwd(), 'assets', 'constants.js')
+LOCAL_CONSTANTS_PATH = os.path.join(os.getcwd(), 'assets', 'constants.ts')
 
 
 def _apply_changes_based_on_config(
@@ -86,7 +86,7 @@ def _apply_changes_based_on_config(
 
 
 def _update_configs():
-    """Updates the 'feconf.py' and 'constants.js' files after doing the
+    """Updates the 'feconf.py' and 'constants.ts' files after doing the
     prerequisite checks.
     """
     # Do prerequisite checks.

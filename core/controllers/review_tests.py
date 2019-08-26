@@ -50,7 +50,7 @@ class ReviewTestsPage(base.BaseHandler):
             'additional_angular_modules': additional_angular_modules,
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
         })
-        self.render_template('dist/review-test-page.mainpage.html')
+        self.render_template('review-test-page.mainpage.html')
 
 
 class ReviewTestsPageDataHandler(base.BaseHandler):

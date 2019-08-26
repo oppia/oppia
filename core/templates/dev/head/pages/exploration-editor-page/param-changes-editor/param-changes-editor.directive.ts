@@ -50,10 +50,12 @@ angular.module('oppia').directive('paramChangesEditor', [
         '$scope', '$rootScope', 'EditabilityService', 'StateEditorService',
         'ExplorationParamSpecsService', 'AlertsService',
         'ParamChangeObjectFactory', 'ExplorationStatesService',
+        'INVALID_PARAMETER_NAMES',
         function(
             $scope, $rootScope, EditabilityService, StateEditorService,
             ExplorationParamSpecsService, AlertsService,
-            ParamChangeObjectFactory, ExplorationStatesService) {
+            ParamChangeObjectFactory, ExplorationStatesService,
+            INVALID_PARAMETER_NAMES) {
           $scope.EditabilityService = EditabilityService;
           $scope.isParamChangesEditorOpen = false;
           $scope.warningText = '';
@@ -61,8 +63,6 @@ angular.module('oppia').directive('paramChangesEditor', [
             Copier: 'to',
             RandomSelector: 'to one of'
           };
-
-          var INVALID_PARAMETER_NAMES = constants.INVALID_PARAMETER_NAMES;
 
           $scope.$on('externalSave', function() {
             if ($scope.isParamChangesEditorOpen) {

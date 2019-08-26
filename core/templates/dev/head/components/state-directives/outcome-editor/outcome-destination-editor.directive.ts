@@ -44,15 +44,17 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
       controller: [
         '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
         'StateEditorService', 'StateGraphLayoutService', 'UserService',
-        'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
+        'ENABLE_PREREQUISITE_SKILLS', 'EXPLORATION_AND_SKILL_ID_PATTERN',
+        'PLACEHOLDER_OUTCOME_DEST',
         function(
             $scope, EditorFirstTimeEventsService, FocusManagerService,
             StateEditorService, StateGraphLayoutService, UserService,
-            EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
+            ENABLE_PREREQUISITE_SKILLS, EXPLORATION_AND_SKILL_ID_PATTERN,
+            PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
           var currentStateName = null;
           ctrl.canAddPrerequisiteSkill = (
-            constants.ENABLE_PREREQUISITE_SKILLS &&
+            ENABLE_PREREQUISITE_SKILLS &&
             StateEditorService.isExplorationWhitelisted());
 
           $scope.$on('saveOutcomeDestDetails', function() {

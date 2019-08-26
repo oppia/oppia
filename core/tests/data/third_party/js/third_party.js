@@ -23036,7 +23036,7 @@ function detectDisabledThemes($mdThemingProvider) {
  * stylesheet file into the `$mdThemingProvider`.
  *
  * If it's necessary to load an external stylesheet, we suggest using a bundler, which supports including raw content,
- * like [raw-loader](https://github.com/webpack/raw-loader) for `webpack`.
+ * like [raw-loader](https://github.com/webpack_bundles/raw-loader) for `webpack`.
  *
  * <hljs lang="js">
  *   myAppModule.config(function($mdThemingProvider) {

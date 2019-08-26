@@ -43,8 +43,8 @@ handlers:
   expiration: "90d"
 
 # DEVELOPMENT STATIC
-- url: /dist
-  static_dir: core/templates/dev/head/dist
+- url: /webpack_bundles
+  static_dir: webpack_bundles
   secure: always
   application_readable: true
   expiration: "0"
@@ -140,8 +140,8 @@ handlers:
   
 # STATIC PAGES.
 - url: /about
-  static_files: core/templates/dev/head/dist/about-page.mainpage.html
-  upload: core/templates/dev/head/dist/about-page.mainpage.html
+  static_files: webpack_bundles/about-page.mainpage.html
+  upload: webpack_bundles/about-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -151,8 +151,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /contact
-  static_files: core/templates/dev/head/dist/contact-page.mainpage.html
-  upload: core/templates/dev/head/dist/contact-page.mainpage.html
+  static_files: webpack_bundles/contact-page.mainpage.html
+  upload: webpack_bundles/contact-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -162,8 +162,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /donate
-  static_files: core/templates/dev/head/dist/donate-page.mainpage.html
-  upload: core/templates/dev/head/dist/donate-page.mainpage.html
+  static_files: webpack_bundles/donate-page.mainpage.html
+  upload: webpack_bundles/donate-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -173,8 +173,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /get_started
-  static_files: core/templates/dev/head/dist/get-started-page.mainpage.html
-  upload: core/templates/dev/head/dist/get-started-page.mainpage.html
+  static_files: webpack_bundles/get-started-page.mainpage.html
+  upload: webpack_bundles/get-started-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -184,8 +184,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /privacy
-  static_files: core/templates/dev/head/dist/privacy-page.mainpage.html
-  upload: core/templates/dev/head/dist/privacy-page.mainpage.html
+  static_files: webpack_bundles/privacy-page.mainpage.html
+  upload: webpack_bundles/privacy-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -195,8 +195,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /splash
-  static_files: core/templates/dev/head/dist/splash-page.mainpage.html
-  upload: core/templates/dev/head/dist/splash-page.mainpage.html
+  static_files: webpack_bundles/splash-page.mainpage.html
+  upload: webpack_bundles/splash-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -206,8 +206,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /teach
-  static_files: core/templates/dev/head/dist/teach-page.mainpage.html
-  upload: core/templates/dev/head/dist/teach-page.mainpage.html
+  static_files: webpack_bundles/teach-page.mainpage.html
+  upload: webpack_bundles/teach-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -217,8 +217,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /terms
-  static_files: core/templates/dev/head/dist/terms-page.mainpage.html
-  upload: core/templates/dev/head/dist/terms-page.mainpage.html
+  static_files: webpack_bundles/terms-page.mainpage.html
+  upload: webpack_bundles/terms-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -228,8 +228,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /thanks
-  static_files: core/templates/dev/head/dist/thanks-page.mainpage.html
-  upload: core/templates/dev/head/dist/thanks-page.mainpage.html
+  static_files: webpack_bundles/thanks-page.mainpage.html
+  upload: webpack_bundles/thanks-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -264,7 +264,7 @@ skip_files:
 # Karma test files
 - ^(.*/)Spec.js$
 # Typescript files
-- ^(.*/)?.*\.ts$
+- ^core/(.*/)?.*\.ts$
 # Typescript output log file
 - ^(.*/)tsc_output_log.txt$
 # Other folders to ignore

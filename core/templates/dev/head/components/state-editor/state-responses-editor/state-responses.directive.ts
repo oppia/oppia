@@ -101,6 +101,7 @@ angular.module('oppia').directive('stateResponses', [
         'UrlInterpolationService', 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+        'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
             $filter, $rootScope, $scope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService,
@@ -109,9 +110,10 @@ angular.module('oppia').directive('stateResponses', [
             StateInteractionIdService, StateSolicitAnswerDetailsService,
             UrlInterpolationService, ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
-            PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
+            PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
+            SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-            constants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+            SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
           $scope.stateName = StateEditorService.getActiveStateName();
           $scope.enableSolicitAnswerDetailsFeature = (

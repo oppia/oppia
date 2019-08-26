@@ -22,6 +22,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/CollectionObjectFactory';
 
 @Injectable({
@@ -49,7 +50,9 @@ export class CollectionValidationService {
   validateTagFormat(tags: string[]) {
     // Check to ensure that all tags follow the format specified in
     // TAG_REGEX.
-    var tagRegex = new RegExp(constants.TAG_REGEX);
+    // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    var tagRegex = new RegExp(AppConstants.TAG_REGEX);
     return tags.every(function(tag) {
       return tag.match(tagRegex);
     });

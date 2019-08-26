@@ -63,7 +63,7 @@ class CollectionEditorPage(CollectionEditorHandler):
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
         })
 
-        self.render_template('dist/collection-editor-page.mainpage.html')
+        self.render_template('collection-editor-page.mainpage.html')
 
 
 class EditableCollectionDataHandler(CollectionEditorHandler):

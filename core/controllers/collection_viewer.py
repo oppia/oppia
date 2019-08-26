@@ -33,7 +33,7 @@ class CollectionPage(base.BaseHandler):
     def get(self, _):
         """Handles GET requests."""
 
-        self.render_template('dist/collection-player-page.mainpage.html')
+        self.render_template('collection-player-page.mainpage.html')
 
 
 class CollectionDataHandler(base.BaseHandler):

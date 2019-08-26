@@ -16,97 +16,19 @@
  * @fileoverview Development environment config file for Webpack.
  */
 
-var commonWebpackConfig = require('./webpack.config.ts');
-var path = require('path');
+const merge = require('webpack-merge');
+const common = require('./webpack.common.config.ts');
+const path = require('path');
 
-const { styles } = require('@ckeditor/ckeditor5-dev-utils/lib/');
-
-module.exports = {
+module.exports = merge(common, {
   mode: 'development',
-  resolve: {
-    modules: [
-      path.resolve(__dirname, 'core/templates/dev/head'),
-      path.resolve(__dirname, 'extensions'),
-      path.resolve(__dirname, 'node_modules'),
-      path.resolve(__dirname, 'third_party')
-    ],
-    extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
-    alias: {
-      '@angular/upgrade/static': (
-        '@angular/upgrade/bundles/upgrade-static.umd.js')
-    }
-  },
-  entry: commonWebpackConfig.entries,
-  plugins: commonWebpackConfig.plugins,
-  module: {
-    rules: [{
-      test: /ckeditor5-[^\/]+\/theme\/icons\/[^\/]+\.svg$/,
-      use: ['raw-loader']
-    },
-    {
-      test: /ckeditor5-[^\/]+\/theme\/[-\w\/]+\.css$/,
-      use: [{
-        loader: 'style-loader',
-        options: {
-          singleton: true
-        }
-      },
-      {
-        loader: 'postcss-loader',
-        options: styles.getPostCssConfig( {
-          themeImporter: {
-            themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-          },
-          minify: true
-        })
-      },
-      ]
-    },
-    {
-      test: /\.ts$/,
-      include: [
-        path.resolve(__dirname, 'core/templates/dev/head'),
-        path.resolve(__dirname, 'extensions'),
-        path.resolve(__dirname, 'typings')
-      ],
-      use: [
-        'cache-loader',
-        'thread-loader',
-        {
-          loader: 'ts-loader',
-          options: {
-            // this is needed for thread-loader to work correctly
-            happyPackMode: true
-          }
-        }
-      ]
-    },
-    {
-      test: /\.html$/,
-      loader: 'underscore-template-loader'
-    },
-    {
-      test: /\.css$/,
-      include: [
-        path.resolve(__dirname, 'extensions'),
-      ],
-      use: ['style-loader', 'css-loader']
-    }]
-  },
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'core/templates/dev/head/dist')
+    path: path.resolve(__dirname, 'webpack_bundles')
   },
   devtool: 'inline-source-map',
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      minSize: 1024 * 10,
-      maxInitialRequests: 9,
-    }
-  },
   watchOptions: {
     aggregateTimeout: 500,
     poll: 1000
   }
-};
+});
