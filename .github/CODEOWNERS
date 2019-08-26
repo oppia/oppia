@@ -333,7 +333,7 @@
 /main.py @nithusha21 @DubeySandeep
 /feconf.py @seanlip @nithusha21
 /constants*.py @seanlip @nithusha21
-/assets/constants.js @seanlip @nithusha21
+/assets/constants.ts @seanlip @nithusha21
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
@@ -393,7 +393,7 @@
 /core/domain/rte_component_registry*.py @vojtechjelinek
 /extensions/ckeditor_plugins/ @vojtechjelinek
 /extensions/rich_text_components/ @vojtechjelinek
-/assets/rich_text_components_definitions.js @vojtechjelinek
+/assets/rich_text_components_definitions.ts @vojtechjelinek
 
 
 # Suggestion and feedback team.
@@ -433,6 +433,7 @@
 
 # Speed Improvement team.
 /app_dev.yaml @vojtechjelinek
+/core/templates/dev/head/google-analytics.initializer.ts @vojtechjelinek
 /core/templates/dev/head/base_components/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/Base.ts @vojtechjelinek
 /core/templates/dev/head/pages/base.html @vojtechjelinek
@@ -444,7 +445,7 @@
 /core/templates/dev/head/services/CsrfTokenService*.ts @jamesjay4199 @vojtechjelinek
 /gulpfile.js @vojtechjelinek
 /jinja_utils*.py @vojtechjelinek
-/webpack.config.ts @vojtechjelinek
+/webpack.common.config.ts @vojtechjelinek
 /webpack.dev.config.ts @vojtechjelinek
 /webpack.prod.config.ts @vojtechjelinek
 
