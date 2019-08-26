@@ -68,7 +68,6 @@ describe('Test solicit answer details feature', function() {
       'creator@user.com', 'creatorUser');
 
     // Creator creates and publishes an exploration.
-    // users.login('creator@user.com');
     workflow.createExplorationAsAdmin();
     explorationEditorMainTab.exitTutorial();
 
@@ -129,5 +128,26 @@ describe('Test solicit answer details feature', function() {
     explorationEditorImprovementsTab.navigateReviewAnswerDetails();
     explorationEditorImprovementsTab.verifyAnswerDetails(
       'I liked this choi...');
+    users.logout();
+    users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+    adminPage.get();
+    adminPage.editConfigProperty(
+      'Always ask learners for answer details while playing exploration.',
+      'Boolean',
+      function(elem) {
+        elem.setValue(false);
+      });
+
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean',
+      function(elem) {
+        elem.setValue(false);
+      });
+    users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });

@@ -1124,87 +1124,6 @@ def get_learner_answer_details(entity_type, state_reference):
     return None
 
 
-def get_learner_answer_info_for_exploration(exp_id):
-    """Returns the learner answer info in dict format.
-
-    Args:
-        exp_id: str. The ID of the exploration.
-
-    Returns:
-        list. Consists of dicts
-            with state name as keys, and a list of learner answer info dicts as
-            values. The learner answer info dicts contains following keys:
-                learner_answer_info_id: str. The id of the LearnerAnswerInfo
-                    object.
-                answer: json-like. The answer which is submitted by the
-                    learner. The actual type of answer depends on the
-                    interaction.
-                answer_details: str. The details the learner will submit when
-                    the learner will be asked questions like 'Hey how did you
-                    land on this answer', 'Why did you pick that answer' etc.
-                    i.e the learner's explanation of their choice.
-                created_on: datetime. The time at which the answer details
-                    was received.
-    """
-    exp = exp_fetchers.get_exploration_by_id(exp_id)
-    learner_answer_info_data = []
-    for state_name in exp.states.keys():
-        state_reference = get_state_reference_for_exploration(
-            exp_id, state_name)
-        learner_answer_details = get_learner_answer_details(
-            feconf.ENTITY_TYPE_EXPLORATION, state_reference)
-        if learner_answer_details is not None:
-            learner_answer_info_data.append({
-                'state_name': state_name,
-                'interaction_id': learner_answer_details.interaction_id,
-                'customization_args': exp.states[state_name].interaction
-                                      .to_dict()['customization_args'],
-                'learner_answer_info_dict_list': [
-                    learner_answer_info.to_dict() for learner_answer_info
-                    in learner_answer_details.learner_answer_info_list]
-            })
-    return learner_answer_info_data
-
-
-def get_learner_answer_info_for_question(question_id):
-    """Returns the learner answer info in dict format.
-
-    Args:
-        question_id: str. The ID of the question.
-
-    Returns:
-        list. Consists of learner answer info
-            dict. The learner answer info dict contains following keys:
-                learner_answer_info_id: str. The id of the LearnerAnswerInfo
-                    object.
-                answer: dict or list or str or int or bool. The answer which is
-                    submitted by the learner. Actually type of the answer is
-                    interaction dependent, like TextInput interactions have
-                    string type answer, NumericInput have int type answers etc.
-                answer_details: str. The details the learner will submit when
-                    the learner will be asked questions like 'Hey how did you
-                    land on this answer', 'Why did you pick that answer' etc.
-                created_on: datetime. The time at which the answer details
-                    was received.
-    """
-    question = question_services.get_question_by_id(question_id)
-    state_reference = get_state_reference_for_question(question_id)
-    learner_answer_info_data = []
-    learner_answer_details = get_learner_answer_details(
-        feconf.ENTITY_TYPE_QUESTION, state_reference)
-    if learner_answer_details is not None:
-        learner_answer_info_dict_list = [
-            learner_answer_info.to_dict() for learner_answer_info in
-            learner_answer_details.learner_answer_info_list]
-    learner_answer_info_data = {
-        'interaction_id': learner_answer_details.interaction_id,
-        'customization_args': question.question_state_data.interaction
-                              .to_dict()['customization_args'],
-        'learner_answer_info_dict_list': learner_answer_info_dict_list
-    }
-    return learner_answer_info_data
-
-
 def create_learner_answer_details_model_instance(learner_answer_details):
     """Creates a new model instance from the given LearnerAnswerDetails domain
     object.
@@ -1278,10 +1197,9 @@ def record_learner_answer_info(
             value will be equal to 'exp_id:state_name' and for question
             this will be equal to 'question_id'.
         interaction_id: str. The ID of the interaction.
-        answer: dict or list or str or int or bool. The answer which is
-            submitted by the learner. Actually type of the answer is
-            interaction dependent, like TextInput interactions have
-            string type answer, NumericInput have int type answers etc.
+        answer: *(json-like). The answer which is submitted by the
+            learner. The actual type of answer depends on the
+            interaction.
         answer_details: str. The details the learner will submit when the
             learner will be asked questions like 'Hey how did you land on
             this answer', 'Why did you pick that answer' etc.

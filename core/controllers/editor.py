@@ -32,6 +32,7 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import interaction_registry
+from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -771,14 +772,44 @@ class LearnerAnswerInfoHandler(EditorHandler):
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
 
+        learner_answer_info_data = []
+
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            learner_answer_info_data = (
-                stats_services.get_learner_answer_info_for_exploration(
-                    entity_id))
+            exp = exp_fetchers.get_exploration_by_id(entity_id)
+            for state_name in exp.states:
+                state_reference = (
+                    stats_services.get_state_reference_for_exploration(
+                        entity_id, state_name))
+                learner_answer_details = (
+                    stats_services.get_learner_answer_details(
+                        feconf.ENTITY_TYPE_EXPLORATION, state_reference))
+                if learner_answer_details is not None:
+                    learner_answer_info_data.append({
+                        'state_name': state_name,
+                        'interaction_id': learner_answer_details.interaction_id,
+                        'customization_args': exp.states[state_name].interaction
+                                              .to_dict()['customization_args'],
+                        'learner_answer_info_dict_list': [
+                            learner_answer_info.to_dict() for
+                            learner_answer_info in
+                            learner_answer_details.learner_answer_info_list]
+                    })
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            learner_answer_info_data = (
-                stats_services.get_learner_answer_info_for_question(
-                    entity_id))
+            question = question_services.get_question_by_id(entity_id)
+            state_reference = stats_services.get_state_reference_for_question(
+                entity_id)
+            learner_answer_details = stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_QUESTION, state_reference)
+            if learner_answer_details is not None:
+                learner_answer_info_dict_list = [
+                    learner_answer_info.to_dict() for learner_answer_info in
+                    learner_answer_details.learner_answer_info_list]
+            learner_answer_info_data = {
+                'interaction_id': learner_answer_details.interaction_id,
+                'customization_args': question.question_state_data.interaction
+                                      .to_dict()['customization_args'],
+                'learner_answer_info_dict_list': learner_answer_info_dict_list
+            }
 
         self.render_json({
             'learner_answer_info_data': learner_answer_info_data

@@ -32,6 +32,8 @@ var ExplorationEditorImprovementsTab = function() {
   var reviewAnswerDetailsButton = element(
     by.css('.protractor-review-answer-details'));
   var answerDetails = element(by.css('.protractor-answer-details'));
+  var closeAnswerDetailsButton = element(
+    by.css('.protractor-close-answer-details'));
 
   var _getAnswerDetailsCardStateName = function() {
     return answerDetailsCardStateName.getText();
@@ -59,6 +61,10 @@ var ExplorationEditorImprovementsTab = function() {
 
   this.verifyAnswerDetails = function(answerDetails) {
     expect(_getAnswerDetails()).toMatch(answerDetails);
+    waitFor.elementToBeClickable(
+      closeAnswerDetailsButton,
+      'Answer details close button takes too long to be clickable');
+    closeAnswerDetailsButton.click();
   };
 };
 
