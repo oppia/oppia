@@ -31,15 +31,12 @@ angular.module('oppia').directive('i18nFooter', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$timeout', '$translate', 'UserService',
-        'SUPPORTED_SITE_LANGUAGES',
-        function(
-            $http, $timeout, $translate, UserService,
-            SUPPORTED_SITE_LANGUAGES) {
+        function($http, $timeout, $translate, UserService) {
           var ctrl = this;
           // Changes the language of the translations.
           var preferencesDataUrl = '/preferenceshandler/data';
           var siteLanguageUrl = '/save_site_language';
-          ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
+          ctrl.supportedSiteLanguages = constants.SUPPORTED_SITE_LANGUAGES;
 
           // The $timeout seems to be necessary for the dropdown to show
           // anything at the outset, if the default language is not English.
@@ -67,13 +64,12 @@ angular.module('oppia').directive('i18nFooter', [
     };
   }]);
 
-
 angular.module('oppia').config([
-  '$translateProvider', 'DEFAULT_TRANSLATIONS', 'SUPPORTED_SITE_LANGUAGES',
-  function($translateProvider, DEFAULT_TRANSLATIONS, SUPPORTED_SITE_LANGUAGES) {
+  '$translateProvider', 'DEFAULT_TRANSLATIONS',
+  function($translateProvider, DEFAULT_TRANSLATIONS) {
     var availableLanguageKeys = [];
     var availableLanguageKeysMap = {};
-    SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
+    constants.SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
       availableLanguageKeys.push(language.id);
       availableLanguageKeysMap[language.id + '*'] = language.id;
     });

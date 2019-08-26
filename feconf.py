@@ -62,14 +62,15 @@ INTERACTIONS_DIR = (
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
-    os.path.join('assets', 'rich_text_components_definitions.ts'))
+    os.path.join('assets', 'rich_text_components_definitions.js'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
-    os.path.join('webpack_bundles') if constants.DEV_MODE else
-    os.path.join('backend_prod_files', 'webpack_bundles'))
+    os.path.join(
+        'core', 'templates', 'dev', 'head') if constants.DEV_MODE else
+    os.path.join('backend_prod_files', 'templates', 'head'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 

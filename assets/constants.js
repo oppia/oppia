@@ -13,7 +13,7 @@
  * @fileoverview Initializes constants for the Oppia codebase.
  */
 
-export = {
+var constants = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 

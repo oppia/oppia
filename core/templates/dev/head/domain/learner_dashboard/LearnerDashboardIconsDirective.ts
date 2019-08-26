@@ -36,13 +36,11 @@ angular.module('oppia').directive('learnerDashboardIcons', [
       controller: [
         '$scope', 'LearnerDashboardIdsBackendApiService',
         'LearnerDashboardActivityIdsObjectFactory',
-        'LearnerPlaylistService', 'ACTIVITY_TYPE_COLLECTION',
-        'ACTIVITY_TYPE_EXPLORATION',
+        'LearnerPlaylistService',
         function(
             $scope, LearnerDashboardIdsBackendApiService,
             LearnerDashboardActivityIdsObjectFactory,
-            LearnerPlaylistService, ACTIVITY_TYPE_COLLECTION,
-            ACTIVITY_TYPE_EXPLORATION) {
+            LearnerPlaylistService) {
           $scope.activityIsCurrentlyHoveredOver = true;
           $scope.playlistTooltipIsEnabled = false;
           $scope.enablePlaylistTooltip = function() {
@@ -88,11 +86,11 @@ angular.module('oppia').directive('learnerDashboardIcons', [
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
               /* eslint-disable max-len */
-              if (activityType === ACTIVITY_TYPE_EXPLORATION) {
+              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToExplorationPlaylist(
                     $scope.getActivityId()));
-              } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
+              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToCollectionPlaylist(
                     $scope.getActivityId()));
@@ -105,11 +103,11 @@ angular.module('oppia').directive('learnerDashboardIcons', [
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
               /* eslint-disable max-len */
-              if (activityType === ACTIVITY_TYPE_EXPLORATION) {
+              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToCompletedExplorations(
                     $scope.getActivityId()));
-              } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
+              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToCompletedCollections(
                     $scope.getActivityId()));
@@ -122,11 +120,11 @@ angular.module('oppia').directive('learnerDashboardIcons', [
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
               /* eslint-disable max-len */
-              if (activityType === ACTIVITY_TYPE_EXPLORATION) {
+              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToIncompleteExplorations(
                     $scope.getActivityId()));
-              } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
+              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToIncompleteCollections(
                     $scope.getActivityId()));
@@ -140,12 +138,12 @@ angular.module('oppia').directive('learnerDashboardIcons', [
               LearnerPlaylistService.addToLearnerPlaylist(
                 activityId, activityType));
             if (isSuccessfullyAdded) {
-              if (activityType === ACTIVITY_TYPE_EXPLORATION) {
+              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
                 /* eslint-disable max-len */
                 $scope.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
                   activityId);
                 /* eslint-enable max-len */
-              } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
+              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
                 /* eslint-disable max-len */
                 $scope.learnerDashboardActivityIds.addToCollectionLearnerPlaylist(
                   activityId);

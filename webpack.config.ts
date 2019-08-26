@@ -16,13 +16,12 @@
  * @fileoverview General config file for Webpack.
  */
 
+var CleanWebpackPlugin = require('clean-webpack-plugin');
+var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+
 const CKEditorWebpackPlugin = require(
-  '@ckeditor/ckeditor5-dev-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
-const { styles } = require('@ckeditor/ckeditor5-dev-utils/lib/');
+  '@ckeditor/ckeditor5-dev-webpack-plugin' );
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -30,6 +29,7 @@ var htmlMinifyConfig = {
     /<\{%[\s\S]*?%\}/,
     /<\[[\s\S]*?\]>/]
 };
+
 var commonPrefix = './core/templates/dev/head';
 var defaultMeta = {
   name: 'Personalized Online Learning from Oppia',
@@ -38,21 +38,7 @@ var defaultMeta = {
 };
 
 module.exports = {
-  resolve: {
-    modules: [
-      path.resolve(__dirname, 'assets'),
-      path.resolve(__dirname, 'core/templates/dev/head'),
-      path.resolve(__dirname, 'extensions'),
-      path.resolve(__dirname, 'node_modules'),
-      path.resolve(__dirname, 'third_party')
-    ],
-    extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
-    alias: {
-      '@angular/upgrade/static': (
-        '@angular/upgrade/bundles/upgrade-static.umd.js')
-    }
-  },
-  entry: {
+  entries: {
     about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
     collection_editor:
@@ -118,6 +104,9 @@ module.exports = {
       commonPrefix + '/pages/story-editor-page/story-editor-page.scripts.ts',
     story_viewer:
       commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
+    subtopic_viewer:
+      commonPrefix + '/pages/subtopic-viewer-page/' +
+      'subtopic-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.scripts.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.scripts.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.scripts.ts',
@@ -261,13 +250,6 @@ module.exports = {
       template:
         commonPrefix +
         '/pages/email-dashboard-pages/email-dashboard-result.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
-      filename: 'error-iframed.mainpage.html',
-      template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -579,74 +561,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
-    new CleanWebpackPlugin({
-      cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
-    }),
-    new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true
-    })
-  ],
-  module: {
-    rules: [{
-      test: /ckeditor5-[^\/]+\/theme\/icons\/[^\/]+\.svg$/,
-      use: ['raw-loader']
-    },
-    {
-      test: /ckeditor5-[^\/]+\/theme\/[-\w\/]+\.css$/,
-      use: [{
-        loader: 'style-loader',
-        options: {
-          singleton: true
-        }
-      },
-      {
-        loader: 'postcss-loader',
-        options: styles.getPostCssConfig( {
-          themeImporter: {
-            themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-          },
-          minify: true
-        })
-      },
-      ]
-    },
-    {
-      test: /\.ts$/,
-      include: [
-        path.resolve(__dirname, 'assets'),
-        path.resolve(__dirname, 'core/templates/dev/head'),
-        path.resolve(__dirname, 'extensions'),
-        path.resolve(__dirname, 'typings')
-      ],
-      use: [
-        'cache-loader',
-        'thread-loader',
-        {
-          loader: 'ts-loader',
-          options: {
-            // this is needed for thread-loader to work correctly
-            happyPackMode: true
-          }
-        }
-      ]
-    },
-    {
-      test: /\.html$/,
-      loader: 'underscore-template-loader'
-    },
-    {
-      test: /\.css$/,
-      include: [
-        path.resolve(__dirname, 'extensions'),
-      ],
-      use: ['style-loader', 'css-loader']
-    }]
-  },
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      minSize: 1024 * 10,
-      maxInitialRequests: 9,
-    }
-  }
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
+  ]
 };

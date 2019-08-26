@@ -103,12 +103,12 @@ fi
 trap cleanup EXIT
 
 # Argument passed to feconf.py to help choose production templates folder.
-DEV_MODE=true
+FORCE_PROD_MODE=False
 RUN_ON_BROWSERSTACK=False
 for arg in "$@"; do
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
-    DEV_MODE=false
+    FORCE_PROD_MODE=True
     echo "  Generating files for production mode..."
   fi
 
@@ -119,20 +119,20 @@ for arg in "$@"; do
   fi
 done
 
-if [[ "DEV_MODE" == "true" ]]; then
-  constants_env_variable="\"DEV_MODE\": true"
-  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
-  $PYTHON_CMD scripts/build.py
-  APP_YAML_FILEPATH="app_dev.yaml"
-else
+if [[ "$FORCE_PROD_MODE" == "True" ]]; then
   constants_env_variable="\"DEV_MODE\": false"
-  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py --prod_env
   APP_YAML_FILEPATH="app.yaml"
+else
+  constants_env_variable="\"DEV_MODE\": true"
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
+  $PYTHON_CMD scripts/build.py
+  APP_YAML_FILEPATH="app_dev.yaml"
 fi
 
 # Delete the modified feconf.py file(-i.bak)
-rm assets/constants.ts.bak
+rm assets/constants.js.bak
 
 # Start a selenium server using chromedriver 2.41.
 # The 'detach' option continues the flow once the server is up and runnning.
@@ -209,14 +209,14 @@ done
 # TODO(bhenning): Figure out if this is a bug with protractor.
 if [ "$RUN_ON_BROWSERSTACK" == "False" ]; then
   if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor.conf.js --suite "$SUITE" --params.devMode="$DEV_MODE"
+    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
   else
-    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
+    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
   fi
 else
   if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --suite "$SUITE" --params.devMode="$DEV_MODE"
+    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --suite "$SUITE"
   else
-    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
+    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
   fi
 fi

@@ -42,15 +42,13 @@ angular.module('oppia').directive('collectionDetailsEditor', [
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
         'CollectionValidationService', 'AlertsService', 'ALL_CATEGORIES',
-        'ALL_LANGUAGE_CODES', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
-        'TAG_REGEX',
+        'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
         function(
             $scope, CollectionEditorStateService, CollectionUpdateService,
             CollectionValidationService, AlertsService, ALL_CATEGORIES,
-            ALL_LANGUAGE_CODES, COLLECTION_TITLE_INPUT_FOCUS_LABEL,
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
-            TAG_REGEX) {
+            COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
           var ctrl = this;
           ctrl.collection = CollectionEditorStateService.getCollection();
           ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
@@ -66,8 +64,9 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             }
           );
 
-          ctrl.languageListForSelect = ALL_LANGUAGE_CODES;
-          ctrl.TAG_REGEX = TAG_REGEX;
+          ctrl.languageListForSelect = constants.ALL_LANGUAGE_CODES;
+
+          ctrl.TAG_REGEX = constants.TAG_REGEX;
 
           var refreshSettingsTab = function() {
             ctrl.displayedCollectionTitle = ctrl.collection.getTitle();

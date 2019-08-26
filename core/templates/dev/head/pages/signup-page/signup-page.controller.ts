@@ -27,7 +27,8 @@ require('services/contextual/UrlService.ts');
 require('services/stateful/FocusManagerService.ts');
 
 angular.module('oppia').directive('signupPage', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -37,14 +38,14 @@ angular.module('oppia').directive('signupPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$uibModal', 'AlertsService',
-        'FocusManagerService', 'SiteAnalyticsService',
-        'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
-        'DASHBOARD_TYPE_LEARNER', 'SITE_NAME',
+        'FocusManagerService',
+        'SiteAnalyticsService', 'UrlInterpolationService', 'UrlService',
+        'SITE_NAME',
         function(
             $http, $rootScope, $uibModal, AlertsService,
-            FocusManagerService, SiteAnalyticsService,
-            UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
-            DASHBOARD_TYPE_LEARNER, SITE_NAME) {
+            FocusManagerService,
+            SiteAnalyticsService, UrlInterpolationService, UrlService,
+            SITE_NAME) {
           var ctrl = this;
           var _SIGNUP_DATA_URL = '/signuphandler/data';
           $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
@@ -149,14 +150,14 @@ angular.module('oppia').directive('signupPage', [
               return;
             }
 
-            var defaultDashboard = DASHBOARD_TYPE_LEARNER;
+            var defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
             var returnUrl = window.decodeURIComponent(
               UrlService.getUrlParams().return_url);
 
             if (returnUrl.indexOf('creator_dashboard') !== -1) {
-              defaultDashboard = DASHBOARD_TYPE_CREATOR;
+              defaultDashboard = constants.DASHBOARD_TYPE_CREATOR;
             } else {
-              defaultDashboard = DASHBOARD_TYPE_LEARNER;
+              defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
             }
 
             var requestParams = {

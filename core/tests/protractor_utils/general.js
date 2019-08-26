@@ -70,7 +70,9 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var isInDevMode = function() {
-  return browser.params.devMode === 'true';
+  browser.get('/splash');
+  waitFor.pageToFullyLoad();
+  return browser.executeScript('return constants.DEV_MODE');
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';

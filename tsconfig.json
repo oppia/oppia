@@ -10,7 +10,6 @@
     "typeRoots": ["./node_modules/@types"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
@@ -25,9 +24,12 @@
   },
   "files_explanation": "These files are included separately since we still do not have webpack in extensions folder and these files are still included through scripts tags, so they need to be compiled separately.",
   "files": [
+    "assets/constants.js",
+    "assets/rich_text_components_definitions.js",
+    "core/tests/karma-globals.ts",
+    "core/tests/karma.conf.ts",
     "core/templates/dev/head/mathjaxConfig.ts",
-    "core/templates/dev/head/expressions/ExpressionParserService.js",
-    "core/tests/karma-globals.ts"
+    "core/templates/dev/head/expressions/ExpressionParserService.js" 
   ],
   "include_explanation": "The files in extensions/ckeditor_plugins are yet to be integrated into webpack (#6732).",
   "include": [

@@ -19,7 +19,6 @@
 require('domain/utilities/UrlInterpolationService.ts');
 
 describe('URL Interpolation Service', function() {
-  var hashes = require('hashes.json');
   var uis = null;
   var UrlService = null;
   var mockLocation = null;
@@ -33,7 +32,6 @@ describe('URL Interpolation Service', function() {
     mockLocation = {
       origin: 'http://sample.com'
     };
-
     UrlService = $injector.get('UrlService');
     spyOn(UrlService, 'getCurrentLocation').and.returnValue(mockLocation);
   }));

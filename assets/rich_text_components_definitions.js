@@ -12,7 +12,7 @@
  * @fileoverview Definitions for rich text components.
  */
 
-export = {
+var richTextComponents = {
   "Collapsible": {
     "backend_id": "Collapsible",
     "category": "Basic Input",
