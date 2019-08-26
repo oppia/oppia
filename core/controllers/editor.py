@@ -63,6 +63,7 @@ class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
     pass
 
+
 class ExplorationPage(EditorHandler):
     """The editor page for a single exploration."""
 
