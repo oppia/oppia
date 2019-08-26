@@ -32,7 +32,7 @@ class CommunityDashboardPage(base.BaseHandler):
         # the COMMUNITY_DASHBOARD_ENABLED flag is removed.
         if not feconf.COMMUNITY_DASHBOARD_ENABLED:
             raise self.PageNotFoundException
-        self.render_template('dist/community-dashboard-page.mainpage.html')
+        self.render_template('community-dashboard-page.mainpage.html')
 
 
 class ContributionOpportunitiesHandler(base.BaseHandler):
