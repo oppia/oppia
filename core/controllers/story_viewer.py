@@ -33,7 +33,7 @@ class StoryPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        self.render_template('dist/story-viewer-page.mainpage.html')
+        self.render_template('story-viewer-page.mainpage.html')
 
 
 class StoryPageDataHandler(base.BaseHandler):

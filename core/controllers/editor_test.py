@@ -43,11 +43,6 @@ import python_utils
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
 
-    CAN_EDIT_STR = 'can_edit: JSON.parse(\'true\'),'
-    CANNOT_EDIT_STR = 'can_edit: JSON.parse(\'false\'),'
-    CAN_VOICEOVER_STR = 'can_voiceover: JSON.parse(\'true\'),'
-    CANNOT_VOICEOVER_STR = 'can_voiceover: JSON.parse(\'false\'),'
-
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super(BaseEditorControllerTests, self).setUp()
@@ -73,33 +68,35 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.system_user = user_services.get_system_user()
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
-    def assert_can_edit(self, response_body):
-        """Returns True if the response body indicates that the exploration is
+    def assert_can_edit(self, exp_id):
+        """Returns True if the current user can edit the exploration
         editable.
         """
-        self.assertIn(self.CAN_EDIT_STR, response_body)
-        self.assertNotIn(self.CANNOT_EDIT_STR, response_body)
+        response = self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
+        self.assertEqual(response['can_edit'], True)
 
-    def assert_cannot_edit(self, response_body):
-        """Returns True if the response body indicates that the exploration is
+    def assert_cannot_edit(self, exp_id):
+        """Returns True if the current user can not edit the exploration
         not editable.
         """
-        self.assertIn(self.CANNOT_EDIT_STR, response_body)
-        self.assertNotIn(self.CAN_EDIT_STR, response_body)
+        response = self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
+        self.assertEqual(response['can_edit'], False)
 
-    def assert_can_voiceover(self, response_body):
-        """Returns True if the response body indicates that the exploration can
-        be voiceovered.
-        """
-        self.assertIn(self.CAN_VOICEOVER_STR, response_body)
-        self.assertNotIn(self.CANNOT_VOICEOVER_STR, response_body)
+    def assert_can_voiceover(self, exp_id):
+        """Returns True if the current user can voiceover the exploration."""
+        response = self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
+        self.assertEqual(response['can_voiceover'], True)
 
-    def assert_cannot_voiceover(self, response_body):
-        """Returns True if the response body indicates that the exploration can
-        not be voiceovered.
+    def assert_cannot_voiceover(self, exp_id):
+        """Returns True if the current user can not voiceover the
+        exploration.
         """
-        self.assertIn(self.CANNOT_VOICEOVER_STR, response_body)
-        self.assertNotIn(self.CAN_VOICEOVER_STR, response_body)
+        response = self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
+        self.assertEqual(response['can_voiceover'], False)
 
 
 class EditorTests(BaseEditorControllerTests):
@@ -117,7 +114,7 @@ class EditorTests(BaseEditorControllerTests):
         # Check that non-editors can access, but not edit, the editor page.
         response = self.get_html_response('/create/0')
         self.assertIn('Help others learn new things.', response.body)
-        self.assert_cannot_edit(response.body)
+        self.assert_cannot_edit('0')
 
         # Log in as an editor.
         self.login(self.EDITOR_EMAIL)
@@ -125,7 +122,7 @@ class EditorTests(BaseEditorControllerTests):
         # Check that it is now possible to access and edit the editor page.
         response = self.get_html_response('/create/0')
         self.assertIn('Help others learn new things.', response.body)
-        self.assert_can_edit(response.body)
+        self.assert_can_edit('0')
 
         self.logout()
 
@@ -1265,25 +1262,24 @@ class ExplorationEditRightsTest(BaseEditorControllerTests):
         # Joe logs in.
         self.login('joe@example.com')
 
-        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        response = self.get_html_response('/create/%s' % exp_id)
-        self.assert_can_edit(response.body)
+        self.get_html_response(feconf.LIBRARY_INDEX_URL)
+        self.get_html_response('/create/%s' % exp_id)
+        self.assert_can_edit(exp_id)
 
         # Ban joe.
         self.set_banned_users(['joe'])
 
         # Test that Joe is banned (He can still access the library page).
-        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        response = self.get_html_response('/create/%s' % exp_id)
-        self.assert_cannot_edit(response.body)
+        self.get_html_response(feconf.LIBRARY_INDEX_URL)
+        self.get_html_response('/create/%s' % exp_id)
+        self.assert_cannot_edit(exp_id)
 
         # Joe logs out.
         self.logout()
 
         # Sandra logs in and is unaffected.
         self.login('sandra@example.com')
-        response = self.get_html_response('/create/%s' % exp_id)
-        self.assert_can_edit(response.body)
+        self.assert_can_edit(exp_id)
         self.logout()
 
 
@@ -1355,16 +1351,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         # Check that viewer can access editor page but cannot edit.
         self.login(self.VIEWER_EMAIL)
-        response = self.get_html_response('/create/%s' % exp_id)
-        self.assert_cannot_edit(response.body)
-        self.assert_cannot_voiceover(response.body)
+        self.assert_cannot_edit(exp_id)
+        self.assert_cannot_voiceover(exp_id)
         self.logout()
 
         # Check that collaborator can access editor page and can edit.
         self.login(self.COLLABORATOR_EMAIL)
-        response = self.get_html_response('/create/%s' % exp_id)
-        self.assert_can_edit(response.body)
-        self.assert_can_voiceover(response.body)
+        self.assert_can_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
         csrf_token = self.get_new_csrf_token()
 
         # Check that collaborator can add a new state called 'State 4'.
@@ -1404,8 +1398,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         # Check that collaborator2 can access editor page and can edit.
         self.login(self.COLLABORATOR2_EMAIL)
-        response = self.get_html_response('/create/%s' % exp_id)
-        self.assert_can_edit(response.body)
+        self.get_html_response('/create/%s' % exp_id)
+        self.assert_can_edit(exp_id)
         csrf_token = self.get_new_csrf_token()
 
         # Check that collaborator2 can add a new state called 'State 5'.
@@ -1444,9 +1438,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         # Check that voice artist can access editor page and can only voiceover.
         self.login(self.VOICE_ARTIST_EMAIL)
-        response = self.get_html_response('/create/%s' % exp_id)
-        self.assert_cannot_edit(response.body)
-        self.assert_can_voiceover(response.body)
+        self.get_html_response('/create/%s' % exp_id)
+        self.assert_cannot_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
         csrf_token = self.get_new_csrf_token()
 
         # Check that voice artist cannot add new members.
@@ -1496,8 +1490,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         # Check that any random user can access editor page and can edit.
         self.login(self.RANDOM_USER_EMAIL)
-        response = self.get_html_response('/create/%s' % exp_id)
-        self.assert_can_edit(response.body)
+        self.assert_can_edit(exp_id)
 
         self.logout()
 
@@ -2604,3 +2597,29 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
             self.assertEqual(
                 len(learner_answer_details.learner_answer_info_list), 0)
+
+
+class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
+
+    def test_rights_handler_returns_appropriate_rights(self):
+        """Test that rights handler returns the correct rights of a user
+        for an exploration.
+        """
+
+        self.login(self.EDITOR_EMAIL)
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
+
+        self.assertTrue(response['can_delete'])
+        self.assertTrue(response['can_edit'])
+        self.assertTrue(response['can_modify_roles'])
+        self.assertTrue(response['can_publish'])
+        self.assertFalse(response['can_release_ownership'])
+        self.assertTrue(response['can_voiceover'])
+        self.assertFalse(response['can_unpublish'])
+
+        self.logout()
