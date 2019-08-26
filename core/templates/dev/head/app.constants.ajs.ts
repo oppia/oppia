@@ -20,6 +20,8 @@
 // equivalents of the Angular constants are no longer needed.
 import { AppConstants } from 'app.constants';
 
+const constants = require('constants.ts');
+
 for (var constantName in constants) {
   angular.module('oppia').constant(constantName, constants[constantName]);
 }
@@ -30,10 +32,6 @@ for (var constantName in constants) {
 // See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
 angular.module('oppia').constant(
   'DEFAULT_TRANSLATIONS', AppConstants.DEFAULT_TRANSLATIONS);
-
-angular.module('oppia').constant(
-  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
-  AppConstants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
 
 angular.module('oppia').constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
   AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
