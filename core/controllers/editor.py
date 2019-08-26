@@ -92,7 +92,7 @@ class ExplorationPage(EditorHandler):
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
         })
 
-        self.render_template('dist/exploration-editor-page.mainpage.html')
+        self.render_template('exploration-editor-page.mainpage.html')
 
 
 class ExplorationHandler(EditorHandler):

@@ -142,19 +142,21 @@ def main(argv):
     atexit.register(cleanup)
 
     if parsed_args.prod_env:
+        dev_mode = 'false'
         python_utils.PRINT('Generating files for production mode...')
         constants_env_variable = '\'DEV_MODE\': false'
         for line in fileinput.input(
-                files=['assets/constants.js'], inplace=True):
+                files=['assets/constants.ts'], inplace=True):
             python_utils.PRINT(
                 re.sub(r'\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
         build.build(['--prod_env'])
         app_yaml_filepath = 'app.yaml'
     else:
+        dev_mode = 'true'
         constants_env_variable = '\'DEV_MODE\': true'
         for line in fileinput.input(
-                files=['assets/constants.js'], inplace=True):
+                files=['assets/constants.ts'], inplace=True):
             python_utils.PRINT(
                 re.sub('\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
@@ -203,32 +205,34 @@ def main(argv):
         if not parsed_args.sharding or parsed_args.sharding_instances == '1':
             subprocess.call((
                 'node_modules/protractor/bin/protractor '
-                'core/tests/protractor.conf.js --suite %s'
-                % parsed_args.suite).split())
+                'core/tests/protractor.conf.js --suite %s --params.devMode="%s"'
+                % (parsed_args.suite, dev_mode)).split())
         else:
             subprocess.call((
                 'node_modules/protractor/bin/protractor '
                 'core/tests/protractor.conf.js --capabilities.shardTestFiles=%s'
-                ' --capabilities.maxInstances=%s --suite %s'
+                ' --capabilities.maxInstances=%s --suite %s '
+                '--params.devMode="%s"'
                 % (
                     parsed_args.sharding, parsed_args.sharding_instances,
-                    parsed_args.suite)).split())
+                    parsed_args.suite, dev_mode)).split())
     else:
         python_utils.PRINT('Running the tests on browserstack...')
         if not parsed_args.sharding or parsed_args.sharding_instances == '1':
             subprocess.call(
                 ('node_modules/protractor/bin/protractor '
                  'core/tests/protractor-browserstack.conf.js --suite %s '
-                 % parsed_args.suite).split())
+                 '--params.devMode="%s"'
+                 % (parsed_args.suite, dev_mode)).split())
         else:
             subprocess.call((
                 'node_modules/protractor/bin/protractor '
                 'core/tests/protractor-browserstack.conf.js '
                 '--capabilities.shardTestFiles=%s --capabilities.maxInstances='
-                '%s --suite %s'
+                '%s --suite %s --params.devMode="%s"'
                 % (
                     parsed_args.sharding, parsed_args.sharding_instances,
-                    parsed_args.suite)).split())
+                    parsed_args.suite, dev_mode)).split())
 
     for process in background_processes:
         process.wait()

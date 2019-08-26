@@ -100,9 +100,16 @@ def main(argv):
                 'coverage', '4.5.4',
                 os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'))
 
+    build.build([])
+
+    # Compile typescript files
+    python_utils.PRINT('Compiling typescript...')
+    subprocess.call(
+        'node_modules/typescript/bin/tsc --project .'.split())
+
     python_utils.PRINT('Compiling webpack...')
     subprocess.call(
-        'node_modules/webpack/bin/webpack.js --config webpack.prod.config.ts'
+        'node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts'
         .split())
 
     backend_tests.main([])

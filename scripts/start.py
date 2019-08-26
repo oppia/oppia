@@ -107,7 +107,7 @@ def main(argv):
     if parsed_args.prod_env:
         constants_env_variable = '\'DEV_MODE\': false'
         for line in fileinput.input(
-                files=['assets/constants.js'], inplace=True):
+                files=['assets/constants.ts'], inplace=True):
             python_utils.PRINT(
                 re.sub(
                     '\'DEV_MODE\': .*', constants_env_variable, line), end='')
@@ -116,7 +116,7 @@ def main(argv):
     else:
         constants_env_variable = '\'DEV_MODE\': true'
         for line in fileinput.input(
-                files=['assets/constants.js'], inplace=True):
+                files=['assets/constants.ts'], inplace=True):
             python_utils.PRINT(
                 re.sub(
                     '\'DEV_MODE\': .*', constants_env_variable, line), end='')
@@ -135,12 +135,11 @@ def main(argv):
             % common.NODE_PATH).split()))
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
-        subprocess.call(
-            'node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts'
-            .split())
         background_processes.append(subprocess.Popen(
             'node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts'
             ' --watch'.split()))
+        # Give webpack few seconds to do the initíal compilation.
+        time.sleep(10)
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen((
