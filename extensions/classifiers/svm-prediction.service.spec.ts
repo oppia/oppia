@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SVMPredictionService } from 'classifiers/SVM-prediction.service';
+import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 
 describe('SVM prediction functions', () => {
   describe('Test SVM prediction functions', () => {
