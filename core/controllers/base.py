@@ -431,7 +431,7 @@ class BaseHandler(webapp2.RequestHandler):
                     current_user_services.create_login_url(self.request.uri))
             return
 
-        logging.info(''.join(traceback.format_exception(*sys.exc_info())))
+        logging.info(b''.join(traceback.format_exception(*sys.exc_info())))
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)

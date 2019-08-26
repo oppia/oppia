@@ -869,7 +869,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
                 duration.microseconds, 1E6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)' %
-                (exploration.title, processing_time))
+                (utils.to_ascii(exploration.title), processing_time))
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(),

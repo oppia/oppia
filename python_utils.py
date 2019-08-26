@@ -399,6 +399,12 @@ def recursively_convert_to_str(value):
             recursively_convert_to_str(k): recursively_convert_to_str(
                 v) for k, v in value.items()}
     elif isinstance(value, BASESTRING):
-        return str(value)
+        # We are importing utils here to prevent circular imports.
+        import utils
+        temp = str(utils.to_ascii(value))
+        if temp.startswith('b\''):
+            # Remove the b'' prefix from the string.
+            return temp[2:-1]
+        return temp
     else:
         return value

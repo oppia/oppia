@@ -34,7 +34,6 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        print 'test'
         job_id = (
             feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob
             .create_new())
