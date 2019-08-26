@@ -1339,7 +1339,7 @@ def get_image_filenames_from_exploration(exploration):
 
     for rte_comp in rte_components_in_exp:
         if 'id' in rte_comp and (
-                python_utils.STR(
+                python_utils.UNICODE(
                     rte_comp['id']) == 'oppia-noninteractive-image'):
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])

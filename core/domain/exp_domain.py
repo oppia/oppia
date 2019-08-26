@@ -833,12 +833,12 @@ class Exploration(python_utils.OBJECT):
             try:
                 self._verify_all_states_reachable()
             except utils.ValidationError as e:
-                warnings_list.append(python_utils.STR(e))
+                warnings_list.append(python_utils.UNICODE(e))
 
             try:
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
-                warnings_list.append(python_utils.STR(e))
+                warnings_list.append(python_utils.UNICODE(e))
 
             if not self.title:
                 warnings_list.append(

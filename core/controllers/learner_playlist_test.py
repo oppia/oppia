@@ -164,7 +164,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 feconf.LEARNER_PLAYLIST_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
                 'exp_id_%s' %
-                python_utils.STR(
+                python_utils.UNICODE(
                     feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3)),
             {}, csrf_token=csrf_token)
         self.assertEqual(response['playlist_limit_exceeded'], True)
@@ -263,7 +263,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 feconf.LEARNER_PLAYLIST_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
                 'exp_id_%s' %
-                python_utils.STR(
+                python_utils.UNICODE(
                     feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3)),
             {}, csrf_token=csrf_token)
         self.assertEqual(response['playlist_limit_exceeded'], True)
@@ -283,7 +283,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.EXP_ID_1, self.EXP_ID_2])
 
         # Remove an exploration.
-        self.delete_json(python_utils.STR(
+        self.delete_json(python_utils.UNICODE(
             '%s/%s/%s' % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
@@ -293,7 +293,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.EXP_ID_2])
 
         # Removing the same exploration again has no effect.
-        self.delete_json(python_utils.STR('%s/%s/%s' % (
+        self.delete_json(python_utils.UNICODE('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
             constants.ACTIVITY_TYPE_EXPLORATION,
             self.EXP_ID_1)))
@@ -302,7 +302,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.EXP_ID_2])
 
         # Remove the second exploration.
-        self.delete_json(python_utils.STR('%s/%s/%s' % (
+        self.delete_json(python_utils.UNICODE('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
             constants.ACTIVITY_TYPE_EXPLORATION,
             self.EXP_ID_2)))
@@ -325,7 +325,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.COL_ID_1, self.COL_ID_2])
 
         # Remove a collection.
-        self.delete_json(python_utils.STR('%s/%s/%s' % (
+        self.delete_json(python_utils.UNICODE('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
             constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_1)))
         self.assertEqual(
@@ -333,7 +333,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.COL_ID_2])
 
         # Removing the same collection again has no effect.
-        self.delete_json(python_utils.STR('%s/%s/%s' % (
+        self.delete_json(python_utils.UNICODE('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
             constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_1)))
         self.assertEqual(
@@ -341,7 +341,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.COL_ID_2])
 
         # Remove the second collection.
-        self.delete_json(python_utils.STR('%s/%s/%s' % (
+        self.delete_json(python_utils.UNICODE('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
             constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)))
         self.assertEqual(

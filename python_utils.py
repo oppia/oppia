@@ -44,7 +44,7 @@ OBJECT = builtins.object
 PRINT = print
 RANGE = builtins.range
 ROUND = builtins.round
-STR = builtins.str
+UNICODE = builtins.str
 ZIP = builtins.zip
 
 
@@ -375,13 +375,16 @@ def convert_to_bytes(string_to_convert):
     Returns:
         bytes. The encoded string.
     """
-    if isinstance(string_to_convert, STR):
+    if isinstance(string_to_convert, UNICODE):
         return string_to_convert.encode('utf-8')
     return bytes(string_to_convert)
 
 
 def recursively_convert_to_str(value):
-    """Convert all elements in a data structure to str.
+    """Convert all elements in a data structure to str. This is required for the
+    yaml.safe_dump() function to work as it only works for unicode and str and
+    not bytes nor builtins.str(UNICODE). See:
+    https://stackoverflow.com/a/1950399/11755830
 
     Args:
         value: list|dict|str. The data structure to convert.

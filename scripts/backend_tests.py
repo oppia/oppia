@@ -89,11 +89,11 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
-    type=python_utils.STR)
+    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
-    type=python_utils.STR)
+    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--exclude_load_tests',
     help='optional; if specified, exclude load tests from being run',

@@ -5841,7 +5841,7 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(JobModelValidatorTests, self).setUp()
 
-        current_time_str = python_utils.STR(
+        current_time_str = python_utils.UNICODE(
             int(utils.get_current_time_in_millisecs()))
         random_int = random.randint(0, 1000)
         self.model_instance = job_models.JobModel(

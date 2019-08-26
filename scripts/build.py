@@ -206,7 +206,7 @@ def write_to_file_stream(file_stream, content):
         file_stream: file. A stream handling object to do write operation on.
         content: str. String content to write to file object.
     """
-    file_stream.write(python_utils.STR(content))
+    file_stream.write(python_utils.UNICODE(content))
 
 
 def _join_files(source_paths, target_file_stream):
@@ -1063,7 +1063,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         file_extensions_to_always_rebuild = ('.html', '.py',)
         python_utils.PRINT(
             'Staging dir exists, re-building all %s files'
-            % python_utils.STR(file_extensions_to_always_rebuild))
+            % python_utils.UNICODE(file_extensions_to_always_rebuild))
 
         filenames_to_always_rebuild = get_filepaths_by_extensions(
             source_dir, file_extensions_to_always_rebuild)

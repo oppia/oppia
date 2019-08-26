@@ -447,8 +447,8 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'\Wstr\('),
         'message': (
-            'Please try to use python_utils.STR. If you are getting an error, '
-            'use python_utils.convert_to_bytes() instead.'),
+            'Please try to use python_utils.UNICODE. If you are getting an '
+            'error, use python_utils.convert_to_bytes() instead.'),
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
     },

@@ -56,7 +56,8 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 f.readlines()
 
     def test_url_quote(self):
-        self.assertEqual(python_utils.url_quote(b'/~connolly/'), b'/%7Econnolly/')
+        self.assertEqual(
+            python_utils.url_quote(b'/~connolly/'), b'/%7Econnolly/')
 
     def test_url_encode(self):
         url_dict = {'url': 'http://myapp/my%20test/'}
@@ -163,16 +164,16 @@ class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
 
     def test_unicode_and_str_chars_in_file(self):
         self.assertIsInstance(
-            unicode_and_str_handler.SOME_STR_TEXT, python_utils.STR)
+            unicode_and_str_handler.SOME_STR_TEXT, python_utils.UNICODE)
         self.assertIsInstance(
-            unicode_and_str_handler.SOME_UNICODE_TEXT, python_utils.STR)
+            unicode_and_str_handler.SOME_UNICODE_TEXT, python_utils.UNICODE)
         self.assertIsInstance(
             unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
 
         with python_utils.open_file(
             'core/tests/data/unicode_and_str_handler.py', 'r') as f:
             file_content = f.read()
-            self.assertIsInstance(file_content, python_utils.STR)
+            self.assertIsInstance(file_content, python_utils.UNICODE)
 
 @unittest.skipUnless(
     sys.version[0] == '3', 'Test cases for ensuring Python 3 behavior only')

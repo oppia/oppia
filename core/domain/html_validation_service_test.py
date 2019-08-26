@@ -73,7 +73,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 tag = soup.find(name='b')
             html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
             self.assertEqual(
-                python_utils.STR(soup), test_case['expected_output'])
+                python_utils.UNICODE(soup), test_case['expected_output'])
 
     def test_convert_to_textangular(self):
         test_cases = [{

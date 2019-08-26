@@ -79,7 +79,7 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
                 model.reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
             # Send email to Oppia.
             self.post_email(
-                python_utils.STR(recipient_email), self.USER_A_EMAIL,
+                python_utils.UNICODE(recipient_email), self.USER_A_EMAIL,
                 'feedback email reply', 'New reply')
 
             # Check that new message is added.

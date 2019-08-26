@@ -211,7 +211,7 @@ class BaseModel(ndb.Model):
             Exception: An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        entity_name = python_utils.STR(entity_name)
+        entity_name = python_utils.UNICODE(entity_name)
 
         for _ in python_utils.RANGE(MAX_RETRIES):
             new_id = utils.convert_to_hash(
@@ -578,7 +578,7 @@ class VersionedModel(BaseModel):
             current_version = self.version
 
             version_numbers = [
-                python_utils.STR(num + 1) for num in python_utils.RANGE(
+                python_utils.UNICODE(num + 1) for num in python_utils.RANGE(
                     current_version)]
             snapshot_ids = [
                 self._get_snapshot_id(self.id, version_number)

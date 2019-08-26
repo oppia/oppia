@@ -393,7 +393,7 @@ title: Old Title
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': '0',
-                'to_version': python_utils.STR(
+                'to_version': python_utils.UNICODE(
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             }],
             'version_number': 4,

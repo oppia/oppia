@@ -79,7 +79,8 @@ class QuestionModel(base_models.VersionedModel):
 
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
-                python_utils.STR(utils.get_random_int(base_models.RAND_RANGE)),
+                python_utils.UNICODE(
+                    utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             if not cls.get_by_id(new_id):
                 return new_id

@@ -215,7 +215,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. Full message ID.
         """
-        return '.'.join([thread_id, python_utils.STR(message_id)])
+        return '.'.join([thread_id, python_utils.UNICODE(message_id)])
 
     @property
     def entity_id(self):

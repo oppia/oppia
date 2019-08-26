@@ -117,8 +117,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
-            obj = python_utils.STR(obj)
-        assert isinstance(obj, python_utils.STR), (
+            obj = python_utils.UNICODE(obj)
+        assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
         normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
@@ -135,8 +135,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
-            obj = python_utils.STR(obj)
-        assert isinstance(obj, python_utils.STR), (
+            obj = python_utils.UNICODE(obj)
+        assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     else:

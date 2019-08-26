@@ -52,7 +52,7 @@ class JobModel(base_models.BaseModel):
             str. A job id.
         """
         job_type = entity_name
-        current_time_str = python_utils.STR(
+        current_time_str = python_utils.UNICODE(
             int(utils.get_current_time_in_millisecs()))
         random_int = random.randint(0, 1000)
         return '%s-%s-%s' % (job_type, current_time_str, random_int)

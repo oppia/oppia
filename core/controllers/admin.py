@@ -211,7 +211,7 @@ class AdminHandler(base.BaseHandler):
                 recommendations_services.update_topic_similarities(data)
             self.render_json({})
         except Exception as e:
-            self.render_json({'error': python_utils.STR(e)})
+            self.render_json({'error': python_utils.UNICODE(e)})
             raise
 
     def _reload_exploration(self, exploration_id):

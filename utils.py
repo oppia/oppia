@@ -171,7 +171,7 @@ def to_ascii(input_string):
         str. String containing the ascii representation of the input string.
     """
     return unicodedata.normalize(
-        'NFKD', python_utils.STR(input_string)).encode('ascii', 'ignore')
+        'NFKD', python_utils.UNICODE(input_string)).encode('ascii', 'ignore')
 
 
 def yaml_from_dict(dictionary, width=80):
@@ -397,7 +397,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(python_utils.STR([value]))
+    return base64.b64encode(python_utils.UNICODE([value]))
 
 
 def get_time_in_millisecs(datetime_obj):
@@ -471,7 +471,7 @@ def vfs_construct_path(base_path, *path_components):
 def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc."""
     # Preserve unicode (if path is unicode).
-    slash, dot = (u'/', u'.') if isinstance(path, python_utils.STR) else (
+    slash, dot = (u'/', u'.') if isinstance(path, python_utils.UNICODE) else (
         '/', '.')
     if path == '':
         return dot

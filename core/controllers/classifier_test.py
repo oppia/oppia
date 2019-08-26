@@ -269,9 +269,9 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         )
 
         self.expected_response = {
-            u'job_id': python_utils.STR(self.job_id, 'utf-8'),
+            u'job_id': python_utils.UNICODE(self.job_id, 'utf-8'),
             u'training_data': self.training_data,
-            u'algorithm_id': python_utils.STR(self.algorithm_id, 'utf-8')
+            u'algorithm_id': python_utils.UNICODE(self.algorithm_id, 'utf-8')
         }
 
         self.payload = {}

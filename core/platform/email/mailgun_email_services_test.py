@@ -141,7 +141,7 @@ class EmailTests(test_utils.GenericTestBase):
             lambda data=None:
             self.assertEqual(
                 data['h:Reply-To'],
-                'reply+' + python_utils.STR(reply_id) + '@' +
+                'reply+' + python_utils.UNICODE(reply_id) + '@' +
                 feconf.INCOMING_EMAILS_DOMAIN_NAME))
         post_request = self.swap(
             mailgun_email_services, 'post_to_mailgun', req_post_lambda)

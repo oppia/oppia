@@ -389,7 +389,8 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                 yield (
                     'Successfully cleaned up UserSubscriptionsModel %s and '
                     'removed explorations %s' % (
-                        model_instance.id, python_utils.STR(exp_ids_removed)),
+                        model_instance.id,
+                        python_utils.UNICODE(exp_ids_removed)),
                     1)
 
     @staticmethod
