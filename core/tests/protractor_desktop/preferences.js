@@ -64,6 +64,36 @@ describe('Preferences', function() {
     preferencesPage.expectUserBioToBe('Junior student from USA studying CS!');
   });
 
+  it('should change prefered audio language of the learner', function() {
+    users.createUser('paul@preferences.com', 'paulPreferences');
+    users.login('paul@preferences.com');
+    preferencesPage.get();
+    expect(preferencesPage.preferredAudioLanguageSelector).toBeUndefined();
+    preferencesPage.selectPreferredAudioLanguage('Hindi');
+    preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
+    browser.refresh();
+    preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
+    preferencesPage.selectPreferredAudioLanguage('Arabic');
+    preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
+    browser.refresh();
+    preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
+  });
+
+  it('should change prefered site language of the learner', function() {
+    users.createUser('john@preferences.com', 'johnPreferences');
+    users.login('john@preferences.com');
+    preferencesPage.get();
+    expect(preferencesPage.systemLanguageSelector).toBeUndefined();
+    preferencesPage.selectSystemLanguage('Español');
+    preferencesPage.expectPreferredSiteLanguageToBe('Español');
+    browser.refresh();
+    preferencesPage.expectPreferredSiteLanguageToBe('Español');
+    preferencesPage.selectSystemLanguage('English');
+    preferencesPage.expectPreferredSiteLanguageToBe('English');
+    browser.refresh();
+    preferencesPage.expectPreferredSiteLanguageToBe('English');
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
     users.logout();
