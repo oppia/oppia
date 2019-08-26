@@ -53,9 +53,9 @@
            tooltip-placement="bottom"
            ng-class="{'oppia-disabled-link': isExplorationLockedForEditing() || countWarnings(),'btn-success': !isExplorationLockedForEditing() && !countWarnings()}">
         <a class="oppia-editor-PublishSave-button oppia-dropdown-btn protractor-test-publish-exploration"
-                ng-click="showPublishExplorationModal()"
-                ng-disabled="isExplorationLockedForEditing() || countWarnings()"
-                ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}">
+           ng-click="showPublishExplorationModal()"
+           ng-disabled="isExplorationLockedForEditing() || countWarnings()"
+           ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}">
           <span ng-if="!publishIsInProcess" class="oppia-dropdown-btn-text">
             <span>Publish</span>
           </span>
