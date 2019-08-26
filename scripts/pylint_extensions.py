@@ -174,11 +174,11 @@ class HangingIndentChecker(checkers.BaseChecker):
         exclude = False
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].lstrip().rstrip()
-            if line.startswith('"""') and not line.endswith('"""'):
+            if line.startswith(b'"""') and not line.endswith(b'"""'):
                 exclude = True
-            if line.endswith('"""'):
+            if line.endswith(b'"""'):
                 exclude = False
-            if line.startswith('#') or exclude:
+            if line.startswith(b'#') or exclude:
                 continue
             line_length = len(line)
             bracket_count = 0
@@ -194,7 +194,7 @@ class HangingIndentChecker(checkers.BaseChecker):
                 content = line[position + 1:]
                 if not len(content) or not ',' in content:
                     continue
-                split_list = content.split(', ')
+                split_list = content.split(b', ')
                 if len(split_list) == 1 and not any(
                         char.isalpha() for char in split_list[0]):
                     continue
@@ -748,7 +748,7 @@ class BackslashContinuationChecker(checkers.BaseChecker):
         """
         file_content = read_from_node(node)
         for (line_num, line) in enumerate(file_content):
-            if line.rstrip('\r\n').endswith('\\'):
+            if line.rstrip(b'\r\n').endswith(b'\\'):
                 self.add_message(
                     'backslash-continuation', line=line_num + 1)
 

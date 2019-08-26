@@ -14,6 +14,7 @@
 
 """Tests for Feedback-related jobs."""
 from __future__ import absolute_import # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
@@ -33,6 +34,7 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
+        print 'test'
         job_id = (
             feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob
             .create_new())
