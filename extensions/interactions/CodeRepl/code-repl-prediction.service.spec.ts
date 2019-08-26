@@ -21,7 +21,7 @@
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
-import { SVMPredictionService } from 'classifiers/SVMPredictionService';
+import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
 // ^^^ This block is to be removed.
