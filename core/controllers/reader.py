@@ -25,7 +25,6 @@ from core.controllers import base
 from core.domain import classifier_services
 from core.domain import collection_services
 from core.domain import config_domain
-from core.domain import dependency_registry
 from core.domain import event_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -46,8 +45,6 @@ from core.platform import models
 import feconf
 import utils
 
-import jinja2
-
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
@@ -66,11 +63,7 @@ def _get_exploration_player_data(
     Returns:
         dict. A dict of exploration player data.
         The keys and values of the dict are as follows:
-        - 'additional_angular_modules': list. A de-duplicated list of strings,
-            each representing an additional angular module that should be
-            loaded.
         - 'can_edit': bool. Whether the given user can edit this activity.
-        - 'dependencies_html': str. The additional HTML to insert on the page.
         - 'exploration_title': str. Title of exploration.
         - 'exploration_version': int. The version of the exploration.
         - 'collection_id': str. ID of the collection.
@@ -97,24 +90,8 @@ def _get_exploration_player_data(
 
     version = exploration.version
 
-    # TODO(sll): Cache these computations.
-    interaction_ids = exploration.get_interaction_ids()
-    for interaction_id in feconf.ALLOWED_QUESTION_INTERACTION_IDS:
-        if interaction_id not in interaction_ids:
-            interaction_ids.append(interaction_id)
-
-    dependency_ids = (
-        interaction_registry.Registry.get_deduplicated_dependency_ids(
-            interaction_ids))
-    dependencies_html, additional_angular_modules = (
-        dependency_registry.Registry.get_deps_html_and_angular_modules(
-            dependency_ids))
-
     return {
-        'additional_angular_modules': additional_angular_modules,
         'can_edit': can_edit,
-        'dependencies_html': jinja2.utils.Markup(
-            dependencies_html),
         'exploration_title': exploration.title,
         'exploration_version': version,
         'collection_id': collection_id,
@@ -279,7 +256,7 @@ class ExplorationHandler(base.BaseHandler):
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
-                config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value)
+                config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
         })
         self.render_json(self.values)
 
