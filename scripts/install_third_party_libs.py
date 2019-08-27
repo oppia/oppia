@@ -173,8 +173,9 @@ def install_skulpt(argv):
                     end='')
 
             subprocess.call([
-                'python', 'dist', os.path.join(
-                    common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/skulpt.py')])
+                'python', os.path.join(
+                    common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/skulpt.py'),
+                'dist'])
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
