@@ -51,7 +51,7 @@ describe('ExplorationFeedback', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('adds feedback to an exploration', function() {
+  it('should add feedback to an exploration', function() {
     users.createUser(
       'user1@ExplorationFeedback.com',
       'creatorExplorationFeedback');
@@ -102,7 +102,7 @@ describe('ExplorationFeedback', function() {
     users.logout();
   });
 
-  it('changes status of feedback thread', function() {
+  it('should change status of feedback thread', function() {
     var feedback = 'Hey! This exploration looks awesome';
     var feedbackResponse = 'Thanks for the feedback!';
 
