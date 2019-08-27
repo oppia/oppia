@@ -16,7 +16,6 @@
  * @fileoverview Primary controller for the skill editor page.
  */
 
-
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 

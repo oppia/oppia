@@ -17,7 +17,6 @@
  */
 
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -37,10 +36,6 @@ angular.module('oppia').directive('schemaBasedHtmlEditor', [
         '/components/forms/schema-based-editors/' +
         'schema-based-html-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', 'CURRENT_RTE_IS_CKEDITOR_4',
-        function($scope, CURRENT_RTE_IS_CKEDITOR_4) {
-          var ctrl = this;
-          ctrl.currentRteIsCKEditor4 = CURRENT_RTE_IS_CKEDITOR_4;
-        }]
+      controller: [function() {}]
     };
   }]);
