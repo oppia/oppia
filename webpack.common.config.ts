@@ -16,13 +16,10 @@
  * @fileoverview General config file for Webpack.
  */
 
-const CKEditorWebpackPlugin = require(
-  '@ckeditor/ckeditor5-dev-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
-const { styles } = require('@ckeditor/ckeditor5-dev-utils/lib/');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -132,9 +129,6 @@ module.exports = {
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
   },
   plugins: [
-    new CKEditorWebpackPlugin({
-      language: 'en'
-    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',
@@ -588,29 +582,6 @@ module.exports = {
   ],
   module: {
     rules: [{
-      test: /ckeditor5-[^\/]+\/theme\/icons\/[^\/]+\.svg$/,
-      use: ['raw-loader']
-    },
-    {
-      test: /ckeditor5-[^\/]+\/theme\/[-\w\/]+\.css$/,
-      use: [{
-        loader: 'style-loader',
-        options: {
-          singleton: true
-        }
-      },
-      {
-        loader: 'postcss-loader',
-        options: styles.getPostCssConfig( {
-          themeImporter: {
-            themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-          },
-          minify: true
-        })
-      },
-      ]
-    },
-    {
       test: /\.ts$/,
       include: [
         path.resolve(__dirname, 'assets'),
