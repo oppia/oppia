@@ -152,6 +152,20 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             'http://www.cwi.nl/%7Eguido/Python.html', 'FAQ.html')
         self.assertEqual(response, 'http://www.cwi.nl/%7Eguido/FAQ.html')
 
+    def test_recursively_convert_to_str(self):
+        test_var_1 = python_utils.UNICODE('test_var_1')
+        test_var_2 = python_utils.UNICODE('test_var_2')
+        test_dict = {test_var_1: 'a', test_var_2: b'b'}
+
+        for key, val in test_dict.values():
+            self.assertFalse(isinstance(key, str))
+            self.assertFalse(isinstance(val, str))
+
+        dict_in_str = python_utils.recursively_convert_to_str(test_dict)
+        for key, val in dict_in_str.values():
+            self.assertTrue(isinstance(key, str))
+            self.assertTrue(isinstance(val, str))
+
 
 @unittest.skipUnless(
     sys.version[0] == '2', 'Test cases for ensuring Python 2 behavior only')
