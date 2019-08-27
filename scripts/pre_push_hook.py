@@ -367,7 +367,7 @@ def main(argv):
     args, _ = parser.parse_known_args(args=argv)
     if args.install:
         _install_hook()
-        sys.exit(0)
+        return
 
     remote = _get_remote_name()
     remote = remote if remote else args.remote
@@ -403,7 +403,7 @@ def main(argv):
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
-    sys.exit(0)
+    return
 
 
 if __name__ == '__main__':

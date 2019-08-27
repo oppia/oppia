@@ -95,13 +95,15 @@ def pip_install(package, version, install_path):
                 'Windows%29')
         sys.exit(1)
 
-    if hasattr(pip, 'main'):
-        pip.main(['install', package])
-    else:
-        import pip._internal
-        pip._internal.main(args=[  # pylint: disable=protected-access
-            'install', '%s==%s' % (package, version), '--target', install_path,
-            '--system'])
+    subprocess.call((
+        'pip install %s==%s --target=%s'
+        % (package, version, install_path)).split())
+    # if hasattr(pip, 'main'):
+    #     pip.main(['install', package])
+    # else:
+    #     import pip._internal
+    #     pip._internal.main(args=[  # pylint: disable=protected-access
+    #         'install', '%s==%s' % (package, version), '--target', install_path])
 
 
 def install_skulpt(argv):

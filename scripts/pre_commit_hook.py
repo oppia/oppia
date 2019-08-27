@@ -135,7 +135,7 @@ def main(argv):
     args, _ = parser.parse_known_args(args=argv)
     if args.install:
         _install_hook()
-        sys.exit(0)
+        return
 
     python_utils.PRINT('Running pre-commit check for package-lock.json ...')
     if _does_diff_include_package_lock_file_and_no_package_file():
@@ -145,7 +145,7 @@ def main(argv):
             'package-lock.json will be automatically reverted.')
         python_utils.PRINT('Reverting changes in package-lock.json ...')
         _revert_changes_in_package_lock_file()
-    sys.exit(0)
+    return
 
 
 if __name__ == '__main__':
