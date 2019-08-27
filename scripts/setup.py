@@ -148,6 +148,9 @@ def main():
         tar.extractall(path=common.OPPIA_TOOLS_DIR)
         tar.close()
         os.remove('node-download.tgz')
+        os.rename(
+            os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
+            common.NODE_PATH)
 
     # Change ownership of $NODE_MODULE_DIR.
     # Note: on some machines, these commands seem to take quite a long time.
