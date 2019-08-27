@@ -83,12 +83,12 @@ angular.module('oppia').directive('emailDashboardResultPage', [
 
               $http.post(resultHandlerUrl, {
                 data: data
-              }).success(function() {
+              }).then(function() {
                 ctrl.emailSubmitted = true;
                 $timeout(function() {
                   $window.location.href = EMAIL_DASHBOARD_PAGE;
                 }, 4000);
-              }).error(function() {
+              }).then(null, function() {
                 ctrl.errorHasOccurred = true;
                 ctrl.submitIsInProgress = false;
               });
@@ -116,7 +116,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
               $timeout(function() {
                 $window.location.href = EMAIL_DASHBOARD_PAGE;
               }, 4000);
-            }).error(function() {
+            }).then(null, function() {
               ctrl.errorHasOccurred = true;
               ctrl.submitIsInProgress = false;
             });
@@ -133,7 +133,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
               $http.post(testEmailHandlerUrl, {
                 email_subject: ctrl.emailSubject,
                 email_body: ctrl.emailBody
-              }).success(function() {
+              }).then(function() {
                 ctrl.testEmailSentSuccesfully = true;
               });
               ctrl.invalid.subject = false;

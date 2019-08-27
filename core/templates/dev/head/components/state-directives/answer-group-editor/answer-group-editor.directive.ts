@@ -76,6 +76,7 @@ angular.module('oppia').directive('answerGroupEditor', [
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.rulesMemento = null;
           ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           ctrl.editAnswerGroupForm = {};
@@ -84,7 +85,6 @@ angular.module('oppia').directive('answerGroupEditor', [
             StateEditorService.getMisconceptionsBySkill();
 
           var _getTaggedMisconceptionName = function(skillMisconceptionId) {
-            if (skillMisconceptionId !== null) {
               if (typeof skillMisconceptionId === 'string' &&
                   skillMisconceptionId.split('-').length === 2) {
                 var skillId = skillMisconceptionId.split('-')[0];
@@ -101,7 +101,6 @@ angular.module('oppia').directive('answerGroupEditor', [
                 throw Error('Expected skillMisconceptionId to be ' +
                   '<skillId>-<misconceptionId>.');
               }
-            }
           };
 
           _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
@@ -400,6 +399,7 @@ angular.module('oppia').directive('answerGroupEditor', [
             ctrl.answerChoices = ctrl.getAnswerChoices();
           });
         }
+      }
       ]
     };
   }]);

@@ -46,6 +46,7 @@ angular.module('oppia').directive('sharingLinks', [
             ExplorationEmbedButtonService, SiteAnalyticsService,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
           var ctrl = this;
+          this.$onInit = function(){
           ctrl.registerShareEvent = null;
 
           if (ctrl.shareType === 'exploration') {
@@ -68,6 +69,7 @@ angular.module('oppia').directive('sharingLinks', [
             ctrl.registerShareEvent = (
               SiteAnalyticsService.registerShareCollectionEvent);
           } else {
+            console.log(JSON.stringify(ctrl));
             throw Error(
               'SharingLinks directive can only be used either in the' +
               'collection player or the exploration player');
@@ -83,6 +85,7 @@ angular.module('oppia').directive('sharingLinks', [
           ctrl.classroomUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/classroom.png');
         }
+      }
       ]
     };
   }]);
