@@ -25,14 +25,13 @@ import logging
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import dependency_registry
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
-from core.domain import interaction_registry
+from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -42,8 +41,6 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
-
-import jinja2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
@@ -72,26 +69,10 @@ class EditorHandler(base.BaseHandler):
 class ExplorationPage(EditorHandler):
     """The editor page for a single exploration."""
 
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
 
     @acl_decorators.can_play_exploration
     def get(self, unused_exploration_id):
         """Handles GET requests."""
-        interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
-
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
-                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
-
-        self.values.update({
-            'additional_angular_modules': additional_angular_modules,
-            'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-        })
 
         self.render_template('exploration-editor-page.mainpage.html')
 
@@ -808,27 +789,47 @@ class LearnerAnswerInfoHandler(EditorHandler):
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
 
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            state_name = self.request.get('state_name')
-            if not state_name:
-                raise self.InvalidInputException
-            state_reference = (
-                stats_services.get_state_reference_for_exploration(
-                    entity_id, state_name))
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            state_reference = (
-                stats_services.get_state_reference_for_question(
-                    entity_id))
+        learner_answer_info_data = []
 
-        learner_answer_details = stats_services.get_learner_answer_details(
-            entity_type, state_reference)
-        learner_answer_info_dict_list = []
-        if learner_answer_details is not None:
-            learner_answer_info_dict_list = [
-                learner_answer_info.to_dict() for learner_answer_info in
-                learner_answer_details.learner_answer_info_list]
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            exp = exp_fetchers.get_exploration_by_id(entity_id)
+            for state_name in exp.states:
+                state_reference = (
+                    stats_services.get_state_reference_for_exploration(
+                        entity_id, state_name))
+                learner_answer_details = (
+                    stats_services.get_learner_answer_details(
+                        feconf.ENTITY_TYPE_EXPLORATION, state_reference))
+                if learner_answer_details is not None:
+                    learner_answer_info_data.append({
+                        'state_name': state_name,
+                        'interaction_id': learner_answer_details.interaction_id,
+                        'customization_args': exp.states[state_name].interaction
+                                              .to_dict()['customization_args'],
+                        'learner_answer_info_dicts': [
+                            learner_answer_info.to_dict() for
+                            learner_answer_info in
+                            learner_answer_details.learner_answer_info_list]
+                    })
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            question = question_services.get_question_by_id(entity_id)
+            state_reference = stats_services.get_state_reference_for_question(
+                entity_id)
+            learner_answer_details = stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_QUESTION, state_reference)
+            if learner_answer_details is not None:
+                learner_answer_info_dicts = [
+                    learner_answer_info.to_dict() for learner_answer_info in
+                    learner_answer_details.learner_answer_info_list]
+            learner_answer_info_data = {
+                'interaction_id': learner_answer_details.interaction_id,
+                'customization_args': question.question_state_data.interaction
+                                      .to_dict()['customization_args'],
+                'learner_answer_info_dicts': learner_answer_info_dicts
+            }
+
         self.render_json({
-            'learner_answer_info_dict_list': learner_answer_info_dict_list
+            'learner_answer_info_data': learner_answer_info_data
         })
 
     @acl_decorators.can_edit_entity
