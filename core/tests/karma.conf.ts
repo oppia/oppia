@@ -150,6 +150,7 @@ module.exports = function(config) {
           'core/templates/dev/head',
           'extensions',
           'node_modules',
+          'third_party',
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
