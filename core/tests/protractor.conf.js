@@ -29,6 +29,10 @@ var suites = {
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],
 
+    creatorDashboard: [
+      'protractor_desktop/creatorDashboard.js'
+    ],
+
     embedding: [
       'protractor_desktop/embedding.js'
     ],
