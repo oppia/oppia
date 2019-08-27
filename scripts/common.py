@@ -39,6 +39,7 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0/google-cloud-sdk')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
 FRONTEND_DIR = 'core/templates/dev/head'
+os.environ['PATH'] = '%s/bin:' % NODE_PATH + os.environ['PATH']
 
 
 def ensure_directory_exists(d):
