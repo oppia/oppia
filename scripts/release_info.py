@@ -19,8 +19,8 @@ Should be run from the oppia root dir.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
-import argparse
 import collections
+import getpass
 import os
 import re
 import subprocess
@@ -53,14 +53,6 @@ FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
-
-_PARSER = argparse.ArgumentParser()
-_PARSER.add_argument(
-    '--personal_access_token',
-    help=(
-        'Personal access token for your github ID. '
-        'You can create one at https://github.com/settings/tokens'),
-    type=str)
 
 
 def _run_cmd(cmd_str):
@@ -299,15 +291,18 @@ def main():
         raise Exception(
             'This script should only be run from the latest release branch.')
 
-    parsed_args = _PARSER.parse_args()
-    if parsed_args.personal_access_token is None:
+    personal_access_token = getpass.getpass(
+        prompt=(
+            'Personal access token for your github ID. '
+            'You can create one at https://github.com/settings/tokens: '))
+
+    if personal_access_token is None:
         python_utils.PRINT(
             'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and pass it '
-            'to the script using --personal_access_token=<token>')
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script')
         return
 
-    personal_access_token = parsed_args.personal_access_token
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
@@ -391,7 +386,7 @@ def main():
             '``Thanks to %s, our returning contributors who made this release '
             'possible.``\n' % existing_author_comma_list)
 
-        if parsed_args.personal_access_token:
+        if personal_access_token:
             out.write('\n### Changelog: \n')
             for category in categorized_pr_titles:
                 out.write('%s\n' % category)
