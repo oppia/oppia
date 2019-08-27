@@ -24,10 +24,12 @@ import sys
 
 import python_utils
 
+from . import build
 from . import common
 from . import install_third_party
 from . import pre_commit_hook
 from . import pre_push_hook
+from . import setup
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -182,8 +184,30 @@ def install_skulpt(argv):
             os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
 
 
+def maybe_install_dependencies(
+        skip_installing_third_party_libs, run_minified_tests):
+    """Parse additional command line arguments."""
+    if skip_installing_third_party_libs is False:
+        # Install third party dependencies.
+        main([])
+        # Ensure that generated JS and CSS files are in place before running the
+        # tests.
+        python_utils.PRINT('')
+        python_utils.PRINT('Running build task with concatenation only')
+        python_utils.PRINT('')
+        build.build([])
+
+    if run_minified_tests is True:
+        python_utils.PRINT('')
+        python_utils.PRINT(
+            'Running build task with concatenation and minification')
+        python_utils.PRINT('')
+        build.build(['--prod_env'])
+
+
 def main(argv):
     """Install third-party libraries for Oppia."""
+    setup.main()
     pip_dependencies = [
         ('future', '0.17.1', common.THIRD_PARTY_DIR),
         ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),

@@ -57,6 +57,7 @@ import python_utils
 from . import build
 from . import common
 from . import install_chrome_on_travis
+from . import install_third_party_libs
 from . import setup
 from . import setup_gae
 
@@ -123,7 +124,7 @@ def main(argv):
         install_chrome_on_travis.main()
 
     parsed_args, _ = _PARSER.parse_known_args(args=argv)
-    setup.maybe_install_dependencies(
+    install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
     if not common.is_port_open(8181):

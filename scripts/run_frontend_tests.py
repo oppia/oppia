@@ -37,6 +37,7 @@ import sys
 import python_utils
 
 from . import build
+from . import install_third_party_libs
 from . import setup
 from . import setup_gae
 
@@ -60,7 +61,7 @@ def main(argv):
     if os.environ.get('VAGRANT') or os.path.isfile('/etc/is_vagrant_vm'):
         xvfb_prefix = '/usr/bin/xvfb-run'
     parsed_args, _ = _PARSER.parse_known_args(args=argv)
-    setup.maybe_install_dependencies(
+    install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
     python_utils.PRINT('')
     python_utils.PRINT(

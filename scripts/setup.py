@@ -25,9 +25,7 @@ import tarfile
 
 import python_utils
 
-from . import build
 from . import common
-from . import install_third_party_libs
 
 
 def delete_directory_tree(directory_path):
@@ -52,27 +50,6 @@ def create_directory(directory_path):
     if os.path.exists(directory_path):
         return
     os.makedirs(directory_path)
-
-
-def maybe_install_dependencies(
-        skip_installing_third_party_libs, run_minified_tests):
-    """Parse additional command line arguments."""
-    if skip_installing_third_party_libs is False:
-        # Install third party dependencies.
-        install_third_party_libs.main([])
-        # Ensure that generated JS and CSS files are in place before running the
-        # tests.
-        python_utils.PRINT('')
-        python_utils.PRINT('Running build task with concatenation only')
-        python_utils.PRINT('')
-        build.build([])
-
-    if run_minified_tests is True:
-        python_utils.PRINT('')
-        python_utils.PRINT(
-            'Running build task with concatenation and minification')
-        python_utils.PRINT('')
-        build.build(['--prod_env'])
 
 
 # This function takes a command for python as its only input.
