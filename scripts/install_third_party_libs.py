@@ -84,7 +84,7 @@ def pip_install(package, version, install_path):
             'install', '%s==%s' % (package, version), '--target', install_path])
     # For pip version > 10.
     else:
-        import pip._internal
+        import pip._internal # pylint: disable=no-name-in-module # pylint: disable=import-error
         pip._internal.main(args=[  # pylint: disable=protected-access
             'install', '%s==%s' % (package, version), '--target', install_path])
 

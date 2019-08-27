@@ -138,7 +138,7 @@ def main(argv):
         background_processes.append(subprocess.Popen(
             'node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts'
             ' --watch'.split()))
-        # Give webpack few seconds to do the initíal compilation.
+        # Give webpack few seconds to do the initial compilation.
         time.sleep(10)
 
     python_utils.PRINT('Starting GAE development server')
