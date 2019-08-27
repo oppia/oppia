@@ -26,7 +26,8 @@ import utils
 
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 
 class SentEmailModel(base_models.BaseModel):
@@ -417,3 +418,34 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         return {
             user_id: model for user_id, model in python_utils.ZIP(
                 user_ids, user_models)}
+
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export GeneralFeedbackEmailReplyToIdModel's user properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict whose keys are IDs of threads the user is
+            involved in. The corresponding value is the reply_to_id of that
+            thread. If the user_id does not have a corresponding
+            UserSubscriptionsModel, then this method returns None. If a thread
+            ID in UserSubscriptionsModel does not have a corresponding
+            GeneralFeedbackEmailReplyToIdModel, it is excluded.
+        """
+        user_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            user_id, strict=False)
+        if not user_subscriptions_model:
+            return None
+
+        user_data = {}
+        for thread_id in user_subscriptions_model.general_feedback_thread_ids:
+            user_email_model = GeneralFeedbackEmailReplyToIdModel.get(
+                user_id, thread_id, strict=False)
+            if user_email_model is not None:
+                user_data[thread_id] = user_email_model.reply_to_id
+
+        return user_data
+
+
