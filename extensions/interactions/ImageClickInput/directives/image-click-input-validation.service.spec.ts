@@ -17,10 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
+/*eslint-disable */
 import { ImageClickInputValidationService } from
-  'interactions/ImageClickInput/directives/' +
-  'image-click-input-validation.service';
+  'interactions/ImageClickInput/directives/image-click-input-validation.service';
+/* eslint-enable */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 

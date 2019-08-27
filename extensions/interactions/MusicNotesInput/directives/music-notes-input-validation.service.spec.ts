@@ -20,9 +20,10 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
+/*eslint-disable */
 import { MusicNotesInputValidationService } from
-  'interactions/MusicNotesInput/directives/' +
-  'music-notes-input-validation.service';
+  'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
+/* eslint-enable */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 
