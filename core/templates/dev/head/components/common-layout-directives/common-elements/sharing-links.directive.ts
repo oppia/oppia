@@ -69,7 +69,6 @@ angular.module('oppia').directive('sharingLinks', [
             ctrl.registerShareEvent = (
               SiteAnalyticsService.registerShareCollectionEvent);
           } else {
-            console.log(JSON.stringify(ctrl));
             throw Error(
               'SharingLinks directive can only be used either in the' +
               'collection player or the exploration player');

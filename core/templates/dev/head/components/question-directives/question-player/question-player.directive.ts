@@ -585,7 +585,8 @@ angular.module('oppia').directive('questionPlayer', [
               ctrl.testIsPassed = hasUserPassedTest();
             }
           });
-        }}
+        }
+      }
       ]
     };
   }]);
