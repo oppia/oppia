@@ -239,7 +239,7 @@ class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
                 [self.THREAD_ID_1, self.THREAD_ID_2])).put()
 
         # Since reply-to-id is generated using a random generator
-        # that does not support seeding (SystemRandom) whose
+        # that does not support seeding (SystemRandom) and whose
         # output is hashed by utils.convert_to_hash, we will
         # (for testing purposes) instead replace convert_to_hash
         # with a lambda that returns a predetermined value.

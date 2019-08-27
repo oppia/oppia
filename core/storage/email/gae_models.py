@@ -432,7 +432,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread. If the user_id does not have a corresponding
             UserSubscriptionsModel, then this method returns None. If a thread
             ID in UserSubscriptionsModel does not have a corresponding
-            GeneralFeedbackEmailReplyToIdModel, it is excluded.
+            GeneralFeedbackEmailReplyToIdModel, it is excluded from the
+            returned dict.
         """
         user_subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
