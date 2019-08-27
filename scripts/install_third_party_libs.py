@@ -84,10 +84,13 @@ def pip_install(package, version, install_path):
             'install', '%s==%s' % (package, version), '--target', install_path])
     # For pip version > 10.
     else:
-        import pip._internal # pylint: disable=no-name-in-module # pylint: disable=import-error
+        # pylint: disable=no-name-in-module
+        # pylint: disable=import-error
+        import pip._internal
         pip._internal.main(args=[  # pylint: disable=protected-access
             'install', '%s==%s' % (package, version), '--target', install_path])
-
+        # pylint: enable=no-name-in-module
+        # pylint: enable=import-error
 
 def install_skulpt(argv):
     """Download and install Skulpt. Skulpt is built using a Python script
