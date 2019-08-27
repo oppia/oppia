@@ -17,10 +17,6 @@ export = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
-  // This specifies the current editor in use and used to switch
-  // between CK4 & CK5.
-  "CURRENT_RTE_IS_CKEDITOR_4": true,
-
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
