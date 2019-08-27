@@ -154,8 +154,8 @@ def main():
 
     # Change ownership of $NODE_MODULE_DIR.
     # Note: on some machines, these commands seem to take quite a long time.
-    os.chown('node_modules/', os.getuid(), -1)
-    os.chmod('node_modules/', 744)
+    common.recursive_chown('node_modules/', os.getuid(), -1)
+    common.recursive_chmod('node_modules/', 744)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.

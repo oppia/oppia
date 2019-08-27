@@ -226,6 +226,36 @@ def run_command(command):
     return subprocess.check_output(command.split())
 
 
+def recursive_chown(path, uid, gid):
+    """Changes the owner and group id of all files in a path to the numeric
+    uid and gid.
+
+    Args:
+        path: str. The path for which owner id and group id need to be setup.
+        uid: int. Owner ID to be set.
+        gid: int. Group ID to be set.
+    """
+    for root, dirs, files in os.walk(path):
+        for directory in dirs:
+            os.chown(os.path.join(root, directory), uid, gid)
+        for filename in files:
+            os.chown(os.path.join(root, filename), uid, gid)
+
+
+def recursive_chmod(path, mode):
+    """Changes the mode of path to the passed numeric mode.
+
+    Args:
+        path: str. The path for which mode would be set.
+        mode: int. The mode to be set.
+    """
+    for root, dirs, files in os.walk(path):
+        for directory in dirs:
+            os.chmod(os.path.join(root, directory), mode)
+        for filename in files:
+            os.chmod(os.path.join(root, filename), mode)
+
+
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
 

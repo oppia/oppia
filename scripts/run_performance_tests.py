@@ -109,7 +109,7 @@ def main(argv):
         common.OPPIA_TOOLS_DIR, 'browsermob-proxy-2.1.1/bin/browsermob-proxy')
 
     # Change execute status of browsermob-proxy.
-    os.chmod(browsermob_proxy_path, 744)
+    common.recursive_chmod(browsermob_proxy_path, 744)
 
     # Start a demo server.
     background_process = subprocess.Popen((
@@ -148,7 +148,7 @@ def main(argv):
         run_performance_test('profile_page_test', xvfb_prefix)
         run_performance_test('splash_test', xvfb_prefix)
 
-    os.chmod(browsermob_proxy_path, 644)
+    common.recursive_chmod(browsermob_proxy_path, 644)
     clean.delete_file('bmp.log')
     clean.delete_file('server.log')
 
