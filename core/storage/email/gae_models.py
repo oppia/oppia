@@ -447,5 +447,3 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                 user_data[thread_id] = user_email_model.reply_to_id
 
         return user_data
-
-

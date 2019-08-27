@@ -276,5 +276,3 @@ class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
             self.THREAD_ID_2: self.USER_2_REPLY_TO_ID_2
         }
         self.assertEqual(expected_data, user_data)
-
-
