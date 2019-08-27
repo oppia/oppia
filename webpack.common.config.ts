@@ -150,12 +150,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      filename: 'base.html',
-      template: 'core/templates/dev/head/pages/base.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['about'],
       filename: 'about-page.mainpage.html',
       meta: {
