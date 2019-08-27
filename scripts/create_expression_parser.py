@@ -12,12 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""INSTRUCTIONS:
-Run this script from the oppia root folder:
-  python -m scripts.create_expression_parser
-The root folder MUST be named 'oppia'.
-It produces the expression parser.
-"""
+"""It produces the expression parser."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import fileinput
@@ -42,7 +37,7 @@ def main():
         'core/templates/dev/head/expressions/ExpressionParserService.js')
 
     # Install the basic environment, e.g. nodejs.
-    install_third_party_libs.main([])
+    install_third_party_libs.main()
 
     python_utils.PRINT(
         'Checking whether pegjs is installed in %s' % common.OPPIA_TOOLS_DIR)

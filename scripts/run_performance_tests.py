@@ -12,19 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""INSTRUCTIONS:
-
-The root folder MUST be named 'oppia'.
-
-Run all tests sequentially:
-- run python -m scripts.run_performance_tests without args in order to run all
-  tests sequentially.
-
-Run test for a specific page:
-- run python -m scripts.run_performance_tests --test_name=page_test
-
-page_test is the name of the file containing that test eg. splash_test.
-"""
+"""Runs the performance tests."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse
@@ -64,7 +52,7 @@ def cleanup():
 
     # Wait for the servers to go down; suppress 'connection refused' error
     # output from nc since that is exactly what we are expecting to happen.
-    while not common.is_port_open(9501):
+    while not common.is_port_close(9501):
         time.sleep(1)
 
     python_utils.PRINT('Done!')
@@ -83,7 +71,7 @@ def run_performance_test(test_name, xvfb_prefix):
         % (xvfb_prefix, test_name)).split())
 
 
-def main(argv):
+def main(argv=None):
     """Main function to run the performance tests."""
     setup.main()
     setup_gae.main()
@@ -92,7 +80,7 @@ def main(argv):
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
-    if not common.is_port_open(8181):
+    if not common.is_port_close(8181):
         python_utils.PRINT(
             'There is already a server running on localhost:8181')
         python_utils.PRINT(
@@ -119,7 +107,7 @@ def main(argv):
         % common.GOOGLE_APP_ENGINE_HOME).split())
 
     # Wait for the servers to come up.
-    while common.is_port_open(9501):
+    while common.is_port_close(9501):
         time.sleep(1)
 
     # Install xvfb if not on travis, Used in frontend, e2e tests and performance

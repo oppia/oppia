@@ -30,7 +30,7 @@ import python_utils
 from . import clean
 
 
-def main(argv):
+def main(argv=None):
     """Creates a lockfile."""
     vagrant_lock_file = './.lock'
 

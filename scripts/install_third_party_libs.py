@@ -198,17 +198,17 @@ def maybe_install_dependencies(
         python_utils.PRINT('')
         python_utils.PRINT('Running build task with concatenation only')
         python_utils.PRINT('')
-        build.build([])
+        build.main()
 
     if run_minified_tests is True:
         python_utils.PRINT('')
         python_utils.PRINT(
             'Running build task with concatenation and minification')
         python_utils.PRINT('')
-        build.build(['--prod_env'])
+        build.main(argv=['--prod_env'])
 
 
-def main(argv):
+def main(argv=None):
     """Install third-party libraries for Oppia."""
     setup.main()
     pip_dependencies = [
@@ -250,11 +250,11 @@ def main(argv):
     install_skulpt(argv)
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')
-    pre_commit_hook.main(['--install'])
+    pre_commit_hook.main(argv=['--install'])
 
     # Install pre-push script.
     python_utils.PRINT('Installing pre-push hook for git')
-    pre_push_hook.main(['--install'])
+    pre_push_hook.main(argv=['--install'])
 
 
 if __name__ == '__main__':

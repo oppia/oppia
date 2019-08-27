@@ -297,7 +297,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     return result
 
 
-def main(argv):
+def main(argv=None):
     """Run the tests."""
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):

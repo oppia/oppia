@@ -12,17 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""INSTRUCTIONS:
-
-This script starts up a development server running Oppia. It installs any
+"""This script starts up a development server running Oppia. It installs any
 missing third-party dependencies and starts up a local GAE development
 server.
-
-Run the script from the oppia root folder:
-
-  python -m scripts.start
-
-Note that the root folder MUST be named 'oppia'.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
@@ -69,14 +61,14 @@ def cleanup():
     python_utils.PRINT('INFORMATION')
     python_utils.PRINT('Cleaning up the servers.')
     python_utils.PRINT('')
-    while not common.is_port_open(8181):
+    while not common.is_port_close(8181):
         time.sleep(1)
 
 
-def main(argv):
+def main(argv=None):
     """Starts up a development server running Oppia."""
     if os.path.isfile('/etc/is_vagrant_vm'):
-        vagrant_lock.main([])
+        vagrant_lock.main()
 
     setup.main()
     setup_gae.main()
@@ -85,12 +77,12 @@ def main(argv):
     atexit.register(cleanup)
 
     # Install third party dependencies.
-    install_third_party_libs.main([])
+    install_third_party_libs.main()
 
     python_utils.PRINT('Oppia setup complete!')
 
     # Check that there isn't a server already running.
-    if not common.is_port_open(8181):
+    if not common.is_port_close(8181):
         python_utils.PRINT('')
         python_utils.PRINT('WARNING')
         python_utils.PRINT(
@@ -111,7 +103,7 @@ def main(argv):
             python_utils.PRINT(
                 re.sub(
                     '\'DEV_MODE\': .*', constants_env_variable, line), end='')
-        build.build(['--prod_env', '--enable_watcher'])
+        build.main(argv=['--prod_env', '--enable_watcher'])
         app_yaml_filepath = 'app.yaml'
     else:
         constants_env_variable = '\'DEV_MODE\': true'
@@ -120,7 +112,7 @@ def main(argv):
             python_utils.PRINT(
                 re.sub(
                     '\'DEV_MODE\': .*', constants_env_variable, line), end='')
-        build.build(['--enable_watcher'])
+        build.main(argv=['--enable_watcher'])
         app_yaml_filepath = 'app_dev.yaml'
 
     # Set up a local dev instance.
@@ -150,7 +142,7 @@ def main(argv):
             enable_console_arg, app_yaml_filepath)).split()))
 
     # Wait for the servers to come up.
-    while common.is_port_open(8181):
+    while common.is_port_close(8181):
         time.sleep(1)
 
     os_info = os.uname()

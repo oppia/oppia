@@ -1347,7 +1347,7 @@ def compile_typescript_files_continuously(project_dir):
                     return
 
 
-def build(argv):
+def main(argv=None):
     """The main method of this script.
 
     Creates a third-party directory where all the JS and CSS dependencies are
@@ -1393,4 +1393,4 @@ def build(argv):
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when build.py is used as a script.
 if __name__ == '__main__':  # pragma: no cover
-    build(sys.argv)
+    main(sys.argv)

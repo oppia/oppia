@@ -12,34 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""INSTRUCTIONS:
-
-Run this script from the oppia root folder:
-  bash scripts/run_e2e_tests.sh
-
-Optional arguments:
-  --browserstack Run the tests on browserstack using the
-        protractor-browserstack.conf.js file.
-  --skip-install=true/false If true, skips installing dependencies. The
-        default value is false.
-  --sharding=true/false Disables/Enables parallelization of protractor tests.
-  --sharding-instances=# Sets the number of parallel browsers to open while
-        sharding.
-  --prod_env Run the tests in prod mode. Static resources are served from
-        build directory and use cache slugs.
-Sharding must be disabled (either by passing in false to --sharding or 1 to
---sharding-instances) if running any tests in isolation (fit or fdescribe).
-  --suite=suite_name Performs test for different suites, here suites are the
-        name of the test files present in core/tests/protractor_desktop/ and
-        core/test/protractor/ dirs. e.g. for the file
-        core/tests/protractor/accessibility.js use --suite=accessibility.
-        For performing a full test, no argument is required.
-
-The root folder MUST be named 'oppia'.
-
-Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
-single test or test suite.
-"""
+"""Runs the end to end tests."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse
@@ -101,7 +74,7 @@ def cleanup():
 
     # Wait for the servers to go down; suppress 'connection refused' error
     # output from nc since that is exactly what we are expecting to happen.
-    while not common.is_port_open(4444) or not common.is_port_open(9001):
+    while not common.is_port_close(4444) or not common.is_port_close(9001):
         time.sleep(1)
 
     if os.path.isdir('../protractor-screenshots'):
@@ -116,7 +89,7 @@ def cleanup():
     python_utils.PRINT('Done!')
 
 
-def main(argv):
+def main(argv=None):
     """Runs the end to end tests."""
     setup.main()
     setup_gae.main()
@@ -127,7 +100,7 @@ def main(argv):
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
-    if not common.is_port_open(8181):
+    if not common.is_port_close(8181):
         python_utils.PRINT('')
         python_utils.PRINT(
             'There is already a server running on localhost:8181.')
@@ -151,7 +124,7 @@ def main(argv):
             python_utils.PRINT(
                 re.sub(r'\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
-        build.build(['--prod_env'])
+        build.main(argv=['--prod_env'])
         app_yaml_filepath = 'app.yaml'
     else:
         dev_mode = 'true'
@@ -161,7 +134,7 @@ def main(argv):
             python_utils.PRINT(
                 re.sub('\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
-        build.build([])
+        build.main()
         app_yaml_filepath = 'app_dev.yaml'
 
     # Start a selenium server using chromedriver 2.41.
@@ -190,7 +163,7 @@ def main(argv):
          % (common.GOOGLE_APP_ENGINE_HOME, app_yaml_filepath)).split()))
 
     # Wait for the servers to come up.
-    while common.is_port_open(4444) or common.is_port_open(9001):
+    while common.is_port_close(4444) or common.is_port_close(9001):
         time.sleep(1)
 
     # Delete outdated screenshots.

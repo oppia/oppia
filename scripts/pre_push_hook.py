@@ -355,7 +355,7 @@ def _does_diff_include_package_json(files_to_lint):
     return False
 
 
-def main(argv):
+def main(argv=None):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
     """

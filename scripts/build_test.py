@@ -919,7 +919,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         with ensure_files_exist_swap, build_using_webpack_swap, (
             compile_typescript_files_swap), compare_file_count_swap, args_swap:
-            build.build([])
+            build.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -949,7 +949,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         with ensure_files_exist_swap, (
             compile_typescript_files_continuously_swap), args_swap:
-            build.build([])
+            build.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -981,7 +981,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         with ensure_files_exist_swap, compile_typescript_files_swap, (
             assert_raises_regexp_context_manager), args_swap:
-            build.build([])
+            build.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -993,6 +993,6 @@ class BuildTests(test_utils.GenericTestBase):
                 % (build.WEBPACK_FILE, build.WEBPACK_PROD_CONFIG))
 
         with self.swap(subprocess, 'check_call', mock_check_call):
-            build.build_using_webpack()
+            build.main_using_webpack()
 
 # pylint: enable=protected-access

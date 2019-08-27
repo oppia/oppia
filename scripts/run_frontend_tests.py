@@ -12,21 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""INSTRUCTIONS:
-Run this script from the oppia root folder:
-    python -m scripts.run_frontend_tests
-
-Optional arguments:
-    --skip_install. If specified, skips installing dependencies.
-    --run_minified_tests. If specified, runs frontend karma tests on both
-        minified and non-minified code.
-
-The root folder MUST be named 'oppia'.
-It runs unit tests for frontend JavaScript code (using Karma).
-
-Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
-single test or test suite.
-"""
+"""It runs unit tests for frontend JavaScript code (using Karma)."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse
@@ -53,7 +39,7 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def main(argv):
+def main(argv=None):
     """Runs the frontend tests."""
     setup.main()
     setup_gae.main()
@@ -75,7 +61,7 @@ def main(argv):
     python_utils.PRINT('Running test in development environment')
     python_utils.PRINT('')
 
-    build.build([])
+    build.main()
 
     start_tests_cmd = (
         '%s node_modules/karma/bin/karma start core/tests/karma.conf.ts'
@@ -87,7 +73,7 @@ def main(argv):
         python_utils.PRINT('Running test in production environment')
         python_utils.PRINT('')
 
-        build.build(['--prod_env', '--minify_third_party_libs_only'])
+        build.main(argv=['--prod_env', '--minify_third_party_libs_only'])
 
         start_tests_cmd = (
             '%s node_modules/karma/bin/karma start '

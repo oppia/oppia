@@ -125,7 +125,7 @@ def _revert_changes_in_package_lock_file():
         raise ValueError(err_unstage_cmd)
 
 
-def main(argv):
+def main(argv=None):
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
     """

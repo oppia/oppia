@@ -15,6 +15,7 @@
 """Common utility functions and classes used by multiple Python scripts."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
+import contextlib
 import os
 import signal
 import socket
@@ -23,9 +24,9 @@ import sys
 
 import python_utils
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PSUTIL_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'psutil-5.6.3')
-sys.path.insert(0, _PSUTIL_PATH)
+PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+PSUTIL_PATH = os.path.join(PARENT_DIR, 'oppia_tools', 'psutil-5.6.3')
+sys.path.insert(0, PSUTIL_PATH)
 
 import psutil  # isort:skip  # pylint: disable=wrong-import-position
 
@@ -183,7 +184,7 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         subprocess.call(['git', 'pull', remote_alias])
 
 
-def is_port_open(port):
+def is_port_close(port):
     """Checks if no process is listening to the port.
 
     Args:
@@ -192,10 +193,9 @@ def is_port_open(port):
     Return:
         bool. True if port is open else False.
     """
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    result = sock.connect_ex(('localhost', port))
-    sock.close()
-    return bool(result)
+    with contextlib.closing(
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        return bool(s.connect_ex(('localhost', port)))
 
 
 # Credits: https://stackoverflow.com/a/20691431/11755830

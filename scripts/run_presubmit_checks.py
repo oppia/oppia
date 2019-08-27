@@ -12,12 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""INSTRUCTIONS:
-
-Run this script from the oppia root folder prior to opening a PR:
-  python -m scripts.run_presubmit_checks
-
-It runs the following tests in all cases.
+"""It runs the following tests in all cases.
 - Javascript and Python Linting
 - Backend Python tests
 
@@ -27,18 +22,6 @@ If any of these tests result in errors, this script will terminate.
 
 Note: The test scripts are arranged in increasing order of time taken. This
 enables a broken build to be detected as quickly as possible.
-
-=====================
-CUSTOMIZATION OPTIONS
-=====================
-
-Set the origin branch to compare against by adding
-
-  --branch=your_branch or -b=your_branch
-
-By default, if the current branch tip exists on remote origin,
-the current branch is compared against its tip on GitHub.
-Otherwise it's compared against 'develop'.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
@@ -58,7 +41,7 @@ _PARSER.add_argument(
     help='optional; if specified, the origin branch to compare against.')
 
 
-def main(argv):
+def main(argv=None):
     """Run the presubmit checks."""
 
     # Run Javascript and Python linters.
@@ -91,7 +74,7 @@ def main(argv):
     if common.FRONTEND_DIR in all_changed_files:
         # Run frontend unit tests.
         python_utils.PRINT('Running frontend unit tests')
-        run_frontend_tests.main(['--run_minified_tests'])
+        run_frontend_tests.main(argv=['--run_minified_tests'])
         python_utils.PRINT('Frontend tests passed.')
         python_utils.PRINT('')
     else:
@@ -101,7 +84,7 @@ def main(argv):
 
     # Run backend tests.
     python_utils.PRINT('Running backend tests')
-    run_backend_tests.main([])
+    run_backend_tests.main()
     python_utils.PRINT('Backend tests passed.')
     python_utils.PRINT('')
 
