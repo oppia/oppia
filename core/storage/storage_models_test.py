@@ -48,7 +48,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
 
     def test_all_model_module_names_unique(self):
         names_of_ndb_model_subclasses = [
-            clazz.__name__ for clazz in  self._get_model_classes()]
+            clazz.__name__ for clazz in self._get_model_classes()]
 
         self.assertEqual(
             len(set(names_of_ndb_model_subclasses)),

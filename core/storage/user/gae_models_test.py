@@ -348,7 +348,13 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)
 
 
+class UserSubscribersModelTests(test_utils.GenericTestBase):
+    """Tests for UserSubscribersModel."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
 
 class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
