@@ -102,7 +102,7 @@ def main(argv=None):
         'python', '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME,
         '--host=0.0.0.0', '--port=9501', '--clear_datastore=yes',
         '--dev_appserver_log_level=critical', '--log_level=critical',
-        '--skip_sdk_update_check=true', app_dev.yaml])
+        '--skip_sdk_update_check=true', 'app_dev.yaml'])
 
     # Wait for the servers to come up.
     while common.is_port_close(9501):
@@ -142,4 +142,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main(argv=sys.argv)

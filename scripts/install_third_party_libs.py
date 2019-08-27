@@ -90,6 +90,7 @@ def pip_install(package, version, install_path):
         # pylint: enable=no-name-in-module
         # pylint: enable=import-error
 
+
 def install_skulpt(argv):
     """Download and install Skulpt. Skulpt is built using a Python script
     included within the Skulpt repository (skulpt.py). This script normally
@@ -245,11 +246,11 @@ def main(argv=None):
     install_third_party.main()
 
     # Install third-party node modules needed for the build process.
-    subprocess.call([common.NPM_PATH, 'install', '--only=dev'])
+    subprocess.call(['sudo', common.NPM_PATH, 'install', '--only=dev'])
     # This line removes the 'npm ERR! missing:' messages. For reference, see
     # this thread: https://github.com/npm/npm/issues/19393#issuecomment-
     # 374076889.
-    subprocess.call([common.NPM_PATH, 'dedupe'])
+    # subprocess.call([common.NPM_PATH, 'dedupe'])
 
     install_skulpt(argv)
 
@@ -263,4 +264,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main(argv=sys.argv)

@@ -192,7 +192,7 @@ def main(argv=None):
                 '--capabilities.shardTestFiles=%s' % parsed_args.sharding,
                 '--capabilities.maxInstances=%s'
                 % parsed_args.sharding_instances, '--suite', parsed_args.suite,
-                '--params.devMode="%s"' % devMode])
+                '--params.devMode="%s"' % dev_mode])
     else:
         python_utils.PRINT('Running the tests on browserstack...')
         if not parsed_args.sharding or parsed_args.sharding_instances == '1':
@@ -214,4 +214,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main(argv=sys.argv)

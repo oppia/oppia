@@ -25,10 +25,8 @@ import argparse
 import os
 import sys
 
-import python_utils
-
-from . import common
 from . import clean
+from . import common
 
 
 def main(argv=None):
@@ -58,4 +56,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main(argv=sys.argv)

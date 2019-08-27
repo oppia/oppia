@@ -71,7 +71,7 @@ def main(argv=None):
         'webpack.dev.config.ts'])
 
     sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
-    backend_tests.main(argv)
+    backend_tests.main(argv=argv)
 
     if parsed_args.generate_coverage_report:
         subprocess.call(['python', coverage_path, 'combine'])
@@ -88,4 +88,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main(argv=sys.argv)

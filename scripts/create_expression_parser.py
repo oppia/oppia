@@ -16,7 +16,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import fileinput
-import os
 import re
 import subprocess
 

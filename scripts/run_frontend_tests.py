@@ -23,6 +23,7 @@ import sys
 import python_utils
 
 from . import build
+from . import common
 from . import install_third_party_libs
 from . import setup
 from . import setup_gae
@@ -74,4 +75,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main(argv=sys.argv)
