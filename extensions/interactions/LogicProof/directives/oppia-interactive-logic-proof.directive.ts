@@ -16,6 +16,8 @@
  * @fileoverview Directive for the LogicProof Interaction.
  */
 
+require('interactions/codemirrorRequires.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(

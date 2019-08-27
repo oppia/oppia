@@ -24,14 +24,12 @@ import logging
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import dependency_registry
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
-from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -41,8 +39,6 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
-
-import jinja2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
@@ -71,26 +67,10 @@ class EditorHandler(base.BaseHandler):
 class ExplorationPage(EditorHandler):
     """The editor page for a single exploration."""
 
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
 
     @acl_decorators.can_play_exploration
     def get(self, unused_exploration_id):
         """Handles GET requests."""
-        interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
-
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
-                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
-
-        self.values.update({
-            'additional_angular_modules': additional_angular_modules,
-            'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-        })
 
         self.render_template('exploration-editor-page.mainpage.html')
 
