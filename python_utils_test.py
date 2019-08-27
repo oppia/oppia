@@ -155,14 +155,14 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_recursively_convert_to_str(self):
         test_var_1 = python_utils.UNICODE('test_var_1')
         test_var_2 = python_utils.UNICODE('test_var_2')
-        test_dict = {test_var_1: 'a', test_var_2: b'b'}
+        test_dict = {test_var_1: 'a', test_var_2: 'b'}
 
-        for key, val in test_dict.values():
+        for key, val in test_dict.items():
             self.assertFalse(isinstance(key, str))
             self.assertFalse(isinstance(val, str))
 
         dict_in_str = python_utils.recursively_convert_to_str(test_dict)
-        for key, val in dict_in_str.values():
+        for key, val in dict_in_str.items():
             self.assertTrue(isinstance(key, str))
             self.assertTrue(isinstance(val, str))
 
