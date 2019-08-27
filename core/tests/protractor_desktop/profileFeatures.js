@@ -24,6 +24,7 @@ var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var ProfilePage = require('../protractor_utils/ProfilePage.js');
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 
 describe('Un-customized profile page for current, logged-in user', function() {
   var TEST_USERNAME = 'currentDefaultProfileFeatures';
@@ -96,6 +97,52 @@ describe('Un-customized profile page for other user', function() {
   });
 
   afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
+
+describe('Customized profile page for current user', function() {
+  var TEST_USERNAME = 'currCustomizedProfileFeatures';
+  var TEST_EMAIL = TEST_USERNAME + '@example.com';
+  var TEST_BIO = 'My test bio!';
+  var TEST_INTERESTS = ['math', 'social studies'];
+  var profilePage = null;
+
+  beforeAll(function() {
+    profilePage = new ProfilePage.ProfilePage();
+    var preferencesPage = new PreferencesPage.PreferencesPage();
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+    users.login(TEST_EMAIL);
+    preferencesPage.get();
+    preferencesPage.setUserBio(TEST_BIO);
+    preferencesPage.get();
+    preferencesPage.setUserInterests(TEST_INTERESTS);
+    users.logout();
+  });
+
+  beforeEach(function() {
+    users.login(TEST_EMAIL);
+    profilePage.get(TEST_USERNAME);
+  });
+
+  it('displays the profile photo', function() {
+    profilePage.expectCurrUserToHaveProfilePhoto();
+  });
+
+  it('displays custom bio text', function() {
+    profilePage.expectUserToHaveBio(TEST_BIO);
+  });
+
+  it('displays custom interests', function() {
+    profilePage.expectUserToHaveInterests(TEST_INTERESTS);
+  });
+
+  it('does not display placeholder interest text', function() {
+    profilePage.expectUserToNotHaveInterestPlaceholder();
+  });
+
+  afterEach(function() {
+    users.logout();
     general.checkForConsoleErrors([]);
   });
 });

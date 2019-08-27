@@ -53,8 +53,25 @@ var ProfilePage = function() {
     });
   };
 
+  this.expectUserToHaveInterests = function(expectedInterests) {
+    interests.count().then(function(numInterests) {
+      expect(numInterests).toEqual(expectedInterests.length);
+      interests.map(function(interestElem) {
+        return interestElem.getText();
+      }).then(function(interestTexts) {
+        interestTexts.forEach(function(interestText) {
+          expect(expectedInterests.includes(interestText)).toBe(true);
+        });
+      });
+    });
+  };
+
   this.expectUserToHaveInterestPlaceholder = function(expectedText) {
     expect(interestPlaceholder.getText()).toMatch(expectedText);
+  };
+
+  this.expectUserToNotHaveInterestPlaceholder = function() {
+    expect(interestPlaceholder.isPresent()).toBe(false);
   };
 };
 
