@@ -146,3 +146,47 @@ describe('Customized profile page for current user', function() {
     general.checkForConsoleErrors([]);
   });
 });
+
+describe('Customized profile page for other user', function() {
+  var TEST_USERNAME = 'otherCustomizedProfileFeatures';
+  var TEST_EMAIL = TEST_USERNAME + '@example.com';
+  var TEST_BIO = 'My test bio!';
+  var TEST_INTERESTS = ['math', 'social studies'];
+  var profilePage = null;
+
+  beforeAll(function() {
+    profilePage = new ProfilePage.ProfilePage();
+    var preferencesPage = new PreferencesPage.PreferencesPage();
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+    users.login(TEST_EMAIL);
+    preferencesPage.get();
+    preferencesPage.setUserBio(TEST_BIO);
+    preferencesPage.get();
+    preferencesPage.setUserInterests(TEST_INTERESTS);
+    users.logout();
+  });
+
+  beforeEach(function() {
+    profilePage.get(TEST_USERNAME);
+  });
+
+  it('does not display the profile photo', function() {
+    profilePage.expectOtherUserToNotHaveProfilePhoto();
+  });
+
+  it('displays custom bio text', function() {
+    profilePage.expectUserToHaveBio(TEST_BIO);
+  });
+
+  it('displays custom interests', function() {
+    profilePage.expectUserToHaveInterests(TEST_INTERESTS);
+  });
+
+  it('does not display placeholder interest text', function() {
+    profilePage.expectUserToNotHaveInterestPlaceholder();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
