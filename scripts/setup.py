@@ -27,6 +27,7 @@ import python_utils
 
 from . import build
 from . import common
+from . import install_third_party_libs
 
 
 def delete_directory_tree(directory_path):
@@ -58,7 +59,7 @@ def maybe_install_dependencies(
     """Parse additional command line arguments."""
     if skip_installing_third_party_libs is False:
         # Install third party dependencies.
-        subprocess.call('bash scripts/install_third_party.sh'.split())
+        install_third_party_libs.main([])
         # Ensure that generated JS and CSS files are in place before running the
         # tests.
         python_utils.PRINT('')

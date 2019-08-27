@@ -29,7 +29,6 @@ from . import common
 from . import install_third_party
 from . import pre_commit_hook
 from . import pre_push_hook
-from . import setup
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -101,7 +100,8 @@ def pip_install(package, version, install_path):
     else:
         import pip._internal
         pip._internal.main(args=[  # pylint: disable=protected-access
-            'install', '%s==%s' % (package, version), '--target', install_path])
+            'install', '%s==%s' % (package, version), '--target', install_path,
+            '--system'])
 
 
 def install_skulpt(argv):
@@ -223,8 +223,6 @@ def main(argv):
         if not os.path.exists(exact_lib_path):
             python_utils.PRINT('Installing %s' % package)
             pip_install(package, version, exact_lib_path)
-
-    setup.main()
 
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')

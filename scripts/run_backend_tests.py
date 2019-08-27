@@ -83,7 +83,7 @@ def main(argv):
     setup_gae.main()
 
     # Install third party dependencies.
-    subprocess.call('bash scripts/install_third_party.sh'.split())
+    install_third_party_libs.main([])
 
     coverage_home = os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')
     coverage_path = os.path.join(coverage_home, 'coverage')
@@ -102,7 +102,7 @@ def main(argv):
 
     build.build([])
 
-    # Compile typescript files
+    # Compile typescript files.
     python_utils.PRINT('Compiling typescript...')
     subprocess.call(
         'node_modules/typescript/bin/tsc --project .'.split())
