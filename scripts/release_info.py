@@ -299,6 +299,26 @@ def check_blocking_bugs(repo):
     return blocking_bugs_milestone.open_issues
 
 
+def check_prs_for_current_release(repo):
+    """Checks that all pull requests for current release have a
+    PR: released label.
+
+    Args:
+        repo: github.Repository.Repository. The PyGithub object for the repo.
+
+    Returns:
+        int. Whether all pull requests for current release have a
+            PR: released label.
+    """
+    all_prs = repo.get_pulls(state='all')
+    for pr in all_prs:
+        label_names = [label.name for label in pr.labels]
+        if 'PR: released' not in label_names and (
+                'PR: for current release' in label_names):
+            return False
+    return True
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = _get_current_branch()
@@ -330,6 +350,15 @@ def main():
             'There are %s unresolved blocking bugs. Please '
             'ensure that they are resolved before changelog creation.' % (
                 blocking_bugs_count))
+
+    if not check_prs_for_current_release(repo):
+        common.open_new_tab_in_browser_if_possible(
+            'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
+            '+label%3A%22PR%3A+for+current+release%22+')
+        raise Exception(
+            'There are PRs for current release which do not have '
+            'a \'PR: released\' label. Please ensure that they are released '
+            'before changelog creation.')
 
     current_release = _get_current_version_tag(repo)
     current_release_tag = current_release.name
