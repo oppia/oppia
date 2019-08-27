@@ -16,6 +16,7 @@
  * @fileoverview Scripts needed for console_error page.
  */
 
+require('tests/console_errors.module.ts');
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');
