@@ -28,6 +28,8 @@ import sys
 
 import python_utils
 
+from . import common
+
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
 sys.path.insert(0, _PY_GITHUB_PATH)
@@ -284,6 +286,19 @@ def _check_storage_models(current_release):
     return [item for item in diff_list if item.startswith('core/storage')]
 
 
+def check_blocking_bugs(repo):
+    """Checks the number of unresolved blocking bugs.
+
+    Args:
+        repo: github.Repository.Repository. The PyGithub object for the repo.
+
+    Returns:
+        int: Number of unresolved blocking bugs.
+    """
+    blocking_bugs_milestone = repo.get_milestone(number=39)
+    return blocking_bugs_milestone.open_issues
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = _get_current_branch()
@@ -305,6 +320,16 @@ def main():
 
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
+
+    blocking_bugs_count = check_blocking_bugs(repo)
+    if blocking_bugs_count:
+        common.open_new_tab_in_browser_if_possible(
+            'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
+            'is%3Aissue+milestone%3A%22Blocking+bugs%22')
+        raise Exception(
+            'There are %s unresolved blocking bugs. Please '
+            'ensure that they are resolved before changelog creation.' % (
+                blocking_bugs_count))
 
     current_release = _get_current_version_tag(repo)
     current_release_tag = current_release.name
