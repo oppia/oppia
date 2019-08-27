@@ -19,7 +19,8 @@
 import { TestBed } from '@angular/core/testing';
 
 import { ImageClickInputValidationService } from
-  'interactions/ImageClickInput/directives/image-click-input-validation.service';
+  'interactions/ImageClickInput/directives/' +
+  'image-click-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 

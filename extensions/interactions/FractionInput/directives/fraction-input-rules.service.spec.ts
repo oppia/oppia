@@ -21,7 +21,8 @@
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 // ^^^ This block is to be removed.
 
-require('interactions/FractionInput/directives/fraction-input-rules.service.ts');
+require(
+  'interactions/FractionInput/directives/fraction-input-rules.service.ts');
 
 describe('Fraction Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
