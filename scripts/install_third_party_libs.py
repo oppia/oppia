@@ -16,7 +16,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse
-import contextlib
 import fileinput
 import os
 import shutil
@@ -39,24 +38,6 @@ _PARSER.add_argument(
     '--noskulpt',
     help='optional; if specified, skips installation of skulpt.',
     action='store_true')
-
-
-@contextlib.contextmanager
-def _redirect_stdout(new_target):
-    """Redirect stdout to the new target.
-
-    Args:
-        new_target: TextIOWrapper. The new target to which stdout is redirected.
-
-    Yields:
-        TextIOWrapper. The new target.
-    """
-    old_target = sys.stdout
-    sys.stdout = new_target
-    try:
-        yield new_target
-    finally:
-        sys.stdout = old_target
 
 
 def pip_install(package, version, install_path):
@@ -140,12 +121,7 @@ def install_skulpt(argv):
             # Use a specific Skulpt release.
             subprocess.call('git checkout 0.10.0'.split())
 
-            # Add a temporary backup file so that this script works on both
-            # Linux and Mac.
-            tmp_file = '/tmp/backup.XXXXXXXXXX'
-
             python_utils.PRINT('Compiling Skulpt')
-            target_stdout = python_utils.string_io()
             # The Skulpt setup function needs to be tweaked. It fails without
             # certain third party commands. These are only used for unit tests
             # and generating documentation and are not necessary when building
@@ -153,37 +129,29 @@ def install_skulpt(argv):
             for line in fileinput.input(
                     files=[os.path.join(
                         common.OPPIA_TOOLS_DIR,
-                        'skulpt-0.10.0/skulpt/skulpt.py')]):
+                        'skulpt-0.10.0/skulpt/skulpt.py')], inplace=True):
                 # Inside this loop the STDOUT will be redirected to the file.
                 # The comma after each python_utils.PRINT statement is needed to
                 #  avoid double line breaks.
-                with _redirect_stdout(target_stdout):
-                    python_utils.PRINT(
-                        line.replace('ret = test()', 'ret = 0'),
-                        end='')
-                    python_utils.PRINT(
-                        line.replace('  doc()', '  pass#doc()'),
-                        end='')
-                    # This and the next command disable unit and compressed unit
-                    # tests for the compressed distribution of Skulpt. These
-                    # tests don't work on some Ubuntu environments and cause a
-                    # libreadline dependency issue.
-                    python_utils.PRINT(
-                        line.replace(
-                            'ret = os.system(\'{0}',
-                            'ret = 0 #os.system(\'{0}'),
-                        end='')
-                    python_utils.PRINT(
-                        line.replace('ret = rununits(opt=True)', 'ret = 0'),
-                        end='')
+                python_utils.PRINT(
+                    line.replace('ret = test()', 'ret = 0'),
+                    end='')
+                python_utils.PRINT(
+                    line.replace('  doc()', '  pass#doc()'),
+                    end='')
+                # This and the next command disable unit and compressed unit
+                # tests for the compressed distribution of Skulpt. These
+                # tests don't work on some Ubuntu environments and cause a
+                # libreadline dependency issue.
+                python_utils.PRINT(
+                    line.replace(
+                        'ret = os.system(\'{0}',
+                        'ret = 0 #os.system(\'{0}'),
+                    end='')
+                python_utils.PRINT(
+                    line.replace('ret = rununits(opt=True)', 'ret = 0'),
+                    end='')
 
-            temp_file_content = target_stdout.getvalue()
-            with python_utils.open_file(tmp_file, 'w') as f:
-                f.write(python_utils.STR(temp_file_content))
-
-            shutil.move(
-                tmp_file, os.path.join(
-                    common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/skulpt.py'))
             subprocess.call(
                 'python $common.OPPIA_TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py '
                 'dist'.split())
@@ -191,13 +159,13 @@ def install_skulpt(argv):
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
 
-            # Move the build directory to the static resources folder.
-            os.makedirs(
-                os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
-            shutil.copytree(
-                os.path.join(
-                    common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/dist/'),
-                os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
+        # Move the build directory to the static resources folder.
+        os.makedirs(
+            os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
+        shutil.copytree(
+            os.path.join(
+                common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/dist/'),
+            os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
 
 
 def main(argv):
@@ -206,7 +174,7 @@ def main(argv):
         ('future', '0.17.1', common.THIRD_PARTY_DIR),
         ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
         ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', '0.2.1', common.OPPIA_TOOLS_DIR),
+        ('pylint-quotes', '0.1.8', common.OPPIA_TOOLS_DIR),
         ('webtest', '2.0.33', common.OPPIA_TOOLS_DIR),
         ('isort', '4.3.20', common.OPPIA_TOOLS_DIR),
         ('pycodestyle', '2.5.0', common.OPPIA_TOOLS_DIR),
