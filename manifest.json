@@ -496,11 +496,11 @@
         }
       },
       "uiCodemirror": {
-        "version": "0.3.0",
+        "version": "5d04fa5c991f915e4578be5f1175e22d94696633",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.3.0.zip",
-        "rootDirPrefix": "ui-codemirror-src",
-        "targetDirPrefix": "ui-codemirror-"
+        "url": "https://github.com/oppia/ui-codemirror/archive/5d04fa5c991f915e4578be5f1175e22d94696633.zip",
+        "rootDirPrefix": "ui-codemirror-",
+        "targetDir": "ui-codemirror-5d04fa"
       },
       "uiSortable": {
         "version": "0.19.0",

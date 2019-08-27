@@ -212,7 +212,6 @@
 /core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
 /core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
-/extensions/dependencies/ @seanlip @vojtechjelinek
 /extensions/domain*.py @seanlip @DubeySandeep
 /extensions/interactions/ @kevinlee12 @vojtechjelinek
 /extensions/objects/ @aks681
@@ -479,7 +478,6 @@
 # in scripts/pre_commit_linter.py in sync with the modifications.
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
-/core/domain/dependency_registry*.py @seanlip
 /core/domain/html*.py @seanlip
 /core/domain/rights_manager*.py @seanlip
 /core/domain/role_services*.py @seanlip

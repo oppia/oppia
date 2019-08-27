@@ -2,12 +2,7 @@
 <html ng-app="oppia" lang="<[currentLang]>" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Oppia"})
-    <script type="text/javascript">
-      var GLOBALS = {
-        ADDITIONAL_ANGULAR_MODULES: JSON.parse(
-          '{{additional_angular_modules|js_string}}')
-      };
-    </script>
+
     <!-- Updated previous version to current version of google charts
     https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -125,7 +120,6 @@
     @require('../footer_js_libs.html')
     <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-    {{ dependencies_html }}
+    @require('../../../../../../extensions/interactions/dependency_html.html')
   </body>
 </html>

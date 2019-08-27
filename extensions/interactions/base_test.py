@@ -22,7 +22,6 @@ import re
 import string
 import struct
 
-from core.domain import dependency_registry
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import interaction_registry
@@ -127,15 +126,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     ca_spec['default_value'],
                     obj_class.normalize(ca_spec['default_value']))
-
-    def _validate_dependencies(self, dependency_ids):
-        """Validates all the dependency ids.
-
-        Args:
-            dependency_ids: list(str). A list of dependency ids.
-        """
-        for dependency_id in dependency_ids:
-            dependency_registry.Registry.get_dependency_html(dependency_id)
 
     def _validate_answer_visualization_specs(self, answer_visualization_specs):
         """Validates all the answer_visualization_specs for the interaction.
@@ -481,8 +471,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             self._validate_customization_arg_specs(
                 interaction._customization_arg_specs)  # pylint: disable=protected-access
-
-            self._validate_dependencies(interaction.dependency_ids)
 
             answer_visualization_specs = (
                 interaction.answer_visualization_specs)
