@@ -16,7 +16,10 @@
  * @fileoverview Scripts needed for console_error page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
 require('tests/console_errors.module.ts');
+
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');
