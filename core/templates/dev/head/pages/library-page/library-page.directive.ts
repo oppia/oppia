@@ -102,7 +102,7 @@ angular.module('oppia').directive('libraryPage', [
               params: {
                 group_name: ctrl.groupName
               }
-            }).success(
+            }).then(
               function(data) {
                 ctrl.activityList = data.activity_list;
 
@@ -115,7 +115,7 @@ angular.module('oppia').directive('libraryPage', [
                 $rootScope.loadingMessage = '';
               });
           } else {
-            $http.get('/libraryindexhandler').success(function(data) {
+            $http.get('/libraryindexhandler').then(function(data) {
               ctrl.libraryGroups = data.activity_summary_dicts_by_category;
 
               UserService.getUserInfoAsync().then(function(userInfo) {
@@ -123,7 +123,7 @@ angular.module('oppia').directive('libraryPage', [
                 if (userInfo.isLoggedIn()) {
                   $http.get('/creatordashboardhandler/data')
                     .then(function(response) {
-                      ctrl.libraryGroups.forEach(function(libraryGroup) {
+                      angular.forEach(ctrl.libraryGroups, function(libraryGroup) {
                         var activitySummaryDicts = (
                           libraryGroup.activity_summary_dicts);
 
@@ -192,9 +192,11 @@ angular.module('oppia').directive('libraryPage', [
               // elements flush left.
               // Transforms the group names into translation ids
               ctrl.leftmostCardIndices = [];
+              if (ctrl.libraryGroups !== undefined) {
               for (var i = 0; i < ctrl.libraryGroups.length; i++) {
                 ctrl.leftmostCardIndices.push(0);
               }
+            }
             });
           }
 

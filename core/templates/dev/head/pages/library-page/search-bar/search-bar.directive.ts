@@ -230,7 +230,7 @@ angular.module('oppia').directive('searchBar', [
           $scope.$on(
             'preferredLanguageCodesLoaded',
             function(evt, preferredLanguageCodesList) {
-              preferredLanguageCodesList.forEach(function(languageCode) {
+              angular.forEach(preferredLanguageCodesList,function(languageCode) {
                 var selections =
                  ctrl.selectionDetails.languageCodes.selections;
                 if (!selections.hasOwnProperty(languageCode)) {
