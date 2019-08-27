@@ -63,6 +63,7 @@ def main():
                 '\'ExpressionParserService\', [\'$log\', function($log) {',
                 line), end='')
 
+    for line in fileinput.input(files=[expression_parser_js], inplace=True):
         python_utils.PRINT(
             re.sub(r'^})();\s*$', '}]);', line), end='')
 

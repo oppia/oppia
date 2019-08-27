@@ -136,9 +136,19 @@ def install_skulpt(argv):
                 python_utils.PRINT(
                     line.replace('ret = test()', 'ret = 0'),
                     end='')
+
+            for line in fileinput.input(
+                    files=[os.path.join(
+                        common.OPPIA_TOOLS_DIR,
+                        'skulpt-0.10.0/skulpt/skulpt.py')], inplace=True):
                 python_utils.PRINT(
                     line.replace('  doc()', '  pass#doc()'),
                     end='')
+
+            for line in fileinput.input(
+                    files=[os.path.join(
+                        common.OPPIA_TOOLS_DIR,
+                        'skulpt-0.10.0/skulpt/skulpt.py')], inplace=True):
                 # This and the next command disable unit and compressed unit
                 # tests for the compressed distribution of Skulpt. These
                 # tests don't work on some Ubuntu environments and cause a
@@ -148,20 +158,24 @@ def install_skulpt(argv):
                         'ret = os.system(\'{0}',
                         'ret = 0 #os.system(\'{0}'),
                     end='')
+
+            for line in fileinput.input(
+                    files=[os.path.join(
+                        common.OPPIA_TOOLS_DIR,
+                        'skulpt-0.10.0/skulpt/skulpt.py')], inplace=True):
                 python_utils.PRINT(
                     line.replace('ret = rununits(opt=True)', 'ret = 0'),
                     end='')
 
-            subprocess.call(
-                'python $common.OPPIA_TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py '
-                'dist'.split())
+            subprocess.call((
+                'python %s dist' % os.path.join(
+                    common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/skulpt.py'))
+                            .split())
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
 
         # Move the build directory to the static resources folder.
-        os.makedirs(
-            os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
         shutil.copytree(
             os.path.join(
                 common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/dist/'),
