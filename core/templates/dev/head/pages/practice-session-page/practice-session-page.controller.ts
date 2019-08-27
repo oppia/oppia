@@ -84,16 +84,16 @@ angular.module('oppia').directive('practiceSessionPage', [
                 resultActionButtons: [
                   {
                     type: 'BOOST_SCORE',
-                    text: 'Boost My Score'
+                    i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
                   },
                   {
                     type: 'RETRY_SESSION',
-                    text: 'New Session',
+                    i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
                     url: practiceSessionsUrl
                   },
                   {
                     type: 'DASHBOARD',
-                    text: 'My Dashboard',
+                    i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
                     url: topicViewerUrl
                   }
                 ],

@@ -83,16 +83,16 @@ angular.module('oppia').directive('reviewTestPage', [
                 resultActionButtons: [
                   {
                     type: 'BOOST_SCORE',
-                    text: 'Boost My Score'
+                    i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
                   },
                   {
                     type: 'RETRY_SESSION',
-                    text: 'Retry Test',
+                    i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
                     url: reviewTestsUrl
                   },
                   {
                     type: 'DASHBOARD',
-                    text: 'Return To Story',
+                    i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
                     url: storyViewerUrl
                   }
                 ],
