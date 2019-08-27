@@ -315,7 +315,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             update_last_updated_time: bool. Whether to update the
                 last_updated_field of the thread.
         Returns:
-            GeneralFeedbackThreadModel. The thread entity.
+            GeneralFeedbackEmailReplyToIdModel. The thread entity.
         """
         if update_last_updated_time:
             self.last_updated = datetime.datetime.utcnow()
@@ -378,11 +378,14 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                             ' already exists.')
 
         reply_to_id = cls._generate_unique_reply_to_id()
-        return cls(
+        feedback_email_reply_model_instance = cls(
             id=instance_id,
             user_id=user_id,
             thread_id=thread_id,
             reply_to_id=reply_to_id)
+
+        feedback_email_reply_model_instance.put()
+        return feedback_email_reply_model_instance
 
     @classmethod
     def get_by_reply_to_id(cls, reply_to_id):
