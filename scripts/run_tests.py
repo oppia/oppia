@@ -42,19 +42,16 @@ def main():
     python_utils.PRINT('Running frontend unit tests')
     run_frontend_tests.main()
     python_utils.PRINT('Frontend tests passed.')
-    python_utils.PRINT('')
 
     # Run backend tests.
     python_utils.PRINT('Running backend tests')
     run_backend_tests.main()
     python_utils.PRINT('Backend tests passed.')
-    python_utils.PRINT('')
 
     # Run end-to-end tests.
     python_utils.PRINT('Running end-to-end tests')
     run_e2e_tests.main()
 
-    python_utils.PRINT('')
     python_utils.PRINT(
         'SUCCESS    All frontend, backend and end-to-end tests passed!')
 

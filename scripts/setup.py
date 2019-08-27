@@ -63,21 +63,17 @@ def test_python_version():
         # path.
         os_info = os.uname()
         if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
-            python_utils.PRINT(
+            common.print_string_after_two_new_lines([
                 'It looks like you are using Windows. If you have Python '
-                'installed,')
-            python_utils.PRINT(
-                'make sure it is in your PATH and that PYTHONPATH is set.')
-            python_utils.PRINT(
+                'installed,',
+                'make sure it is in your PATH and that PYTHONPATH is set.',
                 'If you have two versions of Python (ie, Python 2.7 and 3), '
                 'specify 2.7 before other versions of Python when setting the '
-                'PATH.')
-            python_utils.PRINT('Here are some helpful articles:')
-            python_utils.PRINT(
-                'http://docs.python-guide.org/en/latest/starting/install/win/')
-            python_utils.PRINT(
+                'PATH.',
+                'Here are some helpful articles:',
+                'http://docs.python-guide.org/en/latest/starting/install/win/',
                 'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
-                'pythonpath-in-windows-7')
+                'pythonpath-in-windows-7'])
         # Exit when no suitable Python environment can be found.
         sys.exit(1)
 
@@ -108,21 +104,13 @@ def main():
     if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
         # Node is a requirement for all installation scripts. Here, we check if
         # the OS supports node.js installation; if not, we exit with an error.
-        python_utils.PRINT('')
-        python_utils.PRINT(
-            'WARNING: Unsupported OS for installation of node.js.')
-        python_utils.PRINT(
-            'If you are running this script on Windows, see the instructions')
-        python_utils.PRINT(
-            'here regarding installation of node.js:')
-        python_utils.PRINT('')
-        python_utils.PRINT(
+        common.print_string_after_two_new_lines([
+            'WARNING: Unsupported OS for installation of node.js.',
+            'If you are running this script on Windows, see the instructions',
+            'here regarding installation of node.js:',
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows'
-            '%29')
-        python_utils.PRINT('')
-        python_utils.PRINT(
-            'STATUS: Installation completed except for node.js. Exiting.')
-        python_utils.PRINT('')
+            '%29',
+            'STATUS: Installation completed except for node.js. Exiting.'])
         sys.exit(1)
 
     # Download and install node.js.
@@ -163,15 +151,16 @@ def main():
         chrome_bin = '/usr/bin/chromium-browser'
     elif os.environ.get('VAGRANT') or os.path.isfile('/etc/is_vagrant_vm'):
         # XVFB is required for headless testing in Vagrant.
-        subprocess.call('sudo apt-get install xvfb chromium-browser'.split())
+        subprocess.call([
+            'sudo', 'apt-get', 'install', 'xvfb', 'chromium-browser'])
         chrome_bin = '/usr/bin/chromium-browser'
         # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
         os.environ['XVFB_PREFIX'] = '/usr/bin/xvfb-run'
         # Enforce proper ownership on oppia, oppia_tools, and node_modules or
         # else NPM installs will fail.
-        subprocess.call(
-            'sudo chown -R vagrant.vagrant /home/vagrant/oppia '
-            '/home/vagrant/oppia_tools /home/vagrant/node_modules'.split())
+        common.recursive_chown('/home/vagrant/oppia', os.getuid(), -1)
+        common.recursive_chown('/home/vagrant/oppia_tools', os.getuid(), -1)
+        common.recursive_chown('/home/vagrant/node_modules', os.getuid(), -1)
     elif os.path.isfile('/usr/bin/google-chrome'):
         # Unix.
         chrome_bin = '/usr/bin/google-chrome'

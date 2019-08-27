@@ -121,6 +121,8 @@ def main(argv=None):
         constants_env_variable = '\'DEV_MODE\': false'
         for line in fileinput.input(
                 files=['assets/constants.ts'], inplace=True):
+            # Inside this loop the STDOUT will be redirected to the file.
+            # The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(r'\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
@@ -131,6 +133,8 @@ def main(argv=None):
         constants_env_variable = '\'DEV_MODE\': true'
         for line in fileinput.input(
                 files=['assets/constants.ts'], inplace=True):
+            # Inside this loop the STDOUT will be redirected to the file.
+            # The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub('\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
@@ -141,26 +145,26 @@ def main(argv=None):
     # The 'detach' option continues the flow once the server is up and runnning.
     # The 'quiet' option prints only the necessary information about the server
     # start-up process.
-    subprocess.call(
-        'node_modules/.bin/webdriver-manager update --versions.chrome 2.41'
-        .split())
-    subprocess.call(
-        'node_modules/.bin/webdriver-manager start --versions.chrome 2.41 '
-        '--detach --quiet'.split())
+    subprocess.call([
+        'node_modules/.bin/webdriver-manager', 'update',
+        '--versions.chrome', '2.41'])
+    subprocess.call([
+        'node_modules/.bin/webdriver-manager', 'start',
+        '--versions.chrome 2.41', '--detach --quiet'])
 
     # Start a selenium process. The program sends thousands of lines of useless
     # info logs to stderr so we discard them.
     # TODO(jacob): Find a webdriver or selenium argument that controls log
     # level.
     background_processes = []
-    background_processes.append(subprocess.Popen(
-        'node_modules/.bin/webdriver-manager start 2>/dev/null'.split()))
+    background_processes.append(subprocess.Popen([
+        'node_modules/.bin/webdriver-manager', 'start', '2>/dev/null']))
     # Start a demo server.
-    background_processes.append(subprocess.Popen(
-        ('python %s/dev_appserver.py --host=0.0.0.0 --port=9001 '
-         '--clear_datastore=yes --dev_appserver_log_level=critical '
-         '--log_level=critical --skip_sdk_update_check=true $%s'
-         % (common.GOOGLE_APP_ENGINE_HOME, app_yaml_filepath)).split()))
+    background_processes.append(subprocess.Popen([
+        'python', '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME,
+        '--host=0.0.0.0', '--port=9001', '--clear_datastore=yes',
+        '--dev_appserver_log_level=critical', '--log_level=critical',
+        '--skip_sdk_update_check=true', app_yaml_filepath]))
 
     # Wait for the servers to come up.
     while common.is_port_close(4444) or common.is_port_close(9001):
@@ -177,36 +181,33 @@ def main(argv=None):
     # TODO(bhenning): Figure out if this is a bug with protractor.
     if not parsed_args.browserstack:
         if not parsed_args.sharding or parsed_args.sharding_instances == '1':
-            subprocess.call((
-                'node_modules/protractor/bin/protractor '
-                'core/tests/protractor.conf.js --suite %s --params.devMode="%s"'
-                % (parsed_args.suite, dev_mode)).split())
+            subprocess.call([
+                'node_modules/protractor/bin/protractor',
+                'core/tests/protractor.conf.js', '--suite', parsed_args.suite,
+                '--params.devMode="%s"' % dev_mode])
         else:
-            subprocess.call((
-                'node_modules/protractor/bin/protractor '
-                'core/tests/protractor.conf.js --capabilities.shardTestFiles=%s'
-                ' --capabilities.maxInstances=%s --suite %s '
-                '--params.devMode="%s"'
-                % (
-                    parsed_args.sharding, parsed_args.sharding_instances,
-                    parsed_args.suite, dev_mode)).split())
+            subprocess.call([
+                'node_modules/protractor/bin/protractor',
+                'core/tests/protractor.conf.js',
+                '--capabilities.shardTestFiles=%s' % parsed_args.sharding,
+                '--capabilities.maxInstances=%s'
+                % parsed_args.sharding_instances, '--suite', parsed_args.suite,
+                '--params.devMode="%s"' % devMode])
     else:
         python_utils.PRINT('Running the tests on browserstack...')
         if not parsed_args.sharding or parsed_args.sharding_instances == '1':
-            subprocess.call(
-                ('node_modules/protractor/bin/protractor '
-                 'core/tests/protractor-browserstack.conf.js --suite %s '
-                 '--params.devMode="%s"'
-                 % (parsed_args.suite, dev_mode)).split())
+            subprocess.call([
+                'node_modules/protractor/bin/protractor',
+                'core/tests/protractor-browserstack.conf.js', '--suite',
+                parsed_args.suite, '--params.devMode="%s"' % dev_mode])
         else:
-            subprocess.call((
-                'node_modules/protractor/bin/protractor '
-                'core/tests/protractor-browserstack.conf.js '
-                '--capabilities.shardTestFiles=%s --capabilities.maxInstances='
-                '%s --suite %s --params.devMode="%s"'
-                % (
-                    parsed_args.sharding, parsed_args.sharding_instances,
-                    parsed_args.suite, dev_mode)).split())
+            subprocess.call([
+                'node_modules/protractor/bin/protractor',
+                'core/tests/protractor-browserstack.conf.js',
+                '--capabilities.shardTestFiles=%s' % parsed_args.sharding,
+                '--capabilities.maxInstances=%s'
+                % parsed_args.sharding_instances, '--suite', parsed_args.suite,
+                '--params.devMode="%s"' % dev_mode])
 
     for process in background_processes:
         process.wait()

@@ -54,21 +54,19 @@ def pip_install(package, version, install_path):
         python_utils.PRINT('Checking if pip is installed on the local machine')
         import pip
     except ImportError:
-        python_utils.PRINT(
+        common.print_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
-            'found')
-        python_utils.PRINT('on your local machine.')
-        python_utils.PRINT('')
-        python_utils.PRINT(
+            'found',
+            'on your local machine.',
             'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
-            'page:')
+            'page:'])
 
         os_info = os.uname()
-        if os_info[0] != 'Darwin':
+        if os_info[0] == 'Darwin':
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
                 'OS%29')
-        elif os_info[0] != 'Linux':
+        elif os_info[0] == 'Linux':
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
                 '%29')
@@ -96,7 +94,7 @@ def install_skulpt(argv):
     """Download and install Skulpt. Skulpt is built using a Python script
     included within the Skulpt repository (skulpt.py). This script normally
     requires GitPython, however the patches to it below
-    (with the sed operations) lead to it no longer being required. The Python
+    (with the fileinput.replace) lead to it no longer being required. The Python
     script is used to avoid having to manually recreate the Skulpt dist build
     process in install_third_party.py. Note that skulpt.py will issue a
     warning saying its dist command will not work properly without GitPython,
@@ -119,12 +117,12 @@ def install_skulpt(argv):
             os.chdir(common.OPPIA_TOOLS_DIR)
             os.mkdir('skulpt-0.10.0')
             os.chdir('skulpt-0.10.0')
-            subprocess.call(
-                'git clone https://github.com/skulpt/skulpt'.split())
+            subprocess.call([
+                'git', 'clone', 'https://github.com/skulpt/skulpt'])
             os.chdir('skulpt')
 
             # Use a specific Skulpt release.
-            subprocess.call('git checkout 0.10.0'.split())
+            subprocess.call(['git', 'checkout', '0.10.0'])
 
             python_utils.PRINT('Compiling Skulpt')
             # The Skulpt setup function needs to be tweaked. It fails without
@@ -136,8 +134,7 @@ def install_skulpt(argv):
                         common.OPPIA_TOOLS_DIR,
                         'skulpt-0.10.0/skulpt/skulpt.py')], inplace=True):
                 # Inside this loop the STDOUT will be redirected to the file.
-                # The comma after each python_utils.PRINT statement is needed to
-                #  avoid double line breaks.
+                # The end='' is needed to avoid double line breaks.
                 python_utils.PRINT(
                     line.replace('ret = test()', 'ret = 0'),
                     end='')
@@ -146,6 +143,8 @@ def install_skulpt(argv):
                     files=[os.path.join(
                         common.OPPIA_TOOLS_DIR,
                         'skulpt-0.10.0/skulpt/skulpt.py')], inplace=True):
+                # Inside this loop the STDOUT will be redirected to the file.
+                # The end='' is needed to avoid double line breaks.
                 python_utils.PRINT(
                     line.replace('  doc()', '  pass#doc()'),
                     end='')
@@ -172,10 +171,9 @@ def install_skulpt(argv):
                     line.replace('ret = rununits(opt=True)', 'ret = 0'),
                     end='')
 
-            subprocess.call((
-                'python %s dist' % os.path.join(
-                    common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/skulpt.py'))
-                            .split())
+            subprocess.call([
+                'python', 'dist', os.path.join(
+                    common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/skulpt.py')])
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
@@ -192,20 +190,33 @@ def maybe_install_dependencies(
     """Parse additional command line arguments."""
     if skip_installing_third_party_libs is False:
         # Install third party dependencies.
-        main([])
+        main()
         # Ensure that generated JS and CSS files are in place before running the
         # tests.
-        python_utils.PRINT('')
         python_utils.PRINT('Running build task with concatenation only')
-        python_utils.PRINT('')
         build.main()
 
     if run_minified_tests is True:
-        python_utils.PRINT('')
         python_utils.PRINT(
             'Running build task with concatenation and minification')
-        python_utils.PRINT('')
         build.main(argv=['--prod_env'])
+
+
+def ensure_pip_library_is_installed(package, version, path):
+    """Installs the pip library after ensuring its not already installed.
+
+    Args:
+        package: str. The package name.
+        version: str. The package version.
+        path: str. The installation path for the package.
+    """
+    python_utils.PRINT(
+        'Checking if %s is installed in %s' % (package, path))
+
+    exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
+    if not os.path.exists(exact_lib_path):
+        python_utils.PRINT('Installing %s' % package)
+        pip_install(package, version, exact_lib_path)
 
 
 def main(argv=None):
@@ -227,27 +238,21 @@ def main(argv=None):
     ]
 
     for package, version, path in pip_dependencies:
-        python_utils.PRINT(
-            'Checking if %s is installed in %s' % (package, path))
-
-        exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
-        if not os.path.exists(exact_lib_path):
-            python_utils.PRINT('Installing %s' % package)
-            pip_install(package, version, exact_lib_path)
+        ensure_pip_library_is_installed(package, version, path)
 
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main()
 
     # Install third-party node modules needed for the build process.
-    subprocess.call((
-        '%s/bin/npm install --only=dev' % common.NODE_PATH).split())
+    subprocess.call([common.NPM_PATH, 'install', '--only=dev'])
     # This line removes the 'npm ERR! missing:' messages. For reference, see
     # this thread: https://github.com/npm/npm/issues/19393#issuecomment-
     # 374076889.
-    subprocess.call(('%s/bin/npm dedupe' % common.NODE_PATH).split())
+    subprocess.call([common.NPM_PATH, 'dedupe'])
 
     install_skulpt(argv)
+
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')
     pre_commit_hook.main(argv=['--install'])

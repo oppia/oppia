@@ -49,36 +49,26 @@ def main(argv=None):
     parsed_args, _ = _PARSER.parse_known_args(args=argv)
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'View interactive frontend test coverage reports by navigating to')
-    python_utils.PRINT('')
-    python_utils.PRINT('    ../karma_coverage_reports')
-    python_utils.PRINT('')
-    python_utils.PRINT('  on your filesystem.')
-    python_utils.PRINT('')
-    python_utils.PRINT('')
-    python_utils.PRINT('Running test in development environment')
-    python_utils.PRINT('')
+    common.print_string_after_two_new_lines([
+        'View interactive frontend test coverage reports by navigating to',
+        '../karma_coverage_reports',
+        'on your filesystem.',
+        'Running test in development environment'])
 
     build.main()
 
-    start_tests_cmd = (
-        '%s node_modules/karma/bin/karma start core/tests/karma.conf.ts'
-        % xvfb_prefix)
-    subprocess.call(start_tests_cmd.split())
+    subprocess.call([
+        xvfb_prefix, 'node_modules/karma/bin/karma', 'start',
+        'core/tests/karma.conf.ts'])
 
     if parsed_args.run_minified_tests is True:
-        python_utils.PRINT('')
         python_utils.PRINT('Running test in production environment')
-        python_utils.PRINT('')
 
         build.main(argv=['--prod_env', '--minify_third_party_libs_only'])
 
-        start_tests_cmd = (
-            '%s node_modules/karma/bin/karma start '
-            'core/tests/karma.conf.ts --prodEnv' % xvfb_prefix)
-        subprocess.call(start_tests_cmd.split())
+        subprocess.call([
+            xvfb_prefix, 'node_modules/karma/bin/karma', 'start',
+            'core/tests/karma.conf.ts', '--prodEnv'])
 
     python_utils.PRINT('Done!')
 

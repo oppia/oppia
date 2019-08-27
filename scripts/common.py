@@ -40,6 +40,7 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0/google-cloud-sdk')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
 FRONTEND_DIR = 'core/templates/dev/head'
+NPM_PATH = os.path.join(NODE_PATH, 'bin/npm')
 os.environ['PATH'] = '%s/bin:' % NODE_PATH + os.environ['PATH']
 
 
@@ -254,6 +255,31 @@ def recursive_chmod(path, mode):
             os.chmod(os.path.join(root, directory), mode)
         for filename in files:
             os.chmod(os.path.join(root, filename), mode)
+
+
+def print_string_after_two_new_lines(strings):
+    """Prints each string after two new lines.
+
+    Args:
+        strings: list(str). The strings to print.
+    """
+    for string in strings:
+        python_utils.PRINT('%s\n' % string)
+
+
+def install_npm_library(library, version, path):
+    """Installs the npm library after ensuring its not already installed.
+
+    Args:
+        library: str. The library name.
+        version: str. The library version.
+        path: str. The installation path for the library.
+    """
+    python_utils.PRINT(
+        'Checking whether %s is installed in %s' % (library, path))
+    if not os.path.exists('node_modules/%s' % library):
+        python_utils.PRINT('Installing %s' % library)
+        subprocess.call([NPM_PATH, 'install', '%s@%s' % (library, version)])
 
 
 class CD(python_utils.OBJECT):

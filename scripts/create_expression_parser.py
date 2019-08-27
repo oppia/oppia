@@ -39,18 +39,15 @@ def main():
     # Install the basic environment, e.g. nodejs.
     install_third_party_libs.main()
 
-    python_utils.PRINT(
-        'Checking whether pegjs is installed in %s' % common.OPPIA_TOOLS_DIR)
-    if not os.path.exists('node_modules/pegjs'):
-        python_utils.PRINT('Installing pegjs')
-        subprocess.call((
-            '%s/bin/npm install pegjs@0.8.0' % common.NODE_PATH).split())
+    common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
 
-    subprocess.call((
-        'node_modules/pegjs/bin/pegjs %s %s'
-        % (expression_parser_definition, expression_parser_js)).split())
+    subprocess.call([
+        'node_modules/pegjs/bin/pegjs',
+        expression_parser_definition, expression_parser_js])
 
     for line in fileinput.input(files=[expression_parser_js], inplace=True):
+        # Inside this loop the STDOUT will be redirected to the file.
+        # The end='' is needed to avoid double line breaks.
         python_utils.PRINT(
             re.sub(
                 r'module\.exports.*$',
@@ -59,6 +56,8 @@ def main():
                 line), end='')
 
     for line in fileinput.input(files=[expression_parser_js], inplace=True):
+        # Inside this loop the STDOUT will be redirected to the file.
+        # The end='' is needed to avoid double line breaks.
         python_utils.PRINT(
             re.sub(r'^})();\s*$', '}]);', line), end='')
 

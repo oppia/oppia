@@ -63,26 +63,25 @@ def main(argv=None):
 
     # Compile typescript files.
     python_utils.PRINT('Compiling typescript...')
-    subprocess.call(
-        'node_modules/typescript/bin/tsc --project .'.split())
+    subprocess.call(['node_modules/typescript/bin/tsc', '--project', '.'])
 
     python_utils.PRINT('Compiling webpack...')
-    subprocess.call(
-        'node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts'
-        .split())
+    subprocess.call([
+        'node_modules/webpack/bin/webpack.js', '--config',
+        'webpack.dev.config.ts'])
 
     sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
     backend_tests.main(argv)
 
     if parsed_args.generate_coverage_report:
-        subprocess.call(('python %s combine' % coverage_path).split())
-        subprocess.call(
-            ('python %s report --omit="%s*","third_party/*","/usr/share/*" '
-             '--show-missing'
-             % (coverage_path, common.OPPIA_TOOLS_DIR)).split())
+        subprocess.call(['python', coverage_path, 'combine'])
+        subprocess.call([
+            'python', coverage_path, 'report',
+            '--omit="%s*","third_party/*","/usr/share/*"'
+            % common.OPPIA_TOOLS_DIR, '--show-missing'])
 
         python_utils.PRINT('Generating xml coverage report...')
-        subprocess.call(('python %s xml' % coverage_path).split())
+        subprocess.call(['python', coverage_path, 'xml'])
 
     python_utils.PRINT('')
     python_utils.PRINT('Done!')

@@ -57,10 +57,9 @@ _PARSER.add_argument(
 
 def cleanup():
     """Function for waiting for the servers to go down."""
-    python_utils.PRINT('')
-    python_utils.PRINT('INFORMATION')
-    python_utils.PRINT('Cleaning up the servers.')
-    python_utils.PRINT('')
+    common.print_string_after_two_new_lines([
+        'INFORMATION',
+        'Cleaning up the servers.'])
     while not common.is_port_close(8181):
         time.sleep(1)
 
@@ -83,12 +82,10 @@ def main(argv=None):
 
     # Check that there isn't a server already running.
     if not common.is_port_close(8181):
-        python_utils.PRINT('')
-        python_utils.PRINT('WARNING')
-        python_utils.PRINT(
-            'Could not start new server. There is already an existing server')
-        python_utils.PRINT('running at port 8181.')
-        python_utils.PRINT('')
+        common.print_string_after_two_new_lines([
+            'WARNING',
+            'Could not start new server. There is already an existing server',
+            'running at port 8181.'])
 
     parsed_args, _ = _PARSER.parse_known_args(args=argv)
     clear_datastore_arg = (
@@ -100,6 +97,8 @@ def main(argv=None):
         constants_env_variable = '\'DEV_MODE\': false'
         for line in fileinput.input(
                 files=['assets/constants.ts'], inplace=True):
+            # Inside this loop the STDOUT will be redirected to the file.
+            # The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
                     '\'DEV_MODE\': .*', constants_env_variable, line), end='')
@@ -109,6 +108,8 @@ def main(argv=None):
         constants_env_variable = '\'DEV_MODE\': true'
         for line in fileinput.input(
                 files=['assets/constants.ts'], inplace=True):
+            # Inside this loop the STDOUT will be redirected to the file.
+            # The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
                     '\'DEV_MODE\': .*', constants_env_variable, line), end='')
@@ -122,24 +123,24 @@ def main(argv=None):
     # spam people accidentally.
     background_processes = []
     if not parsed_args.prod_env:
-        background_processes.append(subprocess.Popen((
-            '%s/bin/node node_modules/gulp/bin/gulp.js watch'
-            % common.NODE_PATH).split()))
+        background_processes.append(subprocess.Popen([
+            '%s/bin/node' % common.NODE_PATH, 'node_modules/gulp/bin/gulp.js',
+            'watch']))
+
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
-        background_processes.append(subprocess.Popen(
-            'node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts'
-            ' --watch'.split()))
+        background_processes.append(subprocess.Popen([
+            'node_modules/webpack/bin/webpack.js',
+            '--config', 'webpack.dev.config.ts', '--watch']))
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)
 
     python_utils.PRINT('Starting GAE development server')
-    background_processes.append(subprocess.Popen((
-        'python %s/dev_appserver.py %s %s --admin_host 0.0.0.0 --admin_port '
-        '8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true %s'
-        % (
-            common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
-            enable_console_arg, app_yaml_filepath)).split()))
+    background_processes.append(subprocess.Popen([
+        'python', '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME,
+        clear_datastore_arg, enable_console_arg, '--admin_host', '0.0.0.0',
+        '--admin_port', '8000', '--host', '0.0.0.0', '--port', '8181',
+        '--skip_sdk_update_check', 'true', app_yaml_filepath]))
 
     # Wait for the servers to come up.
     while common.is_port_close(8181):
@@ -152,44 +153,34 @@ def main(argv=None):
         if list(filter(
                 detect_virtualbox_pattern.match,
                 os.listdir('/dev/disk/by-id/'))):
-            python_utils.PRINT('')
-            python_utils.PRINT('INFORMATION')
-            python_utils.PRINT(
+            common.print_string_after_two_new_lines([
+                'INFORMATION',
                 'Setting up a local development server. You can access this '
-                'server')
-            python_utils.PRINT(
-                'by navigating to localhost:8181 in a browser window.')
-            python_utils.PRINT('')
+                'server',
+                'by navigating to localhost:8181 in a browser window.'])
         else:
-            python_utils.PRINT('')
-            python_utils.PRINT('INFORMATION')
-            python_utils.PRINT(
+            common.print_string_after_two_new_lines([
+                'INFORMATION',
                 'Setting up a local development server at localhost:8181. '
-                'Opening a')
-            python_utils.PRINT('default browser window pointing to this server')
-            python_utils.PRINT('')
+                'Opening a',
+                'default browser window pointing to this server'])
             time.sleep(5)
             background_processes.append(
-                subprocess.Popen('xdg-open http://localhost:8181/'.split()))
+                subprocess.Popen(['xdg-open', 'http://localhost:8181/']))
     elif os_info[0] == 'Darwin' and not parsed_args.no_browser:
-        python_utils.PRINT('')
-        python_utils.PRINT('INFORMATION')
-        python_utils.PRINT(
+        common.print_string_after_two_new_lines([
+            'INFORMATION',
             'Setting up a local development server at localhost:8181. '
-            'Opening a')
-        python_utils.PRINT('default browser window pointing to this server.')
-        python_utils.PRINT('')
+            'Opening a',
+            'default browser window pointing to this server.'])
         time.sleep(5)
         background_processes.append(
-            subprocess.Popen('open http://localhost:8181/'.split()))
+            subprocess.Popen(['open', 'http://localhost:8181/']))
     else:
-        python_utils.PRINT('')
-        python_utils.PRINT('INFORMATION')
-        python_utils.PRINT(
-            'Setting up a local development server. You can access this server')
-        python_utils.PRINT(
-            'by navigating to localhost:8181 in a browser window.')
-        python_utils.PRINT('')
+        common.print_string_after_two_new_lines([
+            'INFORMATION',
+            'Setting up a local development server. You can access this server',
+            'by navigating to localhost:8181 in a browser window.'])
 
     python_utils.PRINT('Done!')
 

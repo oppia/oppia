@@ -27,6 +27,7 @@ import sys
 
 import python_utils
 
+from . import common
 from . import clean
 
 
@@ -45,16 +46,11 @@ def main(argv=None):
         sys.exit(0)
 
     if os.path.isfile(vagrant_lock_file):
-        python_utils.PRINT('')
-        python_utils.PRINT('Another setup instance is already running')
-        python_utils.PRINT('')
-        python_utils.PRINT(
-            'Please wait for that instance to complete or terminate it')
-        python_utils.PRINT('')
-        python_utils.PRINT(
-            'If you ran $0 twice on purpose, you can override this with '
-            '--nolock')
-        python_utils.PRINT('')
+        common.print_string_after_two_new_lines([
+            'Another setup instance is already running',
+            'Please wait for that instance to complete or terminate it',
+            'If you ran $0 twice on purpose, you can override this with ',
+            '--nolock'])
         sys.exit(1)
     else:
         os.utime(vagrant_lock_file, None)

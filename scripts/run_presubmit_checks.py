@@ -76,17 +76,16 @@ def main(argv=None):
         python_utils.PRINT('Running frontend unit tests')
         run_frontend_tests.main(argv=['--run_minified_tests'])
         python_utils.PRINT('Frontend tests passed.')
-        python_utils.PRINT('')
     else:
         # If files in common.FRONTEND_DIR were not changed, skip the tests.
-        python_utils.PRINT('No frontend files were changed.')
-        python_utils.PRINT('Skipped frontend tests')
+        common.print_string_after_two_new_lines([
+            'No frontend files were changed.',
+            'Skipped frontend tests'])
 
     # Run backend tests.
     python_utils.PRINT('Running backend tests')
     run_backend_tests.main()
     python_utils.PRINT('Backend tests passed.')
-    python_utils.PRINT('')
 
 
 if __name__ == '__main__':

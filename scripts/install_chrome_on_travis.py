@@ -45,7 +45,7 @@ def main():
         os.chdir(oppia_dir)
 
     python_utils.PRINT('Installing %s' % travis_chrome_path)
-    subprocess.call(('sudo dpkg -i %s' % travis_chrome_path).split())
+    subprocess.call(['sudo', 'dpkg', '-i', travis_chrome_path])
 
 
 if __name__ == '__main__':

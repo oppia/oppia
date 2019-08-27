@@ -65,10 +65,9 @@ def run_performance_test(test_name, xvfb_prefix):
         test_name: str. The test name to be run.
         xvfb_prefix: str. The XVFB prefix.
     """
-    subprocess.call((
-        '%s python -m scripts.backend_tests '
-        '--test_target=core.tests.performance_tests.%s'
-        % (xvfb_prefix, test_name)).split())
+    subprocess.call([
+        xvfb_prefix, 'python', '-m', 'scripts.backend_tests',
+        '--test_target=core.tests.performance_tests.%s' % test_name])
 
 
 def main(argv=None):
@@ -81,11 +80,10 @@ def main(argv=None):
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
     if not common.is_port_close(8181):
-        python_utils.PRINT(
-            'There is already a server running on localhost:8181')
-        python_utils.PRINT(
-            'Please terminate it before running the performance tests.')
-        python_utils.PRINT('Exiting.')
+        common.print_string_after_two_new_lines([
+            'There is already a server running on localhost:8181',
+            'Please terminate it before running the performance tests.',
+            'Exiting.'])
         sys.exit(1)
 
     # Forces the cleanup function to run on exit.
@@ -100,11 +98,11 @@ def main(argv=None):
     common.recursive_chmod(browsermob_proxy_path, 744)
 
     # Start a demo server.
-    background_process = subprocess.Popen((
-        'python %s/dev_appserver.py --host=0.0.0.0 --port=9501 '
-        '--clear_datastore=yes --dev_appserver_log_level=critical '
-        '--log_level=critical --skip_sdk_update_check=true app_dev.yaml'
-        % common.GOOGLE_APP_ENGINE_HOME).split())
+    background_process = subprocess.Popen([
+        'python', '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME,
+        '--host=0.0.0.0', '--port=9501', '--clear_datastore=yes',
+        '--dev_appserver_log_level=critical', '--log_level=critical',
+        '--skip_sdk_update_check=true', app_dev.yaml])
 
     # Wait for the servers to come up.
     while common.is_port_close(9501):
@@ -118,7 +116,7 @@ def main(argv=None):
         # This installs xvfb for systems with apt-get installer like Ubuntu, and
         # will fail for other systems.
         # TODO(gvishal): Install/provide xvfb for other systems.
-        subprocess.call('sudo apt-get install xvfb'.split())
+        subprocess.call(['sudo', 'apt-get', 'install', 'xvfb'])
         xvfb_prefix = '/usr/bin/xvfb-run'
 
     # If an argument is present then run test for that specific page. Otherwise
