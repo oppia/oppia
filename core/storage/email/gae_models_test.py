@@ -22,9 +22,8 @@ import types
 
 from core.platform import models
 from core.tests import test_utils
-import python_utils
-import utils
 import feconf
+import utils
 
 (email_models, user_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.user])
@@ -211,6 +210,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
         self.assertNotEqual(email_hash1, email_hash2)
         # pylint: enable=protected-access
 
+
 class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackEmailReplyToId model."""
     USER_ID_1 = 'user_id_1'
@@ -234,9 +234,9 @@ class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
         # USER 2 has a UserSubscriptionsModel and corresponding
         # GeneralFeedbackEmailReplyToId models for each thread ID.
         user_models.UserSubscriptionsModel(
-                id=self.USER_ID_2,
-                general_feedback_thread_ids=[self.THREAD_ID_1,
-                                             self.THREAD_ID_2]).put()
+            id=self.USER_ID_2,
+            general_feedback_thread_ids=(
+                [self.THREAD_ID_1, self.THREAD_ID_2])).put()
 
         # Since reply-to-id is generated using a random generator
         # that does not support seeding (SystemRandom) whose
