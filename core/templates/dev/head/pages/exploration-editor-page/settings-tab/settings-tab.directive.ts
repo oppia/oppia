@@ -111,6 +111,7 @@ angular.module('oppia').directive('settingsTab', [
             UrlInterpolationService, UserEmailPreferencesService,
             ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
             EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
           ctrl.EditabilityService = EditabilityService;
@@ -479,5 +480,6 @@ angular.module('oppia').directive('settingsTab', [
             return ExplorationTitleService.savedMemento.length > 0;
           };
         }
+      }
       ]};
   }]);

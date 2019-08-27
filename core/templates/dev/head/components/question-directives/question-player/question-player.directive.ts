@@ -149,6 +149,7 @@ angular.module('oppia').directive('questionPlayer', [
             VIEW_HINT_PENALTY_FOR_MASTERY,
             WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             ctrl.canCreateCollections = userInfo.canCreateCollections();
@@ -584,7 +585,7 @@ angular.module('oppia').directive('questionPlayer', [
               ctrl.testIsPassed = hasUserPassedTest();
             }
           });
-        }
+        }}
       ]
     };
   }]);
