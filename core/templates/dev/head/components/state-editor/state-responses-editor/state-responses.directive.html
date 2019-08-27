@@ -2,7 +2,7 @@
   <div class="oppia-editor-header">
     <strong>Learner's Answers and Oppia's Responses</strong>
     <span style="margin-left: 150px;" ng-if="!isCurrentInteractionTrivial()" ng-hide="!enableSolicitAnswerDetailsFeature">
-      <input type="checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed">
+      <input type="checkbox" class="protractor-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed">
       Solicit Answer Details
     </span>
   </div>

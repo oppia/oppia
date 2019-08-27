@@ -30,20 +30,24 @@
  *   - Card.prototype.getActionButtons() -> ImprovementActionButton[]
  */
 
+require('domain/statistics/AnswerDetailsImprovementCardObjectFactory.ts');
 require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
 require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
 require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 
 angular.module('oppia').factory('ImprovementCardService', [
-  '$q', 'FeedbackImprovementCardObjectFactory',
+  '$q', 'AnswerDetailsImprovementCardObjectFactory',
+  'FeedbackImprovementCardObjectFactory',
   'PlaythroughImprovementCardObjectFactory',
   'SuggestionImprovementCardObjectFactory',
   function(
-      $q, FeedbackImprovementCardObjectFactory,
+      $q, AnswerDetailsImprovementCardObjectFactory,
+      FeedbackImprovementCardObjectFactory,
       PlaythroughImprovementCardObjectFactory,
       SuggestionImprovementCardObjectFactory) {
     /** @type {Object[]} */
     var improvementCardObjectFactoryRegistry = Object.freeze([
+      AnswerDetailsImprovementCardObjectFactory,
       FeedbackImprovementCardObjectFactory,
       PlaythroughImprovementCardObjectFactory,
       SuggestionImprovementCardObjectFactory,

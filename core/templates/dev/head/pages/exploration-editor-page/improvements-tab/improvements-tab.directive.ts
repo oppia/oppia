@@ -19,6 +19,10 @@
 
 require(
   'pages/exploration-editor-page/improvements-tab/' +
+  'answer-details-improvement-card/answer-details-improvement-card.directive.ts'
+);
+require(
+  'pages/exploration-editor-page/improvements-tab/' +
   'feedback-improvement-card/feedback-improvement-card.directive.ts'
 );
 require(
