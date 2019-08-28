@@ -179,6 +179,22 @@ indexes:
   - name: last_updated
     direction: desc
 
+- kind: QuestionSkillLinkModel
+  properties:
+  - name: skill_id
+  - name: question_id
+
+- kind: QuestionSkillLinkModel
+  properties:
+  - name: skill_id
+  - name: skill_difficulty
+
+- kind: QuestionSkillLinkModel
+  properties:
+  - name: skill_id
+  - name: skill_difficulty
+    direction: desc
+
 - kind: RecentUpdatesRealtimeModel
   properties:
   - name: realtime_layer

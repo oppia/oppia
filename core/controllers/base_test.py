@@ -527,10 +527,6 @@ class EscapingTests(test_utils.GenericTestBase):
     class FakePage(base.BaseHandler):
         """Fake page for testing autoescaping."""
 
-        def get(self):
-            """Handles GET requests."""
-            self.render_template('tests/jinja_escaping.html')
-
         def post(self):
             """Handles POST requests."""
             self.render_json({'big_value': u'\n<script>马={{'})
@@ -547,17 +543,6 @@ class EscapingTests(test_utils.GenericTestBase):
             [webapp2.Route('/fake', self.FakePage, name='FakePage')],
             debug=feconf.DEBUG,
         ))
-
-    def test_jinja_autoescaping(self):
-        dangerous_field_contents = '<[angular_tag]> x{{51 * 3}}y'
-        with self.swap(constants, 'DEV_MODE', dangerous_field_contents):
-            response = self.get_html_response('/fake')
-
-            self.assertIn('&lt;[angular_tag]&gt;', response.body)
-            self.assertNotIn('<[angular_tag]>', response.body)
-
-            self.assertIn('x{{51 * 3}}y', response.body)
-            self.assertNotIn('x153y', response.body)
 
     def test_special_char_escaping(self):
         response = self.testapp.post('/fake', params={})
@@ -988,7 +973,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
             self.render_template(
-                'pages/about-page/about-page.mainpage.html',
+                'about-page.mainpage.html',
                 iframe_restriction=iframe_restriction)
 
     def setUp(self):
