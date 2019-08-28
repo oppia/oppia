@@ -45,6 +45,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
         '$scope', '$filter', '$sce', '$translate', 'DeviceInfoService',
         function($scope, $filter, $sce, $translate, DeviceInfoService) {
           var ctrl = this;
+          this.$onInit = function() {
           if (ctrl.uiConfig() && ctrl.uiConfig().coding_mode) {
             // Flag that is flipped each time the codemirror view is
             // shown. (The codemirror instance needs to be refreshed
@@ -132,6 +133,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
               $filter('convertUnicodeWithParamsToHtml')(ctrl.localValue));
           };
         }
+      }
       ]
     };
   }

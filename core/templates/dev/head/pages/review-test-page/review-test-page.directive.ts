@@ -53,6 +53,7 @@ angular.module('oppia').directive('reviewTestPage', [
             REVIEW_TESTS_URL, STORY_VIEWER_PAGE
         ) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.storyId = UrlService.getStoryIdFromUrl();
           ctrl.questionPlayerConfig = null;
 
@@ -110,6 +111,8 @@ angular.module('oppia').directive('reviewTestPage', [
             });
           };
           _fetchSkillDetails();
+        }
+        }
         }
       ]
     };

@@ -61,6 +61,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
           ctrl.collection = CollectionEditorStateService.getCollection();
           ctrl.collectionRights = (
@@ -271,6 +272,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                   'There was an error when unpublishing the collection.');
               });
           };
+        }
         }
       ]
     };

@@ -50,6 +50,7 @@ angular.module('oppia').directive('learnerViewInfo', [
             UrlInterpolationService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var ctrl = this;
+          this.$onInit = function () {
           var explorationId = ContextService.getExplorationId();
           var expInfo = null;
 
@@ -163,6 +164,7 @@ angular.module('oppia').directive('learnerViewInfo', [
               ]
             });
           };
+        }
         }
       ]
     };

@@ -50,6 +50,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.collection = CollectionEditorStateService.getCollection();
           ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
             COLLECTION_TITLE_INPUT_FOCUS_LABEL);
@@ -139,6 +140,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             CollectionUpdateService.setCollectionTags(
               ctrl.collection, ctrl.displayedCollectionTags);
           };
+        }
         }
       ]
     };

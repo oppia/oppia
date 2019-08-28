@@ -48,6 +48,7 @@ angular.module('oppia').directive('roleGraph', [
             $element, $timeout, $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var ctrl = this;
+          this.$onInit = function () {
           var getElementDimensions = function() {
             return {
               h: $element.height(),
@@ -99,6 +100,7 @@ angular.module('oppia').directive('roleGraph', [
               ctrl.graphData.initStateId, ctrl.graphData.finalStateIds
             );
           }
+        }
         }
       ]
     };

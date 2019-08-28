@@ -31,6 +31,7 @@ angular.module('oppia').directive('backgroundBanner', [
       controller: [
         function() {
           var ctrl = this;
+          this.$onInit = function () {
           var possibleBannerFilenames = [
             'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
           var bannerImageFilename = possibleBannerFilenames[
@@ -38,6 +39,7 @@ angular.module('oppia').directive('backgroundBanner', [
           ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
             '/background/' + bannerImageFilename);
         }
+      }
       ]
     };
   }]);

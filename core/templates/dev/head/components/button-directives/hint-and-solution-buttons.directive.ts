@@ -55,6 +55,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_OPENED, INTERACTION_SPECS, StatsReportingService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.hintIndexes = [];
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           // Represents the index of the currently viewed hint.
@@ -89,7 +90,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.activeHintIndex = index;
             var promise = (
               HintAndSolutionModalService.displayHintModal(index));
-            promise.result.then(null, function() {
+            promise.result.catch(function() {
               ctrl.activeHintIndex = null;
             });
           };
@@ -118,7 +119,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
                 PlayerPositionService.getCurrentStateName());
             }
             var promise = HintAndSolutionModalService.displaySolutionModal();
-            promise.result.then(null, function() {
+            promise.result.catch(function() {
               ctrl.solutionModalIsActive = false;
             });
           };
@@ -146,6 +147,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
           });
           resetLocalHintsArray();
         }
+      }
       ]
     };
   }]);

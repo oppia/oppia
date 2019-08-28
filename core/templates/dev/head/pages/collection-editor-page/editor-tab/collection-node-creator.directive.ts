@@ -55,6 +55,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
             SearchExplorationsBackendApiService, SiteAnalyticsService,
             INVALID_NAME_CHARS) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.collection = CollectionEditorStateService.getCollection();
           ctrl.newExplorationId = '';
           ctrl.newExplorationTitle = '';
@@ -186,6 +187,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
               ctrl.newExplorationId));
             ctrl.newExplorationId = '';
           };
+        }
         }
       ]
     };

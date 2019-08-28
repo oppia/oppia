@@ -45,6 +45,7 @@ angular.module('oppia').directive('explorationGraph', [
             ExplorationStatesService, GraphDataService, RouterService,
             StateEditorService, UrlInterpolationService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.getGraphData = GraphDataService.getGraphData;
           ctrl.isEditable = EditabilityService.isEditable;
 
@@ -121,6 +122,7 @@ angular.module('oppia').directive('explorationGraph', [
               }
             });
           };
+        }
         }]
     };
   }]);

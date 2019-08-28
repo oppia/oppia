@@ -33,9 +33,11 @@ angular.module('oppia').directive('profileLinkText', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        this.isUsernameLinkable = function(username) {
-          return SYSTEM_USER_IDS.indexOf(username) === -1;
-        };
-      }]
+        this.$onInit = function() {
+          this.isUsernameLinkable = function(username) {
+            return SYSTEM_USER_IDS.indexOf(username) === -1;
+          };
+        }
+     }]
     };
   }]);

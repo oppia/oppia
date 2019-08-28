@@ -35,6 +35,7 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       controller: ['SUBTOPIC_VIEWER_URL_TEMPLATE',
         function(SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.getSubtopicLink = function() {
             return UrlInterpolationService.interpolateUrl(
               SUBTOPIC_VIEWER_URL_TEMPLATE, {
@@ -46,6 +47,7 @@ angular.module('oppia').directive('subtopicSummaryTile', [
           ctrl.getStaticImageUrl = function(url) {
             return UrlInterpolationService.getStaticImageUrl(url);
           };
+        }
         }
       ]
     };

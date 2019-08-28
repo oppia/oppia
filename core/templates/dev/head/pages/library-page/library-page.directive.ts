@@ -65,6 +65,7 @@ angular.module('oppia').directive('libraryPage', [
             WindowDimensionsService, ALL_CATEGORIES,
             LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
           var ctrl = this;
+          this.$onInit = function () {
           $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
           var possibleBannerFilenames = [
             'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -359,6 +360,7 @@ angular.module('oppia').directive('libraryPage', [
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
             $scope.$apply();
           });
+        }
         }
       ]
     };

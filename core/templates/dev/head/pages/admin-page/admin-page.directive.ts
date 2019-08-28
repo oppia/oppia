@@ -53,6 +53,7 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
         function($http, $location, $scope, AdminDataService,
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.userEmail = '';
           AdminDataService.getDataAsync().then(function(response) {
             ctrl.userEmail = response.user_email;
@@ -75,6 +76,7 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
           $scope.$on('$locationChangeSuccess', function() {
             AdminRouterService.showTab($location.path().replace('/', '#'));
           });
+        }
         }
       ]
     };

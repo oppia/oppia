@@ -40,6 +40,7 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
           $scope, $element, $rootScope, $filter,
           StateInteractionIdService, INTERACTION_SPECS) {
         var ctrl = this;
+        this.$onInit = function () {
         var choices = [];
         var numberOfRuleTypes = 0;
 
@@ -95,6 +96,7 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
           // get updated when the rule type is changed.
           $scope.$apply();
         });
+      }
       }
     ]
   };

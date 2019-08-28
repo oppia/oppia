@@ -46,6 +46,7 @@ angular.module('oppia').directive('collectionNodeEditor', [
             CollectionEditorStateService, CollectionLinearizerService,
             CollectionUpdateService, AlertsService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.collection = CollectionEditorStateService.getCollection();
 
           // Deletes this collection node from the frontend collection
@@ -83,6 +84,7 @@ angular.module('oppia').directive('collectionNodeEditor', [
                 'right with ID: ' + explorationId);
             }
           };
+        }
         }
       ]
     };

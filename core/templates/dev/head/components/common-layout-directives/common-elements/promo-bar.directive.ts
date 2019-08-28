@@ -35,6 +35,7 @@ angular.module('oppia').directive('promoBar', [
       controller: [
         function() {
           var ctrl = this;
+          this.$onInit = function() {
           var isPromoDismissed = function() {
             if (!$window.hasOwnProperty('sessionStorage')) {
               return false;
@@ -64,6 +65,7 @@ angular.module('oppia').directive('promoBar', [
             setPromoDismissed(true);
           };
         }
+      }
       ]
     };
   }

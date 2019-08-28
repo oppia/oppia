@@ -61,6 +61,7 @@ angular.module('oppia').directive('learnerLocalNav', [
             UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.explorationId = ExplorationEngineService.getExplorationId();
           ReadOnlyExplorationBackendApiService
             .loadExploration(ctrl.explorationId)
@@ -128,7 +129,7 @@ angular.module('oppia').directive('learnerLocalNav', [
                 result.report_text);
               $http.post(flagExplorationUrl, {
                 report_text: report
-              }).then(null, function(error) {
+              }).catch(function(error) {
                 AlertsService.addWarning(error);
               });
               $uibModal.open({
@@ -147,6 +148,7 @@ angular.module('oppia').directive('learnerLocalNav', [
               });
             });
           };
+        }
         }
       ]
     };

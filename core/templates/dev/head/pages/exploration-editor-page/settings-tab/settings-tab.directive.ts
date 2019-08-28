@@ -437,6 +437,7 @@ angular.module('oppia').directive('settingsTab', [
                   '$uibModalInstance', 'draftEmailBody',
                   function($uibModalInstance, draftEmailBody) {
                     var ctrl = this;
+                    this.$onInit = function () {
                     ctrl.willEmailBeSent = Boolean(draftEmailBody);
                     ctrl.emailBody = draftEmailBody;
 
@@ -459,6 +460,7 @@ angular.module('oppia').directive('settingsTab', [
                       $uibModalInstance.dismiss('cancel');
                       AlertsService.clearWarnings();
                     };
+                  }
                   }
                 ]
               }).result.then(function(result) {

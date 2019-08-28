@@ -34,15 +34,17 @@ angular.module('oppia').directive('collectionLocalNav', [
         function(
             $scope, ReadOnlyCollectionBackendApiService, UrlService) {
           var ctrl = this;
-          ctrl.collectionId = UrlService.getCollectionIdFromUrl();
-          $scope.$on('collectionLoaded', function() {
-            var collectionDetails = (
-              ReadOnlyCollectionBackendApiService.getCollectionDetails(
-                ctrl.collectionId));
-            ctrl.canEdit = collectionDetails.canEdit;
-          });
-        }
-      ]
+          this.$onInit = function () {
+            ctrl.collectionId = UrlService.getCollectionIdFromUrl();
+            $scope.$on('collectionLoaded', function() {
+              var collectionDetails = (
+                ReadOnlyCollectionBackendApiService.getCollectionDetails(
+                  ctrl.collectionId));
+              ctrl.canEdit = collectionDetails.canEdit;
+            });
+          }
+         }
+       ]
     };
   }
 ]);

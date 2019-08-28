@@ -40,9 +40,11 @@ angular.module('oppia').directive('summaryListHeader', [
       controller: [
         function() {
           var ctrl = this;
-          ctrl.deleteItem = function(evt) {
-            ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
-          };
+          this.$onInit = function () {
+            ctrl.deleteItem = function(evt) {
+              ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
+            };
+          }
         }
       ]
     };

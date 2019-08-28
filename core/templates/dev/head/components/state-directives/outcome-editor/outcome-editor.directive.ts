@@ -58,6 +58,7 @@ angular.module('oppia').directive('outcomeEditor', [
             $scope, StateEditorService, StateInteractionIdService,
             INTERACTION_SPECS) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.editOutcomeForm = {};
           ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
           ctrl.canAddPrerequisiteSkill =
@@ -213,6 +214,7 @@ angular.module('oppia').directive('outcomeEditor', [
               ctrl.savedOutcome.missingPrerequisiteSkillId;
             ctrl.destinationEditorIsOpen = false;
           };
+        }
         }
       ]
     };

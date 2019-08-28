@@ -48,6 +48,7 @@ angular.module('oppia').directive('topNavigationBar', [
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
             DebouncerService, DeviceInfoService, LOGOUT_URL) {
           var ctrl = this;
+          this.$onInit = function() {
           ctrl.isModerator = null;
           ctrl.isAdmin = null;
           ctrl.isTopicManager = null;
@@ -295,6 +296,7 @@ angular.module('oppia').directive('topNavigationBar', [
             $timeout(truncateNavbar, 100);
           });
         }
+      }
       ]
     };
   }]);

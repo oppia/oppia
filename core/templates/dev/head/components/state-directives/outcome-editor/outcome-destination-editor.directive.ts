@@ -50,6 +50,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
             StateEditorService, StateGraphLayoutService, UserService,
             EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
+          this.$onInit = function () {
           var currentStateName = null;
           ctrl.canAddPrerequisiteSkill = (
             constants.ENABLE_PREREQUISITE_SKILLS &&
@@ -170,6 +171,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
               });
             }
           }, true);
+        }
         }
       ]
     };

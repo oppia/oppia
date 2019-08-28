@@ -55,6 +55,7 @@ angular.module('oppia').directive('collectionSummaryTile', [
             DateTimeFormatService, UserService,
             COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
@@ -90,6 +91,7 @@ angular.module('oppia').directive('collectionSummaryTile', [
           ctrl.setHoverState = function(hoverState) {
             ctrl.collectionIsCurrentlyHoveredOver = hoverState;
           };
+        }
         }
       ]
     };

@@ -60,6 +60,7 @@ angular.module('oppia').directive('storyViewerChaptersList', [
             PageTitleService, StoryPlaythroughObjectFactory,
             UrlInterpolationService, UrlService, UserService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.storyPlaythroughObject = ctrl.getPlaythroughObject();
           UserService.getUserInfoAsync().then(function(userInfo) {
             ctrl.isLoggedIn = userInfo.isLoggedIn();
@@ -234,6 +235,7 @@ angular.module('oppia').directive('storyViewerChaptersList', [
           });
 
           ctrl.generatePathParameters();
+        }
         }]
     };
   }

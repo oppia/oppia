@@ -155,7 +155,7 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                       }
                     }).then(function(response) {
                       $scope.showUnresolvedAnswers(response.unresolved_answers);
-                    }).then(null, function(response) {
+                    }).catch(function(response) {
                       $log.error(
                         'Error occurred while fetching unresolved answers ' +
                         'for exploration ' + _explorationId + 'state ' +

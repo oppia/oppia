@@ -47,6 +47,7 @@ angular.module('oppia').directive('searchBar', [
             HtmlEscaperService, LanguageUtilService, NavigationService,
             SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.isSearchInProgress = SearchService.isSearchInProgress;
           ctrl.SEARCH_DROPDOWN_CATEGORIES = (
             SEARCH_DROPDOWN_CATEGORIES.map(
@@ -277,6 +278,7 @@ angular.module('oppia').directive('searchBar', [
           };
 
           $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
+        }
         }
       ]
     };

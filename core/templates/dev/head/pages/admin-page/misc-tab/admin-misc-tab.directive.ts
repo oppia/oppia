@@ -38,6 +38,7 @@ angular.module('oppia').directive('adminMiscTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        this.$onInit = function () {
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
 
@@ -149,6 +150,7 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.numAnswers = 0;
           ctrl.showDataExtractionQueryStatus = false;
         };
+      }
       }]
     };
   }

@@ -34,6 +34,7 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
         '$scope', '$rootScope', 'SearchService', 'WindowDimensionsService',
         function($scope, $rootScope, SearchService, WindowDimensionsService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.endOfPageIsReached = false;
           ctrl.allActivitiesInOrder = [];
           // Called when the first batch of search results is retrieved from the
@@ -70,6 +71,7 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
             $scope.$apply();
           });
+        }
         }
       ]
     };

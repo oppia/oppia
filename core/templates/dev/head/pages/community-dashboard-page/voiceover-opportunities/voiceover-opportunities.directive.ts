@@ -44,6 +44,7 @@ angular.module('oppia').directive('voiceoverOpportunities', [
             $scope, ContributionOpportunitiesService,
             TranslationLanguageService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.opportunities = [];
           ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
@@ -87,6 +88,7 @@ angular.module('oppia').directive('voiceoverOpportunities', [
           ContributionOpportunitiesService.getVoiceoverOpportunities(
             TranslationLanguageService.getActiveLanguageCode(),
             updateWithNewOpportunities);
+        }
         }
       ]
     };

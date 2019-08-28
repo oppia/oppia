@@ -39,6 +39,7 @@ angular.module('oppia').directive('searchResults', [
         function($scope, $rootScope, $q, $timeout, $window,
             SiteAnalyticsService, UserService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.someResultsExist = true;
 
           ctrl.userIsLoggedIn = null;
@@ -71,6 +72,7 @@ angular.module('oppia').directive('searchResults', [
           ctrl.noExplorationsImgUrl =
            UrlInterpolationService.getStaticImageUrl(
              '/general/no_explorations_found.png');
+        }
         }
       ]
     };

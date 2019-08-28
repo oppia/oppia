@@ -39,6 +39,7 @@ angular.module('oppia').directive('adminConfigTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        this.$onInit = function () {
         ctrl.configProperties = {};
 
         ctrl.isNonemptyObject = function(object) {
@@ -103,6 +104,7 @@ angular.module('oppia').directive('adminConfigTab', [
         };
 
         ctrl.reloadConfigProperties();
+      }
       }]
     };
   }

@@ -61,6 +61,7 @@ angular.module('oppia').directive('feedbackTab', [
             ThreadDataService, ThreadStatusDisplayService,
             UrlInterpolationService, UserService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
           ctrl.threadData = ThreadDataService.data;
           ctrl.getLabelClass = ThreadStatusDisplayService.getLabelClass;
@@ -225,6 +226,7 @@ angular.module('oppia').directive('feedbackTab', [
             }
             ctrl.tmpMessage.status = ctrl.activeThread.status;
           };
+        }
         }
       ]};
   }]);

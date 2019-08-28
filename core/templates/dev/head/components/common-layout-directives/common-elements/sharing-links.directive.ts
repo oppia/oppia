@@ -46,7 +46,7 @@ angular.module('oppia').directive('sharingLinks', [
             ExplorationEmbedButtonService, SiteAnalyticsService,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
           var ctrl = this;
-          this.$onInit = function(){
+          this.$onInit = function() {
           ctrl.registerShareEvent = null;
 
           if (ctrl.shareType === 'exploration') {

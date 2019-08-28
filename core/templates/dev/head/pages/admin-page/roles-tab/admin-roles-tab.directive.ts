@@ -41,7 +41,7 @@ angular.module('oppia').directive('adminRolesTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-
+        this.$onInit = function () {
         ctrl.resultRolesVisible = false;
         ctrl.result = {};
         ctrl.setStatusMessage('');
@@ -141,7 +141,8 @@ angular.module('oppia').directive('adminRolesTab', [
           });
           AdminTaskManagerService.finishTask();
         };
-      }]
+      }
+    }]
     };
   }
 ]);

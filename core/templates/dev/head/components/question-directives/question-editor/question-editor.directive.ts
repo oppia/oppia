@@ -72,6 +72,7 @@ angular.module('oppia').directive('questionEditor', [
             INTERACTION_SPECS, StateEditorService, ResponsesService,
             SolutionValidityService, QuestionUpdateService) {
           var ctrl = this;
+          this.$onInit = function() {
           if (ctrl.canEditQuestion()) {
             EditabilityService.markEditable();
           } else {
@@ -224,6 +225,7 @@ angular.module('oppia').directive('questionEditor', [
           });
 
           _init();
+        }
         }
       ]
     };

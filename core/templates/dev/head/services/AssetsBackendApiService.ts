@@ -123,7 +123,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
           successCallback(
             ImageFileObjectFactory.createNew(filename, assetBlob));
         }
-      }).then(null, function() {
+      }).catch(function() {
         errorCallback(filename);
       })['finally'](function() {
         _removeFromFilesCurrentlyBeingRequested(filename, assetType);

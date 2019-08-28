@@ -39,6 +39,7 @@ angular.module('oppia').directive('conceptCard', [
             $scope, $filter, $rootScope,
             ConceptCardBackendApiService, ConceptCardObjectFactory) {
           var ctrl = this;
+          this.$onInit = function() {
           ctrl.conceptCards = [];
           var currentConceptCard = null;
           var numberOfWorkedExamplesShown = 0;
@@ -86,6 +87,7 @@ angular.module('oppia').directive('conceptCard', [
             numberOfWorkedExamplesShown = 0;
           });
         }
+      }
       ]
     };
   }]);

@@ -38,8 +38,10 @@ angular.module('oppia').directive('opportunitiesList', [
       'opportunities-list.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
-        var ctrl = this;
-        ctrl.showMoreOpportunities = $scope.onLoadMoreOpportunities;
+        var ctrl = this
+        this.$onInit = function () {;
+          ctrl.showMoreOpportunities = $scope.onLoadMoreOpportunities;
+        }
       }]
     };
   }]);

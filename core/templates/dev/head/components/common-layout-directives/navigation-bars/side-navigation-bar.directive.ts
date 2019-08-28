@@ -30,8 +30,10 @@ angular.module('oppia').directive('sideNavigationBar', [
       controllerAs: '$ctrl',
       controller: ['$timeout', function($timeout) {
         var ctrl = this;
-        ctrl.currentUrl = window.location.pathname;
-        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        this.$onInit = function() {
+          ctrl.currentUrl = window.location.pathname;
+          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        }
       }]
     };
   }]);

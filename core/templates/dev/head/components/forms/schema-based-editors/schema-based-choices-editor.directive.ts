@@ -44,12 +44,14 @@ angular.module('oppia').directive('schemaBasedChoicesEditor', [
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        ctrl.getReadonlySchema = function() {
-          var readonlySchema = angular.copy(ctrl.schema());
-          delete readonlySchema.choices;
-          return readonlySchema;
-        };
-      }]
+        this.$onInit = function() {
+          ctrl.getReadonlySchema = function() {
+            var readonlySchema = angular.copy(ctrl.schema());
+            delete readonlySchema.choices;
+            return readonlySchema;
+          };
+        }
+     }]
     };
   }
 ]);

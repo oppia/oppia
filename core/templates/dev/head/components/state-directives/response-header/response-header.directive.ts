@@ -55,6 +55,7 @@ angular.module('oppia').directive('responseHeader', [
             PLACEHOLDER_OUTCOME_DEST,
             StateInteractionIdService, INTERACTION_SPECS) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.EditabilityService = EditabilityService;
           ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
 
@@ -89,6 +90,7 @@ angular.module('oppia').directive('responseHeader', [
           ctrl.deleteResponse = function(evt) {
             ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
           };
+        }
         }
       ]
     };

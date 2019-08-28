@@ -44,6 +44,7 @@ angular.module('oppia').directive('hintEditor', [
         '$scope', 'EditabilityService', 'StateHintsService',
         function($scope, EditabilityService, StateHintsService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.isEditable = EditabilityService.isEditable();
           ctrl.StateHintsService = StateHintsService;
           ctrl.editHintForm = {};
@@ -90,6 +91,7 @@ angular.module('oppia').directive('hintEditor', [
               ctrl.saveThisHint();
             }
           });
+        }
         }
       ]
     };

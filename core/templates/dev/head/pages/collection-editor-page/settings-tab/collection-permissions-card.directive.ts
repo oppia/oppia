@@ -35,10 +35,12 @@ angular.module('oppia').directive('collectionPermissionsCard', [
         'CollectionEditorStateService',
         function(CollectionEditorStateService) {
           var ctrl = this;
-          ctrl.collectionRights =
-            CollectionEditorStateService.getCollectionRights();
-          ctrl.hasPageLoaded =
-            CollectionEditorStateService.hasLoadedCollection;
+          this.$onInit = function () {
+            ctrl.collectionRights =
+              CollectionEditorStateService.getCollectionRights();
+            ctrl.hasPageLoaded =
+              CollectionEditorStateService.hasLoadedCollection;
+          }
         }
       ]
     };

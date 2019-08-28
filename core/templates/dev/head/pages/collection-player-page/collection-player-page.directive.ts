@@ -70,6 +70,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
             UrlInterpolationService, UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
+          this.$onInit = function () {
           $rootScope.loadingMessage = 'Loading';
           ctrl.collection = null;
           ctrl.collectionPlaythrough = null;
@@ -358,6 +359,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
               ctrl.explorationCardIsShown = false;
             }
           });
+        }
         }]
     };
   }

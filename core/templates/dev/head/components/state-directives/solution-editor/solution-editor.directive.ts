@@ -64,6 +64,7 @@ angular.module('oppia').directive('solutionEditor', [
         'StateSolutionService',
         function(StateSolutionService) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.StateSolutionService = StateSolutionService;
 
           ctrl.EXPLANATION_FORM_SCHEMA = {
@@ -77,6 +78,7 @@ angular.module('oppia').directive('solutionEditor', [
               StateInteractionIdService.savedMemento,
               StateCustomizationArgsService.savedMemento);
           };
+        }
         }
       ]
     };

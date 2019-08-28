@@ -68,6 +68,7 @@ angular.module('oppia').directive('statisticsTab', [
             StateRulesStatsService, StatesObjectFactory,
             UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
           var ctrl = this;
+          this.$onInit = function () {
           ctrl.COMPLETION_RATE_CHART_OPTIONS = {
             chartAreaWidth: 300,
             colors: ['green', 'firebrick'],
@@ -289,6 +290,7 @@ angular.module('oppia').directive('statisticsTab', [
               });
             });
           };
+        }
         }
       ]
     };
