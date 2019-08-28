@@ -398,13 +398,13 @@ def recursively_convert_to_str(value):
         return {
             recursively_convert_to_str(k): recursively_convert_to_str(
                 v) for k, v in value.items()}
-    elif isinstance(value, BASESTRING):
-        # We are importing utils here to prevent circular imports.
-        import utils
-        temp = str(utils.to_ascii(value))
-        if temp.startswith('b\''):
-            # Remove the b'' prefix from the string.
-            return temp[2:-1]
-        return temp
+    elif type(value) == future.types.newstr:
+        temp = str(value.encode('utf-8'))
+        # Remove the b'' prefix from the string.
+        return temp[2:-1].decode('utf-8')
+    elif type(value) == future.types.newbytes:
+        temp = bytes(value)
+        # Remove the b'' prefix from the string.
+        return temp[2:-1]
     else:
         return value
