@@ -81,6 +81,7 @@ before_install:
 - pip install codecov
 - pip install pyyaml
 - export CHROME_BIN=/usr/bin/google-chrome-stable
+- export CHROME_SOURCE_URL=https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start
 - pip install future
