@@ -39,5 +39,7 @@ class ExplorationFeaturesHandler(base.BaseHandler):
             'is_improvements_tab_enabled':
                 config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,
             'is_exploration_whitelisted':
-                exploration_id in whitelisted_exploration_ids_for_playthroughs
+                exploration_id in whitelisted_exploration_ids_for_playthroughs,
+            'always_ask_learners_for_answer_details':
+                config_domain.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value
         })
