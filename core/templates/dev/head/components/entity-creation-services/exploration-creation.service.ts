@@ -88,47 +88,49 @@ angular.module('oppia').factory('ExplorationCreationService', [
               };
 
               $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
+                $uibModalInstance.close('cancel');
                 AlertsService.clearWarnings();
               };
             }
           ]
         }).result.then(function(result) {
-          var yamlFile = result.yamlFile;
+          if(result!='cancel') {
+            var yamlFile = result.yamlFile;
 
-          $rootScope.loadingMessage = 'Creating exploration';
+            $rootScope.loadingMessage = 'Creating exploration';
 
-          var form = new FormData();
-          form.append('yaml_file', yamlFile);
-          form.append('payload', JSON.stringify({}));
-          CsrfTokenService.getTokenAsync().then(function(token) {
-            form.append('csrf_token', token);
-            $.ajax({
-              contentType: false,
-              data: form,
-              dataFilter: function(data) {
-                // Remove the XSSI prefix.
-                return JSON.parse(data.substring(5));
-              },
-              dataType: 'text',
-              processData: false,
-              type: 'POST',
-              url: 'contributehandler/upload'
-            }).done(function(data) {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                  exploration_id: data.explorationId
-                }
-              );
-            }).fail(function(data) {
-              var transformedData = data.responseText.substring(5);
-              var parsedResponse = JSON.parse(transformedData);
-              AlertsService.addWarning(
-                parsedResponse.error || 'Error communicating with server.');
-              $rootScope.loadingMessage = '';
-              $rootScope.$apply();
+            var form = new FormData();
+            form.append('yaml_file', yamlFile);
+            form.append('payload', JSON.stringify({}));
+            CsrfTokenService.getTokenAsync().then(function(token) {
+              form.append('csrf_token', token);
+              $.ajax({
+                contentType: false,
+                data: form,
+                dataFilter: function(data) {
+                  // Remove the XSSI prefix.
+                  return JSON.parse(data.substring(5));
+                },
+                dataType: 'text',
+                processData: false,
+                type: 'POST',
+                url: 'contributehandler/upload'
+              }).done(function(data) {
+                $window.location = UrlInterpolationService.interpolateUrl(
+                  CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                    exploration_id: data.explorationId
+                  }
+                );
+              }).fail(function(data) {
+                var transformedData = data.responseText.substring(5);
+                var parsedResponse = JSON.parse(transformedData);
+                AlertsService.addWarning(
+                  parsedResponse.error || 'Error communicating with server.');
+                $rootScope.loadingMessage = '';
+                $rootScope.$apply();
+              });
             });
-          });
+          }
         });
       }
     };

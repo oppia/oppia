@@ -51,35 +51,37 @@ angular.module('oppia').factory('StoryCreationService', [
                 $uibModalInstance.close(storyTitle);
               };
               $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
+                $uibModalInstance.close('cancel');
               };
             }
           ]
         });
 
         modalInstance.result.then(function(storyTitle) {
-          if (storyTitle === '') {
-            throw Error('Story title cannot be empty');
-          }
-          storyCreationInProgress = true;
-          AlertsService.clearWarnings();
-          var topic = TopicEditorStateService.getTopic();
-          $rootScope.loadingMessage = 'Creating story';
-          var createStoryUrl = UrlInterpolationService.interpolateUrl(
-            STORY_CREATOR_URL_TEMPLATE, {
-              topic_id: topic.getId()
+          if (storyTitle != 'cancel') {
+            if (storyTitle === '') {
+              throw Error('Story title cannot be empty');
             }
-          );
-          $http.post(createStoryUrl, {title: storyTitle})
-            .then(function(response) {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                STORY_EDITOR_URL_TEMPLATE, {
-                  story_id: response.data.storyId
-                }
-              );
-            }, function() {
-              $rootScope.loadingMessage = '';
-            });
+            storyCreationInProgress = true;
+            AlertsService.clearWarnings();
+            var topic = TopicEditorStateService.getTopic();
+            $rootScope.loadingMessage = 'Creating story';
+            var createStoryUrl = UrlInterpolationService.interpolateUrl(
+              STORY_CREATOR_URL_TEMPLATE, {
+                topic_id: topic.getId()
+              }
+            );
+            $http.post(createStoryUrl, {title: storyTitle})
+              .then(function(response) {
+                $window.location = UrlInterpolationService.interpolateUrl(
+                  STORY_EDITOR_URL_TEMPLATE, {
+                    story_id: response.data.storyId
+                  }
+                );
+              }, function() {
+                $rootScope.loadingMessage = '';
+              });
+            }
         });
       }
     };

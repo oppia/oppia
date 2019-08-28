@@ -42,7 +42,7 @@ angular.module('oppia').factory('ExplorationEmbedButtonService', [
                 $window.location.protocol + '//' + $window.location.host);
 
               $scope.close = function() {
-                $uibModalInstance.dismiss('close');
+                $uibModalInstance.close('close');
               };
 
               $scope.selectText = function(evt) {
