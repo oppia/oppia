@@ -1863,8 +1863,7 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         learner_answer_info_id = (
             stats_domain.LearnerAnswerInfo.get_new_learner_answer_info_id())
         self.assertNotEqual(learner_answer_info_id, None)
-        self.assertTrue(
-            isinstance(learner_answer_info_id, python_utils.UNICODE))
+        self.assertTrue(isinstance(learner_answer_info_id, bytes))
 
     def test_id_must_be_string(self):
         self.learner_answer_info.id = 123
