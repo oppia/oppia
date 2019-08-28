@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the story editor."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -32,7 +33,7 @@ class StoryEditorPage(base.BaseHandler):
     def get(self, _):
         """Handles GET requests."""
 
-        self.render_template('dist/story-editor-page.mainpage.html')
+        self.render_template('story-editor-page.mainpage.html')
 
 
 class EditableStoryDataHandler(base.BaseHandler):

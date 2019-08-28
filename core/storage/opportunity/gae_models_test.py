@@ -15,9 +15,11 @@
 # limitations under the License.
 
 """Tests for core.storage.opportunity.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
 (base_models, opportunity_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.opportunity])
@@ -70,7 +72,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, basestring))
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_get_all_translation_opportunities_pagination(self):
         results, cursor, more = (
@@ -79,7 +81,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
-        self.assertTrue(isinstance(cursor, basestring))
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
         results, new_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
@@ -87,7 +89,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(new_cursor, basestring))
+        self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
 
     def test_get_all_voiceover_opportunities(self):
         results, cursor, more = (
@@ -97,7 +99,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, basestring))
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_get_all_voiceover_opportunities_pagination(self):
         results, cursor, more = (
@@ -106,7 +108,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
-        self.assertTrue(isinstance(cursor, basestring))
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
         results, new_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
@@ -114,7 +116,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(new_cursor, basestring))
+        self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
 
     def test_get_by_topic(self):
         model_list = (

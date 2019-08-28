@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the base action specification."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import action_registry
 from core.platform import models
@@ -33,7 +34,7 @@ class ActionUnitTests(test_utils.GenericTestBase):
             stats_models.ACTION_TYPE_EXPLORATION_START)
 
         action_dict = action.to_dict()
-        self.assertItemsEqual(action_dict.keys(), [
+        self.assertItemsEqual(list(action_dict.keys()), [
             'customization_arg_specs'])
         self.assertEqual(
             action_dict['customization_arg_specs'], [{
@@ -52,7 +53,7 @@ class ActionUnitTests(test_utils.GenericTestBase):
             stats_models.ACTION_TYPE_ANSWER_SUBMIT)
 
         action_dict = action.to_dict()
-        self.assertItemsEqual(action_dict.keys(), [
+        self.assertItemsEqual(list(action_dict.keys()), [
             'customization_arg_specs'])
         self.assertEqual(
             action_dict['customization_arg_specs'], [{
@@ -106,7 +107,7 @@ class ActionUnitTests(test_utils.GenericTestBase):
             stats_models.ACTION_TYPE_EXPLORATION_QUIT)
 
         action_dict = action.to_dict()
-        self.assertItemsEqual(action_dict.keys(), [
+        self.assertItemsEqual(list(action_dict.keys()), [
             'customization_arg_specs'])
         self.assertEqual(
             action_dict['customization_arg_specs'], [{

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Skill models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import rights_manager
 from core.platform import models

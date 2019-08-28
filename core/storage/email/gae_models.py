@@ -15,11 +15,13 @@
 # limitations under the License.
 
 """Models for the content of sent emails."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -94,11 +96,12 @@ class SentEmailModel(base_models.BaseModel):
         """
         id_prefix = '%s.' % intent
 
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 id_prefix,
                 utils.convert_to_hash(
-                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    python_utils.STR(utils.get_random_int(
+                        base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -338,7 +341,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             str. The unique reply-to id if there are no collisions.
         """
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s' % (utils.get_random_int(base_models.RAND_RANGE)),
                 REPLY_TO_ID_LENGTH)
@@ -427,4 +430,5 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                         for user_id in user_ids]
         user_models = cls.get_multi(instance_ids)
         return {
-            user_id: model for user_id, model in zip(user_ids, user_models)}
+            user_id: model for user_id, model in python_utils.ZIP(
+                user_ids, user_models)}

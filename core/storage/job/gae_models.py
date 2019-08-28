@@ -15,10 +15,12 @@
 # limitations under the License.
 
 """Models for long-running jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import random
 
 from core.platform import models
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -49,7 +51,8 @@ class JobModel(base_models.BaseModel):
             str. A job id.
         """
         job_type = entity_name
-        current_time_str = str(int(utils.get_current_time_in_millisecs()))
+        current_time_str = python_utils.STR(
+            int(utils.get_current_time_in_millisecs()))
         random_int = random.randint(0, 1000)
         return '%s-%s-%s' % (job_type, current_time_str, random_int)
 

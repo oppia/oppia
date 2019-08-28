@@ -15,6 +15,7 @@
 """Controllers for the topics and skills dashboard, from where topics and skills
 are created.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -34,7 +35,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
         self.render_template(
-            'dist/topics-and-skills-dashboard-page.mainpage.html')
+            'topics-and-skills-dashboard-page.mainpage.html')
 
 
 class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
