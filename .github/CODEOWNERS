@@ -212,7 +212,6 @@
 /core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
 /core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
-/extensions/dependencies/ @seanlip @vojtechjelinek
 /extensions/domain*.py @seanlip @DubeySandeep
 /extensions/interactions/ @kevinlee12 @vojtechjelinek
 /extensions/objects/ @aks681
@@ -384,7 +383,6 @@
 
 # Rich text editor team.
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-5-rte.directive.ts @aks681 @NishealJ
 /core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
 /core/templates/dev/head/mathjaxConfig.ts @aks681
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
@@ -436,7 +434,6 @@
 /core/templates/dev/head/google-analytics.initializer.ts @vojtechjelinek
 /core/templates/dev/head/base_components/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/Base.ts @vojtechjelinek
-/core/templates/dev/head/pages/base.html @vojtechjelinek
 /core/templates/dev/head/pages/oppia_footer_directive.html @vojtechjelinek
 /core/templates/dev/head/pages/OppiaFooterDirective.ts @vojtechjelinek
 /core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
@@ -479,7 +476,6 @@
 # in scripts/pre_commit_linter.py in sync with the modifications.
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
-/core/domain/dependency_registry*.py @seanlip
 /core/domain/html*.py @seanlip
 /core/domain/rights_manager*.py @seanlip
 /core/domain/role_services*.py @seanlip

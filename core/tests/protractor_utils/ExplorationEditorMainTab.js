@@ -141,6 +141,8 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-state-name-submit'));
   var answerCorrectnessToggle = element(
     by.css('.protractor-test-editor-correctness-toggle'));
+  var solicitAnswerDetailsCheckbox = element(
+    by.css('.protractor-test-solicit-answer-details-checkbox'));
 
   /*
    * Actions
@@ -986,6 +988,13 @@ var ExplorationEditorMainTab = function() {
       stateNameContainer, name,
       'Current state name is:' + stateNameContainer.getAttribute(
         'textContent') + 'instead of expected ' + name);
+  };
+
+  this.setSolicitAnswerDetailsFeature = function() {
+    waitFor.elementToBeClickable(
+      solicitAnswerDetailsCheckbox,
+      'Solicit answer details checkbox takes too long to be clickable');
+    solicitAnswerDetailsCheckbox.click();
   };
 
   this.expectCurrentStateToBe = function(name) {

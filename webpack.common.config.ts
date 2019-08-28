@@ -16,13 +16,10 @@
  * @fileoverview General config file for Webpack.
  */
 
-const CKEditorWebpackPlugin = require(
-  '@ckeditor/ckeditor5-dev-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
-const { styles } = require('@ckeditor/ckeditor5-dev-utils/lib/');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -62,6 +59,7 @@ module.exports = {
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.scripts.ts',
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
+    console_errors: commonPrefix + '/tests/console_errors.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
       'creator-dashboard-page.scripts.ts',
@@ -132,9 +130,6 @@ module.exports = {
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
   },
   plugins: [
-    new CKEditorWebpackPlugin({
-      language: 'en'
-    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',
@@ -145,12 +140,6 @@ module.exports = {
           'user-created explorations, or teach and create your own.'
       },
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'base.html',
-      template: 'core/templates/dev/head/pages/base.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -196,6 +185,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['console_errors'],
       filename: 'console_errors.html',
       template: commonPrefix + '/tests/console_errors.html',
       minify: htmlMinifyConfig,
@@ -588,29 +578,6 @@ module.exports = {
   ],
   module: {
     rules: [{
-      test: /ckeditor5-[^\/]+\/theme\/icons\/[^\/]+\.svg$/,
-      use: ['raw-loader']
-    },
-    {
-      test: /ckeditor5-[^\/]+\/theme\/[-\w\/]+\.css$/,
-      use: [{
-        loader: 'style-loader',
-        options: {
-          singleton: true
-        }
-      },
-      {
-        loader: 'postcss-loader',
-        options: styles.getPostCssConfig( {
-          themeImporter: {
-            themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-          },
-          minify: true
-        })
-      },
-      ]
-    },
-    {
       test: /\.ts$/,
       include: [
         path.resolve(__dirname, 'assets'),

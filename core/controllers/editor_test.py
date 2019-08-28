@@ -2467,6 +2467,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         self.state_name = self.exploration.init_state_name
         self.interaction_id = self.exploration.states[
             self.state_name].interaction.id
+        self.customization_args = self.exploration.states[
+            self.state_name].interaction.to_dict()['customization_args']
         self.answer = 'This is an answer'
         self.answer_details = 'These are the answer details'
         self.state_reference = (
@@ -2477,35 +2479,32 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer, self.answer_details)
 
     def test_get_learner_answer_details_of_exploration_states(self):
-        response = self.get_json(
-            '%s/%s/%s?state_name=%s' % (
-                feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
-                feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
-                self.state_name), expected_status_int=404)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
+            response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id),
+                expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference)
-            learner_answer_info_dict_list = {'learner_answer_info_dict_list': [
-                learner_answer_info.to_dict() for learner_answer_info in
-                learner_answer_details.learner_answer_info_list]}
+            learner_answer_info_dicts = [
+                learner_answer_info.to_dict() for
+                learner_answer_info in
+                learner_answer_details.learner_answer_info_list]
+            learner_answer_info_data = {'learner_answer_info_data': [{
+                'state_name': self.state_name,
+                'interaction_id': self.interaction_id,
+                'customization_args': self.customization_args,
+                'learner_answer_info_dicts': learner_answer_info_dicts
+            }]}
             response = self.get_json(
-                '%s/%s/%s?state_name=%s' % (
-                    feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
-                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
-                    self.state_name))
-            self.assertEqual(response, learner_answer_info_dict_list)
-            state_name_1 = 'new'
-            self.get_json(
-                '%s/%s/%s?state_name=%s' % (
-                    feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
-                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
-                    state_name_1), expected_status_int=500)
-            self.get_json(
                 '%s/%s/%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
-                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id),
-                expected_status_int=400)
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id))
+            self.assertEqual(response, learner_answer_info_data)
 
     def test_get_learner_answer_details_of_question_states(self):
         question_id = question_services.get_new_question_id()
@@ -2513,6 +2512,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
         self.assertNotEqual(question, None)
+        interaction_id = question.question_state_data.interaction.id
+        customization_args = (
+            question.question_state_data.interaction.to_dict()[
+                'customization_args'])
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))
         self.assertEqual(state_reference, question_id)
@@ -2523,21 +2526,30 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
-            learner_answer_info_dict_list = {'learner_answer_info_dict_list': [
-                learner_answer_info.to_dict() for learner_answer_info in
-                learner_answer_details.learner_answer_info_list]}
+            learner_answer_info_dicts = [learner_answer_info.to_dict() for
+                                         learner_answer_info in
+                                         learner_answer_details
+                                         .learner_answer_info_list]
+            learner_answer_info_data = {'learner_answer_info_data': {
+                'interaction_id': interaction_id,
+                'customization_args': customization_args,
+                'learner_answer_info_dicts': learner_answer_info_dicts
+            }}
             response = self.get_json(
                 '%s/%s/%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_QUESTION, question_id))
-            self.assertEqual(response, learner_answer_info_dict_list)
+            self.assertEqual(response, learner_answer_info_data)
 
     def test_delete_learner_answer_info_of_exploration_states(self):
-        self.delete_json(
-            '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
-                feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
-                feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.state_name,
-                'learner_answer_info_id'), expected_status_int=404)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
+            self.delete_json(
+                '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
+                    feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                    self.state_name, 'learner_answer_info_id'),
+                expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
