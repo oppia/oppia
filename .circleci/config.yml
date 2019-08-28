@@ -114,9 +114,14 @@ jobs:
       - run: sudo pip install pyyaml
       - run: sudo pip install webtest
       - run:
+          name: Install virtual environment
+          command: |
+            sudo pip install pipenv
+            pipenv install
+      - run:
           name: Run backend tests
           command: |
-            python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
+            pipenv python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
       - run:
           <<: *install_cc
       - run:
