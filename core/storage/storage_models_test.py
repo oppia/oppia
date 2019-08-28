@@ -14,9 +14,12 @@
 
 """Tests for Oppia storage models."""
 import inspect
+import unittest
 
 from core.platform import models
 from core.tests import test_utils
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class StorageModelsTest(test_utils.GenericTestBase):
@@ -54,20 +57,24 @@ class StorageModelsTest(test_utils.GenericTestBase):
             len(set(names_of_ndb_model_subclasses)),
             len(names_of_ndb_model_subclasses))
 
+    @unittest.skip("get_deletion_policy is not yet implemented on all models")
     def test_all_models_have_get_deletion_policy(self):
         model_subclasses = self._get_model_classes()
 
         for clazz in model_subclasses:
             base_classes = [base.__name__ for base in inspect.getmro(clazz)]
+            # BaseSnapshotMetadataModel adopts the policy of parent
+            # VersionedModel
             if 'BaseSnapshotMetadataModel' in base_classes:
                 continue
+            # BaseSnapshotContentModel adopts the policy of parent
+            # VersionedModel
             if 'BaseSnapshotContentModel' in base_classes:
                 continue
+            # BaseCommitLogEntryModel adopts the policy of parent VersionedModel
             if 'BaseCommitLogEntryModel' in base_classes:
                 continue
-            try:
-                clazz.get_deletion_policy()
-            except NotImplementedError:
-                print(clazz.__name__)
+            self.assertIn(
+                clazz.get_deletion_policy(),
+                base_models.DELETION_POLICY.__dict__)
 
-        self.assertTrue(False)
