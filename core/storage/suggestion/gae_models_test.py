@@ -366,15 +366,15 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertIn('category2', score_categories)
 
     def test_export_data_trivial(self):
-        user_data = (suggestion_models
-                     .GeneralSuggestionModel
-                     .export_data('non_existent_user'))
+        user_data = (
+            suggestion_models.GeneralSuggestionModel
+            .export_data('non_existent_user'))
         test_data = {}
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
-        test_export_suggestion_type = (suggestion_models
-                                       .SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+        test_export_suggestion_type = (
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
         test_export_target_type = suggestion_models.TARGET_TYPE_EXPLORATION
         test_export_target_id = self.target_id
         test_export_target_version = self.target_version_at_submission
@@ -386,7 +386,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         test_export_thread_id = 'exploration.exp1.thread_export'
 
         suggestion_models.GeneralSuggestionModel.create(
-
             test_export_suggestion_type,
             test_export_target_type,
             test_export_target_id,
@@ -399,9 +398,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             test_export_thread_id
         )
 
-        user_data = (suggestion_models
-                     .GeneralSuggestionModel
-                     .export_data('test_export_author'))
+        user_data = (
+            suggestion_models.GeneralSuggestionModel
+            .export_data('test_export_author'))
+
         test_data = {
             test_export_thread_id: {
                 'suggestion_type': test_export_suggestion_type,
