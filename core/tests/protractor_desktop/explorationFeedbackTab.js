@@ -168,10 +168,10 @@ describe('ExplorationFeedback', function() {
   it('should send message to feedback thread', function() {
     users.createUser(
       'user5@ExplorationFeedback.com',
-      'creatorExplorationFeedback');
+      'creatorFeedback');
     users.createUser(
       'user6@ExplorationFeedback.com',
-      'learnerExplorationFeedback');
+      'learnerFeedback');
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
