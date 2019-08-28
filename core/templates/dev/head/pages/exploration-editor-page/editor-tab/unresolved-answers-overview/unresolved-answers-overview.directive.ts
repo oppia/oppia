@@ -49,20 +49,20 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
         'ExplorationRightsService', 'ExplorationStatesService',
         'ImprovementsService', 'StateEditorService',
         'StateInteractionIdService', 'StateTopAnswersStatsService',
-        'INTERACTION_SPECS',
+        'INTERACTION_SPECS', 'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
             $rootScope, $scope, $uibModal, EditabilityService,
             ExplorationRightsService, ExplorationStatesService,
             ImprovementsService, StateEditorService,
             StateInteractionIdService, StateTopAnswersStatsService,
-            INTERACTION_SPECS) {
+            INTERACTION_SPECS, SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
           $scope.unresolvedAnswersOverviewIsShown = false;
 
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-            constants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+            SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
 
           var isStateRequiredToBeResolved = function(stateName) {
             return ImprovementsService
