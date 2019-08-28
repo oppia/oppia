@@ -88,7 +88,7 @@ angular.module('oppia').directive('skillsList', [
                     $uibModalInstance.close();
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]
@@ -123,7 +123,7 @@ angular.module('oppia').directive('skillsList', [
                     $uibModalInstance.close($scope.selectedTopicIds);
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]
@@ -180,7 +180,7 @@ angular.module('oppia').directive('skillsList', [
                       });
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]

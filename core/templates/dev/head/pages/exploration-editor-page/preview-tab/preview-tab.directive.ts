@@ -147,7 +147,7 @@ angular.module('oppia').directive('previewTab', [
                   $scope.manualParamChanges = manualParamChanges;
                   $scope.previewParamModalOk = $uibModalInstance.close;
                   $scope.previewParamModalCancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                     RouterService.navigateToMainTab();
                   };
                 }

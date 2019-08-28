@@ -317,7 +317,7 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
                   $scope.cancel = function() {
                     SiteAnalyticsService.registerDeclineTutorialModalEvent(
                       explorationId);
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                   // translation tutorial image url for modal
                   $scope.translationWelcomeImgUrl = (

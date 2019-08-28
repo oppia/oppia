@@ -94,7 +94,7 @@ angular.module('oppia').factory('LearnerPlaylistService', [
             };
 
             $scope.cancel = function() {
-              $uibModalInstance.dismiss('cancel');
+              $uibModalInstance.close(false);
             };
           }
         ]

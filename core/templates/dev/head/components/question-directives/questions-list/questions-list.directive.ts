@@ -241,11 +241,11 @@ angular.module('oppia').directive('questionsList', [
                   };
 
                   $scope.cancelModal = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
 
                   $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('ok');
+                   $uibModalInstance.close(false);
                   };
 
                   init();
@@ -375,7 +375,7 @@ angular.module('oppia').directive('questionsList', [
                           '$scope', '$uibModalInstance',
                           function($scope, $uibModalInstance) {
                             $scope.cancel = function() {
-                              $uibModalInstance.dismiss('cancel');
+                              $uibModalInstance.close(false);
                             };
 
                             $scope.close = function() {
@@ -385,10 +385,10 @@ angular.module('oppia').directive('questionsList', [
                         ]
                       });
                       modalInstance.result.then(function() {
-                        $uibModalInstance.dismiss('cancel');
+                        $uibModalInstance.close(false);
                       });
                     } else {
-                      $uibModalInstance.dismiss('cancel');
+                      $uibModalInstance.close(false);
                     }
                   };
                 }

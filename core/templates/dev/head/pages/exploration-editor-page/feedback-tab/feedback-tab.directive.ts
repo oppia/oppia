@@ -143,7 +143,7 @@ angular.module('oppia').directive('feedbackTab', [
                 };
 
                 $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
+                  $uibModalInstance.close(false);
                 };
               }]
             }).result.then(function(result) {

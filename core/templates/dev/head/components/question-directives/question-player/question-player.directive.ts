@@ -256,7 +256,7 @@ angular.module('oppia').directive('questionPlayer', [
                   };
 
                   $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
 
                   $scope.goToNextConceptCard = function() {
@@ -542,7 +542,7 @@ angular.module('oppia').directive('questionPlayer', [
                   }
 
                   $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
 
                   $scope.openConceptCardModal = function(skillId) {

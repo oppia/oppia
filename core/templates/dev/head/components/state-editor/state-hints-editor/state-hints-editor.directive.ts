@@ -170,7 +170,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                     AlertsService.clearWarnings();
                   };
                 }
@@ -220,7 +220,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                     AlertsService.clearWarnings();
                   };
                 }
@@ -259,7 +259,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                     AlertsService.clearWarnings();
                   };
                 }

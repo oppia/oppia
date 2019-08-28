@@ -156,7 +156,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]

@@ -114,7 +114,7 @@ angular.module('oppia').directive('learnerLocalNav', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]
@@ -141,7 +141,7 @@ angular.module('oppia').directive('learnerLocalNav', [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {
                     $scope.close = function() {
-                      $uibModalInstance.dismiss('cancel');
+                      $uibModalInstance.close(false);
                     };
                   }
                 ]

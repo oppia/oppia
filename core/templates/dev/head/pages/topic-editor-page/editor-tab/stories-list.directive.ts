@@ -58,7 +58,7 @@ angular.module('oppia').directive('storiesList', [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {
                     $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
+                      $uibModalInstance.close(false);
                     };
                   }
                 ]
@@ -85,7 +85,7 @@ angular.module('oppia').directive('storiesList', [
                     $uibModalInstance.close();
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]

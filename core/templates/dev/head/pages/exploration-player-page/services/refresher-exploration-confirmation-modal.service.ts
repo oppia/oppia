@@ -74,7 +74,7 @@ angular.module('oppia').factory(
                   $uibModalInstance.close();
                 };
                 $scope.cancelRedirect = function() {
-                  $uibModalInstance.dismiss('cancel');
+                  $uibModalInstance.close(false);
                 };
               }
             ]

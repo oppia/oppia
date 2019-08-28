@@ -116,7 +116,7 @@ angular.module('oppia').factory('RteHelperService', [
               }
 
               $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
+                $uibModalInstance.close(false);
               };
 
               $scope.save = function() {

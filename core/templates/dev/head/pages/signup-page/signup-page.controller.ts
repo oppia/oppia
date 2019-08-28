@@ -85,7 +85,7 @@ angular.module('oppia').directive('signupPage', [
                 function($scope, $uibModalInstance, SITE_NAME) {
                   $scope.siteName = SITE_NAME;
                   $scope.close = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]
@@ -227,7 +227,7 @@ angular.module('oppia').directive('signupPage', [
                         }
                       }
                     );
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]

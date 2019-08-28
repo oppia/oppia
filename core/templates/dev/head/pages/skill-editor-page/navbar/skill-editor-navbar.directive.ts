@@ -75,7 +75,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {
                     $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
+                      $uibModalInstance.close(false);
                     };
                   }
                 ]
@@ -140,7 +140,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
                     $uibModalInstance.close(commitMessage);
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]
@@ -167,7 +167,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }]
             }).result.then(function() {

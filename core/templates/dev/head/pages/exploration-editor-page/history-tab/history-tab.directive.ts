@@ -294,7 +294,7 @@ angular.module('oppia').directive('historyTab', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]

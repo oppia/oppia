@@ -318,7 +318,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
                 }
 
                 $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
+                  $uibModalInstance.close(false);
                 };
 
                 // Options for the codemirror mergeview.

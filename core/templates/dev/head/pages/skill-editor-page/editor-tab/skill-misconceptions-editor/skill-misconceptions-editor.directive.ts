@@ -86,7 +86,7 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                     });
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }]
             }).result.then(function(result) {
@@ -138,7 +138,7 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }]
             }).result.then(function(result) {

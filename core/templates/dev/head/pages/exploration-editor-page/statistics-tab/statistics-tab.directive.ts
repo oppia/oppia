@@ -273,7 +273,7 @@ angular.module('oppia').directive('statisticsTab', [
                     $scope.visualizationsHtml = _getVisualizationsHtml();
 
                     $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
+                      $uibModalInstance.close(false);
                       AlertsService.clearWarnings();
                     };
 

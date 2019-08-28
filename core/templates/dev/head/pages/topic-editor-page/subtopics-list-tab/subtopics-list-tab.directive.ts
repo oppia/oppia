@@ -118,7 +118,7 @@ angular.module('oppia').directive('subtopicsListTab', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]
@@ -232,7 +232,7 @@ angular.module('oppia').directive('subtopicsListTab', [
                     $uibModalInstance.close(title);
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]

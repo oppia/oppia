@@ -85,7 +85,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
                     $uibModalInstance.close(commitMessage);
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    $uibModalInstance.close(false);
                   };
                 }
               ]

@@ -50,7 +50,7 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
           controller: [
             '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.closeAndRefresh = function() {
-                $uibModalInstance.dismiss('cancel');
+                $uibModalInstance.close(false);
                 _refreshPage(20);
               };
             }
@@ -114,7 +114,7 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
             // to discard the draft and reload the page thereafter.
             $scope.close = function() {
               LocalStorageService.removeExplorationDraft(explorationId);
-              $uibModalInstance.dismiss('cancel');
+              $uibModalInstance.close(false);
             };
 
             $scope.lostChangesHtml = (
