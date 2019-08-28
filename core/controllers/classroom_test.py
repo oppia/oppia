@@ -34,8 +34,9 @@ class ClassroomPageTests(BaseClassroomControllerTests):
     def test_any_user_can_access_classroom_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.login(self.NEW_USER_EMAIL)
-            self.get_html_response(
+            response = self.get_html_response(
                 '%s/%s' % (feconf.CLASSROOM_URL_PREFIX, 'Math'))
+            self.assertIn('<classroom-page></classroom-page>', response)
             self.logout()
 
 

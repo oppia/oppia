@@ -2374,9 +2374,10 @@ def can_access_classroom_page(handler):
             raise self.NotLoggedInException
 
         classroom_name_is_valid = False
-        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGE.value:
+        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
             if classroom_dict['name'] == classroom_name:
                 classroom_name_is_valid = True
+                break
 
         if classroom_name_is_valid:
             return handler(self, classroom_name, **kwargs)

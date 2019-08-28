@@ -309,9 +309,9 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
         '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
         'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
 
-TOPIC_IDS_FOR_CLASSROOM_PAGE = ConfigProperty(
-    'topic_ids_for_classroom_page', SET_OF_CLASSROOM_DICTS_SCHEMA,
-    'The set of topic IDs in the initial classroom page.', [{
+TOPIC_IDS_FOR_CLASSROOM_PAGES = ConfigProperty(
+    'topic_ids_for_classroom_pages', SET_OF_CLASSROOM_DICTS_SCHEMA,
+    'The set of topic IDs for each classroom page.', [{
         'name': 'Math',
         'topic_ids': []
     }]

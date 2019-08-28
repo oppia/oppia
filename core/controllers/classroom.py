@@ -33,7 +33,7 @@ class ClassroomPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        self.render_template('dist/classroom-page.mainpage.html')
+        self.render_template('classroom-page.mainpage.html')
 
 
 class ClassroomDataHandler(base.BaseHandler):
@@ -49,9 +49,10 @@ class ClassroomDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGE.value:
+        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
             if classroom_dict['name'] == classroom_name:
                 topic_ids = classroom_dict['topic_ids']
+                break
 
         topic_summaries = topic_services.get_multi_topic_summaries(topic_ids)
         topic_summary_dicts = [summary.to_dict() for summary in topic_summaries]
