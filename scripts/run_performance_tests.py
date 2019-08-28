@@ -65,9 +65,14 @@ def run_performance_test(test_name, xvfb_prefix):
         test_name: str. The test name to be run.
         xvfb_prefix: str. The XVFB prefix.
     """
-    subprocess.call([
-        xvfb_prefix, 'python', '-m', 'scripts.backend_tests',
-        '--test_target=core.tests.performance_tests.%s' % test_name])
+    if xvfb_prefix:
+        subprocess.call([
+            xvfb_prefix, 'python', '-m', 'scripts.backend_tests',
+            '--test_target=core.tests.performance_tests.%s' % test_name])
+    else:
+        subprocess.call([
+            'python', '-m', 'scripts.backend_tests',
+            '--test_target=core.tests.performance_tests.%s' % test_name])
 
 
 def main(argv=None):

@@ -251,7 +251,7 @@ def main(argv=None):
     # This line removes the 'npm ERR! missing:' messages. For reference, see
     # this thread: https://github.com/npm/npm/issues/19393#issuecomment-
     # 374076889.
-    # subprocess.call([common.NPM_PATH, 'dedupe'])
+    subprocess.call([common.NPM_PATH, 'dedupe'])
 
     install_skulpt(argv)
 
