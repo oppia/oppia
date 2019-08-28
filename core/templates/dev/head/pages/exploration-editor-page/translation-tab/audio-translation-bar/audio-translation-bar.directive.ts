@@ -602,24 +602,24 @@ angular.module('oppia').directive('audioTranslationBar', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close('cancel');
+                    $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };
                 }
               ]
             }).result.then(function(result) {
-              if(result!='cancel') {
-                if ($scope.isAudioAvailable) {
-                  StateRecordedVoiceoversService.displayed.deleteVoiceover(
-                    $scope.contentId, $scope.languageCode);
-                }
-                StateRecordedVoiceoversService.displayed.addVoiceover(
-                  $scope.contentId, $scope.languageCode, result.filename,
-                  result.fileSizeBytes);
-                saveRecordedVoiceoversChanges();
-                $scope.initAudioBar();
+              if ($scope.isAudioAvailable) {
+                StateRecordedVoiceoversService.displayed.deleteVoiceover(
+                  $scope.contentId, $scope.languageCode);
               }
-            });
+              StateRecordedVoiceoversService.displayed.addVoiceover(
+                $scope.contentId, $scope.languageCode, result.filename,
+                result.fileSizeBytes);
+              saveRecordedVoiceoversChanges();
+              $scope.initAudioBar();
+            }, function(result){
+              // uib-modal promise is handled here.
+              });
           };
           $scope.initAudioBar();
         }]
