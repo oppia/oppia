@@ -136,11 +136,11 @@ def main(argv=None):
         time.sleep(10)
 
     python_utils.PRINT('Starting GAE development server')
-    background_processes.append(subprocess.Popen([
-        'python', '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME,
-        clear_datastore_arg, enable_console_arg, '--admin_host', '0.0.0.0',
-        '--admin_port', '8000', '--host', '0.0.0.0', '--port', '8181',
-        '--skip_sdk_update_check', 'true', app_yaml_filepath]))
+    background_processes.append(subprocess.Popen(
+        'python %s/dev_appserver.py %s %s --admin_host 0.0.0.0 --admin_port '
+        '8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true %s' % (
+            common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
+            enable_console_arg, app_yaml_filepath), shell=True))
 
     # Wait for the servers to come up.
     while common.is_port_close(8181):
