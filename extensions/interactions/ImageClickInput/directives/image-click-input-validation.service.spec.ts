@@ -17,10 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-/*eslint-disable */
+/* eslint-disable max-len*/
 import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
-/* eslint-enable */
+/* eslint-enable max-len*/
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 
