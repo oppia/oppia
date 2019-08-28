@@ -29,6 +29,8 @@ from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
 import python_utils
 
+import future  # isort:skip
+
 
 class PythonUtilsTests(test_utils.GenericTestBase):
     """Tests for feature detection utilities that are common for Python 2 and
@@ -155,16 +157,18 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_recursively_convert_to_str(self):
         test_var_1 = python_utils.UNICODE('test_var_1')
         test_var_2 = python_utils.UNICODE('test_var_2')
-        test_dict = {test_var_1: 'a', test_var_2: 'b'}
+        test_var_3 = test_var_1.encode('utf-8')
+        test_var_4 = test_var_2.encode('utf-8')
+        test_dict = {test_var_1: test_var_3, test_var_2: test_var_4}
 
         for key, val in test_dict.items():
-            self.assertFalse(isinstance(key, str))
-            self.assertFalse(isinstance(val, str))
+            self.assertEqual(type(key), future.types.newstr)
+            self.assertEqual(type(val), future.types.newbytes)
 
         dict_in_str = python_utils.recursively_convert_to_str(test_dict)
         for key, val in dict_in_str.items():
-            self.assertTrue(isinstance(key, str))
-            self.assertTrue(isinstance(val, str))
+            self.assertEqual(type(key), unicode)
+            self.assertEqual(type(val), bytes)
 
 
 @unittest.skipUnless(
