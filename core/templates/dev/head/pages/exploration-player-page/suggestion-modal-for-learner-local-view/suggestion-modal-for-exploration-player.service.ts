@@ -102,7 +102,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
         };
         var url = '/suggestionhandler/';
 
-        $http.post(url, data).error(function(res) {
+        $http.post(url, data).then(null, function(res) {
           AlertsService.addWarning(res);
         });
         $uibModal.open({

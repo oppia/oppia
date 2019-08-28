@@ -128,7 +128,7 @@ angular.module('oppia').directive('learnerLocalNav', [
                 result.report_text);
               $http.post(flagExplorationUrl, {
                 report_text: report
-              }).error(function(error) {
+              }).then(null, function(error) {
                 AlertsService.addWarning(error);
               });
               $uibModal.open({

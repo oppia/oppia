@@ -465,7 +465,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
               text: newMessage
             };
             ctrl.messageSendingInProgress = true;
-            $http.post(url, payload).success(function() {
+            $http.post(url, payload).then(function() {
               ctrl.threadSummary = ctrl.threadSummaries[threadIndex];
               ctrl.threadSummary.appendNewMessage(
                 newMessage, ctrl.username);

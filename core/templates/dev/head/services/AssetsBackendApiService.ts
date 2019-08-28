@@ -76,7 +76,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
         responseType: 'blob',
         url: _getDownloadUrl(entityType, entityId, filename, assetType),
         timeout: canceler.promise
-      }).success(function(data) {
+      }).then(function(data) {
         var assetBlob = null;
         try {
           if (assetType === ASSET_TYPE_AUDIO) {
@@ -123,7 +123,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
           successCallback(
             ImageFileObjectFactory.createNew(filename, assetBlob));
         }
-      }).error(function() {
+      }).then(null, function() {
         errorCallback(filename);
       })['finally'](function() {
         _removeFromFilesCurrentlyBeingRequested(filename, assetType);

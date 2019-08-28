@@ -111,7 +111,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
                 query_id: getQueryId()
               });
 
-            $http.post(cancelUrlHandler).success(function() {
+            $http.post(cancelUrlHandler).then(function() {
               ctrl.emailCancelled = true;
               $timeout(function() {
                 $window.location.href = EMAIL_DASHBOARD_PAGE;
