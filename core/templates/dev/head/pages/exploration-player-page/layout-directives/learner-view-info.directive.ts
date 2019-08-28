@@ -25,8 +25,10 @@ require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('components/ratings/rating-computation/rating-computation.service.ts');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/ContextService.ts');
+require('services/contextual/UrlService.ts');
 require('services/DateTimeFormatService.ts');
 
 angular.module('oppia').directive('learnerViewInfo', [
@@ -35,23 +37,29 @@ angular.module('oppia').directive('learnerViewInfo', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {
-        explorationTitle: '@'
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-player-page/layout-directives/' +
         'learner-view-info.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$uibModal', 'ContextService',
-        'UrlInterpolationService', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
+        'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
+        'UrlService', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function($http, $log, $uibModal, ContextService,
-            UrlInterpolationService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
+            ReadOnlyExplorationBackendApiService, UrlInterpolationService,
+            UrlService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var ctrl = this;
           var explorationId = ContextService.getExplorationId();
           var expInfo = null;
+
+          ctrl.explorationTitle = 'Loading...';
+          ReadOnlyExplorationBackendApiService.fetchExploration(
+            explorationId, UrlService.getExplorationVersionFromUrl())
+            .then(function(response) {
+              ctrl.explorationTitle = response.exploration.title;
+            });
 
           ctrl.showInformationCard = function() {
             if (expInfo) {
