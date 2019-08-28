@@ -29,8 +29,8 @@ anchor_for_installing_cc_test_reporter: &install_cc
 
 anchor_for_restoring_cache: &restore_cache
   keys:
-    - v1-setup-files-cache-{{ checksum "date" }}
-    - v1-third-party-cache-{{ checksum "date" }}
+    - setup-files-cache-{{ checksum "date" }}
+    - third-party-cache-{{ checksum "date" }}
 
 version: 2
 jobs:
@@ -44,7 +44,7 @@ jobs:
       - run:
           <<: *install_dependencies
       - save_cache:
-          key: v1-setup-files-cache-{{ checksum "date" }}
+          key: setup-files-cache-{{ checksum "date" }}
           paths:
             - node_modules/
             - ../oppia_tools/
