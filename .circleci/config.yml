@@ -17,6 +17,7 @@ anchor_for_installing_dependencies: &install_dependencies
   command: |
     sudo pip install future
     sudo pip install psutil
+    sudo pip uninstall pylint
     python -m scripts.setup
     python -m scripts.setup_gae
 

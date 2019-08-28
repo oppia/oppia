@@ -28,7 +28,6 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 sys.path.insert(0, _PYLINT_PATH)
 
-raise Exception(sys.path)
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 import astroid # isort:skip
