@@ -414,13 +414,13 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """
         instance_ids = [cls._generate_id(user_id, thread_id)
                         for user_id in user_ids]
-        retrieved_user_models = cls.get_multi(instance_ids)
+        retrieved_models = cls.get_multi(instance_ids)
         return {
             user_id: model for user_id, model in python_utils.ZIP(
-                user_ids, retrieved_user_models)}
+                user_ids, retrieved_models)}
 
-    @staticmethod
-    def export_data(user_id):
+    @classmethod
+    def export_data(cls, user_id):
         """(Takeout) Export GeneralFeedbackEmailReplyToIdModel's user data.
 
         Args:
@@ -435,16 +435,21 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             GeneralFeedbackEmailReplyToIdModel, it is excluded from the
             returned dict.
         """
+        # We use the UserSubscriptionsModel to retrieve thread_ids associated
+        # with the given user_id since GeneralFeedbackEmailReplyToIdModel
+        # does not store the user_id, so querying the datastore isn't feasible.
         user_subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         if not user_subscriptions_model:
             return None
 
+        thread_ids = user_subscriptions_model.general_feedback_thread_ids
+        instance_ids = (
+            ['.'.join([user_id, thread_id]) for thread_id in thread_ids])
+        user_email_models = cls.get_multi(instance_ids)
+
         user_data = {}
-        for thread_id in user_subscriptions_model.general_feedback_thread_ids:
-            user_email_model = GeneralFeedbackEmailReplyToIdModel.get(
-                user_id, thread_id, strict=False)
-            if user_email_model is not None:
-                user_data[thread_id] = user_email_model.reply_to_id
+        for i, email_model in enumerate(user_email_models):
+            user_data[thread_ids[i]] = email_model.reply_to_id
 
         return user_data
