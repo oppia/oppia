@@ -15,7 +15,6 @@ anchor_for_job_defaults: &job_defaults
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
-    pip2 install --upgrade virtualenv --user
     pip2 install future --user
     pip2 install psutil --user
     python -m scripts.setup
@@ -114,6 +113,7 @@ jobs:
           <<: *restore_cache
       - run: pip2 install pyyaml --user
       - run: pip2 install webtest --user
+      - run: pip2 install configparser --user
       - run:
           name: Run backend tests
           command: |
