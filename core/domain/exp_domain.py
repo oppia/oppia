@@ -3304,16 +3304,6 @@ class Exploration(python_utils.OBJECT):
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
         }
 
-    def get_interaction_ids(self):
-        """Gets all interaction ids used in this exploration.
-
-        Returns:
-            list(str). The list of interaction ids.
-        """
-        return list(set([
-            state.interaction.id for state in self.states.values()
-            if state.interaction.id is not None]))
-
     def get_all_html_content_strings(self):
         """Gets all html content strings used in this exploration.
 
