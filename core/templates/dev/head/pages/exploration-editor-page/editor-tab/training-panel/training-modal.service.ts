@@ -107,7 +107,7 @@ angular.module('oppia').factory('TrainingModalService', [
               };
 
               $scope.exitTrainer = function() {
-                $uibModalInstance.dismiss();
+                $uibModalInstance.close(false);
               };
 
               $scope.onConfirm = function() {

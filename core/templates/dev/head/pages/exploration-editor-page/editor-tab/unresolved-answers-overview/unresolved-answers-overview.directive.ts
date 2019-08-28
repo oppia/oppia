@@ -248,7 +248,7 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                   };
 
                   $scope.finishTeaching = function(reopen) {
-                    $uibModalInstance.dismiss();
+                    $uibModalInstance.close(false);
                   };
 
                   $scope.loadingDotsAreShown = true;

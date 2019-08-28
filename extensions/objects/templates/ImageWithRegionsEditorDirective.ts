@@ -507,7 +507,7 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss();
+                    $uibModalInstance.close(false);
                   };
 
                   $scope.confirmClear = function() {

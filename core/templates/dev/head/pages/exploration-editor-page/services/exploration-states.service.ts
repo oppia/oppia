@@ -436,7 +436,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
               };
 
               $scope.cancel = function() {
-                $uibModalInstance.dismiss();
+                $uibModalInstance.close(false);
                 AlertsService.clearWarnings();
               };
             }
