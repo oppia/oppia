@@ -195,8 +195,8 @@ angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
 // (so that they can be fixed).
 // NOTE: The line number logged in stack driver will not accurately
 // match the line number in the source code. This is because browsers
-// automatically remove empty lines and concatinate strings which are 
-// spread over multiple lines. The errored file may be viewed on the 
+// automatically remove empty lines and concatinate strings which are
+// spread over multiple lines. The errored file may be viewed on the
 // browser console where the line number should match.
 angular.module('oppia').factory('$exceptionHandler', [
   '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
@@ -205,18 +205,18 @@ angular.module('oppia').factory('$exceptionHandler', [
 
     return function(exception, cause) {
       sourceMappedStackTrace.mapStackTrace(
-        exception.stack, function(mappedStack) { 
+        exception.stack, function(mappedStack) {
           var messageAndSourceAndStackTrace = [
             '',
             'Cause: ' + cause,
             exception.message,
-            mappedStack.join("\n"),
+            mappedStack.join('\n'),
             '    at URL: ' + window.location.href
           ].join('\n');
-    
           // To prevent an overdose of errors, throttle to at most 1 error every
           // MIN_TIME_BETWEEN_ERRORS_MSEC.
-          if (Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+          if (
+            Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
             // Catch all errors, to guard against infinite recursive loops.
             try {
               // We use jQuery here instead of Angular's $http, since the latter
@@ -236,14 +236,14 @@ angular.module('oppia').factory('$exceptionHandler', [
                   dataType: 'text',
                   async: true
                 });
-    
+
                 timeOfLastPostedError = Date.now();
               });
             } catch (loggingError) {
               $log.warn('Error logging failed.');
             }
-          }    
-      });
+          }
+        });
       $log.error.apply($log, arguments);
     };
   }
