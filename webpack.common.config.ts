@@ -59,6 +59,7 @@ module.exports = {
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.scripts.ts',
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
+    console_errors: commonPrefix + '/tests/console_errors.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
       'creator-dashboard-page.scripts.ts',
@@ -143,12 +144,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      filename: 'base.html',
-      template: 'core/templates/dev/head/pages/base.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['about'],
       filename: 'about-page.mainpage.html',
       meta: {
@@ -190,6 +185,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['console_errors'],
       filename: 'console_errors.html',
       template: commonPrefix + '/tests/console_errors.html',
       minify: htmlMinifyConfig,
