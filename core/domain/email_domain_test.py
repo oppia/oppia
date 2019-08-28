@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for domain objects for models relating to emails."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import email_domain
 from core.tests import test_utils

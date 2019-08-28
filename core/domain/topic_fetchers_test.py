@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for topic domain objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import topic_domain
 from core.domain import topic_fetchers

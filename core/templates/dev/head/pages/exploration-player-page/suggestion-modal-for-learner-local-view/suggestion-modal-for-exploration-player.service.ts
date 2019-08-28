@@ -16,6 +16,9 @@
  * @fileoverview Service to display suggestion modal in learner local view.
  */
 
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -38,12 +41,12 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
         resolve: {},
         controller: [
           '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
-          'CURRENT_RTE_IS_CKEDITOR_4', 'PlayerPositionService',
-          'PlayerTranscriptService', 'SuggestionModalService',
+          'PlayerPositionService', 'PlayerTranscriptService',
+          'SuggestionModalService',
           function(
               $scope, $timeout, $uibModalInstance, ExplorationEngineService,
-              CURRENT_RTE_IS_CKEDITOR_4, PlayerPositionService,
-              PlayerTranscriptService, SuggestionModalService) {
+              PlayerPositionService, PlayerTranscriptService,
+              SuggestionModalService) {
             var stateName = PlayerPositionService.getCurrentStateName();
             var displayedCard = PlayerTranscriptService.getCard(
               PlayerPositionService.getDisplayedCardIndex());
@@ -62,8 +65,6 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             $scope.cancelSuggestion = function() {
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };
-
-            $scope.currentRteIsCKEditor4 = CURRENT_RTE_IS_CKEDITOR_4;
 
             $scope.submitSuggestion = function() {
               var data = {

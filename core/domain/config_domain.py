@@ -15,10 +15,12 @@
 # limitations under the License.
 
 """Domain objects for configuration properties."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import change_domain
 from core.platform import models
 import feconf
+import python_utils
 import schema_utils
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
@@ -81,7 +83,7 @@ class ConfigPropertyChange(change_domain.BaseChange):
     }]
 
 
-class ConfigProperty(object):
+class ConfigProperty(python_utils.OBJECT):
     """A property with a name and a default value.
 
     NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
@@ -210,7 +212,7 @@ class ConfigProperty(object):
         return schema_utils.normalize_against_schema(value, self._schema)
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all configuration properties."""
 
     # The keys of _config_registry are the property names, and the values are
@@ -250,7 +252,7 @@ class Registry(object):
         """
         schemas_dict = {}
 
-        for (property_name, instance) in cls._config_registry.iteritems():
+        for (property_name, instance) in cls._config_registry.items():
             schemas_dict[property_name] = {
                 'schema': instance.schema,
                 'description': instance.description,
@@ -290,4 +292,9 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
 IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
     'is_improvements_tab_enabled', BOOL_SCHEMA,
     'Exposes the Improvements Tab for creators in the exploration editor.',
+    False)
+
+ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
+    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
+    'Always ask learners for answer details. For testing -- do not use',
     False)
