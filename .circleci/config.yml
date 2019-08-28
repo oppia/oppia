@@ -15,9 +15,9 @@ anchor_for_job_defaults: &job_defaults
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
-    sudo pip install --upgrade pip --user
-    sudo pip install future
-    sudo pip install psutil
+    pip install --upgrade pip --user
+    pip install future --user
+    pip install psutil --user
     python -m scripts.setup
     python -m scripts.setup_gae
 
@@ -56,7 +56,7 @@ jobs:
       - checkout
       - run:
           <<: *install_dependencies
-      - run: sudo pip install pyyaml
+      - run: pip install pyyaml --user
       - run:
           name: Run lint tests
           # All the python scripts should behave as modules. Files like the
@@ -91,7 +91,7 @@ jobs:
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
-      - run: sudo pip install pyyaml
+      - run: pip install pyyaml --user
       - run:
           name: Run frontend tests
           command: |
@@ -99,7 +99,7 @@ jobs:
       - run:
           name: Generate frontend coverage report
           command: |
-            sudo pip install codecov
+            pip install codecov --user
             codecov --file ../karma_coverage_reports/lcov.info -F frontend
           when: on_success
 
@@ -112,14 +112,8 @@ jobs:
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
-      - run: sudo pip install pyyaml
-      - run: sudo pip install webtest
-      - run:
-          name: Install virtual environment
-          command: |
-            sudo pip install virtualenv
-            virtualenv venv
-            source venv/bin/activate
+      - run: pip install pyyaml --user
+      - run: pip install webtest --user
       - run:
           name: Run backend tests
           command: |
@@ -129,7 +123,7 @@ jobs:
       - run:
           name: Generate backend coverage report
           command: |
-            sudo pip install codecov
+            pip install codecov --user
             codecov -F backend
             ./cc-test-reporter format-coverage -t coverage.py coverage.xml
             ./cc-test-reporter sum-coverage coverage/codeclimate.json
