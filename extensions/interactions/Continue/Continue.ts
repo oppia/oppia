@@ -16,10 +16,13 @@
  * @fileoverview Requires for Continue interaction.
  */
 
-require('interactions/Continue/directives/ContinueRulesService.ts');
-require('interactions/Continue/directives/ContinueValidationService.ts');
+require('interactions/Continue/directives/continue-rules.service.ts');
+require('interactions/Continue/directives/continue-validation.service.ts');
 require(
-  'interactions/Continue/directives/OppiaInteractiveContinueDirective.ts');
-require('interactions/Continue/directives/OppiaResponseContinueDirective.ts');
+  'interactions/Continue/directives/oppia-interactive-continue.directive.ts');
 require(
-  'interactions/Continue/directives/OppiaShortResponseContinueDirective.ts');
+  'interactions/Continue/directives/' +
+  'oppia-response-continue.directive.ts');
+require(
+  'interactions/Continue/directives/' +
+  'oppia-short-response-continue.directive.ts');
