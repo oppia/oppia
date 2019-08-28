@@ -625,7 +625,7 @@ angular.module('oppia').directive('explorationEditorPage', [
                   $scope.cancel = function() {
                     SiteAnalyticsService.registerDeclineTutorialModalEvent(
                       explorationId);
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
 
                   $scope.editorWelcomeImgUrl = (

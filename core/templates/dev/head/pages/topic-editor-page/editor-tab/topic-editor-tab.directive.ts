@@ -68,7 +68,7 @@ angular.module('oppia').directive('topicEditorTab', [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {
                     $scope.cancel = function() {
-                      $uibModalInstance.close(false);
+                      $uibModalInstance.dismiss('cancel');
                     };
                   }
                 ]

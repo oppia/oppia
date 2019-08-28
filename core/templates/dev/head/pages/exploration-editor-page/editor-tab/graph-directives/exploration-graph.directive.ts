@@ -107,7 +107,7 @@ angular.module('oppia').directive('explorationGraph', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };
                 }

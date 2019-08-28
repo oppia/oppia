@@ -73,7 +73,7 @@ angular.module('oppia').directive('topicsList', [
                     $uibModalInstance.close();
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]

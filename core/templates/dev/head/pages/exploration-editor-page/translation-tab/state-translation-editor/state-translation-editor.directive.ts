@@ -66,7 +66,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }]
               }).result.then(function() {

@@ -104,7 +104,7 @@ angular.module('oppia').directive('createActivityButton', [
                     };
 
                     $scope.cancel = function() {
-                      $uibModalInstance.close(false);
+                      $uibModalInstance.dismiss('cancel');
                     };
 
                     $scope.explorationImgUrl = (

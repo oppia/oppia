@@ -399,7 +399,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                     };
 
                     $scope.cancel = function() {
-                      $uibModalInstance.close(false);
+                      $uibModalInstance.dismiss('cancel');
                     };
                   }
                 ]
@@ -425,7 +425,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                     $uibModalInstance.close();
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };
                 }

@@ -49,7 +49,7 @@ angular.module('oppia').factory('TopicCreationService', [
                 $uibModalInstance.close(topicName);
               };
               $scope.cancel = function() {
-                $uibModalInstance.close(false);
+                $uibModalInstance.dismiss('cancel');
               };
             }
           ]

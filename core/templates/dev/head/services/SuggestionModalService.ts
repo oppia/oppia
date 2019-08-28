@@ -64,7 +64,7 @@ export class SuggestionModalService {
   // 'any' since '$uibModalInstance' is a AngularJS native object and does not
   // have a TS interface.
   cancelSuggestion($uibModalInstance: any): void {
-    $uibModalInstance.close(false);
+    $uibModalInstance.dismiss('cancel');
   }
 }
 

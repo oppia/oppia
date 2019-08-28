@@ -199,7 +199,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                     $uibModalInstance.close(title);
                   };
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]

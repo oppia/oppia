@@ -119,7 +119,7 @@ angular.module('oppia').directive('editorNavigation', [
                   $scope.goToHelpCenter = function() {
                     SiteAnalyticsService.registerVisitHelpCenterEvent(
                       explorationId);
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ],

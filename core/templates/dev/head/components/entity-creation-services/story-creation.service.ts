@@ -51,7 +51,7 @@ angular.module('oppia').factory('StoryCreationService', [
                 $uibModalInstance.close(storyTitle);
               };
               $scope.cancel = function() {
-                $uibModalInstance.close(false);
+                $uibModalInstance.dismiss('cancel');
               };
             }
           ]

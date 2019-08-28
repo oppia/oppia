@@ -127,7 +127,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
               DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
             $scope.close = function() {
-              $uibModalInstance.close(false);
+              $uibModalInstance.dismiss('cancel');
             };
             $scope.explorationId = (
               ContextService.getExplorationId());
@@ -166,7 +166,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             $scope.publish = $uibModalInstance.close;
 
             $scope.cancel = function() {
-              $uibModalInstance.close(false);
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]
@@ -287,7 +287,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
               '$scope', '$uibModalInstance',
               function($scope, $uibModalInstance) {
                 $timeout(function() {
-                  $uibModalInstance.close(false);
+                  $uibModalInstance.dismiss('cancel');
                 }, 2500);
               }
             ],
@@ -440,7 +440,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
                 };
 
                 $scope.cancel = function() {
-                  $uibModalInstance.close(false);
+                  $uibModalInstance.dismiss('cancel');
                 };
               }
             ]
@@ -585,7 +585,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
                   $uibModalInstance.close(commitMessage);
                 };
                 $scope.cancel = function() {
-                  $uibModalInstance.close(false);
+                  $uibModalInstance.dismiss('cancel');
                   AlertsService.clearWarnings();
                 };
               }

@@ -152,7 +152,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }]
             }).result.then(function(result) {
@@ -189,7 +189,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]

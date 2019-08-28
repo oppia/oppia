@@ -255,7 +255,7 @@ angular.module('oppia').directive('preferencesPage', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]

@@ -95,7 +95,7 @@ angular.module('oppia').directive('skillsMasteryList', [
                   $scope.currentSkill = skillDescription;
 
                   $scope.closeModal = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]

@@ -561,7 +561,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]

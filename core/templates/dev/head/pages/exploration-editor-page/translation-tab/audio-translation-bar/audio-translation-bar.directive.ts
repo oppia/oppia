@@ -388,7 +388,7 @@ angular.module('oppia').directive('audioTranslationBar', [
                 function( $scope, $uibModalInstance, message) {
                   $scope.busyMessage = message;
                   $scope.gotIt = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
@@ -506,7 +506,7 @@ angular.module('oppia').directive('audioTranslationBar', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
@@ -602,7 +602,7 @@ angular.module('oppia').directive('audioTranslationBar', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };
                 }

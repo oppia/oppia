@@ -265,7 +265,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
                 };
 
                 $scope.cancel = function() {
-                  $uibModalInstance.close(false);
+                  $uibModalInstance.dismiss('cancel');
                   AlertsService.clearWarnings();
                 };
               }

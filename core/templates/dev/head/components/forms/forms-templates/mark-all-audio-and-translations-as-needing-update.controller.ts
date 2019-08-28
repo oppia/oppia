@@ -26,7 +26,7 @@ angular.module('oppia').controller(
       };
 
       $scope.cancel = function() {
-        $uibModalInstance.close(false);
+        $uibModalInstance.dismiss('cancel');
       };
     }
   ]);

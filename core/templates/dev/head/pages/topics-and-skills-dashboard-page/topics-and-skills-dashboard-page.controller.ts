@@ -186,7 +186,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
