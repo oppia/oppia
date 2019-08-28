@@ -99,8 +99,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             cls.original_author_id == user_id).fetch()
 
         for feedback_model in feedback_models:
-            feedback_model_id = str(feedback_model.id)
-            user_data[feedback_model_id] = {
+            user_data[feedback_model.id] = {
                 'entity_type': feedback_model.entity_type,
                 'entity_id': feedback_model.entity_id,
                 'status': feedback_model.status,
@@ -248,8 +247,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         feedback_models = cls.get_all().filter(cls.author_id == user_id).fetch()
 
         for feedback_model in feedback_models:
-            feedback_model_id = str(feedback_model.id)
-            user_data[feedback_model_id] = {
+            user_data[feedback_model.id] = {
                 'thread_id': feedback_model.thread_id,
                 'message_id': feedback_model.message_id,
                 'updated_status': feedback_model.updated_status,

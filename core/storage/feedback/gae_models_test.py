@@ -122,7 +122,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         user_data = (feedback_models
                      .GeneralFeedbackThreadModel.export_data('user_1'))
         test_data = {
-            str(feedback_thread_model.id): {
+            feedback_thread_model.id: {
                 'entity_type': test_export_entity_type,
                 'entity_id': test_export_entity_id,
                 'status': test_export_status,
