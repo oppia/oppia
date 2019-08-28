@@ -58,7 +58,7 @@ def main():
         # Inside this loop the STDOUT will be redirected to the file.
         # The end='' is needed to avoid double line breaks.
         python_utils.PRINT(
-            re.sub(r'^})();\s*$', '}]);', line), end='')
+            re.sub(r'^\}\)\(\);\s*$', '}]);', line), end='')
 
     python_utils.PRINT('Done!')
 
