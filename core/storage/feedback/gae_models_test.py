@@ -89,7 +89,6 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
     def test_export_data_trivial(self):
         user_data = feedback_models.GeneralFeedbackThreadModel.export_data(
-
             'fake_user'
         )
         test_data = {}
