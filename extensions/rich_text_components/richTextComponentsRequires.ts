@@ -18,16 +18,19 @@
 
 require(
   'rich_text_components/Collapsible/directives/' +
-  'OppiaNoninteractiveCollapsibleDirective.ts');
+  'oppia-noninteractive-collapsible.directive.ts');
 require(
   'rich_text_components/Image/directives/' +
-  'OppiaNoninteractiveImageDirective.ts');
+  'oppia-noninteractive-image.directive.ts');
 require(
-  'rich_text_components/Link/directives/OppiaNoninteractiveLinkDirective.ts');
+  'rich_text_components/Link/directives/' +
+  'oppia-noninteractive-link.directive.ts');
 require(
-  'rich_text_components/Math/directives/OppiaNoninteractiveMathDirective.ts');
+  'rich_text_components/Math/directives/' +
+  'oppia-noninteractive-math.directive.ts');
 require(
-  'rich_text_components/Tabs/directives/OppiaNoninteractiveTabsDirective.ts');
+  'rich_text_components/Tabs/directives/' +
+  'oppia-noninteractive-tabs.directive.ts');
 require(
   'rich_text_components/Video/directives/' +
-  'OppiaNoninteractiveVideoDirective.ts');
+  'oppia-noninteractive-video.directive.ts');

@@ -20,16 +20,16 @@ require('interactions/MultipleChoiceInput/static/multiple_choice_input.css');
 
 require(
   'interactions/MultipleChoiceInput/directives/' +
-  'MultipleChoiceInputRulesService.ts');
+  'multiple-choice-input-rules.service.ts');
 require(
   'interactions/MultipleChoiceInput/directives/' +
-  'MultipleChoiceInputValidationService.ts');
+  'multiple-choice-input-validation.service.ts');
 require(
   'interactions/MultipleChoiceInput/directives/' +
-  'OppiaInteractiveMultipleChoiceInputDirective.ts');
+  'oppia-interactive-multiple-choice-input.directive.ts');
 require(
   'interactions/MultipleChoiceInput/directives/' +
-  'OppiaResponseMultipleChoiceInputDirective.ts');
+  'oppia-response-multiple-choice-input.directive.ts');
 require(
   'interactions/MultipleChoiceInput/directives/' +
-  'OppiaShortResponseMultipleChoiceInputDirective.ts');
+  'oppia-short-response-multiple-choice-input.directive.ts');

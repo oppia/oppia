@@ -17,16 +17,17 @@
  */
 
 require(
-  'interactions/ImageClickInput/directives/ImageClickInputRulesService.ts');
+  'interactions/ImageClickInput/directives/' +
+  'image-click-input-rules.service.ts');
 require(
   'interactions/ImageClickInput/directives/' +
-  'ImageClickInputValidationService.ts');
+  'image-click-input-validation.service.ts');
 require(
   'interactions/ImageClickInput/directives/' +
-  'OppiaInteractiveImageClickInputDirective.ts');
+  'oppia-interactive-image-click-input.directive.ts');
 require(
   'interactions/ImageClickInput/directives/' +
-  'OppiaResponseImageClickInputDirective.ts');
+  'oppia-response-image-click-input.directive.ts');
 require(
   'interactions/ImageClickInput/directives/' +
-  'OppiaShortResponseImageClickInputDirective.ts');
+  'oppia-short-response-image-click-input.directive.ts');

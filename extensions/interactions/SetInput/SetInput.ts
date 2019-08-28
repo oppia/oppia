@@ -16,10 +16,13 @@
  * @fileoverview Requires for SetInput interaction.
  */
 
-require('interactions/SetInput/directives/SetInputRulesService.ts');
-require('interactions/SetInput/directives/SetInputValidationService.ts');
+require('interactions/SetInput/directives/set-input-rules.service.ts');
+require('interactions/SetInput/directives/set-input-validation.service.ts');
 require(
-  'interactions/SetInput/directives/OppiaInteractiveSetInputDirective.ts');
-require('interactions/SetInput/directives/OppiaResponseSetInputDirective.ts');
+  'interactions/SetInput/directives/oppia-interactive-set-input.directive.ts');
 require(
-  'interactions/SetInput/directives/OppiaShortResponseSetInputDirective.ts');
+  'interactions/SetInput/directives/' +
+  'oppia-response-set-input.directive.ts');
+require(
+  'interactions/SetInput/directives/' +
+  'oppia-short-response-set-input.directive.ts');
