@@ -28,6 +28,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
     """Tests for Oppia storage models."""
 
     def _get_model_module_names(self):
+        """Get all module names in storage."""
         all_model_module_names = []
 
         # As models.NAMES is an enum, it cannot be iterated. So we use the
@@ -38,6 +39,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         return all_model_module_names
 
     def _get_model_classes(self):
+        """Get all model classes in storage."""
         model_subclasses = []
         for module_name in self._get_model_module_names():
             (module,) = models.Registry.import_models([module_name])
@@ -59,24 +61,24 @@ class StorageModelsTest(test_utils.GenericTestBase):
             len(set(names_of_ndb_model_subclasses)),
             len(names_of_ndb_model_subclasses))
 
-    @unittest.skip("get_deletion_policy is not yet implemented on all models")
+    @unittest.skip('get_deletion_policy is not yet implemented on all models')
     def test_all_models_have_get_deletion_policy(self):
         model_subclasses = self._get_model_classes()
 
         for clazz in model_subclasses:
             base_classes = [base.__name__ for base in inspect.getmro(clazz)]
             # BaseSnapshotMetadataModel adopts the policy of parent
-            # VersionedModel
+            # VersionedModel.
             if 'BaseSnapshotMetadataModel' in base_classes:
                 continue
             # BaseSnapshotContentModel adopts the policy of parent
-            # VersionedModel
+            # VersionedModel.
             if 'BaseSnapshotContentModel' in base_classes:
                 continue
-            # BaseCommitLogEntryModel adopts the policy of parent VersionedModel
+            # BaseCommitLogEntryModel adopts the policy of parent
+            # VersionedModel.
             if 'BaseCommitLogEntryModel' in base_classes:
                 continue
             self.assertIn(
                 clazz.get_deletion_policy(),
                 base_models.DELETION_POLICY.__dict__)
-

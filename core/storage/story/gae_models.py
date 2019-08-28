@@ -163,6 +163,7 @@ class StorySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Story summary should be kept if the corresponding topic is published.
+        """Story summary should be kept if the corresponding topic is
+        published.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
