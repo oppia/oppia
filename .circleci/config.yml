@@ -15,7 +15,7 @@ anchor_for_job_defaults: &job_defaults
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
-    pip2 install --upgrade virtualenv
+    pip2 install --upgrade virtualenv --user
     pip2 install future --user
     pip2 install psutil --user
     python -m scripts.setup
