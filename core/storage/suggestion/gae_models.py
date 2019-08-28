@@ -268,8 +268,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                              .filter(cls.author_id == user_id).fetch())
 
         for suggestion_model in suggestion_models:
-            suggestion_model_id = str(suggestion_model.id)
-            user_data[suggestion_model_id] = {
+            user_data[suggestion_model.id] = {
                 'suggestion_type': suggestion_model.suggestion_type,
                 'target_type': suggestion_model.target_type,
                 'target_id': suggestion_model.target_id,
