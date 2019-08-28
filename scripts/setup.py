@@ -140,7 +140,7 @@ def main():
             os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
             common.NODE_PATH)
 
-    # Change ownership of $NODE_MODULE_DIR.
+    # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
     common.recursive_chown('node_modules/', os.getuid(), -1)
     common.recursive_chmod('node_modules/', 744)

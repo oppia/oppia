@@ -58,18 +58,28 @@ def main(argv=None):
 
     build.main()
 
-    subprocess.call([
-        xvfb_prefix, 'node_modules/karma/bin/karma', 'start',
-        'core/tests/karma.conf.ts'])
+    if xvfb_prefix:
+        subprocess.call([
+            xvfb_prefix, 'node_modules/karma/bin/karma', 'start',
+            'core/tests/karma.conf.ts'])
+    else:
+        subprocess.call([
+            'node_modules/karma/bin/karma', 'start',
+            'core/tests/karma.conf.ts'])
 
     if parsed_args.run_minified_tests is True:
         python_utils.PRINT('Running test in production environment')
 
         build.main(argv=['--prod_env', '--minify_third_party_libs_only'])
 
-        subprocess.call([
-            xvfb_prefix, 'node_modules/karma/bin/karma', 'start',
-            'core/tests/karma.conf.ts', '--prodEnv'])
+        if xvfb_prefix:
+            subprocess.call([
+                xvfb_prefix, 'node_modules/karma/bin/karma', 'start',
+                'core/tests/karma.conf.ts', '--prodEnv'])
+        else:
+            subprocess.call([
+                'node_modules/karma/bin/karma', 'start',
+                'core/tests/karma.conf.ts', '--prodEnv'])
 
     python_utils.PRINT('Done!')
 
