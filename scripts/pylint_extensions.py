@@ -19,17 +19,9 @@ presubmit checks.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
-import os
 import re
-import sys
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
-sys.path.insert(0, _PYLINT_PATH)
-
-# Since these module needs to be imported after adding Pylint path,
-# we need to disable isort for the below lines to prevent import
-# order errors.
+from . import docstrings_checker  # isort:skip
 
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
@@ -40,7 +32,6 @@ from pylint.checkers import typecheck  # isort:skip
 from pylint.checkers import utils as checker_utils  # isort:skip
 
 import python_utils  # isort:skip
-from . import docstrings_checker  # isort:skip
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
 

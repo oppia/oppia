@@ -19,27 +19,12 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
 import contextlib
-import os
-import sys
 import unittest
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
-sys.path.insert(0, _PYLINT_PATH)
-
-# Since these module needs to be imported after adding Pylint path,
-# we need to disable isort for the below lines to prevent import
-# order errors.
-
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import astroid  # isort:skip
 
 from . import docstrings_checker  # isort:skip
 
+import astroid  # isort:skip
 from pylint.checkers import utils # isort:skip
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
 
 
 class ASTDocstringsCheckerTest(unittest.TestCase):
