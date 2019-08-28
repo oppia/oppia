@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for the creator dashboard page.
  */
 
+var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -28,7 +29,7 @@ var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
 
-describe('Learner dashboard functionality', function() {
+describe('Creator dashboard functionality', function() {
   var EXPLORATION_TITLE_1 = 'Exploration 1';
   var EXPLORATION_TITLE_2 = 'Exploration 2';
   var EXPLORATION_OBJECTIVE = 'To explore something';
@@ -122,5 +123,108 @@ describe('Learner dashboard functionality', function() {
     expect(creatorDashboardPage.getOpenFeedbacks()).toEqual('2');
     expect(creatorDashboardPage.getSubscribers()).toEqual('2');
     users.logout();
+  });
+
+  it('should work fine in grid view as well as list view', function() {
+    var feedback = 'A good exploration. Would love to see a few more questions';
+    // Create required users.
+    users.createUser(
+      'user1@creatorDashboard.com',
+      'creatorDashboardOwner');
+    users.createUser(
+      'user2@creatorDashboard.com',
+      'learner2');
+    users.createUser(
+      'user3@creatorDashboard.com',
+      'learner3');
+
+    users.login('user1@creatorDashboard.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE_1,
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
+    creatorDashboardPage.get();
+
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE_2,
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
+    users.logout();
+    users.login('user2@creatorDashboard.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE_1);
+    libraryPage.playExploration(EXPLORATION_TITLE_1);
+    explorationPlayerPage.rateExploration(3);
+    users.logout();
+
+    users.login('user3@creatorDashboard.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE_2);
+    libraryPage.playExploration(EXPLORATION_TITLE_2);
+    explorationPlayerPage.rateExploration(5);
+    explorationPlayerPage.submitFeedback(feedback);
+    users.logout();
+
+    users.login('user1@creatorDashboard.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.getExpSummaryTileTitles().
+      then(function(titles) {
+        expect(titles.length).toEqual(2);
+        expect(titles[0].getText()).toEqual(EXPLORATION_TITLE_2);
+        expect(titles[1].getText()).toEqual(EXPLORATION_TITLE_1);
+      });
+    creatorDashboardPage.getExpSummaryTileRatings().
+      then(function(ratings) {
+        expect(ratings.length).toEqual(2);
+        expect(ratings[0].getText()).toEqual('5.0');
+        expect(ratings[1].getText()).toEqual('3.0');
+      });
+    creatorDashboardPage.getExpSummaryTileOpenFeedbackCount().
+      then(function(feedbackCount) {
+        expect(feedbackCount.length).toEqual(2);
+        expect(feedbackCount[0].getText()).toEqual('1');
+        expect(feedbackCount[1].getText()).toEqual('0');
+      });
+    creatorDashboardPage.getExpSummaryTileViewsCount().
+      then(function(views) {
+        expect(views.length).toEqual(2);
+        expect(views[0].getText()).toEqual('1');
+        expect(views[1].getText()).toEqual('1');
+      });
+
+    creatorDashboardPage.getListView();
+
+    creatorDashboardPage.getExpSummaryRowTitles().
+      then(function(titles) {
+        expect(titles.length).toEqual(2);
+        expect(titles[0].getText()).toEqual(EXPLORATION_TITLE_2);
+        expect(titles[1].getText()).toEqual(EXPLORATION_TITLE_1);
+      });
+    creatorDashboardPage.getExpSummaryRowRatings().
+      then(function(ratings) {
+        expect(ratings.length).toEqual(2);
+        expect(ratings[0].getText()).toEqual('5.0');
+        expect(ratings[1].getText()).toEqual('3.0');
+      });
+    creatorDashboardPage.getExpSummaryRowOpenFeedbackCount().
+      then(function(feedbackCount) {
+        expect(feedbackCount.length).toEqual(2);
+        expect(feedbackCount[0].getText()).toEqual('1');
+        expect(feedbackCount[1].getText()).toEqual('0');
+      });
+    creatorDashboardPage.getExpSummaryRowViewsCount().
+      then(function(views) {
+        expect(views.length).toEqual(2);
+        expect(views[0].getText()).toEqual('1');
+        expect(views[1].getText()).toEqual('1');
+      });
+
+    users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });
