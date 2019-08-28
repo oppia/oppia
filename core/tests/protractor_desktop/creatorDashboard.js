@@ -28,7 +28,7 @@ var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
 
-describe('Learner dashboard functionality', function() {
+describe('Creator dashboard functionality', function() {
   var EXPLORATION_TITLE_1 = 'Exploration 1';
   var EXPLORATION_TITLE_2 = 'Exploration 2';
   var EXPLORATION_OBJECTIVE = 'To explore something';
