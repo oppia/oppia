@@ -369,7 +369,7 @@ angular.module('oppia').directive('settingsTab', [
                   };
 
                   $scope.close = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss();
                     AlertsService.clearWarnings();
                   };
                 }

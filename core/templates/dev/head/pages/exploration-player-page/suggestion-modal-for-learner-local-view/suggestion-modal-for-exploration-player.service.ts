@@ -112,7 +112,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {
               $scope.close = function() {
-                $uibModalInstance.close(false);
+                $uibModalInstance.dismiss();
               };
             }
           ]

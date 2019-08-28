@@ -266,7 +266,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           controller: [
             '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.cancel = function() {
-                $uibModalInstance.close(false);
+                $uibModalInstance.dismiss();
               };
               $scope.confirmDiscard = function() {
                 $uibModalInstance.close();

@@ -115,7 +115,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss();
                   };
 
                   $scope.resetCode = function() {

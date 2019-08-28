@@ -158,7 +158,7 @@ angular.module('oppia').directive('learnerViewInfo', [
                   $scope.explorationIsPrivate = (expInfo.status === 'private');
 
                   $scope.cancel = function() {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.dismiss();
                   };
                 }
               ]
