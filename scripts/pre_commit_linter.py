@@ -1410,6 +1410,16 @@ class LintChecksManager( # pylint: disable=inherit-non-class
 
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
+        self.process_manager = multiprocessing.Manager().dict()
+
+    def _run_multiple_checks(self, *checks):
+        processes = []
+        for check in checks:
+            p = multiprocessing.Process(target=check)
+            processes.append(p)
+            p.start()
+        for p in processes:
+            p.join()
 
     def _check_for_mandatory_pattern_in_file(
             self, pattern_list, filepath, failed):
@@ -1486,7 +1496,8 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         python_utils.PRINT('')
 
         summary_messages.append(summary_message)
-        return summary_messages
+        self.process_manager['mandatory'] = summary_messages
+        # return summary_messages
 
     def _check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
@@ -1554,9 +1565,12 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                 python_utils.PRINT('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
                 python_utils.PRINT(summary_message)
+        self.process_manager['bad_pattern'] = summary_messages
+        # return summary_messages
 
-        return summary_messages
-
+    def _check_patterns(self):
+        methods = [self._check_bad_patterns, self._check_mandatory_patterns]
+        self._run_multiple_checks(*methods)
     def check_for_important_patterns_at_bottom_of_codeowners(
             self, important_patterns):
         """Checks that the most important patterns are at the bottom
@@ -1737,9 +1751,14 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
-        mandatory_patterns_messages = self._check_mandatory_patterns()
-        pattern_messages = self._check_bad_patterns()
-        codeowner_messages = self._check_codeowner_file()
+        # mandatory_patterns_messages = self._check_mandatory_patterns()
+        # pattern_messages = self._check_bad_patterns()
+        # codeowner_messages = self._check_codeowner_file()
+        codeowner_messages = []
+        self._check_patterns()
+        mandatory_patterns_messages = self.process_manager['mandatory']
+        pattern_messages = self.process_manager['bad_pattern']
+
         return (
             mandatory_patterns_messages + pattern_messages + codeowner_messages)
 
@@ -1956,8 +1975,8 @@ class JsTsLintChecksManager(LintChecksManager):
             summary_messages.append(summary_message)
             python_utils.PRINT(summary_message)
             python_utils.PRINT('')
-
-        return summary_messages
+        self.process_manager['extra'] = summary_messages
+        # return summary_messages
 
     def _check_js_and_ts_component_name_and_count(self):
         """This function ensures that all JS/TS files have exactly
@@ -2011,7 +2030,8 @@ class JsTsLintChecksManager(LintChecksManager):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
-            return summary_messages
+            self.process_manager['component'] = summary_messages
+            # return summary_messages
 
     def _check_directive_scope(self):
         """This function checks that all directives have an explicit
@@ -2142,7 +2162,8 @@ class JsTsLintChecksManager(LintChecksManager):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
-            return summary_messages
+            self.process_manager['directive'] = summary_messages
+            # return summary_messages
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -2236,8 +2257,8 @@ class JsTsLintChecksManager(LintChecksManager):
         python_utils.PRINT(summary_message)
         if self.verbose_mode_enabled:
             python_utils.PRINT('----------------------------------------')
-
-        return summary_messages
+        self.process_manager['sorted'] = summary_messages
+        # return summary_messages
 
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
@@ -2298,8 +2319,8 @@ class JsTsLintChecksManager(LintChecksManager):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
-
-        return summary_messages
+        self.process_manager['line_breaks'] = summary_messages
+        # return summary_messages
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
@@ -2476,6 +2497,10 @@ class JsTsLintChecksManager(LintChecksManager):
 
         return summary_messages
 
+    def _check_dependencies(self):
+        methods = [self._check_sorted_dependencies, self._match_line_breaks_in_controller_dependencies]
+        super(JsTsLintChecksManager, self)._run_multiple_checks(*methods)
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2487,14 +2512,24 @@ class JsTsLintChecksManager(LintChecksManager):
         linter_messages = self._lint_all_files()
         common_messages = super(
             JsTsLintChecksManager, self).perform_all_lint_checks()
-        extra_js_files_messages = self._check_extra_js_files()
-        js_and_ts_component_messages = (
-            self._check_js_and_ts_component_name_and_count())
-        directive_scope_messages = self._check_directive_scope()
-        sorted_dependencies_messages = (
-            self._check_sorted_dependencies())
-        controller_dependency_messages = (
-            self._match_line_breaks_in_controller_dependencies())
+        # extra_js_files_messages = self._check_extra_js_files()
+        # js_and_ts_component_messages = (
+        #     self._check_js_and_ts_component_name_and_count())
+        # directive_scope_messages = self._check_directive_scope()
+        super(JsTsLintChecksManager, self)._run_multiple_checks(
+            self._check_extra_js_files, self._check_js_and_ts_component_name_and_count,
+            self._check_directive_scope
+        )
+        self._check_dependencies()
+        extra_js_files_messages = self.process_manager['extra']
+        js_and_ts_component_messages = self.process_manager['component']
+        directive_scope_messages = self.process_manager['directive']
+        sorted_dependencies_messages = self.process_manager['sorted']
+        controller_dependency_messages = self.process_manager['line_breaks']
+        # sorted_dependencies_messages = (
+        #     self._check_sorted_dependencies())
+        # controller_dependency_messages = (
+        #     self._match_line_breaks_in_controller_dependencies())
 
         all_messages = (
             linter_messages + common_messages + extra_js_files_messages +
@@ -2592,6 +2627,7 @@ class OtherLintChecksManager(LintChecksManager):
             py_filepaths + html_filepaths + other_filepaths + css_filepaths)
         super(OtherLintChecksManager, self).__init__(
             self.all_filepaths, verbose_mode_enabled=verbose_mode_enabled)
+
 
     def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
@@ -2703,14 +2739,14 @@ class OtherLintChecksManager(LintChecksManager):
         python_utils.divide() is used instead.
         """
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting import-order checks')
+            python_utils.PRINT('Starting division checks')
             python_utils.PRINT('----------------------------------------')
 
         summary_messages = []
         files_to_check = [
-            filepath for filepath in self.all_filepaths if not
+            filepath for filepath in self.py_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS) and filepath.endswith('.py')]
+                EXCLUDED_PATHS)]
         failed = False
 
         with _redirect_stdout(_TARGET_STDOUT):
@@ -2739,7 +2775,8 @@ class OtherLintChecksManager(LintChecksManager):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
-            return summary_messages
+            self.process_manager["division"] = summary_messages
+            # return summary_messages
 
     def _check_import_order(self):
         """This function is used to check that each file
@@ -2777,8 +2814,16 @@ class OtherLintChecksManager(LintChecksManager):
                     '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
+        self.process_manager['import'] = summary_messages
 
-        return summary_messages
+
+    def _check_divide_and_import(self):
+        methods = [self._check_division_operator, self._check_import_order]
+        super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
+
+    def _check_docstrings_and_comments(self):
+        methods = [self._check_docstrings, self._check_comments]
+        super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
 
     def _check_docstrings(self):
         """This function ensures that docstrings end in a period and the arg
@@ -2933,8 +2978,8 @@ class OtherLintChecksManager(LintChecksManager):
                     '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
-
-        return summary_messages
+        self.process_manager['docstrings'] = summary_messages
+        # return summary_messages
 
     def _check_comments(self):
         """This function ensures that comments follow correct style."""
@@ -3011,8 +3056,8 @@ class OtherLintChecksManager(LintChecksManager):
                     '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
-
-        return summary_messages
+        self.process_manager['comments'] = summary_messages
+        # return summary_messages
 
     def _check_html_tags_and_attributes(self, debug=False):
         """This function checks the indentation of lines in HTML files."""
@@ -3128,16 +3173,21 @@ class OtherLintChecksManager(LintChecksManager):
         linter_messages = self._lint_all_files()
         common_messages = super(
             OtherLintChecksManager, self).perform_all_lint_checks()
-        division_operator_messages = self._check_division_operator()
-        import_order_messages = self._check_import_order()
-        docstring_messages = self._check_docstrings()
-        comment_messages = self._check_comments()
+        # division_operator_messages = self._check_division_operator()
+        # import_order_messages = self._check_import_order()
+        self._check_divide_and_import()
+        self._check_docstrings_and_comments()
+        # docstring_messages = self._check_docstrings()
+        # comment_messages = self._check_comments()
+        docstring_messages = self.process_manager['docstrings']
+        comment_messages = self.process_manager['comments']
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
         html_tag_and_attribute_messages = (
             self._check_html_tags_and_attributes())
         html_linter_messages = self._lint_html_files()
-
+        import_order_messages = self.process_manager['import']
+        division_operator_messages = self.process_manager['division']
 
         all_messages = (
             linter_messages + import_order_messages + common_messages +
@@ -3186,7 +3236,8 @@ def main():
         verbose_mode_enabled)
     other_lint_checks_manager = OtherLintChecksManager( # pylint: disable=too-many-function-args
         all_filepaths_dict['.py'], all_filepaths_dict['.html'],
-        all_filepaths_dict['css'], all_filepaths_dict['other'])
+        all_filepaths_dict['css'], all_filepaths_dict['other'],
+        verbose_mode_enabled)
     all_messages = js_ts_lint_checks_manager.perform_all_lint_checks()
     all_messages += other_lint_checks_manager.perform_all_lint_checks()
 
