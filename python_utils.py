@@ -381,16 +381,17 @@ def convert_to_bytes(string_to_convert):
 
 
 def recursively_convert_to_str(value):
-    """Convert all elements in a data structure to str. This is required for the
-    yaml.safe_dump() function to work as it only works for unicode and str and
+    """Convert all builtins.bytes and builtins.str elements in a data structure
+    to bytes and unicode respectively. This is required for the
+    yaml.safe_dump() function to work as it only works for unicode and bytes and
     not builtins.bytes nor builtins.str(UNICODE). See:
     https://stackoverflow.com/a/1950399/11755830
 
     Args:
-        value: list|dict|str. The data structure to convert.
+        value: list|dict|BASESTRING. The data structure to convert.
 
     Returns:
-        list|dict|str. The data structure in str.
+        list|dict|bytes|unicode. The data structure in bytes and unicode.
     """
     if isinstance(value, list):
         return [recursively_convert_to_str(e) for e in value]
@@ -398,11 +399,13 @@ def recursively_convert_to_str(value):
         return {
             recursively_convert_to_str(k): recursively_convert_to_str(
                 v) for k, v in value.items()}
-    elif type(value) == future.types.newstr:
+    # We are using 'type' here instead of 'isinstance' because we need to
+    # clearly distinguish the builtins.str and builtins.bytes strings.
+    elif type(value) == future.types.newstr:  # pylint: disable=unidiomatic-typecheck
         temp = str(value.encode('utf-8'))
         # Remove the b'' prefix from the string.
         return temp[2:-1].decode('utf-8')
-    elif type(value) == future.types.newbytes:
+    elif type(value) == future.types.newbytes:  # pylint: disable=unidiomatic-typecheck
         temp = bytes(value)
         # Remove the b'' prefix from the string.
         return temp[2:-1]
