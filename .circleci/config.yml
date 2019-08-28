@@ -15,7 +15,7 @@ anchor_for_job_defaults: &job_defaults
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
-    sudo pip install --upgrade pip
+    sudo pip install --upgrade pip --user
     sudo pip install future
     sudo pip install psutil
     python -m scripts.setup
