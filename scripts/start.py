@@ -101,7 +101,7 @@ def main(argv=None):
             # The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
-                    '\'DEV_MODE\': .*', constants_env_variable, line), end='')
+                    r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
         build.main(argv=['--prod_env', '--enable_watcher'])
         app_yaml_filepath = 'app.yaml'
     else:
@@ -112,7 +112,7 @@ def main(argv=None):
             # The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
-                    '\'DEV_MODE\': .*', constants_env_variable, line), end='')
+                    r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
         build.main(argv=['--enable_watcher'])
         app_yaml_filepath = 'app_dev.yaml'
 

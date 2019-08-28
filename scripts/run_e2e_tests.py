@@ -78,13 +78,10 @@ def cleanup():
         time.sleep(1)
 
     if os.path.isdir('../protractor-screenshots'):
-        python_utils.PRINT('')
-        python_utils.PRINT(
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in')
-        python_utils.PRINT(
-            'core/tests/protractor.conf.js, you can view screenshots')
-        python_utils.PRINT('of the failed tests in ../protractor-screenshots/')
-        python_utils.PRINT('')
+        common.print_string_after_two_new_lines([
+            'Note: If ADD_SCREENSHOT_REPORTER is set to true in',
+            'core/tests/protractor.conf.js, you can view screenshots',
+            'of the failed tests in ../protractor-screenshots/'])
 
     python_utils.PRINT('Done!')
 
@@ -101,13 +98,10 @@ def main(argv=None):
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
     if not common.is_port_close(8181):
-        python_utils.PRINT('')
-        python_utils.PRINT(
-            'There is already a server running on localhost:8181.')
-        python_utils.PRINT(
-            'Please terminate it before running the end-to-end tests.')
-        python_utils.PRINT('Exiting.')
-        python_utils.PRINT('')
+        common.print_string_after_two_new_lines([
+            'There is already a server running on localhost:8181.',
+            'Please terminate it before running the end-to-end tests.',
+            'Exiting.'])
         sys.exit(1)
 
     # Forces the cleanup function to run on exit.
@@ -136,7 +130,7 @@ def main(argv=None):
             # Inside this loop the STDOUT will be redirected to the file.
             # The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
-                re.sub('\'DEV_MODE\': .*', constants_env_variable, line),
+                re.sub(r'\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
         build.main()
         app_yaml_filepath = 'app_dev.yaml'
@@ -150,7 +144,7 @@ def main(argv=None):
         '--versions.chrome', '2.41'])
     subprocess.call([
         'node_modules/.bin/webdriver-manager', 'start',
-        '--versions.chrome 2.41', '--detach --quiet'])
+        '--versions.chrome', '2.41', '--detach', '--quiet'])
 
     # Start a selenium process. The program sends thousands of lines of useless
     # info logs to stderr so we discard them.
@@ -160,11 +154,11 @@ def main(argv=None):
     background_processes.append(subprocess.Popen([
         'node_modules/.bin/webdriver-manager', 'start', '2>/dev/null']))
     # Start a demo server.
-    background_processes.append(subprocess.Popen([
-        'python', '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME,
-        '--host=0.0.0.0', '--port=9001', '--clear_datastore=yes',
-        '--dev_appserver_log_level=critical', '--log_level=critical',
-        '--skip_sdk_update_check=true', app_yaml_filepath]))
+    background_processes.append(subprocess.Popen(
+        'python %s/dev_appserver.py --host=0.0.0.0 --port=9001 '
+        '--clear_datastore=yes --dev_appserver_log_level=critical '
+        '--log_level=critical --skip_sdk_update_check=true %s' % (
+            common.GOOGLE_APP_ENGINE_HOME, app_yaml_filepath), shell=True))
 
     # Wait for the servers to come up.
     while common.is_port_close(4444) or common.is_port_close(9001):
