@@ -15,6 +15,7 @@ anchor_for_job_defaults: &job_defaults
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
+    pip2 install --upgrade virtualenv
     pip2 install future --user
     pip2 install psutil --user
     python -m scripts.setup
@@ -116,7 +117,7 @@ jobs:
       - run:
           name: Run backend tests
           command: |
-            python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
+            python2 -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
       - run:
           <<: *install_cc
       - run:
