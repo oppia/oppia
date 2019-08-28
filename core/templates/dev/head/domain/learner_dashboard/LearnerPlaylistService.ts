@@ -21,7 +21,9 @@ require('services/AlertsService.ts');
 
 angular.module('oppia').factory('LearnerPlaylistService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
-  function($http, $uibModal, AlertsService, UrlInterpolationService) {
+  'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
+  function($http, $uibModal, AlertsService, UrlInterpolationService,
+      ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION) {
     var _addToLearnerPlaylist = function(activityId, activityType) {
       var successfullyAdded = true;
       var addToLearnerPlaylistUrl = (
@@ -97,10 +99,10 @@ angular.module('oppia').factory('LearnerPlaylistService', [
           }
         ]
       }).result.then(function() {
-        if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+        if (activityType === ACTIVITY_TYPE_EXPLORATION) {
           learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
             activityId);
-        } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+        } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
           learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
             activityId);
         }

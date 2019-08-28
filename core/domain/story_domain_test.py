@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for story domain objects and methods defined on them."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -22,6 +23,7 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 
@@ -375,7 +377,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_corresponding_topic_id_validation(self):
         # Generating valid topic id of type str.
         valid_topic_id = utils.generate_random_string(12)
-        self.assertTrue(isinstance(valid_topic_id, basestring))
+        self.assertTrue(isinstance(valid_topic_id, python_utils.BASESTRING))
         self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 

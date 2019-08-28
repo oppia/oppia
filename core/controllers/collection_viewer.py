@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the Oppia collection learner view."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -32,7 +33,7 @@ class CollectionPage(base.BaseHandler):
     def get(self, _):
         """Handles GET requests."""
 
-        self.render_template('dist/collection-player-page.mainpage.html')
+        self.render_template('collection-player-page.mainpage.html')
 
 
 class CollectionDataHandler(base.BaseHandler):

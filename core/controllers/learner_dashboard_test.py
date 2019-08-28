@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the learner dashboard and the notifications dashboard."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers

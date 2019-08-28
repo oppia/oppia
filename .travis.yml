@@ -30,6 +30,7 @@ env:
     - RUN_E2E_TESTS_EMBEDDING=true
     - RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB=true
     - RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB=true
+    - RUN_E2E_TESTS_EXPLORATION_IMPROVEMENTS_TAB=true
     - RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB=true
     - RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB=true
     - RUN_E2E_TESTS_EXTENSIONS=true
@@ -108,6 +109,7 @@ script:
 - if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="explorationFeedbackTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="explorationHistoryTab" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_IMPROVEMENTS_TAB" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="explorationImprovementsTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="explorationStatisticsTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="explorationTranslationTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env; fi
@@ -123,7 +125,6 @@ script:
 - if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_USERS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
-
 # These lines are commented out because these checks are being run on CircleCI
 # here: https://circleci.com/gh/oppia/oppia
 # after_success:
