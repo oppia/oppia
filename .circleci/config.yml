@@ -116,12 +116,13 @@ jobs:
       - run:
           name: Install virtual environment
           command: |
-            sudo pip install pipenv
-            pipenv install
+            sudo pip install virtualenv
+            virtualenv venv
+            source venv/bin/activate
       - run:
           name: Run backend tests
           command: |
-            pipenv python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
+            python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
       - run:
           <<: *install_cc
       - run:
