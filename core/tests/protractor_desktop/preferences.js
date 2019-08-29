@@ -99,12 +99,12 @@ describe('Preferences', function() {
     users.login('lorem@preferences.com');
     preferencesPage.get();
     preferencesPage.selectCreatorDashboard();
-    preferencesPage.goToHomePage();
+    general.goToHomePage();
     expect(browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/creator_dashboard');
     preferencesPage.get();
     preferencesPage.selectLearnerDashboard();
-    preferencesPage.goToHomePage();
+    general.goToHomePage();
     expect(browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/learner_dashboard');
   });

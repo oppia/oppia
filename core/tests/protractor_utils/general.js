@@ -185,6 +185,12 @@ var checkConsoleErrorsExist = function(expectedErrors) {
   });
 };
 
+var goToHomePage = function() {
+  var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
+  oppiaMainLogo.click();
+  return waitFor.pageToFullyLoad();
+};
+
 exports.acceptAlert = acceptAlert;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
@@ -209,3 +215,5 @@ exports.expect404Error = expect404Error;
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 
 exports.checkConsoleErrorsExist = checkConsoleErrorsExist;
+
+exports.goToHomePage = goToHomePage;

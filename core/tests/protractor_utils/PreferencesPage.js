@@ -41,7 +41,6 @@ var PreferencesPage = function() {
     by.css('.protractor-test-creator-dashboard-radio'));
   var learnerDashboardRadio = element(
     by.css('.protractor-test-learner-dashboard-radio'));
-  var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
 
   this.editUserBio = function(bio) {
     userBioElement.sendKeys(bio);
@@ -145,11 +144,6 @@ var PreferencesPage = function() {
 
   this.selectLearnerDashboard = function() {
     learnerDashboardRadio.click();
-  };
-
-  this.goToHomePage = function() {
-    oppiaMainLogo.click();
-    return waitFor.pageToFullyLoad();
   };
 };
 
