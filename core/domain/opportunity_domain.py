@@ -243,8 +243,8 @@ class SkillOpportunity(object):
     """The domain object for skill opportunities."""
 
     def __init__(
-            self, id, topic_id, topic_name, skill_id, skill_description,
-            question_count):
+            self, id, skill_id, skill_description,
+            question_count=0, topic_id=None, topic_name=None):
         """Constructs a SkillOpportunity domain object.
 
         Args:

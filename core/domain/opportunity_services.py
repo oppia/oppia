@@ -446,8 +446,8 @@ def create_skill_opportunity(skill_opportunity):
     entity in the datastore.
 
     Args:
-        skill_opportunity: The skill opportunity object to be saved in the
-            datastore.
+        skill_opportunity: The skill opportunity domain object to be saved in
+            the datastore.
     """
     skill_opportunity_model = opportunity_models.SkillOpportunityModel(
         topic_id=skill_opportunity.topic_id,

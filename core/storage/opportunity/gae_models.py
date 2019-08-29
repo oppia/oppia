@@ -15,10 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia users."""
-<<<<<<< HEAD
-=======
 from __future__ import absolute_import  # pylint: disable=import-only-modules
->>>>>>> upstream/develop
 
 from core.platform import models
 
@@ -133,7 +130,6 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             ExplorationOpportunitySummaryModel having given topic_id.
         """
         return cls.query(cls.topic_id == topic_id).fetch()
-<<<<<<< HEAD
 
 
 class SkillOpportunityModel(base_models.BaseModel):
@@ -143,9 +139,9 @@ class SkillOpportunityModel(base_models.BaseModel):
     SkillModel occurs.
     """
     # The ID of the topic assigned to the opportunity's skill.
-    topic_id = ndb.StringProperty(required=True, indexed=True)
+    topic_id = ndb.StringProperty(indexed=True)
     # The name of the topic assigned to the opportunity's skill.
-    topic_name = ndb.StringProperty(required=True, indexed=True)
+    topic_name = ndb.StringProperty(indexed=True)
     # The ID of the opportunity's skill.
     skill_id = ndb.StringProperty(required=True, indexed=True)
     # The description of the opportunity's skill.
@@ -188,12 +184,20 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @classmethod
     def get_by_skill_id(cls, skill_id):
-        """Returns all the models corresponding to the specific skill ID.
+        """Returns the first model matching the supplied skill_id.
 
         Returns:
-            SkillOpportunityModel|None. A SkillOpportunityModel having given
+            SkillOpportunityModel|None. A SkillOpportunityModel with the given
             skill_id.
         """
         return cls.query(cls.skill_id == skill_id).get()
-=======
->>>>>>> upstream/develop
+
+    @classmethod
+    def get_by_topic_id(cls, topic_id):
+        """Returns all models matching the supplied topic_id.
+
+        Returns:
+            list(SkillOpportunityModel)|None. A list of
+            SkillOpportunityModel(s) with the given topic_id.
+        """
+        return cls.query(cls.topic_id == topic_id).fetch()
