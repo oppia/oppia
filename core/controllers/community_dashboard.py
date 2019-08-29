@@ -13,10 +13,7 @@
 # limitations under the License.
 
 """Controllers for the community dashboard page."""
-<<<<<<< HEAD
-=======
 from __future__ import absolute_import  # pylint: disable=import-only-modules
->>>>>>> upstream/develop
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -35,11 +32,7 @@ class CommunityDashboardPage(base.BaseHandler):
         # the COMMUNITY_DASHBOARD_ENABLED flag is removed.
         if not feconf.COMMUNITY_DASHBOARD_ENABLED:
             raise self.PageNotFoundException
-<<<<<<< HEAD
-        self.render_template('dist/community-dashboard-page.mainpage.html')
-=======
         self.render_template('community-dashboard-page.mainpage.html')
->>>>>>> upstream/develop
 
 
 class ContributionOpportunitiesHandler(base.BaseHandler):

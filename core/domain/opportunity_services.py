@@ -15,10 +15,7 @@
 # limitations under the License.
 
 """Commands that can be used to operate on opportunity models."""
-<<<<<<< HEAD
-=======
 from __future__ import absolute_import  # pylint: disable=import-only-modules
->>>>>>> upstream/develop
 
 from constants import constants
 from core.domain import exp_fetchers
@@ -117,11 +114,7 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
 
     exploration_opportunity_summary_list = []
-<<<<<<< HEAD
-    for exp_id, exploration in explorations.iteritems():
-=======
     for exp_id, exploration in explorations.items():
->>>>>>> upstream/develop
         node = story.story_contents.get_node_with_corresponding_exp_id(exp_id)
 
         audio_language_codes = set([
@@ -392,7 +385,6 @@ def update_opportunities_with_new_topic_name(topic_id, topic_name):
 
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
-<<<<<<< HEAD
 
 
 def get_skill_opportunity_from_model(model):
@@ -446,8 +438,8 @@ def create_skill_opportunity(skill_opportunity):
     entity in the datastore.
 
     Args:
-        skill_opportunity: The skill opportunity domain object to be saved in
-            the datastore.
+        skill_opportunity: The skill opportunity object to be saved in the
+            datastore.
     """
     skill_opportunity_model = opportunity_models.SkillOpportunityModel(
         topic_id=skill_opportunity.topic_id,
@@ -458,5 +450,3 @@ def create_skill_opportunity(skill_opportunity):
     )
 
     skill_opportunity_model.put()
-=======
->>>>>>> upstream/develop
