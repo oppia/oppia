@@ -21,7 +21,4 @@
 require('pages/classroom-page/classroom-page.module.ts');
 require('App.ts');
 
-// require(
-//   'pages/classroom-page/navbar-breadcrumb/' +
-//   'classroom-navbar-breadcrumb.directive.ts');
 require('pages/classroom-page/classroom-page.controller.ts');
