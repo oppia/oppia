@@ -31,28 +31,30 @@ angular.module('oppia').directive('fractionEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        var errorMessage = '';
-        var fractionString = '0';
-        if (ctrl.value !== null) {
-          var defaultFraction = FractionObjectFactory.fromDict(ctrl.value);
-          fractionString = defaultFraction.toString();
-        }
-        ctrl.localValue = {
-          label: fractionString
-        };
-
-        $scope.$watch('$ctrl.localValue.label', function(newValue) {
-          try {
-            ctrl.value = FractionObjectFactory.fromRawInputString(newValue);
-            errorMessage = '';
-          } catch (parsingError) {
-            errorMessage = parsingError.message;
+        this.$onInit = function () {
+          var errorMessage = '';
+          var fractionString = '0';
+          if (ctrl.value !== null) {
+            var defaultFraction = FractionObjectFactory.fromDict(ctrl.value);
+            fractionString = defaultFraction.toString();
           }
-        });
+          ctrl.localValue = {
+            label: fractionString
+          };
 
-        ctrl.getWarningText = function() {
-          return errorMessage;
-        };
+          $scope.$watch('$ctrl.localValue.label', function(newValue) {
+            try {
+              ctrl.value = FractionObjectFactory.fromRawInputString(newValue);
+              errorMessage = '';
+            } catch (parsingError) {
+              errorMessage = parsingError.message;
+            }
+          });
+
+          ctrl.getWarningText = function() {
+            return errorMessage;
+          };
+        }
       }]
     };
   }]);

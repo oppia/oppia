@@ -36,10 +36,12 @@ angular.module('oppia').directive('oppiaShortResponseNumericInput', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        // If the answer is an integer, omit the fractional part.
-        if (ctrl.answer % 1 === 0) {
-          ctrl.answer = Math.round(ctrl.answer);
+        this.$onInit = function () {
+          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          // If the answer is an integer, omit the fractional part.
+          if (ctrl.answer % 1 === 0) {
+            ctrl.answer = Math.round(ctrl.answer);
+          }
         }
       }]
     };

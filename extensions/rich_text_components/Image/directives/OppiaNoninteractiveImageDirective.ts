@@ -43,62 +43,64 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.filepath = HtmlEscaperService.escapedJsonToObj(
-          $attrs.filepathWithValue);
-        ctrl.imageUrl = '';
-        ctrl.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
-          LOADING_INDICATOR_URL);
-        ctrl.isLoadingIndicatorShown = false;
-        ctrl.isTryAgainShown = false;
+        this.$onInit = function () {
+          ctrl.filepath = HtmlEscaperService.escapedJsonToObj(
+            $attrs.filepathWithValue);
+          ctrl.imageUrl = '';
+          ctrl.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
+            LOADING_INDICATOR_URL);
+          ctrl.isLoadingIndicatorShown = false;
+          ctrl.isTryAgainShown = false;
 
-        if (ImagePreloaderService.inExplorationPlayer()) {
-          ctrl.isLoadingIndicatorShown = true;
-          ctrl.dimensions = (
-            ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
-          // For aligning the gif to the center of it's container
-          var loadingIndicatorSize = (
-            (ctrl.dimensions.height < 124) ? 24 : 120);
-          ctrl.imageContainerStyle = {
-            height: ctrl.dimensions.height + 'px'
-          };
-          ctrl.loadingIndicatorStyle = {
-            height: loadingIndicatorSize + 'px',
-            width: loadingIndicatorSize + 'px'
-          };
-
-          ctrl.loadImage = function() {
+          if (ImagePreloaderService.inExplorationPlayer()) {
             ctrl.isLoadingIndicatorShown = true;
-            ctrl.isTryAgainShown = false;
-            ImagePreloaderService.getImageUrl(ctrl.filepath)
-              .then(function(objectUrl) {
-                ctrl.isTryAgainShown = false;
-                ctrl.isLoadingIndicatorShown = false;
-                ctrl.imageUrl = objectUrl;
-              }, function() {
-                ctrl.isTryAgainShown = true;
-                ctrl.isLoadingIndicatorShown = false;
-              });
-          };
-          ctrl.loadImage();
-        } else {
-          // This is the case when user is in exploration editor or in
-          // preview mode. We don't have loading indicator or try again for
-          // showing images in the exploration editor or in preview mode. So
-          // we directly assign the url to the imageUrl.
-          ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-            ContextService.getEntityType(), ContextService.getEntityId(),
-            ctrl.filepath);
-        }
+            ctrl.dimensions = (
+              ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
+            // For aligning the gif to the center of it's container
+            var loadingIndicatorSize = (
+              (ctrl.dimensions.height < 124) ? 24 : 120);
+            ctrl.imageContainerStyle = {
+              height: ctrl.dimensions.height + 'px'
+            };
+            ctrl.loadingIndicatorStyle = {
+              height: loadingIndicatorSize + 'px',
+              width: loadingIndicatorSize + 'px'
+            };
 
-        ctrl.imageCaption = '';
-        if ($attrs.captionWithValue) {
-          ctrl.imageCaption = HtmlEscaperService.escapedJsonToObj(
-            $attrs.captionWithValue);
-        }
-        ctrl.imageAltText = '';
-        if ($attrs.altWithValue) {
-          ctrl.imageAltText = HtmlEscaperService.escapedJsonToObj(
-            $attrs.altWithValue);
+            ctrl.loadImage = function() {
+              ctrl.isLoadingIndicatorShown = true;
+              ctrl.isTryAgainShown = false;
+              ImagePreloaderService.getImageUrl(ctrl.filepath)
+                .then(function(objectUrl) {
+                  ctrl.isTryAgainShown = false;
+                  ctrl.isLoadingIndicatorShown = false;
+                  ctrl.imageUrl = objectUrl;
+                }, function() {
+                  ctrl.isTryAgainShown = true;
+                  ctrl.isLoadingIndicatorShown = false;
+                });
+            };
+            ctrl.loadImage();
+          } else {
+            // This is the case when user is in exploration editor or in
+            // preview mode. We don't have loading indicator or try again for
+            // showing images in the exploration editor or in preview mode. So
+            // we directly assign the url to the imageUrl.
+            ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+              ContextService.getEntityType(), ContextService.getEntityId(),
+              ctrl.filepath);
+          }
+
+          ctrl.imageCaption = '';
+          if ($attrs.captionWithValue) {
+            ctrl.imageCaption = HtmlEscaperService.escapedJsonToObj(
+              $attrs.captionWithValue);
+          }
+          ctrl.imageAltText = '';
+          if ($attrs.altWithValue) {
+            ctrl.imageAltText = HtmlEscaperService.escapedJsonToObj(
+              $attrs.altWithValue);
+          }
         }
       }]
     };

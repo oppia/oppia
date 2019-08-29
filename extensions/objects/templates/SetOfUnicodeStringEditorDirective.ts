@@ -34,18 +34,20 @@ angular.module('oppia').directive('setOfUnicodeStringEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'unicode'
-          },
-          validators: [{
-            id: 'is_uniquified'
-          }]
-        };
+        this.$onInit = function () {
+          ctrl.SCHEMA = {
+            type: 'list',
+            items: {
+              type: 'unicode'
+            },
+            validators: [{
+              id: 'is_uniquified'
+            }]
+          };
 
-        if (!ctrl.value) {
-          ctrl.value = [];
+          if (!ctrl.value) {
+            ctrl.value = [];
+          }
         }
       }]
     };

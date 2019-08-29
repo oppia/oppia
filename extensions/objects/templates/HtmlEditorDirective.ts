@@ -36,9 +36,11 @@ angular.module('oppia').directive('htmlEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.schema = {
-          type: 'html'
-        };
+        this.$onInit = function () {
+          ctrl.schema = {
+            type: 'html'
+          };
+        }
       }]
     };
   }]);

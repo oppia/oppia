@@ -38,8 +38,10 @@ angular.module('oppia').directive('oppiaResponseMathExpressionInput', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.latexAnswer = HtmlEscaperService.escapedJsonToObj(
-          $attrs.answer).latex;
+        this.$onInit = function () {
+          ctrl.latexAnswer = HtmlEscaperService.escapedJsonToObj(
+            $attrs.answer).latex;
+        }
       }]
     };
   }
