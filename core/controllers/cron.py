@@ -134,8 +134,7 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         min_age_msec = recency_msec
         # Only consider jobs that started at most 1 week before recency_msec.
         max_age_msec = recency_msec + 7 * 24 * 60 * 60 * 1000
-        # Compute max_start_time_msec, which is the latest start time that a
-        # job scheduled for cleanup may have.
+        # The latest start time that a job scheduled for cleanup may have.
         max_start_time_msec = (
             utils.get_current_time_in_millisecs() - min_age_msec)
 
