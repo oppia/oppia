@@ -20,15 +20,15 @@ var waitFor = require('./waitFor.js');
 
 var ProfilePage = function() {
   var currUserProfilePhoto = element(
-    by.css('.protractor-profile-curr-user-photo'));
+    by.css('.protractor-test-profile-curr-user-photo'));
   var otherUserProfilePhoto = element(
-    by.css('.protractor-profile-other-user-photo'));
+    by.css('.protractor-test-profile-other-user-photo'));
   var bio = element(
-    by.css('.protractor-profile-bio'));
+    by.css('.protractor-test-profile-bio'));
   var interests = element.all(
-    by.css('.protractor-profile-interest'));
+    by.css('.protractor-test-profile-interest'));
   var interestPlaceholder = element(
-    by.css('.protractor-profile-no-interest'));
+    by.css('.protractor-test-profile-no-interest'));
 
   this.get = function(userName) {
     browser.get('/profile/' + userName);

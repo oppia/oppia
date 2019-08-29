@@ -13,10 +13,10 @@
             </div>
           </a>
           <img ng-src="<[$ctrl.profilePictureDataUrl]>"
-               class="oppia-profile-picture-fullsize protractor-profile-curr-user-photo"
+               class="oppia-profile-picture-fullsize protractor-test-profile-curr-user-photo"
                alt="">
           <img ng-if="!$ctrl.profileIsOfCurrentUser" ng-src="<[$ctrl.profilePictureDataUrl]>"
-               class="oppia-profile-picture-fullsize protractor-profile-other-user-photo"
+               class="oppia-profile-picture-fullsize protractor-test-profile-other-user-photo"
                alt="">
         </div>
       </div>
@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <p class="oppia-profile-user-bio protractor-profile-bio">
+    <p class="oppia-profile-user-bio protractor-test-profile-bio">
       <span ng-if="$ctrl.userBio" style="white-space: pre-wrap;"><[$ctrl.userBio]></span>
       <span ng-if="!$ctrl.userBio">
         <em>This user has not supplied a bio yet.</em>
@@ -60,12 +60,12 @@
       <span ng-if="$ctrl.subjectInterests.length > 0"><br>
         <span ng-repeat="interest in $ctrl.subjectInterests track by $index">
           <span
-                class="oppia-profile-subject-interest protractor-profile-interest"
+                class="oppia-profile-subject-interest protractor-test-profile-interest"
           ><[interest]></span>
         </span>
       </span>
       <span ng-if="$ctrl.subjectInterests.length === 0"
-            class="oppia-profile-no-interests-text protractor-profile-no-interest">
+            class="oppia-profile-no-interests-text protractor-test-profile-no-interest">
         <em>none specified</em>
       </span>
     </p>
