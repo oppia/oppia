@@ -726,13 +726,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         with logging_swap, assert_raises_context_manager:
             skill_services.update_skill(
-                self.USER_ID, self.SKILL_ID, b'invalid_change_list',
+                self.USER_ID, self.SKILL_ID, 'invalid_change_list',
                 'commit message')
 
         self.assertEqual(len(observed_log_messages), 1)
         self.assertEqual(
-            observed_log_messages[0], 'AttributeError \'str\' object has no '
-            'attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
+            observed_log_messages[0], 'AttributeError \'unicode\' object has no'
+            ' attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
 
     def test_cannot_update_misconception_name_with_invalid_id(self):
         changelist = [skill_domain.SkillChange({

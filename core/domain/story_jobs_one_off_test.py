@@ -164,7 +164,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         def _mock_get_story_by_id(unused_story_id):
             """Mocks get_story_by_id()."""
-            return b'invalid_story'
+            return 'invalid_story'
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A title', self.TOPIC_ID)
@@ -187,7 +187,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # 'successfully migrated' message. Its absence means that the story
         # could not be processed.
         expected = [[u'validation_error',
-                     [u'Story %s failed validation: \'str\' object has '
+                     [u'Story %s failed validation: \'unicode\' object has '
                       'no attribute \'validate\'' % (self.STORY_ID)]]]
         self.assertEqual(
             expected, [ast.literal_eval(x) for x in output])

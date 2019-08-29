@@ -435,7 +435,7 @@ class StorePlaythroughHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         try:
-            self.current_playthrough_id = self.payload[b'playthrough_id']
+            self.current_playthrough_id = self.payload['playthrough_id']
         except KeyError as e:
             raise self.InvalidInputException(e)
 

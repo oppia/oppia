@@ -283,29 +283,29 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.EXP_ID_1, self.EXP_ID_2])
 
         # Remove an exploration.
-        self.delete_json(python_utils.UNICODE(
+        self.delete_json(
             '%s/%s/%s' % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
-                self.EXP_ID_1)))
+                self.EXP_ID_1))
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [self.EXP_ID_2])
 
         # Removing the same exploration again has no effect.
-        self.delete_json(python_utils.UNICODE('%s/%s/%s' % (
+        self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
             constants.ACTIVITY_TYPE_EXPLORATION,
-            self.EXP_ID_1)))
+            self.EXP_ID_1))
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [self.EXP_ID_2])
 
         # Remove the second exploration.
-        self.delete_json(python_utils.UNICODE('%s/%s/%s' % (
+        self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
             constants.ACTIVITY_TYPE_EXPLORATION,
-            self.EXP_ID_2)))
+            self.EXP_ID_2))
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [])
@@ -325,25 +325,25 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.COL_ID_1, self.COL_ID_2])
 
         # Remove a collection.
-        self.delete_json(python_utils.UNICODE('%s/%s/%s' % (
+        self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
-            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_1)))
+            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_1))
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_2])
 
         # Removing the same collection again has no effect.
-        self.delete_json(python_utils.UNICODE('%s/%s/%s' % (
+        self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
-            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_1)))
+            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_1))
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_2])
 
         # Remove the second collection.
-        self.delete_json(python_utils.UNICODE('%s/%s/%s' % (
+        self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
-            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)))
+            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2))
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [])
