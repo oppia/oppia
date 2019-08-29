@@ -43,12 +43,13 @@
         </a>
       </td>
       <td ng-if="getMergeableSkillSummaries().length > 0">
-        <button class="btn btn-default protractor-test-merge-skills-button" ng-click="mergeSkill(skill)">
+        <button class="btn btn-secondary protractor-test-merge-skills-button" ng-click="mergeSkill(skill)">
           <span> Merge Skill </span>
         </button>
       </td>
       <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
-        <button class="btn btn-default protractor-test-assign-skill-to-topic-button" ng-click="assignSkillToTopic(skill.id)">
+        <button class="btn btn-secondary oppia-assign-skill-to-topic-button
+        protractor-test-assign-skill-to-topic-button" ng-click="assignSkillToTopic(skill.id)">
           <span> Assign to Topic </span>
         </button>
       </td>
@@ -124,6 +125,10 @@
     display: inline-block;
     line-height: normal;
     vertical-align: middle;
+  }
+
+  skills-list .oppia-assign-skill-to-topic-button {
+    min-width: 125px;
   }
 
   @media (max-width: 768px) {
