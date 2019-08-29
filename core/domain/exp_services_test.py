@@ -869,7 +869,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
                 duration.microseconds, 1E6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)' %
-                (utils.to_ascii(exploration.title), processing_time))
+                (exploration.title, processing_time))
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(),
@@ -3406,7 +3406,7 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
-    UPGRADED_EXP_YAML = (b"""author_notes: ''
+    UPGRADED_EXP_YAML = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category

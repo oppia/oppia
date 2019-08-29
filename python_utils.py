@@ -380,6 +380,27 @@ def convert_to_bytes(string_to_convert):
     return bytes(string_to_convert)
 
 
+def recursively_convert_to_bytes(value):
+    """Recursively converts all unicode elements in a data structure to bytes.
+
+    Args:
+        value: list|dict|BASESTRING. The data structure to convert.
+
+    Returns:
+        list|dict|bytes. The data structure in bytes.
+    """
+    if isinstance(value, list):
+        return [recursively_convert_to_bytes(e) for e in value]
+    elif isinstance(value, dict):
+        return {
+            recursively_convert_to_bytes(k): recursively_convert_to_bytes(
+                v) for k, v in value.items()}
+    elif isinstance(value, UNICODE):
+        return value.encode('utf-8')
+    else:
+        return value
+
+
 def recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
     to bytes and unicode respectively. This is required for the

@@ -716,7 +716,8 @@ class Exploration(python_utils.OBJECT):
             raise utils.ValidationError(
                 'There is no state in %s corresponding to the exploration\'s '
                 'initial state name %s.' %
-                (list(self.states.keys()), self.init_state_name))
+                (python_utils.recursively_convert_to_bytes(
+                    list(self.states.keys())), self.init_state_name))
 
         if not isinstance(self.param_specs, dict):
             raise utils.ValidationError(

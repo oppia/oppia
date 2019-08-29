@@ -269,7 +269,7 @@ def export_to_zip_file(exploration_id, version=None):
             file_contents = fs.get(filepath, version=1)
 
             str_filepath = 'assets/%s' % filepath
-            assert isinstance(str_filepath, python_utils.BASESTRING)
+            assert isinstance(str_filepath, python_utils.UNICODE)
             unicode_filepath = str_filepath.decode('utf-8')
             zfile.writestr(unicode_filepath, file_contents)
 
@@ -1338,9 +1338,7 @@ def get_image_filenames_from_exploration(exploration):
                 html_string))
 
     for rte_comp in rte_components_in_exp:
-        if 'id' in rte_comp and (
-                python_utils.UNICODE(
-                    rte_comp['id']) == 'oppia-noninteractive-image'):
+        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.

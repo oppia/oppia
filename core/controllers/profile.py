@@ -246,8 +246,7 @@ class SignupPage(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
-        return_url = python_utils.UNICODE(
-            self.request.get('return_url', self.request.uri))
+        return_url = self.request.get('return_url', self.request.uri)
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
