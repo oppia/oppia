@@ -39,7 +39,7 @@ angular.module('oppia').directive('adminNavbar', [
       controllerAs: '$ctrl',
       controller: ['UserService', function(UserService) {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
         ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
         ctrl.showTab = AdminRouterService.showTab;
         ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;

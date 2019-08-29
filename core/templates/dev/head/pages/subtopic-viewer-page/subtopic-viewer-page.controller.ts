@@ -53,7 +53,7 @@ angular.module('oppia').directive('subtopicViewerPage', [
             SubtopicViewerBackendApiService, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.checkMobileView = function() {
               return (WindowDimensionsService.getWidth() < 500);
             };

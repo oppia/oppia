@@ -34,7 +34,7 @@ angular.module('oppia').directive('errorPage', [
         function(
             PageTitleService, UrlInterpolationService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/oops_mint.png');
 

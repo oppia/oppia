@@ -29,23 +29,16 @@ angular.module('oppia').directive('collectionFooter', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {
-        twitterText: '@'
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection-player-page/collection-footer/' +
         'collection-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: ['UrlService', function(UrlService) {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
           ctrl.collectionId = UrlService.getCollectionIdFromUrl();
 
           ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-
-          ctrl.getTwitterText = function() {
-            return ctrl.twitterText;
-          };
         }
       }]
     };

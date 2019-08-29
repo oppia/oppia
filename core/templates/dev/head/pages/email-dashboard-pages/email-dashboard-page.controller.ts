@@ -35,7 +35,7 @@ angular.module('oppia').directive('emailDashboardPage', [
         '$rootScope', 'EmailDashboardDataService', 'UserService',
         function($rootScope, EmailDashboardDataService, UserService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.username = '';
             $rootScope.loadingMessage = 'Loading';
             UserService.getUserInfoAsync().then(function(userInfo) {

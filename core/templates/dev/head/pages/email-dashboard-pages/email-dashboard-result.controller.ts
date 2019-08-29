@@ -34,7 +34,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
         '$http', '$timeout', '$window', 'UrlInterpolationService',
         function($http, $timeout, $window, UrlInterpolationService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
             var CANCEL_EMAIL_HANDLER_URL =
               '/emaildashboardcancelresult/<query_id>';

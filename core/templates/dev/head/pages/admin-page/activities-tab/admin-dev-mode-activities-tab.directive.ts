@@ -41,7 +41,7 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
         ctrl.reloadExploration = function(explorationId) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;

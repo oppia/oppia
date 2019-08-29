@@ -53,7 +53,7 @@ angular.module('oppia').directive('stateNameEditor', [
             StateEditorService, FocusManagerService, ExplorationStatesService,
             RouterService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.EditabilityService = EditabilityService;
           var _stateNameMemento = null;
           ctrl.stateNameEditorIsShown = false;

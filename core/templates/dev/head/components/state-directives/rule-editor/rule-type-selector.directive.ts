@@ -40,7 +40,7 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
           $scope, $element, $rootScope, $filter,
           StateInteractionIdService, INTERACTION_SPECS) {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
         var choices = [];
         var numberOfRuleTypes = 0;
 

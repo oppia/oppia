@@ -37,7 +37,7 @@ angular.module('oppia').directive('moderatorPage', [
         '$http', '$rootScope', 'AlertsService', 'DateTimeFormatService',
         function($http, $rootScope, AlertsService, DateTimeFormatService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             $rootScope.loadingMessage = 'Loading';
             ctrl.getDatetimeAsString = function(millisSinceEpoch) {
               return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(

@@ -41,7 +41,7 @@ angular.module('oppia').directive('practiceTab', [
         function(
             $scope) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.newPracticeSession = function() {
               var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
                 PRACTICE_SESSIONS_URL, {

@@ -61,7 +61,7 @@ angular.module('oppia').directive('learnerLocalNav', [
             UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.explorationId = ExplorationEngineService.getExplorationId();
           ReadOnlyExplorationBackendApiService
             .loadExploration(ctrl.explorationId)

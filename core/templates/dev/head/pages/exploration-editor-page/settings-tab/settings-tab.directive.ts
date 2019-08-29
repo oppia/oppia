@@ -118,7 +118,7 @@ angular.module('oppia').directive('settingsTab', [
             CATEGORIES_TO_COLORS, DEFAULT_CATEGORY_ICON, DEFAULT_COLOR,
             EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
             EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
           ctrl.EditabilityService = EditabilityService;
@@ -458,7 +458,7 @@ angular.module('oppia').directive('settingsTab', [
                   '$uibModalInstance', 'draftEmailBody',
                   function($uibModalInstance, draftEmailBody) {
                     var ctrl = this;
-                    this.$onInit = function () {
+                    this.$onInit = function() {
                     ctrl.willEmailBeSent = Boolean(draftEmailBody);
                     ctrl.emailBody = draftEmailBody;
 

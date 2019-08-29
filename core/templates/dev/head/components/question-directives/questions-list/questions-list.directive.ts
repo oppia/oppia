@@ -79,7 +79,7 @@ angular.module('oppia').directive('questionsList', [
             MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL,
             StateEditorService, QuestionUndoRedoService, UndoRedoService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.currentPage = 0;
             ctrl.skillIds = [];
 

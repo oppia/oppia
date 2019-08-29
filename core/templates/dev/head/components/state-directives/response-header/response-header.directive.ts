@@ -55,7 +55,7 @@ angular.module('oppia').directive('responseHeader', [
             PLACEHOLDER_OUTCOME_DEST,
             StateInteractionIdService, INTERACTION_SPECS) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.EditabilityService = EditabilityService;
           ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
 

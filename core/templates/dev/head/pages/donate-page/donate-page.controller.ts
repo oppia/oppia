@@ -39,7 +39,7 @@ angular.module('oppia').directive('donatePage', [
             $http, $timeout, $window, SiteAnalyticsService,
             UrlInterpolationService, WindowDimensionsService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             ctrl.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/opp_donate_text.svg');

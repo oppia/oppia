@@ -38,7 +38,7 @@ angular.module('oppia').directive('adminMiscTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
 

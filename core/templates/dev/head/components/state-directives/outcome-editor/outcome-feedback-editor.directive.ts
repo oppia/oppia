@@ -34,7 +34,7 @@ angular.module('oppia').directive('outcomeFeedbackEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
           ctrl.OUTCOME_FEEDBACK_SCHEMA = {
             type: 'html'
           };

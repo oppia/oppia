@@ -35,7 +35,7 @@ angular.module('oppia').directive('notificationsDashboardPage', [
         '$http', '$rootScope', 'DateTimeFormatService',
         function($http, $rootScope, DateTimeFormatService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.getItemUrl = function(activityId, notificationType) {
               return (
                 '/create/' + activityId + (

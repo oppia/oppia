@@ -35,7 +35,7 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       controller: ['SUBTOPIC_VIEWER_URL_TEMPLATE',
         function(SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.getSubtopicLink = function() {
             return UrlInterpolationService.interpolateUrl(
               SUBTOPIC_VIEWER_URL_TEMPLATE, {

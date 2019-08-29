@@ -46,7 +46,7 @@ angular.module('oppia').directive('signupPage', [
             UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
             DASHBOARD_TYPE_LEARNER, SITE_NAME) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             var _SIGNUP_DATA_URL = '/signuphandler/data';
             $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
             ctrl.warningI18nCode = '';

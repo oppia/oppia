@@ -63,7 +63,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
       controllerAs: '$ctrl',
       controller: ['$uibModal', function($uibModal) {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
         // Constants for color of nodes in diff graph
         var COLOR_ADDED = '#4EA24E';
         var COLOR_DELETED = '#DC143C';

@@ -44,7 +44,7 @@ angular.module('oppia').directive('collectionEditorTab', [
         function(
             CollectionEditorStateService, CollectionLinearizerService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.hasLoadedCollection = (
               CollectionEditorStateService.hasLoadedCollection);
             ctrl.collection = CollectionEditorStateService.getCollection();

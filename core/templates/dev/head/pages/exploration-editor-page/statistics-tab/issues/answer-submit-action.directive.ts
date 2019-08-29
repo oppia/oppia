@@ -36,7 +36,7 @@ angular.module('oppia').directive('answerSubmitAction', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
           ctrl.currentStateName = $attrs.currentStateName;
           ctrl.destStateName = $attrs.destStateName;
           ctrl.actionIndex = $attrs.actionIndex;

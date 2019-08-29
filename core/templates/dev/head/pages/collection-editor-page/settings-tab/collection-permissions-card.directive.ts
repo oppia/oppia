@@ -35,7 +35,7 @@ angular.module('oppia').directive('collectionPermissionsCard', [
         'CollectionEditorStateService',
         function(CollectionEditorStateService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.collectionRights =
               CollectionEditorStateService.getCollectionRights();
             ctrl.hasPageLoaded =

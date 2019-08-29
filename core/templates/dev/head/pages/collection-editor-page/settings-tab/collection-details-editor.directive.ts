@@ -52,7 +52,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             TAG_REGEX) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.collection = CollectionEditorStateService.getCollection();
           ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
             COLLECTION_TITLE_INPUT_FOCUS_LABEL);

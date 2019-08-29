@@ -63,7 +63,7 @@ angular.module('oppia').directive('ruleEditor', [
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
           ctrl.editRuleForm = {};
 

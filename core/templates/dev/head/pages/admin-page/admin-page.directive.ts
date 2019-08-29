@@ -53,7 +53,7 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
         function($http, $location, $scope, AdminDataService,
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.userEmail = '';
           AdminDataService.getDataAsync().then(function(response) {
             ctrl.userEmail = response.user_email;

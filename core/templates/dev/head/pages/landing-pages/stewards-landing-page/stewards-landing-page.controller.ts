@@ -40,7 +40,7 @@ angular.module('oppia').directive('stewardsLandingPage', [
             $scope, $timeout, $window, SiteAnalyticsService,
             UrlInterpolationService, UrlService, WindowDimensionsService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.TAB_NAME_PARENTS = 'Parents';
             ctrl.TAB_NAME_TEACHERS = 'Teachers';
             ctrl.TAB_NAME_NONPROFITS = 'NGOs';

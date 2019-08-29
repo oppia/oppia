@@ -43,7 +43,7 @@ angular.module('oppia').directive('createActivityButton', [
             SiteAnalyticsService, UrlService, UserService,
             ALLOW_YAML_FILE_UPLOAD) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.creationInProgress = false;
           ctrl.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
 

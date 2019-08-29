@@ -76,7 +76,7 @@ angular.module('oppia').directive('answerGroupEditor', [
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.rulesMemento = null;
           ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           ctrl.editAnswerGroupForm = {};

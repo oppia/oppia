@@ -38,7 +38,7 @@ angular.module('oppia').directive('splashPage', [
         function($rootScope, $timeout, $window, SiteAnalyticsService,
             UrlInterpolationService, UserService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.userIsLoggedIn = null;
             $rootScope.loadingMessage = 'Loading';
             UserService.getUserInfoAsync().then(function(userInfo) {

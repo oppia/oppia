@@ -47,7 +47,7 @@ angular.module('oppia').directive('topicLandingPage', [
             SiteAnalyticsService, UrlInterpolationService,
             TOPIC_LANDING_PAGE_DATA) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             var pathArray = $window.location.pathname.split('/');
             ctrl.subject = pathArray[2];
             var topic = pathArray[3];

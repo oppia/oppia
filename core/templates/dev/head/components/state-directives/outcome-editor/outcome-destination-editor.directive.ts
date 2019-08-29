@@ -52,7 +52,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
             ENABLE_PREREQUISITE_SKILLS, EXPLORATION_AND_SKILL_ID_PATTERN,
             PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           var currentStateName = null;
           ctrl.canAddPrerequisiteSkill = (
             ENABLE_PREREQUISITE_SKILLS &&

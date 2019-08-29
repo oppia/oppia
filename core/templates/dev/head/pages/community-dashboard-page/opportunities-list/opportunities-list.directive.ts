@@ -39,7 +39,7 @@ angular.module('oppia').directive('opportunitiesList', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this
-        this.$onInit = function () {;
+        this.$onInit = function() {;
           ctrl.showMoreOpportunities = $scope.onLoadMoreOpportunities;
         }
       }]

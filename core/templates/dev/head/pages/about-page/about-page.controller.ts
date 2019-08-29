@@ -35,7 +35,7 @@ angular.module('oppia').directive('aboutPage', [
         '$window', 'UrlInterpolationService',
         function($window, UrlInterpolationService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             // Define constants
             ctrl.TAB_ID_ABOUT = 'about';
             ctrl.TAB_ID_FOUNDATION = 'foundation';

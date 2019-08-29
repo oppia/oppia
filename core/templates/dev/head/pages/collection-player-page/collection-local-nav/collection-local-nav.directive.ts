@@ -34,7 +34,7 @@ angular.module('oppia').directive('collectionLocalNav', [
         function(
             $scope, ReadOnlyCollectionBackendApiService, UrlService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.collectionId = UrlService.getCollectionIdFromUrl();
             $scope.$on('collectionLoaded', function() {
               var collectionDetails = (

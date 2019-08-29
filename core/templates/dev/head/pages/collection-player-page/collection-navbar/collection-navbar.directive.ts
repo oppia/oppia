@@ -35,7 +35,7 @@ angular.module('oppia').directive('collectionNavbar', [
         function(
             $scope, ReadOnlyCollectionBackendApiService, UrlService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             $scope.$on('collectionLoaded', function() {
               ctrl.collectionTitle = (
                 ReadOnlyCollectionBackendApiService.getCollectionDetails(

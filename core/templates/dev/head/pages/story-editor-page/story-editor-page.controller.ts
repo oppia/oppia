@@ -56,7 +56,7 @@ angular.module('oppia').directive('storyEditorPage', [
             UrlInterpolationService, UrlService,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
             StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
 

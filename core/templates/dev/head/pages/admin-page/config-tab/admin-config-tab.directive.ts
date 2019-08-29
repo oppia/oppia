@@ -39,7 +39,7 @@ angular.module('oppia').directive('adminConfigTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
         ctrl.configProperties = {};
 
         ctrl.isNonemptyObject = function(object) {

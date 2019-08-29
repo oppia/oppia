@@ -31,7 +31,7 @@ angular.module('oppia').directive('scoreRing', [
       controller: ['$scope', '$timeout', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
         function($scope, $timeout, $window, COLORS_FOR_PASS_FAIL_MODE) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             const circle = <SVGCircleElement>(
               document.querySelector('.score-ring-circle'));
             const radius = circle.r.baseVal.value;

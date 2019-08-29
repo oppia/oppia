@@ -35,7 +35,7 @@ angular.module('oppia').directive('opportunitiesListItem', [
       controller: [
         '$scope', function($scope) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.loadingView = false;
             ctrl.opportunity = $scope.getOpportunity();
             if (ctrl.opportunity) {

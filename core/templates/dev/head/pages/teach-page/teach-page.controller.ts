@@ -41,7 +41,7 @@ angular.module('oppia').directive('teachPage', [
             $timeout, $window, SiteAnalyticsService,
             UrlInterpolationService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             // Define constants
             ctrl.TAB_ID_TEACH = 'teach';
             ctrl.TAB_ID_PLAYBOOK = 'playbook';

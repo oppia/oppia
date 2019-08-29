@@ -55,7 +55,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
             SearchExplorationsBackendApiService, SiteAnalyticsService,
             INVALID_NAME_CHARS) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.collection = CollectionEditorStateService.getCollection();
           ctrl.newExplorationId = '';
           ctrl.newExplorationTitle = '';

@@ -45,7 +45,7 @@ angular.module('oppia').directive('profilePage', [
         function($http, $log, $rootScope, $window, DateTimeFormatService,
             UrlInterpolationService, UrlService, UserService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             var profileDataUrl = (
               '/profilehandler/data/' + UrlService.getUsernameFromProfileUrl());
             var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService

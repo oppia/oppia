@@ -31,7 +31,7 @@ angular.module('oppia').directive('backgroundBanner', [
       controller: [
         function() {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           var possibleBannerFilenames = [
             'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
           var bannerImageFilename = possibleBannerFilenames[

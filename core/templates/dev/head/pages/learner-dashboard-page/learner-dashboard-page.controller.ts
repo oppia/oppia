@@ -77,7 +77,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
             FeedbackMessageSummaryObjectFactory,
             SuggestionModalForLearnerDashboardService, UserService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
               EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
             ctrl.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (

@@ -50,7 +50,7 @@ angular.module('oppia').directive('storyViewerPage', [
             PageTitleService, StoryPlaythroughObjectFactory,
             StoryViewerBackendApiService, UrlService, FATAL_ERROR_CODES) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.checkMobileView = function() {
             return ($window.innerWidth < 500);
           };

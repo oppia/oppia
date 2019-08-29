@@ -58,7 +58,7 @@ angular.module('oppia').directive('preferencesPage', [
             DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
             SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
             ctrl.profilePictureDataUrl = '';
             ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;

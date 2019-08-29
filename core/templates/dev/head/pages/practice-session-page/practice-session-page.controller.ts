@@ -57,7 +57,7 @@ angular.module('oppia').directive('practiceSessionPage', [
             TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS
         ) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
             var _fetchSkillDetails = function() {
               var practiceSessionsDataUrl = UrlInterpolationService

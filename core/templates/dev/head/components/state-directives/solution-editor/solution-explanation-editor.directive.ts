@@ -40,7 +40,7 @@ angular.module('oppia').directive('solutionExplanationEditor', [
         '$scope', 'EditabilityService', 'StateSolutionService',
         function($scope, EditabilityService, StateSolutionService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.isEditable = EditabilityService.isEditable();
           ctrl.editSolutionForm = {};
           ctrl.explanationEditorIsOpen = false;

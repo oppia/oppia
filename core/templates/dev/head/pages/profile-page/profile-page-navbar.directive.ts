@@ -30,7 +30,7 @@ angular.module('oppia').directive('profilePageNavbar', [
       controllerAs: '$ctrl',
       controller: ['UrlService', function(UrlService) {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
           ctrl.username = UrlService.getUsernameFromProfileUrl();
         }
       }]

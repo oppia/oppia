@@ -34,7 +34,7 @@ angular.module('oppia').directive('storySummaryTile', [
       controller: ['STORY_VIEWER_URL_TEMPLATE',
         function(STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.getStoryLink = function() {
               return UrlInterpolationService.interpolateUrl(
                 STORY_VIEWER_URL_TEMPLATE, {

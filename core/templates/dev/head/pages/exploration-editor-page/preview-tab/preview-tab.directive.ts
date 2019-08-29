@@ -76,7 +76,7 @@ angular.module('oppia').directive('previewTab', [
             PlayerCorrectnessFeedbackEnabledService, StateEditorService,
             UrlInterpolationService) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.isExplorationPopulated = false;
           ExplorationDataService.getData().then(function() {
             var initStateNameForPreview = StateEditorService

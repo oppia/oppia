@@ -38,7 +38,7 @@ angular.module('oppia').directive('adminJobsTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
         ctrl.HUMAN_READABLE_CURRENT_TIME = '';
         ctrl.CONTINUOUS_COMPUTATIONS_DATA = {};
         ctrl.ONE_OFF_JOB_SPECS = {};

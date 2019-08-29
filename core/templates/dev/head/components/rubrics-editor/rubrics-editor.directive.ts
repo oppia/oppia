@@ -53,7 +53,7 @@ angular.module('oppia').directive('rubricsEditor', [
             $scope, $filter, $uibModal, $rootScope,
             RubricObjectFactory, EVENT_SKILL_REINITIALIZED) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
           ctrl.activeRubricIndex = 0;
           ctrl.explanationEditorIsOpen = false;
           var explanationMemento = null;

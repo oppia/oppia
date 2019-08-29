@@ -34,7 +34,7 @@ angular.module('oppia').directive('thanksPage', [
       controller: ['UrlInterpolationService', function(
           UrlInterpolationService) {
         var ctrl = this;
-        this.$onInit = function () {
+        this.$onInit = function() {
           ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/donate.png');
         }

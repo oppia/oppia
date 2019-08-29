@@ -54,7 +54,7 @@ angular.module('oppia').directive('collectionEditorPage', [
             RouterService, UrlService, EVENT_COLLECTION_INITIALIZED,
             EVENT_COLLECTION_REINITIALIZED) {
           var ctrl = this;
-          this.$onInit = function () {
+          this.$onInit = function() {
             ctrl.getActiveTabName = RouterService.getActiveTabName;
             // Load the collection to be edited.
             CollectionEditorStateService.loadCollection(
