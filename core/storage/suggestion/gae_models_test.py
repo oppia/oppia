@@ -365,6 +365,56 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category2', score_categories)
 
+    def test_export_data_trivial(self):
+        user_data = (
+            suggestion_models.GeneralSuggestionModel
+            .export_data('non_existent_user'))
+        test_data = {}
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_nontrivial(self):
+        test_export_suggestion_type = (
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+        test_export_target_type = suggestion_models.TARGET_TYPE_EXPLORATION
+        test_export_target_id = self.target_id
+        test_export_target_version = self.target_version_at_submission
+        test_export_status = suggestion_models.STATUS_IN_REVIEW
+        test_export_author = 'test_export_author'
+        test_export_reviewer = 'test_export_reveiwer'
+        test_export_change_cmd = self.change_cmd
+        test_export_score_category = 'category1'
+        test_export_thread_id = 'exploration.exp1.thread_export'
+
+        suggestion_models.GeneralSuggestionModel.create(
+            test_export_suggestion_type,
+            test_export_target_type,
+            test_export_target_id,
+            test_export_target_version,
+            test_export_status,
+            test_export_author,
+            test_export_reviewer,
+            test_export_change_cmd,
+            test_export_score_category,
+            test_export_thread_id
+        )
+
+        user_data = (
+            suggestion_models.GeneralSuggestionModel
+            .export_data('test_export_author'))
+
+        test_data = {
+            test_export_thread_id: {
+                'suggestion_type': test_export_suggestion_type,
+                'target_type': test_export_target_type,
+                'target_id': test_export_target_id,
+                'target_version_at_submission': test_export_target_version,
+                'status': test_export_status,
+                'change_cmd': test_export_change_cmd
+            }
+        }
+
+        self.assertEqual(user_data, test_data)
+
 
 class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
 
