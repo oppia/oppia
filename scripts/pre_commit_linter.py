@@ -447,9 +447,10 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'\Wstr\('),
         'message': (
-            'Please try to use python_utils.UNICODE or '
-            'python_utils.convert_to_bytes() for the strings used in '
-            'webapp2\'s in-built methods or for the datastore models.'),
+            'Please try to use python_utils.convert_to_bytes() for the strings '
+            'used in webapp2\'s built-in methods or for strings used directly '
+            'in NDB datastore models. If you need to cast ints/floats to '
+            'strings, please use python_utils.UNICODE() instead.'),
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
     },
@@ -1832,7 +1833,7 @@ class JsTsLintChecksManager(LintChecksManager):
             js_and_ts_messages.append(js_and_ts_stdout.get())
 
         python_utils.PRINT('')
-        # The source files are read as bytes, hence the b' prefix.
+        # The output from the stdout are read as bytes, hence the b' prefix.
         python_utils.PRINT(b'\n'.join(js_and_ts_messages))
 
         with _redirect_stdout(_TARGET_STDOUT):

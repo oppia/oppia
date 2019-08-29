@@ -205,6 +205,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         for item in list_in_str:
             self.assertNotEqual(type(item), future.types.newstr)
             self.assertNotEqual(type(item), future.types.newbytes)
+            self.assertTrue(isinstance(item, dict))
 
         dict_in_str = list_in_str[-1]
         for key, value in dict_in_str.items():
@@ -212,6 +213,13 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             self.assertNotEqual(type(key), future.types.newbytes)
             self.assertNotEqual(type(value), future.types.newstr)
             self.assertNotEqual(type(value), future.types.newbytes)
+            self.assertTrue(isinstance(key, unicode))
+            self.assertTrue(isinstance(value, list))
+
+            for item in value:
+                self.assertNotEqual(type(item), future.types.newstr)
+                self.assertNotEqual(type(item), future.types.newbytes)
+                self.assertTrue(isinstance(item, (unicode, bytes, dict)))
 
 
 @unittest.skipUnless(
