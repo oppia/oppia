@@ -40,7 +40,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def _get_image_url(self, entity_type, entity_id, filename):
         """Gets the image URL."""
-        return '%s/%s/%s/assets/image/%s' %(
+        return '%s/%s/%s/assets/image/%s' % (
             self.ASSET_HANDLER_URL_PREFIX, entity_type, entity_id, filename)
 
     def setUp(self):

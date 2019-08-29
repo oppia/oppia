@@ -23,7 +23,6 @@ from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
 
 (feedback_models, email_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.email])
