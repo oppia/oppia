@@ -1853,7 +1853,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'issue_schema_version': 1
             }, csrf_token=self.csrf_token, expected_status_int=400)
 
-        self.assertEqual(response['error'], u'\'playthrough_id\'')
+        self.assertEqual(response['error'], 'u\'playthrough_id\'')
 
     def test_move_playthrough_to_correct_issue(self):
         playthrough_id = stats_models.PlaythroughModel.create(

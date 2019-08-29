@@ -27,7 +27,6 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
-import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
