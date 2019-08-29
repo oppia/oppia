@@ -15,9 +15,10 @@ anchor_for_job_defaults: &job_defaults
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
-    sudo python -m pip install --upgrade virtualenv
-    sudo pip install future
-    sudo pip install psutil
+    sudo pip install pipenv
+    pipenv shell
+    pip install future
+    pip install psutil
     python -m scripts.setup
     python -m scripts.setup_gae
 
@@ -56,7 +57,7 @@ jobs:
       - checkout
       - run:
           <<: *install_dependencies
-      - run: sudo pip install pyyaml
+      - run: pip install pyyaml
       - run:
           name: Run lint tests
           # All the python scripts should behave as modules. Files like the
@@ -91,7 +92,7 @@ jobs:
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
-      - run: sudo pip install pyyaml
+      - run: pip install pyyaml
       - run:
           name: Run frontend tests
           command: |
@@ -99,7 +100,7 @@ jobs:
       - run:
           name: Generate frontend coverage report
           command: |
-            sudo pip install codecov
+            pip install codecov
             codecov --file ../karma_coverage_reports/lcov.info -F frontend
           when: on_success
 
@@ -112,9 +113,9 @@ jobs:
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
-      - run: sudo pip install pyyaml
-      - run: sudo pip install webtest
-      - run: sudo pip install configparser
+      - run: pip install pyyaml
+      - run: pip install webtest
+      - run: pip install configparser
       - run:
           name: Run backend tests
           command: |
@@ -124,7 +125,7 @@ jobs:
       - run:
           name: Generate backend coverage report
           command: |
-            sudo pip install codecov
+            pip install codecov
             codecov -F backend
             ./cc-test-reporter format-coverage -t coverage.py coverage.xml
             ./cc-test-reporter sum-coverage coverage/codeclimate.json
