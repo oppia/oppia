@@ -39,38 +39,54 @@ describe('Exploration Improvements', function() {
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
+  var adminPage = null;
+  var libraryPage = null;
+  var creatorDashboardPage = null;
   var explorationEditorPage = null;
   var explorationEditorImprovementsTab = null;
-  var creatorDashboardPage = null;
-  var libraryPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
+  var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
 
   beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorImprovementsTab =
-      explorationEditorPage.getImprovementsTab();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    explorationEditorImprovementsTab = (
+      explorationEditorPage.getImprovementsTab());
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
 
     users.createUser(
-      'user1@ExplorationImprovements.com',
+      'creatorUser@ExplorationImprovements.com',
       'creatorExplorationImprovements');
     users.createUser(
-      'user2@ExplorationImprovements.com',
+      'learnerUser@ExplorationImprovements.com',
       'learnerExplorationImprovements');
     users.createUser(
-      'user3@ExplorationImprovements.com',
+      'suggesterUser@ExplorationImprovements.com',
       'suggesterExplorationImprovements');
+    users.createAndLoginAdminUser(
+      'adminUser@ExplorationImprovements.com',
+      'adminExplorationImprovements');
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean', (elem) => elem.setValue(true));
+    users.logout();
   });
 
   describe('Feedback Improvements', function() {
     it('adds feedback to an exploration', function() {
+      /*
       var feedback = 'A good exploration. Would love to see more questions';
       var feedbackResponse = 'Thanks for the feedback';
 
       // Creator creates and publishes an exploration.
-      users.login('user1@ExplorationImprovements.com');
+      users.login('creatorUser@ExplorationImprovements.com');
       workflow.createAndPublishExploration(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
@@ -81,7 +97,7 @@ describe('Exploration Improvements', function() {
       users.logout();
 
       // Learner plays the exploration and submits a feedback.
-      users.login('user2@ExplorationImprovements.com');
+      users.login('learnerUser@ExplorationImprovements.com');
       libraryPage.get();
       libraryPage.findExploration(EXPLORATION_TITLE);
       libraryPage.playExploration(EXPLORATION_TITLE);
@@ -89,7 +105,7 @@ describe('Exploration Improvements', function() {
       users.logout();
 
       // Creator reads the feedback and responds.
-      users.login('user1@ExplorationImprovements.com');
+      users.login('creatorUser@ExplorationImprovements.com');
       creatorDashboardPage.get();
       expect(creatorDashboardPage.getNumberOfFeedbackMessages()).toEqual(1);
       creatorDashboardPage.navigateToExplorationEditor();
@@ -105,12 +121,14 @@ describe('Exploration Improvements', function() {
       explorationEditorImprovementsTab.sendResponseToLatestImprovement(
         feedbackResponse);
       users.logout();
+      */
     });
   });
 
   describe('Suggestion Improvements', function() {
     it('accepts & rejects a suggestion on a published exploration', function() {
-      users.login('user1@ExplorationImprovements.com');
+      /*
+      users.login('creatorUser@ExplorationImprovements.com');
       workflow.createAndPublishExploration(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
@@ -119,7 +137,7 @@ describe('Exploration Improvements', function() {
       users.logout();
 
       // Suggester plays the exploration and suggests a change.
-      users.login('user2@ExplorationImprovements.com');
+      users.login('learnerUser@ExplorationImprovements.com');
       libraryPage.get();
       libraryPage.findExploration(EXPLORATION_TITLE);
       libraryPage.playExploration(EXPLORATION_TITLE);
@@ -137,7 +155,7 @@ describe('Exploration Improvements', function() {
       users.logout();
 
       // Exploration author reviews the suggestion and accepts it.
-      users.login('user1@ExplorationImprovements.com');
+      users.login('creatorUser@ExplorationImprovements.com');
       creatorDashboardPage.get();
       creatorDashboardPage.navigateToExplorationEditor();
 
@@ -156,137 +174,90 @@ describe('Exploration Improvements', function() {
       users.logout();
 
       // Student logs in and plays the exploration, finds the updated content.
-      users.login('user3@ExplorationImprovements.com');
+      users.login('suggesterUser@ExplorationImprovements.com');
       libraryPage.get();
       libraryPage.findExploration(EXPLORATION_TITLE);
       libraryPage.playExploration(EXPLORATION_TITLE);
       explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
       users.logout();
+      */
+    });
+  });
+
+  describe('Test solicit answer details feature', function() {
+    var EXPLORATION_TITLE = 'Check';
+    var EXPLORATION_OBJECTIVE = 'To explore something';
+    var EXPLORATION_CATEGORY = 'Algorithms';
+    var EXPLORATION_LANGUAGE = 'English';
+
+    beforeAll(function() {
+      // Creator creates and publishes an exploration.
+      workflow.createExplorationAsAdmin();
+      explorationEditorMainTab.exitTutorial();
+
+      explorationEditorPage.navigateToSettingsTab();
+      explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
+      explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
+      explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
+      explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
+
+      explorationEditorPage.navigateToMainTab();
+      explorationEditorMainTab.setStateName('One');
+      explorationEditorMainTab.setContent(
+        forms.toRichText('Please write 1 in words.'));
+      explorationEditorMainTab.setInteraction('TextInput');
+      explorationEditorMainTab.addResponse(
+        'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
+        'One');
+      explorationEditorMainTab.getResponseEditor('default').setFeedback(
+        forms.toRichText('Try again'));
+      explorationEditorMainTab.setSolicitAnswerDetailsFeature();
+      explorationEditorMainTab.moveToState('End');
+      explorationEditorMainTab.setInteraction('EndExploration');
+      explorationEditorPage.saveChanges();
+      workflow.publishExploration();
+
+      adminPage.editConfigProperty(
+        'Always ask learners for answer details. For testing -- do not use',
+        'Boolean', (elem) => elem.setValue(true));
     });
 
-    afterEach(function() {
+    it('checks solicit answer details feature', function() {
+      users.login('learnerUser@ExplorationImprovements.com');
+      libraryPage.get();
+      libraryPage.findExploration(EXPLORATION_TITLE);
+      libraryPage.playExploration(EXPLORATION_TITLE);
+      explorationPlayerPage.submitAnswer('TextInput', 'One');
+      explorationPlayerPage.submitAnswerDetails(
+        'I liked this choice of answer');
+      explorationPlayerPage.expectExplorationToNotBeOver();
+
+      oppiaLogo.click();
+      general.acceptAlert();
+      users.logout();
+      users.login('creatorUser@ExplorationImprovements.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.navigateToExplorationEditor();
+      explorationEditorPage.navigateToImprovementsTab();
+      explorationEditorImprovementsTab.checkAnswerDetailsCard('One', '1');
+      explorationEditorImprovementsTab.navigateReviewAnswerDetails();
+      explorationEditorImprovementsTab.verifyAnswerDetails(
+        'I liked this choi...');
+      users.logout();
+    });
+
+    afterAll(function() {
+      users.login('adminUser@ExplorationImprovements.com');
+      adminPage.get();
+      adminPage.editConfigProperty(
+        'Always ask learners for answer details. For testing -- do not use',
+        'Boolean', (elem) => elem.setValue(true));
+      users.logout();
       general.checkForConsoleErrors([]);
     });
+  });
 
-    describe('Test solicit answer details feature', function() {
-      var EXPLORATION_TITLE = 'Check';
-      var EXPLORATION_OBJECTIVE = 'To explore something';
-      var EXPLORATION_CATEGORY = 'Algorithms';
-      var EXPLORATION_LANGUAGE = 'English';
-      var adminPage = null;
-      var libraryPage = null;
-      var creatorDashboardPage = null;
-      var explorationEditorPage = null;
-      var explorationEditorImprovementsTab = null;
-      var explorationEditorMainTab = null;
-      var explorationEditorSettingsTab = null;
-      var explorationPlayerPage = null;
-      var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
-
-      beforeAll(function() {
-        adminPage = new AdminPage.AdminPage();
-        explorationEditorPage =
-          new ExplorationEditorPage.ExplorationEditorPage();
-        explorationEditorImprovementsTab = (
-          explorationEditorPage.getImprovementsTab());
-        explorationEditorMainTab = explorationEditorPage.getMainTab();
-        explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-        explorationPlayerPage =
-          new ExplorationPlayerPage.ExplorationPlayerPage();
-        libraryPage = new LibraryPage.LibraryPage();
-        creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-        explorationPlayerPage =
-          new ExplorationPlayerPage.ExplorationPlayerPage();
-
-        users.createUser(
-          'learner@user.com', 'learnerUser');
-        users.createAndLoginAdminUser(
-          'creator@user.com', 'creatorUser');
-
-        // Creator creates and publishes an exploration.
-        workflow.createExplorationAsAdmin();
-        explorationEditorMainTab.exitTutorial();
-
-        explorationEditorPage.navigateToSettingsTab();
-        explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
-        explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
-        explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
-        explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
-
-        explorationEditorPage.navigateToMainTab();
-        explorationEditorMainTab.setStateName('One');
-        explorationEditorMainTab.setContent(
-          forms.toRichText('Please write 1 in words.'));
-        explorationEditorMainTab.setInteraction('TextInput');
-        explorationEditorMainTab.addResponse(
-          'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
-          'One');
-        explorationEditorMainTab.getResponseEditor('default').setFeedback(
-          forms.toRichText('Try again'));
-        explorationEditorMainTab.setSolicitAnswerDetailsFeature();
-        explorationEditorMainTab.moveToState('End');
-        explorationEditorMainTab.setInteraction('EndExploration');
-        explorationEditorPage.saveChanges();
-        workflow.publishExploration();
-
-        adminPage.editConfigProperty(
-          'Always ask learners for answer details. For testing -- do not use',
-          'Boolean',
-          function(elem) {
-            elem.setValue(true);
-          });
-
-        adminPage.editConfigProperty(
-          'Exposes the Improvements Tab for creators in the exploration editor',
-          'Boolean',
-          function(elem) {
-            elem.setValue(true);
-          });
-      });
-
-      it('checks solicit answer details feature', function() {
-        users.login('learner@user.com');
-        libraryPage.get();
-        libraryPage.findExploration(EXPLORATION_TITLE);
-        libraryPage.playExploration(EXPLORATION_TITLE);
-        explorationPlayerPage.submitAnswer('TextInput', 'One');
-        explorationPlayerPage.submitAnswerDetails(
-          'I liked this choice of answer');
-        explorationPlayerPage.expectExplorationToNotBeOver();
-
-        oppiaLogo.click();
-        general.acceptAlert();
-        users.logout();
-        users.login('creator@user.com');
-        creatorDashboardPage.get();
-        creatorDashboardPage.navigateToExplorationEditor();
-        explorationEditorPage.navigateToImprovementsTab();
-        explorationEditorImprovementsTab.checkAnswerDetailsCard('One', '1');
-        explorationEditorImprovementsTab.navigateReviewAnswerDetails();
-        explorationEditorImprovementsTab.verifyAnswerDetails(
-          'I liked this choi...');
-        users.logout();
-      });
-
-      afterAll(function() {
-        users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
-        adminPage.get();
-        adminPage.editConfigProperty(
-          'Always ask learners for answer details. For testing -- do not use',
-          'Boolean',
-          function(elem) {
-            elem.setValue(false);
-          });
-
-        adminPage.editConfigProperty(
-          'Exposes the Improvements Tab for creators in the exploration editor',
-          'Boolean',
-          function(elem) {
-            elem.setValue(false);
-          });
-        users.logout();
-        general.checkForConsoleErrors([]);
-      });
-    });
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });
