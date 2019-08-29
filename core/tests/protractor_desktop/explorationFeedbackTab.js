@@ -34,6 +34,7 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 describe('ExplorationFeedback', function() {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
   var EXPLORATION_TITLE_2 = 'Exploration for testing feedback status';
+  var EXPLORATION_TITLE_3 = 'Exploration for testing feedback message';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
@@ -161,6 +162,72 @@ describe('ExplorationFeedback', function() {
       'Open', feedbackResponse);
     explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Open');
 
+    users.logout();
+  });
+
+  it('should send message to feedback thread', function() {
+    users.createUser(
+      'user5@ExplorationFeedback.com',
+      'creatorFeedback');
+    users.createUser(
+      'user6@ExplorationFeedback.com',
+      'learnerFeedback');
+    var feedback = 'A good exploration. Would love to see a few more questions';
+    var feedbackResponse = 'Thanks for the feedback';
+
+    // Creator creates and publishes an exploration.
+    users.login('user5@ExplorationFeedback.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE_3,
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
+    creatorDashboardPage.get();
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(0);
+    users.logout();
+
+    // Learner plays the exploration and submits a feedback.
+    users.login('user6@ExplorationFeedback.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE_3);
+    libraryPage.playExploration(EXPLORATION_TITLE_3);
+    explorationPlayerPage.submitFeedback(feedback);
+    users.logout();
+
+    // Creator reads the feedback and responds.
+    users.login('user5@ExplorationFeedback.com');
+    creatorDashboardPage.get();
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(1);
+    creatorDashboardPage.navigateToExplorationEditor();
+
+    explorationEditorPage.navigateToFeedbackTab();
+    explorationEditorFeedbackTab.expectToHaveFeedbackThread();
+    explorationEditorFeedbackTab.readFeedbackMessages()
+      .then(function(messages) {
+        expect(messages.length).toEqual(1);
+        expect(messages[0]).toEqual(feedback);
+      });
+    explorationEditorPage.navigateToFeedbackTab();
+    explorationEditorFeedbackTab.sendResponseToLatestFeedback(
+      feedbackResponse);
+    explorationEditorFeedbackTab.readFeedbackMessagesFromThread()
+      .then(function(messages) {
+        expect(messages.length).toEqual(2);
+        expect(messages[0].getText()).toEqual(feedback);
+        expect(messages[1].getText()).toEqual(feedbackResponse);
+      });
+    browser.refresh();
+    explorationEditorFeedbackTab.selectLatestFeedbackThread();
+    explorationEditorFeedbackTab.readFeedbackMessagesFromThread()
+      .then(function(messages) {
+        expect(messages.length).toEqual(2);
+        expect(messages[0].getText()).toEqual(feedback);
+        expect(messages[1].getText()).toEqual(feedbackResponse);
+      });
     users.logout();
   });
 
