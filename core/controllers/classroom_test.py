@@ -62,6 +62,13 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
+    def test_get_fails_for_invalid_classroom_name(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_json(
+                '%s/%s' % (
+                    feconf.CLASSROOM_DATA_HANDLER, 'invalid_subject'),
+                expected_status_int=404)
+
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
