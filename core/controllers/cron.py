@@ -31,7 +31,6 @@ from core.domain import user_jobs_one_off
 from core.platform import models
 import feconf
 import python_utils
-import utils
 
 from pipeline import pipeline
 
