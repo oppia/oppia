@@ -15,8 +15,8 @@
 /**
  * @fileoverview End-to-end tests for the core features of the exploration
  *    editor and player. Core features include the features without which an
- *    exploration cannot be published. These include state content, answer groups,
- *    oppia's feedback and customization_args.
+ *    exploration cannot be published. These include state content, answer
+ *    groups, oppia's feedback and customization_args.
  */
 
 var forms = require('../protractor_utils/forms.js');
@@ -185,12 +185,14 @@ describe('Exploration Improvements', function() {
 
       beforeAll(function() {
         adminPage = new AdminPage.AdminPage();
-        explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+        explorationEditorPage =
+          new ExplorationEditorPage.ExplorationEditorPage();
         explorationEditorImprovementsTab = (
           explorationEditorPage.getImprovementsTab());
         explorationEditorMainTab = explorationEditorPage.getMainTab();
         explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-        explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+        explorationPlayerPage =
+          new ExplorationPlayerPage.ExplorationPlayerPage();
         libraryPage = new LibraryPage.LibraryPage();
         creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
         explorationPlayerPage =
@@ -248,7 +250,8 @@ describe('Exploration Improvements', function() {
         libraryPage.findExploration(EXPLORATION_TITLE);
         libraryPage.playExploration(EXPLORATION_TITLE);
         explorationPlayerPage.submitAnswer('TextInput', 'One');
-        explorationPlayerPage.submitAnswerDetails('I liked this choice of answer');
+        explorationPlayerPage.submitAnswerDetails(
+          'I liked this choice of answer');
         explorationPlayerPage.expectExplorationToNotBeOver();
 
         oppiaLogo.click();
