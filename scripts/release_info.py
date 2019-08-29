@@ -19,7 +19,9 @@ Should be run from the oppia root dir.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
+import argparse
 import collections
+import datetime
 import getpass
 import os
 import re
@@ -39,6 +41,7 @@ import github # isort:skip
 # pylint: enable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
+GIT_CMD_CHECKOUT = 'git checkout -- %s'
 GIT_CMD_TEMPLATE_GET_NEW_COMMITS = 'git cherry %s -v'
 GIT_CMD_GET_LOGS_FORMAT_STRING = (
     'git log -z --no-color --pretty=format:%H{0}%aN{0}%aE{0}%B {1}..{2}')
@@ -53,8 +56,22 @@ FECONF_VAR_NAMES = ['CURRENT_STATE_SCHEMA_VERSION',
                     'CURRENT_COLLECTION_SCHEMA_VERSION']
 FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
+# This should match the indentation of span and li elements used
+# in credits section of
+# core/templates/dev/head/pages/about-page/about-page.directive.html.
+SPAN_INDENT = '              '
+LI_INDENT = '                '
+ABOUT_PAGE_FILEPATH = (
+    'core/templates/dev/head/pages/about-page/about-page.directive.html')
+AUTHORS_FILEPATH = 'AUTHORS'
+CHANGELOG_FILEPATH = 'CHANGELOG'
+CONTRIBUTORS_FILEPATH = 'CONTRIBUTORS'
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
+
+_PARSER = argparse.ArgumentParser()
+_PARSER.add_argument(
+    '--github_username', help=('Your GitHub username. '), type=str)
 
 
 def _run_cmd(cmd_str):
@@ -319,6 +336,29 @@ def check_prs_for_current_release(repo):
     return True
 
 
+def update_sorted_file(filepath, new_list, start_index_line):
+    """Updates the files AUTHORS and CONTRIBUTORS with a sorted list of
+    new authors or contributors.
+
+    Args:
+        filepath: str. The path of the file to update.
+        new_list: list(str). The list of new authors or contributors to
+            add to the file.
+        start_index_line: str. The line whose index determines the start
+            of authors/contributors list in the file.
+    """
+    content = []
+    with python_utils.open_file(filepath, 'r') as f:
+        content = f.readlines()
+    start_index = content.index(start_index_line) + 2
+    updated_list = new_list + content[start_index:]
+    updated_list = sorted(updated_list, key=lambda s: s.lower())
+    content = content[:start_index] + updated_list
+    with python_utils.open_file(filepath, 'w') as f:
+        for line in content:
+            f.write(line)
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = _get_current_branch()
@@ -338,8 +378,17 @@ def main():
             'the script')
         return
 
+    parsed_args = _PARSER.parse_args()
+    if parsed_args.github_username is None:
+        python_utils.PRINT(
+            'No GitHub username provided. Please re-run the '
+            'script specifying a username using --username=<Your username>')
+        return
+    github_username = parsed_args.github_username
+
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
+    repo_fork = g.get_repo('%s/oppia' % github_username)
 
     blocking_bugs_count = check_blocking_bugs(repo)
     if blocking_bugs_count:
@@ -425,6 +474,10 @@ def main():
         for name, email in existing_authors:
             out.write('* %s <%s>\n' % (name, email))
 
+        out.write('\n### New Contributors:\n')
+        for name, email in new_authors:
+            out.write('* %s <%s>\n' % (name, email))
+
         # Generate the author sections of the email.
         out.write('\n### Email C&P Blurbs about authors:\n')
         new_author_comma_list = (
@@ -459,6 +512,156 @@ def main():
                 out.write('* [%s](%s)  \n' % (link, link))
 
     python_utils.PRINT('Done. Summary file generated in ../release_summary.md')
+
+    while True:
+        python_utils.PRINT(
+            '******************************************************')
+        python_utils.PRINT(
+            'Please update ../release_summary.md to:\n'
+            '- have a correct changelog for '
+            'updating the CHANGELOG file\n'
+            '- have a correct list of new authors and contributors to '
+            'update AUTHORS, CONTRIBUTORS and Credits section in '
+            'about-page.directive.html\n'
+            'Confirm once you are done by entering y/ye/yes.\n')
+        answer = python_utils.INPUT().lower()
+        if answer in ['y', 'ye', 'yes']:
+            break
+
+    current_release_version = branch_name[len(
+        common.RELEASE_BRANCH_NAME_PREFIX):]
+    current_date = datetime.date.today().strftime('%d %b %Y')
+    source_branch = 'develop'
+    target_branch = 'update-changelog-for-releasev%s' % current_release_version
+    # This complete code block is wrapped in try except since in case of
+    # an exception, we should ensure that the changes made to AUTHORS,
+    # CONTRIBUTORS, CHANGELOG and about-page are reverted and the branch
+    # created is deleted. This is required to avoid errors when running
+    # the script again.
+    try:
+        with python_utils.open_file(
+            '../release_summary.md', 'r') as release_summary_file:
+            release_summary_content = release_summary_file.readlines()
+
+            python_utils.PRINT('Updating Changelog...')
+            start_index = release_summary_content.index('### Changelog:\n') + 1
+            end_index = release_summary_content.index('### Commit History:\n')
+            release_version_changelog = [
+                u'v%s (%s)\n' % (current_release_version, current_date),
+                u'------------------------\n'] + release_summary_content[
+                    start_index:end_index]
+            changelog_content = []
+            with python_utils.open_file(
+                CHANGELOG_FILEPATH, 'r') as changelog_file:
+                changelog_content = changelog_file.readlines()
+            changelog_content[2:2] = release_version_changelog
+            with python_utils.open_file(
+                CHANGELOG_FILEPATH, 'w') as changelog_file:
+                for line in changelog_content:
+                    changelog_file.write(line)
+            python_utils.PRINT('Updated Changelog!')
+
+            python_utils.PRINT('Updating Authors...')
+            start_index = release_summary_content.index(
+                '### New Authors:\n') + 1
+            end_index = release_summary_content.index(
+                '### Existing Authors:\n') - 1
+            new_authors = release_summary_content[start_index:end_index]
+            new_authors = [author.replace('* ', '') for author in new_authors]
+            update_sorted_file(
+                AUTHORS_FILEPATH, new_authors,
+                '# Please keep the list sorted alphabetically.\n')
+            python_utils.PRINT('Updated Authors!')
+
+            python_utils.PRINT('Updating Contributors...')
+            start_index = release_summary_content.index(
+                '### New Contributors:\n') + 1
+            end_index = release_summary_content.index(
+                '### Email C&P Blurbs about authors:\n') - 1
+            new_contributors = (
+                release_summary_content[start_index:end_index])
+            new_contributors = [
+                contributor.replace(
+                    '* ', '') for contributor in new_contributors]
+            update_sorted_file(
+                CONTRIBUTORS_FILEPATH, new_contributors,
+                '# Please keep the list sorted alphabetically.\n')
+            python_utils.PRINT('Updated Contributors!')
+
+            python_utils.PRINT('Updating Credits...')
+            new_credits = [
+                contributor.split('<')[0] for contributor in new_contributors]
+            new_credits.sort()
+            credit_dict = collections.defaultdict(list)
+            for credit in new_credits:
+                credit_dict[credit[0].upper()].append(
+                    '%s<li>%s</li>\n' % (LI_INDENT, credit))
+            with python_utils.open_file(
+                ABOUT_PAGE_FILEPATH, 'r') as about_page_file:
+                about_page_content = about_page_file.readlines()
+                for char in credit_dict:
+                    start_index = about_page_content.index(
+                        '%s<span>%s</span>\n' % (SPAN_INDENT, char)) + 2
+                    if char != 'Z':
+                        nxt_char = chr(ord(char) + 1)
+                        end_index = about_page_content.index(
+                            '%s<span>%s</span>\n' % (SPAN_INDENT, nxt_char)) - 2
+                    else:
+                        nxt_line = (
+                            '            <p translate="I18N_ABOUT_PAGE_CREDITS_'
+                            'TAB_TEXT_BOTTOM" translate-values="{listOfNames: '
+                            '$ctrl.listOfNames}">\n')
+                        end_index = about_page_content.index(nxt_line) - 2
+
+                    old_credits = about_page_content[start_index:end_index]
+                    updated_credits = old_credits + credit_dict[char]
+                    updated_credits = sorted(
+                        updated_credits, key=lambda s: s.lower())
+                    about_page_content[start_index:end_index] = updated_credits
+
+            with python_utils.open_file(
+                ABOUT_PAGE_FILEPATH, 'w') as about_page_file:
+                for line in about_page_content:
+                    about_page_file.write(line)
+            python_utils.PRINT('Updated Credits!')
+
+        python_utils.PRINT(
+            'Creating new branch with updates to AUTHORS, CONTRIBUTORS,'
+            'CHANGELOG and about-page...')
+        sb = repo_fork.get_branch(source_branch)
+        repo_fork.create_git_ref(
+            ref='refs/heads/%s' % target_branch, sha=sb.commit.sha)
+
+        for filepath in [
+                ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
+                CHANGELOG_FILEPATH]:
+            contents = repo_fork.get_contents(filepath, ref=target_branch)
+            with python_utils.open_file(filepath, 'r') as f:
+                repo_fork.update_file(
+                    contents.path, 'Update %s' % filepath, f.read(),
+                    contents.sha, branch=target_branch)
+        _run_cmd(GIT_CMD_CHECKOUT % ('%s %s %s %s') % (
+            ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
+            CHANGELOG_FILEPATH))
+        common.open_new_tab_in_browser_if_possible(
+            'https://github.com/oppia/oppia/compare/develop...%s:%s?'
+            'expand=1' % (github_username, target_branch))
+        python_utils.PRINT(
+            'Pushed changes to Github. '
+            'Please create a pull request from the %s branch' % target_branch)
+    except Exception as e:
+        _run_cmd(GIT_CMD_CHECKOUT % ('%s %s %s %s') % (
+            ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
+            CHANGELOG_FILEPATH))
+        # The get_git_ref code is wrapped in try except block since the
+        # function raises an exception if the target branch is not found.
+        try:
+            repo_fork.get_git_ref('heads/%s' % target_branch).delete()
+        except Exception:
+            python_utils.PRINT(
+                'Please ensure that %s branch is deleted before re-running '
+                'the script' % target_branch)
+        raise Exception(e)
 
 
 if __name__ == '__main__':
