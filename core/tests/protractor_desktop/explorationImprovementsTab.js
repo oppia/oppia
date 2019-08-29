@@ -13,15 +13,10 @@
 // limitations under the License.
 
 /**
-<<<<<<< HEAD
- * @fileoverview End-to-end tests for the functionality of the improvements tab
- *    of the exploration editor.
-=======
  * @fileoverview End-to-end tests for the core features of the exploration
- * editor and player. Core features include the features without which an
- * exploration cannot be published. These include state content, answer groups,
- * oppia's feedback and customization_args.
->>>>>>> upstream/develop
+ *    editor and player. Core features include the features without which an
+ *    exploration cannot be published. These include state content, answer groups,
+ *    oppia's feedback and customization_args.
  */
 
 var forms = require('../protractor_utils/forms.js');
@@ -30,10 +25,7 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 
-<<<<<<< HEAD
-=======
 var AdminPage = require('../protractor_utils/AdminPage.js');
->>>>>>> upstream/develop
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
@@ -42,7 +34,6 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-<<<<<<< HEAD
 describe('Exploration Improvements', function() {
   var EXPLORATION_TITLE = 'Exploration with Improvements';
   var EXPLORATION_OBJECTIVE = 'To explore something';
@@ -176,7 +167,6 @@ describe('Exploration Improvements', function() {
     afterEach(function() {
       general.checkForConsoleErrors([]);
     });
-=======
 describe('Test solicit answer details feature', function() {
   var EXPLORATION_TITLE = 'Check';
   var EXPLORATION_OBJECTIVE = 'To explore something';
@@ -292,6 +282,5 @@ describe('Test solicit answer details feature', function() {
       });
     users.logout();
     general.checkForConsoleErrors([]);
->>>>>>> upstream/develop
   });
 });
