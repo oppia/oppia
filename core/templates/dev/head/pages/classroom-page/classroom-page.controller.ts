@@ -50,14 +50,6 @@ angular.module('oppia').directive('topicViewerPage', [
           PageTitleService.setPageTitle(ctrl.classroomName + ' - Oppia');
 
           $rootScope.loadingMessage = 'Loading';
-          ClassroomBackendApiService.fetchClassroomData(
-            ctrl.classroomName).then(function(classroomDataDict) {
-          },
-          function(errorResponse) {
-            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-              AlertsService.addWarning('Failed to get classroom data');
-            }
-          });
         }
       ]
     };

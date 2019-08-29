@@ -33,37 +33,28 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.login(self.NEW_USER_EMAIL)
             response = self.get_html_response(
                 '%s/%s' % (feconf.CLASSROOM_URL_PREFIX, 'Math'))
             self.assertIn('<classroom-page></classroom-page>', response)
-            self.logout()
-
 
     def test_no_user_can_access_invalid_classroom_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.login(self.NEW_USER_EMAIL)
             self.get_html_response(
                 '%s/%s' % (
                     feconf.CLASSROOM_URL_PREFIX, 'invalid_subject'),
                 expected_status_int=404)
-            self.logout()
-
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.login(self.NEW_USER_EMAIL)
             self.get_html_response(
                 '%s/%s' % (feconf.CLASSROOM_URL_PREFIX, 'Math'),
                 expected_status_int=404)
-            self.logout()
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.login(self.NEW_USER_EMAIL)
             json_response = self.get_json(
                 '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'Math'))
             expected_dict = {
@@ -71,18 +62,8 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
-            self.logout()
-
-    def test_get_fails_when_user_not_logged_in(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'Math'),
-                expected_status_int=401)
-
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.login(self.NEW_USER_EMAIL)
             self.get_json(
                 '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'Math'),
                 expected_status_int=404)
-            self.logout()

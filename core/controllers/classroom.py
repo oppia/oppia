@@ -26,11 +26,20 @@ import feconf
 class ClassroomPage(base.BaseHandler):
     """Renders the classroom page."""
 
-    @acl_decorators.can_access_classroom_page
-    def get(self, _):
+    @acl_decorators.open_access
+    def get(self, classroom_name):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        classroom_name_is_valid = False
+        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
+            if classroom_dict['name'] == classroom_name:
+                classroom_name_is_valid = True
+                break
+
+        if not classroom_name_is_valid:
             raise self.PageNotFoundException
 
         self.render_template('classroom-page.mainpage.html')
@@ -42,17 +51,22 @@ class ClassroomDataHandler(base.BaseHandler):
     """
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_classroom_page
+    @acl_decorators.open_access
     def get(self, classroom_name):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
+        classroom_name_is_valid = False
         for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
             if classroom_dict['name'] == classroom_name:
+                classroom_name_is_valid = True
                 topic_ids = classroom_dict['topic_ids']
                 break
+
+        if not classroom_name_is_valid:
+            raise self.PageNotFoundException
 
         topic_summaries = topic_services.get_multi_topic_summaries(topic_ids)
         topic_summary_dicts = [summary.to_dict() for summary in topic_summaries]

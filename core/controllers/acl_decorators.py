@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 import functools
 
 from core.controllers import base
-from core.domain import config_domain
 from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
@@ -2344,48 +2343,6 @@ def can_change_topic_publication_status(handler):
     test_can_change_topic_publication_status.__wrapped__ = True
 
     return test_can_change_topic_publication_status
-
-
-def can_access_classroom_page(handler):
-    """Decorator to check access to classroom page.
-
-    Args:
-        handler: function. The function to be decorated.
-
-    Returns:
-        function. The newly decorated function that now also checks if
-            one can access the classroom page.
-    """
-
-    def test_can_access(self, classroom_name, **kwargs):
-        """Checks if the user can access the classroom page.
-
-        Args:
-            classroom_name: str. The name of the classroom.
-            **kwargs: *. Keyword arguments.
-
-        Returns:
-            *. The return value of the decorated function.
-
-        Raises:
-            NotLoggedInException: The user is not logged in.
-        """
-        if not self.user_id:
-            raise self.NotLoggedInException
-
-        classroom_name_is_valid = False
-        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
-            if classroom_dict['name'] == classroom_name:
-                classroom_name_is_valid = True
-                break
-
-        if classroom_name_is_valid:
-            return handler(self, classroom_name, **kwargs)
-        else:
-            raise self.PageNotFoundException
-    test_can_access.__wrapped__ = True
-
-    return test_can_access
 
 
 def can_access_topic_viewer_page(handler):
