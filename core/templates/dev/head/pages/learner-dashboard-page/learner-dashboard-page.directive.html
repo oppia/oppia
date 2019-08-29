@@ -66,8 +66,7 @@
        style="display: flex;"
        ng-if="!$ctrl.noActivity">
     <div class="col-md-2 oppia-learner-dashboard-side-content"
-         ng-class="{'oppia-learner-dashboard-mobile-mode': $ctrl.checkMobileView()}"
-         style="min-width: 200px;">
+         ng-class="{'oppia-learner-dashboard-mobile-mode': $ctrl.checkMobileView()}">
       <md-card class="oppia-learner-dashboard-main-menu">
         <h4 class="dropdown-toggle oppia-learner-dashboard-menu protractor-test-play-later-section"
             ng-class="{'oppia-learner-dashboard-section-active': $ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST}"
@@ -827,7 +826,8 @@
   }
 
   .oppia-learner-dashboard-side-content {
-    padding: 0;
+    min-width: 200px;
+    padding-left: 20px;
     width: 20%;
   }
 
