@@ -19,38 +19,52 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-editor-tab.directive.ts is upgraded to Angular 8.
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service.ts';
+  'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+  'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory.ts';
+  'domain/exploration/AnswerStatsObjectFactory';
 import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory.ts';
+  'domain/classifier/ClassifierObjectFactory';
 import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory.ts';
+  'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService.ts';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
-import { ImprovementsService } from 'services/ImprovementsService.ts';
+  'services/ExplorationFeaturesService';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { ImprovementsService } from 'services/ImprovementsService';
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory.ts';
+  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { ParamMetadataObjectFactory } from
+  'domain/exploration/ParamMetadataObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+/* eslint-enable max-len */
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
+/* eslint-disable max-len */
+import { StateEditorService } from
+  'components/state-editor/state-editor-properties-services/state-editor.service';
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory.ts';
+  'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory.ts';
+  'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -77,12 +91,17 @@ describe('Exploration editor tab controller', function() {
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
       $provide.value(
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+          new RuleObjectFactory()));
+      $provide.value(
         'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value(
         'ExplorationFeaturesService', new ExplorationFeaturesService());
+      $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
           new SubtitledHtmlObjectFactory()));
@@ -93,12 +112,24 @@ describe('Exploration editor tab controller', function() {
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value(
+        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+          new ParamChangeObjectFactory()));
+      $provide.value(
+        'ParamMetadataObjectFactory', new ParamMetadataObjectFactory());
+      $provide.value(
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value(
+        'StateClassifierMappingService', new StateClassifierMappingService(
+          new ClassifierObjectFactory()));
+      $provide.value(
+        'StateEditorService', new StateEditorService(
+          new SolutionValidityService()));
+      $provide.value(
         'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',

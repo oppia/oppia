@@ -18,6 +18,7 @@
 
 export class ServicesConstants {
   public static PAGE_CONTEXT = {
+    COLLECTION_EDITOR: 'collection_editor',
     EXPLORATION_EDITOR: 'editor',
     EXPLORATION_PLAYER: 'learner',
     QUESTION_EDITOR: 'question_editor',
@@ -64,5 +65,6 @@ export class ServicesConstants {
   public static STATE_ANSWER_STATS_URL =
     '/createhandler/state_answer_stats/<exploration_id>';
 
-  public static RTE_COMPONENT_SPECS = richTextComponents;
+  public static RTE_COMPONENT_SPECS = (
+      require('rich_text_components_definitions.ts'));
 }

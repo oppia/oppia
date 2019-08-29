@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for the profile page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import re
 
 from constants import constants
@@ -853,6 +855,7 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
             'can_create_collections': False,
             'preferred_site_language_code': None,
             'username': self.EDITOR_USERNAME,
+            'email': self.EDITOR_EMAIL,
             'user_is_logged_in': True}, json_response)
         self.logout()
 

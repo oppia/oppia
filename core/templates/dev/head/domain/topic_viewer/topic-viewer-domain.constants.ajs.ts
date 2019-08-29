@@ -19,8 +19,16 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { TopicViewerDomainConstants } from
-  'domain/topic_viewer/topic-viewer-domain.constants.ts';
+  'domain/topic_viewer/topic-viewer-domain.constants';
 
 angular.module('oppia').constant(
   'TOPIC_DATA_URL_TEMPLATE',
   TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'STORY_VIEWER_URL_TEMPLATE',
+  TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'SUBTOPIC_VIEWER_URL_TEMPLATE',
+  TopicViewerDomainConstants.SUBTOPIC_VIEWER_URL_TEMPLATE);

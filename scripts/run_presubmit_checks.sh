@@ -24,14 +24,14 @@
 # It runs the following tests in all cases.
 # - Javascript and Python Linting
 # - Backend Python tests
-# 
+#
 # Only when frontend files are changed will it run Frontend Karma unit tests.
 #
 # If any of these tests result in errors, this script will terminate.
 #
 # Note: The test scripts are arranged in increasing order of time taken. This
 # enables a broken build to be detected as quickly as possible.
-# 
+#
 # =====================
 # CUSTOMIZATION OPTIONS
 # =====================
@@ -57,7 +57,7 @@ fi
 set -e
 # Run Javascript and Python linters.
 echo 'Linting files since the last commit'
-python $(dirname $0)/pre_commit_linter.py || exit 1
+python -m $(dirname $0).pre_commit_linter || exit 1
 echo 'Linting passed.'
 echo ''
 
@@ -90,13 +90,13 @@ FRONTEND_DIR='core/templates/dev/head'
 echo "Comparing the current branch with $BRANCH"
 
 if [ -n "$(git diff --cached --name-only --diff-filter=ACM ${BRANCH} | grep ${FRONTEND_DIR})" ]
-then 
+then
   # Run frontend unit tests.
   echo 'Running frontend unit tests'
   source $(dirname $0)/run_frontend_tests.sh --run-minified-tests=true || exit 1
   echo 'Frontend tests passed.'
   echo ''
-else 
+else
   # If files in FRONTEND_DIR were not changed, skip the tests.
   echo 'No frontend files were changed.'
   echo 'Skipped frontend tests'

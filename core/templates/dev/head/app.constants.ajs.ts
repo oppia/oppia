@@ -18,7 +18,9 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
+
+const constants = require('constants.ts');
 
 for (var constantName in constants) {
   angular.module('oppia').constant(constantName, constants[constantName]);
@@ -30,10 +32,6 @@ for (var constantName in constants) {
 // See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
 angular.module('oppia').constant(
   'DEFAULT_TRANSLATIONS', AppConstants.DEFAULT_TRANSLATIONS);
-
-angular.module('oppia').constant(
-  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
-  AppConstants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
 
 angular.module('oppia').constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
   AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
@@ -57,9 +55,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
   AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE);
-angular.module('oppia').constant(
-  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
-  AppConstants.VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE);
 /* New card is available but user hasn't gone to it yet (when oppia
    gives a feedback and waits for user to press 'continue').
    Not called when a card is selected by clicking progress dots */

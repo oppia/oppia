@@ -29,11 +29,12 @@ IMPORTANT NOTES:
 
 2.  This script should be run from the oppia root folder:
 
-        python scripts/deploy.py --app_name=[APP_NAME]
+        python -m scripts.deploy --app_name=[APP_NAME]
 
     where [APP_NAME] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -45,11 +46,11 @@ import shutil
 import string
 import subprocess
 
-import common  # pylint: disable=relative-import
-import gcloud_adapter  # pylint: disable=relative-import
+import python_utils
 
+from . import common
+from . import gcloud_adapter
 # pylint: enable=wrong-import-order
-
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -59,6 +60,7 @@ _PARSER.add_argument(
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
+BUCKET_NAME_SUFFIX = '-resources'
 
 PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.app_name:
@@ -106,7 +108,8 @@ def preprocess_release():
 
     (1) Substitutes files from the per-app deployment data.
     (2) Change the DEV_MODE constant in assets/constants.js.
-    (3) Removes the "version" field from app.yaml, since gcloud does not like
+    (3) Change GCS_RESOURCE_BUCKET in assets/constants.js.
+    (4) Removes the "version" field from app.yaml, since gcloud does not like
         it (when deploying).
     """
     if not os.path.exists(DEPLOY_DATA_PATH):
@@ -144,23 +147,100 @@ def preprocess_release():
             shutil.copyfile(src, dst)
 
     # Changes the DEV_MODE constant in assets/constants.js.
-    with open(os.path.join('assets', 'constants.js'), 'r') as assets_file:
+    with python_utils.open_file(
+        os.path.join('assets', 'constants.js'), 'r') as assets_file:
         content = assets_file.read()
+    bucket_name = APP_NAME + BUCKET_NAME_SUFFIX
     assert '"DEV_MODE": true' in content
+    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
     os.remove(os.path.join('assets', 'constants.js'))
     content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
-    with open(os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
+    content = content.replace(
+        '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
+        '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
+    with python_utils.open_file(
+        os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
         new_assets_file.write(content)
+
+
+def install_required_dev_dependencies():
+    """Runs start.sh to ensure that dev dependencies are up-to-date
+    and installs required dependencies.
+    """
+
+    cmd = ['bash', 'scripts/start.sh']
+    if os.path.exists('dev_output.txt'):
+        os.remove('dev_output.txt')
+
+    with python_utils.open_file('dev_output.txt', 'w') as out:
+        process = subprocess.Popen(cmd, stdout=out)
+
+        while True:
+            with python_utils.open_file('dev_output.txt', 'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    if 'Oppia setup complete!' in line:
+                        process.kill()
+                        os.remove('dev_output.txt')
+                        return
+
+
+def check_errors_in_a_page(url_to_check, msg_to_confirm):
+    """Prompts user to check errors in a page.
+
+    Args:
+        url_to_check: str. The url of the page to be tested.
+        msg_to_confirm: str. The message displayed asking user for confirmation.
+
+    Returns:
+        bool. Whether the page has errors or not.
+    """
+
+    common.open_new_tab_in_browser_if_possible(url_to_check)
+    while True:
+        python_utils.PRINT(
+            '******************************************************')
+        python_utils.PRINT(
+            'PLEASE CONFIRM: %s See %s '
+            '(y/n)' % (msg_to_confirm, url_to_check))
+        answer = python_utils.INPUT().lower()
+        if answer in ['y', 'ye', 'yes']:
+            return True
+        elif answer:
+            return False
 
 
 def _execute_deployment():
     """Executes the deployment process after doing the prerequisite checks."""
+
+    install_required_dev_dependencies()
 
     if not common.is_current_branch_a_release_branch():
         raise Exception(
             'The deployment script must be run from a release branch.')
     current_release_version = CURRENT_BRANCH_NAME[len(
         common.RELEASE_BRANCH_NAME_PREFIX):].replace('.', '-')
+
+    # This is required to compose the release_version_library_url correctly.
+    if '.' in current_release_version:
+        raise Exception('Current release version has \'.\' character.')
+
+    indexes_page_url = (
+        'https://console.cloud.google.com/datastore/indexes'
+        '?project=%s') % APP_NAME
+    release_version_library_url = (
+        'https://%s-dot-%s.appspot.com/library' %
+        current_release_version, APP_NAME)
+    memcache_url = (
+        'https://pantheon.corp.google.com/appengine/memcache?'
+        'project=%s') % APP_NAME
+    test_server_error_logs_url = (
+        'https://console.cloud.google.com/logs/viewer?'
+        'project=%s&key1=default&minLogLevel=500') % APP_NAME
+    release_journal_url = (
+        'https://drive.google.com/drive/folders/'
+        '0B9KSjiibL_WDNjJyYlEtbTNvY3c')
+    issue_filing_url = 'https://github.com/oppia/oppia/milestone/39'
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
@@ -171,7 +251,7 @@ def _execute_deployment():
             raise Exception(
                 'The deployment script must be run from a release branch.')
     if APP_NAME == APP_NAME_OPPIASERVER:
-        with open('./feconf.py', 'r') as f:
+        with python_utils.open_file('./feconf.py', 'r') as f:
             feconf_contents = f.read()
             if ('MAILGUN_API_KEY' not in feconf_contents or
                     'MAILGUN_API_KEY = None' in feconf_contents):
@@ -186,11 +266,11 @@ def _execute_deployment():
         ['git', 'rev-parse', 'HEAD']).strip()
 
     # Create a folder in which to save the release candidate.
-    print 'Ensuring that the release directory parent exists'
+    python_utils.PRINT('Ensuring that the release directory parent exists')
     common.ensure_directory_exists(os.path.dirname(RELEASE_DIR_PATH))
 
     # Copy files to the release directory. Omits the .git subfolder.
-    print 'Copying files to the release directory'
+    python_utils.PRINT('Copying files to the release directory')
     shutil.copytree(
         os.getcwd(), RELEASE_DIR_PATH, ignore=shutil.ignore_patterns('.git'))
 
@@ -201,9 +281,9 @@ def _execute_deployment():
                 'Invalid directory accessed during deployment: %s'
                 % os.getcwd())
 
-        print 'Changing directory to %s' % os.getcwd()
+        python_utils.PRINT('Changing directory to %s' % os.getcwd())
 
-        print 'Preprocessing release...'
+        python_utils.PRINT('Preprocessing release...')
         preprocess_release()
 
         # Update indexes, then prompt for a check that they are all serving
@@ -212,25 +292,15 @@ def _execute_deployment():
         # index.yaml file or create a different version of it to use in
         # production.
         gcloud_adapter.update_indexes(INDEX_YAML_PATH, APP_NAME)
-        datastore_indexes_url = (
-            'https://console.cloud.google.com/datastore/indexes?project=%s' %
-            APP_NAME)
-        common.open_new_tab_in_browser_if_possible(datastore_indexes_url)
-        while True:
-            print '******************************************************'
-            print (
-                'PLEASE CONFIRM: are all datastore indexes serving? See %s '
-                '(y/n)' % datastore_indexes_url)
-            answer = raw_input().lower()
-            if answer in ['y', 'ye', 'yes']:
-                break
-            elif answer:
-                raise Exception(
-                    'Please wait for all indexes to serve, then run this '
-                    'script again to complete the deployment. Exiting.')
+        if not gcloud_adapter.check_all_indexes_are_serving(APP_NAME):
+            common.open_new_tab_in_browser_if_possible(indexes_page_url)
+            raise Exception(
+                'Please wait for all indexes to serve, then run this '
+                'script again to complete the deployment. For details, '
+                'visit the indexes page. Exiting.')
 
         # Do a build, while outputting to the terminal.
-        print 'Building and minifying scripts...'
+        python_utils.PRINT('Building and minifying scripts...')
         build_process = subprocess.Popen(
             ['python', 'scripts/build.py', '--prod_env'],
             stdout=subprocess.PIPE)
@@ -238,7 +308,7 @@ def _execute_deployment():
             line = build_process.stdout.readline().strip()
             if not line:
                 break
-            print line
+            python_utils.PRINT(line)
         # Wait for process to terminate, then check return code.
         build_process.communicate()
         if build_process.returncode > 0:
@@ -253,13 +323,28 @@ def _execute_deployment():
 
         # Writing log entry.
         common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
-        with open(LOG_FILE_PATH, 'a') as log_file:
+        with python_utils.open_file(LOG_FILE_PATH, 'a') as log_file:
             log_file.write(
                 'Successfully deployed to %s at %s (version %s)\n' % (
                     APP_NAME, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
                     current_git_revision))
 
-        print 'Returning to oppia/ root directory.'
+        python_utils.PRINT('Returning to oppia/ root directory.')
+
+    library_page_loads_correctly = check_errors_in_a_page(
+        release_version_library_url, 'Library page is loading correctly?')
+    if library_page_loads_correctly:
+        gcloud_adapter.switch_version(
+            APP_NAME, current_release_version)
+        python_utils.PRINT('Successfully migrated traffic to release version!')
+    else:
+        raise Exception(
+            'Aborting version switch due to issues in library page '
+            'loading.')
+
+    if not gcloud_adapter.flush_memcache(APP_NAME):
+        python_utils.PRINT('Memcache flushing failed. Please do it manually.')
+        common.open_new_tab_in_browser_if_possible(memcache_url)
 
     # If this is a test server deployment and the current release version is
     # already serving, open the library page (for sanity checking) and the GAE
@@ -268,20 +353,23 @@ def _execute_deployment():
         gcloud_adapter.get_currently_served_version(APP_NAME))
     if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
             currently_served_version == current_release_version):
-        common.open_new_tab_in_browser_if_possible(
-            'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
-        common.open_new_tab_in_browser_if_possible(
-            'https://console.cloud.google.com/logs/viewer?'
-            'project=%s&key1=default&minLogLevel=500'
-            % APP_NAME_OPPIATESTSERVER)
+        major_breakage = check_errors_in_a_page(
+            test_server_error_logs_url, 'Is anything major broken?')
+        if major_breakage:
+            common.open_new_tab_in_browser_if_possible(release_journal_url)
+            common.open_new_tab_in_browser_if_possible(issue_filing_url)
+            raise Exception(
+                'Please note the issue in the release journal for this month, '
+                'file a blocking bug and switch to the last known good '
+                'version.')
 
-    print 'Done!'
+    python_utils.PRINT('Done!')
 
 
 def get_unique_id():
     """Returns a unique id."""
     unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
-                        for _ in range(CACHE_SLUG_PROD_LENGTH))
+                        for _ in python_utils.RANGE(CACHE_SLUG_PROD_LENGTH))
     return unique_id
 
 

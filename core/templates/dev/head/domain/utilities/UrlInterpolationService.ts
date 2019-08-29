@@ -16,11 +16,14 @@
  * @fileoverview Service to construct URLs by inserting variables within them as
  * necessary to have a fully-qualified URL.
  */
+
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/UtilsService.ts');
 
 require('app.constants.ajs.ts');
+
+const hashes = require('hashes.json');
 
 angular.module('oppia').factory('UrlInterpolationService', [
   'AlertsService', 'UrlService', 'UtilsService', 'DEV_MODE',
@@ -163,13 +166,6 @@ angular.module('oppia').factory('UrlInterpolationService', [
         return getCompleteUrl('/assets', '/images' + imagePath);
       },
 
-      /**
-       * Given an story id returns the complete url path to that image.
-       */
-      getStoryUrl: function(storyId) {
-        validateResourcePath(storyId);
-        return '/story' + storyId;
-      },
       /**
        * Given a video path relative to /assets/videos folder,
        * returns the complete url path to that image.

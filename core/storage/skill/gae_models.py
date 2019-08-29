@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Models for storing the skill data models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -48,9 +49,14 @@ class SkillModel(base_models.VersionedModel):
     # The schema version for each of the misconception dicts.
     misconceptions_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
+    # The schema version for each of the rubric dicts.
+    rubric_schema_version = ndb.IntegerProperty(
+        required=True, indexed=True)
     # A list of misconceptions associated with the skill, in which each
     # element is a dict.
     misconceptions = ndb.JsonProperty(repeated=True, indexed=False)
+    # The rubrics for the skill that explain each difficulty level.
+    rubrics = ndb.JsonProperty(repeated=True, indexed=False)
     # The ISO 639-1 code for the language this skill is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The schema version for the skill_contents.

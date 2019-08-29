@@ -32,18 +32,18 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants.ts';
+  'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants.ts';
+  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
-import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
+  'domain/objects/objects-domain.constants';
+import { ServicesConstants } from 'services/services.constants';
+import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { StoryEditorPageConstants } from
-  'pages/story-editor-page/story-editor-page.constants.ts';
+  'pages/story-editor-page/story-editor-page.constants';
 
 @NgModule({
   imports: [
@@ -87,10 +87,9 @@ angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-  downgradedModule
-].concat(
-  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
+  'ui.validate', downgradedModule
+])
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
   .directive(

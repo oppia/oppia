@@ -20,8 +20,11 @@
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('services/AlertsService.ts');
+require('services/ContextService.ts');
 require('services/LocalStorageService.ts');
 require('services/contextual/UrlService.ts');
+
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationDataService', [
   '$http', '$log', '$q', '$window', 'AlertsService',
@@ -30,7 +33,7 @@ angular.module('oppia').factory('ExplorationDataService', [
   function(
       $http, $log, $q, $window, AlertsService,
       EditableExplorationBackendApiService, LocalStorageService,
-      ReadOnlyExplorationBackendApiService, UrlService) {
+      ReadOnlyExplorationBackendApiService, UrlService,) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
@@ -51,15 +54,8 @@ angular.module('oppia').factory('ExplorationDataService', [
 
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
-    var explorationDraftAutosaveUrl = '';
-    if (GLOBALS.can_edit) {
-      explorationDraftAutosaveUrl = (
-        '/createhandler/autosave_draft/' + explorationId);
-    } else if (GLOBALS.can_voiceover) {
-      explorationDraftAutosaveUrl = (
-        '/createhandler/autosave_voiceover_draft/' + explorationId);
-    }
-
+    var explorationDraftAutosaveUrl = (
+      '/createhandler/autosave_draft/' + explorationId);
 
     // Put exploration variables here.
     var explorationData = {

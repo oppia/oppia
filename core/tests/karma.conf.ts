@@ -2,6 +2,7 @@ var argv = require('yargs').argv;
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
+const isDocker = require('is-docker')();
 if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
@@ -14,8 +15,6 @@ module.exports = function(config) {
     files: [
       'local_compiled_js/core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      'local_compiled_js/assets/constants.js',
-      'local_compiled_js/assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.4.1/jquery.min.js',
@@ -46,7 +45,7 @@ module.exports = function(config) {
         served: true,
         included: false
       },
-      'extensions/interactions/**/*_directive.html',
+      'extensions/interactions/**/*.directive.html',
       'extensions/interactions/rule_templates.json',
       'core/tests/data/*.json',
       {
@@ -78,7 +77,7 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
       'core/templates/dev/head/**/*.directive.html': ['ng-html2js'],
       'core/templates/dev/head/**/*.template.html': ['ng-html2js'],
-      'extensions/interactions/**/*_directive.html': ['ng-html2js'],
+      'extensions/interactions/**/*.directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
@@ -105,8 +104,16 @@ module.exports = function(config) {
     singleRun: true,
     customLaunchers: {
       Chrome_Travis: {
-        base: 'Chrome',
-        flags: ['--no-sandbox']
+        // Karma can only connect to ChromeHeadless when inside Docker.
+        base: isDocker ? 'ChromeHeadless' : 'Chrome',
+        // Discussion of the necessity of extra flags can be found here:
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/154
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/180
+        flags: isDocker ? [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-web-security'
+        ] : ['--no-sandbox']
       }
     },
 
@@ -138,10 +145,14 @@ module.exports = function(config) {
       mode: 'development',
       resolve: {
         modules: [
+          'core/tests/data',
+          'assets',
           'core/templates/dev/head',
           'extensions',
           'node_modules',
+          'third_party',
         ],
+        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
       devtool: 'inline-source-map',
       module: {
@@ -171,6 +182,10 @@ module.exports = function(config) {
               loader: 'istanbul-instrumenter-loader',
               options: { esModules: true }
             }
+          },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
           }
         ]
       },

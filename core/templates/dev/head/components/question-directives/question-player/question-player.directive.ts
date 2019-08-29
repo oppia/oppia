@@ -17,7 +17,6 @@
  */
 
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
@@ -236,8 +235,7 @@ angular.module('oppia').directive('questionPlayer', [
             });
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/question-directives/question-player/' +
-                'review-and-retry-modal.template.html'
+                '/components/concept-card/concept-card-modal.template.html'
               ),
               backdrop: true,
               controller: [
@@ -246,13 +244,14 @@ angular.module('oppia').directive('questionPlayer', [
                 function(
                     $scope, $uibModalInstance, $window,
                     UrlService) {
-                  $scope.failedSkillIds = skillIds;
-                  $scope.failedSkills = skills;
+                  $scope.skillIds = skillIds;
+                  $scope.skills = skills;
                   $scope.index = 0;
-                  $scope.currentSkill = $scope.failedSkills[$scope.index];
+                  $scope.currentSkill = $scope.skills[$scope.index];
+                  $scope.isInTestMode = true;
 
                   $scope.isLastConceptCard = function() {
-                    return $scope.index === $scope.failedSkills.length - 1;
+                    return $scope.index === $scope.skills.length - 1;
                   };
 
                   $scope.closeModal = function() {
@@ -261,7 +260,7 @@ angular.module('oppia').directive('questionPlayer', [
 
                   $scope.goToNextConceptCard = function() {
                     $scope.index++;
-                    $scope.currentSkill = $scope.failedSkills[$scope.index];
+                    $scope.currentSkill = $scope.skills[$scope.index];
                   };
 
                   $scope.retryTest = function() {
@@ -420,8 +419,8 @@ angular.module('oppia').directive('questionPlayer', [
                       WRONG_ANSWER_PENALTY_FOR_MASTERY;
                   }
                 } else {
-                  for (var skillId in masteryChangePerQuestion) {
-                    masteryChangePerQuestion[skillId] -=
+                  for (var masterySkillId in masteryChangePerQuestion) {
+                    masteryChangePerQuestion[masterySkillId] -=
                       WRONG_ANSWER_PENALTY_FOR_MASTERY;
                   }
                 }
@@ -543,6 +542,10 @@ angular.module('oppia').directive('questionPlayer', [
 
                   $scope.closeModal = function() {
                     $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.openConceptCardModal = function(skillId) {
+                    openConceptCardModal([skillId]);
                   };
                 }
               ]
