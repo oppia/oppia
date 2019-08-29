@@ -356,6 +356,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         super(SkillOpportunityDomainTest, self).setUp()
         self.valid_skill_opportunity = (
                 opportunity_domain.SkillOpportunity.from_dict({
+                    'id': 'skill_1',
                     'topic_id': 'topic_1',
                     'topic_name': 'A topic',
                     'skill_id': 'skill_1',
@@ -365,6 +366,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
 
     def test_to_and_from_dict_works_correctly(self):
         skill_opportunity_dict = {
+            'id': 'skill_1',
             'topic_id': 'topic_1',
             'topic_name': 'A topic',
             'skill_id': 'skill_1',
@@ -378,7 +380,8 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(
             skill_opportunity, opportunity_domain.SkillOpportunity))
         self.assertEqual(skill_opportunity.to_dict(), {
-            'skill_id': 'skill_1',
+            'id': 'skill_1',
+            'topic_id': 'topic_1',
             'topic_name': 'A topic',
             'skill_description': 'A new skill',
             'question_count': 5,

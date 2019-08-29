@@ -130,6 +130,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         """
         return cls.query(cls.topic_id == topic_id).fetch()
 
+
 class SkillOpportunityModel(base_models.BaseModel):
     """Model for opportunities to add questions to skills.
 
@@ -145,7 +146,7 @@ class SkillOpportunityModel(base_models.BaseModel):
     # The description of the opportunity's skill.
     skill_description = ndb.StringProperty(required=True, indexed=True)
     # The number of questions associated with this opportunity's skill.
-    question_counts = ndb.JsonProperty(default={}, indexed=False)
+    question_count = ndb.IntegerProperty(required=True, indexed=True)
 
     @classmethod
     def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
@@ -179,3 +180,13 @@ class SkillOpportunityModel(base_models.BaseModel):
         results, cursor, more = cls.get_all().order(
                 cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
+
+    @classmethod
+    def get_by_skill_id(cls, skill_id):
+        """Returns all the models corresponding to the specific skill ID.
+
+        Returns:
+            SkillOpportunityModel|None. A SkillOpportunityModel having given
+            skill_id.
+        """
+        return cls.query(cls.skill_id == skill_id).get()

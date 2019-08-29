@@ -384,3 +384,68 @@ def update_opportunities_with_new_topic_name(topic_id, topic_name):
 
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
+
+
+def get_skill_opportunity_from_model(model):
+    """Returns a SkillOpportunity domain object from a SkillOpportunityModel.
+
+    Args:
+        model: SkillOpportunityModel. The skill opportunity model.
+
+    Returns:
+        SkillOpportunity. The corresponding SkillOpportunity object.
+    """
+
+    return opportunity_domain.SkillOpportunity(
+        model.topic_id, model.topic_name, model.skill_id,
+        model.skill_description, model.question_count)
+
+
+def get_skill_opportunities(cursor):
+    """Returns a list of skill opportunities available for questions.
+
+    Args:
+        cursor: str or None. If provided, the list of returned entities
+            starts from this datastore cursor. Otherwise, the returned
+            entities start from the beginning of the full list of entities.
+
+    Returns:
+        3-tuple(opportunities, cursor, more). where:
+            opportunities: list(dict). A list of dict of opportunity details.
+            cursor: str or None. A query cursor pointing to the next
+                batch of results. If there are no more results, this might
+                be None.
+            more: bool. If True, there are (probably) more results after
+                this batch. If False, there are no further results after
+                this batch.
+    """
+    page_size = feconf.OPPORTUNITIES_PAGE_SIZE
+    skill_opportunity_models, cursor, more = (
+        opportunity_models.SkillOpportunityModel
+        .get_skill_opportunities(page_size, cursor))
+    opportunities = []
+    for skill_opportunity_model in skill_opportunity_models:
+        skill_opportunity = (
+            get_skill_opportunity_from_model(
+                skill_opportunity_model))
+        opportunities.append(skill_opportunity.to_dict())
+    return opportunities, cursor, more
+
+
+def create_skill_opportunity(skill_opportunity):
+    """Create a skill opportunity domain object as a SkillOpportunityModel
+    entity in the datastore.
+
+    Args:
+        skill_opportunity: The skill opportunity object to be saved in the
+            datastore.
+    """
+    skill_opportunity_model = opportunity_models.SkillOpportunityModel(
+        topic_id=skill_opportunity.topic_id,
+        topic_name=skill_opportunity.topic_name,
+        skill_id=skill_opportunity.skill_id,
+        skill_description=skill_opportunity.skill_description,
+        question_count=skill_opportunity.question_count,
+    )
+
+    skill_opportunity_model.put()

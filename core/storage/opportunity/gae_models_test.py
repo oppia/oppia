@@ -141,7 +141,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
             topic_name='Topic 1',
             skill_id='skill_id1',
             skill_description='A skill description',
-            question_counts=20,
+            question_count=20,
         ).put()
         opportunity_models.SkillOpportunityModel(
             id='opportunity_id2',
@@ -149,7 +149,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
             topic_name='Topic 2',
             skill_id='skill_id2',
             skill_description='A skill description',
-            question_counts=30,
+            question_count=30,
         ).put()
 
     def test_get_skill_opportunities(self):

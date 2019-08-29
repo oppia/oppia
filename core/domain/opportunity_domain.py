@@ -202,7 +202,7 @@ class SkillOpportunity(object):
     """The domain object for skill opportunities."""
 
     def __init__(
-            self, topic_id, topic_name, skill_id, skill_description,
+            self, id, topic_id, topic_name, skill_id, skill_description,
             question_count):
         """Constructs a SkillOpportunity domain object.
 
@@ -213,6 +213,7 @@ class SkillOpportunity(object):
             skill_description: str. The title of the skill.
             question_count: int. The total number of questions for the skill.
         """
+        self.id = skill_id
         self.topic_id = topic_id
         self.topic_name = topic_name
         self.skill_id = skill_id
@@ -263,6 +264,7 @@ class SkillOpportunity(object):
                 SkillOpportunity domain object.
         """
         return cls(
+            skill_opportunity_dict['id'],
             skill_opportunity_dict['topic_id'],
             skill_opportunity_dict['topic_name'],
             skill_opportunity_dict['skill_id'],
@@ -282,7 +284,8 @@ class SkillOpportunity(object):
             contributor.
         """
         return {
-            'skill_id': self.skill_id,
+            'id': self.id,
+            'topic_id': self.topic_id,
             'topic_name': self.topic_name,
             'skill_description': self.skill_description,
             'question_count': self.question_count
