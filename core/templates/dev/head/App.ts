@@ -92,6 +92,10 @@ angular.module('oppia').config([
       $locationProvider.html5Mode(true);
     }
 
+    // The default location prefix is '!' we have to change it to '' to avoid
+    // '!' as a prefix in urls 
+    $locationProvider.hashPrefix('');
+
     // Prevent storing duplicate cookies for translation language.
     $cookiesProvider.defaults.path = '/';
 
