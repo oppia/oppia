@@ -15,7 +15,9 @@
 """Controllers for the cron jobs."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
+import datetime
 import logging
+import time
 
 from core import jobs
 from core.controllers import acl_decorators
@@ -134,9 +136,18 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         min_age_msec = recency_msec
         # Only consider jobs that started at most 1 week before recency_msec.
         max_age_msec = recency_msec + 7 * 24 * 60 * 60 * 1000
-        # The latest start time that a job scheduled for cleanup may have.
-        max_start_time_msec = (
-            utils.get_current_time_in_millisecs() - min_age_msec)
+        # Compute max_start_time_msec, which is the latest start time that a
+        # job scheduled for cleanup may have. Note that this cannot use
+        # utils.get_current_time_in_millisecs() -- we need to follow the method
+        # of generating a start time in the GAE pipeline third-party library,
+        # otherwise tests will break in some geographic locations due to the
+        # discrepancy between the two methods of calculating the current
+        # datetime.
+        current_datetime = datetime.datetime.utcnow()
+        current_time_in_millisecs = int(
+            float(time.mktime(current_datetime.utctimetuple()) * 1000.0) +
+            current_datetime.microsecond / 1000.0)
+        max_start_time_msec = current_time_in_millisecs - min_age_msec
 
         # Get all pipeline ids from jobs that started between max_age_msecs
         # and max_age_msecs + 1 week, before now.
