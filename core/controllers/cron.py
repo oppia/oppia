@@ -30,6 +30,7 @@ from core.domain import suggestion_services
 from core.domain import user_jobs_one_off
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from pipeline import pipeline
@@ -146,7 +147,7 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         current_datetime = datetime.datetime.utcnow()
         current_time_in_millisecs = int(
             float(time.mktime(current_datetime.utctimetuple()) * 1000.0) +
-            current_datetime.microsecond / 1000.0)
+            python_utils.divide(current_datetime.microsecond, 1000.0))
         max_start_time_msec = current_time_in_millisecs - min_age_msec
 
         # Get all pipeline ids from jobs that started between max_age_msecs
