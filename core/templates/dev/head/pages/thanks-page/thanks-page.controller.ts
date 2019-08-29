@@ -34,7 +34,9 @@ angular.module('oppia').directive('thanksPage', [
       controller: ['UrlInterpolationService', function(
           UrlInterpolationService) {
         var ctrl = this;
-        ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
-          '/general/donate.png');
+        this.$onInit = function () {
+          ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/donate.png');
+        }
       }]};
   }]);

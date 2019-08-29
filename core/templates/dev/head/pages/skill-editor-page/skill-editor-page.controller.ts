@@ -47,8 +47,10 @@ angular.module('oppia').directive('skillEditorPage', [
         function(
             SkillEditorRoutingService, SkillEditorStateService, UrlService) {
           var ctrl = this;
-          ctrl.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
-          SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
+          this.$onInit = function () {
+            ctrl.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
+            SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
+          }
         }
       ]
     };

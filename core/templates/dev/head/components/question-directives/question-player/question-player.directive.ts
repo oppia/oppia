@@ -269,7 +269,8 @@ angular.module('oppia').directive('questionPlayer', [
                   };
                 }
               ]
-            });
+            }).result.catch(function(result) {
+              });
           };
 
 
@@ -550,7 +551,8 @@ angular.module('oppia').directive('questionPlayer', [
                   };
                 }
               ]
-            });
+            }).result.catch(function(result) {
+              });
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {

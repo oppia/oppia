@@ -34,13 +34,15 @@ angular.module('oppia').directive('errorPage', [
         function(
             PageTitleService, UrlInterpolationService) {
           var ctrl = this;
-          ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/oops_mint.png');
+          this.$onInit = function () {
+            ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/oops_mint.png');
 
-          ctrl.statusCode = GLOBALS.status_code;
+            ctrl.statusCode = GLOBALS.status_code;
 
-          PageTitleService.setPageTitle(
-            'Error ' + ctrl.statusCode + ' - Oppia');
+            PageTitleService.setPageTitle(
+              'Error ' + ctrl.statusCode + ' - Oppia');
+          }
         }
       ]};
   }]);
