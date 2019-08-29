@@ -167,120 +167,123 @@ describe('Exploration Improvements', function() {
     afterEach(function() {
       general.checkForConsoleErrors([]);
     });
-describe('Test solicit answer details feature', function() {
-  var EXPLORATION_TITLE = 'Check';
-  var EXPLORATION_OBJECTIVE = 'To explore something';
-  var EXPLORATION_CATEGORY = 'Algorithms';
-  var EXPLORATION_LANGUAGE = 'English';
-  var adminPage = null;
-  var libraryPage = null;
-  var creatorDashboardPage = null;
-  var explorationEditorPage = null;
-  var explorationEditorImprovementsTab = null;
-  var explorationEditorMainTab = null;
-  var explorationEditorSettingsTab = null;
-  var explorationPlayerPage = null;
-  var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
 
-  beforeAll(function() {
-    adminPage = new AdminPage.AdminPage();
-    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorImprovementsTab = (
-      explorationEditorPage.getImprovementsTab());
-    explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    libraryPage = new LibraryPage.LibraryPage();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    explorationPlayerPage =
-      new ExplorationPlayerPage.ExplorationPlayerPage();
+    describe('Test solicit answer details feature', function() {
+      var EXPLORATION_TITLE = 'Check';
+      var EXPLORATION_OBJECTIVE = 'To explore something';
+      var EXPLORATION_CATEGORY = 'Algorithms';
+      var EXPLORATION_LANGUAGE = 'English';
+      var adminPage = null;
+      var libraryPage = null;
+      var creatorDashboardPage = null;
+      var explorationEditorPage = null;
+      var explorationEditorImprovementsTab = null;
+      var explorationEditorMainTab = null;
+      var explorationEditorSettingsTab = null;
+      var explorationPlayerPage = null;
+      var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
 
-    users.createUser(
-      'learner@user.com', 'learnerUser');
-    users.createAndLoginAdminUser(
-      'creator@user.com', 'creatorUser');
+      beforeAll(function() {
+        adminPage = new AdminPage.AdminPage();
+        explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+        explorationEditorImprovementsTab = (
+          explorationEditorPage.getImprovementsTab());
+        explorationEditorMainTab = explorationEditorPage.getMainTab();
+        explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+        explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+        libraryPage = new LibraryPage.LibraryPage();
+        creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+        explorationPlayerPage =
+          new ExplorationPlayerPage.ExplorationPlayerPage();
 
-    // Creator creates and publishes an exploration.
-    workflow.createExplorationAsAdmin();
-    explorationEditorMainTab.exitTutorial();
+        users.createUser(
+          'learner@user.com', 'learnerUser');
+        users.createAndLoginAdminUser(
+          'creator@user.com', 'creatorUser');
 
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
-    explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
-    explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
-    explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
+        // Creator creates and publishes an exploration.
+        workflow.createExplorationAsAdmin();
+        explorationEditorMainTab.exitTutorial();
 
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.setStateName('One');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('Please write 1 in words.'));
-    explorationEditorMainTab.setInteraction('TextInput');
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
-      'One');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
-    explorationEditorMainTab.setSolicitAnswerDetailsFeature();
-    explorationEditorMainTab.moveToState('End');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
+        explorationEditorPage.navigateToSettingsTab();
+        explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
+        explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
+        explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
+        explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
 
-    adminPage.editConfigProperty(
-      'Always ask learners for answer details. For testing -- do not use',
-      'Boolean',
-      function(elem) {
-        elem.setValue(true);
+        explorationEditorPage.navigateToMainTab();
+        explorationEditorMainTab.setStateName('One');
+        explorationEditorMainTab.setContent(
+          forms.toRichText('Please write 1 in words.'));
+        explorationEditorMainTab.setInteraction('TextInput');
+        explorationEditorMainTab.addResponse(
+          'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
+          'One');
+        explorationEditorMainTab.getResponseEditor('default').setFeedback(
+          forms.toRichText('Try again'));
+        explorationEditorMainTab.setSolicitAnswerDetailsFeature();
+        explorationEditorMainTab.moveToState('End');
+        explorationEditorMainTab.setInteraction('EndExploration');
+        explorationEditorPage.saveChanges();
+        workflow.publishExploration();
+
+        adminPage.editConfigProperty(
+          'Always ask learners for answer details. For testing -- do not use',
+          'Boolean',
+          function(elem) {
+            elem.setValue(true);
+          });
+
+        adminPage.editConfigProperty(
+          'Exposes the Improvements Tab for creators in the exploration editor',
+          'Boolean',
+          function(elem) {
+            elem.setValue(true);
+          });
       });
 
-    adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor',
-      'Boolean',
-      function(elem) {
-        elem.setValue(true);
-      });
-  });
+      it('checks solicit answer details feature', function() {
+        users.login('learner@user.com');
+        libraryPage.get();
+        libraryPage.findExploration(EXPLORATION_TITLE);
+        libraryPage.playExploration(EXPLORATION_TITLE);
+        explorationPlayerPage.submitAnswer('TextInput', 'One');
+        explorationPlayerPage.submitAnswerDetails('I liked this choice of answer');
+        explorationPlayerPage.expectExplorationToNotBeOver();
 
-  it('checks solicit answer details feature', function() {
-    users.login('learner@user.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.submitAnswer('TextInput', 'One');
-    explorationPlayerPage.submitAnswerDetails('I liked this choice of answer');
-    explorationPlayerPage.expectExplorationToNotBeOver();
-
-    oppiaLogo.click();
-    general.acceptAlert();
-    users.logout();
-    users.login('creator@user.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.navigateToExplorationEditor();
-    explorationEditorPage.navigateToImprovementsTab();
-    explorationEditorImprovementsTab.checkAnswerDetailsCard('One', '1');
-    explorationEditorImprovementsTab.navigateReviewAnswerDetails();
-    explorationEditorImprovementsTab.verifyAnswerDetails(
-      'I liked this choi...');
-    users.logout();
-  });
-
-  afterAll(function() {
-    users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
-    adminPage.get();
-    adminPage.editConfigProperty(
-      'Always ask learners for answer details. For testing -- do not use',
-      'Boolean',
-      function(elem) {
-        elem.setValue(false);
+        oppiaLogo.click();
+        general.acceptAlert();
+        users.logout();
+        users.login('creator@user.com');
+        creatorDashboardPage.get();
+        creatorDashboardPage.navigateToExplorationEditor();
+        explorationEditorPage.navigateToImprovementsTab();
+        explorationEditorImprovementsTab.checkAnswerDetailsCard('One', '1');
+        explorationEditorImprovementsTab.navigateReviewAnswerDetails();
+        explorationEditorImprovementsTab.verifyAnswerDetails(
+          'I liked this choi...');
+        users.logout();
       });
 
-    adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor',
-      'Boolean',
-      function(elem) {
-        elem.setValue(false);
+      afterAll(function() {
+        users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+        adminPage.get();
+        adminPage.editConfigProperty(
+          'Always ask learners for answer details. For testing -- do not use',
+          'Boolean',
+          function(elem) {
+            elem.setValue(false);
+          });
+
+        adminPage.editConfigProperty(
+          'Exposes the Improvements Tab for creators in the exploration editor',
+          'Boolean',
+          function(elem) {
+            elem.setValue(false);
+          });
+        users.logout();
+        general.checkForConsoleErrors([]);
       });
-    users.logout();
-    general.checkForConsoleErrors([]);
+    });
   });
 });
