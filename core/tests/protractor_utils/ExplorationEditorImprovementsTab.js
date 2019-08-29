@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // Copyright 2018 The Oppia Authors. All Rights Reserved.
+=======
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
+>>>>>>> upstream/develop
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +17,7 @@
 // limitations under the License.
 
 /**
+<<<<<<< HEAD
  * @fileoverview Page object for the exploration editor's feedback tab, for
  * use in Protractor tests.
  */
@@ -51,3 +56,61 @@ var ExplorationEditorImprovementsTab = function() {
       by.css('.protractor-test-improvement-action-button' + index.toString()));
   };
 };
+=======
+ * @fileoverview Page object for the exploration editor's improvements tab, for
+ *  use in Protractor tests.
+ */
+
+var forms = require('./forms.js');
+var general = require('./general.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
+var ruleTemplates = require(
+  '../../../extensions/interactions/rule_templates.json');
+var waitFor = require('../protractor_utils/waitFor.js');
+
+var ExplorationEditorImprovementsTab = function() {
+  var answerDetailsCardStateName = element(
+    by.css('.protractor-test-answer-details-state'));
+  var answerInfoCount = element(
+    by.css('.protractor-test-answer-info-count'));
+  var reviewAnswerDetailsButton = element(
+    by.css('.protractor-test-review-answer-details'));
+  var answerDetails = element(by.css('.protractor-test-answer-details'));
+  var closeAnswerDetailsButton = element(
+    by.css('.protractor-test-close-answer-details'));
+
+  var _getAnswerDetailsCardStateName = function() {
+    return answerDetailsCardStateName.getText();
+  };
+
+  var _getAnswerInfoCount = function() {
+    return answerInfoCount.getText();
+  };
+
+  var _getAnswerDetails = function() {
+    return answerDetails.getText();
+  };
+
+  this.navigateReviewAnswerDetails = function() {
+    waitFor.elementToBeClickable(
+      reviewAnswerDetailsButton,
+      'Answer details button takes too long to be clickable');
+    reviewAnswerDetailsButton.click();
+  };
+
+  this.checkAnswerDetailsCard = function(stateName, count) {
+    expect(_getAnswerDetailsCardStateName()).toMatch(stateName);
+    expect(_getAnswerInfoCount()).toMatch(count);
+  };
+
+  this.verifyAnswerDetails = function(answerDetails) {
+    expect(_getAnswerDetails()).toMatch(answerDetails);
+    waitFor.elementToBeClickable(
+      closeAnswerDetailsButton,
+      'Answer details close button takes too long to be clickable');
+    closeAnswerDetailsButton.click();
+  };
+};
+
+exports.ExplorationEditorImprovementsTab = ExplorationEditorImprovementsTab;
+>>>>>>> upstream/develop

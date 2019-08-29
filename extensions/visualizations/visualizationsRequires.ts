@@ -16,7 +16,7 @@
  * @fileoverview Requires for all the visualization directives.
  */
 
-require('visualizations/OppiaVisualizationBarChartDirective.ts');
+require('visualizations/oppia-visualization-bar-chart.directive.ts');
 require(
-  'visualizations/OppiaVisualizationEnumeratedFrequencyTableDirective.ts');
-require('visualizations/OppiaVisualizationFrequencyTableDirective.ts');
+  'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
+require('visualizations/oppia-visualization-frequency-table.directive.ts');

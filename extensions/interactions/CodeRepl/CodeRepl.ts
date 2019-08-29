@@ -18,12 +18,15 @@
 
 require('interactions/CodeRepl/static/code_repl.css');
 
-require('interactions/CodeRepl/CodeReplPredictionService.ts');
+require('interactions/CodeRepl/code-repl-prediction.service.ts');
 
-require('interactions/CodeRepl/directives/CodeReplRulesService.ts');
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
+require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
+require('interactions/CodeRepl/directives/code-repl-validation.service.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');
-require('interactions/CodeRepl/directives/OppiaResponseCodeReplDirective.ts');
+  'interactions/CodeRepl/directives/oppia-interactive-code-repl.directive.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaShortResponseCodeReplDirective.ts');
+  'interactions/CodeRepl/directives/' +
+  'oppia-response-code-repl.directive.ts');
+require(
+  'interactions/CodeRepl/directives/' +
+  'oppia-short-response-code-repl.directive.ts');
