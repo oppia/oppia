@@ -253,7 +253,6 @@ describe('Exploration Improvements', function() {
         'Always ask learners for answer details. For testing -- do not use',
         'Boolean', (elem) => elem.setValue(true));
       users.logout();
-      general.checkForConsoleErrors([]);
     });
   });
 
