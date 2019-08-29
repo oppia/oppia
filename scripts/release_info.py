@@ -61,11 +61,18 @@ NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
 # core/templates/dev/head/pages/about-page/about-page.directive.html.
 SPAN_INDENT = '              '
 LI_INDENT = '                '
+# This line should match the line after div element for credits in
+# about-page.directive.html.
+LINE_AFTER_Z_CREDITS = (
+    '            <p translate="I18N_ABOUT_PAGE_CREDITS_'
+    'TAB_TEXT_BOTTOM" translate-values="{listOfNames: $ctrl.listOfNames}">\n')
 ABOUT_PAGE_FILEPATH = (
     'core/templates/dev/head/pages/about-page/about-page.directive.html')
 AUTHORS_FILEPATH = 'AUTHORS'
 CHANGELOG_FILEPATH = 'CHANGELOG'
 CONTRIBUTORS_FILEPATH = 'CONTRIBUTORS'
+RELEASE_SUMMARY_FILEPATH = os.path.join(
+    os.getcwd(), os.pardir, 'release_summary.md')
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
 
@@ -303,8 +310,8 @@ def _check_storage_models(current_release):
     return [item for item in diff_list if item.startswith('core/storage')]
 
 
-def check_blocking_bugs(repo):
-    """Checks the number of unresolved blocking bugs.
+def get_blocking_bug_issue_count(repo):
+    """Returns the number of unresolved blocking bugs.
 
     Args:
         repo: github.Repository.Repository. The PyGithub object for the repo.
@@ -316,15 +323,15 @@ def check_blocking_bugs(repo):
     return blocking_bugs_milestone.open_issues
 
 
-def check_prs_for_current_release(repo):
+def check_prs_for_current_release_are_released(repo):
     """Checks that all pull requests for current release have a
-    PR: released label.
+    'PR: released' label.
 
     Args:
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Returns:
-        int. Whether all pull requests for current release have a
+        bool. Whether all pull requests for current release have a
             PR: released label.
     """
     all_prs = repo.get_pulls(state='all')
@@ -359,24 +366,138 @@ def update_sorted_file(filepath, new_list, start_index_line):
             f.write(line)
 
 
+def update_changelog(release_summary_content, current_release_version):
+    """Updates CHANGELOG file.
+
+    Args:
+        release_summary_content: list(str). List of lines in
+            ../release_summary.md.
+        current_release_version: str. The version of current release.
+    """
+
+    current_date = datetime.date.today().strftime('%d %b %Y')
+    python_utils.PRINT('Updating Changelog...')
+    start_index = release_summary_content.index('### Changelog:\n') + 1
+    end_index = release_summary_content.index('### Commit History:\n')
+    release_version_changelog = [
+        u'v%s (%s)\n' % (current_release_version, current_date),
+        u'------------------------\n'] + release_summary_content[
+            start_index:end_index]
+    changelog_content = []
+    with python_utils.open_file(
+        CHANGELOG_FILEPATH, 'r') as changelog_file:
+        changelog_content = changelog_file.readlines()
+    changelog_content[2:2] = release_version_changelog
+    with python_utils.open_file(
+        CHANGELOG_FILEPATH, 'w') as changelog_file:
+        for line in changelog_content:
+            changelog_file.write(line)
+    python_utils.PRINT('Updated Changelog!')
+
+
+def update_authors(release_summary_content):
+    """Updates AUTHORS file.
+
+    Args:
+        release_summary_content: list(str). List of lines in
+            ../release_summary.md.
+    """
+    python_utils.PRINT('Updating Authors...')
+    start_index = release_summary_content.index(
+        '### New Authors:\n') + 1
+    end_index = release_summary_content.index(
+        '### Existing Authors:\n') - 1
+    new_authors = release_summary_content[start_index:end_index]
+    new_authors = [author.replace('* ', '') for author in new_authors]
+    update_sorted_file(
+        AUTHORS_FILEPATH, new_authors,
+        '# Please keep the list sorted alphabetically.\n')
+    python_utils.PRINT('Updated Authors!')
+
+
+def update_contributors(release_summary_content):
+    """Updates CONTRIBUTORS file.
+
+    Args:
+        release_summary_content: list(str). List of lines in
+            ../release_summary.md.
+    """
+    python_utils.PRINT('Updating Contributors...')
+    start_index = release_summary_content.index(
+        '### New Contributors:\n') + 1
+    end_index = release_summary_content.index(
+        '### Email C&P Blurbs about authors:\n') - 1
+    new_contributors = (
+        release_summary_content[start_index:end_index])
+    new_contributors = [
+        contributor.replace(
+            '* ', '') for contributor in new_contributors]
+    update_sorted_file(
+        CONTRIBUTORS_FILEPATH, new_contributors,
+        '# Please keep the list sorted alphabetically.\n')
+    python_utils.PRINT('Updated Contributors!')
+
+
+def update_credits(release_summary_content):
+    """Updates about-page.directive.html file.
+
+    Args:
+        release_summary_content: list(str). List of lines in
+            ../release_summary.md.
+    """
+    python_utils.PRINT('Updating Credits...')
+    start_index = release_summary_content.index(
+        '### New Contributors:\n') + 1
+    end_index = release_summary_content.index(
+        '### Email C&P Blurbs about authors:\n') - 1
+    new_contributors = (
+        release_summary_content[start_index:end_index])
+    new_contributors = [
+        contributor.replace(
+            '* ', '') for contributor in new_contributors]
+    new_credits = [
+        contributor.split('<')[0] for contributor in new_contributors]
+    new_credits.sort()
+    credit_dict = collections.defaultdict(list)
+    for credit in new_credits:
+        credit_dict[credit[0].upper()].append(
+            '%s<li>%s</li>\n' % (LI_INDENT, credit))
+    with python_utils.open_file(
+        ABOUT_PAGE_FILEPATH, 'r') as about_page_file:
+        about_page_content = about_page_file.readlines()
+        for char in credit_dict:
+            start_index = about_page_content.index(
+                '%s<span>%s</span>\n' % (SPAN_INDENT, char)) + 2
+            if char != 'Z':
+                nxt_char = chr(ord(char) + 1)
+                end_index = about_page_content.index(
+                    '%s<span>%s</span>\n' % (SPAN_INDENT, nxt_char)) - 2
+            else:
+                nxt_line = (
+                    '            <p translate="I18N_ABOUT_PAGE_CREDITS_'
+                    'TAB_TEXT_BOTTOM" translate-values="{listOfNames: '
+                    '$ctrl.listOfNames}">\n')
+                end_index = about_page_content.index(nxt_line) - 2
+
+            old_credits = about_page_content[start_index:end_index]
+            updated_credits = old_credits + credit_dict[char]
+            updated_credits = sorted(
+                updated_credits, key=lambda s: s.lower())
+            about_page_content[start_index:end_index] = updated_credits
+
+    with python_utils.open_file(
+        ABOUT_PAGE_FILEPATH, 'w') as about_page_file:
+        for line in about_page_content:
+            about_page_file.write(line)
+    python_utils.PRINT('Updated Credits!')
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = _get_current_branch()
     if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
         raise Exception(
             'This script should only be run from the latest release branch.')
-
-    personal_access_token = getpass.getpass(
-        prompt=(
-            'Personal access token for your github ID. '
-            'You can create one at https://github.com/settings/tokens: '))
-
-    if personal_access_token is None:
-        python_utils.PRINT(
-            'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and re-run '
-            'the script')
-        return
 
     parsed_args = _PARSER.parse_args()
     if parsed_args.github_username is None:
@@ -386,11 +507,22 @@ def main():
         return
     github_username = parsed_args.github_username
 
+    personal_access_token = getpass.getpass(
+        prompt=(
+            'Please provide personal access token for your github ID. '
+            'You can create one at https://github.com/settings/tokens: '))
+
+    if personal_access_token is None:
+        python_utils.PRINT(
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script')
+        return
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
     repo_fork = g.get_repo('%s/oppia' % github_username)
 
-    blocking_bugs_count = check_blocking_bugs(repo)
+    blocking_bugs_count = get_blocking_bug_issue_count(repo)
     if blocking_bugs_count:
         common.open_new_tab_in_browser_if_possible(
             'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
@@ -400,7 +532,7 @@ def main():
             'ensure that they are resolved before changelog creation.' % (
                 blocking_bugs_count))
 
-    if not check_prs_for_current_release(repo):
+    if not check_prs_for_current_release_are_released(repo):
         common.open_new_tab_in_browser_if_possible(
             'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
             '+label%3A%22PR%3A+for+current+release%22+')
@@ -431,8 +563,7 @@ def main():
     prs = get_prs_from_pr_numbers(pr_numbers, repo)
     categorized_pr_titles = get_changelog_categories(prs)
 
-    summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
-    with python_utils.open_file(summary_file, 'w') as out:
+    with python_utils.open_file(RELEASE_SUMMARY_FILEPATH, 'w') as out:
         out.write('## Collected release information\n')
 
         if feconf_version_changes:
@@ -511,28 +642,30 @@ def main():
             for link in issue_links:
                 out.write('* [%s](%s)  \n' % (link, link))
 
-    python_utils.PRINT('Done. Summary file generated in ../release_summary.md')
+    python_utils.PRINT('Done. Summary file generated in %s' % (
+        RELEASE_SUMMARY_FILEPATH))
 
     while True:
         python_utils.PRINT(
             '******************************************************')
         python_utils.PRINT(
-            'Please update ../release_summary.md to:\n'
+            'Please update %s to:\n'
             '- have a correct changelog for '
             'updating the CHANGELOG file\n'
             '- have a correct list of new authors and contributors to '
             'update AUTHORS, CONTRIBUTORS and Credits section in '
             'about-page.directive.html\n'
-            'Confirm once you are done by entering y/ye/yes.\n')
+            'Confirm once you are done by entering y/ye/yes.\n' % (
+                RELEASE_SUMMARY_FILEPATH))
         answer = python_utils.INPUT().lower()
         if answer in ['y', 'ye', 'yes']:
             break
 
     current_release_version = branch_name[len(
         common.RELEASE_BRANCH_NAME_PREFIX):]
-    current_date = datetime.date.today().strftime('%d %b %Y')
     source_branch = 'develop'
     target_branch = 'update-changelog-for-releasev%s' % current_release_version
+    release_summary_content = []
     # This complete code block is wrapped in try except since in case of
     # an exception, we should ensure that the changes made to AUTHORS,
     # CONTRIBUTORS, CHANGELOG and about-page are reverted and the branch
@@ -540,93 +673,17 @@ def main():
     # the script again.
     try:
         with python_utils.open_file(
-            '../release_summary.md', 'r') as release_summary_file:
+            RELEASE_SUMMARY_FILEPATH, 'r') as release_summary_file:
             release_summary_content = release_summary_file.readlines()
 
-            python_utils.PRINT('Updating Changelog...')
-            start_index = release_summary_content.index('### Changelog:\n') + 1
-            end_index = release_summary_content.index('### Commit History:\n')
-            release_version_changelog = [
-                u'v%s (%s)\n' % (current_release_version, current_date),
-                u'------------------------\n'] + release_summary_content[
-                    start_index:end_index]
-            changelog_content = []
-            with python_utils.open_file(
-                CHANGELOG_FILEPATH, 'r') as changelog_file:
-                changelog_content = changelog_file.readlines()
-            changelog_content[2:2] = release_version_changelog
-            with python_utils.open_file(
-                CHANGELOG_FILEPATH, 'w') as changelog_file:
-                for line in changelog_content:
-                    changelog_file.write(line)
-            python_utils.PRINT('Updated Changelog!')
-
-            python_utils.PRINT('Updating Authors...')
-            start_index = release_summary_content.index(
-                '### New Authors:\n') + 1
-            end_index = release_summary_content.index(
-                '### Existing Authors:\n') - 1
-            new_authors = release_summary_content[start_index:end_index]
-            new_authors = [author.replace('* ', '') for author in new_authors]
-            update_sorted_file(
-                AUTHORS_FILEPATH, new_authors,
-                '# Please keep the list sorted alphabetically.\n')
-            python_utils.PRINT('Updated Authors!')
-
-            python_utils.PRINT('Updating Contributors...')
-            start_index = release_summary_content.index(
-                '### New Contributors:\n') + 1
-            end_index = release_summary_content.index(
-                '### Email C&P Blurbs about authors:\n') - 1
-            new_contributors = (
-                release_summary_content[start_index:end_index])
-            new_contributors = [
-                contributor.replace(
-                    '* ', '') for contributor in new_contributors]
-            update_sorted_file(
-                CONTRIBUTORS_FILEPATH, new_contributors,
-                '# Please keep the list sorted alphabetically.\n')
-            python_utils.PRINT('Updated Contributors!')
-
-            python_utils.PRINT('Updating Credits...')
-            new_credits = [
-                contributor.split('<')[0] for contributor in new_contributors]
-            new_credits.sort()
-            credit_dict = collections.defaultdict(list)
-            for credit in new_credits:
-                credit_dict[credit[0].upper()].append(
-                    '%s<li>%s</li>\n' % (LI_INDENT, credit))
-            with python_utils.open_file(
-                ABOUT_PAGE_FILEPATH, 'r') as about_page_file:
-                about_page_content = about_page_file.readlines()
-                for char in credit_dict:
-                    start_index = about_page_content.index(
-                        '%s<span>%s</span>\n' % (SPAN_INDENT, char)) + 2
-                    if char != 'Z':
-                        nxt_char = chr(ord(char) + 1)
-                        end_index = about_page_content.index(
-                            '%s<span>%s</span>\n' % (SPAN_INDENT, nxt_char)) - 2
-                    else:
-                        nxt_line = (
-                            '            <p translate="I18N_ABOUT_PAGE_CREDITS_'
-                            'TAB_TEXT_BOTTOM" translate-values="{listOfNames: '
-                            '$ctrl.listOfNames}">\n')
-                        end_index = about_page_content.index(nxt_line) - 2
-
-                    old_credits = about_page_content[start_index:end_index]
-                    updated_credits = old_credits + credit_dict[char]
-                    updated_credits = sorted(
-                        updated_credits, key=lambda s: s.lower())
-                    about_page_content[start_index:end_index] = updated_credits
-
-            with python_utils.open_file(
-                ABOUT_PAGE_FILEPATH, 'w') as about_page_file:
-                for line in about_page_content:
-                    about_page_file.write(line)
-            python_utils.PRINT('Updated Credits!')
+        update_changelog(
+            release_summary_content, current_release_version)
+        update_authors(release_summary_content)
+        update_contributors(release_summary_content)
+        update_credits(release_summary_content)
 
         python_utils.PRINT(
-            'Creating new branch with updates to AUTHORS, CONTRIBUTORS,'
+            'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
             'CHANGELOG and about-page...')
         sb = repo_fork.get_branch(source_branch)
         repo_fork.create_git_ref(
