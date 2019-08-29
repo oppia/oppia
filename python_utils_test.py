@@ -177,37 +177,31 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             self.assertEqual(type(key), unicode)
             self.assertEqual(type(val), bytes)
 
-    def test_recursively_convert_to_str_with_list(self):
+    def test_recursively_convert_to_str_with_nested_structure(self):
         test_var_1 = python_utils.UNICODE('test_var_1')
         test_list_1 = [
             test_var_1, test_var_1.encode('utf-8'), 'test_var_2', b'test_var_3',
             {'test_var_4': b'test_var_5'}]
-        test_list_2 = [{test_var_1: test_list_1}]
+        test_dict = {test_var_1: test_list_1}
         self.assertEqual(
-            test_list_2,
-            [{
+            test_dict,
+            {
                 'test_var_1': [
                     'test_var_1', b'test_var_1', 'test_var_2', b'test_var_3',
                     {'test_var_4': b'test_var_5'}]
-                }
-            ])
+            }
+        )
 
-        list_in_str = python_utils._recursively_convert_to_str(test_list_2)  # pylint: disable=protected-access
+        dict_in_str = python_utils._recursively_convert_to_str(test_dict)  # pylint: disable=protected-access
         self.assertEqual(
-            test_list_2,
-            [{
+            dict_in_str,
+            {
                 'test_var_1': [
                     'test_var_1', b'test_var_1', 'test_var_2', 'test_var_3',
                     {'test_var_4': 'test_var_5'}]
-                }
-            ])
+            }
+        )
 
-        for item in list_in_str:
-            self.assertNotEqual(type(item), future.types.newstr)
-            self.assertNotEqual(type(item), future.types.newbytes)
-            self.assertTrue(isinstance(item, dict))
-
-        dict_in_str = list_in_str[-1]
         for key, value in dict_in_str.items():
             self.assertNotEqual(type(key), future.types.newstr)
             self.assertNotEqual(type(key), future.types.newbytes)
