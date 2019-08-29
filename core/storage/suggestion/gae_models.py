@@ -251,6 +251,37 @@ class GeneralSuggestionModel(base_models.BaseModel):
         query_set = cls.query(projection=['score_category'], distinct=True)
         return [data.score_category for data in query_set]
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Exports the data from GeneralSuggestionModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from GeneralSuggestionModel.
+        """
+
+        user_data = dict()
+        suggestion_models = (
+            cls.get_all()
+            .filter(cls.author_id == user_id).fetch())
+
+        for suggestion_model in suggestion_models:
+            user_data[suggestion_model.id] = {
+                'suggestion_type': suggestion_model.suggestion_type,
+                'target_type': suggestion_model.target_type,
+                'target_id': suggestion_model.target_id,
+                'target_version_at_submission': (
+                    suggestion_model
+                    .target_version_at_submission),
+                'status': suggestion_model.status,
+                'change_cmd': suggestion_model.change_cmd,
+            }
+
+        return user_data
+
 
 class ReviewerRotationTrackingModel(base_models.BaseModel):
     """Model to keep track of the position in the reviewer rotation. This model

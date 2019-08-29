@@ -33,10 +33,10 @@ require('services/ComputeGraphService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/StateRulesStatsService.ts');
-require('visualizations/OppiaVisualizationBarChartDirective.ts');
+require('visualizations/oppia-visualization-bar-chart.directive.ts');
 require(
-  'visualizations/OppiaVisualizationEnumeratedFrequencyTableDirective.ts');
-require('visualizations/OppiaVisualizationFrequencyTableDirective.ts');
+  'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
+require('visualizations/oppia-visualization-frequency-table.directive.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
