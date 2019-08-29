@@ -32,6 +32,8 @@ var SubscriptionDashboardPage =
 describe('Creator dashboard functionality', function() {
   var EXPLORATION_TITLE_1 = 'Exploration 1';
   var EXPLORATION_TITLE_2 = 'Exploration 2';
+  var EXPLORATION_TITLE_3 = 'Exploration 3';
+  var EXPLORATION_TITLE_4 = 'Exploration 4';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
@@ -129,51 +131,51 @@ describe('Creator dashboard functionality', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
     users.createUser(
-      'user1@creatorDashboard.com',
-      'creatorDashboardOwner');
+      'user5@creatorDashboard.com',
+      'creatorDashboard');
     users.createUser(
-      'user2@creatorDashboard.com',
-      'learner2');
+      'user6@creatorDashboard.com',
+      'learner6');
     users.createUser(
-      'user3@creatorDashboard.com',
-      'learner3');
+      'user7@creatorDashboard.com',
+      'learner7');
 
-    users.login('user1@creatorDashboard.com');
+    users.login('user5@creatorDashboard.com');
     workflow.createAndPublishExploration(
-      EXPLORATION_TITLE_1,
+      EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
     creatorDashboardPage.get();
 
     workflow.createAndPublishExploration(
-      EXPLORATION_TITLE_2,
+      EXPLORATION_TITLE_4,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
     users.logout();
-    users.login('user2@creatorDashboard.com');
+    users.login('user6@creatorDashboard.com');
     libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_1);
-    libraryPage.playExploration(EXPLORATION_TITLE_1);
+    libraryPage.findExploration(EXPLORATION_TITLE_3);
+    libraryPage.playExploration(EXPLORATION_TITLE_3);
     explorationPlayerPage.rateExploration(3);
     users.logout();
 
-    users.login('user3@creatorDashboard.com');
+    users.login('user7@creatorDashboard.com');
     libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_2);
-    libraryPage.playExploration(EXPLORATION_TITLE_2);
+    libraryPage.findExploration(EXPLORATION_TITLE_4);
+    libraryPage.playExploration(EXPLORATION_TITLE_4);
     explorationPlayerPage.rateExploration(5);
     explorationPlayerPage.submitFeedback(feedback);
     users.logout();
 
-    users.login('user1@creatorDashboard.com');
+    users.login('user5@creatorDashboard.com');
     creatorDashboardPage.get();
     creatorDashboardPage.getExpSummaryTileTitles().
       then(function(titles) {
         expect(titles.length).toEqual(2);
-        expect(titles[0].getText()).toEqual(EXPLORATION_TITLE_2);
-        expect(titles[1].getText()).toEqual(EXPLORATION_TITLE_1);
+        expect(titles[0].getText()).toEqual(EXPLORATION_TITLE_4);
+        expect(titles[1].getText()).toEqual(EXPLORATION_TITLE_3);
       });
     creatorDashboardPage.getExpSummaryTileRatings().
       then(function(ratings) {
@@ -199,8 +201,8 @@ describe('Creator dashboard functionality', function() {
     creatorDashboardPage.getExpSummaryRowTitles().
       then(function(titles) {
         expect(titles.length).toEqual(2);
-        expect(titles[0].getText()).toEqual(EXPLORATION_TITLE_2);
-        expect(titles[1].getText()).toEqual(EXPLORATION_TITLE_1);
+        expect(titles[0].getText()).toEqual(EXPLORATION_TITLE_4);
+        expect(titles[1].getText()).toEqual(EXPLORATION_TITLE_3);
       });
     creatorDashboardPage.getExpSummaryRowRatings().
       then(function(ratings) {
