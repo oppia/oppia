@@ -15,6 +15,7 @@
 /**
  * @fileoverview Controller for the supplemental card.
  */
+require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(

@@ -15,6 +15,10 @@
 # limitations under the License.
 
 """Unit tests for core.domain.opportunity_services."""
+<<<<<<< HEAD
+=======
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+>>>>>>> upstream/develop
 
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -24,6 +28,10 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.tests import test_utils
+<<<<<<< HEAD
+=======
+import python_utils
+>>>>>>> upstream/develop
 
 
 class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
@@ -40,7 +48,11 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i,
+<<<<<<< HEAD
         ) for i in xrange(5)]
+=======
+        ) for i in python_utils.RANGE(5)]
+>>>>>>> upstream/develop
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain object for contribution opportunities."""
+<<<<<<< HEAD
 
 from constants import constants
 import utils
@@ -25,6 +26,19 @@ class ExplorationOpportunitySummary(object):
     available in an exploration.
     """
 
+=======
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
+from constants import constants
+import python_utils
+import utils
+
+
+class ExplorationOpportunitySummary(python_utils.OBJECT):
+    """The domain object for the translation and voiceover opportunities summary
+    available in an exploration.
+    """
+>>>>>>> upstream/develop
     def __init__(
             self, exp_id, topic_id, topic_name, story_id, story_title,
             chapter_title, content_count, incomplete_translation_language_codes,
@@ -36,7 +50,11 @@ class ExplorationOpportunitySummary(object):
             exp_id: str. The unique id of the exploration.
             topic_id: str. The unique id of the topic.
             topic_name: str. The name of the topic.
+<<<<<<< HEAD
             story_id: str. The unique id of the story.
+=======
+            story_id: str. The uniques id of the story.
+>>>>>>> upstream/develop
             story_title: str. The title of the story.
             chapter_title: str. The title of the story chapter.
             content_count: int. The total number of content available in the
@@ -122,6 +140,7 @@ class ExplorationOpportunitySummary(object):
         Raises:
             ValidationError: One or more attributes of the object are invalid.
         """
+<<<<<<< HEAD
         if not isinstance(self.topic_id, basestring):
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' % self.topic_id)
@@ -137,6 +156,23 @@ class ExplorationOpportunitySummary(object):
                 'Expected story_title to be a string, received %s' %
                 self.story_title)
         if not isinstance(self.chapter_title, basestring):
+=======
+        if not isinstance(self.topic_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected topic_id to be a string, received %s' % self.topic_id)
+        if not isinstance(self.topic_name, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected topic_name to be a string, received %s' %
+                self.topic_name)
+        if not isinstance(self.story_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected story_id to be a string, received %s' % self.story_id)
+        if not isinstance(self.story_title, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected story_title to be a string, received %s' %
+                self.story_title)
+        if not isinstance(self.chapter_title, python_utils.BASESTRING):
+>>>>>>> upstream/develop
             raise utils.ValidationError(
                 'Expected chapter_title to be a string, received %s' %
                 self.chapter_title)
@@ -161,7 +197,11 @@ class ExplorationOpportunitySummary(object):
                     self.need_voice_artist_in_language_codes,
                     self.assigned_voice_artist_in_language_codes))
         for language_code, count in (
+<<<<<<< HEAD
                 self.translation_counts.iteritems()):
+=======
+                self.translation_counts.items()):
+>>>>>>> upstream/develop
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
                     'Invalid language_code: %s' % language_code)
@@ -196,6 +236,7 @@ class ExplorationOpportunitySummary(object):
                 'incomplete_translation, needs_voiceover and assigned_voiceover'
                 ' to be the same as the supported audio languages, '
                 'received %s' % list(expected_set_of_all_languages))
+<<<<<<< HEAD
 
 
 class SkillOpportunity(object):
@@ -290,3 +331,5 @@ class SkillOpportunity(object):
             'skill_description': self.skill_description,
             'question_count': self.question_count
         }
+=======
+>>>>>>> upstream/develop

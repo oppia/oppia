@@ -15,6 +15,10 @@
 # limitations under the License.
 
 """Models for Oppia users."""
+<<<<<<< HEAD
+=======
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+>>>>>>> upstream/develop
 
 from core.platform import models
 
@@ -129,6 +133,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             ExplorationOpportunitySummaryModel having given topic_id.
         """
         return cls.query(cls.topic_id == topic_id).fetch()
+<<<<<<< HEAD
 
 
 class SkillOpportunityModel(base_models.BaseModel):
@@ -190,3 +195,5 @@ class SkillOpportunityModel(base_models.BaseModel):
             skill_id.
         """
         return cls.query(cls.skill_id == skill_id).get()
+=======
+>>>>>>> upstream/develop

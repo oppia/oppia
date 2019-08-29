@@ -26,6 +26,8 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -61,6 +63,9 @@ describe('States object factory', function() {
     $provide.value(
       'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value(
+      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+        new ParamChangeObjectFactory()));
+    $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
@@ -82,14 +87,8 @@ describe('States object factory', function() {
   describe('StatesObjectFactory', function() {
     var scope, sof, ssof, statesDict, statesWithAudioDict, vof;
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ssof = $injector.get('StatesObjectFactory');
-      sof = $injector.get('StateObjectFactory');
-      vof = $injector.get('VoiceoverObjectFactory');
-
-      oldValueForNewStateTemplate = constants.NEW_STATE_TEMPLATE;
-
-      constants.NEW_STATE_TEMPLATE = {
+    beforeEach(angular.mock.module(function($provide) {
+      $provide.constant('NEW_STATE_TEMPLATE', {
         classifier_model_id: null,
         content: {
           content_id: 'content',
@@ -134,8 +133,14 @@ describe('States object factory', function() {
             content: {},
             default_outcome: {}
           }
-        },
-      };
+        }
+      });
+    }));
+
+    beforeEach(angular.mock.inject(function($injector) {
+      ssof = $injector.get('StatesObjectFactory');
+      sof = $injector.get('StateObjectFactory');
+      vof = $injector.get('VoiceoverObjectFactory');
 
       statesDict = {
         'first state': {
@@ -367,10 +372,6 @@ describe('States object factory', function() {
           }
         }
       };
-    }));
-
-    afterEach(inject(function() {
-      constants.NEW_STATE_TEMPLATE = oldValueForNewStateTemplate;
     }));
 
     it('should create a new state given a state name', function() {

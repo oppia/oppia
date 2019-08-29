@@ -16,8 +16,13 @@
  * @fileoverview Directive for the audio translation bar.
  */
 
+require(
+  'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
 require('filters/format-timer.filter.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
@@ -48,8 +53,11 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('audioTranslationBar', [
-  'UrlInterpolationService', 'UserService',
-  function(UrlInterpolationService, UserService) {
+  'UrlInterpolationService', 'UserExplorationPermissionsService',
+  'UserService',
+  function(
+      UrlInterpolationService, UserExplorationPermissionsService,
+      UserService) {
     return {
       restrict: 'E',
       scope: {
@@ -61,13 +69,15 @@ angular.module('oppia').directive('audioTranslationBar', [
         var userIsLoggedIn;
         UserService.getUserInfoAsync().then(function(userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
-        });
-        $('.oppia-translation-tab').on('dragover', function(evt) {
-          evt.preventDefault();
-          scope.dropAreaIsAccessible = GLOBALS.can_voiceover;
-          scope.userIsGuest = !userIsLoggedIn;
-          scope.$digest();
-          return false;
+          return UserExplorationPermissionsService.getPermissionsAsync();
+        }).then(function(permissions) {
+          $('.oppia-translation-tab').on('dragover', function(evt) {
+            evt.preventDefault();
+            scope.dropAreaIsAccessible = permissions.can_voiceover;
+            scope.userIsGuest = !userIsLoggedIn;
+            scope.$digest();
+            return false;
+          });
         });
 
         $('.oppia-main-body').on('dragleave', function(evt) {

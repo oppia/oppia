@@ -29,6 +29,8 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
+const constants = require('constants.ts');
+
 describe('Constants Generating', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {

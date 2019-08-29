@@ -16,6 +16,9 @@
  * @fileoverview Directive for a schema-based editor for integers.
  */
 
+require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 
 angular.module('oppia').directive('schemaBasedIntEditor', [
