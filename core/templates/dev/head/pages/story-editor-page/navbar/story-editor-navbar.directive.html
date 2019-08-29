@@ -1,8 +1,8 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak">
+<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
-      <button class="btn btn-default oppia-save-draft-button protractor-test-save-story-button"
-              ng-class="{'btn-success': isStorySaveable(), 'save-draft-button-padding': getChangeListLength()}"
+      <button class="btn btn-light oppia-save-changes-button protractor-test-save-story-button"
+              ng-class="{'btn-success': isStorySaveable()}"
               ng-click="saveChanges()"
               style="float: left;"
               ng-disabled="!isStorySaveable()">
@@ -11,8 +11,8 @@
              alt="Save Story">
             &#xE161;
           </i>
-          <span class="oppia-save-publish-button-label">Save Changes</span>
-          <span class="hidden-sm hidden-xs" style="opacity: 0.5"
+          <span class="oppia-save-publish-button-label float-left">Save Changes</span>
+          <span class="d-none d-md-block float-left" style="opacity: 0.5;margin-left: 2px;"
                 ng-if="getChangeListLength() > 0">
             (<[getChangeListLength()]>)
           </span>
@@ -23,18 +23,17 @@
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-default uib-dropdown-toggle"
+      <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle dropdown-toggle"
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
-        <span class="caret"></span>
       </button>
       <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}">Discard Draft</a></li>
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item">Discard Draft</a></li>
       </ul>
     </div>
   </li>
   <li style="margin-right: 20px; margin-top: 8px;">
     <button type="button" ng-if="!isStoryPublished()"
-            class="btn btn-default oppia-editor-publish-button protractor-test-publish-story-button"
+            class="btn btn-secondary oppia-editor-publish-button protractor-test-publish-story-button"
             ng-click="publishStory()"
             ng-class="{'btn-success': !isStorySaveable()}"
             ng-disabled="isStorySaveable() || getWarningsCount() > 0">
@@ -46,13 +45,14 @@
     </button>
     <button type="button" ng-click="unpublishStory()"
             ng-if="isStoryPublished()"
-            class="btn btn-default protractor-test-unpublish-story-button"
+            class="btn btn-secondary protractor-test-unpublish-story-button"
             ng-disabled="isStorySaveable()">
       Unpublish Story
     </button>
   </li>
-  <li style="margin-right: 20px; margin-left: 10px;" ng-class="{'active': true, 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>">
-    <a uib-tooltip="Editor" class="protractor-test-main-tab">
+  <li ng-class="{'active': true, 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>"
+      class="nav-item">
+    <a uib-tooltip="Editor" class="nav-link protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
     <div ng-show="getWarningsCount()"
@@ -71,8 +71,3 @@
     </ul>
   </li>
 </ul>
-<style>
-  story-editor-navbar .save-draft-button-padding {
-    padding-right: 120px;
-  }
-</style>

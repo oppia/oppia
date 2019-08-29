@@ -1,6 +1,6 @@
-<div ng-if="$ctrl.isHintButtonVisible(0) && $ctrl.currentlyOnLatestCard" class="oppia-hint-and-solution-buttons pull-left">
-  <span class="pull-left footer-hints-label">HINTS</span>
-  <ul class="list-inline pull-right">
+<div ng-if="$ctrl.isHintButtonVisible(0) && $ctrl.currentlyOnLatestCard" class="oppia-hint-and-solution-buttons float-left">
+  <span class="float-left footer-hints-label">HINTS</span>
+  <ul class="list-inline float-right">
     <li ng-repeat="hintIndex in $ctrl.hintIndexes track by $index">
       <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-hint"
               popover-trigger="'none'"
@@ -39,6 +39,10 @@
 
   .oppia-hint-and-solution-buttons .popover-content {
     color: #000000;
+  }
+
+  .oppia-hint-and-solution-buttons .list-inline > li {
+    float: left;
   }
 
   .oppia-hint-and-solution-buttons .uib-position-measure {

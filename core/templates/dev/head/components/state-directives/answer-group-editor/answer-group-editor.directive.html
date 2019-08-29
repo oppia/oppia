@@ -54,6 +54,9 @@
     width: 100%;
     margin-top: 4%;
   }
+  outcome-feedback-editor {
+    min-width: 619px;
+  }
 </style>
 
 <div style="height: 100%;">
@@ -93,12 +96,12 @@
       </li>
     </ul>
 
-    <button type="button" ng-if="$ctrl.isEditable" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="$ctrl.addNewRule()">
+    <button type="button" ng-if="$ctrl.isEditable" class="btn btn-secondary btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="$ctrl.addNewRule()">
       + Add Another Possible Answer
     </button>
 
     <div ng-if="$ctrl.isEditable && $ctrl.isCurrentInteractionTrainable() && $ctrl.isMLEnabled() && !$ctrl.isInQuestionMode()">
-      <button type="button" class="btn btn-default btn-lg oppia-modify-training-data-button" ng-click="$ctrl.openTrainingDataEditor()">
+      <button type="button" class="btn btn-secondary btn-lg oppia-modify-training-data-button" ng-click="$ctrl.openTrainingDataEditor()">
         <i class="material-icons md-24">playlist_add</i> Modify Training Data
       </button>
     </div>
@@ -123,7 +126,7 @@
   </div>
   <button type="button"
           ng-if="$ctrl.isEditable && $ctrl.isInQuestionMode() && $ctrl.rules && !$ctrl.outcome.labelledAsCorrect && $ctrl.containsMisconceptions()"
-          class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer"
+          class="btn btn-secondary btn-lg oppia-add-rule-button protractor-test-add-answer"
           style="padding-top: 5px;"
           ng-click="$ctrl.tagAnswerGroupWithMisconception()">
     Tag with misconception

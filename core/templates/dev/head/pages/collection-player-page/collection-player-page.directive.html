@@ -9,7 +9,7 @@
       <span>You have finished the collection! Feel free to replay any explorations below.</span>
     </h2>
 
-    <div ng-if="$ctrl.collection" class="oppia-collection-path-section hidden-sm hidden-xs">
+    <div ng-if="$ctrl.collection" class="oppia-collection-path-section d-none d-md-block">
       <svg width="540px" ng-attr-height="<[$ctrl.svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
         <path fill="none"
               stroke="#296E5F"
@@ -114,7 +114,7 @@
       </a>
     </div>
 
-    <div ng-if="$ctrl.collection" class="oppia-collection-table hidden-md hidden-lg hidden-xl">
+    <div ng-if="$ctrl.collection" class="oppia-collection-table d-none d-md-none d-lg-none d-xl-none">
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
       <div class="mobile-path-segment" ng-repeat="node in $ctrl.collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
         <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;text-align: center">
@@ -224,7 +224,7 @@
       </div>
     </div>
 
-    <div ng-if="$ctrl.collection && $ctrl.collectionSummary" class="oppia-card-preview-panel hidden-sm hidden-xs">
+    <div ng-if="$ctrl.collection && $ctrl.collectionSummary" class="oppia-card-preview-panel d-none d-md-block">
       <md-card class="oppia-activity-summary-tile md-default-theme">
         <div class="title-section" style="background-color: <[$ctrl.collectionSummary.thumbnail_bg_color]>; z-index: 1;">
           <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.collectionSummary.thumbnail_icon_url)]>" class="thumbnail-image">

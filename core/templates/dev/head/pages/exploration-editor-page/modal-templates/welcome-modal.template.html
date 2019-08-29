@@ -1,4 +1,4 @@
-<div class="modal-body oppia-long-text protractor-test-welcome-modal">
+<div class="modal-body oppia-welcome-modal-container oppia-long-text protractor-test-welcome-modal">
   <div class="row">
     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
       <h1 class="oppia-welcome-modal-h1">Welcome!</h1>
@@ -55,7 +55,7 @@
     font-size: 14px;
     margin-top: 10px;
     text-transform: uppercase;
-    width: 250px;
+    width: 260px;
   }
   .oppia-welcome-modal .oppia-welcome-modal-button:hover,
   .oppia-welcome-modal .oppia-welcome-modal-button:focus,
@@ -89,4 +89,10 @@
       width: 95%;
     }
   }
+  @media (min-width: 576px) {
+    .oppia-welcome-modal .modal-dialog {
+     max-width: 900px;
+     margin: 1.75rem auto;
+   }
+}
 </style>

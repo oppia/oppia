@@ -4,7 +4,7 @@
       <rule-type-selector class="protractor-test-answer-description" local-value="<[$ctrl.rule.type]>" on-selection-change="$ctrl.onSelectNewRuleType">
       </rule-type-selector>
 
-      <span ng-repeat="item in $ctrl.ruleDescriptionFragments track by $index" class="form-group protractor-test-answer-description-fragment" style="margin-right: 5px; width: 100%;">
+      <span ng-repeat="item in $ctrl.ruleDescriptionFragments track by $index" class="form-group oppia-rule-editor-span protractor-test-answer-description-fragment">
         <span ng-if="item.type == 'select'" style="color: black;">
           <span ng-if="$ctrl.ruleDescriptionChoices.length === 1">
             "<[$ctrl.ruleDescriptionChoices[0].val|convertToPlainText|truncate]>"
@@ -43,7 +43,7 @@
   </form>
 
   <div class="oppia-rule-save-cancel-buttons" ng-if="$ctrl.isEditingRuleInline()">
-    <div class="pull-right">
+    <div class="float-right">
       <button type="button" class="btn btn-default" ng-click="$ctrl.cancelThisEdit()">Cancel</button>
       <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="$ctrl.ruleEditForm.form.$invalid" ng-click="$ctrl.saveThisRule()">Save Answer</button>
     </div>
@@ -51,3 +51,10 @@
     <div style="clear: both;"></div>
   </div>
 </div>
+<style>
+  .form-group.oppia-rule-editor-span {
+    display: inline-block;
+    margin-right: 5px;
+    width: 100%;
+  }
+</style>

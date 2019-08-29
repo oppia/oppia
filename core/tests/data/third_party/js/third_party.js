@@ -13961,7 +13961,7 @@ if (typeof jQuery === 'undefined') {
     if (this.transitioning || this.$element.hasClass('in')) return
 
     var activesData
-    var actives = this.$parent && this.$parent.children('.panel').children('.in, .collapsing')
+    var actives = this.$parent && this.$parent.children('.card').children('.in, .collapsing')
 
     if (actives && actives.length) {
       activesData = actives.data('bs.collapse')
@@ -15719,7 +15719,7 @@ if (typeof jQuery === 'undefined') {
 (function(){
 "use strict";
 
-angular.module('ngMaterial', ["ng","ngAnimate","ngAria","material.core","material.core.animate","material.core.gestures","material.core.interaction","material.core.layout","material.core.meta","material.core.theming.palette","material.core.theming","material.components.autocomplete","material.components.backdrop","material.components.bottomSheet","material.components.button","material.components.card","material.components.checkbox","material.components.chips","material.components.colors","material.components.content","material.components.datepicker","material.components.dialog","material.components.divider","material.components.fabActions","material.components.fabShared","material.components.fabSpeedDial","material.components.fabToolbar","material.components.gridList","material.components.icon","material.components.input","material.components.list","material.components.menu","material.components.menuBar","material.components.navBar","material.components.panel","material.components.progressCircular","material.components.progressLinear","material.components.radioButton","material.components.select","material.components.showHide","material.components.sidenav","material.components.slider","material.components.sticky","material.components.subheader","material.components.swipe","material.components.switch","material.components.tabs","material.components.toast","material.components.toolbar","material.components.tooltip","material.components.truncate","material.components.virtualRepeat","material.components.whiteframe"]);
+angular.module('ngMaterial', ["ng","ngAnimate","ngAria","material.core","material.core.animate","material.core.gestures","material.core.interaction","material.core.layout","material.core.meta","material.core.theming.palette","material.core.theming","material.components.autocomplete","material.components.backdrop","material.components.bottomSheet","material.components.button","material.components.card","material.components.checkbox","material.components.chips","material.components.colors","material.components.content","material.components.datepicker","material.components.dialog","material.components.divider","material.components.fabActions","material.components.fabShared","material.components.fabSpeedDial","material.components.fabToolbar","material.components.gridList","material.components.icon","material.components.input","material.components.list","material.components.menu","material.components.menuBar","material.components.navBar","material.components.card","material.components.progressCircular","material.components.progressLinear","material.components.radioButton","material.components.select","material.components.showHide","material.components.sidenav","material.components.slider","material.components.sticky","material.components.subheader","material.components.swipe","material.components.switch","material.components.tabs","material.components.toast","material.components.toolbar","material.components.tooltip","material.components.truncate","material.components.virtualRepeat","material.components.whiteframe"]);
 })();
 (function(){
 "use strict";
@@ -41401,11 +41401,11 @@ MdNavItemController.prototype._isEnabled = function() {
 
 /**
  * @ngdoc module
- * @name material.components.panel
+ * @name material.components.card
  */
 MdPanelService.$inject = ["presets", "$rootElement", "$rootScope", "$injector", "$window"];
 angular
-  .module('material.components.panel', [
+  .module('material.components.card', [
     'material.core',
     'material.components.backdrop'
   ])
@@ -41420,7 +41420,7 @@ angular
 /**
  * @ngdoc service
  * @name $mdPanelProvider
- * @module material.components.panel
+ * @module material.components.card
  *
  * @description
  * `$mdPanelProvider` allows users to create configuration presets that will be
@@ -41549,7 +41549,7 @@ angular
 /**
  * @ngdoc service
  * @name $mdPanel
- * @module material.components.panel
+ * @module material.components.card
  *
  * @description
  * `$mdPanel` is a robust, low-level service for creating floating panels on
@@ -41790,7 +41790,7 @@ angular
 /**
  * @ngdoc type
  * @name MdPanelRef
- * @module material.components.panel
+ * @module material.components.card
  * @description
  * A reference to a created panel. This reference contains a unique id for the
  * panel, along with the following properties:
@@ -42013,7 +42013,7 @@ angular
 /**
  * @ngdoc type
  * @name MdPanelPosition
- * @module material.components.panel
+ * @module material.components.card
  * @description
  *
  * Object for configuring the position of the panel.
@@ -42250,7 +42250,7 @@ angular
 /**
  * @ngdoc type
  * @name MdPanelAnimation
- * @module material.components.panel
+ * @module material.components.card
  * @description
  * Animation configuration object. To use, create an MdPanelAnimation with the
  * desired properties, then pass the object as part of $mdPanel creation.
@@ -42804,10 +42804,10 @@ function MdPanelRef(config, $injector) {
   this.config = config;
 
   /** @type {!angular.JQLite|undefined} */
-  this.panelContainer;
+  this.cardContainer;
 
   /** @type {!angular.JQLite|undefined} */
-  this.panelEl;
+  this.cardEl;
 
   /**
    * Whether the panel is attached. This is synchronous. When attach is called,
@@ -42925,7 +42925,7 @@ MdPanelRef.prototype.close = function(closeReason) {
  *     the panel is attached.
  */
 MdPanelRef.prototype.attach = function() {
-  if (this.isAttached && this.panelEl) {
+  if (this.isAttached && this.cardEl) {
     return this._$q.when(this);
   }
 
@@ -42978,14 +42978,14 @@ MdPanelRef.prototype.detach = function() {
     }
 
     if (self._restoreCache.classes) {
-      self.panelEl[0].className = self._restoreCache.classes;
+      self.cardEl[0].className = self._restoreCache.classes;
     }
 
     // Either restore the saved styles or clear the ones set by mdPanel.
-    self.panelEl[0].style.cssText = self._restoreCache.styles || '';
+    self.cardEl[0].style.cssText = self._restoreCache.styles || '';
 
     self._compilerCleanup();
-    self.panelContainer.remove();
+    self.cardContainer.remove();
     self.isAttached = false;
     return self._$q.when(self);
   };
@@ -43034,19 +43034,19 @@ MdPanelRef.prototype.destroy = function() {
  *     the panel has shown and animations finish.
  */
 MdPanelRef.prototype.show = function() {
-  if (!this.panelContainer) {
+  if (!this.cardContainer) {
     return this._$q(function(resolve, reject) {
       reject('mdPanel: Panel does not exist yet. Call open() or attach().');
     });
   }
 
-  if (!this.panelContainer.hasClass(MD_PANEL_HIDDEN)) {
+  if (!this.cardContainer.hasClass(MD_PANEL_HIDDEN)) {
     return this._$q.when(this);
   }
 
   var self = this;
   var animatePromise = function() {
-    self.panelContainer.removeClass(MD_PANEL_HIDDEN);
+    self.cardContainer.removeClass(MD_PANEL_HIDDEN);
     return self._animateOpen();
   };
 
@@ -43078,13 +43078,13 @@ MdPanelRef.prototype.show = function() {
  *     the panel has hidden and animations finish.
  */
 MdPanelRef.prototype.hide = function() {
-  if (!this.panelContainer) {
+  if (!this.cardContainer) {
     return this._$q(function(resolve, reject) {
       reject('mdPanel: Panel does not exist yet. Call open() or attach().');
     });
   }
 
-  if (this.panelContainer.hasClass(MD_PANEL_HIDDEN)) {
+  if (this.cardContainer.hasClass(MD_PANEL_HIDDEN)) {
     return this._$q.when(this);
   }
 
@@ -43094,7 +43094,7 @@ MdPanelRef.prototype.hide = function() {
     var done = self._done(resolve, self);
     var onRemoving = self.config['onRemoving'] || angular.noop;
     var hidePanel = function() {
-      self.panelContainer.addClass(MD_PANEL_HIDDEN);
+      self.cardContainer.addClass(MD_PANEL_HIDDEN);
     };
     var removeFromGroupOpen = function() {
       if (self.config.groupName) {
@@ -43146,15 +43146,15 @@ MdPanelRef.prototype.addClass = function(newClass, toElement) {
       'To achieve the same results, use the panelContainer or panelEl ' +
       'JQLite elements that are referenced in MdPanelRef.');
 
-  if (!this.panelContainer) {
+  if (!this.cardContainer) {
     throw new Error(
         'mdPanel: Panel does not exist yet. Call open() or attach().');
   }
 
-  if (!toElement && !this.panelContainer.hasClass(newClass)) {
-    this.panelContainer.addClass(newClass);
-  } else if (toElement && !this.panelEl.hasClass(newClass)) {
-    this.panelEl.addClass(newClass);
+  if (!toElement && !this.cardContainer.hasClass(newClass)) {
+    this.cardContainer.addClass(newClass);
+  } else if (toElement && !this.cardEl.hasClass(newClass)) {
+    this.cardEl.addClass(newClass);
   }
 };
 
@@ -43177,15 +43177,15 @@ MdPanelRef.prototype.removeClass = function(oldClass, fromElement) {
       'To achieve the same results, use the panelContainer or panelEl ' +
       'JQLite elements that are referenced in MdPanelRef.');
 
-  if (!this.panelContainer) {
+  if (!this.cardContainer) {
     throw new Error(
         'mdPanel: Panel does not exist yet. Call open() or attach().');
   }
 
-  if (!fromElement && this.panelContainer.hasClass(oldClass)) {
-    this.panelContainer.removeClass(oldClass);
-  } else if (fromElement && this.panelEl.hasClass(oldClass)) {
-    this.panelEl.removeClass(oldClass);
+  if (!fromElement && this.cardContainer.hasClass(oldClass)) {
+    this.cardContainer.removeClass(oldClass);
+  } else if (fromElement && this.cardEl.hasClass(oldClass)) {
+    this.cardEl.removeClass(oldClass);
   }
 };
 
@@ -43208,15 +43208,15 @@ MdPanelRef.prototype.toggleClass = function(toggleClass, onElement) {
       'To achieve the same results, use the panelContainer or panelEl ' +
       'JQLite elements that are referenced in MdPanelRef.');
 
-  if (!this.panelContainer) {
+  if (!this.cardContainer) {
     throw new Error(
         'mdPanel: Panel does not exist yet. Call open() or attach().');
   }
 
   if (!onElement) {
-    this.panelContainer.toggleClass(toggleClass);
+    this.cardContainer.toggleClass(toggleClass);
   } else {
-    this.panelEl.toggleClass(toggleClass);
+    this.cardEl.toggleClass(toggleClass);
   }
 };
 
@@ -43246,12 +43246,12 @@ MdPanelRef.prototype._compile = function() {
       self._restoreCache.styles = panelEl[0].style.cssText;
       self._restoreCache.classes = panelEl[0].className;
 
-      self.panelContainer = self._$mdPanel._wrapContentElement(panelEl);
-      self.panelEl = panelEl;
+      self.cardContainer = self._$mdPanel._wrapContentElement(panelEl);
+      self.cardEl = panelEl;
     } else {
-      self.panelContainer = compileData.link(config['scope']);
-      self.panelEl = angular.element(
-        self.panelContainer[0].querySelector('.md-panel')
+      self.cardContainer = compileData.link(config['scope']);
+      self.cardEl = angular.element(
+        self.cardContainer[0].querySelector('.md-panel')
       );
     }
 
@@ -43259,7 +43259,7 @@ MdPanelRef.prototype._compile = function() {
     self._compilerCleanup = compileData.cleanup;
 
     // Attach the panel to the proper place in the DOM.
-    getElement(self.config['attachTo']).append(self.panelContainer);
+    getElement(self.config['attachTo']).append(self.cardContainer);
 
     return self;
   });
@@ -43286,27 +43286,27 @@ MdPanelRef.prototype._createPanel = function() {
       if (self.config['disableParentScroll']) {
         self._restoreScroll = self._$mdUtil.disableScrollAround(
           null,
-          self.panelContainer,
+          self.cardContainer,
           { disableScrollMask: true }
         );
       }
 
       // Add a custom CSS class to the panel element.
       if (self.config['panelClass']) {
-        self.panelEl.addClass(self.config['panelClass']);
+        self.cardEl.addClass(self.config['panelClass']);
       }
 
       // Handle click and touch events for the panel container.
       if (self.config['propagateContainerEvents']) {
-        self.panelContainer.css('pointer-events', 'none');
-        self.panelEl.css('pointer-events', 'all');
+        self.cardContainer.css('pointer-events', 'none');
+        self.cardEl.css('pointer-events', 'all');
       }
 
       // Panel may be outside the $rootElement, tell ngAnimate to animate
       // regardless.
       if (self._$animate.pin) {
         self._$animate.pin(
-          self.panelContainer,
+          self.cardContainer,
           getElement(self.config['attachTo'])
         );
       }
@@ -43330,22 +43330,22 @@ MdPanelRef.prototype._createPanel = function() {
 MdPanelRef.prototype._addStyles = function() {
   var self = this;
   return this._$q(function(resolve) {
-    self.panelContainer.css('z-index', self.config['zIndex']);
-    self.panelEl.css('z-index', self.config['zIndex'] + 1);
+    self.cardContainer.css('z-index', self.config['zIndex']);
+    self.cardEl.css('z-index', self.config['zIndex'] + 1);
 
     var hideAndResolve = function() {
       // Theme the element and container.
       self._setTheming();
 
       // Remove offscreen class and add hidden class.
-      self.panelEl.removeClass('_md-panel-offscreen');
-      self.panelContainer.addClass(MD_PANEL_HIDDEN);
+      self.cardEl.removeClass('_md-panel-offscreen');
+      self.cardContainer.addClass(MD_PANEL_HIDDEN);
 
       resolve(self);
     };
 
     if (self.config['fullscreen']) {
-      self.panelEl.addClass('_md-panel-fullscreen');
+      self.cardEl.addClass('_md-panel-fullscreen');
       hideAndResolve();
       return; // Don't setup positioning.
     }
@@ -43376,8 +43376,8 @@ MdPanelRef.prototype._addStyles = function() {
  * @private
  */
 MdPanelRef.prototype._setTheming = function() {
-  this._$mdTheming(this.panelEl);
-  this._$mdTheming(this.panelContainer);
+  this._$mdTheming(this.cardEl);
+  this._$mdTheming(this.cardContainer);
 };
 
 
@@ -43386,7 +43386,7 @@ MdPanelRef.prototype._setTheming = function() {
  * @param {!MdPanelPosition} position
  */
 MdPanelRef.prototype.updatePosition = function(position) {
-  if (!this.panelContainer) {
+  if (!this.cardContainer) {
     throw new Error(
         'mdPanel: Panel does not exist yet. Call open() or attach().');
   }
@@ -43405,27 +43405,27 @@ MdPanelRef.prototype._updatePosition = function(init) {
   var positionConfig = this.config['position'];
 
   if (positionConfig) {
-    positionConfig._setPanelPosition(this.panelEl);
+    positionConfig._setPanelPosition(this.cardEl);
 
     // Hide the panel now that position is known.
     if (init) {
-      this.panelEl.removeClass('_md-panel-offscreen');
-      this.panelContainer.addClass(MD_PANEL_HIDDEN);
+      this.cardEl.removeClass('_md-panel-offscreen');
+      this.cardContainer.addClass(MD_PANEL_HIDDEN);
     }
 
-    this.panelEl.css(
+    this.cardEl.css(
       MdPanelPosition.absPosition.TOP,
       positionConfig.getTop()
     );
-    this.panelEl.css(
+    this.cardEl.css(
       MdPanelPosition.absPosition.BOTTOM,
       positionConfig.getBottom()
     );
-    this.panelEl.css(
+    this.cardEl.css(
       MdPanelPosition.absPosition.LEFT,
       positionConfig.getLeft()
     );
-    this.panelEl.css(
+    this.cardEl.css(
       MdPanelPosition.absPosition.RIGHT,
       positionConfig.getRight()
     );
@@ -43444,8 +43444,8 @@ MdPanelRef.prototype._focusOnOpen = function() {
     // isn't available to focus.
     var self = this;
     this._$rootScope['$$postDigest'](function() {
-      var target = self._$mdUtil.findFocusTarget(self.panelEl) ||
-          self.panelEl;
+      var target = self._$mdUtil.findFocusTarget(self.cardEl) ||
+          self.cardEl;
       target.focus();
     });
   }
@@ -43531,12 +43531,12 @@ MdPanelRef.prototype._configureEscapeToClose = function() {
     };
 
     // Add keydown listeners
-    this.panelContainer.on('keydown', keyHandlerFn);
+    this.cardContainer.on('keydown', keyHandlerFn);
     parentTarget.on('keydown', keyHandlerFn);
 
     // Queue remove listeners function
     this._removeListeners.push(function() {
-      self.panelContainer.off('keydown', keyHandlerFn);
+      self.cardContainer.off('keydown', keyHandlerFn);
       parentTarget.off('keydown', keyHandlerFn);
     });
   }
@@ -43551,7 +43551,7 @@ MdPanelRef.prototype._configureClickOutsideToClose = function() {
   if (this.config['clickOutsideToClose']) {
     var target = this.config['propagateContainerEvents'] ?
         angular.element(document.body) :
-        this.panelContainer;
+        this.cardContainer;
     var sourceEl;
 
     // Keep track of the element on which the mouse originally went down
@@ -43571,7 +43571,7 @@ MdPanelRef.prototype._configureClickOutsideToClose = function() {
 
         // We check if the sourceEl of the event is the panel element or one
         // of it's children. If it is not, then close the panel.
-        if (sourceEl !== self.panelEl[0] && !self.panelEl[0].contains(sourceEl)) {
+        if (sourceEl !== self.cardEl[0] && !self.cardEl[0].contains(sourceEl)) {
           self.close();
         }
 
@@ -43629,9 +43629,9 @@ MdPanelRef.prototype._configureScrollListener = function() {
  */
 MdPanelRef.prototype._configureTrapFocus = function() {
   // Focus doesn't remain inside of the panel without this.
-  this.panelEl.attr('tabIndex', '-1');
+  this.cardEl.attr('tabIndex', '-1');
   if (this.config['trapFocus']) {
-    var element = this.panelEl;
+    var element = this.cardEl;
     // Set up elements before and after the panel to capture focus and
     // redirect back into the panel.
     this._topFocusTrap = FOCUS_TRAP_TEMPLATE.clone()[0];
@@ -43680,11 +43680,11 @@ MdPanelRef.prototype.updateAnimation = function(animation) {
  * @private
  */
 MdPanelRef.prototype._animateOpen = function() {
-  this.panelContainer.addClass('md-panel-is-showing');
+  this.cardContainer.addClass('md-panel-is-showing');
   var animationConfig = this.config['animation'];
   if (!animationConfig) {
     // Promise is in progress, return it.
-    this.panelContainer.addClass('_md-panel-shown');
+    this.cardContainer.addClass('_md-panel-shown');
     return this._$q.when(this);
   }
 
@@ -43698,7 +43698,7 @@ MdPanelRef.prototype._animateOpen = function() {
       done();
     };
 
-    animationConfig.animateOpen(self.panelEl)
+    animationConfig.animateOpen(self.cardEl)
         .then(done, warnAndOpen);
   });
 };
@@ -43713,15 +43713,15 @@ MdPanelRef.prototype._animateOpen = function() {
 MdPanelRef.prototype._animateClose = function() {
   var animationConfig = this.config['animation'];
   if (!animationConfig) {
-    this.panelContainer.removeClass('md-panel-is-showing');
-    this.panelContainer.removeClass('_md-panel-shown');
+    this.cardContainer.removeClass('md-panel-is-showing');
+    this.cardContainer.removeClass('_md-panel-shown');
     return this._$q.when(this);
   }
 
   var self = this;
   return this._$q(function(resolve) {
     var done = function() {
-      self.panelContainer.removeClass('md-panel-is-showing');
+      self.cardContainer.removeClass('md-panel-is-showing');
       resolve(self);
     };
     var warnAndClose = function() {
@@ -43731,7 +43731,7 @@ MdPanelRef.prototype._animateClose = function() {
       done();
     };
 
-    animationConfig.animateClose(self.panelEl)
+    animationConfig.animateClose(self.cardEl)
         .then(done, warnAndClose);
   });
 };
@@ -43876,10 +43876,10 @@ MdPanelRef.prototype.addToGroup = function(groupName) {
   }
 
   var group = this._$mdPanel._groups[groupName];
-  var index = group.panels.indexOf(this);
+  var index = group.cards.indexOf(this);
 
   if (index < 0) {
-    group.panels.push(this);
+    group.cards.push(this);
   }
 };
 
@@ -43895,10 +43895,10 @@ MdPanelRef.prototype.removeFromGroup = function(groupName) {
   }
 
   var group = this._$mdPanel._groups[groupName];
-  var index = group.panels.indexOf(this);
+  var index = group.cards.indexOf(this);
 
   if (index > -1) {
-    group.panels.splice(index, 1);
+    group.cards.splice(index, 1);
   }
 };
 
@@ -52453,7 +52453,7 @@ MdTooltipDirective.$inject = ["$timeout", "$window", "$$rAF", "$document", "$int
 angular
     .module('material.components.tooltip', [
       'material.core',
-      'material.components.panel'
+      'material.components.card'
     ])
     .directive('mdTooltip', MdTooltipDirective)
     .service('$$mdTooltipRegistry', MdTooltipRegistry);
@@ -52577,8 +52577,8 @@ function MdTooltipDirective($timeout, $window, $$rAF, $document, $interpolate,
 
       // If the panel has already been created, remove the current origin
       // class from the panel element.
-      if (panelRef && panelRef.panelEl) {
-        panelRef.panelEl.removeClass(origin);
+      if (panelRef && panelRef.cardEl) {
+        panelRef.cardEl.removeClass(origin);
       }
 
       // Set the panel element origin class based off of the current
@@ -52596,8 +52596,8 @@ function MdTooltipDirective($timeout, $window, $$rAF, $document, $interpolate,
 
       // If the panel has already been created, add the new origin class to
       // the panel element and update it's position with the panelPosition.
-      if (panelRef && panelRef.panelEl) {
-        panelRef.panelEl.addClass(origin);
+      if (panelRef && panelRef.cardEl) {
+        panelRef.cardEl.addClass(origin);
         panelRef.updatePosition(panelPosition);
       }
     }
@@ -52841,7 +52841,7 @@ function MdTooltipDirective($timeout, $window, $$rAF, $document, $interpolate,
           zIndex: scope.mdZIndex,
           focusOnOpen: false,
           onDomAdded: function() {
-            panelRef.panelEl.addClass(origin);
+            panelRef.cardEl.addClass(origin);
           }
         };
 
@@ -52849,7 +52849,7 @@ function MdTooltipDirective($timeout, $window, $$rAF, $document, $interpolate,
       }
 
       panelRef.open().then(function() {
-        panelRef.panelEl.attr('role', 'tooltip');
+        panelRef.cardEl.attr('role', 'tooltip');
       });
     }
 
@@ -119168,7 +119168,7 @@ module.exports = [{
             "<div class=\"popover ng-joyride sharp-borders\"> <div class=\"arrow\"></div>   <h3 class=\"popover-title sharp-borders\"></h3> <div class=\"popover-content container-fluid\"></div></div>"
         );
         $templateCache.put('ng-joyride-title-tplv1.html',
-            "<div id=\"ng-joyride-title-tplv1\"><div class=\"ng-joyride sharp-borders intro-banner\" style=\"\"><div class=\"popover-inner\"><h3 class=\"popover-title sharp-borders\">{{heading}}</h3><div class=\"popover-content container-fluid\"><div ng-bind-html=\"content\"></div><hr><div class=\"row\"><div class=\"col-md-4 skip-class\"><a class=\"skipBtn pull-left\" type=\"button\"><i class=\"glyphicon glyphicon-ban-circle\"></i>&nbsp; Skip</a></div><div class=\"col-md-8\"><div class=\"pull-right\"><button class=\"prevBtn btn\" type=\"button\"><i class=\"glyphicon glyphicon-chevron-left\"></i>&nbsp;Previous</button> <button id=\"nextTitleBtn\" class=\"nextBtn btn btn-primary\" type=\"button\">Next&nbsp;<i class=\"glyphicon glyphicon-chevron-right\"></i></button></div></div></div></div></div></div></div>"
+            "<div id=\"ng-joyride-title-tplv1\"><div class=\"ng-joyride sharp-borders intro-banner\" style=\"\"><div class=\"popover-inner\"><h3 class=\"popover-title sharp-borders\">{{heading}}</h3><div class=\"popover-content container-fluid\"><div ng-bind-html=\"content\"></div><hr><div class=\"row\"><div class=\"col-md-4 skip-class\"><a class=\"skipBtn float-left\" type=\"button\"><i class=\"glyphicon glyphicon-ban-circle\"></i>&nbsp; Skip</a></div><div class=\"col-md-8\"><div class=\"float-right\"><button class=\"prevBtn btn\" type=\"button\"><i class=\"glyphicon glyphicon-chevron-left\"></i>&nbsp;Previous</button> <button id=\"nextTitleBtn\" class=\"nextBtn btn btn-primary\" type=\"button\">Next&nbsp;<i class=\"glyphicon glyphicon-chevron-right\"></i></button></div></div></div></div></div></div></div>"
         );
     }]);
     drctv.factory('joyrideElement', ['$timeout', '$compile', '$sce', function ($timeout, $compile, $sce) {
@@ -119190,12 +119190,12 @@ module.exports = [{
                     '<hr>' +
                     '<div class=\"row\">' +
                     '<div class=\"col-md-4 center\">' +
-                    '<a class=\"skipBtn pull-left\" type=\"button\">Skip</a>' +
+                    '<a class=\"skipBtn float-left\" type=\"button\">Skip</a>' +
                     '</div>' +
                     '<div class=\"col-md-8\">' +
-                    '<div class=\"pull-right\">' +
-                    '<button id=\"prevBtn\" class=\"prevBtn btn btn-xs\" type=\"button\">Previous</button>' +
-                    ' <button id=\"nextBtn\" class=\"nextBtn btn btn-xs btn-primary\" type=\"button\">' +
+                    '<div class=\"float-right\">' +
+                    '<button id=\"prevBtn\" class=\"prevBtn btn btn-sm\" type=\"button\">Previous</button>' +
+                    ' <button id=\"nextBtn\" class=\"nextBtn btn btn-sm btn-primary\" type=\"button\">' +
                     _generateTextForNext() +
                     '</button>' +
                     '</div>' +
@@ -126394,7 +126394,7 @@ angular.module('ui.bootstrap.accordion', ['ui.bootstrap.collapse', 'ui.bootstrap
       accordionCtrl.addGroup(scope);
 
       scope.openClass = attrs.openClass || 'panel-open';
-      scope.panelClass = attrs.panelClass || 'panel-default';
+      scope.cardClass = attrs.cardClass || 'panel-default';
       scope.$watch('isOpen', function(value) {
         element.toggleClass(scope.openClass, !!value);
         if (value) {
@@ -126412,7 +126412,7 @@ angular.module('ui.bootstrap.accordion', ['ui.bootstrap.collapse', 'ui.bootstrap
 
       var id = 'accordiongroup-' + scope.$id + '-' + Math.floor(Math.random() * 10000);
       scope.headingId = id + '-tab';
-      scope.panelId = id + '-panel';
+      scope.cardId = id + '-panel';
     }
   };
 })
@@ -133634,9 +133634,9 @@ angular.module("uib/template/datepicker/day.html", []).run(["$templateCache", fu
     "<table role=\"grid\" aria-labelledby=\"{{::uniqueId}}-title\" aria-activedescendant=\"{{activeDateId}}\">\n" +
     "  <thead>\n" +
     "    <tr>\n" +
-    "      <th><button type=\"button\" class=\"btn btn-default btn-sm pull-left uib-left\" ng-click=\"move(-1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-left\"></i><span class=\"sr-only\">previous</span></button></th>\n" +
-    "      <th colspan=\"{{::5 + showWeeks}}\"><button id=\"{{::uniqueId}}-title\" role=\"heading\" aria-live=\"assertive\" aria-atomic=\"true\" type=\"button\" class=\"btn btn-default btn-sm uib-title\" ng-click=\"toggleMode()\" ng-disabled=\"datepickerMode === maxMode\" tabindex=\"-1\"><strong>{{title}}</strong></button></th>\n" +
-    "      <th><button type=\"button\" class=\"btn btn-default btn-sm pull-right uib-right\" ng-click=\"move(1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-right\"></i><span class=\"sr-only\">next</span></button></th>\n" +
+    "      <th><button type=\"button\" class=\"btn btn-secondary btn-sm float-left uib-left\" ng-click=\"move(-1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-left\"></i><span class=\"sr-only\">previous</span></button></th>\n" +
+    "      <th colspan=\"{{::5 + showWeeks}}\"><button id=\"{{::uniqueId}}-title\" role=\"heading\" aria-live=\"assertive\" aria-atomic=\"true\" type=\"button\" class=\"btn btn-secondary btn-sm uib-title\" ng-click=\"toggleMode()\" ng-disabled=\"datepickerMode === maxMode\" tabindex=\"-1\"><strong>{{title}}</strong></button></th>\n" +
+    "      <th><button type=\"button\" class=\"btn btn-secondary btn-sm float-right uib-right\" ng-click=\"move(1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-right\"></i><span class=\"sr-only\">next</span></button></th>\n" +
     "    </tr>\n" +
     "    <tr>\n" +
     "      <th ng-if=\"showWeeks\" class=\"text-center\"></th>\n" +
@@ -133649,7 +133649,7 @@ angular.module("uib/template/datepicker/day.html", []).run(["$templateCache", fu
     "      <td ng-repeat=\"dt in row\" class=\"uib-day text-center\" role=\"gridcell\"\n" +
     "        id=\"{{::dt.uid}}\"\n" +
     "        ng-class=\"::dt.customClass\">\n" +
-    "        <button type=\"button\" class=\"btn btn-default btn-sm\"\n" +
+    "        <button type=\"button\" class=\"btn btn-secondary btn-sm\"\n" +
     "          uib-is-class=\"\n" +
     "            'btn-info' for selectedDt,\n" +
     "            'active' for activeDt\n" +
@@ -133669,9 +133669,9 @@ angular.module("uib/template/datepicker/month.html", []).run(["$templateCache", 
     "<table role=\"grid\" aria-labelledby=\"{{::uniqueId}}-title\" aria-activedescendant=\"{{activeDateId}}\">\n" +
     "  <thead>\n" +
     "    <tr>\n" +
-    "      <th><button type=\"button\" class=\"btn btn-default btn-sm pull-left uib-left\" ng-click=\"move(-1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-left\"></i><span class=\"sr-only\">previous</span></button></th>\n" +
-    "      <th colspan=\"{{::yearHeaderColspan}}\"><button id=\"{{::uniqueId}}-title\" role=\"heading\" aria-live=\"assertive\" aria-atomic=\"true\" type=\"button\" class=\"btn btn-default btn-sm uib-title\" ng-click=\"toggleMode()\" ng-disabled=\"datepickerMode === maxMode\" tabindex=\"-1\"><strong>{{title}}</strong></button></th>\n" +
-    "      <th><button type=\"button\" class=\"btn btn-default btn-sm pull-right uib-right\" ng-click=\"move(1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-right\"></i><span class=\"sr-only\">next</span></i></button></th>\n" +
+    "      <th><button type=\"button\" class=\"btn btn-secondary btn-sm float-left uib-left\" ng-click=\"move(-1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-left\"></i><span class=\"sr-only\">previous</span></button></th>\n" +
+    "      <th colspan=\"{{::yearHeaderColspan}}\"><button id=\"{{::uniqueId}}-title\" role=\"heading\" aria-live=\"assertive\" aria-atomic=\"true\" type=\"button\" class=\"btn btn-secondary btn-sm uib-title\" ng-click=\"toggleMode()\" ng-disabled=\"datepickerMode === maxMode\" tabindex=\"-1\"><strong>{{title}}</strong></button></th>\n" +
+    "      <th><button type=\"button\" class=\"btn btn-secondary btn-sm float-right uib-right\" ng-click=\"move(1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-right\"></i><span class=\"sr-only\">next</span></i></button></th>\n" +
     "    </tr>\n" +
     "  </thead>\n" +
     "  <tbody>\n" +
@@ -133679,7 +133679,7 @@ angular.module("uib/template/datepicker/month.html", []).run(["$templateCache", 
     "      <td ng-repeat=\"dt in row\" class=\"uib-month text-center\" role=\"gridcell\"\n" +
     "        id=\"{{::dt.uid}}\"\n" +
     "        ng-class=\"::dt.customClass\">\n" +
-    "        <button type=\"button\" class=\"btn btn-default\"\n" +
+    "        <button type=\"button\" class=\"btn btn-secondary\"\n" +
     "          uib-is-class=\"\n" +
     "            'btn-info' for selectedDt,\n" +
     "            'active' for activeDt\n" +
@@ -133699,9 +133699,9 @@ angular.module("uib/template/datepicker/year.html", []).run(["$templateCache", f
     "<table role=\"grid\" aria-labelledby=\"{{::uniqueId}}-title\" aria-activedescendant=\"{{activeDateId}}\">\n" +
     "  <thead>\n" +
     "    <tr>\n" +
-    "      <th><button type=\"button\" class=\"btn btn-default btn-sm pull-left uib-left\" ng-click=\"move(-1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-left\"></i><span class=\"sr-only\">previous</span></button></th>\n" +
-    "      <th colspan=\"{{::columns - 2}}\"><button id=\"{{::uniqueId}}-title\" role=\"heading\" aria-live=\"assertive\" aria-atomic=\"true\" type=\"button\" class=\"btn btn-default btn-sm uib-title\" ng-click=\"toggleMode()\" ng-disabled=\"datepickerMode === maxMode\" tabindex=\"-1\"><strong>{{title}}</strong></button></th>\n" +
-    "      <th><button type=\"button\" class=\"btn btn-default btn-sm pull-right uib-right\" ng-click=\"move(1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-right\"></i><span class=\"sr-only\">next</span></button></th>\n" +
+    "      <th><button type=\"button\" class=\"btn btn-secondary btn-sm float-left uib-left\" ng-click=\"move(-1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-left\"></i><span class=\"sr-only\">previous</span></button></th>\n" +
+    "      <th colspan=\"{{::columns - 2}}\"><button id=\"{{::uniqueId}}-title\" role=\"heading\" aria-live=\"assertive\" aria-atomic=\"true\" type=\"button\" class=\"btn btn-secondary btn-sm uib-title\" ng-click=\"toggleMode()\" ng-disabled=\"datepickerMode === maxMode\" tabindex=\"-1\"><strong>{{title}}</strong></button></th>\n" +
+    "      <th><button type=\"button\" class=\"btn btn-secondary btn-sm float-right uib-right\" ng-click=\"move(1)\" tabindex=\"-1\"><i aria-hidden=\"true\" class=\"glyphicon glyphicon-chevron-right\"></i><span class=\"sr-only\">next</span></button></th>\n" +
     "    </tr>\n" +
     "  </thead>\n" +
     "  <tbody>\n" +
@@ -133709,7 +133709,7 @@ angular.module("uib/template/datepicker/year.html", []).run(["$templateCache", f
     "      <td ng-repeat=\"dt in row\" class=\"uib-year text-center\" role=\"gridcell\"\n" +
     "        id=\"{{::dt.uid}}\"\n" +
     "        ng-class=\"::dt.customClass\">\n" +
-    "        <button type=\"button\" class=\"btn btn-default\"\n" +
+    "        <button type=\"button\" class=\"btn btn-secondary\"\n" +
     "          uib-is-class=\"\n" +
     "            'btn-info' for selectedDt,\n" +
     "            'active' for activeDt\n" +
@@ -133729,11 +133729,11 @@ angular.module("uib/template/datepickerPopup/popup.html", []).run(["$templateCac
     "<ul role=\"presentation\" class=\"uib-datepicker-popup dropdown-menu uib-position-measure\" dropdown-nested ng-if=\"isOpen\" ng-keydown=\"keydown($event)\" ng-click=\"$event.stopPropagation()\">\n" +
     "  <li ng-transclude></li>\n" +
     "  <li ng-if=\"showButtonBar\" class=\"uib-button-bar\">\n" +
-    "    <span class=\"btn-group pull-left\">\n" +
+    "    <span class=\"btn-group float-left\">\n" +
     "      <button type=\"button\" class=\"btn btn-sm btn-info uib-datepicker-current\" ng-click=\"select('today', $event)\" ng-disabled=\"isDisabled('today')\">{{ getText('current') }}</button>\n" +
     "      <button type=\"button\" class=\"btn btn-sm btn-danger uib-clear\" ng-click=\"select(null, $event)\">{{ getText('clear') }}</button>\n" +
     "    </span>\n" +
-    "    <button type=\"button\" class=\"btn btn-sm btn-success pull-right uib-close\" ng-click=\"close($event)\">{{ getText('close') }}</button>\n" +
+    "    <button type=\"button\" class=\"btn btn-sm btn-success float-right uib-close\" ng-click=\"close($event)\">{{ getText('close') }}</button>\n" +
     "  </li>\n" +
     "</ul>\n" +
     "");
@@ -133895,7 +133895,7 @@ angular.module("uib/template/timepicker/timepicker.html", []).run(["$templateCac
     "      <td class=\"form-group uib-time seconds\" ng-class=\"{'has-error': invalidSeconds}\" ng-show=\"showSeconds\">\n" +
     "        <input type=\"text\" placeholder=\"SS\" ng-model=\"seconds\" ng-change=\"updateSeconds()\" class=\"form-control text-center\" ng-readonly=\"readonlyInput\" maxlength=\"2\" tabindex=\"{{::tabindex}}\" ng-disabled=\"noIncrementSeconds()\" ng-blur=\"blur()\">\n" +
     "      </td>\n" +
-    "      <td ng-show=\"showMeridian\" class=\"uib-time am-pm\"><button type=\"button\" ng-class=\"{disabled: noToggleMeridian()}\" class=\"btn btn-default text-center\" ng-click=\"toggleMeridian()\" ng-disabled=\"noToggleMeridian()\" tabindex=\"{{::tabindex}}\">{{meridian}}</button></td>\n" +
+    "      <td ng-show=\"showMeridian\" class=\"uib-time am-pm\"><button type=\"button\" ng-class=\"{disabled: noToggleMeridian()}\" class=\"btn btn-secondary text-center\" ng-click=\"toggleMeridian()\" ng-disabled=\"noToggleMeridian()\" tabindex=\"{{::tabindex}}\">{{meridian}}</button></td>\n" +
     "    </tr>\n" +
     "    <tr class=\"text-center\" ng-show=\"::showSpinners\">\n" +
     "      <td class=\"uib-decrement hours\"><a ng-click=\"decrementHours()\" ng-class=\"{disabled: noDecrementHours()}\" class=\"btn btn-link\" ng-disabled=\"noDecrementHours()\" tabindex=\"-1\"><span class=\"glyphicon glyphicon-chevron-down\"></span></a></td>\n" +

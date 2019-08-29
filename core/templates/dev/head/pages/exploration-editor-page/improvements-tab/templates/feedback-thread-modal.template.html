@@ -2,7 +2,7 @@
   <h3 style="float: left"><[getTitle()]></h3>
 
   <div class="text-right" style="float: right">
-    <span ng-if="activeThread.stateName" class="label label-info">
+    <span ng-if="activeThread.stateName" class="badge badge-info">
       state: <[activeThread.stateName]>
     </span>
     <span ng-class="getLabelClass(activeThread.status)">
@@ -75,7 +75,7 @@
           <span ng-if="!messageSendingInProgress">Send and Close</span>
         </button>
         <button ng-click="close()" ng-disabled="messageSendingInProgress"
-                class="btn btn-default protractor-test-oppia-feedback-response-close-btn"
+                class="btn btn-secondary protractor-test-oppia-feedback-response-close-btn"
                 style="margin-right: 0">
           Close
         </button>
@@ -88,7 +88,7 @@
     <em style="float: left; padding: 6px 0">To respond to a feedback thread, please log in.</em>
     <div style="float: right">
       <button ng-click="close()" ng-disabled="messageSendingInProgress"
-              class="btn btn-default protractor-test-oppia-feedback-response-close-btn"
+              class="btn btn-secondary protractor-test-oppia-feedback-response-close-btn"
               style="margin-right: 0">
         Close
       </button>

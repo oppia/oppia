@@ -1,7 +1,7 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" style="margin-left: 20px;">
+<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" style="margin-left: 20px;">
   <!-- Editor -->
-  <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>">
-    <a href="#" uib-tooltip="Editor" ng-click="$ctrl.selectMainTab()" class="protractor-test-main-tab">
+  <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>" class="nav-item">
+    <a href="#" uib-tooltip="Editor" ng-click="$ctrl.selectMainTab()" class="nav-link protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
     <div ng-show="$ctrl.getWarningsCount()"
@@ -22,23 +22,23 @@
   </li>
 
   <!-- Settings -->
-  <li ng-class="{'active': $ctrl.getActiveTabName() === 'settings'}">
-    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="$ctrl.selectSettingsTab()" class="protractor-test-settings-tab">
+  <li ng-class="{'active': $ctrl.getActiveTabName() === 'settings'}" class="nav-item">
+    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="$ctrl.selectSettingsTab()" class="nav-link protractor-test-settings-tab">
       <i class="material-icons">&#xE8B8;</i>
     </a>
   </li>
 
   <!-- Player -->
-  <li>
-    <a ng-href="/collection/<[$ctrl.collectionId]>" target="_blank" rel="noopener" uib-tooltip="Player (new tab)" tooltip-placement="bottom">
+  <li class="nav-item">
+    <a ng-href="/collection/<[$ctrl.collectionId]>" target="_blank" rel="noopener" uib-tooltip="Player (new tab)" tooltip-placement="bottom" class="nav-link">
       <i class="material-icons">&#xE037;</i>
     </a>
   </li>
 </ul>
 
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-if="!$ctrl.isLoadingCollection()">
+<ul class="nav navbar-nav oppia-navbar-nav float-right" ng-if="!$ctrl.isLoadingCollection()">
   <li style="margin-right: 10px; margin-top: 8px;">
-    <button class="btn btn-default oppia-save-draft-button protractor-test-save-draft-button"
+    <button class="btn btn-secondary oppia-save-draft-button protractor-test-save-draft-button"
             ng-class="{'btn-success': $ctrl.isCollectionSaveable()}"
             ng-click="$ctrl.saveChanges()"
             ng-disabled="!$ctrl.isCollectionSaveable()">
@@ -48,8 +48,8 @@
              alt="Save Collection">
             &#xE161;
           </i>
-          <span class="oppia-save-publish-button-label">Save Draft</span>
-          <span class="hidden-sm hidden-xs" style="opacity: 0.5"
+          <span class="oppia-save-publish-button-label float-left">Save Draft</span>
+          <span class="d-none d-md-block float-left" style="opacity: 0.5;margin-left: 2px;"
                 ng-if="$ctrl.getChangeListCount() > 0">
             (<[$ctrl.getChangeListCount()]>)
           </span>
@@ -71,7 +71,7 @@
     </button>
 
     <button type="button" ng-if="$ctrl.collectionRights.isPrivate()"
-            class="btn btn-default oppia-editor-publish-button protractor-test-editor-publish-button"
+            class="btn btn-secondary oppia-editor-publish-button protractor-test-editor-publish-button"
             ng-class="{'btn-success': $ctrl.isCollectionPublishable()}"
             ng-click="$ctrl.publishCollection()"
             ng-disabled="!$ctrl.isCollectionPublishable()">
@@ -84,7 +84,7 @@
 
     <button type="button" ng-click="$ctrl.unpublishCollection()"
             ng-if="$ctrl.collectionRights.isPublic() && $ctrl.collectionRights.canUnpublish()"
-            class="btn btn-default">
+            class="btn btn-secondary">
       Unpublish (as moderator)
     </button>
   </li>

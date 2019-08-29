@@ -11,7 +11,7 @@
     <input class="form-control protractor-test-new-chapter-title-field" style="font-size: 12px;"
            placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
            ng-model="nodeTitle" ng-change="resetErrorMsg()" autofocus>
-    <span class="help-block" style="font-size: smaller; color: red;" ng-if="errorMsg">
+    <span class="form-text" style="font-size: smaller; color: red;" ng-if="errorMsg">
       <em><[errorMsg]></em>
     </span>
   </div>
@@ -19,6 +19,6 @@
     <button class="btn btn-success protractor-test-confirm-chapter-creation-button" type="submit" ng-disabled="isNodeTitleEmpty(nodeTitle)">
       <span>Create Chapter</span>
     </button>
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
   </div>
 </form>

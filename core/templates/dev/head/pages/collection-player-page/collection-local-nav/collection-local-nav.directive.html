@@ -1,6 +1,6 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-right: 0px;">
-  <li ng-if="$ctrl.canEdit">
-    <a ng-href="/collection_editor/create/<[$ctrl.collectionId]>" uib-tooltip="Edit" tooltip-placement="bottom" target="_blank" rel="noopener">
+<ul class="nav navbar-nav oppia-navbar-nav float-right" style="margin-right: 0;">
+  <li ng-if="$ctrl.canEdit" class="nav-item">
+    <a ng-href="/collection_editor/create/<[$ctrl.collectionId]>" uib-tooltip="Edit" tooltip-placement="bottom" target="_blank" rel="noopener" class="nav-link">
       <i class="material-icons">&#xE254;</i>
       <span class="oppia-icon-accessibility-label">Edit</span>
     </a>

@@ -13,7 +13,7 @@
     <span ng-if="$ctrl.isCreatingNewState($ctrl.outcome)">
       <input type="text" focus-on="$ctrl.newStateNameInputField" name="newStateName" ng-model="$ctrl.outcome.newStateName" class="form-control protractor-test-add-state-input" tabindex="0" aria-invalid="false" ng-pattern="$ctrl.newStateNamePattern" required>
     </span>
-    <p ng-show="newStateNameForm.newStateName.$error.pattern" class="help-block oppia-form-error" style="font-size: 0.85em;">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
+    <p ng-show="newStateNameForm.newStateName.$error.pattern" class="form-text oppia-form-error" style="font-size: 0.85em;">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
   </ng-form>
 
   <div ng-if="$ctrl.isSelfLoop() && $ctrl.canEditRefresherExplorationId" style="margin-top: 12px;">

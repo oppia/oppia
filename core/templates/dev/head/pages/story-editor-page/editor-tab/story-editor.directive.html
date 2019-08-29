@@ -5,7 +5,7 @@
       <input id="storyTitle" type="text" class="form-control protractor-test-story-title-field"
              ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
              placeholder="Enter a title for the story." maxlength="20" ng-trim="false">
-      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
+      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
         <em>Please use at most 20 characters for the story title.</em>
       </span>
     </div>
@@ -18,7 +18,7 @@
                 ng-blur="updateStoryDescription(editableDescription)"
                 placeholder="Enter the description of the story">
       </textarea>
-      <span ng-if="editableDescriptionIsEmpty && storyDescriptionChanged" class="help-block" style="font-size: smaller">
+      <span ng-if="editableDescriptionIsEmpty && storyDescriptionChanged" class="form-text" style="font-size: smaller">
         What does this story contain?
       </span>
     </div>
@@ -28,7 +28,7 @@
         <label class="form-heading">Notes</label>
         <div ng-if="!notesEditorIsShown" style="padding-top: 0.5em; padding-bottom: 1em;">
           <div ng-class="oppia-editable-section" ng-click="openNotesEditor()" class="protractor-test-open-story-notes-editor-button">
-            <i class="material-icons oppia-editor-edit-icon pull-right"
+            <i class="material-icons oppia-editor-edit-icon float-right"
                title="Edit Story Notes">&#xE254;
             </i>
             <div class="oppia-state-content-display oppia-transition-200"
@@ -51,12 +51,12 @@
           </schema-based-editor>
           <div class="editor-buttons">
             <button type="button"
-                    class="btn btn-success oppia-save-state-item-button pull-right protractor-test-save-story-notes-button"
+                    class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-story-notes-button"
                     ng-disabled="!editableNotes"
                     ng-click="updateNotes(editableNotes)">
               Save
             </button>
-            <button type="button" class="btn btn-default pull-right" ng-click="closeNotesEditor()">Cancel</button>
+            <button type="button" class="btn btn-secondary float-right" ng-click="closeNotesEditor()">Cancel</button>
             <div style="clear: both;"></div>
           </div>
         </div>

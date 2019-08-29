@@ -8,19 +8,19 @@
     <span><b><['I18N_PLAYER_REPORT_MODAL_BODY_HEADER' | translate]></b></span>
   </h4>
   <form>
-    <div class="radio">
+    <div class="oppia-flag-modal-long-text radio">
       <label>
         <input type="radio" value="ad" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
         <['I18N_PLAYER_REPORT_MODAL_BODY_AD' | translate]>
       </label>
     </div>
-    <div class="radio">
+    <div class="oppia-flag-modal-long-text radio">
       <label>
         <input type="radio" value="poor_experience" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
         <['I18N_PLAYER_REPORT_MODAL_BODY_POOR_EXPERIENCE' | translate]>
       </label>
     </div>
-    <div class="radio">
+    <div class="oppia-flag-modal-long-text radio">
       <label>
         <input type="radio" value="other" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
         <['I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate]>
@@ -34,7 +34,7 @@
   </form>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-default" ng-click="cancel()">
+  <button class="btn btn-secondary" ng-click="cancel()">
     <['I18N_PLAYER_REPORT_MODAL_FOOTER_CANCEL' | translate]>
   </button>
   <button class="btn btn-success" ng-click="submitReport()" ng-disabled="!flagMessage">
@@ -47,5 +47,13 @@
     font-size: 16px;
     margin-bottom: 20px;
     margin-top: 20px;
+  }
+  .oppia-flag-modal-long-text input {
+    height: 15px;
+    margin-right: 5px;
+  }
+  .oppia-flag-modal-long-text label {
+    font-weight: lighter;
+    height: 15px;
   }
 </style>

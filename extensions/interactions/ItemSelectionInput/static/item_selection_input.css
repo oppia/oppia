@@ -37,7 +37,7 @@ md-checkbox.item-selection-input-checkbox .md-label {
 }
 
 .item-selection-input-container md-input-group.md-default-theme label {
-  border-bottom: 0px;
+  border-bottom: 0;
 }
 
 .item-selection-input-container img {
@@ -85,7 +85,7 @@ md-checkbox.item-selection-input-checkbox .md-label {
   border-radius: 50%;
   display: inline-block;
   height: 16px;
-  margin-bottom: -7px;
+  margin-bottom: -1px;
   margin-right: 12px;
   width: 16px;
 }
