@@ -17,16 +17,17 @@
  */
 
 require(
-  'interactions/NumberWithUnits/directives/NumberWithUnitsRulesService.ts');
+  'interactions/NumberWithUnits/directives/' +
+  'number-with-units-rules.service.ts');
 require(
   'interactions/NumberWithUnits/directives/' +
-  'NumberWithUnitsValidationService.ts');
+  'number-with-units-validation.service.ts');
 require(
   'interactions/NumberWithUnits/directives/' +
-  'OppiaInteractiveNumberWithUnitsDirective.ts');
+  'oppia-interactive-number-with-units.directive.ts');
 require(
   'interactions/NumberWithUnits/directives/' +
-  'OppiaResponseNumberWithUnitsDirective.ts');
+  'oppia-response-number-with-units.directive.ts');
 require(
   'interactions/NumberWithUnits/directives/' +
-  'OppiaShortResponseNumberWithUnitsDirective.ts');
+  'oppia-short-response-number-with-units.directive.ts');

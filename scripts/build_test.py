@@ -482,7 +482,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
-            with self.swap(build, 'HASHES_TS_FILEPATH', hashes_path):
+            with self.swap(build, 'HASHES_JSON_FILEPATH', hashes_path):
                 hashes = {'path/file.js': '123456'}
                 build.save_hashes_to_file(hashes)
                 with python_utils.open_file(hashes_path, 'r') as hashes_file:

@@ -109,6 +109,7 @@ script:
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalEditorAndPlayerFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_COLLECTIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="collections" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_CREATOR_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="embedding" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationFeedbackTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationHistoryTab" --prod_env; fi
