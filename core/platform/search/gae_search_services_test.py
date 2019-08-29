@@ -112,7 +112,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         doc1 = {'f': ['a', 'b', ['c', 'd']]}
         doc2 = {'f': ['a', 'b', 3, set([4, 5, 6])]}
 
-        # The str of list and set are passed in to ensure that we
+        # The names of list and set are passed in to ensure that we
         # mention the type the user passed in, in our error message..
         with self.assertRaisesRegexp(ValueError, python_utils.UNICODE(list)):
             gae_search_services.add_documents_to_index([doc1], 'my_index')

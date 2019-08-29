@@ -898,8 +898,6 @@ def update_collection(
             'Collection is public so expected a commit message but '
             'received none.')
 
-    change_list = python_utils.recursively_convert_to_bytes(change_list)
-
     collection = apply_change_list(collection_id, change_list)
 
     _save_collection(committer_id, collection, commit_message, change_list)

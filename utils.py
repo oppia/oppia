@@ -174,21 +174,6 @@ def to_ascii(input_string):
         'NFKD', python_utils.UNICODE(input_string)).encode('ascii', 'ignore')
 
 
-def yaml_from_dict(dictionary, width=80):
-    """Gets the YAML representation of a dict.
-
-    Args:
-        dictionary: dict. Dictionary for conversion into yaml.
-        width: int. Width for the yaml representation, default value
-            is set to be of 80.
-
-    Returns:
-        str. Converted yaml of the passed dictionary.
-    """
-    dictionary = python_utils.recursively_convert_to_str(dictionary)
-    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
 def dict_from_yaml(yaml_str):
     """Gets the dict representation of a YAML string.
 
@@ -397,7 +382,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(python_utils.UNICODE([value]))
+    return base64.b64encode(bytes([value]))
 
 
 def get_time_in_millisecs(datetime_obj):

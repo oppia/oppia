@@ -1064,7 +1064,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         file_extensions_to_always_rebuild = ('.html', '.py',)
         python_utils.PRINT(
             'Staging dir exists, re-building all %s files'
-            % python_utils.UNICODE(file_extensions_to_always_rebuild))
+            % ', '.join(file_extensions_to_always_rebuild))
 
         filenames_to_always_rebuild = get_filepaths_by_extensions(
             source_dir, file_extensions_to_always_rebuild)

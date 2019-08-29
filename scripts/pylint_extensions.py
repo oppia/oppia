@@ -174,6 +174,7 @@ class HangingIndentChecker(checkers.BaseChecker):
         exclude = False
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].lstrip().rstrip()
+            # The source files are read as bytes, hence the b' prefix.
             if line.startswith(b'"""') and not line.endswith(b'"""'):
                 exclude = True
             if line.endswith(b'"""'):

@@ -23,6 +23,8 @@ import io
 import os
 import sys
 
+import yaml
+
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
 
@@ -380,28 +382,7 @@ def convert_to_bytes(string_to_convert):
     return bytes(string_to_convert)
 
 
-def recursively_convert_to_bytes(value):
-    """Recursively converts all unicode elements in a data structure to bytes.
-
-    Args:
-        value: list|dict|BASESTRING. The data structure to convert.
-
-    Returns:
-        list|dict|bytes. The data structure in bytes.
-    """
-    if isinstance(value, list):
-        return [recursively_convert_to_bytes(e) for e in value]
-    elif isinstance(value, dict):
-        return {
-            recursively_convert_to_bytes(k): recursively_convert_to_bytes(
-                v) for k, v in value.items()}
-    elif isinstance(value, UNICODE):
-        return value.encode('utf-8')
-    else:
-        return value
-
-
-def recursively_convert_to_str(value):
+def _recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
     to bytes and unicode respectively. This is required for the
     yaml.safe_dump() function to work as it only works for unicode and bytes and
@@ -415,10 +396,10 @@ def recursively_convert_to_str(value):
         list|dict|bytes|unicode. The data structure in bytes and unicode.
     """
     if isinstance(value, list):
-        return [recursively_convert_to_str(e) for e in value]
+        return [_recursively_convert_to_str(e) for e in value]
     elif isinstance(value, dict):
         return {
-            recursively_convert_to_str(k): recursively_convert_to_str(
+            _recursively_convert_to_str(k): _recursively_convert_to_str(
                 v) for k, v in value.items()}
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
@@ -432,3 +413,18 @@ def recursively_convert_to_str(value):
         return temp[2:-1]
     else:
         return value
+
+
+def yaml_from_dict(dictionary, width=80):
+    """Gets the YAML representation of a dict.
+
+    Args:
+        dictionary: dict. Dictionary for conversion into yaml.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
+
+    Returns:
+        str. Converted yaml of the passed dictionary.
+    """
+    dictionary = _recursively_convert_to_str(dictionary)
+    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)

@@ -355,7 +355,7 @@ class Collection(python_utils.OBJECT):
         # YAML representation.
         del collection_dict['id']
 
-        return utils.yaml_from_dict(collection_dict)
+        return python_utils.yaml_from_dict(collection_dict)
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):

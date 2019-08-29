@@ -751,7 +751,7 @@ tags: []
                     j) for j in i) for i in upload_files)
 
         json_response = app.post(
-            python_utils.UNICODE(url), data, expect_errors=expect_errors,
+            url, data, expect_errors=expect_errors,
             upload_files=upload_files, headers=headers,
             status=expected_status_int)
         return json_response

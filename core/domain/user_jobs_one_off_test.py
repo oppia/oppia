@@ -1379,10 +1379,10 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
                 .activity_ids), 0)
         actual_output = job.get_output(job_id)
         expected_output = [
-            u'[u\"Successfully cleaned up UserSubscriptionsModel %s and '
-            'removed explorations [u\'0\', u\'1\', u\'2\']\", 1]' %
+            u'[u\'Successfully cleaned up UserSubscriptionsModel %s and '
+            'removed explorations 0, 1, 2\', 1]' %
             self.owner_id,
-            u'[u\"Successfully cleaned up UserSubscriptionsModel %s and '
-            'removed explorations [u\'0\', u\'1\', u\'2\']\", 1]' %
+            u'[u\'Successfully cleaned up UserSubscriptionsModel %s and '
+            'removed explorations 0, 1, 2\', 1]' %
             self.user_id]
         self.assertEqual(sorted(actual_output), sorted(expected_output))

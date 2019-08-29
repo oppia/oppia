@@ -1210,7 +1210,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    b'x': 'Test'
+                    'x': 'Test'
                 },
                 'rule_type': 'Contains'
             }],
@@ -1229,7 +1229,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'RuleSpec \'Contains\' has inputs which are not recognized '
-                'parameter names: set([\'x\'])'
+                'parameter names: set([u\'x\'])'
             ]
         )
 

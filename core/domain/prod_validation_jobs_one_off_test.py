@@ -5821,6 +5821,7 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         model_with_invalid_version_in_id = (
             file_models.FileSnapshotContentModel(
                 id='%s-3' % self.id_0))
+        # We are using the b' prefix here as the model don't accept unicode.
         model_with_invalid_version_in_id.content = b'content'
         model_with_invalid_version_in_id.put()
         expected_output = [

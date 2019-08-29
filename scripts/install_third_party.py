@@ -238,7 +238,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
                 python_utils.PRINT(dependency_dict)
                 python_utils.PRINT(
                     'Only one of these keys pair must be used: "%s".'
-                    % python_utils.UNICODE(optional_keys))
+                    % ', '.join(optional_keys))
                 python_utils.PRINT('Exiting')
                 sys.exit(1)
 

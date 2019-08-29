@@ -716,8 +716,7 @@ class Exploration(python_utils.OBJECT):
             raise utils.ValidationError(
                 'There is no state in %s corresponding to the exploration\'s '
                 'initial state name %s.' %
-                (python_utils.recursively_convert_to_bytes(
-                    list(self.states.keys())), self.init_state_name))
+                (list(self.states.keys()), self.init_state_name))
 
         if not isinstance(self.param_specs, dict):
             raise utils.ValidationError(
@@ -3242,7 +3241,7 @@ class Exploration(python_utils.OBJECT):
         # YAML representation.
         del exp_dict['id']
 
-        return utils.yaml_from_dict(exp_dict)
+        return python_utils.yaml_from_dict(exp_dict)
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all

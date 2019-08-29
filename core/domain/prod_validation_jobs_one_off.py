@@ -148,7 +148,7 @@ class BaseModelValidator(python_utils.OBJECT):
             item: ndb.Model. Entity to validate.
         """
         regex_string = cls._get_model_id_regex(item)
-        if not re.compile(regex_string).match(python_utils.UNICODE(item.id)):
+        if not re.compile(regex_string).match(item.id):
             cls.errors['model id check'].append((
                 'Entity id %s: Entity id does not match regex pattern') % (
                     item.id))
@@ -223,8 +223,7 @@ class BaseModelValidator(python_utils.OBJECT):
                         ' value %s, expect model %s with id %s but it doesn\'t'
                         ' exist' % (
                             item.id, field_name, model_id,
-                            python_utils.UNICODE(model_class.__name__),
-                            model_id)))
+                            model_class.__name__, model_id)))
 
     @classmethod
     def _fetch_external_instance_details(cls, item):

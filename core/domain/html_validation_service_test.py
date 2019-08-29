@@ -1129,7 +1129,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'heading-with-value="&amp;quot;lorem ipsum&amp;quot;">'
                 '</oppia-noninteractive-collapsible>'
             )],
-            'Missing attributes: [u\'text-with-value\'], Extra attributes: []':
+            'Missing attributes: text-with-value, Extra attributes: ':
             [(
                 '<oppia-noninteractive-collapsible content-with-value'
                 '="&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-'
@@ -1154,7 +1154,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-video>'
             )],
             (
-                'Invalid URL: Sanitized URL should start with \'http://\' or '
+                u'Invalid URL: Sanitized URL should start with \'http://\' or '
                 '\'https://\'; received htt://link.com'
             ): [(
                 '<p><oppia-noninteractive-link text-with-value="&amp;quot;'
@@ -1162,8 +1162,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'link.com&amp;quot;"></oppia-noninteractive-link></p>'
             )],
             (
-                'Missing attributes: [u\'video_id-with-value\'], '
-                'Extra attributes: []'
+                'Missing attributes: video_id-with-value, '
+                'Extra attributes: '
             ): [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
                 'end-with-value="0" start-with-value="0">'
@@ -1203,7 +1203,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
                 '&amp;quot;Savjet 1&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
-            'Missing attributes: [u\'alt-with-value\'], Extra attributes: []':
+            'Missing attributes: alt-with-value, Extra attributes: ':
             [(
                 '<oppia-noninteractive-image caption-with-value="&amp;quot;abc'
                 '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;'
@@ -1259,8 +1259,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'Invalid URL: Sanitized URL should start with \'http://\' '
                 'or \'https://\'; received htt://link.com'
             )],
-            ['Missing attributes: [u\'alt-with-value\'], Extra attributes: []'],
-            ['Expected dict, received [1, 2, 3]']
+            ['Missing attributes: alt-with-value, Extra attributes: '],
+            [u'Expected dict, received [1, 2, 3]']
         ]
         for test_case in test_cases:
             html_string = test_case['html_string']

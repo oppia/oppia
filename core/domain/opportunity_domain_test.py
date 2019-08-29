@@ -192,10 +192,10 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary.validate()
             self.valid_exp_opp_summary.need_voice_artist_in_language_codes = [
-                b'hi']
+                'hi']
             valid_exp_opp_summary = self.valid_exp_opp_summary
             valid_exp_opp_summary.assigned_voice_artist_in_language_codes = [
-                b'hi', b'en']
+                'hi', 'en']
             need_voice_artist_languages = (
                 valid_exp_opp_summary.need_voice_artist_in_language_codes)
             assigned_voice_artist_languages = (
@@ -208,7 +208,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 self.valid_exp_opp_summary,
                 'Expected voice_artist "needed" and "assigned" list of '
                 'languages to be disjoint, received: '
-                r'\[\'hi\'\], \[\'hi\', \'en\'\]')
+                r'\[u\'hi\'\], \[u\'hi\', u\'en\'\]')
 
     def test_translation_counts_with_invalid_language_code_fails_validation(
             self):
