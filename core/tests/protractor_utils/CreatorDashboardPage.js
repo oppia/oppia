@@ -37,6 +37,11 @@ var CreatorDashboardPage = function() {
     element(by.css('.protractor-test-create-exploration'));
   var createNewExplorationButton =
     element(by.css('.protractor-test-create-new-exploration-button'));
+  // Dashboard stat elements.
+  var averageRating = element(by.css('.protractor-test-oppia-average-rating'));
+  var totalPlays = element(by.css('.protractor-test-oppia-total-plays'));
+  var openFeedbacks = element(by.css('.protractor-test-oppia-open-feedback'));
+  var subscribers = element(by.css('.protractor-test-oppia-total-subscribers'));
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(explorationTitle) {
@@ -132,6 +137,30 @@ var CreatorDashboardPage = function() {
       explorationElement.click();
       waitFor.pageToFullyLoad();
     });
+  };
+
+  this.getAverageRating = function() {
+    waitFor.visibilityOf(
+      averageRating, 'Unable to find average rating');
+    return averageRating.getText();
+  };
+
+  this.getTotalPlays = function() {
+    waitFor.visibilityOf(
+      totalPlays, 'Unable to find total plays');
+    return totalPlays.getText();
+  };
+
+  this.getOpenFeedbacks = function() {
+    waitFor.visibilityOf(
+      openFeedbacks, 'Unable to find open feedbacks count');
+    return openFeedbacks.getText();
+  };
+
+  this.getSubscribers = function() {
+    waitFor.visibilityOf(
+      subscribers, 'Unable to find subscribers count');
+    return subscribers.getText();
   };
 };
 
