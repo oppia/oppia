@@ -430,12 +430,11 @@
         "targetDir": "midi-js-a8a842"
       },
       "ngJoyride": {
-        "version": "b117e0",
-        "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/oppia/ng-joyride/master/",
+        "version": "b117e019582433995393f81e2006a6bc36ca1cf2",
+        "downloadFormat": "zip",
+        "url": "https://github.com/oppia/ng-joyride/archive/b117e019582433995393f81e2006a6bc36ca1cf2.zip",
         "rootDirPrefix": "ng-joyride-",
-        "targetDirPrefix": "ng-joyride-",
-        "files": ["ng-joyride.css", "ng-joyride.js"],
+        "targetDir": "ng-joyride-b117e0",
         "bundle": {
           "css": ["ng-joyride.css"],
           "js": ["ng-joyride.js"]
