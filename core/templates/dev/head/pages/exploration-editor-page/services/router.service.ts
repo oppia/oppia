@@ -46,6 +46,16 @@ angular.module('oppia').factory('RouterService', [
 
     var SLUG_GUI = 'gui';
     var SLUG_PREVIEW = 'preview';
+    // PREVIEW_TAB_WAIT_TIME_MSEC is the minimum duration to wait
+    // before calling _actuallyNavigate. This is done in order to
+    // ensure all pending changes are saved before navigating to
+    // the preview tab.
+    // _savePendingChanges triggers 'externalSave' event which
+    // will be caught by appropriate editors that will
+    // save pending changes. However, the autosave / saving of
+    // changelist is async. To allow autosave / saving of change
+    // list to complete. PREVIEW_TAB_WAIT_TIME_MSEC is provided.
+    var PREVIEW_TAB_WAIT_TIME_MSEC = 200;
 
     var activeTabName = TABS.MAIN.name;
 
@@ -235,7 +245,9 @@ angular.module('oppia').factory('RouterService', [
       navigateToPreviewTab: function() {
         if (activeTabName !== TABS.PREVIEW.name) {
           _savePendingChanges();
-          _actuallyNavigate(SLUG_PREVIEW, null);
+          setTimeout(function() {
+            _actuallyNavigate(SLUG_PREVIEW, null);
+          }, PREVIEW_TAB_WAIT_TIME_MSEC);
         }
       },
       navigateToStatsTab: function() {
