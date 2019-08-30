@@ -268,8 +268,9 @@ angular.module('oppia').directive('preferencesPage', [
                     $window.location.reload();
                   });
               }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
             };
 
             ctrl.LANGUAGE_CHOICES = LanguageUtilService.getLanguageIdsAndTexts();

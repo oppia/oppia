@@ -214,8 +214,9 @@ angular.module('oppia').directive('storyNodeEditor', [
               _init();
               _recalculateAvailableNodes();
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.addDestinationNode = function(nodeId) {

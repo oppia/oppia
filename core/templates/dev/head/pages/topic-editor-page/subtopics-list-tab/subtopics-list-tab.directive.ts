@@ -143,8 +143,9 @@ angular.module('oppia').directive('subtopicsListTab', [
                 TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
               }
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.isSkillDeleted = function(skillSummary) {
@@ -247,8 +248,9 @@ angular.module('oppia').directive('subtopicsListTab', [
               TopicUpdateService.addSubtopic($scope.topic, title);
               _initEditor();
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);

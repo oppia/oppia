@@ -151,8 +151,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
               SkillEditorStateService.saveSkill(commitMessage);
               AlertsService.addSuccessMessage('Changes Saved.');
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.publishSkill = function() {
@@ -176,8 +177,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
             }).result.then(function() {
               _publishSkill();
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
         }]
     };

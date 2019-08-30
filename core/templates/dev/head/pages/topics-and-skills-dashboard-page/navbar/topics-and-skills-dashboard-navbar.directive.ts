@@ -104,8 +104,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
               SkillCreationService.createNewSkill(
                 result.description, result.rubrics, []);
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
           $rootScope.$on(
             EVENT_TYPE_TOPIC_CREATION_ENABLED, function(evt, canCreateTopic) {

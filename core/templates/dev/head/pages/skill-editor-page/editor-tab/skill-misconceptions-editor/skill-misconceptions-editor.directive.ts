@@ -94,8 +94,9 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
               $scope.misconceptions = $scope.skill.getMisconceptions();
               $scope.activeMisconceptionIndex = null;
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.openAddMisconceptionModal = function() {
@@ -148,8 +149,9 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                 $scope.skill, result.misconception);
               $scope.misconceptions = $scope.skill.getMisconceptions();
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
         }]
     };

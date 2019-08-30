@@ -155,8 +155,9 @@ angular.module('oppia').directive('skillsList', [
                 }
               }
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.selectSkill = function(skill) {
@@ -200,8 +201,9 @@ angular.module('oppia').directive('skillsList', [
                   EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
               });
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
         }
       ]

@@ -153,8 +153,9 @@ angular.module('oppia').directive('feedbackTab', [
                   AlertsService.addSuccessMessage('Feedback thread created.');
                 });
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           var _isSuggestionHandled = function() {

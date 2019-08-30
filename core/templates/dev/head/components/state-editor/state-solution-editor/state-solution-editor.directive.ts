@@ -259,8 +259,9 @@ angular.module('oppia').directive('stateSolutionEditor', [
                 }
               }
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.deleteSolution = function(index, evt) {

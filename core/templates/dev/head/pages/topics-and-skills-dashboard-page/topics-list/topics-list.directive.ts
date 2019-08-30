@@ -91,8 +91,9 @@ angular.module('oppia').directive('topicsList', [
                 }
               );
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
         }
       ]

@@ -237,7 +237,8 @@ angular.module('oppia').directive('questionsList', [
                     };
 
                     $scope.startQuestionCreation = function() {
-                      $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
+                      $uibModalInstance.close(
+                        $scope.linkedSkillsWithDifficulty);
                     };
 
                     $scope.cancelModal = function() {
@@ -270,8 +271,9 @@ angular.module('oppia').directive('questionsList', [
                     ctrl.newQuestionSkillIds);
                 }
               }, function() {
-                
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
             };
 
             ctrl.populateMisconceptions = function(skillIds) {
@@ -370,8 +372,9 @@ angular.module('oppia').directive('questionsList', [
                         var modalInstance = $uibModal.open({
                           templateUrl:
                             UrlInterpolationService.getDirectiveTemplateUrl(
-                              '/components/question-directives/modal-templates/' +
-                              'confirm-question-modal-exit-modal.directive.html'),
+                              '/components/question-directives/' +
+                              'modal-templates/confirm-question-' +
+                              'modal-exit-modal.directive.html'),
                           backdrop: true,
                           controller: [
                             '$scope', '$uibModalInstance',
@@ -400,15 +403,16 @@ angular.module('oppia').directive('questionsList', [
               modalInstance.result.then(function() {
                 ctrl.saveAndPublishQuestion();
               }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
             };
 
             $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, _initTab);
 
             _initTab();
-          }
-      }
+          };
+        }
       ]
     };
   }]);

@@ -510,8 +510,9 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.refreshWarnings()();
                 });
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.saveTaggedMisconception = function(misconceptionId, skillId) {

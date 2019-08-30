@@ -157,8 +157,9 @@ angular.module('oppia').directive('previewTab', [
                 callback();
               }
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           ctrl.loadPreviewState = function(stateName, manualParamChanges) {

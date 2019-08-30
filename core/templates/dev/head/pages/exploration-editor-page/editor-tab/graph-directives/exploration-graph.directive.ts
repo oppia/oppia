@@ -121,8 +121,9 @@ angular.module('oppia').directive('explorationGraph', [
                 console.error('Invalid closeDict action: ' + closeDict.action);
               }
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
         }
         }]

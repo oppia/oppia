@@ -180,8 +180,9 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           // When the page is scrolled so that the top of the page is above the
@@ -240,8 +241,9 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.deleteHint = function(index, evt) {

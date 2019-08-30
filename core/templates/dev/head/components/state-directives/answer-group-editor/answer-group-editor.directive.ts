@@ -177,8 +177,9 @@ angular.module('oppia').directive('answerGroupEditor', [
               _getTaggedMisconceptionName(
                 misconceptionSkillId + '-' + misconception.getId());
             }, function() {
-
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           ctrl.getAnswerChoices = function() {
