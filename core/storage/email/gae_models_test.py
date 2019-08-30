@@ -176,6 +176,27 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackEmailReplyToIdModel class."""
 
+    def test_put_function(self):
+        email_reply_model = email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='user_id_1.exploration.exp_id.thread_id',
+            user_id='user_id_1',
+            thread_id='exploration.exp_id.thread_id',
+            reply_to_id='reply_id')
+
+        email_reply_model.put()
+
+        last_updated = email_reply_model.last_updated
+
+        # If we do not wish to update the last_updated time, we should set
+        # the update_last_updated_time argument to False in the put function.
+        email_reply_model.put(update_last_updated_time=False)
+        self.assertEqual(email_reply_model.last_updated, last_updated)
+
+        # If we do wish to change it however, we can simply use the put function
+        # as the default value of update_last_updated_time is True.
+        email_reply_model.put()
+        self.assertNotEqual(email_reply_model.last_updated, last_updated)
+
     def test_create_new_object(self):
         actual_model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user_id', 'exploration.exp_id.thread_id')
