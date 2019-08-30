@@ -1,9 +1,9 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak"
+<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak"
     ng-if="topicRights.canEditTopic()">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
-      <button class="btn btn-default oppia-save-draft-button protractor-test-save-topic-button"
-              ng-class="{'btn-success': isTopicSaveable(), 'save-draft-button-padding': getChangeListLength()}"
+      <button class="btn btn-light oppia-save-changes-button protractor-test-save-topic-button"
+              ng-class="{'btn-success': isTopicSaveable()}"
               ng-click="saveChanges()"
               style="float: left;"
               ng-disabled="!isTopicSaveable()">
@@ -12,8 +12,8 @@
              alt="Save Topic">
             &#xE161;
           </i>
-          <span class="oppia-save-publish-button-label">Save Changes</span>
-          <span class="hidden-sm hidden-xs" style="opacity: 0.5"
+          <span class="oppia-save-publish-button-label float-left">Save Changes</span>
+          <span class="d-none d-md-block float-left" style="opacity: 0.5;margin-left: 2px;"
                 ng-if="getChangeListLength() > 0">
             (<[getChangeListLength()]>)
           </span>
@@ -24,18 +24,17 @@
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-default uib-dropdown-toggle"
+      <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle dropdown-toggle"
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
-        <span class="caret"></span>
       </button>
       <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && topicRights.isPublished() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}">Discard Draft</a></li>
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item">Discard Draft</a></li>
       </ul>
     </div>
   </li>
   <li style="margin-right: 20px; margin-top: 8px;">
     <button type="button" ng-if="!topicRights.isPublished()"
-            class="btn btn-default oppia-editor-publish-button protractor-test-publish-topic-button"
+            class="btn btn-light oppia-editor-publish-button protractor-test-publish-topic-button"
             ng-click="publishTopic()"
             ng-class="{'btn-success': !isTopicSaveable()}"
             ng-disabled="isTopicSaveable() || getWarningsCount() > 0">
@@ -47,13 +46,14 @@
     </button>
     <button type="button" ng-click="unpublishTopic()"
             ng-if="topicRights.isPublished() && topicRights.canPublishTopic()"
-            class="btn btn-default"
+            class="btn btn-light"
             ng-disabled="isTopicSaveable()">
       Unpublish Topic
     </button>
   </li>
-  <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>" class="icon">
-    <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()">
+  <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>" class="nav-item icon">
+    <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()"
+       class="nav-link">
       <i class="material-icons">&#xE254;</i> <span style="font-size: 0.8em;">Topic</span>
     </a>
     <div ng-show="getWarningsCount()"
@@ -73,14 +73,14 @@
     </ul>
   </li>
 
-  <li ng-class="{'active': getActiveTabName() === 'subtopics'}" class="icon">
-    <a class="protractor-test-subtopics-tab-button" uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
+  <li ng-class="{'active': getActiveTabName() === 'subtopics'}" class="nav-item icon">
+    <a class="nav-link protractor-test-subtopics-tab-button" uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
       <i class="material-icons">&#xE254;</i><span style="font-size: 0.7em;">Subtopics</span>
     </a>
   </li>
 
-  <li style="margin-right: 20px;" ng-class="{'active': getActiveTabName() === 'questions'}" class="icon">
-    <a class="protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
+  <li ng-class="{'active': getActiveTabName() === 'questions'}" class="nav-item icon">
+    <a class="nav-link protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
       <i class="material-icons">&#xE254;</i><span style="font-size: 0.7em;">Questions</span>
     </a>
   </li>
@@ -89,9 +89,6 @@
 <style>
   topic-editor-navbar .icon {
     width: 3.5em;
-  }
-  topic-editor-navbar .save-draft-button-padding {
-    padding-right: 120px;
   }
   topic-editor-navbar .icon .material-icons {
     font-size: 1.4em;

@@ -38,9 +38,9 @@
     Email option: <input type="radio" name="email" ng-model="$ctrl.emailOption" value="all" checked> Send to all
     <input type="radio" name="email" ng-model="$ctrl.emailOption" value="custom"> Send to max N users:
     <input type="number" ng-model="$ctrl.maxRecipients" min="0" placeholder="Enter number of users..." ng-disabled="$ctrl.emailOption == 'all'"><br><br>
-    <input class="btn btn-default" type="button" ng-click="$ctrl.sendTestEmail()" value="Send yourself a test email">
+    <input class="btn btn-secondary" type="button" ng-click="$ctrl.sendTestEmail()" value="Send yourself a test email">
     <input class="btn btn-success" type="submit" value="Submit Email">
-    <input class="btn btn-default" type="reset" value="Reset" ng-click="$ctrl.resetForm()">
+    <input class="btn btn-secondary" type="reset" value="Reset" ng-click="$ctrl.resetForm()">
     <input class="btn btn-danger" type="button" ng-click="$ctrl.cancelEmail()" value="Cancel">
   </form>
 </div>
