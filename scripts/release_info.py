@@ -41,7 +41,7 @@ import github # isort:skip
 # pylint: enable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
-GIT_CMD_CHECKOUT = 'git checkout -- %s'
+GIT_CMD_TEMPLATE_CHECKOUT = 'git checkout -- %s'
 GIT_CMD_TEMPLATE_GET_NEW_COMMITS = 'git cherry %s -v'
 GIT_CMD_GET_LOGS_FORMAT_STRING = (
     'git log -z --no-color --pretty=format:%H{0}%aN{0}%aE{0}%B {1}..{2}')
@@ -57,20 +57,20 @@ FECONF_VAR_NAMES = ['CURRENT_STATE_SCHEMA_VERSION',
 FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
 # This should match the indentation of span and li elements used
-# in credits section of
+# in developer_names section of
 # core/templates/dev/head/pages/about-page/about-page.directive.html.
 SPAN_INDENT = '              '
 LI_INDENT = '                '
-# This line should match the line after div element for credits in
+# This line should match the line after div element for developer_names in
 # about-page.directive.html.
-LINE_AFTER_Z_CREDITS = (
-    '            <p translate="I18N_ABOUT_PAGE_CREDITS_'
+LINE_AFTER_Z_DEVELOPER_NAMES = (
+    '            <p translate="I18N_ABOUT_PAGE_developer_nameS_'
     'TAB_TEXT_BOTTOM" translate-values="{listOfNames: $ctrl.listOfNames}">\n')
 ABOUT_PAGE_FILEPATH = (
     'core/templates/dev/head/pages/about-page/about-page.directive.html')
-AUTHORS_FILEPATH = 'AUTHORS'
-CHANGELOG_FILEPATH = 'CHANGELOG'
-CONTRIBUTORS_FILEPATH = 'CONTRIBUTORS'
+AUTHORS_FILEPATH = os.path.join('AUTHORS', '')
+CHANGELOG_FILEPATH = os.path.join('CHANGELOG', '')
+CONTRIBUTORS_FILEPATH = os.path.join('CONTRIBUTORS', '')
 RELEASE_SUMMARY_FILEPATH = os.path.join(
     os.getcwd(), os.pardir, 'release_summary.md')
 
@@ -78,7 +78,7 @@ Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
-    '--github_username', help=('Your GitHub username. '), type=str)
+    '--github_username', help=('Your GitHub username.'), type=str)
 
 
 def _run_cmd(cmd_str):
@@ -343,7 +343,7 @@ def check_prs_for_current_release_are_released(repo):
     return True
 
 
-def update_sorted_file(filepath, new_list, start_index_line):
+def update_sorted_file(filepath, new_list, last_comment_line):
     """Updates the files AUTHORS and CONTRIBUTORS with a sorted list of
     new authors or contributors.
 
@@ -351,18 +351,23 @@ def update_sorted_file(filepath, new_list, start_index_line):
         filepath: str. The path of the file to update.
         new_list: list(str). The list of new authors or contributors to
             add to the file.
-        start_index_line: str. The line whose index determines the start
-            of authors/contributors list in the file.
+        last_comment_line: str. The content of the line of last comment in
+            a line after which the file contains a new line followed by
+            a sorted list of authors/contributors.
     """
-    content = []
+    file_lines = []
     with python_utils.open_file(filepath, 'r') as f:
-        content = f.readlines()
-    start_index = content.index(start_index_line) + 2
-    updated_list = new_list + content[start_index:]
+        file_lines = f.readlines()
+    # start_index is the index of line where list of authors/contributors
+    # starts. The line with the last comment is followed by a empty line
+    # and then the sorted list. So, the start_index is the index of
+    # last_comment_line plus 2.
+    start_index = file_lines.index(last_comment_line) + 2
+    updated_list = new_list + file_lines[start_index:]
     updated_list = sorted(updated_list, key=lambda s: s.lower())
-    content = content[:start_index] + updated_list
+    file_lines = file_lines[:start_index] + updated_list
     with python_utils.open_file(filepath, 'w') as f:
-        for line in content:
+        for line in file_lines:
             f.write(line)
 
 
@@ -402,7 +407,7 @@ def update_authors(release_summary_content):
         release_summary_content: list(str). List of lines in
             ../release_summary.md.
     """
-    python_utils.PRINT('Updating Authors...')
+    python_utils.PRINT('Updating AUTHORS file...')
     start_index = release_summary_content.index(
         '### New Authors:\n') + 1
     end_index = release_summary_content.index(
@@ -412,7 +417,7 @@ def update_authors(release_summary_content):
     update_sorted_file(
         AUTHORS_FILEPATH, new_authors,
         '# Please keep the list sorted alphabetically.\n')
-    python_utils.PRINT('Updated Authors!')
+    python_utils.PRINT('Updated AUTHORS file!')
 
 
 def update_contributors(release_summary_content):
@@ -422,7 +427,7 @@ def update_contributors(release_summary_content):
         release_summary_content: list(str). List of lines in
             ../release_summary.md.
     """
-    python_utils.PRINT('Updating Contributors...')
+    python_utils.PRINT('Updating CONTRIBUTORS file...')
     start_index = release_summary_content.index(
         '### New Contributors:\n') + 1
     end_index = release_summary_content.index(
@@ -435,17 +440,17 @@ def update_contributors(release_summary_content):
     update_sorted_file(
         CONTRIBUTORS_FILEPATH, new_contributors,
         '# Please keep the list sorted alphabetically.\n')
-    python_utils.PRINT('Updated Contributors!')
+    python_utils.PRINT('Updated CONTRIBUTORS file!')
 
 
-def update_credits(release_summary_content):
+def update_developer_names(release_summary_content):
     """Updates about-page.directive.html file.
 
     Args:
         release_summary_content: list(str). List of lines in
             ../release_summary.md.
     """
-    python_utils.PRINT('Updating Credits...')
+    python_utils.PRINT('Updating about-page file...')
     start_index = release_summary_content.index(
         '### New Contributors:\n') + 1
     end_index = release_summary_content.index(
@@ -455,17 +460,17 @@ def update_credits(release_summary_content):
     new_contributors = [
         contributor.replace(
             '* ', '') for contributor in new_contributors]
-    new_credits = [
+    new_developer_names = [
         contributor.split('<')[0] for contributor in new_contributors]
-    new_credits.sort()
-    credit_dict = collections.defaultdict(list)
-    for credit in new_credits:
-        credit_dict[credit[0].upper()].append(
-            '%s<li>%s</li>\n' % (LI_INDENT, credit))
+    new_developer_names.sort()
+    developer_name_dict = collections.defaultdict(list)
+    for developer_name in new_developer_names:
+        developer_name_dict[developer_name[0].upper()].append(
+            '%s<li>%s</li>\n' % (LI_INDENT, developer_name))
     with python_utils.open_file(
         ABOUT_PAGE_FILEPATH, 'r') as about_page_file:
         about_page_content = about_page_file.readlines()
-        for char in credit_dict:
+        for char in developer_name_dict:
             start_index = about_page_content.index(
                 '%s<span>%s</span>\n' % (SPAN_INDENT, char)) + 2
             if char != 'Z':
@@ -473,23 +478,21 @@ def update_credits(release_summary_content):
                 end_index = about_page_content.index(
                     '%s<span>%s</span>\n' % (SPAN_INDENT, nxt_char)) - 2
             else:
-                nxt_line = (
-                    '            <p translate="I18N_ABOUT_PAGE_CREDITS_'
-                    'TAB_TEXT_BOTTOM" translate-values="{listOfNames: '
-                    '$ctrl.listOfNames}">\n')
-                end_index = about_page_content.index(nxt_line) - 2
+                end_index = about_page_content.index(
+                    LINE_AFTER_Z_DEVELOPER_NAMES) - 2
 
-            old_credits = about_page_content[start_index:end_index]
-            updated_credits = old_credits + credit_dict[char]
-            updated_credits = sorted(
-                updated_credits, key=lambda s: s.lower())
-            about_page_content[start_index:end_index] = updated_credits
+            old_developer_names = about_page_content[start_index:end_index]
+            updated_developer_names = (
+                old_developer_names + developer_name_dict[char])
+            updated_developer_names = sorted(
+                updated_developer_names, key=lambda s: s.lower())
+            about_page_content[start_index:end_index] = updated_developer_names
 
     with python_utils.open_file(
         ABOUT_PAGE_FILEPATH, 'w') as about_page_file:
         for line in about_page_content:
             about_page_file.write(line)
-    python_utils.PRINT('Updated Credits!')
+    python_utils.PRINT('Updated about-page file!')
 
 
 def main():
@@ -649,12 +652,10 @@ def main():
         python_utils.PRINT(
             '******************************************************')
         python_utils.PRINT(
-            'Please update %s to:\n'
-            '- have a correct changelog for '
-            'updating the CHANGELOG file\n'
-            '- have a correct list of new authors and contributors to '
-            'update AUTHORS, CONTRIBUTORS and Credits section in '
-            'about-page.directive.html\n'
+            'Please update %s to:\n- have a correct changelog for '
+            'updating the CHANGELOG file\n- have a correct list of new '
+            'authors and contributors to update AUTHORS, CONTRIBUTORS '
+            'and developer_names section in about-page.directive.html\n'
             'Confirm once you are done by entering y/ye/yes.\n' % (
                 RELEASE_SUMMARY_FILEPATH))
         answer = python_utils.INPUT().lower()
@@ -680,7 +681,7 @@ def main():
             release_summary_content, current_release_version)
         update_authors(release_summary_content)
         update_contributors(release_summary_content)
-        update_credits(release_summary_content)
+        update_developer_names(release_summary_content)
 
         python_utils.PRINT(
             'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
@@ -697,7 +698,7 @@ def main():
                 repo_fork.update_file(
                     contents.path, 'Update %s' % filepath, f.read(),
                     contents.sha, branch=target_branch)
-        _run_cmd(GIT_CMD_CHECKOUT % ('%s %s %s %s') % (
+        _run_cmd(GIT_CMD_TEMPLATE_CHECKOUT % ('%s %s %s %s') % (
             ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
             CHANGELOG_FILEPATH))
         common.open_new_tab_in_browser_if_possible(
@@ -707,7 +708,7 @@ def main():
             'Pushed changes to Github. '
             'Please create a pull request from the %s branch' % target_branch)
     except Exception as e:
-        _run_cmd(GIT_CMD_CHECKOUT % ('%s %s %s %s') % (
+        _run_cmd(GIT_CMD_TEMPLATE_CHECKOUT % ('%s %s %s %s') % (
             ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
             CHANGELOG_FILEPATH))
         # The get_git_ref code is wrapped in try except block since the
