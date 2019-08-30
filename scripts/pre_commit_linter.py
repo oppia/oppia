@@ -108,8 +108,8 @@ CONFIG_FILE_PATHS = (
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/dev/head/mathjaxConfig.ts',
-    'assets/constants.js',
-    'assets/rich_text_components_definitions.js')
+    'assets/constants.ts',
+    'assets/rich_text_components_definitions.ts')
 
 BAD_PATTERNS = {
     '__author__': {
@@ -489,7 +489,7 @@ BAD_PATTERNS_MAP = {
 
 REQUIRED_STRINGS_CONSTANTS = {
     'DEV_MODE: true': {
-        'message': 'Please set the DEV_MODE variable in constants.js'
+        'message': 'Please set the DEV_MODE variable in constants.ts'
                    'to true before committing.',
         'excluded_files': ()
     }
@@ -517,8 +517,8 @@ CONFIG_FILE_PATHS = (
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/dev/head/mathjaxConfig.ts',
-    'assets/constants.js',
-    'assets/rich_text_components_definitions.js',
+    'assets/constants.ts',
+    'assets/rich_text_components_definitions.ts',
     'webpack.config.ts',
     'webpack.dev.config.ts',
     'webpack.prod.config.ts')
@@ -530,7 +530,6 @@ CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 CODEOWNER_IMPORTANT_PATHS = [
     '/core/controllers/acl_decorators*.py',
     '/core/controllers/base*.py',
-    '/core/domain/dependency_registry*.py',
     '/core/domain/html*.py',
     '/core/domain/rights_manager*.py',
     '/core/domain/role_services*.py',
@@ -1530,7 +1529,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                 failed = failed or temp_failed
                 total_error_count += temp_count
 
-                if filepath == 'constants.js':
+                if filepath == 'constants.ts':
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
                         if pattern not in file_content:
                             failed = True
