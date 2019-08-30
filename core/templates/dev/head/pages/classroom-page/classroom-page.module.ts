@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the topic viewer page.
+ * @fileoverview Module for the classroom page.
  */
 
 import 'core-js/es7/reflect';
@@ -32,13 +32,8 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { TopicViewerDomainConstants } from
-  'domain/topic_viewer/topic-viewer-domain.constants';
+import { ClassroomDomainConstants } from
+  'domain/classroom/classroom-domain.constants';
 
 @NgModule({
   imports: [
@@ -52,13 +47,10 @@ import { TopicViewerDomainConstants } from
     ServiceBootstrapComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    TopicViewerDomainConstants,
+    ClassroomDomainConstants
   ]
 })
-class TopicViewerPageModule {
+class ClassroomPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
@@ -68,7 +60,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(TopicViewerPageModule);
+  return platformRef.bootstrapModule(ClassroomPageModule);
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
@@ -80,7 +72,8 @@ angular.module('oppia', [
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
   downgradedModule
-])
+].concat(
+  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
   .directive(
