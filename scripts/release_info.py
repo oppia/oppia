@@ -371,48 +371,48 @@ def update_sorted_file(filepath, new_list, last_comment_line):
             f.write(line)
 
 
-def update_changelog(release_summary_content, current_release_version):
+def update_changelog(release_summary_lines, current_release_version):
     """Updates CHANGELOG file.
 
     Args:
-        release_summary_content: list(str). List of lines in
+        release_summary_lines: list(str). List of lines in
             ../release_summary.md.
         current_release_version: str. The version of current release.
     """
 
     current_date = datetime.date.today().strftime('%d %b %Y')
     python_utils.PRINT('Updating Changelog...')
-    start_index = release_summary_content.index('### Changelog:\n') + 1
-    end_index = release_summary_content.index('### Commit History:\n')
+    start_index = release_summary_lines.index('### Changelog:\n') + 1
+    end_index = release_summary_lines.index('### Commit History:\n')
     release_version_changelog = [
         u'v%s (%s)\n' % (current_release_version, current_date),
-        u'------------------------\n'] + release_summary_content[
+        u'------------------------\n'] + release_summary_lines[
             start_index:end_index]
-    changelog_content = []
+    changelog_lines = []
     with python_utils.open_file(
         CHANGELOG_FILEPATH, 'r') as changelog_file:
-        changelog_content = changelog_file.readlines()
-    changelog_content[2:2] = release_version_changelog
+        changelog_lines = changelog_file.readlines()
+    changelog_lines[2:2] = release_version_changelog
     with python_utils.open_file(
         CHANGELOG_FILEPATH, 'w') as changelog_file:
-        for line in changelog_content:
+        for line in changelog_lines:
             changelog_file.write(line)
     python_utils.PRINT('Updated Changelog!')
 
 
-def update_authors(release_summary_content):
+def update_authors(release_summary_lines):
     """Updates AUTHORS file.
 
     Args:
-        release_summary_content: list(str). List of lines in
+        release_summary_lines: list(str). List of lines in
             ../release_summary.md.
     """
     python_utils.PRINT('Updating AUTHORS file...')
-    start_index = release_summary_content.index(
+    start_index = release_summary_lines.index(
         '### New Authors:\n') + 1
-    end_index = release_summary_content.index(
+    end_index = release_summary_lines.index(
         '### Existing Authors:\n') - 1
-    new_authors = release_summary_content[start_index:end_index]
+    new_authors = release_summary_lines[start_index:end_index]
     new_authors = [author.replace('* ', '') for author in new_authors]
     update_sorted_file(
         AUTHORS_FILEPATH, new_authors,
@@ -420,20 +420,20 @@ def update_authors(release_summary_content):
     python_utils.PRINT('Updated AUTHORS file!')
 
 
-def update_contributors(release_summary_content):
+def update_contributors(release_summary_lines):
     """Updates CONTRIBUTORS file.
 
     Args:
-        release_summary_content: list(str). List of lines in
+        release_summary_lines: list(str). List of lines in
             ../release_summary.md.
     """
     python_utils.PRINT('Updating CONTRIBUTORS file...')
-    start_index = release_summary_content.index(
+    start_index = release_summary_lines.index(
         '### New Contributors:\n') + 1
-    end_index = release_summary_content.index(
+    end_index = release_summary_lines.index(
         '### Email C&P Blurbs about authors:\n') - 1
     new_contributors = (
-        release_summary_content[start_index:end_index])
+        release_summary_lines[start_index:end_index])
     new_contributors = [
         contributor.replace(
             '* ', '') for contributor in new_contributors]
@@ -443,20 +443,20 @@ def update_contributors(release_summary_content):
     python_utils.PRINT('Updated CONTRIBUTORS file!')
 
 
-def update_developer_names(release_summary_content):
+def update_developer_names(release_summary_lines):
     """Updates about-page.directive.html file.
 
     Args:
-        release_summary_content: list(str). List of lines in
+        release_summary_lines: list(str). List of lines in
             ../release_summary.md.
     """
     python_utils.PRINT('Updating about-page file...')
-    start_index = release_summary_content.index(
+    start_index = release_summary_lines.index(
         '### New Contributors:\n') + 1
-    end_index = release_summary_content.index(
+    end_index = release_summary_lines.index(
         '### Email C&P Blurbs about authors:\n') - 1
     new_contributors = (
-        release_summary_content[start_index:end_index])
+        release_summary_lines[start_index:end_index])
     new_contributors = [
         contributor.replace(
             '* ', '') for contributor in new_contributors]
@@ -469,28 +469,28 @@ def update_developer_names(release_summary_content):
             '%s<li>%s</li>\n' % (LI_INDENT, developer_name))
     with python_utils.open_file(
         ABOUT_PAGE_FILEPATH, 'r') as about_page_file:
-        about_page_content = about_page_file.readlines()
+        about_page_lines = about_page_file.readlines()
         for char in developer_name_dict:
-            start_index = about_page_content.index(
+            start_index = about_page_lines.index(
                 '%s<span>%s</span>\n' % (SPAN_INDENT, char)) + 2
             if char != 'Z':
                 nxt_char = chr(ord(char) + 1)
-                end_index = about_page_content.index(
+                end_index = about_page_lines.index(
                     '%s<span>%s</span>\n' % (SPAN_INDENT, nxt_char)) - 2
             else:
-                end_index = about_page_content.index(
+                end_index = about_page_lines.index(
                     LINE_AFTER_Z_DEVELOPER_NAMES) - 2
 
-            old_developer_names = about_page_content[start_index:end_index]
+            old_developer_names = about_page_lines[start_index:end_index]
             updated_developer_names = (
                 old_developer_names + developer_name_dict[char])
             updated_developer_names = sorted(
                 updated_developer_names, key=lambda s: s.lower())
-            about_page_content[start_index:end_index] = updated_developer_names
+            about_page_lines[start_index:end_index] = updated_developer_names
 
     with python_utils.open_file(
         ABOUT_PAGE_FILEPATH, 'w') as about_page_file:
-        for line in about_page_content:
+        for line in about_page_lines:
             about_page_file.write(line)
     python_utils.PRINT('Updated about-page file!')
 
@@ -666,7 +666,7 @@ def main():
         common.RELEASE_BRANCH_NAME_PREFIX):]
     source_branch = 'develop'
     target_branch = 'update-changelog-for-releasev%s' % current_release_version
-    release_summary_content = []
+    release_summary_lines = []
     # This complete code block is wrapped in try except since in case of
     # an exception, we should ensure that the changes made to AUTHORS,
     # CONTRIBUTORS, CHANGELOG and about-page are reverted and the branch
@@ -675,13 +675,13 @@ def main():
     try:
         with python_utils.open_file(
             RELEASE_SUMMARY_FILEPATH, 'r') as release_summary_file:
-            release_summary_content = release_summary_file.readlines()
+            release_summary_lines = release_summary_file.readlines()
 
         update_changelog(
-            release_summary_content, current_release_version)
-        update_authors(release_summary_content)
-        update_contributors(release_summary_content)
-        update_developer_names(release_summary_content)
+            release_summary_lines, current_release_version)
+        update_authors(release_summary_lines)
+        update_contributors(release_summary_lines)
+        update_developer_names(release_summary_lines)
 
         python_utils.PRINT(
             'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
@@ -693,7 +693,7 @@ def main():
         for filepath in [
                 ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
                 CHANGELOG_FILEPATH]:
-            contents = repo_fork.get_contents(filepath, ref=target_branch)
+            contents = repo_fork.get_liness(filepath, ref=target_branch)
             with python_utils.open_file(filepath, 'r') as f:
                 repo_fork.update_file(
                     contents.path, 'Update %s' % filepath, f.read(),
