@@ -39,6 +39,7 @@ GOOGLE_APP_ENGINE_HOME = os.path.join(
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0/google-cloud-sdk')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
+NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = 'core/templates/dev/head'
 NPM_PATH = os.path.join(NODE_PATH, 'bin/npm')
 os.environ['PATH'] = '%s/bin:' % NODE_PATH + os.environ['PATH']
@@ -277,7 +278,7 @@ def install_npm_library(library, version, path):
     """
     python_utils.PRINT(
         'Checking whether %s is installed in %s' % (library, path))
-    if not os.path.exists('node_modules/%s' % library):
+    if not os.path.exists(os.path.join(NODE_MODULES_PATH, library)):
         python_utils.PRINT('Installing %s' % library)
         subprocess.call([NPM_PATH, 'install', '%s@%s' % (library, version)])
 

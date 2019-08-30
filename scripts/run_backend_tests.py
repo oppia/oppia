@@ -63,7 +63,9 @@ def main(argv=None):
 
     # Compile typescript files.
     python_utils.PRINT('Compiling typescript...')
-    subprocess.call(['node_modules/typescript/bin/tsc', '--project', '.'])
+    subprocess.call([
+        os.path.join(common.NODE_MODULES_PATH, 'typescript/bin/tsc'),
+        '--project', '.'])
 
     python_utils.PRINT('Compiling webpack...')
     subprocess.call([

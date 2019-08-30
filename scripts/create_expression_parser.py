@@ -41,7 +41,7 @@ def main():
     common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
 
     subprocess.call([
-        'node_modules/pegjs/bin/pegjs',
+        os.path.join(common.NODE_MODULES_PATH, 'pegjs/bin/pegjs'),
         expression_parser_definition, expression_parser_js])
 
     for line in fileinput.input(files=[expression_parser_js], inplace=True):
