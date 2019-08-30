@@ -212,7 +212,6 @@
 /core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
 /core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
-/extensions/dependencies/ @seanlip @vojtechjelinek
 /extensions/domain*.py @seanlip @DubeySandeep
 /extensions/interactions/ @kevinlee12 @vojtechjelinek
 /extensions/objects/ @aks681
@@ -305,15 +304,18 @@
 
 # Topic project.
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
+/core/controllers/classroom*.py @aks681
 /core/controllers/topic_*.py @aks681
 /core/domain/subtopic_page_domain*.py @aks681
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
 /core/templates/dev/head/components/entity-creation-services/topic-creation.service.ts.ts @aks681
+/core/templates/dev/head/domain/classroom/ @aks681
 /core/templates/dev/head/domain/subtopic_viewer/ @aks681
 /core/templates/dev/head/domain/topic/ @aks681
 /core/templates/dev/head/domain/topic_viewer @aks681
+/core/templates/dev/head/pages/classroom-page/ @aks681
 /core/templates/dev/head/pages/subtopic-viewer-page/ @aks681
 /core/templates/dev/head/pages/topic-editor-page/ @aks681
 /core/templates/dev/head/pages/topic-viewer-page/ @aks681
@@ -333,7 +335,7 @@
 /main.py @nithusha21 @DubeySandeep
 /feconf.py @seanlip @nithusha21
 /constants*.py @seanlip @nithusha21
-/assets/constants.js @seanlip @nithusha21
+/assets/constants.ts @seanlip @nithusha21
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
@@ -384,7 +386,6 @@
 
 # Rich text editor team.
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-5-rte.directive.ts @aks681 @NishealJ
 /core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
 /core/templates/dev/head/mathjaxConfig.ts @aks681
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
@@ -393,7 +394,7 @@
 /core/domain/rte_component_registry*.py @vojtechjelinek
 /extensions/ckeditor_plugins/ @vojtechjelinek
 /extensions/rich_text_components/ @vojtechjelinek
-/assets/rich_text_components_definitions.js @vojtechjelinek
+/assets/rich_text_components_definitions.ts @vojtechjelinek
 
 
 # Suggestion and feedback team.
@@ -433,9 +434,9 @@
 
 # Speed Improvement team.
 /app_dev.yaml @vojtechjelinek
+/core/templates/dev/head/google-analytics.initializer.ts @vojtechjelinek
 /core/templates/dev/head/base_components/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/Base.ts @vojtechjelinek
-/core/templates/dev/head/pages/base.html @vojtechjelinek
 /core/templates/dev/head/pages/oppia_footer_directive.html @vojtechjelinek
 /core/templates/dev/head/pages/OppiaFooterDirective.ts @vojtechjelinek
 /core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
@@ -444,7 +445,7 @@
 /core/templates/dev/head/services/CsrfTokenService*.ts @jamesjay4199 @vojtechjelinek
 /gulpfile.js @vojtechjelinek
 /jinja_utils*.py @vojtechjelinek
-/webpack.config.ts @vojtechjelinek
+/webpack.common.config.ts @vojtechjelinek
 /webpack.dev.config.ts @vojtechjelinek
 /webpack.prod.config.ts @vojtechjelinek
 
@@ -478,7 +479,6 @@
 # in scripts/pre_commit_linter.py in sync with the modifications.
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
-/core/domain/dependency_registry*.py @seanlip
 /core/domain/html*.py @seanlip
 /core/domain/rights_manager*.py @seanlip
 /core/domain/role_services*.py @seanlip

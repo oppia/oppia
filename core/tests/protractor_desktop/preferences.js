@@ -64,6 +64,51 @@ describe('Preferences', function() {
     preferencesPage.expectUserBioToBe('Junior student from USA studying CS!');
   });
 
+  it('should change prefered audio language of the learner', function() {
+    users.createUser('paul@preferences.com', 'paulPreferences');
+    users.login('paul@preferences.com');
+    preferencesPage.get();
+    expect(preferencesPage.preferredAudioLanguageSelector).toBeUndefined();
+    preferencesPage.selectPreferredAudioLanguage('Hindi');
+    preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
+    browser.refresh();
+    preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
+    preferencesPage.selectPreferredAudioLanguage('Arabic');
+    preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
+    browser.refresh();
+    preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
+  });
+
+  it('should change prefered site language of the learner', function() {
+    users.createUser('john@preferences.com', 'johnPreferences');
+    users.login('john@preferences.com');
+    preferencesPage.get();
+    expect(preferencesPage.systemLanguageSelector).toBeUndefined();
+    preferencesPage.selectSystemLanguage('Español');
+    preferencesPage.expectPreferredSiteLanguageToBe('Español');
+    browser.refresh();
+    preferencesPage.expectPreferredSiteLanguageToBe('Español');
+    preferencesPage.selectSystemLanguage('English');
+    preferencesPage.expectPreferredSiteLanguageToBe('English');
+    browser.refresh();
+    preferencesPage.expectPreferredSiteLanguageToBe('English');
+  });
+
+  it('should load the correct dashboard according to selection', function() {
+    users.createUser('lorem@preferences.com', 'loremPreferences');
+    users.login('lorem@preferences.com');
+    preferencesPage.get();
+    preferencesPage.selectCreatorDashboard();
+    general.goToHomePage();
+    expect(browser.getCurrentUrl()).toEqual(
+      'http://localhost:9001/creator_dashboard');
+    preferencesPage.get();
+    preferencesPage.selectLearnerDashboard();
+    general.goToHomePage();
+    expect(browser.getCurrentUrl()).toEqual(
+      'http://localhost:9001/learner_dashboard');
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
     users.logout();

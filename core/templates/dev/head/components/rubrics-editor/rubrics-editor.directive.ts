@@ -21,7 +21,6 @@ require(
 require('domain/skill/RubricObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 

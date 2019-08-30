@@ -15,8 +15,6 @@ module.exports = function(config) {
     files: [
       'local_compiled_js/core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      'local_compiled_js/assets/constants.js',
-      'local_compiled_js/assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.4.1/jquery.min.js',
@@ -47,7 +45,7 @@ module.exports = function(config) {
         served: true,
         included: false
       },
-      'extensions/interactions/**/*_directive.html',
+      'extensions/interactions/**/*.directive.html',
       'extensions/interactions/rule_templates.json',
       'core/tests/data/*.json',
       {
@@ -79,7 +77,7 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
       'core/templates/dev/head/**/*.directive.html': ['ng-html2js'],
       'core/templates/dev/head/**/*.template.html': ['ng-html2js'],
-      'extensions/interactions/**/*_directive.html': ['ng-html2js'],
+      'extensions/interactions/**/*.directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
@@ -147,9 +145,12 @@ module.exports = function(config) {
       mode: 'development',
       resolve: {
         modules: [
+          'core/tests/data',
+          'assets',
           'core/templates/dev/head',
           'extensions',
           'node_modules',
+          'third_party',
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
