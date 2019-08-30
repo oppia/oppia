@@ -1,4 +1,4 @@
-<div class="navbar-header protractor-test-navbar-header pull-left">
+<div class="float-left navbar-header protractor-test-navbar-header">
   <a ng-if="$ctrl.windowIsNarrow" ng-click="$ctrl.toggleSidebar()"
      class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button"
      tabindex="0">
@@ -17,17 +17,17 @@
   </a>
 </div>
 
-<div ng-cloak class="navbar-header pull-right" ng-if="$ctrl.userMenuIsShown">
+<div ng-cloak class="float-right navbar-header" ng-if="$ctrl.userMenuIsShown">
   <ul class="nav oppia-navbar-nav" ng-if="$ctrl.standardNavIsShown">
     <ul ng-if="$ctrl.windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
       <create-activity-button></create-activity-button>
     </ul>
     <ul ng-if="!$ctrl.windowIsNarrow" class="nav oppia-navbar-tabs">
-      <li ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
-        <a ng-mouseover="$ctrl.blurNavigationLinks($event)" class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
+      <li ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="nav-item oppia-clickable-navbar-element">
+        <a ng-mouseover="$ctrl.blurNavigationLinks($event)" class="nav-link oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
       </li>
-      <li ng-class="{'open' : $ctrl.activeMenuName === 'aboutMenu'}" uib-dropdown ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
-        <a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})" class="oppia-navbar-tab"
+      <li ng-class="{'open' : $ctrl.activeMenuName === 'aboutMenu'}" uib-dropdown ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="nav-item  oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+        <a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})" class="nav-link oppia-navbar-tab dropdown-toggle"
            role="menuitem"
            aria-haspopup="true"
            aria-expanded="false"
@@ -35,24 +35,23 @@
            ng-mouseover="$ctrl.openSubmenu($event, 'aboutMenu')"
            ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
           <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
-          <span class="caret"></span>
         </a>
         <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
             ng-mouseover="$ctrl.openSubmenu($event, 'aboutMenu')"
             ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)"
             role="menu">
-          <li><a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {shiftTab: $ctrl.ACTION_CLOSE})" class="oppia-navbar-tab-content protractor-test-about-link" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
-          <li><a class="oppia-navbar-tab-content protractor-test-get-started-link " href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
-          <li><a class="oppia-navbar-tab-content protractor-test-playbook-link " href="/teach#playbook" translate="I18N_TOPNAV_PARTICIPATION_PLAYBOOK"></a></li>
-          <li><a class="oppia-navbar-tab-content" href="https://medium.com/oppia-org" target="_blank" rel="noopener" translate="I18N_TOPNAV_BLOG">Blog</a></li>
-          <li><a class="oppia-navbar-tab-content" href="http://oppiafoundation.org"  target="_blank" rel="noopener" translate="I18N_TOPNAV_OPPIA_FOUNDATION"></a></li>
-          <li><a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {tab: $ctrl.ACTION_CLOSE})" class="oppia-navbar-tab-content" href="https://oppiafoundation.org/volunteer" target="_blank" rel="noopener" translate="I18N_TOPNAV_GET_INVOLVED"></a></li>
+          <li class="nav-item"> <a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {shiftTab: $ctrl.ACTION_CLOSE})" class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
+          <li class="nav-item"> <a class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-get-started-link " href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
+          <li class="nav-item"> <a class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-playbook-link " href="/teach#playbook" translate="I18N_TOPNAV_PARTICIPATION_PLAYBOOK"></a></li>
+          <li class="nav-item"> <a class="dropdown-item nav-link oppia-navbar-tab-content" href="https://medium.com/oppia-org" target="_blank" rel="noopener" translate="I18N_TOPNAV_BLOG">Blog</a></li>
+          <li class="nav-item"> <a class="dropdown-item nav-link oppia-navbar-tab-content" href="http://oppiafoundation.org"  target="_blank" rel="noopener" translate="I18N_TOPNAV_OPPIA_FOUNDATION"></a></li>
+          <li class="nav-item"> <a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {tab: $ctrl.ACTION_CLOSE})" class="dropdown-item nav-link oppia-navbar-tab-content" href="https://oppiafoundation.org/volunteer" target="_blank" rel="noopener" translate="I18N_TOPNAV_GET_INVOLVED"></a></li>
         </ul>
       </li>
-      <li ng-mouseover="$ctrl.blurNavigationLinks($event)" ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
+      <li class="nav-item" ng-mouseover="$ctrl.blurNavigationLinks($event)" ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
         <div class="oppia-navbar-button-container">
           <a href="/donate"
-             class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200">
+             class="btn oppia-navbar-button nav-link oppia-navbar-hide-on-small-width oppia-transition-200">
             <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_DONATE"></span>
           </a>
         </div>
@@ -61,25 +60,23 @@
     </ul>
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-    <li ng-class="{'open' : $ctrl.activeMenuName === 'profileMenu'}" uib-dropdown ng-if="$ctrl.userIsLoggedIn" class="protractor-test-profile-dropdown">
-      <a uib-dropdown-toggle class="oppia-navbar-dropdown-toggle"
-         ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
-         ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)"
-         ng-keydown="$ctrl.onMenuKeypress($event, 'profileMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})"
+    <li ng-class="{'open' : $ctrl.activeMenuName === 'profileMenu'}" uib-dropdown ng-if="$ctrl.userIsLoggedIn" class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
+      <a ng-keydown="$ctrl.onMenuKeypress($event, 'profileMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})"
+         class="nav-link oppia-navbar-dropdown-toggle"
          role="menuitem"
          aria-haspopup="true"
          aria-expanded="false"
          aria-label="User Menu"
-         tabindex="0">
-        <div class="oppia-navbar-profile-picture-container">
+         tabindex="0"
+         ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
+         ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
+        <div class="oppia-navbar-profile-picture-container dropdown-toggle">
           <span ng-if="$ctrl.profilePictureDataUrl">
-            <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-navbar-profile-picture img-circle" alt="User Avatar">
-            <span class="caret"></span>
+            <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-navbar-profile-picture rounded-circle" alt="User Avatar">
           </span>
           <span ng-if="!$ctrl.profilePictureDataUrl">
             <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
             <span class="oppia-icon-accessibility-label">User Avatar</span>
-            <span class="caret" style="margin-top: -26px;"></span>
           </span>
 
           <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="$ctrl.numUnseenNotifications > 0">
@@ -100,65 +97,65 @@
         </div>
       </a>
 
-      <ul uib-dropdown-menu class="uib-dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu"
+      <ul uib-dropdown-menu class="ng-cloak oppia-navbar-dropdown uib-dropdown-menu" role="menu"
           ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
           ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
-        <li>
+        <li class="nav-item">
           <a ng-click="$ctrl.closeSubmenuIfNotMobile($event)" ng-href="<[$ctrl.profilePageUrl]>"
-             class="protractor-test-profile-link"
+             class="dropdown-item nav-link protractor-test-profile-link"
              ng-keydown="$ctrl.onMenuKeypress($event, 'profileMenu', {shiftTab: $ctrl.ACTION_CLOSE})">
             <strong><[$ctrl.username]></strong>
           </a>
         </li>
         <hr class="oppia-top-right-menu-item-separator">
-        <li>
+        <li class="nav-item">
           <a ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/creator_dashboard"
-             class="protractor-test-creator-dashboard-link">
+             class="dropdown-item nav-link protractor-test-creator-dashboard-link">
             <span translate="I18N_TOPNAV_CREATOR_DASHBOARD"></span>
           </a>
         </li>
-        <li>
+        <li class="nav-item">
           <a ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/learner_dashboard"
-             class="protractor-test-learner-dashboard-link">
+             class="dropdown-item nav-link protractor-test-learner-dashboard-link">
             <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
           </a>
         </li>
-        <li>
-          <a ng-if="($ctrl.isAdmin || $ctrl.isTopicManager)" ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/topics_and_skills_dashboard"
-             class="protractor-test-topics-and-skills-dashboard-link">
+        <li class="nav-item">
+          <a ng-if="($ctrl.isAdmin || $ctrl.isTopicManager)" ng-click="$ctrl.closeSubmenuIfNotMobile($event)"
+             href="/topics_and_skills_dashboard" class="dropdown-item nav-link protractor-test-topics-and-skills-dashboard-link">
             <span translate="I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD"></span>
           </a>
         </li>
-        <li>
+        <li class="nav-item">
           <a ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/notifications_dashboard"
-             class="protractor-test-notifications-link">
+             class="dropdown-item nav-link protractor-test-notifications-link">
             <span translate="I18N_TOPNAV_NOTIFICATIONS"></span>
             <span ng-if="$ctrl.numUnseenNotifications > 0">
               (<[$ctrl.numUnseenNotifications]>)
             </span>
           </a>
         </li>
-        <li>
+        <li class="nav-item">
           <a ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/preferences"
-             class="protractor-test-preferences-link">
+             class="dropdown-item nav-link protractor-test-preferences-link">
             <span translate="I18N_TOPNAV_PREFERENCES"></span>
           </a>
         </li>
-        <li ng-if="$ctrl.isModerator">
-          <a ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/moderator" target="_blank" rel="noopener">
+        <li class="nav-item" ng-if="$ctrl.isModerator">
+          <a class="dropdown-item nav-link" ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/moderator" target="_blank" rel="noopener">
             <span translate="I18N_TOPNAV_MODERATOR_PAGE"></span>
           </a>
         </li>
-        <li ng-if="$ctrl.isSuperAdmin">
-          <a class="protractor-test-admin-link" ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/admin" target="_blank" rel="noopener">
+        <li class="nav-item" ng-if="$ctrl.isSuperAdmin">
+          <a class="dropdown-item nav-link protractor-test-admin-link" ng-click="$ctrl.closeSubmenuIfNotMobile($event)"
+             href="/admin" target="_blank" rel="noopener">
             <span translate="I18N_TOPNAV_ADMIN_PAGE"></span>
           </a>
         </li>
-
         <hr class="oppia-top-right-menu-item-separator">
-
-        <li>
+        <li class="nav-item">
           <a ng-click="$ctrl.closeSubmenuIfNotMobile($event);$ctrl.onLogoutButtonClicked()" ng-href="<[$ctrl.logoutUrl]>"
+             class="dropdown-item nav-link"
              ng-keydown="$ctrl.onMenuKeypress($event, 'profileMenu', {tab: $ctrl.ACTION_CLOSE})">
             <span translate="I18N_TOPNAV_LOGOUT"></span>
           </a>
@@ -166,18 +163,19 @@
       </ul>
     </li>
 
-    <li uib-dropdown ng-if="!$ctrl.userIsLoggedIn && $ctrl.username !== ''" class="oppia-navbar-clickable-dropdown">
+    <li uib-dropdown ng-if="!$ctrl.userIsLoggedIn && $ctrl.username !== ''" class="nav-item
+     oppia-navbar-clickable-dropdown">
       <div class="oppia-navbar-button-container" style="margin-right: 10px;">
-        <button class="btn oppia-navbar-button protractor-mobile-test-login"
+        <button class="btn dropdown-toggle oppia-navbar-button protractor-mobile-test-login"
                 ng-click="$ctrl.onLoginButtonClicked()">
           <span translate="I18N_TOPNAV_SIGN_IN"></span>
-          <span class="caret"></span>
         </button>
       </div>
       <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown" role="menu"
           style="margin-right: 15px; padding: 0;">
-        <li>
-          <a href="" style="padding: 0; width: 190px;" ng-click="$ctrl.onLoginButtonClicked()">
+        <li class="nav-item">
+          <a href="" style="padding: 0; width: 190px;" ng-click="$ctrl.onLoginButtonClicked()"
+             class="nav-link">
             <div class="oppia-signin-google">
               <div class="oppia-signin-g-icon">
                 <img ng-src="<[$ctrl.googleSignInIconUrl]>">
