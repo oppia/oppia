@@ -63,7 +63,8 @@ import webtest
 current_user_services = models.Registry.import_current_user_services()
 
 # Prefix to append to all lines printed by tests to the console.
-LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
+# We are using the b' prefix as all the stdouts are in bytes.
+LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 
 
 def empty_environ():
@@ -497,7 +498,9 @@ tags: []
         """Print the line with a prefix that can be identified by the
         script that calls the test.
         """
-        python_utils.PRINT('%s%s' % (LOG_LINE_PREFIX, line))
+        # We are using the b' prefix as all the stdouts are in bytes.
+        python_utils.PRINT(
+            b'%s%s' % (LOG_LINE_PREFIX, python_utils.convert_to_bytes(line)))
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
