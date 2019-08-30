@@ -1,6 +1,6 @@
 <div>
   <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-story-player-tiles-container">
-    <div class="oppia-story-path-section hidden-sm hidden-xs">
+    <div class="oppia-story-path-section d-none d-md-block">
       <svg width="500px" ng-attr-height="<[$ctrl.svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
         <path fill="none"
               stroke="#296E5F"
@@ -107,7 +107,7 @@
       </a>
     </div>
 
-    <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-story-table hidden-md hidden-lg hidden-xl">
+    <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-story-table d-none d-md-none d-lg-none d-xl-none">
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
       <div class="mobile-path-segment" ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes()" id="mobile-path-anchor-<[$index]>">
         <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;">
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-    <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-card-preview-panel hidden-sm hidden-xs">
+    <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-card-preview-panel d-none d-md-block">
       <md-card class="oppia-activity-summary-tile md-default-theme">
         <div class="title-section" style="background-color: grey; z-index: 1;">
           <img ng-src="<[$ctrl.getStaticImageUrl('/subjects/Lightbulb.svg')]>" class="thumbnail-image">

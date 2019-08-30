@@ -177,7 +177,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
-        self.values['additional_angular_modules'] = []
         self.values['iframed'] = False
         self.values['is_moderator'] = user_services.is_at_least_moderator(
             self.user_id)
@@ -362,10 +361,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
-                    'pages/error-pages/error-iframed.mainpage.html',
+                    'error-iframed.mainpage.html',
                     iframe_restriction=None)
             else:
-                self.render_template('dist/error-page.mainpage.html')
+                self.render_template('error-page.mainpage.html')
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):

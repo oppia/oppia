@@ -24,14 +24,14 @@
   </div>
   <div class="modal-footer" ng-switch="skillSummaries.length > 0">
     <div ng-switch-when="true">
-      <button class="btn btn-default" ng-click="cancelModal()"> Cancel </button>
+      <button class="btn btn-secondary" ng-click="cancelModal()"> Cancel </button>
       <button class="btn btn-success protractor-test-confirm-skill-button"
               ng-disabled="selectedSkillIds.length === 0"
               ng-click="goToSelectDifficultyView()"> Next
       </button>
     </div>
     <div ng-switch-when="false">
-      <button class="btn btn-default" ng-click="closeModal()"> Ok </button>
+      <button class="btn btn-secondary" ng-click="closeModal()"> Ok </button>
     </div>
   </div>
 </div>
@@ -62,14 +62,14 @@
   </div>
   <div class="modal-footer" ng-switch="linkedSkillsWithDifficulty.length > 0">
     <div ng-switch-when="true">
-      <button class="btn btn-default" ng-click="cancelModal()"> Cancel </button>
+      <button class="btn btn-secondary" ng-click="cancelModal()"> Cancel </button>
       <button class="btn btn-success protractor-test-confirm-skill-difficulty-button"
               ng-disabled="linkedSkillsWithDifficulty.length === 0"
               ng-click="startQuestionCreation()"> Done
       </button>
     </div>
     <div ng-switch-when="false">
-      <button class="btn btn-default" ng-click="goToSelectSkillView()"> Back </button>
+      <button class="btn btn-secondary" ng-click="goToSelectSkillView()"> Back </button>
     </div>
   </div>
 </div>

@@ -42,16 +42,6 @@ var checkForConsoleErrors = function(errorsToIgnore) {
       });
     }
 
-    // Since we are in the process of upgrading CKeditor-4 to Ckeditor-5,
-    // we are observing consoles errors for duplicated modules
-    // (for more details,
-    // please refer to https://github.com/ckeditor/ckeditor5/issues/1821)
-    // and therefore, we need to filter such logs until we've upgraded to
-    // CKEditor-5 completely.
-    browserLogs = browserLogs.filter(function(browserLog) {
-      return !(browserLog.message.includes('ckeditor-duplicated-modules'));
-    });
-
     for (var i = 0; i < browserLogs.length; i++) {
       if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
         var errorFatal = true;
@@ -70,9 +60,7 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var isInDevMode = function() {
-  browser.get('/splash');
-  waitFor.pageToFullyLoad();
-  return browser.executeScript('return constants.DEV_MODE');
+  return browser.params.devMode === 'true';
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';
@@ -197,6 +185,12 @@ var checkConsoleErrorsExist = function(expectedErrors) {
   });
 };
 
+var goToHomePage = function() {
+  var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
+  oppiaMainLogo.click();
+  return waitFor.pageToFullyLoad();
+};
+
 exports.acceptAlert = acceptAlert;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
@@ -221,3 +215,5 @@ exports.expect404Error = expect404Error;
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 
 exports.checkConsoleErrorsExist = checkConsoleErrorsExist;
+
+exports.goToHomePage = goToHomePage;
