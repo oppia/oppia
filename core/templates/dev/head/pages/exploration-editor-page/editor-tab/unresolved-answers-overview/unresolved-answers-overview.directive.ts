@@ -255,7 +255,9 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                   fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
                 }]
             }).result.catch(function() {
-              });
+               // This callback is triggered when the Cancel button is clicked.
+               // No further action is needed.
+            });
 
           };
 

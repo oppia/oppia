@@ -80,6 +80,8 @@ angular.module('oppia').directive('skillEditorNavbar', [
                   }
                 ]
               }).result.catch(function() {
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               SkillEditorRoutingService.navigateToQuestionsTab();

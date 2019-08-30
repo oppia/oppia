@@ -76,7 +76,9 @@ angular.module('oppia').directive('storyEditorPage', [
                     }
                   ]
                 }).result.catch(function() {
-              });
+                  // This callback is triggered when the Cancel button is clicked.
+                  // No further action is needed.
+                });
               } else {
                 $window.open(
                   UrlInterpolationService.interpolateUrl(

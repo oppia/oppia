@@ -270,7 +270,9 @@ angular.module('oppia').directive('questionPlayer', [
                 }
               ]
             }).result.catch(function() {
-              });
+               // This callback is triggered when the Cancel button is clicked.
+               // No further action is needed.
+            });
           };
 
 
@@ -552,7 +554,9 @@ angular.module('oppia').directive('questionPlayer', [
                 }
               ]
             }).result.catch(function() {
-              });
+               // This callback is triggered when the Cancel button is clicked.
+               // No further action is needed.
+            });
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {

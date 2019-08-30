@@ -171,7 +171,9 @@ angular.module('oppia').directive('learnerViewInfo', [
                 }
               ]
             }).result.catch(function() {
-              });
+               // This callback is triggered when the Cancel button is clicked.
+               // No further action is needed.
+            });
           };
         }
         }
