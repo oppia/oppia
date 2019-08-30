@@ -102,6 +102,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
 
+    def test_get_multi_summaries(self):
+        topic_summaries = topic_services.get_multi_topic_summaries([
+            self.TOPIC_ID, 'invalid_id'])
+
+        self.assertEqual(len(topic_summaries), 1)
+        self.assertEqual(topic_summaries[0].name, 'Name')
+        self.assertEqual(topic_summaries[0].canonical_story_count, 2)
+        self.assertEqual(topic_summaries[0].additional_story_count, 1)
+        self.assertEqual(topic_summaries[0].total_skill_count, 2)
+        self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
+        self.assertEqual(topic_summaries[0].subtopic_count, 1)
+
     def test_get_new_topic_id(self):
         new_topic_id = topic_services.get_new_topic_id()
 
@@ -899,6 +911,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_admin, topic_rights))
+
+    def test_filter_published_topic_ids(self):
+        published_topic_ids = topic_services.filter_published_topic_ids([
+            self.TOPIC_ID, 'invalid_id'])
+        self.assertEqual(len(published_topic_ids), 0)
+        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
+        published_topic_ids = topic_services.filter_published_topic_ids([
+            self.TOPIC_ID, 'invalid_id'])
+        self.assertEqual(len(published_topic_ids), 1)
+        self.assertEqual(published_topic_ids[0], self.TOPIC_ID)
 
     def test_publish_and_unpublish_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
