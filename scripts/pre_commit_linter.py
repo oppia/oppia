@@ -609,6 +609,7 @@ _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 _TARGET_STDOUT = python_utils.string_io()
 _STDOUTS = multiprocessing.Manager().list()
+_FILES = multiprocessing.Manager().dict()
 
 
 
@@ -1571,7 +1572,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
 
-    def __init__(self, all_filepaths, verbose_mode_enabled=False): # pylint: disable=super-init-not-called
+    def __init__(self, verbose_mode_enabled=False): # pylint: disable=super-init-not-called
         """Constructs a LintChecksManager object.
 
         Args:
@@ -1585,9 +1586,14 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
         os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
-        self.all_filepaths = all_filepaths
+        # self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
         self.process_manager = multiprocessing.Manager().dict()
+
+    @abc.abstractproperty
+    def all_filepaths(self):
+        """"""
+        pass
 
     def _run_multiple_checks(self, *checks):
         """Run multiple checks in parallel."""
@@ -1759,16 +1765,12 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
-        # mandatory_patterns_messages = self._check_mandatory_patterns()
-        # pattern_messages = self._check_bad_patterns()
-        # codeowner_messages = self._check_codeowner_file()
-        codeowner_messages = []
         self._check_patterns()
         mandatory_patterns_messages = self.process_manager['mandatory']
         pattern_messages = self.process_manager['bad_pattern']
 
         return (
-            mandatory_patterns_messages + pattern_messages + codeowner_messages)
+            mandatory_patterns_messages + pattern_messages)
 
 
 class JsTsLintChecksManager(LintChecksManager):
@@ -1782,7 +1784,7 @@ class JsTsLintChecksManager(LintChecksManager):
             validating and parsing the files.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
-    def __init__(self, js_filepaths, ts_filepaths, verbose_mode_enabled=False):
+    def __init__(self, verbose_mode_enabled=False):
         """Constructs a JsTsLintChecksManager object.
 
         Args:
@@ -1793,14 +1795,22 @@ class JsTsLintChecksManager(LintChecksManager):
         node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
         os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
-        self.all_filepaths = js_filepaths + ts_filepaths
-        self.js_filepaths = js_filepaths
-        self.ts_filepaths = ts_filepaths
-        super(JsTsLintChecksManager, self).__init__(
-            self.all_filepaths, verbose_mode_enabled=verbose_mode_enabled)
+        super(JsTsLintChecksManager, self).__init__(verbose_mode_enabled=verbose_mode_enabled)
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
+
+    @property
+    def js_filepaths(self):
+        return _FILES['.js']
+
+    @property
+    def ts_filepaths(self):
+        return _FILES['.ts']
+
+    @property
+    def all_filepaths(self):
+        return self.js_filepaths + self.ts_filepaths
 
     def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
@@ -2622,7 +2632,7 @@ class OtherLintChecksManager(LintChecksManager):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     def __init__(
-            self, py_filepaths, html_filepaths, css_filepaths, other_filepaths,
+            self,
             verbose_mode_enabled=False):
         """Constructs a OtherLintChecksManager object.
 
@@ -2634,14 +2644,33 @@ class OtherLintChecksManager(LintChecksManager):
                 linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
-        self.py_filepaths = py_filepaths
-        self.html_filepaths = html_filepaths
-        self.other_filepaths = other_filepaths
-        self.css_filepaths = css_filepaths
-        self.all_filepaths = (
-            py_filepaths + html_filepaths + other_filepaths + css_filepaths)
-        super(OtherLintChecksManager, self).__init__(
-            self.all_filepaths, verbose_mode_enabled=verbose_mode_enabled)
+        # self.py_filepaths = py_filepaths
+        # self.html_filepaths = html_filepaths
+        # self.other_filepaths = other_filepaths
+        # self.css_filepaths = css_filepaths
+        # self.all_filepaths = (
+        #     py_filepaths + html_filepaths + other_filepaths + css_filepaths)
+        super(OtherLintChecksManager, self).__init__(verbose_mode_enabled=verbose_mode_enabled)
+
+    @property
+    def py_filepaths(self):
+        return _FILES['.py']
+
+    @property
+    def html_filepaths(self):
+        return _FILES['.html']
+
+    @property
+    def other_filepaths(self):
+        return _FILES['other']
+
+    @property
+    def css_filepaths(self):
+        return _FILES['.css']
+
+    @property
+    def all_filepaths(self):
+        return self.css_filepaths + self.html_filepaths + self.other_filepaths + self.py_filepaths
 
 
     def _lint_all_files(self):
@@ -3249,7 +3278,7 @@ def main():
         sys.exit(1)
 
     all_filepaths_dict = {
-        '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], 'css': []
+        '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []
     }
     for f in all_filepaths:
         _, extension = os.path.splitext(f)
@@ -3257,13 +3286,11 @@ def main():
             all_filepaths_dict[extension].append(f)
         else:
             all_filepaths_dict['other'].append(f)
+    _FILES.update(all_filepaths_dict)
     code_owner_message = _check_codeowner_file(verbose_mode_enabled)
     js_ts_lint_checks_manager = JsTsLintChecksManager(
-        all_filepaths_dict['.js'], all_filepaths_dict['.ts'],
         verbose_mode_enabled)
-    other_lint_checks_manager = OtherLintChecksManager( # pylint: disable=too-many-function-args
-        all_filepaths_dict['.py'], all_filepaths_dict['.html'],
-        all_filepaths_dict['css'], all_filepaths_dict['other'],
+    other_lint_checks_manager = OtherLintChecksManager(
         verbose_mode_enabled)
     all_messages = code_owner_message
     all_messages += js_ts_lint_checks_manager.perform_all_lint_checks()
