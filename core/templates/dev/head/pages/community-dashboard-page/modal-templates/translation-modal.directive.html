@@ -41,9 +41,12 @@
 <div class="modal-footer">
   <div>
     <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
-    <button class="btn btn-success oppia-upload-translated-text-button" ng-disabled="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''" ng-click="addTranslatedText()">
+    <button class="btn btn-success oppia-upload-translated-text-button"
+            ng-disabled="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
+            ng-click="addTranslatedText()">
       <i ng-show="uploadingTranslation" class="fa fa-spinner"></i>
-      <span ng-show="!uploadingTranslation">Save <span ng-show="moreAvailable">and translate another</span></span>
+      <span ng-show="!uploadingTranslation && !moreAvailable">Save and close</span>
+      <span ng-show="!uploadingTranslation && moreAvailable">Save and translate another</span>
     </button>
   </div>
 </div>
@@ -84,11 +87,5 @@
   }
   .oppia-upload-translated-text-button {
     min-width: 200px;
-  }
-  .oppia-translatable-text-section {
-
-  }
-  .oppia-translation-editor-section {
-
   }
 </style>

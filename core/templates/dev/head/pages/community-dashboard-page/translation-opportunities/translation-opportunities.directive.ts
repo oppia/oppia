@@ -153,7 +153,6 @@ angular.module('oppia').directive(
                     function() {
                       var textAndAvailability = (
                         TranslateTextService.getTextToTranslate());
-                      console.log(textAndAvailability);
                       $scope.textToTranslate = textAndAvailability.text;
                       $scope.moreAvailable = textAndAvailability.more;
                       $scope.loadingData = false;
@@ -173,7 +172,6 @@ angular.module('oppia').directive(
                           if ($scope.moreAvailable) {
                             var textAndAvailability = (
                               TranslateTextService.getTextToTranslate());
-                            console.log(textAndAvailability);
                             $scope.textToTranslate = textAndAvailability.text;
                             $scope.moreAvailable = textAndAvailability.more;
                           }
@@ -185,7 +183,6 @@ angular.module('oppia').directive(
                       $uibModalInstance.dismiss('ok');
                     }
                   };
-
                   $scope.done = function() {
                     $uibModalInstance.close();
                   };

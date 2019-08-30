@@ -848,13 +848,18 @@ class WrittenTranslations(object):
         available_translation_content_ids = []
         for content_id, translations in self.translations_mapping.iteritems():
             if language_code in translations and not (
-                    translations[language_code].needs_update) :
+                    translations[language_code].needs_update):
                 available_translation_content_ids.aapend(content_id)
 
         return available_translation_content_ids
 
     def add_translation(self, content_id, language_code, html):
-        """Adds a translation.
+        """Adds a translation for the given content id in a given language.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code of the translated html.
+            html: str. the translated html.
         """
         written_translation = WrittenTranslation(html, False)
         self.translations_mapping[content_id][language_code] = (
@@ -1421,7 +1426,11 @@ class State(object):
         self.recorded_voiceovers.validate(content_id_list)
 
     def validate_matches_content(self, content_id, content_html):
-        """
+        """Validates whether the given content matches the content of the state.
+
+        Raises:
+            ValidationError: The given html doesn't matches the content of the
+                state.
         """
         content_id_to_html = self._get_all_translatable_content()
         if content_id_to_html[content_id] != content_html:
@@ -1551,12 +1560,17 @@ class State(object):
                 self.written_translations.add_content_id_for_translation(
                     content_id)
 
-    def add_translation(self, content_id, language_code, html):
+    def add_translation(self, content_id, language_code, translation_html):
+        """Adds translation to a given content id in a specific language.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code.
+            translation_html: str. The translated html content.
         """
-        """
-        html = html_cleaner.clean(html)
+        translation_html = html_cleaner.clean(translation_html)
         self.written_translations.add_translation(
-            content_id, language_code, html)
+            content_id, language_code, translation_html)
 
     def update_content(self, content):
         """Update the content of this state.
@@ -1800,7 +1814,11 @@ class State(object):
         self.solicit_answer_details = solicit_answer_details
 
     def _get_all_translatable_content(self):
-        """
+        """Returns all content which can be translated into different languages.
+
+        Returns:
+            dict(str, str). Returns a dict with key as content id and value as
+            the content html.
         """
         content_id_to_html = {}
 
@@ -1831,7 +1849,11 @@ class State(object):
         return content_id_to_html
 
     def get_translatable_text(self, language_code):
-        """
+        """Returns all text html which can be translated in the given language.
+
+        Returns:
+            list(str, str). Returns a dict with key as content id and value as
+            the content html.
         """
         content_id_to_html = self._get_all_translatable_content()
         available_translation_content_ids = (
