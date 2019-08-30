@@ -19,15 +19,13 @@ Should be run from the oppia root dir.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
-import argparse
 import collections
-import datetime
 import getpass
 import os
 import re
-import subprocess
 import sys
 
+import feconf
 import python_utils
 
 from . import common
@@ -41,7 +39,6 @@ import github # isort:skip
 # pylint: enable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
-GIT_CMD_TEMPLATE_CHECKOUT = 'git checkout -- %s'
 GIT_CMD_TEMPLATE_GET_NEW_COMMITS = 'git cherry %s -v'
 GIT_CMD_GET_LOGS_FORMAT_STRING = (
     'git log -z --no-color --pretty=format:%H{0}%aN{0}%aE{0}%B {1}..{2}')
@@ -56,52 +53,8 @@ FECONF_VAR_NAMES = ['CURRENT_STATE_SCHEMA_VERSION',
                     'CURRENT_COLLECTION_SCHEMA_VERSION']
 FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
-# This should match the indentation of span and li elements used
-# in developer_names section of
-# core/templates/dev/head/pages/about-page/about-page.directive.html.
-SPAN_INDENT = '              '
-LI_INDENT = '                '
-# This line should match the line after div element for developer_names in
-# about-page.directive.html.
-LINE_AFTER_Z_DEVELOPER_NAMES = (
-    '            <p translate="I18N_ABOUT_PAGE_developer_nameS_'
-    'TAB_TEXT_BOTTOM" translate-values="{listOfNames: $ctrl.listOfNames}">\n')
-ABOUT_PAGE_FILEPATH = (
-    'core/templates/dev/head/pages/about-page/about-page.directive.html')
-AUTHORS_FILEPATH = os.path.join('AUTHORS', '')
-CHANGELOG_FILEPATH = os.path.join('CHANGELOG', '')
-CONTRIBUTORS_FILEPATH = os.path.join('CONTRIBUTORS', '')
-RELEASE_SUMMARY_FILEPATH = os.path.join(
-    os.getcwd(), os.pardir, 'release_summary.md')
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
-
-_PARSER = argparse.ArgumentParser()
-_PARSER.add_argument(
-    '--github_username', help=('Your GitHub username.'), type=str)
-
-
-def _run_cmd(cmd_str):
-    """Runs the command and returns the output.
-    Raises subprocess.CalledProcessError upon failure.
-
-    Args:
-        cmd_str: str. The command string to execute
-
-    Returns:
-        str. The output of the command.
-    """
-    return subprocess.check_output(cmd_str.split(' ')).strip()
-
-
-def _get_current_branch():
-    """Retrieves the branch Git is currently in.
-
-    Returns:
-        (str): The name of the current Git branch.
-    """
-    branch_name_line = _run_cmd(GIT_CMD_GET_STATUS).splitlines()[0]
-    return branch_name_line.split(' ')[2]
 
 
 def _get_current_version_tag(repo):
@@ -129,7 +82,7 @@ def get_extra_commits_in_new_release(base_commit, repo):
         the current commit, which haven't been cherrypicked already.
     """
     get_commits_cmd = GIT_CMD_TEMPLATE_GET_NEW_COMMITS % base_commit
-    out = _run_cmd(get_commits_cmd).split('\n')
+    out = common.run_cmd(get_commits_cmd).split('\n')
     commits = []
     for line in out:
         # Lines that start with a - are already cherrypicked. The commits of
@@ -153,7 +106,7 @@ def _gather_logs(start, stop='HEAD'):
     """
     get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
         GROUP_SEP, start, stop)
-    out = _run_cmd(get_logs_cmd).split('\x00')
+    out = common.run_cmd(get_logs_cmd).split('\x00')
     if len(out) == 1 and out[0] == '':
         return []
     else:
@@ -245,9 +198,9 @@ def _check_versions(current_release):
     """
     feconf_changed_version = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)
-    old_feconf = _run_cmd(git_show_cmd)
-    with python_utils.open_file('feconf.py', 'r') as feconf:
-        new_feconf = feconf.read()
+    old_feconf = common.run_cmd(git_show_cmd)
+    with python_utils.open_file('feconf.py', 'r') as feconf_file:
+        new_feconf = feconf_file.read()
     for variable in FECONF_VAR_NAMES:
         old_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
                                  old_feconf)[0]
@@ -269,7 +222,7 @@ def _git_diff_names_only(left, right='HEAD'):
         list(str): List of files that are different between the two points.
     """
     diff_cmd = (GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING % (left, right))
-    return _run_cmd(diff_cmd).splitlines()
+    return common.run_cmd(diff_cmd).splitlines()
 
 
 def _check_setup_scripts(base_release_tag, changed_only=True):
@@ -343,172 +296,12 @@ def check_prs_for_current_release_are_released(repo):
     return True
 
 
-def update_sorted_file(filepath, new_list, last_comment_line):
-    """Updates the files AUTHORS and CONTRIBUTORS with a sorted list of
-    new authors or contributors.
-
-    Args:
-        filepath: str. The path of the file to update.
-        new_list: list(str). The list of new authors or contributors to
-            add to the file.
-        last_comment_line: str. The content of the line of last comment in
-            a line after which the file contains a new line followed by
-            a sorted list of authors/contributors.
-    """
-    file_lines = []
-    with python_utils.open_file(filepath, 'r') as f:
-        file_lines = f.readlines()
-    # start_index is the index of line where list of authors/contributors
-    # starts. The line with the last comment is followed by a empty line
-    # and then the sorted list. So, the start_index is the index of
-    # last_comment_line plus 2.
-    start_index = file_lines.index(last_comment_line) + 2
-    updated_list = new_list + file_lines[start_index:]
-    updated_list = sorted(updated_list, key=lambda s: s.lower())
-    file_lines = file_lines[:start_index] + updated_list
-    with python_utils.open_file(filepath, 'w') as f:
-        for line in file_lines:
-            f.write(line)
-
-
-def update_changelog(release_summary_lines, current_release_version):
-    """Updates CHANGELOG file.
-
-    Args:
-        release_summary_lines: list(str). List of lines in
-            ../release_summary.md.
-        current_release_version: str. The version of current release.
-    """
-
-    current_date = datetime.date.today().strftime('%d %b %Y')
-    python_utils.PRINT('Updating Changelog...')
-    start_index = release_summary_lines.index('### Changelog:\n') + 1
-    end_index = release_summary_lines.index('### Commit History:\n')
-    release_version_changelog = [
-        u'v%s (%s)\n' % (current_release_version, current_date),
-        u'------------------------\n'] + release_summary_lines[
-            start_index:end_index]
-    changelog_lines = []
-    with python_utils.open_file(
-        CHANGELOG_FILEPATH, 'r') as changelog_file:
-        changelog_lines = changelog_file.readlines()
-    changelog_lines[2:2] = release_version_changelog
-    with python_utils.open_file(
-        CHANGELOG_FILEPATH, 'w') as changelog_file:
-        for line in changelog_lines:
-            changelog_file.write(line)
-    python_utils.PRINT('Updated Changelog!')
-
-
-def update_authors(release_summary_lines):
-    """Updates AUTHORS file.
-
-    Args:
-        release_summary_lines: list(str). List of lines in
-            ../release_summary.md.
-    """
-    python_utils.PRINT('Updating AUTHORS file...')
-    start_index = release_summary_lines.index(
-        '### New Authors:\n') + 1
-    end_index = release_summary_lines.index(
-        '### Existing Authors:\n') - 1
-    new_authors = release_summary_lines[start_index:end_index]
-    new_authors = [author.replace('* ', '') for author in new_authors]
-    update_sorted_file(
-        AUTHORS_FILEPATH, new_authors,
-        '# Please keep the list sorted alphabetically.\n')
-    python_utils.PRINT('Updated AUTHORS file!')
-
-
-def update_contributors(release_summary_lines):
-    """Updates CONTRIBUTORS file.
-
-    Args:
-        release_summary_lines: list(str). List of lines in
-            ../release_summary.md.
-    """
-    python_utils.PRINT('Updating CONTRIBUTORS file...')
-    start_index = release_summary_lines.index(
-        '### New Contributors:\n') + 1
-    end_index = release_summary_lines.index(
-        '### Email C&P Blurbs about authors:\n') - 1
-    new_contributors = (
-        release_summary_lines[start_index:end_index])
-    new_contributors = [
-        contributor.replace(
-            '* ', '') for contributor in new_contributors]
-    update_sorted_file(
-        CONTRIBUTORS_FILEPATH, new_contributors,
-        '# Please keep the list sorted alphabetically.\n')
-    python_utils.PRINT('Updated CONTRIBUTORS file!')
-
-
-def update_developer_names(release_summary_lines):
-    """Updates about-page.directive.html file.
-
-    Args:
-        release_summary_lines: list(str). List of lines in
-            ../release_summary.md.
-    """
-    python_utils.PRINT('Updating about-page file...')
-    start_index = release_summary_lines.index(
-        '### New Contributors:\n') + 1
-    end_index = release_summary_lines.index(
-        '### Email C&P Blurbs about authors:\n') - 1
-    new_contributors = (
-        release_summary_lines[start_index:end_index])
-    new_contributors = [
-        contributor.replace(
-            '* ', '') for contributor in new_contributors]
-    new_developer_names = [
-        contributor.split('<')[0] for contributor in new_contributors]
-    new_developer_names.sort()
-    developer_name_dict = collections.defaultdict(list)
-    for developer_name in new_developer_names:
-        developer_name_dict[developer_name[0].upper()].append(
-            '%s<li>%s</li>\n' % (LI_INDENT, developer_name))
-    with python_utils.open_file(
-        ABOUT_PAGE_FILEPATH, 'r') as about_page_file:
-        about_page_lines = about_page_file.readlines()
-        for char in developer_name_dict:
-            start_index = about_page_lines.index(
-                '%s<span>%s</span>\n' % (SPAN_INDENT, char)) + 2
-            if char != 'Z':
-                nxt_char = chr(ord(char) + 1)
-                end_index = about_page_lines.index(
-                    '%s<span>%s</span>\n' % (SPAN_INDENT, nxt_char)) - 2
-            else:
-                end_index = about_page_lines.index(
-                    LINE_AFTER_Z_DEVELOPER_NAMES) - 2
-
-            old_developer_names = about_page_lines[start_index:end_index]
-            updated_developer_names = (
-                old_developer_names + developer_name_dict[char])
-            updated_developer_names = sorted(
-                updated_developer_names, key=lambda s: s.lower())
-            about_page_lines[start_index:end_index] = updated_developer_names
-
-    with python_utils.open_file(
-        ABOUT_PAGE_FILEPATH, 'w') as about_page_file:
-        for line in about_page_lines:
-            about_page_file.write(line)
-    python_utils.PRINT('Updated about-page file!')
-
-
 def main():
     """Collects necessary info and dumps it to disk."""
-    branch_name = _get_current_branch()
+    branch_name = common.get_current_branch_name()
     if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
         raise Exception(
             'This script should only be run from the latest release branch.')
-
-    parsed_args = _PARSER.parse_args()
-    if parsed_args.github_username is None:
-        python_utils.PRINT(
-            'No GitHub username provided. Please re-run the '
-            'script specifying a username using --username=<Your username>')
-        return
-    github_username = parsed_args.github_username
 
     personal_access_token = getpass.getpass(
         prompt=(
@@ -523,7 +316,6 @@ def main():
         return
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
-    repo_fork = g.get_repo('%s/oppia' % github_username)
 
     blocking_bugs_count = get_blocking_bug_issue_count(repo)
     if blocking_bugs_count:
@@ -531,8 +323,8 @@ def main():
             'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
             'is%3Aissue+milestone%3A%22Blocking+bugs%22')
         raise Exception(
-            'There are %s unresolved blocking bugs. Please '
-            'ensure that they are resolved before changelog creation.' % (
+            'There are %s unresolved blocking bugs. Please ensure '
+            'that they are resolved before release summary generation.' % (
                 blocking_bugs_count))
 
     if not check_prs_for_current_release_are_released(repo):
@@ -542,7 +334,7 @@ def main():
         raise Exception(
             'There are PRs for current release which do not have '
             'a \'PR: released\' label. Please ensure that they are released '
-            'before changelog creation.')
+            'before release summary generation.')
 
     current_release = _get_current_version_tag(repo)
     current_release_tag = current_release.name
@@ -566,7 +358,7 @@ def main():
     prs = get_prs_from_pr_numbers(pr_numbers, repo)
     categorized_pr_titles = get_changelog_categories(prs)
 
-    with python_utils.open_file(RELEASE_SUMMARY_FILEPATH, 'w') as out:
+    with python_utils.open_file(feconf.RELEASE_SUMMARY_FILEPATH, 'w') as out:
         out.write('## Collected release information\n')
 
         if feconf_version_changes:
@@ -646,80 +438,7 @@ def main():
                 out.write('* [%s](%s)  \n' % (link, link))
 
     python_utils.PRINT('Done. Summary file generated in %s' % (
-        RELEASE_SUMMARY_FILEPATH))
-
-    while True:
-        python_utils.PRINT(
-            '******************************************************')
-        python_utils.PRINT(
-            'Please update %s to:\n- have a correct changelog for '
-            'updating the CHANGELOG file\n- have a correct list of new '
-            'authors and contributors to update AUTHORS, CONTRIBUTORS '
-            'and developer_names section in about-page.directive.html\n'
-            'Confirm once you are done by entering y/ye/yes.\n' % (
-                RELEASE_SUMMARY_FILEPATH))
-        answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
-            break
-
-    current_release_version = branch_name[len(
-        common.RELEASE_BRANCH_NAME_PREFIX):]
-    source_branch = 'develop'
-    target_branch = 'update-changelog-for-releasev%s' % current_release_version
-    release_summary_lines = []
-    # This complete code block is wrapped in try except since in case of
-    # an exception, we should ensure that the changes made to AUTHORS,
-    # CONTRIBUTORS, CHANGELOG and about-page are reverted and the branch
-    # created is deleted. This is required to avoid errors when running
-    # the script again.
-    try:
-        with python_utils.open_file(
-            RELEASE_SUMMARY_FILEPATH, 'r') as release_summary_file:
-            release_summary_lines = release_summary_file.readlines()
-
-        update_changelog(
-            release_summary_lines, current_release_version)
-        update_authors(release_summary_lines)
-        update_contributors(release_summary_lines)
-        update_developer_names(release_summary_lines)
-
-        python_utils.PRINT(
-            'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
-            'CHANGELOG and about-page...')
-        sb = repo_fork.get_branch(source_branch)
-        repo_fork.create_git_ref(
-            ref='refs/heads/%s' % target_branch, sha=sb.commit.sha)
-
-        for filepath in [
-                ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
-                CHANGELOG_FILEPATH]:
-            contents = repo_fork.get_liness(filepath, ref=target_branch)
-            with python_utils.open_file(filepath, 'r') as f:
-                repo_fork.update_file(
-                    contents.path, 'Update %s' % filepath, f.read(),
-                    contents.sha, branch=target_branch)
-        _run_cmd(GIT_CMD_TEMPLATE_CHECKOUT % ('%s %s %s %s') % (
-            ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
-            CHANGELOG_FILEPATH))
-        common.open_new_tab_in_browser_if_possible(
-            'https://github.com/oppia/oppia/compare/develop...%s:%s?'
-            'expand=1' % (github_username, target_branch))
-        python_utils.PRINT(
-            'Pushed changes to Github. '
-            'Please create a pull request from the %s branch' % target_branch)
-    except Exception as e:
-        _run_cmd(GIT_CMD_TEMPLATE_CHECKOUT % ('%s %s %s %s') % (
-            ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
-            CHANGELOG_FILEPATH))
-        # The get_git_ref code is wrapped in try except block since the
-        # function raises an exception if the target branch is not found.
-        try:
-            repo_fork.get_git_ref('heads/%s' % target_branch).delete()
-        except Exception:
-            python_utils.PRINT(
-                'Please ensure that %s branch is deleted before re-running '
-                'the script' % target_branch)
-        raise Exception(e)
+        feconf.RELEASE_SUMMARY_FILEPATH))
 
 
 if __name__ == '__main__':
