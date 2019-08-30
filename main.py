@@ -13,15 +13,16 @@
 # limitations under the License.
 
 """URL routing definitions, and some basic error/warmup handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 
-# pylint: disable=relative-import
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import classifier
+from core.controllers import classroom
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import community_dashboard
@@ -64,9 +65,6 @@ from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
-
-# pylint: enable=relative-import
-
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -272,6 +270,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
     get_redirect_route(
+        r'%s/<classroom_name>' % feconf.CLASSROOM_URL_PREFIX,
+        classroom.ClassroomPage),
+    get_redirect_route(
+        r'%s/<classroom_name>' % feconf.CLASSROOM_DATA_HANDLER,
+        classroom.ClassroomDataHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),
     get_redirect_route(
@@ -463,9 +467,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.VOICEOVER_DATA_PREFIX,
-        voice_artist.ExplorationVoiceoverHandler),
-    get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
     get_redirect_route(
@@ -483,6 +484,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_RIGHTS_PREFIX,
         editor.ExplorationRightsHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.USER_PERMISSIONS_URL_PREFIX,
+        editor.UserExplorationPermissionsHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_STATUS_PREFIX,
         editor.ExplorationStatusHandler),
@@ -513,9 +517,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),
-    get_redirect_route(
-        r'/createhandler/autosave_voiceover_draft/<exploration_id>',
-        voice_artist.VoiceArtistAutosaveHandler),
     get_redirect_route(
         r'/createhandler/get_top_unresolved_answers/<exploration_id>',
         editor.TopUnresolvedAnswersHandler),

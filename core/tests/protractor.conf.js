@@ -29,6 +29,10 @@ var suites = {
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],
 
+    creatorDashboard: [
+      'protractor_desktop/creatorDashboard.js'
+    ],
+
     embedding: [
       'protractor_desktop/embedding.js'
     ],
@@ -39,6 +43,10 @@ var suites = {
 
     explorationHistoryTab: [
       'protractor_desktop/explorationHistoryTab.js'
+    ],
+
+    explorationImprovementsTab: [
+      'protractor_desktop/explorationImprovementsTab.js'
     ],
 
     explorationStatisticsTab: [

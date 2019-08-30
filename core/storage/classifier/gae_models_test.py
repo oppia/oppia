@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.classifier.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 import types

@@ -60,6 +60,13 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
       }
       throw Error('Invalid URL for topic');
     },
+    getClassroomNameFromUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/classroom/g)) {
+        return decodeURIComponent(pathname.split('/')[2]);
+      }
+      throw Error('Invalid URL for classroom');
+    },
     getSubtopicIdFromUrl: function() {
       var pathname = this.getPathname();
       var argumentsArray = pathname.split('/');
@@ -70,7 +77,7 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
     },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();
-      if (pathname.match(/\/story_editor\/(\w|-){12}/g)) {
+      if (pathname.match(/\/(story_editor|review_test)\/(\w|-){12}/g)) {
         return pathname.split('/')[2];
       }
       throw Error('Invalid story id url');

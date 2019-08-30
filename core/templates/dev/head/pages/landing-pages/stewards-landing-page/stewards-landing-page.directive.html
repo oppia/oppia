@@ -136,9 +136,8 @@
           <div ng-if="$ctrl.windowIsNarrow">
             <strong>I AM A ...</strong>
             <div uib-dropdown class="oppia-stewards-dropdown">
-              <button uib-dropdown-toggle class="btn btn-default selection" type="button" aria-expanded="false" data-toggle="dropdown">
+              <button uib-dropdown-toggle class="btn btn-secondary selection dropdown-toggle" type="button" aria-expanded="false" data-toggle="dropdown">
                 <[$ctrl.getActiveTabNameInSingularForm()]>
-                <span class="caret"></span>
               </button>
               <ul uib-dropdown-menu style="width: inherit;">
                 <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_PARENTS)">Parent</a></li>

@@ -79,6 +79,7 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
+require('domain/statistics/AnswerDetailsImprovementCardObjectFactory.ts');
 require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
 require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
 require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
@@ -88,6 +89,7 @@ describe('ImprovementCardService', function() {
   var $q = null;
   var $rootScope = null;
   var ImprovementCardService = null;
+  var AnswerDetailsImprovementCardObjectFactory = null;
   var FeedbackImprovementCardObjectFactory = null;
   var PlaythroughImprovementCardObjectFactory = null;
   var SuggestionImprovementCardObjectFactory = null;
@@ -160,12 +162,15 @@ describe('ImprovementCardService', function() {
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _ImprovementCardService_,
+      _AnswerDetailsImprovementCardObjectFactory_,
       _FeedbackImprovementCardObjectFactory_,
       _PlaythroughImprovementCardObjectFactory_,
       _SuggestionImprovementCardObjectFactory_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     ImprovementCardService = _ImprovementCardService_;
+    AnswerDetailsImprovementCardObjectFactory =
+      _AnswerDetailsImprovementCardObjectFactory_;
     FeedbackImprovementCardObjectFactory =
       _FeedbackImprovementCardObjectFactory_;
     PlaythroughImprovementCardObjectFactory =
@@ -174,6 +179,7 @@ describe('ImprovementCardService', function() {
       _SuggestionImprovementCardObjectFactory_;
 
     this.expectedFactories = [
+      AnswerDetailsImprovementCardObjectFactory,
       FeedbackImprovementCardObjectFactory,
       PlaythroughImprovementCardObjectFactory,
       SuggestionImprovementCardObjectFactory,

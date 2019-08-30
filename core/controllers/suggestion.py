@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Controllers for suggestions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -29,8 +30,6 @@ import feconf
 
 
 def _get_translation_suggestion_represntable_data(translation_suggestions):
-    """
-    """
     contributions = {}
     for suggestion in translation_suggestions:
         if suggestion.target_id not in contributions:

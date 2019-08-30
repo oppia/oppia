@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the library page and associated handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import json
 import logging
@@ -64,7 +65,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
-            'additional_angular_modules': [],
             'search_cursor': None
         }, response_dict)
 
@@ -208,7 +208,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
-            'additional_angular_modules': [],
             'search_cursor': None
         }, response_dict)
 
@@ -522,7 +521,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
 class CategoryConfigTests(test_utils.GenericTestBase):
 
     def test_thumbnail_icons_exist_for_each_category(self):
-        all_categories = constants.CATEGORIES_TO_COLORS.keys()
+        all_categories = list(constants.CATEGORIES_TO_COLORS.keys())
 
         # Test that an icon exists for each default category.
         for category in all_categories:

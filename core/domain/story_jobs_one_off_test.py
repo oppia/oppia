@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for Story-related one-off jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import ast
 
 from core.domain import story_domain
