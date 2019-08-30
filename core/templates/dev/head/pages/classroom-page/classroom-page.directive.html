@@ -1,0 +1,32 @@
+<background-banner></background-banner>
+<div class="oppia-classroom-viewer-container" style="position: relative;">
+  <div class="oppia-classroom-header">
+    <div class="classroom-header" translate="I18N_CLASSROOM_PAGE_HEADING"></div>
+    <div class="classroom-name"><[$ctrl.classroomName]></div>
+  </div>
+  <div class="oppia-classroom-banner">
+    <img ng-src="<[$ctrl.bannerImageFileUrl]>" align="center" width="100%" alt="">
+  </div>
+</div>
+<style>
+  .oppia-classroom-viewer-container .oppia-classroom-header {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    text-align: left;
+    margin-bottom: 25px;
+    margin-left: 20vw;
+    margin-top: 0;
+    padding-top: 66.5px;
+  }
+  .oppia-classroom-viewer-container .classroom-name {
+    font-size: 3em;
+  }
+  .oppia-classroom-viewer-container .classroom-header {
+    font-size: 1.2em;
+  }
+  .oppia-classroom-viewer-container .oppia-classroom-banner {
+    margin-left: 65vw;
+    margin-top: -18vh;
+    width: 30vw;
+  }
+</style>

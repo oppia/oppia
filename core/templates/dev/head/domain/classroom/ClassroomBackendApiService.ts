@@ -23,7 +23,7 @@ require('domain/classroom/classroom-domain.constants.ajs.ts');
 angular.module('oppia').factory('ClassroomBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'CLASSROOOM_DATA_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService, CLASSROOOM_DATA_URL_TEMPLATE) {
-    var classroomDataDict = null;
+    var topicSummaryDicts = null;
     var _fetchClassroomData = function(
         classroomName, successCallback, errorCallback) {
       var classroomDataUrl = UrlInterpolationService.interpolateUrl(
@@ -32,9 +32,9 @@ angular.module('oppia').factory('ClassroomBackendApiService', [
         });
 
       $http.get(classroomDataUrl).then(function(response) {
-        classroomDataDict = angular.copy(response.data);
+        topicSummaryDicts = angular.copy(response.data.topic_summary_dicts);
         if (successCallback) {
-          successCallback(classroomDataDict);
+          successCallback(topicSummaryDicts);
         }
       }, function(errorResponse) {
         if (errorCallback) {

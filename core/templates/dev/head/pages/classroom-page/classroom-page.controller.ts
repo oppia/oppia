@@ -20,12 +20,13 @@ require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require('domain/classroom/ClassroomBackendApiService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-angular.module('oppia').directive('topicViewerPage', [
+angular.module('oppia').directive('classroomPage', [
   'UrlInterpolationService', function(
       UrlInterpolationService) {
     return {
@@ -36,20 +37,34 @@ angular.module('oppia').directive('topicViewerPage', [
         '/pages/classroom-page/classroom-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$window', 'AlertsService',
+        '$rootScope', '$window', 'AlertsService', 'ClassroomBackendApiService',
         'PageTitleService', 'UrlService', 'WindowDimensionsService',
         'FATAL_ERROR_CODES',
         function(
-            $rootScope, $window, AlertsService,
+            $rootScope, $window, AlertsService, ClassroomBackendApiService,
             PageTitleService, UrlService, WindowDimensionsService,
             FATAL_ERROR_CODES) {
           var ctrl = this;
 
           ctrl.classroomName = UrlService.getClassroomNameFromUrl();
+          ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+            '/splash/books.svg')
 
           PageTitleService.setPageTitle(ctrl.classroomName + ' - Oppia');
 
           $rootScope.loadingMessage = 'Loading';
+          ClassroomBackendApiService.fetchClassroomData(
+              ctrl.classroomName).then(function(topicSummaryDicts) {
+              ctrl.topicSummaryDicts = topicSummaryDicts;
+              console.log(topicSummaryDicts);
+              $rootScope.loadingMessage = '';
+            },
+            function(errorResponse) {
+              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                AlertsService.addWarning('Failed to get dashboard data');
+              }
+            }
+          );
         }
       ]
     };
