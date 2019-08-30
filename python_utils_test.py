@@ -205,15 +205,20 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         for key, value in dict_in_str.items():
             self.assertNotEqual(type(key), future.types.newstr)
             self.assertNotEqual(type(key), future.types.newbytes)
-            self.assertNotEqual(type(value), future.types.newstr)
-            self.assertNotEqual(type(value), future.types.newbytes)
             self.assertTrue(isinstance(key, unicode))
-            self.assertTrue(isinstance(value, list))
 
             for item in value:
                 self.assertNotEqual(type(item), future.types.newstr)
                 self.assertNotEqual(type(item), future.types.newbytes)
                 self.assertTrue(isinstance(item, (unicode, bytes, dict)))
+
+            for k, v in value[-1].items():
+                self.assertNotEqual(type(k), future.types.newstr)
+                self.assertNotEqual(type(k), future.types.newbytes)
+                self.assertNotEqual(type(v), future.types.newstr)
+                self.assertNotEqual(type(v), future.types.newbytes)
+                self.assertEqual(type(k), unicode)
+                self.assertEqual(type(v), bytes)
 
 
 @unittest.skipUnless(
