@@ -3173,7 +3173,7 @@ def main():
         sys.exit(1)
 
     all_filepaths_dict = {
-        '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], 'css': []
+        '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []
     }
     for f in all_filepaths:
         _, extension = os.path.splitext(f)
@@ -3186,7 +3186,7 @@ def main():
         verbose_mode_enabled)
     other_lint_checks_manager = OtherLintChecksManager( # pylint: disable=too-many-function-args
         all_filepaths_dict['.py'], all_filepaths_dict['.html'],
-        all_filepaths_dict['css'], all_filepaths_dict['other'])
+        all_filepaths_dict['.css'], all_filepaths_dict['other'])
     all_messages = js_ts_lint_checks_manager.perform_all_lint_checks()
     all_messages += other_lint_checks_manager.perform_all_lint_checks()
 
