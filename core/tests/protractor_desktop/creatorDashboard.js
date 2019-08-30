@@ -34,6 +34,8 @@ describe('Creator dashboard functionality', function() {
   var EXPLORATION_TITLE_2 = 'Exploration 2';
   var EXPLORATION_TITLE_3 = 'Exploration 3';
   var EXPLORATION_TITLE_4 = 'Exploration 4';
+  var EXPLORATION_TITLE_5 = 'Exploration 5';
+  var EXPLORATION_TITLE_6 = 'Exploration 6';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
@@ -127,7 +129,7 @@ describe('Creator dashboard functionality', function() {
     users.logout();
   });
 
-  it('should work fine in grid view as well as list view', function() {
+  it('should work fine in grid view', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
     users.createUser(
@@ -195,14 +197,61 @@ describe('Creator dashboard functionality', function() {
         expect(views[0].getText()).toEqual('1');
         expect(views[1].getText()).toEqual('1');
       });
+    users.logout();
+  });
+
+  it('should work fine in list view', function() {
+    var feedback = 'A good exploration. Would love to see a few more questions';
+    // Create required users.
+    users.createUser(
+      'user8@creatorDashboard.com',
+      'newCreatorDashboard');
+    users.createUser(
+      'user9@creatorDashboard.com',
+      'learner9');
+    users.createUser(
+      'user10@creatorDashboard.com',
+      'learner10');
+
+    users.login('user8@creatorDashboard.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE_5,
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
+    creatorDashboardPage.get();
+
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE_6,
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
+    users.logout();
+    users.login('user9@creatorDashboard.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE_5);
+    libraryPage.playExploration(EXPLORATION_TITLE_5);
+    explorationPlayerPage.rateExploration(3);
+    users.logout();
+
+    users.login('user10@creatorDashboard.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE_6);
+    libraryPage.playExploration(EXPLORATION_TITLE_6);
+    explorationPlayerPage.rateExploration(5);
+    explorationPlayerPage.submitFeedback(feedback);
+    users.logout();
+
+    users.login('user8@creatorDashboard.com');
+    creatorDashboardPage.get();
 
     creatorDashboardPage.getListView();
 
     creatorDashboardPage.getExpSummaryRowTitles().
       then(function(titles) {
         expect(titles.length).toEqual(2);
-        expect(titles[0].getText()).toEqual(EXPLORATION_TITLE_4);
-        expect(titles[1].getText()).toEqual(EXPLORATION_TITLE_3);
+        expect(titles[0].getText()).toEqual(EXPLORATION_TITLE_6);
+        expect(titles[1].getText()).toEqual(EXPLORATION_TITLE_5);
       });
     creatorDashboardPage.getExpSummaryRowRatings().
       then(function(ratings) {
@@ -222,7 +271,6 @@ describe('Creator dashboard functionality', function() {
         expect(views[0].getText()).toEqual('1');
         expect(views[1].getText()).toEqual('1');
       });
-
     users.logout();
   });
 

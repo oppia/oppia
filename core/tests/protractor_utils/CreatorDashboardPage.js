@@ -173,7 +173,7 @@ var CreatorDashboardPage = function() {
   // Returns titles of each explorations in grid view.
   this.getExpSummaryTileTitles = function() {
     var expSummaryTileTitleElements = element.all(
-      by.css('.protractor-test-oppia-exp-summary-tile-title'));
+      by.css('.protractor-test-exp-summary-tile-title'));
     waitFor.visibilityOf(
       expSummaryTileTitleElements.first(), 'Unable to find exploration titles');
     return expSummaryTileTitleElements;
@@ -182,7 +182,7 @@ var CreatorDashboardPage = function() {
   // Returns ratings of each explorations in grid view.
   this.getExpSummaryTileRatings = function() {
     var expSummaryTileRatingElements = element.all(
-      by.css('.protractor-test-oppia-exp-summary-tile-rating'));
+      by.css('.protractor-test-exp-summary-tile-rating'));
     waitFor.visibilityOf(
       expSummaryTileRatingElements.first(),
       'Unable to find exploration ratings');
@@ -192,7 +192,7 @@ var CreatorDashboardPage = function() {
   // Returns open feedback count of each exploration in grid view.
   this.getExpSummaryTileOpenFeedbackCount = function() {
     var expSummaryTileFeedbackElements = element.all(
-      by.css('.protractor-test-oppia-exp-summary-tile-open-feedback'));
+      by.css('.protractor-test-exp-summary-tile-open-feedback'));
     waitFor.visibilityOf(
       expSummaryTileFeedbackElements.first(),
       'Unable to find exploration feedbacks');
@@ -202,7 +202,7 @@ var CreatorDashboardPage = function() {
   // Returns total views count of each exploration in grid view.
   this.getExpSummaryTileViewsCount = function() {
     var expSummaryTileViewsElements = element.all(
-      by.css('.protractor-test-oppia-exp-summary-tile-num-views'));
+      by.css('.protractor-test-exp-summary-tile-num-views'));
     waitFor.visibilityOf(
       expSummaryTileViewsElements.first(),
       'Unable to find exploration views');
@@ -212,7 +212,7 @@ var CreatorDashboardPage = function() {
   // Returns titles of each explorations in list view.
   this.getExpSummaryRowTitles = function() {
     var expSummaryRowTitleElements = element.all(
-      by.css('.protractor-test-oppia-exp-summary-row-title'));
+      by.css('.protractor-test-exp-summary-row-title'));
     waitFor.visibilityOf(
       expSummaryRowTitleElements.first(), 'Unable to find exploration titles');
     return expSummaryRowTitleElements;
@@ -221,7 +221,7 @@ var CreatorDashboardPage = function() {
   // Returns ratings of each explorations in list view.
   this.getExpSummaryRowRatings = function() {
     var expSummaryRowRatingElements = element.all(
-      by.css('.protractor-test-oppia-exp-summary-row-rating'));
+      by.css('.protractor-test-exp-summary-row-rating'));
     waitFor.visibilityOf(
       expSummaryRowRatingElements.first(),
       'Unable to find exploration ratings');
@@ -231,7 +231,7 @@ var CreatorDashboardPage = function() {
   // Returns open feedback count of each exploration in list view.
   this.getExpSummaryRowOpenFeedbackCount = function() {
     var expSummaryRowFeedbackElements = element.all(
-      by.css('.protractor-test-oppia-exp-summary-row-open-feedback'));
+      by.css('.protractor-test-exp-summary-row-open-feedback'));
     waitFor.visibilityOf(
       expSummaryRowFeedbackElements.first(),
       'Unable to find exploration feedbacks');
@@ -241,7 +241,7 @@ var CreatorDashboardPage = function() {
   // Returns total views count of each exploration in list view.
   this.getExpSummaryRowViewsCount = function() {
     var expSummaryRowViewsElements = element.all(
-      by.css('.protractor-test-oppia-exp-summary-row-num-views'));
+      by.css('.protractor-test-exp-summary-row-num-views'));
     waitFor.visibilityOf(
       expSummaryRowViewsElements.first(),
       'Unable to find exploration views');
