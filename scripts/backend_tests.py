@@ -308,7 +308,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 def main():
     """Run the tests."""
     # Change default encoding of Python to 'utf-8'.
-    reload(sys)
+    reload(sys)  # pylint: disable=reload-builtin
     sys.setdefaultencoding('utf-8')
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
