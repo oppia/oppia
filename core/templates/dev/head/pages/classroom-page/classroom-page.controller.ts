@@ -20,7 +20,9 @@ require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+
 require('domain/classroom/ClassroomBackendApiService.ts');
+require('domain/topic/TopicSummaryObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
@@ -38,12 +40,12 @@ angular.module('oppia').directive('classroomPage', [
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', '$window', 'AlertsService', 'ClassroomBackendApiService',
-        'PageTitleService', 'UrlService', 'WindowDimensionsService',
-        'FATAL_ERROR_CODES',
+        'PageTitleService', 'TopicSummaryObjectFactory', 'UrlService',
+        'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
             $rootScope, $window, AlertsService, ClassroomBackendApiService,
-            PageTitleService, UrlService, WindowDimensionsService,
-            FATAL_ERROR_CODES) {
+            PageTitleService, TopicSummaryObjectFactory, UrlService,
+            WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
 
           ctrl.classroomName = UrlService.getClassroomNameFromUrl();
@@ -55,8 +57,11 @@ angular.module('oppia').directive('classroomPage', [
           $rootScope.loadingMessage = 'Loading';
           ClassroomBackendApiService.fetchClassroomData(
               ctrl.classroomName).then(function(topicSummaryDicts) {
-              ctrl.topicSummaryDicts = topicSummaryDicts;
-              console.log(topicSummaryDicts);
+              ctrl.topicSummaryDicts = topicSummaryDicts.map(
+                function(summaryDict) {
+                  return TopicSummaryObjectFactory.createFromBackendDict(summaryDict);
+                }
+              );
               $rootScope.loadingMessage = '';
             },
             function(errorResponse) {
