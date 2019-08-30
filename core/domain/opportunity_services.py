@@ -100,9 +100,9 @@ def save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_model_list)
 
 
-def create_exploration_opportunity_summary_model(topic, story, exploration):
-    """Create an ExplorationOpportunitySummaryModel which can be saved into the
-    datastore.
+def create_exploration_opportunity_summary(topic, story, exploration):
+    """Create an ExplorationOpportunitySummary object with the given topic,
+    story and exploration object.
 
     Args:
         topic: Topic. The topic object to which the opportunity belongs.
@@ -111,8 +111,8 @@ def create_exploration_opportunity_summary_model(topic, story, exploration):
             opportunity belongs.
 
     Returns:
-        ExplorationOpportunitySummaryModel. The exploration opportunity summary
-        model object which can be saved into the datastore.
+        ExplorationOpportunitySummary. The exploration opportunity summary
+        object.
     """
 
     audio_language_codes = set([
@@ -171,7 +171,7 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     exploration_opportunity_summary_list = []
     for exploration in explorations.values():
         exploration_opportunity_summary_list.append(
-            create_exploration_opportunity_summary_model(
+            create_exploration_opportunity_summary(
                 topic, story, exploration))
     save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)

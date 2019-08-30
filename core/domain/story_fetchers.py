@@ -190,14 +190,15 @@ def get_story_summary_by_id(story_id, strict=True):
         return None
 
 
-def get_story_by_ids(story_ids):
+def get_stories_by_ids(story_ids):
     """Returns a list of stories matching the IDs provided.
 
     Args:
         story_ids: list(str). List of IDs to get stories for.
 
     Returns:
-        list(Story). The list of stories corresponding to given ids.
+        list(Story|None). The list of stories corresponding to given ids.  If an
+        Story does not exist, the corresponding returned list element is None.
     """
     all_story_models = story_models.StoryModel.get_multi(story_ids)
     stories = [

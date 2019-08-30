@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs to run jobs related to opportunity models."""
+"""One-off jobs related to opportunity models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
@@ -32,6 +32,7 @@ from core.platform import models
 class ExplorationOpportunitySummaryModelRegenerationJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job for regenerating ExplorationOpportunitySummaryModel."""
+
     @classmethod
     def _pre_start_hook(cls, job_id):
         opportunity_services.delete_all_exploration_opportunity_summary_models()
@@ -47,7 +48,7 @@ class ExplorationOpportunitySummaryModelRegenerationJob(
 
         topic = topic_fetchers.get_topic_from_model(topic_model)
         story_ids = topic.get_canonical_story_ids()
-        stories = story_fetchers.get_story_by_ids(story_ids)
+        stories = story_fetchers.get_stories_by_ids(story_ids)
         exp_ids = []
         for story in stories:
             exp_ids += story.story_contents.get_all_linked_exp_ids()
@@ -57,8 +58,7 @@ class ExplorationOpportunitySummaryModelRegenerationJob(
         for story in stories:
             for exp_id in story.story_contents.get_all_linked_exp_ids():
                 exploration_opportunity_summary = (
-                    opportunity_services
-                    .create_exploration_opportunity_summary_model(
+                    opportunity_services.create_exploration_opportunity_summary(
                         topic, story, exp_ids_to_exp[exp_id]))
                 exploration_opportunity_summary_list.append(
                     exploration_opportunity_summary)

@@ -75,8 +75,11 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
                 'new_value': '0'
             })], 'Changes.')
 
-    def test_regeneration_job(self):
-        """Tests the case where user has no created or edited explorations."""
+
+    def test_regeneration_job_returns_the_initial_opportunity(self):
+        exp_opp_sumary_model_regen_job_class = (
+            opportunity_jobs_one_off
+            .ExplorationOpportunitySummaryModelRegenerationJob)
 
         all_opportunity_models = list(
             opportunity_models.ExplorationOpportunitySummaryModel.get_all())
@@ -85,26 +88,16 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         old_opportunities, _, more = (
             opportunity_services.get_translation_opportunities('hi', None))
 
-        self.assertFalse(more)
+        job_id = exp_opp_sumary_model_regen_job_class.create_new()
+        exp_opp_sumary_model_regen_job_class.enqueue(job_id)
 
-        old_creation_time = all_opportunity_models[0].created_on
-
-        job_id = (
-            opportunity_jobs_one_off
-            .ExplorationOpportunitySummaryModelRegenerationJob.create_new())
-        (
-            opportunity_jobs_one_off
-            .ExplorationOpportunitySummaryModelRegenerationJob.enqueue(job_id)
-        )
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
-        output = (
-            opportunity_jobs_one_off
-            .ExplorationOpportunitySummaryModelRegenerationJob.get_output(
-                job_id))
+        output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
+
         expected = [['SUCCESS', 1]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
@@ -118,27 +111,102 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         self.assertEqual(old_opportunities, new_opportunities)
 
-        new_creation_time = all_opportunity_models[0].created_on
-
-        self.assertTrue(old_creation_time < new_creation_time)
-
-    def test_regeneration_job_for_deleted_topic(self):
-        topic_services.delete_topic(self.owner_id, self.topic_id)
-
-        job_id = (
+    def test_regeneration_job_returns_correct_output(self):
+        exp_opp_sumary_model_regen_job_class = (
             opportunity_jobs_one_off
-            .ExplorationOpportunitySummaryModelRegenerationJob.create_new())
-        (
-            opportunity_jobs_one_off
-            .ExplorationOpportunitySummaryModelRegenerationJob.enqueue(job_id)
-        )
+            .ExplorationOpportunitySummaryModelRegenerationJob)
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+
+        self.assertEqual(len(all_opportunity_models), 1)
+
+        job_id = exp_opp_sumary_model_regen_job_class.create_new()
+        exp_opp_sumary_model_regen_job_class.enqueue(job_id)
+
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
-        output = (
+        output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
+
+        expected = [['SUCCESS', 1]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_regeneration_job_generates_expected_number_of_models(self):
+        exp_opp_sumary_model_regen_job_class = (
             opportunity_jobs_one_off
-            .ExplorationOpportunitySummaryModelRegenerationJob.get_output(
-                job_id))
+            .ExplorationOpportunitySummaryModelRegenerationJob)
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+
+        self.assertEqual(len(all_opportunity_models), 1)
+
+        job_id = exp_opp_sumary_model_regen_job_class.create_new()
+        exp_opp_sumary_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
+
+        expected = [['SUCCESS', 1]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 1)
+
+    def test_regeneration_job_creates_new_models(self):
+        exp_opp_sumary_model_regen_job_class = (
+            opportunity_jobs_one_off
+            .ExplorationOpportunitySummaryModelRegenerationJob)
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+
+        self.assertEqual(len(all_opportunity_models), 1)
+
+        old_creation_time = all_opportunity_models[0].created_on
+
+        job_id = exp_opp_sumary_model_regen_job_class.create_new()
+        exp_opp_sumary_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
+        expected = [['SUCCESS', 1]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 1)
+
+        new_creation_time = all_opportunity_models[0].created_on
+
+        self.assertTrue(old_creation_time < new_creation_time)
+
+    def test_regeneration_job_for_deleted_topic_returns_empty_list_output(self):
+        exp_opp_sumary_model_regen_job_class = (
+            opportunity_jobs_one_off
+            .ExplorationOpportunitySummaryModelRegenerationJob)
+
+        topic_services.delete_topic(self.owner_id, self.topic_id)
+
+        job_id = exp_opp_sumary_model_regen_job_class.create_new()
+        exp_opp_sumary_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])
