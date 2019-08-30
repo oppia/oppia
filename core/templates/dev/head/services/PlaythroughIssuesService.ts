@@ -150,116 +150,70 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
                   playthrough, AlertsService, LearnerActionRenderService) {
                 $scope.playthroughIndex = playthroughIndex;
 
-                $scope.displayBlocks =
-                  LearnerActionRenderService.getDisplayBlocks(
+                $scope.startingIndices =
+                  LearnerActionRenderService.getStartingIndices(
                     playthrough.actions);
-                $scope.reversedDisplayBlocks =
-                  $scope.displayBlocks.slice().reverse();
+                $scope.currentChoice = 0;
 
-                var blockActionIndexMapping = {};
-                $scope.displayBlocks.reduce(
-                  function(runningTotal, displayBlock, i) {
-                    blockActionIndexMapping[i] =
-                      runningTotal - displayBlock.length;
-                    return blockActionIndexMapping[i];
-                  }, playthrough.actions.length + 1);
+                $scope.maxHidden = $scope.startingIndices.length - 1;
 
-                $scope.maxHidden = $scope.displayBlocks.length - 1;
-
-                $scope.getDisplayBlockIndex = function(displayBlock) {
-                  return $scope.displayBlocks.indexOf(displayBlock);
-                };
-
-                $scope.isDisplayBlockOnInitDisplay = function(block) {
-                  return $scope.getDisplayBlockIndex(block) === 0;
-                };
-
-                $scope.createDisplayBlockNavId = function(block) {
-                  return $scope.getDisplayBlockIndex(block) + 1;
-                };
-
-                $scope.renderBlockHtml = function(displayBlock) {
-                  var index = $scope.getDisplayBlockIndex(displayBlock);
-                  return LearnerActionRenderService.renderDisplayBlockHTML(
-                    displayBlock, blockActionIndexMapping[index]);
+                /**
+                 * Returns the list of learner actions to currently be
+                 * displayed in the playthrough modal.
+                 * @returns {LearnerAction[]}
+                 */
+                $scope.getActionsToRender = function() {
+                  return playthrough.actions.slice(
+                    $scope.startingIndices[$scope.currentChoice]);
                 };
 
                 /**
-                 * Returns the index of the learner action wihtin the display
-                 * block.
+                 * Returns the index of the learner action.
                  * @param {LearnerAction} learnerAction.
-                 * @param {LearnerAction[]} displayBlock.
                  * @returns {int}
                  */
-                $scope.getLearnerActionIndex = function(
-                    learnerAction, displayBlock) {
-                  return displayBlock.indexOf(learnerAction);
+                $scope.getLearnerActionIndex = function(learnerAction) {
+                  return playthrough.actions.indexOf(learnerAction) + 1;
                 };
 
                 /**
-                 * Renders the HTML of the learner action. The index of the
-                 * learner action will be the sum of the starting action index
-                 * of the block (a block is a list of learner actions grouped
-                 * together for display) computed using the
-                 * blockActionIndexMapping field and the index of the learner
-                 * action within the block.
+                 * Computes whether the learner action needs to be highlighted.
                  * @param {LearnerAction} learnerAction.
-                 * @param {int} blockIndex - The index of the block among all
-                 *  the display blocks.
-                 * @param {int} actionIndex - The index of the learner action
-                 *  within it's display block.
+                 * @returns {boolean}
+                 */
+                $scope.isActionHighlighted = function(action) {
+                  return $scope.getLearnerActionIndex(action) > (
+                    $scope.startingIndices[0]);
+                };
+
+                /**
+                 * Renders the HTML of the learner action.
+                 * @param {LearnerAction} learnerAction.
+                 * @param {int} actionIndex - The index of the learner action.
                  * @returns {string}
                  */
                 $scope.renderLearnerAction = function(
-                    learnerAction, blockIndex, actionIndex) {
+                    learnerAction, actionIndex) {
                   return LearnerActionRenderService.renderLearnerAction(
-                    learnerAction, blockActionIndexMapping[blockIndex],
-                    actionIndex);
+                    learnerAction, actionIndex);
                 };
 
-                var getRemainingActionsElements = function(pIdx, i) {
-                  // We only expect one element to match the below statement and
-                  // thus, we take the first element.
-                  return <HTMLElement>(document.getElementsByClassName(
-                    'remaining-actions' + pIdx.toString() + i.toString())[0]);
-                };
 
                 /**
-                 * Shows the remaining display blocks and the arrow div. If
-                 * there is only one display block, the arrow div is not
-                 * shown at all. If the current shown display block is the
-                 * second last display block, the arrow div is hidden after
-                 * the final display block is shown. Else, the following
-                 * display block is displayed.
+                 * Expands the displayed learner actions by the next start
+                 * index. If there is only one index, the arrow div is not shown
+                 * at all. If the current stop index is the second last one, the
+                 * arrow div is hidden after the final stop is reached.
                  */
-                $scope.showRemainingActions = function(pIdx) {
-                  // If there is only one display block left to be shown,
-                  // the arrow is not required.
+                $scope.expandActionsToRender = function(pIdx) {
                   if ($scope.maxHidden === 1) {
-                    getRemainingActionsElements(pIdx, $scope.maxHidden)
-                      .style.display = 'block';
+                    $scope.currentChoice += 1;
                     document.getElementById('arrowDiv').style.display = 'none';
                   } else {
-                    var currentShown = 0;
-                    var i;
-                    for (i = $scope.maxHidden; i > 0; i--) {
-                      if (getRemainingActionsElements(pIdx, i).style.display ===
-                          'block') {
-                        currentShown = i;
-                        break;
-                      }
-                    }
-                    if (currentShown === 0) {
-                      getRemainingActionsElements(pIdx, currentShown + 1)
-                        .style.display = 'block';
-                    } else if (currentShown === $scope.maxHidden - 1) {
-                      getRemainingActionsElements(pIdx, $scope.maxHidden)
-                        .style.display = 'block';
+                    $scope.currentChoice += 1;
+                    if ($scope.currentChoice === $scope.maxHidden) {
                       document.getElementById('arrowDiv').style.display =
                         'none';
-                    } else {
-                      getRemainingActionsElements(pIdx, currentShown + 1)
-                        .style.display = 'block';
                     }
                   }
                 };

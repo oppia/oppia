@@ -192,6 +192,43 @@ angular.module('oppia').factory('LearnerActionRenderService', [
       }
     };
 
+    /**
+     * Helper object to maintain the status of starting indices while iterating
+     * through the learner actions. This object will be updated as learner
+     * actions are processed.
+     */
+    var groupedStartingIndices = {
+      startingIndices: null,
+      localIndex: null,
+      latestStateName: null,
+      lastIndex: null,
+      /**
+       * Updates the local starting index or finalises the current index and
+       * start calculating the next stop.
+       */
+      handleChangeInState: function(action) {
+        this.latestStateName = action.actionCustomizationArgs.state_name.value;
+        var diff;
+        if (this.startingIndices.length === 0) {
+          diff = this.lastIndex - this.localIndex;
+        } else {
+          diff = this.startingIndices[this.startingIndices.length - 1] -
+            this.localIndex;
+        }
+        if (withinBlockUpperBound(diff)) {
+          // Updates local starting index.
+          this.localIndex -= 1;
+          return;
+        }
+        // Updates current stop.
+        this.startingIndices.push(this.localIndex);
+        this.localIndex -= 1;
+      },
+      handleSameState: function(action) {
+        this.localIndex -= 1;
+      }
+    };
+
     return {
       /**
        * Returns the HTML for the final display block in a MultipleIncorrect
@@ -219,45 +256,38 @@ angular.module('oppia').factory('LearnerActionRenderService', [
           block[index], actionStartIndex + i + 1);
         return $sce.trustAsHtml(htmlString);
       },
-      renderLearnerAction: function(learnerAction, blockIndex, actionIndex) {
-        return renderLearnerActionHTML(
-          learnerAction, blockIndex + actionIndex);
-      },
-      renderDisplayBlockHTML: function(block, actionStartIndex) {
-        var htmlString = '';
-        for (var i = 0; i < block.length; i++) {
-          htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
-        }
-        return $sce.trustAsHtml(htmlString);
+      renderLearnerAction: function(learnerAction, actionIndex) {
+        return renderLearnerActionHTML(learnerAction, actionIndex);
       },
       /**
-       * Splits up the entire set of learner actions into correct display blocks
-       * to be displayed in sequence in the playthroughs modal.
+       * Generates an array of indices, with each index representing an index
+       * to stop the display of learner actions.
        * @param {LearnerActions[]} learnerActions.
-       * @returns {LearnerActions[][]}
+       * @returns {int[]}
        */
-      getDisplayBlocks: function(learnerActions) {
+      getStartingIndices: function(learnerActions) {
         var lastIndex = learnerActions.length - 1;
-        groupedDisplayBlocks.displayBlocks = [];
-        groupedDisplayBlocks.localBlock = [learnerActions[lastIndex]];
-        groupedDisplayBlocks.latestStateName =
+
+        groupedStartingIndices.startingIndices = [];
+        groupedStartingIndices.localIndex = lastIndex;
+        groupedStartingIndices.latestStateName =
           learnerActions[lastIndex].actionCustomizationArgs.state_name.value;
+        groupedStartingIndices.lastIndex = lastIndex;
+
         for (var i = lastIndex - 1; i >= 0; i--) {
           var action = learnerActions[i];
           var currentStateName =
             action.actionCustomizationArgs.state_name.value;
-          if (currentStateName !== groupedDisplayBlocks.latestStateName) {
-            groupedDisplayBlocks.handleChangeInState(action);
+          if (currentStateName !== groupedStartingIndices.latestStateName) {
+            groupedStartingIndices.handleChangeInState(action);
           } else {
-            groupedDisplayBlocks.handleSameState(action);
+            groupedStartingIndices.handleSameState(action);
           }
         }
-        // If there is a local block with actions at the end, push it.
-        if (groupedDisplayBlocks.localBlock) {
-          groupedDisplayBlocks.displayBlocks.push(
-            groupedDisplayBlocks.localBlock);
-        }
-        return groupedDisplayBlocks.displayBlocks;
-      }
+
+        groupedStartingIndices.startingIndices.push(
+          groupedStartingIndices.localIndex);
+        return groupedStartingIndices.startingIndices;
+      },
     };
   }]);
