@@ -993,6 +993,6 @@ class BuildTests(test_utils.GenericTestBase):
                 % (build.WEBPACK_FILE, build.WEBPACK_PROD_CONFIG))
 
         with self.swap(subprocess, 'check_call', mock_check_call):
-            build.main_using_webpack()
+            build.build_using_webpack()
 
 # pylint: enable=protected-access
