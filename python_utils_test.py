@@ -155,11 +155,14 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response, 'http://www.cwi.nl/%7Eguido/FAQ.html')
 
     def test_recursively_convert_to_str_with_dict(self):
-        test_var_1 = python_utils.UNICODE('test_var_1')
-        test_var_2 = python_utils.UNICODE('test_var_2')
-        test_var_3 = test_var_1.encode('utf-8')
-        test_var_4 = test_var_2.encode('utf-8')
-        test_dict = {test_var_1: test_var_3, test_var_2: test_var_4}
+        test_var_1_in_unicode = python_utils.UNICODE('test_var_1')
+        test_var_2_in_unicode = python_utils.UNICODE('test_var_2')
+        test_var_3_in_bytes = test_var_1_in_unicode.encode('utf-8')
+        test_var_4_in_bytes = test_var_2_in_unicode.encode('utf-8')
+        test_dict = {
+            test_var_1_in_unicode: test_var_3_in_bytes,
+            test_var_2_in_unicode: test_var_4_in_bytes
+        }
         self.assertEqual(
             test_dict,
             {'test_var_1': b'test_var_1', 'test_var_2': b'test_var_2'})
@@ -178,11 +181,11 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             self.assertEqual(type(val), bytes)
 
     def test_recursively_convert_to_str_with_nested_structure(self):
-        test_var_1 = python_utils.UNICODE('test_var_1')
+        test_var_1_in_unicode = python_utils.UNICODE('test_var_1')
         test_list_1 = [
-            test_var_1, test_var_1.encode('utf-8'), 'test_var_2', b'test_var_3',
-            {'test_var_4': b'test_var_5'}]
-        test_dict = {test_var_1: test_list_1}
+            test_var_1_in_unicode, test_var_1_in_unicode.encode('utf-8'),
+            'test_var_2', b'test_var_3', {'test_var_4': b'test_var_5'}]
+        test_dict = {test_var_1_in_unicode: test_list_1}
         self.assertEqual(
             test_dict,
             {
