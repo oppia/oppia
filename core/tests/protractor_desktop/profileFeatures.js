@@ -42,19 +42,10 @@ describe('Un-customized profile page for current, logged-in user', function() {
     profilePage.get(TEST_USERNAME);
   });
 
-  it('displays profile photo', function() {
+  it('displays photo, default bio, and interest placeholder', function() {
     profilePage.expectCurrUserToHaveProfilePhoto();
-  });
-
-  it('displays placeholder bio text', function() {
     profilePage.expectUserToHaveBio(DEFAULT_BIO);
-  });
-
-  it('displays no interests', function() {
     profilePage.expectUserToHaveNoInterests();
-  });
-
-  it('displays placeholder interest text', function() {
     profilePage.expectUserToHaveInterestPlaceholder(
       PLACEHOLDER_INTEREST_TEXT);
   });
@@ -79,19 +70,10 @@ describe('Un-customized profile page for other user', function() {
     profilePage.get(TEST_USERNAME);
   });
 
-  it('does not display the profile photo', function() {
+  it('displays no photo, default bio, and no interests', function() {
     profilePage.expectOtherUserToNotHaveProfilePhoto();
-  });
-
-  it('displays placeholder bio text', function() {
     profilePage.expectUserToHaveBio(DEFAULT_BIO);
-  });
-
-  it('displays no interests', function() {
     profilePage.expectUserToHaveNoInterests();
-  });
-
-  it('displays placeholder interest text', function() {
     profilePage.expectUserToHaveInterestPlaceholder(
       PLACEHOLDER_INTEREST_TEXT);
   });
@@ -125,19 +107,10 @@ describe('Customized profile page for current user', function() {
     profilePage.get(TEST_USERNAME);
   });
 
-  it('displays the profile photo', function() {
+  it('displays photo, custom bio, and interests', function() {
     profilePage.expectCurrUserToHaveProfilePhoto();
-  });
-
-  it('displays custom bio text', function() {
     profilePage.expectUserToHaveBio(TEST_BIO);
-  });
-
-  it('displays custom interests', function() {
     profilePage.expectUserToHaveInterests(TEST_INTERESTS);
-  });
-
-  it('does not display placeholder interest text', function() {
     profilePage.expectUserToNotHaveInterestPlaceholder();
   });
 
@@ -170,19 +143,10 @@ describe('Customized profile page for other user', function() {
     profilePage.get(TEST_USERNAME);
   });
 
-  it('does not display the profile photo', function() {
+  it('displays no photo, custom bio, and interests', function() {
     profilePage.expectOtherUserToNotHaveProfilePhoto();
-  });
-
-  it('displays custom bio text', function() {
     profilePage.expectUserToHaveBio(TEST_BIO);
-  });
-
-  it('displays custom interests', function() {
     profilePage.expectUserToHaveInterests(TEST_INTERESTS);
-  });
-
-  it('does not display placeholder interest text', function() {
     profilePage.expectUserToNotHaveInterestPlaceholder();
   });
 
