@@ -70,7 +70,6 @@ def main(argv=None):
         'node_modules/webpack/bin/webpack.js', '--config',
         'webpack.dev.config.ts'])
 
-    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
     backend_tests.main(argv=argv)
 
     if parsed_args.generate_coverage_report:

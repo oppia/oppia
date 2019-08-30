@@ -22,7 +22,7 @@ import io
 import os
 import sys
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
+_FUTURE_PATH = os.path.join(os.getcwd(), 'third_party', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
 
 # pylint: disable=wrong-import-position
