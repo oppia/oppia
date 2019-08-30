@@ -37,6 +37,10 @@ var PreferencesPage = function() {
   var systemLanguageSelector = element.all(
     by.css('.protractor-test-system-language-selector')).first();
   var userBioElement = element(by.css('.protractor-test-user-bio'));
+  var createrDashboardRadio = element(
+    by.css('.protractor-test-creator-dashboard-radio'));
+  var learnerDashboardRadio = element(
+    by.css('.protractor-test-learner-dashboard-radio'));
 
   this.editUserBio = function(bio) {
     userBioElement.sendKeys(bio);
@@ -132,6 +136,14 @@ var PreferencesPage = function() {
 
   this.expectUserBioToBe = function(bio) {
     expect(userBioElement.getAttribute('value')).toMatch(bio);
+  };
+
+  this.selectCreatorDashboard = function() {
+    createrDashboardRadio.click();
+  };
+
+  this.selectLearnerDashboard = function() {
+    learnerDashboardRadio.click();
   };
 };
 

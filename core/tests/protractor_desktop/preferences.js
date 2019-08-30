@@ -94,6 +94,21 @@ describe('Preferences', function() {
     preferencesPage.expectPreferredSiteLanguageToBe('English');
   });
 
+  it('should load the correct dashboard according to selection', function() {
+    users.createUser('lorem@preferences.com', 'loremPreferences');
+    users.login('lorem@preferences.com');
+    preferencesPage.get();
+    preferencesPage.selectCreatorDashboard();
+    general.goToHomePage();
+    expect(browser.getCurrentUrl()).toEqual(
+      'http://localhost:9001/creator_dashboard');
+    preferencesPage.get();
+    preferencesPage.selectLearnerDashboard();
+    general.goToHomePage();
+    expect(browser.getCurrentUrl()).toEqual(
+      'http://localhost:9001/learner_dashboard');
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
     users.logout();
