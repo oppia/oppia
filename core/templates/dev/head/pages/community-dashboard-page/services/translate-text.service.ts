@@ -52,12 +52,9 @@ angular.module('oppia').factory('TranslateTextService', [
         stateNamesList.indexOf(activeStateName) + 1 === stateNamesList.length &&
           stateWiseContentIds[activeStateName].length === 0);
     };
-    _createSuggestionCommand = function() {
-      // TODO
-    };
+
     return {
       init: function(expId, languageCode, successCallback) {
-        // TODO Add lanagaugeCode in the handler.
         stateWiseContents = null;
         stateWiseContentIds = {};
         activeStateName = null;

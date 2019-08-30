@@ -228,8 +228,6 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
             extraParams.clearActiveThread,
             extraParams.canReviewActiveThread
           );
-        } else if (suggestionType === 'translate_content') {
-          console.log('Over here!');
         }
       }
     };

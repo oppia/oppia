@@ -79,13 +79,13 @@
     bottom: 65%;
     color: #009688;
     content: attr(data-tab-name);
-    font-family: Capriola;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
     position: absolute;
   }
   .oppia-contributor-username-container {
     color: #009688;
-    font-family: Capriola;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
     padding-top: 25px;
     position: relative;
@@ -122,13 +122,7 @@
     padding-left: 0;
     text-align: center;
   }
-  .oppia-opportunities-tab-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .oppia-opportunities-tab-item {
+.oppia-opportunities-tab-item {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -174,19 +168,19 @@
     color: #009688;
     text-decoration: none;
   }
-  .oppia-active-opportunities-tab .oppia-active-tab-hilighter {
-    color: #009688;
-    text-decoration: none;
-    border: 2px solid #009688;
-    transform: scale(1);
-  }
-  .oppia-active-tab-hilighter{
+  .oppia-active-tab-hilighter {
     width: 60%;
     height: 0;
     transform: scale(0);
     -webkit-transition: transform 200ms ease-out;
     -ms-transition: transform 200ms ease-out;
     transition: transform 200ms ease-out;
+  }
+  .oppia-active-opportunities-tab .oppia-active-tab-hilighter {
+    color: #009688;
+    text-decoration: none;
+    border: 2px solid #009688;
+    transform: scale(1);
   }
   .oppia-opportunities-tabs-text:hover {
     color: #009688;

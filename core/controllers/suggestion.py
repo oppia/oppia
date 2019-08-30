@@ -30,6 +30,16 @@ import feconf
 
 
 def _get_translation_suggestion_represntable_data(translation_suggestions):
+    """Returns the suggestions details which are required in the frontend to
+    represent the suggestion.
+
+    Args:
+        translation_suggestions: list(SuggestionTranslateContent). A list of
+            translation suggestion object.
+
+    Returns:
+        dict(str).
+    """
     contributions = {}
     for suggestion in translation_suggestions:
         if suggestion.target_id not in contributions:
@@ -40,9 +50,9 @@ def _get_translation_suggestion_represntable_data(translation_suggestions):
             contributions[suggestion.target_id]['suggestions'].append(
                 suggestion.to_dict())
     opportunities = opportunity_services.get_opportunities_by_ids(
-        contributions.keys())
+        list(contributions.keys()))
 
-    for opportunity_id, opportunity in opportunities.iteritems():
+    for opportunity_id, opportunity in opportunities.items():
         contributions[opportunity_id]['details'] = opportunity
     return contributions
 
@@ -68,7 +78,6 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
-        print(suggestion_id)
         if (
                 suggestion_id.split('.')[0] !=
                 suggestion_models.TARGET_TYPE_EXPLORATION):
@@ -180,7 +189,7 @@ class SuggestionListHandler(base.BaseHandler):
                 author_id = user_services.get_user_id_from_username(query[1])
                 if author_id is None:
                     raise self.InvalidInputException(
-                    'Invalid author_name %s' % query[1])
+                        'Invalid author_name %s' % query[1])
                 query = ('author_id', author_id)
             elif query[0] == 'suggestion_type':
                 suggestion_type = query[1]

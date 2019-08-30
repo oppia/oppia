@@ -48,7 +48,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             review: {
               text: 'Awaiting review',
               color: '#eeeeee'
-            }
+            },
             accepted: {
               text: 'Accepted',
               color: '#8ed274'
@@ -57,7 +57,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               text: 'Rejected',
               color: '#e76c8c'
             }
-          }
+          };
           var ctrl = this;
           var username = null;
           ctrl.isAdmin = false;
@@ -75,38 +75,36 @@ angular.module('oppia').directive('contributionsAndReview', [
               var details = ctrl.contributions[key].details;
               var requiredData = {};
               var change = suggestion.change;
-              requiredData['heading'] = $filter('formatRtePreview')(
+              requiredData.heading = $filter('formatRtePreview')(
                 change.translation_html);
-              requiredData['subheading'] = details.topic_name + ' / ' +
+              requiredData.subheading = details.topic_name + ' / ' +
                 details.story_title + ' / ' + details.chapter_title;
-              requiredData['id'] = suggestion.suggestion_id;
-              console.log(suggestion.status)
-              requiredData['labelText'] = (
+              requiredData.id = suggestion.suggestion_id;
+              requiredData.labelText = (
                 SUGGETION_LABELS[suggestion.status].text);
-              requiredData['labelColor'] = (
+              requiredData.labelColor = (
                 SUGGETION_LABELS[suggestion.status].color);
-              requiredData['actionButtonTitle'] = (
-                ctrl.reviewTabActive ? 'Review' : 'View';
+              requiredData.actionButtonTitle = (
+                ctrl.reviewTabActive ? 'Review' : 'View');
               translationContributionsSummaryList.push(requiredData);
             });
             return translationContributionsSummaryList;
           };
-          var removeContributionToReview = function(suggestion_id) {
+          var removeContributionToReview = function(suggestionId) {
             ctrl.contributionSummaries = (
               ctrl.contributionSummaries.filter(function(suggestion) {
-                console.log(suggestion_id, suggestion)
-                if (suggestion.id === suggestion_id) {
+                if (suggestion.id === suggestionId) {
                   return false;
                 }
                 return true;
               }));
-          }
+          };
           var _showTranslationSuggestionModal = function(
-              target_id, suggestion_id, contentHtml, translationHtml,
+              targetId, suggestionId, contentHtml, translationHtml,
               reviewable) {
             var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/community-dashboard-page/modal-templates/' +
-              'translation-suggestion-review.directive.html')
+              'translation-suggestion-review.directive.html');
 
             $uibModal.open({
               templateUrl: _templateUrl,
@@ -126,7 +124,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                 '$scope', '$uibModalInstance', 'SuggestionModalService',
                 'reviewable', 'translationHtml', 'contentHtml',
                 function($scope, $uibModalInstance, SuggestionModalService,
-                    canReview, translationHtml, contentHtml) {
+                    reviewable, translationHtml, contentHtml) {
                   $scope.translationHtml = translationHtml;
                   $scope.contentHtml = contentHtml;
                   $scope.reviewable = reviewable;
@@ -136,15 +134,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                       $uibModalInstance,
                       {
                         action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-                        commitMessage: $scope.commitMessage,
-                        reviewMessage: $scope.reviewMessage,
-                        // TODO(sll): If audio files exist for the content being
-                        // replaced, implement functionality in the modal for the
-                        // exploration creator to indicate whether this change
-                        // requires the corresponding audio subtitles to be updated.
-                        // For now, we default to assuming that the changes are
-                        // sufficiently small as to warrant no updates.
-                        audioUpdateRequired: false
+                        commitMessage: 'Adds translation to the content.',
+                        reviewMessage: 'Accepted translation.'
                       });
                   };
 
@@ -163,8 +154,8 @@ angular.module('oppia').directive('contributionsAndReview', [
               ]
             }).result.then(function(result) {
               ContributionAndReviewService.resolveSuggestion(
-                target_id, suggestion_id, result.action)
-              removeContributionToReview(suggestion_id)
+                targetId, suggestionId, result.action,
+                removeContributionToReview);
             });
           };
 
@@ -173,11 +164,11 @@ angular.module('oppia').directive('contributionsAndReview', [
             _showTranslationSuggestionModal(
               suggestion.target_id, suggestion.suggestion_id,
               suggestion.change.content_html,
-              suggestion.change.translation_html, ctrl.reviewTabActive)
+              suggestion.change.translation_html, ctrl.reviewTabActive);
           };
 
           ctrl.switchToContributionsTab = function() {
-            if(ctrl.reviewTabActive) {
+            if (ctrl.reviewTabActive) {
               ctrl.reviewTabActive = false;
               ctrl.contributionsDataLoading = true;
               ctrl.contributionSummaries = [];
@@ -187,37 +178,34 @@ angular.module('oppia').directive('contributionsAndReview', [
                   ctrl.contributionSummaries = (
                     getTranslationContributionsSummary());
                   ctrl.contributionsDataLoading = false;
-                })
+                });
             }
           };
 
           ctrl.switchToReviewTab = function() {
-            if(!ctrl.reviewTabActive) {
+            if (!ctrl.reviewTabActive) {
               ctrl.reviewTabActive = true;
               ctrl.contributionsDataLoading = true;
               ctrl.contributionSummaries = [];
-              setTimeout(function() {
               ContributionAndReviewService.getReviewableTranslationSuggestions(
                 function(suggestionIdToSuggestions) {
                   ctrl.contributions = suggestionIdToSuggestions;
                   ctrl.contributionSummaries = (
                     getTranslationContributionsSummary());
                   ctrl.contributionsDataLoading = false;
-                })
-
-              }, 10);
+                });
             }
-          }
+          };
 
           UserService.getUserInfoAsync().then(function(userInfo) {
             ctrl.isAdmin = userInfo.isAdmin();
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
             ctrl.userDeatilsLoading = false;
             username = userInfo.getUsername();
-            if(ctrl.isAdmin) {
+            if (ctrl.isAdmin) {
               ctrl.reviewTabActive = false;
               ctrl.switchToReviewTab();
-            } else if(ctrl.userIsLoggedIn) {
+            } else if (ctrl.userIsLoggedIn) {
               ctrl.reviewTabActive = true;
               ctrl.switchToContributionsTab();
             }

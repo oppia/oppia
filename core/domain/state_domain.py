@@ -854,7 +854,7 @@ class WrittenTranslations(python_utils.OBJECT):
                 in the give language.
         """
         available_translation_content_ids = []
-        for content_id, translations in self.translations_mapping.iteritems():
+        for content_id, translations in self.translations_mapping.items():
             if language_code in translations and not (
                     translations[language_code].needs_update):
                 available_translation_content_ids.aapend(content_id)

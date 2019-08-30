@@ -27,11 +27,9 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ContributionAndReviewService', [
-  '$http', '$log', '$q', 'UrlInterpolationService',
-  'ACTION_ACCEPT_SUGGESTION',
+  '$http', '$q', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
   function(
-      $http, $log, $q, UrlInterpolationService,
-      ACTION_ACCEPT_SUGGESTION) {
+      $http, $q, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
     var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
     var _SUGGESTION_ACTION_HANDLER_URL = (
       '/suggestionactionhandler/exploration/<exp_id>/<thread_id>');
@@ -58,8 +56,6 @@ angular.module('oppia').factory('ContributionAndReviewService', [
       });
     };
 
-
-
     return {
       getUserTranslationContributions: function(
           username, onSuccess, onFailure) {
@@ -85,8 +81,8 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         return $http.put(url, {
           action: action,
           review_message: 'Done',
-          commit_message: action === ACTION_ACCEPT_SUGGESTION ? (
-            'Accepted' : 'Rejected')
+          commit_message: (
+            action === ACTION_ACCEPT_SUGGESTION ? 'Accepted' : 'Rejected')
         });
       }
     };

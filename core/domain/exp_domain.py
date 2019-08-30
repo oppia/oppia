@@ -969,7 +969,14 @@ class Exploration(python_utils.OBJECT):
 
     def validate_exploration_matches_content(
             self, state_name, content_id, content_html):
-        """
+        """Validates whether the given content matches the content available in
+        the given state.
+
+        Args:
+            state_name: str. The name of the state.
+            content_id: str. The id of the content which is required to be
+                validate.
+            content_html: str. The html string which is to be validated.
         """
         self.states[state_name].validate_matches_content(
             content_id, content_html)
@@ -1253,7 +1260,7 @@ class Exploration(python_utils.OBJECT):
                 and html content as the key.
         """
         state_wise_translatable_text = {}
-        for state_name, state in self.states.iteritems():
+        for state_name, state in self.states.items():
             state_wise_translatable_text[state_name] = (
                 state.get_translatable_text(language_code))
 

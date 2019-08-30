@@ -362,6 +362,13 @@ def get_voiceover_opportunities(language_code, cursor):
 
 
 def get_opportunities_by_ids(ids):
+    """Returns a list of ExplorationOpportunitySummaryModel corresponding to the
+    given list of ids.
+
+    Returns:
+        list(ExplorationOpportunitySummaryModel). A list of
+        ExplorationOpportunitySummaryModel object.
+    """
     exp_opportunity_summary_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
     opportunities = {}
