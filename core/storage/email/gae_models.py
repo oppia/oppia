@@ -304,9 +304,12 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     thread_id = ndb.StringProperty(required=False, indexed=True)
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
-    # When this user thread was last updated. This overrides the field in
-    # BaseModel. We are overriding it because we do not want the last_updated
-    # field to be updated when running one off job.
+    # When this user thread was created and last updated. This overrides the
+    # fields in BaseModel. We are overriding them because we do not want the
+    # last_updated field to be updated when running one off job and whe the
+    # model is created we need to make sure that created_on is set before
+    # last updated.
+    created_on = ndb.DateTimeProperty(indexed=True, required=True)
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
     def put(self, update_last_updated_time=True):
@@ -317,6 +320,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             GeneralFeedbackEmailReplyToIdModel. The thread entity.
         """
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
+
         if update_last_updated_time:
             self.last_updated = datetime.datetime.utcnow()
 
