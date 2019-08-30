@@ -126,6 +126,9 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
     last_stdout_str, last_stderr_str = p.communicate()
+    # Converting to unicode to stay compatible with the rest of the strings.
+    last_stdout_str = last_stdout_str.decode('utf-8')
+    last_stderr_str = last_stderr_str.decode('utf-8')
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
@@ -307,9 +310,6 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 
 def main():
     """Run the tests."""
-    # Change default encoding of Python to 'utf-8'.
-    reload(sys)  # pylint: disable=reload-builtin
-    sys.setdefaultencoding('utf-8')
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
