@@ -41,6 +41,10 @@ var PreferencesPage = function() {
     by.css('.protractor-test-interests-dropdown'));
   var userInterestsInput = userInterestsElement.element(
     by.css('.select2-search__field'));
+  var createrDashboardRadio = element(
+    by.css('.protractor-test-creator-dashboard-radio'));
+  var learnerDashboardRadio = element(
+    by.css('.protractor-test-learner-dashboard-radio'));
 
   this.editUserBio = function(bio) {
     userBioElement.sendKeys(bio);
@@ -144,6 +148,14 @@ var PreferencesPage = function() {
 
   this.expectUserBioToBe = function(bio) {
     expect(userBioElement.getAttribute('value')).toMatch(bio);
+  };
+
+  this.selectCreatorDashboard = function() {
+    createrDashboardRadio.click();
+  };
+
+  this.selectLearnerDashboard = function() {
+    learnerDashboardRadio.click();
   };
 };
 
