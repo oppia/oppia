@@ -1,10 +1,10 @@
-<div class="modal-header">
+<div class="oppia-translate-text-header-container">
   <div class="oppia-translate-text-header">
     <div class="oppia-opportunities-details">
-      <div class="oppia-opportunities-subheading">This is the sub-heading</div>
-      <div class="oppia-opportunities-heading">This is the Heading</div>
+      <div class="oppia-opportunities-subheading"><[subheading]></div>
+      <div class="oppia-opportunities-heading"><[heading]></div>
     </div>
-    <button type="button" class="close" ng-click="cancel()" aria-label="Close">
+    <button type="button" class="close oppia-close-button-position" ng-click="cancel()" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -12,10 +12,10 @@
 <div class="modal-body">
   <div>
     <div class="oppia-translatable-text-section">
-      <strong>Please translate:</strong>
+      <strong>Please translate the given content in <[languageDescription]>:</strong>
       <a class="oppia-skip-button" ng-disabled="false" ng-click="skipActiveTranslation()"> skip </a>
     </div>
-    <div class="oppia-loading-text" ng-if="loadingData">
+    <div class="oppia-loading-text" ng-if="loadingData || uploadingTranslation">
       <div class="oppia-loading-text1 oppia-animate-fadein">
         <lazy-loading></lazy-loading>
       </div>
@@ -23,7 +23,8 @@
         <lazy-loading></lazy-loading>
       </div>
     </div>
-    <div ng-if="!loadingData">
+    <!-- Should allow translation while the earlier translation is still uploading? -->
+    <div ng-if="!loadingData && !uploadingTranslation">
       <angular-html-bind html-data="textToTranslate"
                          class="oppia-rte-editor">
       </angular-html-bind>
@@ -40,12 +41,17 @@
 <div class="modal-footer">
   <div>
     <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
-    <button class="btn btn-success protractor-test-confirm-skill-button" ng-disabled="uploadingTranslation || activeWrittenTranslation.html === ''" ng-click="addTranslatedText()">
-      <i ng-show="!uploadingTranslation" class="fa fa-refresh fa-spin"></i> Save and translate another
+    <button class="btn btn-success oppia-upload-translated-text-button" ng-disabled="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''" ng-click="addTranslatedText()">
+      <i ng-show="uploadingTranslation" class="fa fa-spinner"></i>
+      <span ng-show="!uploadingTranslation">Save <span ng-show="moreAvailable">and translate another</span></span>
     </button>
   </div>
 </div>
 <style>
+  .oppia-translate-text-header-container {
+    padding-left: 15px;
+    border-bottom: 1px solid #e5e5e5
+  }
   .oppia-translate-text-header,
   .oppia-translatable-text-section {
     display: flex;
@@ -70,6 +76,14 @@
   .oppia-skip-button {
     color: #ababab;
     margin-left: 5%;
+  }
+  .oppia-close-button-position {
+    position: absolute;
+    right: 20px;
+    top: 12px;
+  }
+  .oppia-upload-translated-text-button {
+    min-width: 200px;
   }
   .oppia-translatable-text-section {
 

@@ -178,7 +178,8 @@ class ExplorationChange(change_domain.BaseChange):
     }, {
         'name': CMD_ADD_TRANSLATION,
         'required_attribute_names': [
-            'state_name', 'content_id', 'language_code', 'html'],
+            'state_name', 'content_id', 'language_code', 'content_html',
+            'translation_html'],
         'optional_attribute_names': []
     }, {
         'name': CMD_EDIT_STATE_PROPERTY,
@@ -961,6 +962,13 @@ class Exploration(object):
             raise utils.ValidationError(
                 'It is impossible to complete the exploration from the '
                 'following states: %s' % ', '.join(dead_end_states))
+
+    def validate_exploration_matches_content(
+            self, state_name, content_id, content_html):
+        """
+        """
+        self.states[state_name].validate_matches_content(
+            content_id, content_html)
 
     # Derived attributes of an exploration.
     @property

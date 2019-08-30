@@ -587,6 +587,508 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             }))
 
 
+class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
+    """Tests for the SuggestionEditStateContent class."""
+
+    AUTHOR_EMAIL = 'author@example.com'
+    REVIEWER_EMAIL = 'reviewer@example.com'
+    ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
+    fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+
+    def setUp(self):
+        super(SuggestionTranslateContentUnitTests, self).setUp()
+
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.suggestion_dict = {
+            'suggestion_id': 'exploration.exp1.thread1',
+            'suggestion_type': (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+            'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+            'target_id': 'exp1',
+            'target_version_at_submission': 1,
+            'status': suggestion_models.STATUS_ACCEPTED,
+            'author_name': 'author',
+            'final_reviewer_id': self.reviewer_id,
+            'change': {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'state_1',
+                'new_value': 'new suggestion content',
+                'old_value': None
+            },
+            'score_category': 'content.Algebra',
+            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+        }
+
+    def test_create_suggestion_add_translation(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        observed_suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        self.assertDictEqual(
+            observed_suggestion.to_dict(), expected_suggestion_dict)
+
+    def test_validate_suggestion_add_translation(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+    def test_get_score_part_helper_methods(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        self.assertEqual(suggestion.get_score_type(), 'content')
+        self.assertEqual(suggestion.get_score_sub_type(), 'Algebra')
+
+    def test_validate_suggestion_type(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.suggestion_type = 'invalid_suggestion_type'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected suggestion_type to be among allowed choices'):
+            suggestion.validate()
+
+    def test_validate_target_type(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.target_type = 'invalid_target_type'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected target_type to be among allowed choices'):
+            suggestion.validate()
+
+    def test_validate_target_id(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.target_id = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected target_id to be a string'):
+            suggestion.validate()
+
+    def test_validate_target_version_at_submission(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.target_version_at_submission = 'invalid_version'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected target_version_at_submission to be an int'):
+            suggestion.validate()
+
+    def test_validate_status(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.status = 'invalid_status'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected status to be among allowed choices'):
+            suggestion.validate()
+
+    def test_validate_author_id(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.author_id = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected author_id to be a string'):
+            suggestion.validate()
+
+    def test_validate_final_reviewer_id(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.final_reviewer_id = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected final_reviewer_id to be a string'):
+            suggestion.validate()
+
+    def test_validate_score_category(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.score_category = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected score_category to be a string'):
+            suggestion.validate()
+
+    def test_validate_score_category_format(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.score_category = 'score.score_type.score_sub_type'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected score_category to be of the form'
+            ' score_type.score_sub_type'):
+            suggestion.validate()
+
+        suggestion.score_category = 'invalid_score_category'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected score_category to be of the form'
+            ' score_type.score_sub_type'):
+            suggestion.validate()
+
+    def test_validate_score_type(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.score_category = 'invalid_score_type.score_sub_type'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the first part of score_category to be among allowed'
+            ' choices'):
+            suggestion.validate()
+
+    def test_validate_change(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change = {}
+        with self.assertRaisesRegexp(
+            Exception, 'Expected change to be an ExplorationChange'):
+            suggestion.validate()
+
+    def test_validate_score_type_content(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.score_category = 'question.score_sub_type'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the first part of score_category to be content'):
+            suggestion.validate()
+
+    def test_validate_score_sub_type(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.score_category = 'content.invalid_score_sub_type'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the second part of score_category to be a valid'
+            ' category'):
+            suggestion.validate()
+
+    def test_validate_change_cmd(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change.cmd = 'invalid_cmd'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected cmd to be edit_state_property'):
+            suggestion.validate()
+
+    def test_validate_change_property_name(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change.property_name = 'invalid_property'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected property_name to be content'):
+            suggestion.validate()
+
+    def test_pre_accept_validate_state_name(self):
+        self.save_new_default_exploration('exp1', self.author_id)
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        exp_services.update_exploration(
+            self.author_id, 'exp1', [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State A',
+                })
+            ], 'Added state')
+        suggestion.change.state_name = 'State A'
+
+        suggestion.pre_accept_validate()
+
+        suggestion.change.state_name = 'invalid_state_name'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected invalid_state_name to be a valid state name'):
+            suggestion.pre_accept_validate()
+
+    def test_populate_old_value_of_change_with_invalid_state(self):
+        self.save_new_default_exploration('exp1', self.author_id)
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.change.state_name = 'invalid_state_name'
+
+        self.assertIsNone(suggestion.change.old_value)
+
+        suggestion.populate_old_value_of_change()
+
+        self.assertIsNone(suggestion.change.old_value)
+
+    def test_pre_update_validate_change_cmd(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        change = {
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': suggestion.change.state_name,
+            'new_value': 'new suggestion content',
+            'old_value': None
+        }
+        with self.assertRaisesRegexp(
+            Exception, (
+                'The following extra attributes are present: new_value, '
+                'old_value, property_name')):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_change_property_name(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        change = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_PARAM_CHANGES,
+            'state_name': suggestion.change.state_name,
+            'new_value': 'new suggestion content',
+            'old_value': None
+        }
+        with self.assertRaisesRegexp(
+            Exception, 'The new change property_name must be equal to content'):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_change_state_name(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        change = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'invalid_state',
+            'new_value': 'new suggestion content',
+            'old_value': None
+        }
+        with self.assertRaisesRegexp(
+            Exception, 'The new change state_name must be equal to state_1'):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_change_new_value(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+        new_content = state_domain.SubtitledHtml(
+            'content', '<p>new suggestion html</p>').to_dict()
+
+        suggestion.change.new_value = new_content
+
+        change = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': suggestion.change.state_name,
+            'new_value': new_content,
+            'old_value': None
+        }
+        with self.assertRaisesRegexp(
+            Exception, 'The new html must not match the old html'):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_non_equal_change_cmd(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The new change cmd must be equal to edit_state_property'):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Exploration 1 Albert title'
+            }))
+
+
 class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     """Tests for the SuggestionAddQuestion class."""
     AUTHOR_EMAIL = 'author@example.com'

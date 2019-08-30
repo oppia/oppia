@@ -67,16 +67,18 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
-    if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+    elif suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        exploration.validate_exploration_matches_content(
+            change['state_name'], change['content_id'], change['content_html'])
     elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
     else:
-        raise Exception('Invalid suggestion type')
+        raise Exception('Invalid suggestion type %s' % suggestion_type)
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,

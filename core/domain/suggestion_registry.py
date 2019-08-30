@@ -426,58 +426,30 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Expected the second part of score_category to be a valid'
                 ' category, received %s' % self.get_score_sub_type())
 
-        if self.change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
+        if self.change.cmd != exp_domain.CMD_ADD_TRANSLATION:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
-                    exp_domain.CMD_EDIT_STATE_PROPERTY, self.change.cmd))
+                    exp_domain.CMD_ADD_TRANSLATION, self.change.cmd))
 
-        if (self.change.property_name !=
-                exp_domain.STATE_PROPERTY_CONTENT):
+        if not utils.is_supported_audio_language_code(
+                self.change.language_code):
             raise utils.ValidationError(
-                'Expected property_name to be %s, received %s' % (
-                    exp_domain.STATE_PROPERTY_CONTENT,
-                    self.change.property_name))
+                'Invalid language_code: %s' % self.change.language_code)
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
         self.validate()
-        states = exp_services.get_exploration_by_id(self.target_id).states
-        if self.change.state_name not in states:
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+        if self.change.state_name not in exploration.states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' %
                 self.change.state_name)
 
-    def get_change_list_for_accepting_suggestion(self):
-        """Gets a complete change for the suggestion.
-
-        Returns:
-            list(ExplorationChange). The change_list corresponding to the
-                suggestion.
-        """
-        change = self.change
-        exploration = exp_services.get_exploration_by_id(self.target_id)
-        old_content = (
-            exploration.states[self.change.state_name].content.to_dict())
-
-        change.old_value = old_content
-        change.new_value['content_id'] = old_content['content_id']
-
-        return [change]
-
-    def populate_old_value_of_change(self):
-        """Populates old value of the change."""
-        exploration = exp_services.get_exploration_by_id(self.target_id)
-        if self.change.state_name not in exploration.states:
-            # As the state doesn't exist now, we cannot find the content of the
-            # state to populate the old_value field. So we set it as None.
-            old_content = None
-        else:
-            old_content = (
-                exploration.states[self.change.state_name].content.to_dict())
-
-        self.change.old_value = old_content
+        exploration.validate_exploration_matches_content(
+            self.change.state_name, self.change.content_id,
+            self.change.content_html)
 
     def accept(self, commit_message):
         """Accepts the suggestion.
@@ -485,36 +457,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         Args:
             commit_message: str. The commit message.
         """
-        change_list = self.get_change_list_for_accepting_suggestion()
         exp_services.update_exploration(
-            self.final_reviewer_id, self.target_id, change_list,
+            self.final_reviewer_id, self.target_id, [self.change],
             commit_message, is_suggestion=True)
-
-    def pre_update_validate(self, change):
-        """Performs the pre update validation. This function needs to be called
-        before updating the suggestion.
-
-        Args:
-            change: ExplorationChange. The new change.
-
-        Raises:
-            ValidationError: Invalid new change.
-        """
-        if self.change.cmd != change.cmd:
-            raise utils.ValidationError(
-                'The new change cmd must be equal to %s' %
-                self.change.cmd)
-        elif self.change.property_name != change.property_name:
-            raise utils.ValidationError(
-                'The new change property_name must be equal to %s' %
-                self.change.property_name)
-        elif self.change.state_name != change.state_name:
-            raise utils.ValidationError(
-                'The new change state_name must be equal to %s' %
-                self.change.state_name)
-        elif self.change.new_value['html'] == change.new_value['html']:
-            raise utils.ValidationError(
-                'The new html must not match the old html')
 
 
 class SuggestionAddQuestion(BaseSuggestion):
@@ -690,5 +635,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT: (
         SuggestionEditStateContent),
+    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+        SuggestionTranslateContent),
     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: SuggestionAddQuestion
 }

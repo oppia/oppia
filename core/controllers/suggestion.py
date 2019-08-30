@@ -19,11 +19,33 @@
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import opportunity_services
 from core.domain import suggestion_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+
+
+def _get_translation_suggestion_represntable_data(translation_suggestions):
+    """
+    """
+    contributions = {}
+    for suggestion in translation_suggestions:
+        if suggestion.target_id not in contributions:
+            contributions[suggestion.target_id] = {
+                'suggestions': [suggestion.to_dict()]
+            }
+        else:
+            contributions[suggestion.target_id]['suggestions'].append(
+                suggestion.to_dict())
+    opportunities = opportunity_services.get_opportunities_by_ids(
+        contributions.keys())
+
+    for opportunity_id, opportunity in opportunities.iteritems():
+        contributions[opportunity_id]['details'] = opportunity
+    return contributions
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -47,6 +69,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
+        print(suggestion_id)
         if (
                 suggestion_id.split('.')[0] !=
                 suggestion_models.TARGET_TYPE_EXPLORATION):
@@ -150,15 +173,35 @@ class SuggestionListHandler(base.BaseHandler):
         # request.GET.items() parses the params from the url into the above
         # format. So in the url, the query should be passed as:
         # ?field1=value1&field2=value2...fieldN=valueN.
-        query_fields_and_values = self.request.GET.items()
+        query_fields_and_values = []
+        suggestion_type = None
 
-        for query in query_fields_and_values:
-            if query[0] not in suggestion_models.ALLOWED_QUERY_FIELDS:
+        for query in self.request.GET.items():
+            if query[0] == 'author_name':
+                author_id = user_services.get_user_id_from_username(query[1])
+                if author_id is None:
+                    raise self.InvalidInputException(
+                    'Invalid author_name %s' % query[1])
+                query = ('author_id', author_id)
+            elif query[0] == 'suggestion_type':
+                suggestion_type = query[1]
+            elif query[0] not in suggestion_models.ALLOWED_QUERY_FIELDS:
                 raise self.InvalidInputException(
                     'Not allowed to query on field %s' % query[0])
+
+            query_fields_and_values.append(query)
 
         suggestions = suggestion_services.query_suggestions(
             query_fields_and_values)
 
-        self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
+        if suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            self.values = {
+                'exp_id_to_suggestions': (
+                    _get_translation_suggestion_represntable_data(suggestions))
+            }
+        else:
+            self.values.update({
+                'suggestions': [s.to_dict() for s in suggestions]
+            })
         self.render_json(self.values)

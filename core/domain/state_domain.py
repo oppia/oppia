@@ -1420,6 +1420,13 @@ class State(object):
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
 
+    def validate_matches_content(self, content_id, content_html):
+        """
+        """
+        content_id_to_html = self._get_all_translatable_content()
+        if content_id_to_html[content_id] != content_html:
+            raise utils.ValidationError('Incorrect content_html found.')
+
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
         state_training_data_by_answer_group = []
@@ -1547,8 +1554,7 @@ class State(object):
     def add_translation(self, content_id, language_code, html):
         """
         """
-        html = html_validation_service.convert_to_ckeditor(
-            html_cleaner.clean(html))
+        html = html_cleaner.clean(html)
         self.written_translations.add_translation(
             content_id, language_code, html)
 
@@ -1793,7 +1799,9 @@ class State(object):
                 % solicit_answer_details)
         self.solicit_answer_details = solicit_answer_details
 
-    def get_translatable_text(self, language_code):
+    def _get_all_translatable_content(self):
+        """
+        """
         content_id_to_html = {}
 
         content_id_to_html[self.content.content_id] = self.content.html
@@ -1820,6 +1828,12 @@ class State(object):
             content_id_to_html[solution.explanation.content_id] = (
                 solution.explanation.html)
 
+        return content_id_to_html
+
+    def get_translatable_text(self, language_code):
+        """
+        """
+        content_id_to_html = self._get_all_translatable_content()
         available_translation_content_ids = (
             self.written_translations.get_available_translation_content_ids(
                 language_code))

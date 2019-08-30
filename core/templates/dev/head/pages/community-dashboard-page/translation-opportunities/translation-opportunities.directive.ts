@@ -54,6 +54,16 @@ angular.module('oppia').directive(
           ctrl.opportunities = [];
           ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
+          ctrl.progressBarRequired = true;
+
+          var getOpportunitySummary = function(expId) {
+            for (index in ctrl.opportunities) {
+              if (ctrl.opportunities[index].id === expId) {
+                return ctrl.opportunities[index];
+              }
+            }
+          };
+
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
               var opportunity = opportunities[index];
@@ -74,7 +84,7 @@ angular.module('oppia').directive(
                     totalContentCount) * 100).toFixed(2);
               }
               ctrl.opportunities.push({
-                expId: opportunity.id,
+                id: opportunity.id,
                 heading: heading,
                 subheading: subheading,
                 progressPercentage: progressPercentage,
@@ -106,50 +116,76 @@ angular.module('oppia').directive(
           };
 
           ctrl.onClickButton = function(expId) {
+            var opportunity = getOpportunitySummary(expId);
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/community-dashboard-page/modal-templates/' +
                 'translation-modal.directive.html'),
               backdrop: 'static',
               size: 'lg',
+              resolve: {
+                opportunity: function() {
+                  return opportunity;
+                },
+              },
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$scope', '$uibModalInstance', 'opportunity',
+                function($scope, $uibModalInstance, opportunity) {
                   $scope.uploadingTranslation = false;
-                  $scope.activeWrittenTranslation = {}
-                  $scope.activeWrittenTranslation['html'] = '';
+                  $scope.activeWrittenTranslation = {};
+                  $scope.activeWrittenTranslation.html = '';
                   $scope.HTML_SCHEMA = {
                     type: 'html',
                     ui_config: {
                       hide_complex_extensions: 'true'
                     }
                   };
+                  $scope.subheading = opportunity.subheading;
+                  $scope.heading = opportunity.heading;
                   $scope.loadingData = true;
+                  $scope.moreAvailable = false;
                   $scope.textToTranslate = '';
+                  $scope.languageDescription = (
+                    TranslationLanguageService.getActiveLanguageDescription());
                   TranslateTextService.init(
-                    expId, TranslationLanguageService.getActiveLanguageCode(),
+                    opportunity.id,
+                    TranslationLanguageService.getActiveLanguageCode(),
                     function() {
-                      $scope.textToTranslate = (
-                        TranslateTextService.getTextToTranslate().text);
+                      var textAndAvailability = (
+                        TranslateTextService.getTextToTranslate());
+                      console.log(textAndAvailability);
+                      $scope.textToTranslate = textAndAvailability.text;
+                      $scope.moreAvailable = textAndAvailability.more;
                       $scope.loadingData = false;
                     });
                   $scope.skipActiveTranslation = function() {
                     $scope.textToTranslate = (
-                          TranslateTextService.getTextToTranslate().text);
-                    $scope.activeWrittenTranslation['html'] = '';
-                  }
+                      TranslateTextService.getTextToTranslate().text);
+                    $scope.activeWrittenTranslation.html = '';
+                  };
                   $scope.addTranslatedText = function() {
-                    $scope.uploadingTranslation = true;
-                    TranslateTextService.addTranslatedText(
-                      $scope.activeWrittenTranslation.html,
-                      TranslationLanguageService.getActiveLanguageCode(),
-                      function() {
-                        $scope.textToTranslate = (
-                          TranslateTextService.getTextToTranslate().text);
-                        $scope.uploadingTranslation = false;
-                        $scope.activeWrittenTranslation['html'] = '';
-                      });
-                  }
+                    if (!$scope.uploadingTranslation && !$scope.loadingData) {
+                      $scope.uploadingTranslation = true;
+                      TranslateTextService.addTranslatedText(
+                        $scope.activeWrittenTranslation.html,
+                        TranslationLanguageService.getActiveLanguageCode(),
+                        function() {
+                          if ($scope.moreAvailable) {
+                            var textAndAvailability = (
+                              TranslateTextService.getTextToTranslate());
+                            console.log(textAndAvailability);
+                            $scope.textToTranslate = textAndAvailability.text;
+                            $scope.moreAvailable = textAndAvailability.more;
+                          }
+                          $scope.activeWrittenTranslation.html = '';
+                          $scope.uploadingTranslation = false;
+                        });
+                    }
+                    if (!$scope.moreAvailable) {
+                      $uibModalInstance.dismiss('ok');
+                    }
+                  };
+
                   $scope.done = function() {
                     $uibModalInstance.close();
                   };

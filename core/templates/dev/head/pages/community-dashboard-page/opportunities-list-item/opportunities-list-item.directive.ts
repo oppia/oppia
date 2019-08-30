@@ -19,6 +19,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'lazy-loading.directive.ts');
 
+require(
+  'filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
+
 angular.module('oppia').directive('opportunitiesListItem', [
   'UrlInterpolationService', function(
       UrlInterpolationService) {
@@ -26,7 +29,9 @@ angular.module('oppia').directive('opportunitiesListItem', [
       restrict: 'E',
       scope: {
         getOpportunity: '&opportunity',
-        onClickActionButton: '='
+        onClickActionButton: '=',
+        isLabelRequired: '&labelRequired',
+        isProgressBarRequired: '&progressBarRequired'
       },
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -38,6 +43,12 @@ angular.module('oppia').directive('opportunitiesListItem', [
           var ctrl = this;
           ctrl.loadingView = false;
           ctrl.opportunity = $scope.getOpportunity();
+          if ($scope.isLabelRequired()) {
+            ctrl.labelText = ctrl.opportunity.labelText;
+            ctrl.labelStyle = {
+              'background-color': ctrl.opportunity.labelColor
+            };
+          }
           if (ctrl.opportunity) {
             if (ctrl.opportunity.progressPercentage) {
               ctrl.progressPercentage = (

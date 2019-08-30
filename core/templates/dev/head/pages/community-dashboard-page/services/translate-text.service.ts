@@ -18,53 +18,55 @@
  */
 
 angular.module('oppia').factory('TranslateTextService', [
-    '$http', function($http) {
-  var stateWiseContents = null;
-  var stateWiseContentIds = {};
-  var activeStateName = null;
-  var activeContentId = null;
-  var stateNamesList = [];
-  var activeExpId = null;
-  var activeExpVersion = null;
+  '$http', function($http) {
+    var stateWiseContents = null;
+    var stateWiseContentIds = {};
+    var activeStateName = null;
+    var activeContentId = null;
+    var stateNamesList = [];
+    var activeExpId = null;
+    var activeExpVersion = null;
 
-  var getNextContentId = function() {
-    return stateWiseContentIds[activeStateName].pop();
-  }
-  var getNextState = function() {
-    var currentIndex = stateNamesList.indexOf(activeStateName);
-    return stateNamesList[currentIndex + 1];
-  };
+    var getNextContentId = function() {
+      return stateWiseContentIds[activeStateName].pop();
+    };
+    var getNextState = function() {
+      var currentIndex = stateNamesList.indexOf(activeStateName);
+      return stateNamesList[currentIndex + 1];
+    };
 
-  var getNextText = function() {
-    activeContentId = getNextContentId();
-    if (!activeContentId) {
-      activeStateName = getNextState();
-      if (!activeStateName) {
-        return null;
-      }
+    var getNextText = function() {
       activeContentId = getNextContentId();
-    }
-    return stateWiseContents[activeStateName][activeContentId];
-  };
+      if (!activeContentId) {
+        activeStateName = getNextState();
+        if (!activeStateName) {
+          return null;
+        }
+        activeContentId = getNextContentId();
+      }
+      return stateWiseContents[activeStateName][activeContentId];
+    };
 
-  var isMoreTextAvailableForTranslation = function() {
-    return (stateWiseContentIds[activeStateName].length > 0);
-  };
-  _createSuggestionCommand = function() {
-    // TODO
-  };
-  return {
-    init: function(expId, languageCode, successCallback) {
-      // TODO Add lanagaugeCode in the handler.
-      stateWiseContents = null;
-      stateWiseContentIds = {};
-      activeStateName = null;
-      activeContentId = null;
-      stateNamesList = [];
-      activeExpId = expId;
-      activeExpVersion = null;
-      $http.get(
-        '/gettranslatabletexthandler?exp_id=' + expId).then(
+    var isMoreTextAvailableForTranslation = function() {
+      return !(
+        stateNamesList.indexOf(activeStateName) + 1 === stateNamesList.length &&
+          stateWiseContentIds[activeStateName].length === 0);
+    };
+    _createSuggestionCommand = function() {
+      // TODO
+    };
+    return {
+      init: function(expId, languageCode, successCallback) {
+        // TODO Add lanagaugeCode in the handler.
+        stateWiseContents = null;
+        stateWiseContentIds = {};
+        activeStateName = null;
+        activeContentId = null;
+        stateNamesList = [];
+        activeExpId = expId;
+        activeExpVersion = null;
+        $http.get(
+          '/gettranslatabletexthandler?exp_id=' + expId).then(
           function(response) {
             stateWiseContents = response.data.state_wise_contents;
             activeExpVersion = response.data.version;
@@ -72,41 +74,42 @@ angular.module('oppia').factory('TranslateTextService', [
               stateNamesList.push(stateName);
               var contentIds = [];
               for (contentId in stateWiseContents[stateName]) {
-                contentIds.push(contentId)
+                contentIds.push(contentId);
               }
               stateWiseContentIds[stateName] = contentIds;
             }
             activeStateName = stateNamesList[0];
             successCallback();
           });
-    },
-    getTextToTranslate: function() {
-      return {
-        text: getNextText(),
-        more: isMoreTextAvailableForTranslation()
-      }
-    },
-    addTranslatedText: function(
-        translationHtml, languageCode, successCallback) {
-      var url = '/suggestionhandler/';
-      var data = {
-        suggestion_type: 'translate_content',
-        target_type: 'exploration',
-        description: 'Adds translation',
-        target_id: activeExpId,
-        target_version_at_submission: activeExpVersion,
-        assigned_reviewer_id: null,
-        final_reviewer_id: null,
-        change: {
-          cmd: 'add_translation',
-          content_id: activeContentId,
-          state_name: activeStateName,
-          lanagauge_code: languageCode,
-          html: translationHtml
-        }
-      };
-      $http.post(url, data).then(successCallback);
-    },
+      },
+      getTextToTranslate: function() {
+        return {
+          text: getNextText(),
+          more: isMoreTextAvailableForTranslation()
+        };
+      },
+      addTranslatedText: function(
+          translationHtml, languageCode, successCallback) {
+        var url = '/suggestionhandler/';
+        var data = {
+          suggestion_type: 'translate_content',
+          target_type: 'exploration',
+          description: 'Adds translation',
+          target_id: activeExpId,
+          target_version_at_submission: activeExpVersion,
+          assigned_reviewer_id: null,
+          final_reviewer_id: null,
+          change: {
+            cmd: 'add_translation',
+            content_id: activeContentId,
+            state_name: activeStateName,
+            language_code: languageCode,
+            content_html: stateWiseContents[activeStateName][activeContentId],
+            translation_html: translationHtml
+          }
+        };
+        $http.post(url, data).then(successCallback);
+      },
 
-  };
-}]);
+    };
+  }]);

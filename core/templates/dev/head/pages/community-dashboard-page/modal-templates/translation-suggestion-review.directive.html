@@ -1,0 +1,34 @@
+<div class="modal-header">
+  <h3>Review translation</h3>
+</div>
+
+<div class="modal-body">
+  <section class="oppia-suggestion-review-container">
+    <div class="oppia-suggestion-review-panel-container" style="float: left;">
+      <strong>Content to translate:</strong>
+      <div class="oppia-suggestion-review-panel">
+        <angular-html-bind html-data="contentHtml">
+        </angular-html-bind>
+      </div>
+    </div>
+    <div class="oppia-suggestion-review-panel-container" style="float: right;">
+      <strong> Translation:</strong>
+      <div class="oppia-suggestion-review-panel">
+        <angular-html-bind html-data="translationHtml">
+        </angular-html-bind>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-if="!reviewable" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-default" ng-if="reviewable" ng-click="reject()">Reject</button>
+  <button class="btn btn-default" ng-if="reviewable" ng-click="accept()">Accept</button>
+</div>
+
+<style>
+  .oppia-suggestion-review-panel-container {
+
+  }
+</style>

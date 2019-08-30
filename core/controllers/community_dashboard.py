@@ -17,9 +17,9 @@
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import opportunity_services
 from core.domain import exp_fetchers
-
+from core.domain import opportunity_services
+from core.domain import suggestion_services
 import feconf
 import utils
 
@@ -98,6 +98,29 @@ class TranslatableTextHandler(base.BaseHandler):
         self.values = {
             'state_wise_contents': result,
             'version': exp.version
+        }
+
+        self.render_json(self.values)
+
+
+class ContributionsDatahandler(base.BaseHandler):
+
+    @acl_decorators.can_suggest_changes
+    def get(self, contribution_type):
+        """Handles GET requests."""
+        if contribution_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
+            translation_suggestions = suggestion_services.query_suggestions([
+                ('author_id', self.user_id), (
+                    'suggestion_type', 'translate_content'
+                )
+            ])
+            contributions = _get_translation_contributions_represntable_data(
+                translation_suggestions)
+        else:
+            raise self.PageNotFoundException
+
+        self.values = {
+            'contributions': contributions
         }
 
         self.render_json(self.values)
