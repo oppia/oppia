@@ -79,6 +79,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
                     };
                   }
                 ]
+              }).result.catch(function() {
               });
             } else {
               SkillEditorRoutingService.navigateToQuestionsTab();
@@ -149,7 +150,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
               AlertsService.addSuccessMessage('Changes Saved.');
-            });
+            }, function() {
+
+              });
           };
 
           $scope.publishSkill = function() {
@@ -172,7 +175,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
                 }]
             }).result.then(function() {
               _publishSkill();
-            });
+            }, function() {
+
+              });
           };
         }]
     };

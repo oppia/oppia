@@ -152,7 +152,9 @@ angular.module('oppia').directive('feedbackTab', [
                   ctrl.clearActiveThread();
                   AlertsService.addSuccessMessage('Feedback thread created.');
                 });
-            });
+            }, function() {
+
+              });
           };
 
           var _isSuggestionHandled = function() {

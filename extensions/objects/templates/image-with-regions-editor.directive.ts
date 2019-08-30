@@ -519,6 +519,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
                 ctrl.value.imagePath = '';
                 ctrl.value.labeledRegions = [];
                 ctrl.initializeEditor();
+              }, function() {
+
               });
             };
             ctrl.deleteRegion = function(index) {

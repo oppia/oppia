@@ -154,7 +154,9 @@ angular.module('oppia').directive('skillsList', [
                   }
                 }
               }
-            });
+            }, function() {
+
+              });
           };
 
           $scope.selectSkill = function(skill) {
@@ -197,7 +199,9 @@ angular.module('oppia').directive('skillsList', [
                 $rootScope.$broadcast(
                   EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
               });
-            });
+            }, function() {
+
+              });
           };
         }
       ]

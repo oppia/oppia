@@ -103,7 +103,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
             }).result.then(function(result) {
               SkillCreationService.createNewSkill(
                 result.description, result.rubrics, []);
-            });
+            }, function() {
+
+              });
           };
           $rootScope.$on(
             EVENT_TYPE_TOPIC_CREATION_ENABLED, function(evt, canCreateTopic) {

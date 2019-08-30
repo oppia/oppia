@@ -78,7 +78,8 @@ angular.module('oppia').factory(
                 };
               }
             ]
-          });
+          }).result.catch(function() {
+              });
         }
       };
     }

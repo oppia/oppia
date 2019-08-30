@@ -75,7 +75,8 @@ angular.module('oppia').directive('storyEditorPage', [
                       };
                     }
                   ]
-                });
+                }).result.catch(function() {
+              });
               } else {
                 $window.open(
                   UrlInterpolationService.interpolateUrl(

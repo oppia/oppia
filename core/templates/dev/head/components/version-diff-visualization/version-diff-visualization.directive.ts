@@ -330,7 +330,8 @@ angular.module('oppia').directive('versionDiffVisualization', [
                 };
               }
             ]
-          });
+          }).result.catch(function() {
+           });
         };
       }
     }]

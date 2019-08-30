@@ -74,7 +74,8 @@ angular.module('oppia').factory('HintAndSolutionModalService', [
               };
             }
           ]
-        });
+        }).result.catch(function() {
+              });
       },
       displaySolutionModal: function() {
         return $uibModal.open({
@@ -110,7 +111,8 @@ angular.module('oppia').factory('HintAndSolutionModalService', [
               };
             }
           ]
-        });
+        }).result.catch(function() {
+              });
       },
       displaySolutionInterstitialModal: function() {
         return $uibModal.open({
@@ -130,7 +132,8 @@ angular.module('oppia').factory('HintAndSolutionModalService', [
               };
             }
           ]
-        });
+        }).result.catch(function() {
+              });
       }
     };
   }

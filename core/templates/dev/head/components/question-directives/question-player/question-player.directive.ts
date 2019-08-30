@@ -269,7 +269,7 @@ angular.module('oppia').directive('questionPlayer', [
                   };
                 }
               ]
-            }).result.catch(function(result) {
+            }).result.catch(function() {
               });
           };
 
@@ -551,7 +551,7 @@ angular.module('oppia').directive('questionPlayer', [
                   };
                 }
               ]
-            }).result.catch(function(result) {
+            }).result.catch(function() {
               });
           };
 

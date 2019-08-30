@@ -194,6 +194,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               }).result.then(function(result) {
                 SkillCreationService.createNewSkill(
                   result.description, result.rubrics, []);
+              }, function() {
+
               });
             };
 

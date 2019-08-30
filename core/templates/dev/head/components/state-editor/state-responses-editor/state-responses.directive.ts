@@ -509,7 +509,9 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
                   $scope.refreshWarnings()();
                 });
-            });
+            }, function() {
+
+              });
           };
 
           $scope.saveTaggedMisconception = function(misconceptionId, skillId) {

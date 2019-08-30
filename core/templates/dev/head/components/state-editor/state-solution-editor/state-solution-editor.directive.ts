@@ -258,7 +258,9 @@ angular.module('oppia').directive('stateSolutionEditor', [
                     INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
                 }
               }
-            });
+            }, function() {
+
+              });
           };
 
           $scope.deleteSolution = function(index, evt) {

@@ -93,7 +93,9 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
               SkillUpdateService.deleteMisconception($scope.skill, result.id);
               $scope.misconceptions = $scope.skill.getMisconceptions();
               $scope.activeMisconceptionIndex = null;
-            });
+            }, function() {
+
+              });
           };
 
           $scope.openAddMisconceptionModal = function() {
@@ -145,7 +147,9 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
               SkillUpdateService.addMisconception(
                 $scope.skill, result.misconception);
               $scope.misconceptions = $scope.skill.getMisconceptions();
-            });
+            }, function() {
+
+              });
           };
         }]
     };

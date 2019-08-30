@@ -142,7 +142,9 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.subtopicPage, subtopic.getId(), subtitledHtml);
                 TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
               }
-            });
+            }, function() {
+
+              });
           };
 
           $scope.isSkillDeleted = function(skillSummary) {
@@ -244,7 +246,9 @@ angular.module('oppia').directive('subtopicsListTab', [
               TopicEditorStateService.setSubtopicPage(subtopicPage);
               TopicUpdateService.addSubtopic($scope.topic, title);
               _initEditor();
-            });
+            }, function() {
+
+              });
           };
 
           $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);

@@ -62,6 +62,7 @@ angular.module('oppia').directive('storiesList', [
                     };
                   }
                 ]
+              }).result.catch(function() {
               });
             } else {
               $window.open(
@@ -99,7 +100,9 @@ angular.module('oppia').directive('storiesList', [
                   $scope.storySummaries.splice(i, 1);
                 }
               }
-            });
+            }).result.catch(function() {
+              });
+
           };
         }
       ]

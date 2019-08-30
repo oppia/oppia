@@ -179,7 +179,9 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.displayed.push(result.hint);
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
-            });
+            }, function() {
+
+              });
           };
 
           // When the page is scrolled so that the top of the page is above the
@@ -237,7 +239,9 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.displayed = [];
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
-            });
+            }, function() {
+
+              });
           };
 
           $scope.deleteHint = function(index, evt) {

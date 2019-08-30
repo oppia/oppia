@@ -93,7 +93,9 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
             modalInstance.result.then(function(commitMessage) {
               StoryEditorStateService.saveStory(commitMessage);
-            });
+            }, function() {
+
+              });
           };
 
           $scope.publishStory = function() {

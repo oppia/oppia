@@ -106,7 +106,9 @@ angular.module('oppia').factory('LearnerPlaylistService', [
           learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
             activityId);
         }
-      });
+      }, function() {
+
+              });
     };
 
     return {

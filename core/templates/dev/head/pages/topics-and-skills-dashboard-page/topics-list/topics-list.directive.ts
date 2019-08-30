@@ -90,7 +90,9 @@ angular.module('oppia').directive('topicsList', [
                     error || 'There was an error when deleting the topic.');
                 }
               );
-            });
+            }, function() {
+
+              });
           };
         }
       ]

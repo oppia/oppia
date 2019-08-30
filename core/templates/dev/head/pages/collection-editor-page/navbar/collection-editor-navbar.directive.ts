@@ -157,7 +157,9 @@ angular.module('oppia').directive('collectionEditorNavbar', [
 
             modalInstance.result.then(function(commitMessage) {
               CollectionEditorStateService.saveCollection(commitMessage);
-            });
+            }, function() {
+
+              });
           };
 
           ctrl.publishCollection = function() {

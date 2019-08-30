@@ -89,6 +89,8 @@ angular.module('oppia').directive('topicEditorNavbar', [
                   AlertsService.addSuccessMessage(
                     successToast, 1000);
                 });
+              }, function() {
+
               });
               return;
             }

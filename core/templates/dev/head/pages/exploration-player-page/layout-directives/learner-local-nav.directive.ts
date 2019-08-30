@@ -145,8 +145,11 @@ angular.module('oppia').directive('learnerLocalNav', [
                     };
                   }
                 ]
+              }).result.catch(function() {
               });
-            });
+            }, function() {
+
+              });
           };
         }
         }

@@ -148,7 +148,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
             };
           }
         ]
-      });
+      }).result.catch(function() {
+              });
     };
 
     var openPublishExplorationModal = function(
@@ -170,7 +171,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
             };
           }
         ]
-      });
+      }).result.catch(function() {
+              });
 
       publishModalInstance.result.then(function() {
         if (onStartSaveCallback) {
@@ -302,7 +304,9 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // exploration-with-draft-changes will be reloaded
           // (since it is already cached in ExplorationDataService).
           $window.location.reload();
-        });
+        }, function() {
+
+              });
       },
 
       showPublishExplorationModal: function(

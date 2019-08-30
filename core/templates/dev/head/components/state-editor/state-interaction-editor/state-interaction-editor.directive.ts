@@ -452,7 +452,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 StateInteractionIdService.savedMemento);
               $scope.recomputeGraph();
               _updateInteractionPreviewAndAnswerChoices();
-            });
+            }, function() {
+
+              });
           };
         }
       ]

@@ -42,10 +42,6 @@ var checkForConsoleErrors = function(errorsToIgnore) {
       });
     }
 
-     browserLogs = browserLogs.filter(function(browserLog) {
-      return !(browserLog.message.includes('Possibly unhandled rejection'));
-    });
-     
     for (var i = 0; i < browserLogs.length; i++) {
       if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
         var errorFatal = true;

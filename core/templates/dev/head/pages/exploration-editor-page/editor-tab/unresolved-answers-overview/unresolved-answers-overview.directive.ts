@@ -254,7 +254,9 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                   $scope.loadingDotsAreShown = true;
                   fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
                 }]
-            });
+            }).result.catch(function() {
+              });
+
           };
 
           $scope.getUnresolvedStateStats = function() {

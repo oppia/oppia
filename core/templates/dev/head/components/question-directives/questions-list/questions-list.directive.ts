@@ -269,7 +269,7 @@ angular.module('oppia').directive('questionsList', [
                   ctrl.initializeNewQuestionCreation(
                     ctrl.newQuestionSkillIds);
                 }
-              }, function(result){
+              }, function() {
                 
               });
             };
@@ -399,7 +399,7 @@ angular.module('oppia').directive('questionsList', [
 
               modalInstance.result.then(function() {
                 ctrl.saveAndPublishQuestion();
-              }, function(result){
+              }, function() {
 
               });
             };

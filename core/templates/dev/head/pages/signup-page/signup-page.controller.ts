@@ -90,6 +90,7 @@ angular.module('oppia').directive('signupPage', [
                     };
                   }
                 ]
+              }).result.catch(function() {
               });
             };
 
@@ -232,6 +233,7 @@ angular.module('oppia').directive('signupPage', [
                     };
                   }
                 ]
+              }).result.catch(function() {
               });
             };
           }

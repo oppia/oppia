@@ -156,7 +156,9 @@ angular.module('oppia').directive('previewTab', [
               if (callback) {
                 callback();
               }
-            });
+            }, function() {
+
+              });
           };
 
           ctrl.loadPreviewState = function(stateName, manualParamChanges) {

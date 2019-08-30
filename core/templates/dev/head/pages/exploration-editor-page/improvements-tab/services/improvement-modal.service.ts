@@ -289,7 +289,8 @@ angular.module('oppia').factory('ImprovementModalService', [
               $scope.cancel = $uibModalInstance.dismiss;
             }
           ]
-        });
+        }).result.catch(function() {
+              });
       },
     };
   },

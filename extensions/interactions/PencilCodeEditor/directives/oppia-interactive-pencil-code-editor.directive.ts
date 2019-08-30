@@ -126,6 +126,8 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
                   }]
               }).result.then(function() {
                 pce.setCode(ctrl.initialCode);
+              }, function() {
+
               });
             };
 

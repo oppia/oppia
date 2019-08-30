@@ -61,6 +61,7 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
                     };
                   }
                 ]
+              }).result.catch(function() {
               });
             } else {
               $window.open(

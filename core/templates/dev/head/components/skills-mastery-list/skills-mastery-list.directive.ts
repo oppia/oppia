@@ -99,7 +99,8 @@ angular.module('oppia').directive('skillsMasteryList', [
                   };
                 }
               ]
-            });
+            }).result.catch(function() {
+              });
           };
         }
         }

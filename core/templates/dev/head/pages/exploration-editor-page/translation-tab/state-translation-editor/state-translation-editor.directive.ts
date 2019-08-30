@@ -74,6 +74,8 @@ angular.module('oppia').directive('stateTranslationEditor', [
                   contentId, langaugeCode);
                 ExplorationStatesService.saveRecordedVoiceovers(
                   stateName, recordedVoiceovers);
+              }, function() {
+
               });
             }
           };

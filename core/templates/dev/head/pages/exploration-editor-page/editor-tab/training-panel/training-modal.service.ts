@@ -177,7 +177,9 @@ angular.module('oppia').factory('TrainingModalService', [
 
               $scope.init();
             }]
-        });
+        }).result.catch(function() {
+              });
+
         // Save the modified training data externally in state content.
         $rootScope.$broadcast('externalSave');
       }

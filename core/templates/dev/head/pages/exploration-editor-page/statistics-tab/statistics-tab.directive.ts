@@ -287,6 +287,7 @@ angular.module('oppia').directive('statisticsTab', [
                     };
                   }
                 ]
+              }).result.catch(function() {
               });
             });
           };

@@ -120,7 +120,9 @@ angular.module('oppia').directive('explorationGraph', [
               } else {
                 console.error('Invalid closeDict action: ' + closeDict.action);
               }
-            });
+            }, function() {
+
+              });
           };
         }
         }]

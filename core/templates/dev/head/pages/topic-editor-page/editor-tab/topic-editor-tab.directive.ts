@@ -72,6 +72,7 @@ angular.module('oppia').directive('topicEditorTab', [
                     };
                   }
                 ]
+              }).result.catch(function() {
               });
             } else {
               StoryCreationService.createNewCanonicalStory(

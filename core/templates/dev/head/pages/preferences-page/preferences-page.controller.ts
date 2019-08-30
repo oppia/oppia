@@ -267,6 +267,8 @@ angular.module('oppia').directive('preferencesPage', [
                     // in the top-right corner.
                     $window.location.reload();
                   });
+              }, function() {
+
               });
             };
 

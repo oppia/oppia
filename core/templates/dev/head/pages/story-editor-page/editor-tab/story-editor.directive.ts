@@ -121,7 +121,9 @@ angular.module('oppia').directive('storyEditor', [
 
             modalInstance.result.then(function(title) {
               StoryUpdateService.deleteStoryNode($scope.story, nodeId);
-            });
+            } , function() {
+
+              });
           };
 
           $scope.createNode = function() {
@@ -169,7 +171,9 @@ angular.module('oppia').directive('storyEditor', [
                 $scope.setNodeToEdit(
                   $scope.story.getStoryContents().getInitialNodeId());
               }
-            });
+            } , function() {
+
+              });
           };
 
           $scope.NOTES_SCHEMA = {

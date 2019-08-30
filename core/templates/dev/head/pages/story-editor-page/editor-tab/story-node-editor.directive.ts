@@ -213,7 +213,9 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.story, $scope.getId(), nextNodeId);
               _init();
               _recalculateAvailableNodes();
-            });
+            }, function() {
+
+              });
           };
 
           $scope.addDestinationNode = function(nodeId) {

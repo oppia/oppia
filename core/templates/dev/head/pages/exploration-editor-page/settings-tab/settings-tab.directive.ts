@@ -374,7 +374,7 @@ angular.module('oppia').directive('settingsTab', [
                   };
                 }
               ]
-            }).result.catch(function(result) {
+            }).result.catch(function() {
               });
           };
 
@@ -398,7 +398,7 @@ angular.module('oppia').directive('settingsTab', [
               ]
             }).result.then(function() {
               ExplorationRightsService.makeCommunityOwned();
-            }, function(result){
+            }, function() {
 
             });
           };
@@ -427,7 +427,7 @@ angular.module('oppia').directive('settingsTab', [
                 ctrl.explorationId).then(function() {
                 $window.location = CREATOR_DASHBOARD_PAGE_URL;
               });
-            }, function(result){
+            }, function() {
 
             });
           };
@@ -487,7 +487,7 @@ angular.module('oppia').directive('settingsTab', [
               }).result.then(function(result) {
                 ExplorationRightsService.saveModeratorChangeToBackend(
                   result.emailBody);
-              }, function(result){
+              }, function() {
                 
               });
             });

@@ -270,7 +270,8 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
                 };
               }
             ]
-          });
+          }).result.catch(function() {
+              });
         });
       },
     };

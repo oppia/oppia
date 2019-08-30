@@ -176,7 +176,9 @@ angular.module('oppia').directive('answerGroupEditor', [
                 misconception.getId(), misconceptionSkillId);
               _getTaggedMisconceptionName(
                 misconceptionSkillId + '-' + misconception.getId());
-            });
+            }, function() {
+
+              });
           };
 
           ctrl.getAnswerChoices = function() {

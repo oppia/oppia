@@ -53,6 +53,7 @@ angular.module('oppia').directive('adminRolesTab', [
         ctrl.VIEWABLE_ROLES = {};
         ctrl.topicSummaries = {};
         ctrl.graphData = {};
+        ctrl.boom = "false";
         ctrl.graphDataLoaded = false;
         AdminDataService.getDataAsync().then(function(response) {
           ctrl.UPDATABLE_ROLES = response.updatable_roles;

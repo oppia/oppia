@@ -392,7 +392,8 @@ angular.module('oppia').directive('audioTranslationBar', [
                   };
                 }
               ]
-            });
+            }).result.catch(function() {
+              });
           };
 
           $scope.playPauseUploadedAudioTranslation = function(languageCode) {
@@ -515,7 +516,9 @@ angular.module('oppia').directive('audioTranslationBar', [
                 $scope.contentId, $scope.languageCode);
               saveRecordedVoiceoversChanges();
               $scope.initAudioBar();
-            });
+            }, function() {
+
+              });
           };
 
           $scope.openAddAudioTranslationModal = function(audioFile) {
@@ -617,7 +620,7 @@ angular.module('oppia').directive('audioTranslationBar', [
                 result.fileSizeBytes);
               saveRecordedVoiceoversChanges();
               $scope.initAudioBar();
-            }, function(result){
+            }, function() {
               // uib-modal promise is handled here.
               });
           };

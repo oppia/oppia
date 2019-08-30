@@ -160,7 +160,9 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
               $scope.activeWorkedExampleIndex = null;
-            });
+            }, function() {
+
+              });
           };
 
           $scope.getWorkedExampleSummary = function(workedExample) {
@@ -203,7 +205,9 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                     COMPONENT_NAME_WORKED_EXAMPLE)));
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
-            });
+            }, function() {
+
+              });
           };
 
           $scope.onWorkedExampleSaved = function() {

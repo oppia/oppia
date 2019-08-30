@@ -116,8 +116,11 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
               };
             }
           ]
-        });
-      });
+        }).result.catch(function() {
+              });
+      }, function() {
+
+              });
     };
 
     return {

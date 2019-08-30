@@ -459,7 +459,9 @@ angular.module('oppia').factory('ExplorationStatesService', [
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
           $rootScope.$broadcast('refreshStateEditor');
-        });
+        }, function() {
+
+              });
       },
       renameState: function(oldStateName, newStateName) {
         newStateName = $filter('normalizeWhitespace')(newStateName);

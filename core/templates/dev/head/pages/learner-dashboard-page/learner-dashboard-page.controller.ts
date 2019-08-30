@@ -598,6 +598,8 @@ angular.module('oppia').directive('learnerDashboardPage', [
                     }
                   }
                 }
+              }, function() {
+
               });
             };
           }

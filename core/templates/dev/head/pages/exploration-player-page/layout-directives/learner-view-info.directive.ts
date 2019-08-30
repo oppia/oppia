@@ -170,7 +170,8 @@ angular.module('oppia').directive('learnerViewInfo', [
                   };
                 }
               ]
-            });
+            }).result.catch(function() {
+              });
           };
         }
         }
