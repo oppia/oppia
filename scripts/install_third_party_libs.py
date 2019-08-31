@@ -80,13 +80,13 @@ def pip_install(package, version, install_path):
     if hasattr(pip, 'main'):
         pip.main(args=[
             'install', '%s==%s' % (package, version), '--target', install_path])
-    # For pip version > 10.
+    # For pip version >= 10.
     else:
-        #  pylint: disable=no-name-in-module, import-error
+        # pylint: disable=no-name-in-module, import-error
         import pip._internal
         pip._internal.main(args=[  # pylint: disable=protected-access
             'install', '%s==%s' % (package, version), '--target', install_path])
-        #  pylint: enable=no-name-in-module, import-error
+        # pylint: enable=no-name-in-module, import-error
 
 
 def install_skulpt(argv):

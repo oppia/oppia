@@ -200,9 +200,9 @@ def is_port_open(port):
         return bool(not s.connect_ex(('localhost', port)))
 
 
-# Credits: https://stackoverflow.com/a/20691431/11755830
 def kill_process(port):
     """Kills a process that is listening to a specific port.
+    Credits: https://stackoverflow.com/a/20691431/11755830
 
     Args:
         port: int. The port number.
@@ -237,10 +237,10 @@ def recursive_chown(path, uid, gid):
         uid: int. Owner ID to be set.
         gid: int. Group ID to be set.
     """
-    for root, dirs, files in os.walk(path):
-        for directory in dirs:
+    for root, directories, filenames in os.walk(path):
+        for directory in directories:
             os.chown(os.path.join(root, directory), uid, gid)
-        for filename in files:
+        for filename in filenames:
             os.chown(os.path.join(root, filename), uid, gid)
 
 
@@ -251,10 +251,10 @@ def recursive_chmod(path, mode):
         path: str. The path for which mode would be set.
         mode: int. The mode to be set.
     """
-    for root, dirs, files in os.walk(path):
-        for directory in dirs:
+    for root, directories, filenames in os.walk(path):
+        for directory in directories:
             os.chmod(os.path.join(root, directory), mode)
-        for filename in files:
+        for filename in filenames:
             os.chmod(os.path.join(root, filename), mode)
 
 

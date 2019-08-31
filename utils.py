@@ -105,8 +105,8 @@ def get_exploration_components_from_dir(dir_path):
         dir_path_array = dir_path_array[:-1]
     dir_path_length = len(dir_path_array)
 
-    for root, dirs, files in os.walk(dir_path):
-        for directory in dirs:
+    for root, directories, files in os.walk(dir_path):
+        for directory in directories:
             if root == dir_path and directory != 'assets':
                 raise Exception(
                     'The only directory in %s should be assets/' % dir_path)

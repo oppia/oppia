@@ -21,19 +21,14 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import re
 
-from . import docstrings_checker  # isort:skip
-
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import astroid  # isort:skip
-from pylint import checkers  # isort:skip
-from pylint import interfaces  # isort:skip
-from pylint.checkers import typecheck  # isort:skip
-from pylint.checkers import utils as checker_utils  # isort:skip
+import astroid
+from pylint import checkers
+from pylint import interfaces
+from pylint.checkers import typecheck
+from pylint.checkers import utils as checker_utils
 
 import python_utils  # isort:skip
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
+from . import docstrings_checker  # isort:skip
 
 
 def read_from_node(node):
