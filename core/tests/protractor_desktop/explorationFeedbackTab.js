@@ -46,7 +46,7 @@ describe('ExplorationFeedback', function() {
   var libraryPage = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
@@ -60,9 +60,22 @@ describe('ExplorationFeedback', function() {
     users.createUser(
       'user2@ExplorationFeedback.com',
       'learnerExplorationFeedback');
-    users.createAndLoginAdminUser(
+    users.createAdminUser(
       'user3@ExplorationFeedback.com',
       'configExplorationFeedback');
+    users.createUser(
+      'user4@ExplorationFeedback.com',
+      'creatorExplorationFeedbackStatusChange');
+    users.createUser(
+      'user5@ExplorationFeedback.com',
+      'learnerExplorationFeedbackStatusChange');
+    users.createUser(
+      'user6@ExplorationFeedback.com',
+      'creatorFeedback');
+    users.createUser(
+      'user7@ExplorationFeedback.com',
+      'learnerFeedback');
+    users.login('user3@ExplorationFeedback.com');
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
       'Boolean', function(elem) {
@@ -120,15 +133,8 @@ describe('ExplorationFeedback', function() {
     var feedback = 'Hey! This exploration looks awesome';
     var feedbackResponse = 'Thanks for the feedback!';
 
-    users.createUser(
-      'user3@ExplorationFeedback.com',
-      'creatorExplorationFeedbackStatusChange');
-    users.createUser(
-      'user4@ExplorationFeedback.com',
-      'learnerExplorationFeedbackStatusChange');
-
     // Creator creates and publishes an exploration.
-    users.login('user3@ExplorationFeedback.com');
+    users.login('user5@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
@@ -141,7 +147,7 @@ describe('ExplorationFeedback', function() {
     users.logout();
 
     // Learner plays the exploration and submits a feedback.
-    users.login('user4@ExplorationFeedback.com');
+    users.login('user5@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_2);
     libraryPage.playExploration(EXPLORATION_TITLE_2);
@@ -149,7 +155,7 @@ describe('ExplorationFeedback', function() {
     users.logout();
 
     // Creator reads the feedback and responds.
-    users.login('user3@ExplorationFeedback.com');
+    users.login('user5@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -179,17 +185,11 @@ describe('ExplorationFeedback', function() {
   });
 
   it('should send message to feedback thread', function() {
-    users.createUser(
-      'user5@ExplorationFeedback.com',
-      'creatorFeedback');
-    users.createUser(
-      'user6@ExplorationFeedback.com',
-      'learnerFeedback');
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
     // Creator creates and publishes an exploration.
-    users.login('user5@ExplorationFeedback.com');
+    users.login('user6@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
@@ -202,7 +202,7 @@ describe('ExplorationFeedback', function() {
     users.logout();
 
     // Learner plays the exploration and submits a feedback.
-    users.login('user6@ExplorationFeedback.com');
+    users.login('user7@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_3);
     libraryPage.playExploration(EXPLORATION_TITLE_3);
@@ -210,7 +210,7 @@ describe('ExplorationFeedback', function() {
     users.logout();
 
     // Creator reads the feedback and responds.
-    users.login('user5@ExplorationFeedback.com');
+    users.login('user6@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
