@@ -71,8 +71,8 @@ describe('Exploration Improvements', function() {
       'suggesterUser@ExplorationImprovements.com',
       'suggesterExplorationImprovements');
     users.createAndLoginAdminUser(
-      'adminUser@ExplorationImprovements.com',
-      'adminExplorationImprovements');
+      'superUser@ExplorationImprovements.com',
+      'superUserExplorationImprovements');
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
       'Boolean', (elem) => elem.setValue(true));
@@ -91,7 +91,7 @@ describe('Exploration Improvements', function() {
 
     beforeAll(function() {
       // Creator creates and publishes an exploration.
-      users.login('adminUser@ExplorationImprovements.com', true);
+      users.login('superUserUser@ExplorationImprovements.com', true);
 
       workflow.createExplorationAsAdmin();
       explorationEditorMainTab.exitTutorial();

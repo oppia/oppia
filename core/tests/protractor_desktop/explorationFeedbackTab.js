@@ -74,13 +74,12 @@ describe('ExplorationFeedback', function() {
       'learnerFeedback');
     users.createAndLoginAdminUser(
       'user7@ExplorationFeedback.com',
-      'adminExplorationFeedback');
+      'superUserExplorationFeedback');
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
       'Boolean', function(elem) {
         elem.setValue(false);
       });
-    users.logout();
   });
 
   it('should add feedback to an exploration', function() {
@@ -285,7 +284,6 @@ describe('Suggestions on Explorations', function() {
       'Boolean', function(elem) {
         elem.setValue(false);
       });
-    users.logout();
   });
 
   it('accepts & rejects a suggestion on a published exploration', function() {
