@@ -28,16 +28,16 @@ angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', [
     );
 
     var _showEditStateContentSuggestionModal = function(
-        leftColumnContent, rightColumnContent, description) {
+        newContent, oldContent, description) {
       $uibModal.open({
         templateUrl: _templateUrl,
         backdrop: true,
         resolve: {
-          leftColumnContent: function() {
-            return leftColumnContent;
+          newContent: function() {
+            return newContent;
           },
-          rightColumnContent: function() {
-            return rightColumnContent;
+          oldContent: function() {
+            return oldContent;
           },
           description: function() {
             return description;
@@ -45,11 +45,11 @@ angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', [
         },
         controller: [
           '$scope', '$uibModalInstance', 'SuggestionModalService',
-          'description', 'leftColumnContent', 'rightColumnContent',
+          'description', 'newContent', 'oldContent',
           function($scope, $uibModalInstance, SuggestionModalService,
-              description, leftColumnContent, rightColumnContent) {
-            $scope.leftColumnContent = leftColumnContent;
-            $scope.rightColumnContent = rightColumnContent;
+              description, newContent, oldContent) {
+            $scope.newContent = newContent;
+            $scope.oldContent = oldContent;
             $scope.description = description;
             $scope.cancel = function() {
               SuggestionModalService.cancelSuggestion($uibModalInstance);
@@ -63,13 +63,10 @@ angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', [
       showSuggestionModal: function(suggestionType, extraParams) {
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
-            extraParams.oldContent,
             extraParams.newContent,
+            extraParams.oldContent,
             extraParams.description
           );
-        } else if (suggestionType === 'translate_content') {
-          _showEditStateContentSuggestionModal(
-            extraParams.contentHtml, extraParams.translationHtml, 'Some');
         }
       }
     };

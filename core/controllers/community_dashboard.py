@@ -91,13 +91,13 @@ class TranslatableTextHandler(base.BaseHandler):
 
         if not opportunity_services.is_exploration_available_for_contribution(
                 exp_id):
-            raise self.InvalidInputException
+            raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
 
         exp = exp_fetchers.get_exploration_by_id(exp_id)
-        result = exp.get_translatable_text(language_code)
+        state_wise_translatable_text = exp.get_translatable_text(language_code)
 
         self.values = {
-            'state_wise_contents': result,
+            'state_wise_contents': state_wise_translatable_text,
             'version': exp.version
         }
 

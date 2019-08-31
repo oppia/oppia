@@ -56,7 +56,7 @@ angular.module('oppia').directive(
           ctrl.progressBarRequired = true;
 
           var getOpportunitySummary = function(expId) {
-            for (index in ctrl.opportunities) {
+            for (var index in ctrl.opportunities) {
               if (ctrl.opportunities[index].id === expId) {
                 return ctrl.opportunities[index];
               }

@@ -67,10 +67,10 @@ angular.module('oppia').factory('TranslateTextService', [
           function(response) {
             stateWiseContents = response.data.state_wise_contents;
             activeExpVersion = response.data.version;
-            for (stateName in stateWiseContents) {
+            for (var stateName in stateWiseContents) {
               stateNamesList.push(stateName);
               var contentIds = [];
-              for (contentId in stateWiseContents[stateName]) {
+              for (var contentId in stateWiseContents[stateName]) {
                 contentIds.push(contentId);
               }
               stateWiseContentIds[stateName] = contentIds;

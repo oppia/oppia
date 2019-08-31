@@ -8,16 +8,16 @@
       <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER"></strong>
       <div class="oppia-suggestion-review-panel">
         <div>
-          <angular-html-bind ng-if="leftColumnContent" html-data="leftColumnContent">
+          <angular-html-bind ng-if="oldContent" html-data="oldContent">
           </angular-html-bind>
         </div>
-        <div ng-if="!leftColumnContent" style="color: red;" translate="I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE"></div>
+        <div ng-if="!oldContent" style="color: red;" translate="I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE"></div>
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container" style="float: right;">
       <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER"></strong>
       <div class="oppia-suggestion-review-panel">
-        <angular-html-bind html-data="rightColumnContent">
+        <angular-html-bind html-data="newContent">
         </angular-html-bind>
       </div>
     </div>

@@ -34,7 +34,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
     var _SUGGESTION_ACTION_HANDLER_URL = (
       '/suggestionactionhandler/exploration/<exp_id>/<thread_id>');
 
-    var _fetchSuggestions = function(params, onSuccess = () => {}) {
+    var _fetchSuggestions = function(params, onSuccess) {
       var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
         params: params
       });

@@ -15,14 +15,15 @@
     <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
       <div class="oppia-profile-details-container">
         <span ng-if="$ctrl.profilePictureDataUrl">
-          <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="img-circle" alt="User Avatar">
+          <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="rounded-circle" alt="User Avatar">
         </span>
         <span ng-if="!$ctrl.profilePictureDataUrl">
           <i class="material-icons oppia-profile-picture-icon">&#xE853;</i>
         </span>
       </div>
       <div class="oppia-contributor-username-container" data-tab-name="username">
-        <lazy-loading ng-show="!$ctrl.userName"></lazy-loading><[$ctrl.userName]>
+        <span ng-show="!$ctrl.username">Guest</span>
+        <span ng-show="$ctrl.username"><[$ctrl.username]></span>
       </div>
     </div>
     <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName !== 'myContributionTab'">
@@ -61,8 +62,8 @@
   .oppia-dashboard-langauge-container {
     display: flex;
     flex-direction: column;
-    margin-left: 10%;
     height: 80px;
+    margin-left: 10%;
     width: 15%;
   }
   .oppia-opportunity-language-selector {
@@ -72,8 +73,8 @@
   }
   .oppia-opportunities-tabs-explanation {
     padding-top: 25px;
-    width: 40%;
     position: relative;
+    width: 40%;
   }
   .oppia-opportunities-tabs-explanation::before {
     bottom: 65%;
@@ -100,14 +101,14 @@
   }
   .oppia-mascot-avatar-container,
   .oppia-profile-details-container {
+    margin-right: 20px;
+    max-width: 130px;
     padding: 2% 1%;
     width: 18%;
-    max-width: 130px;
-    margin-right: 20px;
   }
   .oppia-profile-picture-icon {
-    font-size: 120px;
     color: #009688;
+    font-size: 120px;
   }
   .oppia-opportunities-tabs {
     background-color: #ffffff;
@@ -116,11 +117,11 @@
   .oppia-opportunities-tabs-list {
     display: flex;
     justify-content: center;
-    width: 85%;
-    max-width: 1500px;
     margin: auto;
+    max-width: 1500px;
     padding-left: 0;
     text-align: center;
+    width: 85%;
   }
 .oppia-opportunities-tab-item {
     align-items: center;
@@ -147,11 +148,11 @@
   }
   .oppia-opportunities-tabs-list li {
     display: flex;
+    max-width: 250px;
     width: -webkit-calc(100% / 5);
     width: -moz-calc(100% / 5);
     width: -o-calc(100% / 5);
     width: calc(100% / 5);
-    max-width: 250px;
   }
   .oppia-opportunities-tabs-text {
     color: #4a4a4a;
@@ -159,27 +160,27 @@
     font-weight: bold;
     padding: 10px;
     text-decoration: none;
-    width: 100%;
+    transition: color 200ms ease-out;
     -webkit-transition: color 200ms ease-out;
     -ms-transition: color 200ms ease-out;
-    transition: color 200ms ease-out;
+    width: 100%;
   }
   .oppia-active-opportunities-tab a {
     color: #009688;
     text-decoration: none;
   }
   .oppia-active-tab-hilighter {
-    width: 60%;
     height: 0;
     transform: scale(0);
     -webkit-transition: transform 200ms ease-out;
     -ms-transition: transform 200ms ease-out;
     transition: transform 200ms ease-out;
+    width: 60%;
   }
   .oppia-active-opportunities-tab .oppia-active-tab-hilighter {
+    border: 2px solid #009688;
     color: #009688;
     text-decoration: none;
-    border: 2px solid #009688;
     transform: scale(1);
   }
   .oppia-opportunities-tabs-text:hover {

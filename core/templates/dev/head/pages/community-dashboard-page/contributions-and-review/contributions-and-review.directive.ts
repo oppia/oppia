@@ -109,6 +109,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             $uibModal.open({
               templateUrl: _templateUrl,
               backdrop: true,
+              size: 'lg',
               resolve: {
                 translationHtml: function() {
                   return translationHtml;

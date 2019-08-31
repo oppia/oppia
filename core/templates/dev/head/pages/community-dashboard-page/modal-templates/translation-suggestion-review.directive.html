@@ -22,7 +22,7 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-default" ng-if="!reviewable" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-default" ng-if="reviewable" ng-click="reject()">Reject</button>
-  <button class="btn btn-default" ng-if="reviewable" ng-click="accept()">Accept</button>
+  <button class="btn btn-secondary" ng-if="!reviewable" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-danger" ng-if="reviewable" ng-click="reject()">Reject</button>
+  <button class="btn btn-success" ng-if="reviewable" ng-click="accept()">Accept</button>
 </div>

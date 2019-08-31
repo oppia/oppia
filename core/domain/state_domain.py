@@ -843,15 +843,15 @@ class WrittenTranslations(python_utils.OBJECT):
         return cls(translations_mapping)
 
     def get_available_translation_content_ids(self, language_code):
-        """Returns a list of content id in which translations are available in
+        """Returns a list of content ids in which translations are available in
         the give language.
 
         Args:
             language_code: str. The abbreviate code of the language.
 
         Return:
-            list(str). A list of content ids in which translations are available
-                in the give language.
+            list(str). A list of content ids in which the translations are
+                available in the give language.
         """
         available_translation_content_ids = []
         for content_id, translations in self.translations_mapping.items():
@@ -1438,6 +1438,10 @@ class State(python_utils.OBJECT):
     def validate_matches_content(self, content_id, content_html):
         """Validates whether the given content matches the content of the state.
 
+        Args:
+            content_id: The id of the content.
+            content_html: The html content which is required to validate.
+
         Raises:
             ValidationError: The given html doesn't matches the content of the
                 state.
@@ -1827,8 +1831,8 @@ class State(python_utils.OBJECT):
         """Returns all content which can be translated into different languages.
 
         Returns:
-            dict(str, str). Returns a dict with key as content id and value as
-            the content html.
+            dict(str, str). Returns a dict with key as content id and content
+            html as the value.
         """
         content_id_to_html = {}
 
@@ -1860,6 +1864,9 @@ class State(python_utils.OBJECT):
 
     def get_translatable_text(self, language_code):
         """Returns all text html which can be translated in the given language.
+
+        Args:
+            language_code: The abbreviated code of the language.
 
         Returns:
             list(str, str). Returns a dict with key as content id and value as

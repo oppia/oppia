@@ -1256,8 +1256,8 @@ class Exploration(python_utils.OBJECT):
             language_code: The language code in which translation is required.
 
         Returns:
-            dict. A dict where state_name is the key and a dict with content_id
-                and html content as the key.
+            dict(str, str). A dict where state_name is the key and a dict with
+                content_id as the key and html content as value.
         """
         state_wise_translatable_text = {}
         for state_name, state in self.states.items():

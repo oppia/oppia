@@ -64,14 +64,14 @@ angular.module('oppia').directive('communityDashboardPage', [
             DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
           var ctrl = this;
           ctrl.profilePictureDataUrl = null;
-          ctrl.userName = null;
+          ctrl.username = null;
 
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
             ctrl.profilePictureDataUrl = dataUrl;
           });
 
           UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.userName = userInfo.getUsername();
+            ctrl.username = userInfo.getUsername();
           });
 
           var prevSelectedLanguageCode = (
