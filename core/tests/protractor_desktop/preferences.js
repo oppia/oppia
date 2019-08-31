@@ -26,6 +26,20 @@ describe('Preferences', function() {
     preferencesPage = new PreferencesPage.PreferencesPage();
   });
 
+  it('should upload a profile photo', function() {
+    users.createUser('eve@preferences.com', 'evePreferences');
+    users.login('eve@preferences.com');
+    preferencesPage.get();
+    expect(preferencesPage.getProfilePhotoSource())
+      .not
+      .toEqual(
+        preferencesPage.uploadProfilePhoto('../data/img.png')
+          .then(function() {
+            return preferencesPage.getProfilePhotoSource();
+          })
+      );
+  });
+
   it('should change editor role email checkbox value', function() {
     users.createUser('alice@preferences.com', 'alicePreferences');
     users.login('alice@preferences.com');

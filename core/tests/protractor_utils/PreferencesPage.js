@@ -18,6 +18,7 @@
  */
 
 var waitFor = require('./waitFor.js');
+var path = require('path');
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
@@ -41,6 +42,34 @@ var PreferencesPage = function() {
     by.css('.protractor-test-creator-dashboard-radio'));
   var learnerDashboardRadio = element(
     by.css('.protractor-test-learner-dashboard-radio'));
+  var profilePhotoClickable = element(
+    by.css('.protractor-test-photo-clickable'));
+  var profilePhotoUploadInput = element(
+    by.css('.protractor-test-photo-upload-input'));
+  var profilePhotoSubmitButton = element(
+    by.css('.protractor-test-photo-upload-submit'));
+  var customProfilePhoto = element(
+    by.css('.protractor-test-custom-photo'));
+  var profilePhotoCropper = element(
+    by.css('.protractor-test-photo-crop'));
+
+  this.uploadProfilePhoto = function(imgPath) {
+    profilePhotoClickable.click();
+    absPath = path.resolve(__dirname, imgPath);
+    return profilePhotoUploadInput.sendKeys(absPath).then(function() {
+      waitFor.visibilityOf(
+        profilePhotoCropper, 'photo cropper still invisible');
+    }).then(function() {
+      profilePhotoSubmitButton.click();
+    }).then(function() {
+      return waitFor.invisibilityOf(
+        profilePhotoUploadInput, 'photo upload still visible');
+    });
+  };
+
+  this.getProfilePhotoSource = function() {
+    return customProfilePhoto.getAttribute('src');
+  };
 
   this.editUserBio = function(bio) {
     userBioElement.sendKeys(bio);
