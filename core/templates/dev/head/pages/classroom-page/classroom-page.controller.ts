@@ -20,7 +20,7 @@ require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('components/summary-tile/topic-summary-tile.directive.ts')
+require('components/summary-tile/topic-summary-tile.directive.ts');
 
 require('domain/classroom/ClassroomBackendApiService.ts');
 require('domain/topic/TopicSummaryObjectFactory.ts');
@@ -51,26 +51,26 @@ angular.module('oppia').directive('classroomPage', [
 
           ctrl.classroomName = UrlService.getClassroomNameFromUrl();
           ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
-            '/splash/books.svg')
+            '/splash/books.svg');
 
           PageTitleService.setPageTitle(ctrl.classroomName + ' - Oppia');
 
           $rootScope.loadingMessage = 'Loading';
           ClassroomBackendApiService.fetchClassroomData(
-              ctrl.classroomName).then(function(topicSummaryDicts) {
-              ctrl.topicSummaries = topicSummaryDicts.map(
-                function(summaryDict) {
-                  return TopicSummaryObjectFactory.createFromBackendDict(summaryDict);
-                }
-              );
-              $rootScope.loadingMessage = '';
-            },
-            function(errorResponse) {
-              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning('Failed to get dashboard data');
+            ctrl.classroomName).then(function(topicSummaryDicts) {
+            ctrl.topicSummaries = topicSummaryDicts.map(
+              function(summaryDict) {
+                return TopicSummaryObjectFactory.createFromBackendDict(
+                  summaryDict);
               }
+            );
+            $rootScope.loadingMessage = '';
+          },
+          function(errorResponse) {
+            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+              AlertsService.addWarning('Failed to get dashboard data');
             }
-          );
+          });
         }
       ]
     };
