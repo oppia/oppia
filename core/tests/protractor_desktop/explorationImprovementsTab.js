@@ -79,112 +79,11 @@ describe('Exploration Improvements', function() {
     users.logout();
   });
 
-  describe('Feedback Improvements', function() {
-    it('adds feedback to an exploration', function() {
-      /*
-      var feedback = 'A good exploration. Would love to see more questions';
-      var feedbackResponse = 'Thanks for the feedback';
+  // TODO: describe('Feedback Improvements')
 
-      // Creator creates and publishes an exploration.
-      users.login('creatorUser@ExplorationImprovements.com');
-      workflow.createAndPublishExploration(
-        EXPLORATION_TITLE,
-        EXPLORATION_CATEGORY,
-        EXPLORATION_OBJECTIVE,
-        EXPLORATION_LANGUAGE);
-      creatorDashboardPage.get();
-      expect(creatorDashboardPage.getNumberOfFeedbackMessages()).toEqual(0);
-      users.logout();
+  // TODO: describe('Suggestion Improvements')
 
-      // Learner plays the exploration and submits a feedback.
-      users.login('learnerUser@ExplorationImprovements.com');
-      libraryPage.get();
-      libraryPage.findExploration(EXPLORATION_TITLE);
-      libraryPage.playExploration(EXPLORATION_TITLE);
-      explorationPlayerPage.submitFeedback(feedback);
-      users.logout();
-
-      // Creator reads the feedback and responds.
-      users.login('creatorUser@ExplorationImprovements.com');
-      creatorDashboardPage.get();
-      expect(creatorDashboardPage.getNumberOfFeedbackMessages()).toEqual(1);
-      creatorDashboardPage.navigateToExplorationEditor();
-
-      explorationEditorPage.navigateToImprovementsTab();
-      explorationEditorImprovementsTab.expectToHaveFeedbackThread();
-      explorationEditorImprovementsTab.readFeedbackMessages()
-        .then(function(messages) {
-          expect(messages.length).toEqual(1);
-          expect(messages[0]).toEqual(feedback);
-        });
-      explorationEditorPage.navigateToImprovementsTab();
-      explorationEditorImprovementsTab.sendResponseToLatestImprovement(
-        feedbackResponse);
-      users.logout();
-      */
-    });
-  });
-
-  describe('Suggestion Improvements', function() {
-    it('accepts & rejects a suggestion on a published exploration', function() {
-      /*
-      users.login('creatorUser@ExplorationImprovements.com');
-      workflow.createAndPublishExploration(
-        EXPLORATION_TITLE,
-        EXPLORATION_CATEGORY,
-        EXPLORATION_OBJECTIVE,
-        EXPLORATION_LANGUAGE);
-      users.logout();
-
-      // Suggester plays the exploration and suggests a change.
-      users.login('learnerUser@ExplorationImprovements.com');
-      libraryPage.get();
-      libraryPage.findExploration(EXPLORATION_TITLE);
-      libraryPage.playExploration(EXPLORATION_TITLE);
-
-      var suggestion1 = 'New Exploration';
-      var suggestionDescription1 = 'Uppercased the first letter';
-      var suggestion2 = 'New exploration';
-      var suggestionDescription2 = 'Changed';
-
-      explorationPlayerPage.submitSuggestion(
-        suggestion1, suggestionDescription1);
-      explorationPlayerPage.clickOnCloseSuggestionModalButton();
-      explorationPlayerPage.submitSuggestion(
-        suggestion2, suggestionDescription2);
-      users.logout();
-
-      // Exploration author reviews the suggestion and accepts it.
-      users.login('creatorUser@ExplorationImprovements.com');
-      creatorDashboardPage.get();
-      creatorDashboardPage.navigateToExplorationEditor();
-
-      explorationEditorPage.navigateToImprovementsTab();
-      explorationEditorImprovementsTab.getSuggestionThreads()
-        .then(function(threads) {
-          expect(threads.length).toEqual(2);
-          expect(threads[0]).toMatch(suggestionDescription2);
-        });
-      explorationEditorImprovementsTab.acceptSuggestion(suggestionDescription1);
-      explorationEditorImprovementsTab.closeModal();
-      explorationEditorImprovementsTab.rejectSuggestion(suggestionDescription2);
-
-      explorationEditorPage.navigateToPreviewTab();
-      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
-      users.logout();
-
-      // Student logs in and plays the exploration, finds the updated content.
-      users.login('suggesterUser@ExplorationImprovements.com');
-      libraryPage.get();
-      libraryPage.findExploration(EXPLORATION_TITLE);
-      libraryPage.playExploration(EXPLORATION_TITLE);
-      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
-      users.logout();
-      */
-    });
-  });
-
-  describe('Test solicit answer details feature', function() {
+  describe('Answer Details', function() {
     var EXPLORATION_TITLE = 'Check';
     var EXPLORATION_OBJECTIVE = 'To explore something';
     var EXPLORATION_CATEGORY = 'Algorithms';
@@ -192,6 +91,8 @@ describe('Exploration Improvements', function() {
 
     beforeAll(function() {
       // Creator creates and publishes an exploration.
+      users.login('adminUser@ExplorationImprovements.com', true);
+
       workflow.createExplorationAsAdmin();
       explorationEditorMainTab.exitTutorial();
 
@@ -220,6 +121,8 @@ describe('Exploration Improvements', function() {
       adminPage.editConfigProperty(
         'Always ask learners for answer details. For testing -- do not use',
         'Boolean', (elem) => elem.setValue(true));
+
+      users.logout();
     });
 
     it('checks solicit answer details feature', function() {
@@ -246,17 +149,8 @@ describe('Exploration Improvements', function() {
       users.logout();
     });
 
-    afterAll(function() {
-      users.login('adminUser@ExplorationImprovements.com');
-      adminPage.get();
-      adminPage.editConfigProperty(
-        'Always ask learners for answer details. For testing -- do not use',
-        'Boolean', (elem) => elem.setValue(true));
-      users.logout();
+    afterEach(function() {
+      general.checkForConsoleErrors([]);
     });
-  });
-
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
   });
 });
