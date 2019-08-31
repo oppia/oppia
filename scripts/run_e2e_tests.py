@@ -66,15 +66,21 @@ _PARSER.add_argument(
     help='Sets the number of parallel browsers to open while sharding',
     default='3')
 
+PORT_NUMBER_FOR_SELENIUM_SERVER = 4444
+PORT_NUMBER_FOR_GAE_SERVER = 9001
+USUAL_PORT_NUMBER_FOR_GAE_SERVER_IN_START = 8181
+
 
 def cleanup():
     """Send a kill signal to the dev server and Selenium server."""
-    common.kill_process(4444)
-    common.kill_process(9001)
+    common.kill_process(PORT_NUMBER_FOR_SELENIUM_SERVER)
+    common.kill_process(PORT_NUMBER_FOR_GAE_SERVER)
 
     # Wait for the servers to go down; suppress 'connection refused' error
     # output from nc since that is exactly what we are expecting to happen.
-    while common.is_port_open(4444) or common.is_port_open(9001):
+    while common.is_port_open(
+            PORT_NUMBER_FOR_SELENIUM_SERVER) or common.is_port_open(
+                PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
 
     if os.path.isdir(os.path.join('..', 'protractor-screenshots')):
@@ -97,16 +103,18 @@ def main(argv=None):
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
-    if common.is_port_open(8181):
+    if common.is_port_open(USUAL_PORT_NUMBER_FOR_GAE_SERVER_IN_START):
         common.print_each_string_after_two_new_lines([
-            'There is already a server running on localhost:8181.',
+            'There is already a server running on localhost:%s.'
+            % python_utils.UNICODE(USUAL_PORT_NUMBER_FOR_GAE_SERVER_IN_START),
             'Please terminate it before running the end-to-end tests.',
             'Exiting.'])
         raise Exception
 
-    if common.is_port_open(9001):
+    if common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         common.print_each_string_after_two_new_lines([
-            'There is already a server running on localhost:9001.',
+            'There is already a server running on localhost:%s.'
+            % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             'Please terminate it before running the end-to-end tests.',
             'Exiting.'])
         raise Exception
@@ -163,13 +171,17 @@ def main(argv=None):
         'start', '2>/dev/null']))
     # Start a demo server.
     background_processes.append(subprocess.Popen(
-        'python %s/dev_appserver.py --host=0.0.0.0 --port=9001 '
+        'python %s/dev_appserver.py --host=0.0.0.0 --port=%s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' % (
-            common.GOOGLE_APP_ENGINE_HOME, app_yaml_filepath), shell=True))
+            common.GOOGLE_APP_ENGINE_HOME,
+            python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
+            app_yaml_filepath), shell=True))
 
     # Wait for the servers to come up.
-    while not common.is_port_open(4444) or not common.is_port_open(9001):
+    while not common.is_port_open(
+            PORT_NUMBER_FOR_SELENIUM_SERVER) or not common.is_port_open(
+                PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
 
     # Delete outdated screenshots.

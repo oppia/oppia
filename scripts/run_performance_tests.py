@@ -45,14 +45,17 @@ _PARSER.add_argument(
     help='If an argument is present then run test for that specific page. '
     'Otherwise run tests for all the pages sequentially.')
 
+PORT_NUMBER_FOR_GAE_SERVER = 9501
+USUAL_PORT_NUMBER_FOR_GAE_SERVER_IN_START = 8181
+
 
 def cleanup():
     """Send a kill signal to the dev server."""
-    common.kill_process(9501)
+    common.kill_process(PORT_NUMBER_FOR_GAE_SERVER)
 
     # Wait for the servers to go down; suppress 'connection refused' error
     # output from nc since that is exactly what we are expecting to happen.
-    while common.is_port_open(9501):
+    while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
 
     python_utils.PRINT('Done!')
@@ -84,9 +87,10 @@ def main(argv=None):
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
-    if common.is_port_open(8181):
+    if common.is_port_open(USUAL_PORT_NUMBER_FOR_GAE_SERVER_IN_START):
         common.print_each_string_after_two_new_lines([
-            'There is already a server running on localhost:8181',
+            'There is already a server running on localhost:%s'
+            % python_utils.UNICODE(USUAL_PORT_NUMBER_FOR_GAE_SERVER_IN_START),
             'Please terminate it before running the performance tests.',
             'Exiting.'])
         raise Exception
@@ -105,12 +109,13 @@ def main(argv=None):
     # Start a demo server.
     background_process = subprocess.Popen([
         'python', '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME,
-        '--host=0.0.0.0', '--port=9501', '--clear_datastore=yes',
-        '--dev_appserver_log_level=critical', '--log_level=critical',
-        '--skip_sdk_update_check=true', 'app_dev.yaml'])
+        '--host=0.0.0.0',
+        '--port=%s' % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
+        '--clear_datastore=yes', '--dev_appserver_log_level=critical',
+        '--log_level=critical', '--skip_sdk_update_check=true', 'app_dev.yaml'])
 
     # Wait for the servers to come up.
-    while not common.is_port_open(9501):
+    while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
 
     # Install xvfb if not on travis, Used in frontend, e2e tests and performance

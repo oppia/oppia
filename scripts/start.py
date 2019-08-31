@@ -53,13 +53,15 @@ _PARSER.add_argument(
     help='optional; if specified, does not open a browser.',
     action='store_true')
 
+PORT_NUMBER_FOR_GAE_SERVER = 8181
+
 
 def cleanup():
     """Function for waiting for the servers to go down."""
     common.print_each_string_after_two_new_lines([
         'INFORMATION',
         'Cleaning up the servers.'])
-    while common.is_port_open(8181):
+    while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
 
 
@@ -77,11 +79,12 @@ def main(argv=None):
     python_utils.PRINT('Oppia setup complete!')
 
     # Check that there isn't a server already running.
-    if common.is_port_open(8181):
+    if common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         common.print_each_string_after_two_new_lines([
             'WARNING',
             'Could not start new server. There is already an existing server',
-            'running at port 8181.'])
+            'running at port %s.'
+            % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
 
     parsed_args, _ = _PARSER.parse_known_args(args=argv)
     clear_datastore_arg = (
@@ -136,12 +139,14 @@ def main(argv=None):
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
         'python %s/dev_appserver.py %s %s --admin_host 0.0.0.0 --admin_port '
-        '8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true %s' % (
+        '8000 --host 0.0.0.0 --port %s --skip_sdk_update_check true %s' % (
             common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
-            enable_console_arg, app_yaml_filepath), shell=True))
+            enable_console_arg,
+            python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
+            app_yaml_filepath), shell=True))
 
     # Wait for the servers to come up.
-    while not common.is_port_open(8181):
+    while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
 
     os_info = os.uname()
@@ -155,30 +160,38 @@ def main(argv=None):
                 'INFORMATION',
                 'Setting up a local development server. You can access this '
                 'server',
-                'by navigating to localhost:8181 in a browser window.'])
+                'by navigating to localhost:%s in a browser window.'
+                % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
         else:
             common.print_each_string_after_two_new_lines([
                 'INFORMATION',
-                'Setting up a local development server at localhost:8181. '
+                'Setting up a local development server at localhost:%s. '
+                % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
                 'Opening a',
                 'default browser window pointing to this server'])
             time.sleep(5)
             background_processes.append(
-                subprocess.Popen(['xdg-open', 'http://localhost:8181/']))
+                subprocess.Popen([
+                    'xdg-open', 'http://localhost:%s/'
+                    % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
     elif os_info[0] == 'Darwin' and not parsed_args.no_browser:
         common.print_each_string_after_two_new_lines([
             'INFORMATION',
-            'Setting up a local development server at localhost:8181. '
+            'Setting up a local development server at localhost:%s. '
+            % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             'Opening a',
             'default browser window pointing to this server.'])
         time.sleep(5)
         background_processes.append(
-            subprocess.Popen(['open', 'http://localhost:8181/']))
+            subprocess.Popen([
+                'open', 'http://localhost:%s/'
+                % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
     else:
         common.print_each_string_after_two_new_lines([
             'INFORMATION',
             'Setting up a local development server. You can access this server',
-            'by navigating to localhost:8181 in a browser window.'])
+            'by navigating to localhost:%s in a browser window.'
+            % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
 
     python_utils.PRINT('Done!')
 

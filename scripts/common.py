@@ -42,6 +42,7 @@ NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = 'core/templates/dev/head'
 NPM_PATH = os.path.join(NODE_PATH, 'bin/npm')
+# Add path for node which is required by the node_modules.
 os.environ['PATH'] = '%s/bin:' % NODE_PATH + os.environ['PATH']
 
 
