@@ -275,10 +275,10 @@ describe('Suggestions on Explorations', function() {
       'user2@ExplorationSuggestions.com',
       'suggesterExplorationSuggestions');
     users.createUser(
-      'userAdmin@ExplorationSuggestions.com',
+      'user3@ExplorationSuggestions.com',
       'studentExplorationSuggestions');
     users.createAndLoginAdminUser(
-      'user3@ExplorationSuggestions.com',
+      'user4@ExplorationSuggestions.com',
       'configExplorationSuggestions');
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
@@ -335,7 +335,7 @@ describe('Suggestions on Explorations', function() {
     users.logout();
 
     // Student logs in and plays the exploration, finds the updated content.
-    users.login('userAdmin@ExplorationSuggestions.com');
+    users.login('user3@ExplorationSuggestions.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
