@@ -66,9 +66,8 @@ def get_multi_topic_summaries(topic_ids):
     """
     topic_summaries_models = topic_models.TopicSummaryModel.get_multi(topic_ids)
     topic_summaries = [
-        get_topic_summary_from_model(summary)
-        for summary in topic_summaries_models
-        if summary is not None]
+        get_topic_summary_from_model(summary) if summary else None
+        for summary in topic_summaries_models]
     return topic_summaries
 
 
@@ -953,9 +952,8 @@ def get_multi_topic_rights(topic_ids):
     """
     topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
     topic_rights = [
-        get_topic_rights_from_model(rights)
-        for rights in topic_rights_models
-        if rights is not None]
+        get_topic_rights_from_model(rights) if rights else None
+        for rights in topic_rights_models]
     return topic_rights
 
 
