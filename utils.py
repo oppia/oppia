@@ -14,6 +14,7 @@
 
 """Common utility functions."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
 import collections
@@ -170,21 +171,7 @@ def to_ascii(input_string):
         str. String containing the ascii representation of the input string.
     """
     return unicodedata.normalize(
-        'NFKD', python_utils.STR(input_string)).encode('ascii', 'ignore')
-
-
-def yaml_from_dict(dictionary, width=80):
-    """Gets the YAML representation of a dict.
-
-    Args:
-        dictionary: dict. Dictionary for conversion into yaml.
-        width: int. Width for the yaml representation, default value
-            is set to be of 80.
-
-    Returns:
-        str. Converted yaml of the passed dictionary.
-    """
-    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
+        'NFKD', python_utils.UNICODE(input_string)).encode('ascii', 'ignore')
 
 
 def dict_from_yaml(yaml_str):
@@ -395,7 +382,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(python_utils.STR([value]))
+    return base64.b64encode(bytes([value]))
 
 
 def get_time_in_millisecs(datetime_obj):
@@ -469,7 +456,7 @@ def vfs_construct_path(base_path, *path_components):
 def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc."""
     # Preserve unicode (if path is unicode).
-    slash, dot = (u'/', u'.') if isinstance(path, python_utils.STR) else (
+    slash, dot = (u'/', u'.') if isinstance(path, python_utils.UNICODE) else (
         '/', '.')
     if path == '':
         return dot
