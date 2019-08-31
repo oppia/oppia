@@ -27,6 +27,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
+import subprocess
 import sys
 
 import python_utils
@@ -51,12 +52,14 @@ def main(argv=None):
     python_utils.PRINT('Linting passed.')
     python_utils.PRINT('')
 
-    current_branch = common.run_command('git rev-parse --abbrev-ref HEAD')
+    current_branch = subprocess.check_output([
+        'git', 'rev-parse', '--abbrev-ref', 'HEAD'])
 
     # If the current branch exists on remote origin, matched_branch_num=1
     # else matched_branch_num=0.
-    matched_branch_num = common.run_command(
-        'git ls-remote --heads origin %s | wc -l' % current_branch)
+    matched_branch_num = subprocess.check_output([
+        'git', 'ls-remote', '--heads', 'origin', current_branch, '|', 'wc',
+        '-l'])
 
     # Set the origin branch to develop if it's not specified.
     parsed_args, _ = _PARSER.parse_known_args(args=argv)
@@ -69,8 +72,8 @@ def main(argv=None):
 
     python_utils.PRINT('Comparing the current branch with %s' % branch)
 
-    all_changed_files = common.run_command(
-        'git diff --cached --name-only --diff-filter=ACM %s' % branch)
+    all_changed_files = subprocess.check_output([
+        'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM', branch])
 
     if common.FRONTEND_DIR in all_changed_files:
         # Run frontend unit tests.

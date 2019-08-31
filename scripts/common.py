@@ -215,21 +215,6 @@ def kill_process(port):
                 process.send_signal(signal.SIGTERM)
 
 
-def run_command(command):
-    """Runs a subprocess command.
-
-    Args:
-        command: str. The command to be run.
-
-    Returns:
-        str. The command output.
-
-    Raises:
-        CalledProcessError. Raised when the command fails.
-    """
-    return subprocess.check_output(command.split())
-
-
 def recursive_chown(path, uid, gid):
     """Changes the owner and group id of all files in a path to the numeric
     uid and gid.
