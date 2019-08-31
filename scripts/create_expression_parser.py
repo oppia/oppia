@@ -45,8 +45,9 @@ def main():
         expression_parser_definition, expression_parser_js])
 
     for line in fileinput.input(files=[expression_parser_js], inplace=True):
-        # Inside this loop the STDOUT will be redirected to the file.
-        # The end='' is needed to avoid double line breaks.
+        # Inside this loop the STDOUT will be redirected to the file,
+        # expression_parser_js. The end='' is needed to avoid double line
+        # breaks.
         python_utils.PRINT(
             re.sub(
                 r'module\.exports.*$',
@@ -55,8 +56,9 @@ def main():
                 line), end='')
 
     for line in fileinput.input(files=[expression_parser_js], inplace=True):
-        # Inside this loop the STDOUT will be redirected to the file.
-        # The end='' is needed to avoid double line breaks.
+        # Inside this loop the STDOUT will be redirected to the file,
+        # expression_parser_js. The end='' is needed to avoid double line
+        # breaks.
         python_utils.PRINT(
             re.sub(r'^\}\)\(\);\s*$', '}]);', line), end='')
 

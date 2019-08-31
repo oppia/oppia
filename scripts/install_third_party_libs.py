@@ -56,8 +56,7 @@ def pip_install(package, version, install_path):
     except ImportError:
         common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
-            'found',
-            'on your local machine.',
+            'found on your local machine.',
             'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
             'page:'])
 
@@ -74,7 +73,7 @@ def pip_install(package, version, install_path):
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
-        sys.exit(1)
+        raise Exception
 
     # For pip version < 10.
     if hasattr(pip, 'main'):
@@ -113,6 +112,8 @@ def install_skulpt(argv):
         if not os.path.exists(
                 os.path.join(common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0')):
             python_utils.PRINT('Downloading Skulpt')
+            skulpt_filepath = os.path.join(
+                common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0', 'skulpt', 'skulpt.py')
             os.chdir(common.OPPIA_TOOLS_DIR)
             os.mkdir('skulpt-0.10.0')
             os.chdir('skulpt-0.10.0')
@@ -129,29 +130,23 @@ def install_skulpt(argv):
             # and generating documentation and are not necessary when building
             # Skulpt.
             for line in fileinput.input(
-                    files=[os.path.join(
-                        common.OPPIA_TOOLS_DIR,
-                        'skulpt-0.10.0/skulpt/skulpt.py')], inplace=True):
-                # Inside this loop the STDOUT will be redirected to the file.
-                # The end='' is needed to avoid double line breaks.
+                    files=[skulpt_filepath], inplace=True):
+                # Inside this loop the STDOUT will be redirected to the file,
+                # skulpt.py. The end='' is needed to avoid double line breaks.
                 python_utils.PRINT(
                     line.replace('ret = test()', 'ret = 0'),
                     end='')
 
             for line in fileinput.input(
-                    files=[os.path.join(
-                        common.OPPIA_TOOLS_DIR,
-                        'skulpt-0.10.0/skulpt/skulpt.py')], inplace=True):
-                # Inside this loop the STDOUT will be redirected to the file.
-                # The end='' is needed to avoid double line breaks.
+                    files=[skulpt_filepath], inplace=True):
+                # Inside this loop the STDOUT will be redirected to the file,
+                # skulpt.py. The end='' is needed to avoid double line breaks.
                 python_utils.PRINT(
                     line.replace('  doc()', '  pass#doc()'),
                     end='')
 
             for line in fileinput.input(
-                    files=[os.path.join(
-                        common.OPPIA_TOOLS_DIR,
-                        'skulpt-0.10.0/skulpt/skulpt.py')], inplace=True):
+                    files=[skulpt_filepath], inplace=True):
                 # This and the next command disable unit and compressed unit
                 # tests for the compressed distribution of Skulpt. These
                 # tests don't work on some Ubuntu environments and cause a
@@ -163,17 +158,12 @@ def install_skulpt(argv):
                     end='')
 
             for line in fileinput.input(
-                    files=[os.path.join(
-                        common.OPPIA_TOOLS_DIR,
-                        'skulpt-0.10.0/skulpt/skulpt.py')], inplace=True):
+                    files=[skulpt_filepath], inplace=True):
                 python_utils.PRINT(
                     line.replace('ret = rununits(opt=True)', 'ret = 0'),
                     end='')
 
-            subprocess.call([
-                'python', os.path.join(
-                    common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/skulpt.py'),
-                'dist'])
+            subprocess.call(['python', skulpt_filepath, 'dist'])
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)

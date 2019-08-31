@@ -89,7 +89,7 @@ def main(argv=None):
             'There is already a server running on localhost:8181',
             'Please terminate it before running the performance tests.',
             'Exiting.'])
-        sys.exit(1)
+        raise Exception
 
     # Forces the cleanup function to run on exit.
     # Developers: note that at the end of this script, the cleanup() function at

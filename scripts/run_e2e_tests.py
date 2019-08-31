@@ -77,7 +77,7 @@ def cleanup():
     while common.is_port_open(4444) or common.is_port_open(9001):
         time.sleep(1)
 
-    if os.path.isdir('../protractor-screenshots'):
+    if os.path.isdir(os.path.join('..', 'protractor-screenshots')):
         common.print_each_string_after_two_new_lines([
             'Note: If ADD_SCREENSHOT_REPORTER is set to true in',
             'core/tests/protractor.conf.js, you can view screenshots',
@@ -102,14 +102,14 @@ def main(argv=None):
             'There is already a server running on localhost:8181.',
             'Please terminate it before running the end-to-end tests.',
             'Exiting.'])
-        sys.exit(1)
+        raise Exception
 
     if common.is_port_open(9001):
         common.print_each_string_after_two_new_lines([
             'There is already a server running on localhost:9001.',
             'Please terminate it before running the end-to-end tests.',
             'Exiting.'])
-        sys.exit(1)
+        raise Exception
 
     # Forces the cleanup function to run on exit.
     # Developers: note that at the end of this script, the cleanup() function at
@@ -122,8 +122,8 @@ def main(argv=None):
         constants_env_variable = '\'DEV_MODE\': false'
         for line in fileinput.input(
                 files=['assets/constants.ts'], inplace=True):
-            # Inside this loop the STDOUT will be redirected to the file.
-            # The end='' is needed to avoid double line breaks.
+            # Inside this loop the STDOUT will be redirected to the file,
+            # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(r'\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
@@ -134,8 +134,8 @@ def main(argv=None):
         constants_env_variable = '\'DEV_MODE\': true'
         for line in fileinput.input(
                 files=['assets/constants.ts'], inplace=True):
-            # Inside this loop the STDOUT will be redirected to the file.
-            # The end='' is needed to avoid double line breaks.
+            # Inside this loop the STDOUT will be redirected to the file,
+            # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(r'\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
@@ -173,7 +173,7 @@ def main(argv=None):
         time.sleep(1)
 
     # Delete outdated screenshots.
-    if os.path.isdir('../protractor-screenshots'):
+    if os.path.isdir(os.path.join('..', 'protractor-screenshots')):
         shutil.rmtree('../protractor-screenshots')
 
     # Run the end-to-end tests. The conditional is used to run protractor

@@ -60,7 +60,7 @@ def main():
                 'google_appengine_1.9.67.zip', filename='gae-download.zip')
         except Exception:
             python_utils.PRINT('Error downloading Google App Engine. Exiting.')
-            sys.exit(1)
+            raise Exception
         python_utils.PRINT('Download complete. Installing Google App Engine...')
         with zipfile.ZipFile('gae-download.zip', 'r') as zip_ref:
             zip_ref.extractall(
@@ -83,7 +83,7 @@ def main():
                 filename='gcloud-sdk.tar.gz')
         except Exception:
             python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
-            sys.exit(1)
+            raise Exception
         python_utils.PRINT('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(

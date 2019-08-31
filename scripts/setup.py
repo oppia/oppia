@@ -75,7 +75,7 @@ def test_python_version():
                 'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
                 'pythonpath-in-windows-7'])
         # Exit when no suitable Python environment can be found.
-        sys.exit(1)
+        raise Exception
 
 
 def main():
@@ -90,7 +90,7 @@ def main():
         python_utils.PRINT(
             'WARNING   This script should be run from the oppia/ root folder.')
         python_utils.PRINT('')
-        sys.exit(1)
+        raise Exception
 
     # Set COMMON_DIR to the absolute path of the directory above OPPIA_DIR. This
     # is necessary becaue COMMON_DIR (or subsequent variables which refer to it)
@@ -111,7 +111,7 @@ def main():
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows'
             '%29',
             'STATUS: Installation completed except for node.js. Exiting.'])
-        sys.exit(1)
+        raise Exception
 
     # Download and install node.js.
     python_utils.PRINT(
@@ -184,7 +184,7 @@ def main():
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
     else:
         python_utils.PRINT('Chrome is not found, stopping ...')
-        sys.exit(1)
+        raise Exception
 
     os.environ['CHROME_BIN'] = chrome_bin
     python_utils.PRINT('Environment setup completed.')

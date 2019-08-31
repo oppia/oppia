@@ -97,8 +97,8 @@ def main(argv=None):
         constants_env_variable = '\'DEV_MODE\': false'
         for line in fileinput.input(
                 files=['assets/constants.ts'], inplace=True):
-            # Inside this loop the STDOUT will be redirected to the file.
-            # The end='' is needed to avoid double line breaks.
+            # Inside this loop the STDOUT will be redirected to the file,
+            # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
                     r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
@@ -108,8 +108,8 @@ def main(argv=None):
         constants_env_variable = '\'DEV_MODE\': true'
         for line in fileinput.input(
                 files=['assets/constants.ts'], inplace=True):
-            # Inside this loop the STDOUT will be redirected to the file.
-            # The end='' is needed to avoid double line breaks.
+            # Inside this loop the STDOUT will be redirected to the file,
+            # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
                     r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
