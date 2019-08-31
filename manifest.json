@@ -243,11 +243,21 @@
           "js": ["dist/angular-toastr.tpls.min.js"]
         }
       },
-      "bootstrap": {
-        "version": "3.3.4",
+      "popperJs": {
+        "version": "1.15.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/twbs/bootstrap/releases/download/v3.3.4/bootstrap-3.3.4-dist.zip",
-        "rootDir": "bootstrap-3.3.4-dist",
+        "url": "https://github.com/FezVrasta/popper.js/archive/v1.15.0.zip",
+        "rootDirPrefix": "popper.js-",
+        "targetDirPrefix": "popperJs-",
+        "bundle": {
+          "js": ["dist/umd/popper.js"]
+        }
+      },
+      "bootstrap": {
+        "version": "4.3.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip",
+        "rootDir": "bootstrap-4.3.1-dist",
         "targetDirPrefix": "bootstrap-",
         "bundle": {
           "css": ["css/bootstrap.css"],
@@ -420,11 +430,11 @@
         "targetDir": "midi-js-a8a842"
       },
       "ngJoyride": {
-        "version": "5b25d076405c9a787db602d2a8ff49919228f4fc",
+        "version": "b117e019582433995393f81e2006a6bc36ca1cf2",
         "downloadFormat": "zip",
-        "url": "https://github.com/seanlip/ng-joyride/archive/5b25d076405c9a787db602d2a8ff49919228f4fc.zip",
+        "url": "https://github.com/oppia/ng-joyride/archive/b117e019582433995393f81e2006a6bc36ca1cf2.zip",
         "rootDirPrefix": "ng-joyride-",
-        "targetDir": "ng-joyride-5b25d0",
+        "targetDir": "ng-joyride-b117e0",
         "bundle": {
           "css": ["ng-joyride.css"],
           "js": ["ng-joyride.js"]

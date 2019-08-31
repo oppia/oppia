@@ -8,7 +8,7 @@
         <div class="oppia-click-to-start-editing protractor-test-open-hint-editor"
              ng-if="$ctrl.isEditable" ng-click="$ctrl.openHintEditor()">
           <i ng-if="$ctrl.isEditable"
-             class="material-icons oppia-editor-edit-icon pull-right"
+             class="material-icons oppia-editor-edit-icon float-right"
              title="Edit Hint">&#xE254;
           </i>
         </div>
@@ -37,9 +37,9 @@
     </form>
 
     <div class="oppia-rule-save-cancel-buttons">
-      <div class="pull-right">
+      <div class="float-right">
         <button type="button"
-                class="btn btn-default protractor-test-cancel-hint-edit"
+                class="btn btn-secondary protractor-test-cancel-hint-edit"
                 ng-click="$ctrl.cancelThisHintEdit()">
           Cancel
         </button>
