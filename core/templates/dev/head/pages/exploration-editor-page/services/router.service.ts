@@ -53,8 +53,13 @@ angular.module('oppia').factory('RouterService', [
     // _savePendingChanges triggers 'externalSave' event which
     // will be caught by appropriate editors that will
     // save pending changes. However, the autosave / saving of
-    // changelist is async. To allow autosave / saving of change
-    // list to complete. PREVIEW_TAB_WAIT_TIME_MSEC is provided.
+    // changelist is async. Promises cannot be used here to
+    // ensure that _actuallyNavigate is called only after
+    // _savePendingChanges has completed because there is
+    // currently no way to check if all promises returned are
+    // resolved after the 'externalSave' is triggered. Therefore,
+    // to allow autosave / saving of change list to complete,
+    // PREVIEW_TAB_WAIT_TIME_MSEC is provided.
     var PREVIEW_TAB_WAIT_TIME_MSEC = 200;
 
     var activeTabName = TABS.MAIN.name;
@@ -245,7 +250,7 @@ angular.module('oppia').factory('RouterService', [
       navigateToPreviewTab: function() {
         if (activeTabName !== TABS.PREVIEW.name) {
           _savePendingChanges();
-          setTimeout(function() {
+          $timeout(function() {
             _actuallyNavigate(SLUG_PREVIEW, null);
           }, PREVIEW_TAB_WAIT_TIME_MSEC);
         }
