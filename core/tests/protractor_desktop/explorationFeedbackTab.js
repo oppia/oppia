@@ -60,22 +60,21 @@ describe('ExplorationFeedback', function() {
     users.createUser(
       'user2@ExplorationFeedback.com',
       'learnerExplorationFeedback');
-    users.createAdminUser(
-      'user3@ExplorationFeedback.com',
-      'configExplorationFeedback');
     users.createUser(
-      'user4@ExplorationFeedback.com',
+      'user3@ExplorationFeedback.com',
       'creatorExplorationFeedbackStatusChange');
     users.createUser(
-      'user5@ExplorationFeedback.com',
+      'user4@ExplorationFeedback.com',
       'learnerExplorationFeedbackStatusChange');
     users.createUser(
-      'user6@ExplorationFeedback.com',
+      'user5@ExplorationFeedback.com',
       'creatorFeedback');
     users.createUser(
-      'user7@ExplorationFeedback.com',
+      'user6@ExplorationFeedback.com',
       'learnerFeedback');
-    users.login('user3@ExplorationFeedback.com', true);
+    users.createAndLoginAdminUser(
+      'user7@ExplorationFeedback.com',
+      'adminExplorationFeedback');
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
       'Boolean', function(elem) {
@@ -134,7 +133,7 @@ describe('ExplorationFeedback', function() {
     var feedbackResponse = 'Thanks for the feedback!';
 
     // Creator creates and publishes an exploration.
-    users.login('user4@ExplorationFeedback.com');
+    users.login('user3@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
@@ -147,7 +146,7 @@ describe('ExplorationFeedback', function() {
     users.logout();
 
     // Learner plays the exploration and submits a feedback.
-    users.login('user5@ExplorationFeedback.com');
+    users.login('user4@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_2);
     libraryPage.playExploration(EXPLORATION_TITLE_2);
@@ -155,7 +154,7 @@ describe('ExplorationFeedback', function() {
     users.logout();
 
     // Creator reads the feedback and responds.
-    users.login('user4@ExplorationFeedback.com');
+    users.login('user3@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -189,7 +188,7 @@ describe('ExplorationFeedback', function() {
     var feedbackResponse = 'Thanks for the feedback';
 
     // Creator creates and publishes an exploration.
-    users.login('user6@ExplorationFeedback.com');
+    users.login('user5@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
@@ -202,7 +201,7 @@ describe('ExplorationFeedback', function() {
     users.logout();
 
     // Learner plays the exploration and submits a feedback.
-    users.login('user7@ExplorationFeedback.com');
+    users.login('user6@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_3);
     libraryPage.playExploration(EXPLORATION_TITLE_3);
@@ -210,7 +209,7 @@ describe('ExplorationFeedback', function() {
     users.logout();
 
     // Creator reads the feedback and responds.
-    users.login('user6@ExplorationFeedback.com');
+    users.login('user5@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -276,10 +275,10 @@ describe('Suggestions on Explorations', function() {
       'user2@ExplorationSuggestions.com',
       'suggesterExplorationSuggestions');
     users.createUser(
-      'user3@ExplorationSuggestions.com',
+      'userAdmin@ExplorationSuggestions.com',
       'studentExplorationSuggestions');
     users.createAndLoginAdminUser(
-      'user4@ExplorationSuggestions.com',
+      'user3@ExplorationSuggestions.com',
       'configExplorationSuggestions');
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
@@ -336,7 +335,7 @@ describe('Suggestions on Explorations', function() {
     users.logout();
 
     // Student logs in and plays the exploration, finds the updated content.
-    users.login('user3@ExplorationSuggestions.com');
+    users.login('userAdmin@ExplorationSuggestions.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
