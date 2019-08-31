@@ -92,6 +92,7 @@ install:
 - pushd $TRAVIS_BUILD_DIR
 - python -m scripts.setup
 - python -m scripts.setup_gae
+- chown -R $(whoami) node_modules
 - python -m scripts.install_third_party_libs
 
 script:
