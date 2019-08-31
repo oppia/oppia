@@ -41,6 +41,7 @@ jobs:
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
+      - run: sudo pip install pyyaml
       - run:
           <<: *install_dependencies
       - save_cache:
