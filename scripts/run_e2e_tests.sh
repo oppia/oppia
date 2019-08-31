@@ -96,6 +96,15 @@ if ( nc -vz localhost 8181 ); then
   exit 1
 fi
 
+if ( nc -vz localhost 9001 ); then
+  echo ""
+  echo " There is a already a server running on localhost:9001."
+  echo " Please terminate it before running the end-to-end tests."
+  echo " Exiting."
+  echo ""
+  exit 1
+fi
+
 
 # Forces the cleanup function to run on exit.
 # Developers: note that at the end of this script, the cleanup() function at
