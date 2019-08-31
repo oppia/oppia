@@ -129,7 +129,7 @@ def main(argv=None):
         python_utils.PRINT('Generating files for production mode...')
         constants_env_variable = '\'DEV_MODE\': false'
         for line in fileinput.input(
-                files=['assets/constants.ts'], inplace=True):
+                files=[os.path.join('assets', 'constants.ts')], inplace=True):
             # Inside this loop the STDOUT will be redirected to the file,
             # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
@@ -141,7 +141,7 @@ def main(argv=None):
         dev_mode = 'true'
         constants_env_variable = '\'DEV_MODE\': true'
         for line in fileinput.input(
-                files=['assets/constants.ts'], inplace=True):
+                files=[os.path.join('assets', 'constants.ts')], inplace=True):
             # Inside this loop the STDOUT will be redirected to the file,
             # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
@@ -186,7 +186,7 @@ def main(argv=None):
 
     # Delete outdated screenshots.
     if os.path.isdir(os.path.join('..', 'protractor-screenshots')):
-        shutil.rmtree('../protractor-screenshots')
+        shutil.rmtree(os.path.join('..', 'protractor-screenshots'))
 
     # Run the end-to-end tests. The conditional is used to run protractor
     # without any sharding parameters if it is disabled. This helps with
@@ -199,14 +199,14 @@ def main(argv=None):
                 os.path.join(
                     common.NODE_MODULES_PATH, 'protractor', 'bin',
                     'protractor'),
-                'core/tests/protractor.conf.js', '--suite', parsed_args.suite,
-                '--params.devMode="%s"' % dev_mode])
+                os.path.join('core', 'tests', 'protractor.conf.js'), '--suite',
+                parsed_args.suite, '--params.devMode="%s"' % dev_mode])
         else:
             subprocess.call([
                 os.path.join(
                     common.NODE_MODULES_PATH, 'protractor', 'bin',
                     'protractor'),
-                'core/tests/protractor.conf.js',
+                os.path.join('core', 'tests', 'protractor.conf.js'),
                 '--capabilities.shardTestFiles=%s' % parsed_args.sharding,
                 '--capabilities.maxInstances=%s'
                 % parsed_args.sharding_instances, '--suite', parsed_args.suite,
@@ -218,14 +218,17 @@ def main(argv=None):
                 os.path.join(
                     common.NODE_MODULES_PATH, 'protractor', 'bin',
                     'protractor'),
-                'core/tests/protractor-browserstack.conf.js', '--suite',
-                parsed_args.suite, '--params.devMode="%s"' % dev_mode])
+                os.path.join(
+                    'core', 'tests', 'protractor-browserstack.conf.js'),
+                '--suite', parsed_args.suite,
+                '--params.devMode="%s"' % dev_mode])
         else:
             subprocess.call([
                 os.path.join(
                     common.NODE_MODULES_PATH, 'protractor', 'bin',
                     'protractor'),
-                'core/tests/protractor-browserstack.conf.js',
+                os.path.join(
+                    'core', 'tests', 'protractor-browserstack.conf.js'),
                 '--capabilities.shardTestFiles=%s' % parsed_args.sharding,
                 '--capabilities.maxInstances=%s'
                 % parsed_args.sharding_instances, '--suite', parsed_args.suite,

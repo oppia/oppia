@@ -33,15 +33,15 @@ import psutil  # isort:skip  # pylint: disable=wrong-import-position
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
-THIRD_PARTY_DIR = os.path.join('.', 'third_party')
+THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 GOOGLE_APP_ENGINE_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67/google_appengine')
+    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0/google-cloud-sdk')
+    OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
-FRONTEND_DIR = 'core/templates/dev/head'
-NPM_PATH = os.path.join(NODE_PATH, 'bin/npm')
+FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
+NPM_PATH = os.path.join(NODE_PATH, 'bin', 'npm')
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = '%s/bin:' % NODE_PATH + os.environ['PATH']
 

@@ -58,7 +58,7 @@ def main(argv=None):
 
     subprocess.call([
         os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-        'start', 'core/tests/karma.conf.ts'])
+        'start', os.path.join('core', 'tests', 'karma.conf.ts')])
 
     if parsed_args.run_minified_tests is True:
         python_utils.PRINT('Running test in production environment')
@@ -67,7 +67,8 @@ def main(argv=None):
 
         subprocess.call([
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', 'core/tests/karma.conf.ts', '--prodEnv'])
+            'start', os.path.join('core', 'tests', 'karma.conf.ts'),
+            '--prodEnv'])
 
     python_utils.PRINT('Done!')
 

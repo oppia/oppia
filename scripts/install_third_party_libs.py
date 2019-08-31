@@ -52,7 +52,8 @@ def pip_install(package, version, install_path):
     """
     try:
         python_utils.PRINT('Checking if pip is installed on the local machine')
-        import pip
+        # Importing pip just to check if its installed.
+        import pip  #pylint: disable=unused-variable
     except ImportError:
         common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '

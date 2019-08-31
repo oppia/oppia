@@ -19,7 +19,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 import shutil
-import subprocess
 import sys
 import tarfile
 
@@ -97,7 +96,7 @@ def main():
     # may use it in a situation where relative paths won't work as expected(such
     # as $PYTHONPATH).
     create_directory(common.OPPIA_TOOLS_DIR)
-    create_directory('third_party/')
+    create_directory(common.THIRD_PARTY_DIR)
     create_directory(common.NODE_MODULES_PATH)
 
     os_info = os.uname()

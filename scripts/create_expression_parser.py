@@ -16,6 +16,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import fileinput
+import os
 import re
 import subprocess
 
@@ -30,10 +31,11 @@ def main():
     """Produces the expression parser."""
     setup.main()
 
-    expression_parser_definition = (
-        'core/templates/dev/head/expressions/parser.pegjs')
-    expression_parser_js = (
-        'core/templates/dev/head/expressions/ExpressionParserService.js')
+    expression_parser_definition = os.path.join(
+        'core', 'templates', 'dev', 'head', 'expressions', 'parser.pegjs')
+    expression_parser_js = os.path.join(
+        'core', 'templates', 'dev', 'head', 'expressions',
+        'ExpressionParserService.js')
 
     # Install the basic environment, e.g. nodejs.
     install_third_party_libs.main()
@@ -41,7 +43,7 @@ def main():
     common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
 
     subprocess.call([
-        os.path.join(common.NODE_MODULES_PATH, 'pegjs/bin/pegjs'),
+        os.path.join(common.NODE_MODULES_PATH, 'pegjs', 'bin', 'pegjs'),
         expression_parser_definition, expression_parser_js])
 
     for line in fileinput.input(files=[expression_parser_js], inplace=True):

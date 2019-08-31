@@ -101,18 +101,19 @@ def main(argv=None):
     atexit.register(cleanup)
 
     browsermob_proxy_path = os.path.join(
-        common.OPPIA_TOOLS_DIR, 'browsermob-proxy-2.1.1/bin/browsermob-proxy')
+        common.OPPIA_TOOLS_DIR, 'browsermob-proxy-2.1.1', 'bin',
+        'browsermob-proxy')
 
     # Change execute status of browsermob-proxy.
     common.recursive_chmod(browsermob_proxy_path, 744)
 
     # Start a demo server.
-    background_process = subprocess.Popen([
-        'python', '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME,
-        '--host=0.0.0.0',
-        '--port=%s' % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-        '--clear_datastore=yes', '--dev_appserver_log_level=critical',
-        '--log_level=critical', '--skip_sdk_update_check=true', 'app_dev.yaml'])
+    background_process = subprocess.Popen(
+        'python %s/dev_appserver.py --host=0.0.0.0 --port=%s '
+        '--clear_datastore=yes --dev_appserver_log_level=critical '
+        '--log_level=critical --skip_sdk_update_check=true app_dev.yaml' % (
+            common.GOOGLE_APP_ENGINE_HOME,
+            python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)), shell=True)
 
     # Wait for the servers to come up.
     while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):

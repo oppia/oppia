@@ -95,7 +95,7 @@ def main(argv=None):
     if parsed_args.prod_env:
         constants_env_variable = '\'DEV_MODE\': false'
         for line in fileinput.input(
-                files=['assets/constants.ts'], inplace=True):
+                files=[os.path.join('assets', 'constants.ts')], inplace=True):
             # Inside this loop the STDOUT will be redirected to the file,
             # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
@@ -106,7 +106,7 @@ def main(argv=None):
     else:
         constants_env_variable = '\'DEV_MODE\': true'
         for line in fileinput.input(
-                files=['assets/constants.ts'], inplace=True):
+                files=[os.path.join('assets', 'constants.ts')], inplace=True):
             # Inside this loop the STDOUT will be redirected to the file,
             # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
