@@ -79,9 +79,9 @@ describe('Exploration Improvements', function() {
     users.logout();
   });
 
-  // TODO: describe('Feedback Improvements')
+  // TODO(brianrodri): describe('Feedback Improvements').
 
-  // TODO: describe('Suggestion Improvements')
+  // TODO(brianrodri): describe('Suggestion Improvements').
 
   describe('Answer Details', function() {
     var EXPLORATION_TITLE = 'Check';
