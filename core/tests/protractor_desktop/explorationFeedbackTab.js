@@ -75,7 +75,7 @@ describe('ExplorationFeedback', function() {
     users.createUser(
       'user7@ExplorationFeedback.com',
       'learnerFeedback');
-    users.login('user3@ExplorationFeedback.com');
+    users.login('user3@ExplorationFeedback.com', true);
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
       'Boolean', function(elem) {
