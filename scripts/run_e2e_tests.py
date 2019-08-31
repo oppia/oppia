@@ -104,6 +104,13 @@ def main(argv=None):
             'Exiting.'])
         sys.exit(1)
 
+    if not common.is_port_close(9001):
+        common.print_string_after_two_new_lines([
+            'There is already a server running on localhost:9001.',
+            'Please terminate it before running the end-to-end tests.',
+            'Exiting.'])
+        sys.exit(1)
+
     # Forces the cleanup function to run on exit.
     # Developers: note that at the end of this script, the cleanup() function at
     # the top of the file is run.
