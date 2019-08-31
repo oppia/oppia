@@ -20,6 +20,7 @@ require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require('components/summary-tile/topic-summary-tile.directive.ts')
 
 require('domain/classroom/ClassroomBackendApiService.ts');
 require('domain/topic/TopicSummaryObjectFactory.ts');
@@ -57,7 +58,7 @@ angular.module('oppia').directive('classroomPage', [
           $rootScope.loadingMessage = 'Loading';
           ClassroomBackendApiService.fetchClassroomData(
               ctrl.classroomName).then(function(topicSummaryDicts) {
-              ctrl.topicSummaryDicts = topicSummaryDicts.map(
+              ctrl.topicSummaries = topicSummaryDicts.map(
                 function(summaryDict) {
                   return TopicSummaryObjectFactory.createFromBackendDict(summaryDict);
                 }
