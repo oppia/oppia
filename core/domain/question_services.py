@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import skill_services
 from core.domain import state_domain
@@ -85,11 +86,13 @@ def create_new_question(committer_id, question, commit_message):
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
     question.version += 1
     create_question_summary(question.id, committer_id)
+    opportunity_services.update_skill_opportunity_question_counts(
+        question.linked_skill_ids, 1)
 
 
 def link_multiple_skills_for_question(
         user_id, question_id, skill_ids, skill_difficulties):
-    """Links multiple skill IDs to a question. To do that, it creates
+    """Links multiple skill IDxs to a question. To do that, it creates
     multiple new QuestionSkillLink models. It also adds
     the skill ids to the linked_skill_ids of the Question.
 
@@ -172,6 +175,8 @@ def _update_linked_skill_ids_of_question(
     change_list = [question_domain.QuestionChange(change_dict)]
     update_question(
         user_id, question_id, change_list, 'updated linked skill ids')
+    opportunity_services.compute_question_linked_skill_ids_update(
+            old_linked_skill_ids, new_linked_skill_ids)
 
 
 def delete_question_skill_link(user_id, question_id, skill_id):
@@ -326,6 +331,8 @@ def delete_question(
         force_deletion=force_deletion)
 
     question_models.QuestionSummaryModel.get(question_id).delete()
+    opportunity_services.update_skill_opportunity_question_counts(
+        question_model.linked_skill_ids, -1)
 
 
 def get_question_from_model(question_model):

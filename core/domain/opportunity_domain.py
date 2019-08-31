@@ -199,11 +199,11 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                 'received %s' % list(expected_set_of_all_languages))
 
 
-class SkillOpportunity(object):
+class SkillOpportunity(python_utils.OBJECT):
     """The domain object for skill opportunities."""
 
     def __init__(
-            self, id, skill_id, skill_description,
+            self, skill_id, skill_description,
             question_count=0, topic_id=None, topic_name=None):
         """Constructs a SkillOpportunity domain object.
 
@@ -214,7 +214,6 @@ class SkillOpportunity(object):
             skill_description: str. The title of the skill.
             question_count: int. The total number of questions for the skill.
         """
-        self.id = skill_id
         self.topic_id = topic_id
         self.topic_name = topic_name
         self.skill_id = skill_id
@@ -228,17 +227,17 @@ class SkillOpportunity(object):
         Raises:
             ValidationError: One or more attributes of the object are invalid.
         """
-        if not isinstance(self.topic_id, basestring):
+        if not isinstance(self.topic_id, python_utils.BASESTRING) and self.topic_id is not None:
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' % self.topic_id)
-        if not isinstance(self.topic_name, basestring):
+        if not isinstance(self.topic_name, python_utils.BASESTRING) and self.topic_name is not None:
             raise utils.ValidationError(
                 'Expected topic_name to be a string, received %s' %
                 self.topic_name)
-        if not isinstance(self.skill_id, basestring):
+        if not isinstance(self.skill_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected skill_id to be a string, received %s' % self.skill_id)
-        if not isinstance(self.skill_description, basestring):
+        if not isinstance(self.skill_description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected skill_description to be a string, received %s' %
                 self.skill_description)
@@ -265,12 +264,11 @@ class SkillOpportunity(object):
                 SkillOpportunity domain object.
         """
         return cls(
-            skill_opportunity_dict['id'],
-            skill_opportunity_dict['topic_id'],
-            skill_opportunity_dict['topic_name'],
             skill_opportunity_dict['skill_id'],
             skill_opportunity_dict['skill_description'],
-            skill_opportunity_dict['question_count'])
+            skill_opportunity_dict['question_count'],
+            skill_opportunity_dict['topic_id'],
+            skill_opportunity_dict['topic_name'])
 
     def to_dict(self):
         """Returns a copy of the object as a dictionary. It includes all
@@ -285,7 +283,7 @@ class SkillOpportunity(object):
             contributor.
         """
         return {
-            'id': self.id,
+            'skill_id': self.skill_id,
             'topic_id': self.topic_id,
             'topic_name': self.topic_name,
             'skill_description': self.skill_description,

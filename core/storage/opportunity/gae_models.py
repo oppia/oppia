@@ -184,13 +184,13 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @classmethod
     def get_by_skill_id(cls, skill_id):
-        """Returns the first model matching the supplied skill_id.
+        """Returns all models matching the supplied skill_id.
 
         Returns:
-            SkillOpportunityModel|None. A SkillOpportunityModel with the given
-            skill_id.
+            list(SkillOpportunityModel)|None. A list of
+            SkillOpportunityModel(s) with the supplied skill_id.
         """
-        return cls.query(cls.skill_id == skill_id).get()
+        return cls.query(cls.skill_id == skill_id).fetch()
 
     @classmethod
     def get_by_topic_id(cls, topic_id):
@@ -198,6 +198,6 @@ class SkillOpportunityModel(base_models.BaseModel):
 
         Returns:
             list(SkillOpportunityModel)|None. A list of
-            SkillOpportunityModel(s) with the given topic_id.
+            SkillOpportunityModel(s) with the supplied topic_id.
         """
         return cls.query(cls.topic_id == topic_id).fetch()

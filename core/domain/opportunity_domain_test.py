@@ -358,7 +358,6 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         super(SkillOpportunityDomainTest, self).setUp()
         self.valid_skill_opportunity = (
                 opportunity_domain.SkillOpportunity.from_dict({
-                    'id': 'skill_1',
                     'topic_id': 'topic_1',
                     'topic_name': 'A topic',
                     'skill_id': 'skill_1',
@@ -368,7 +367,6 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
 
     def test_to_and_from_dict_works_correctly(self):
         skill_opportunity_dict = {
-            'id': 'skill_1',
             'topic_id': 'topic_1',
             'topic_name': 'A topic',
             'skill_id': 'skill_1',
@@ -382,7 +380,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(
             skill_opportunity, opportunity_domain.SkillOpportunity))
         self.assertEqual(skill_opportunity.to_dict(), {
-            'id': 'skill_1',
+            'skill_id': 'skill_1',
             'topic_id': 'topic_1',
             'topic_name': 'A topic',
             'skill_description': 'A new skill',
@@ -391,7 +389,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
 
     def test_invalid_topic_id_fails_validation_check(self):
         self.assertTrue(isinstance(
-            self.valid_skill_opportunity.topic_id, basestring))
+            self.valid_skill_opportunity.topic_id, python_utils.BASESTRING))
         # Object with topic_id as string passes the validation check.
         self.valid_skill_opportunity.validate()
         self.valid_skill_opportunity.topic_id = 5
@@ -402,7 +400,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
 
     def test_invalid_topic_name_fails_validation_check(self):
         self.assertTrue(isinstance(
-            self.valid_skill_opportunity.topic_name, basestring))
+            self.valid_skill_opportunity.topic_name, python_utils.BASESTRING))
 
         # Object with topic_name as string passes the validation check.
         self.valid_skill_opportunity.validate()
@@ -414,7 +412,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
 
     def test_invalid_skill_id_fails_validation_check(self):
         self.assertTrue(isinstance(
-            self.valid_skill_opportunity.skill_id, basestring))
+            self.valid_skill_opportunity.skill_id, python_utils.BASESTRING))
          # Object with skill_id as string passes the validation check.
         self.valid_skill_opportunity.validate()
         self.valid_skill_opportunity.skill_id = 5
@@ -425,7 +423,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
 
     def test_invalid_skill_description_fails_validation_check(self):
         self.assertTrue(isinstance(
-            self.valid_skill_opportunity.skill_description, basestring))
+            self.valid_skill_opportunity.skill_description, python_utils.BASESTRING))
 
         # Object with skill_description as string passes the validation check.
         self.valid_skill_opportunity.validate()
