@@ -124,13 +124,15 @@ def main(argv=None):
     background_processes = []
     if not parsed_args.prod_env:
         background_processes.append(subprocess.Popen([
-            '%s/bin/node' % common.NODE_PATH, 'node_modules/gulp/bin/gulp.js',
+            os.path.join(common.NODE_PATH, 'bin', 'node'),
+            os.path.join(common.NODE_MODULES_PATH, 'gulp', 'bin', 'gulp.js'),
             'watch']))
 
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
         background_processes.append(subprocess.Popen([
-            'node_modules/webpack/bin/webpack.js',
+            os.path.join(
+                common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
             '--config', 'webpack.dev.config.ts', '--watch']))
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)

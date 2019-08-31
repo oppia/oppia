@@ -60,12 +60,13 @@ def main(argv=None):
 
     if xvfb_prefix:
         subprocess.call([
-            xvfb_prefix, 'node_modules/karma/bin/karma', 'start',
+            xvfb_prefix, os.path.join(
+                common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'), 'start',
             'core/tests/karma.conf.ts'])
     else:
         subprocess.call([
-            'node_modules/karma/bin/karma', 'start',
-            'core/tests/karma.conf.ts'])
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', 'core/tests/karma.conf.ts'])
 
     if parsed_args.run_minified_tests is True:
         python_utils.PRINT('Running test in production environment')
@@ -74,12 +75,13 @@ def main(argv=None):
 
         if xvfb_prefix:
             subprocess.call([
-                xvfb_prefix, 'node_modules/karma/bin/karma', 'start',
-                'core/tests/karma.conf.ts', '--prodEnv'])
+                xvfb_prefix,
+                os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+                'start', 'core/tests/karma.conf.ts', '--prodEnv'])
         else:
             subprocess.call([
-                'node_modules/karma/bin/karma', 'start',
-                'core/tests/karma.conf.ts', '--prodEnv'])
+                os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+                'start', 'core/tests/karma.conf.ts', '--prodEnv'])
 
     python_utils.PRINT('Done!')
 

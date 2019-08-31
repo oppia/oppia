@@ -69,8 +69,8 @@ def main(argv=None):
 
     python_utils.PRINT('Compiling webpack...')
     subprocess.call([
-        'node_modules/webpack/bin/webpack.js', '--config',
-        'webpack.dev.config.ts'])
+        os.path.join(common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
+        '--config', 'webpack.dev.config.ts'])
 
     backend_tests.main(argv=argv)
 

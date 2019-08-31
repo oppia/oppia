@@ -98,7 +98,7 @@ def main():
     # as $PYTHONPATH).
     create_directory(common.OPPIA_TOOLS_DIR)
     create_directory('third_party/')
-    create_directory('node_modules/')
+    create_directory(common.NODE_MODULES_PATH)
 
     os_info = os.uname()
     if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
@@ -142,8 +142,8 @@ def main():
 
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
-    common.recursive_chown('node_modules/', os.getuid(), -1)
-    common.recursive_chmod('node_modules/', 744)
+    common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
+    common.recursive_chmod(common.NODE_MODULES_PATH, 744)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.

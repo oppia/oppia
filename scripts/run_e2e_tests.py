@@ -147,11 +147,11 @@ def main(argv=None):
     # The 'quiet' option prints only the necessary information about the server
     # start-up process.
     subprocess.call([
-        'node_modules/.bin/webdriver-manager', 'update',
-        '--versions.chrome', '2.41'])
+        os.path.join(common.NODE_MODULES_PATH, '.bin', 'webdriver-manager'),
+        'update', '--versions.chrome', '2.41'])
     subprocess.call([
-        'node_modules/.bin/webdriver-manager', 'start',
-        '--versions.chrome', '2.41', '--detach', '--quiet'])
+        os.path.join(common.NODE_MODULES_PATH, '.bin', 'webdriver-manager'),
+        'start', '--versions.chrome', '2.41', '--detach', '--quiet'])
 
     # Start a selenium process. The program sends thousands of lines of useless
     # info logs to stderr so we discard them.
@@ -159,7 +159,8 @@ def main(argv=None):
     # level.
     background_processes = []
     background_processes.append(subprocess.Popen([
-        'node_modules/.bin/webdriver-manager', 'start', '2>/dev/null']))
+        os.path.join(common.NODE_MODULES_PATH, '.bin', 'webdriver-manager'),
+        'start', '2>/dev/null']))
     # Start a demo server.
     background_processes.append(subprocess.Popen(
         'python %s/dev_appserver.py --host=0.0.0.0 --port=9001 '
@@ -183,12 +184,16 @@ def main(argv=None):
     if not parsed_args.browserstack:
         if not parsed_args.sharding or parsed_args.sharding_instances == '1':
             subprocess.call([
-                'node_modules/protractor/bin/protractor',
+                os.path.join(
+                    common.NODE_MODULES_PATH, 'protractor', 'bin',
+                    'protractor'),
                 'core/tests/protractor.conf.js', '--suite', parsed_args.suite,
                 '--params.devMode="%s"' % dev_mode])
         else:
             subprocess.call([
-                'node_modules/protractor/bin/protractor',
+                os.path.join(
+                    common.NODE_MODULES_PATH, 'protractor', 'bin',
+                    'protractor'),
                 'core/tests/protractor.conf.js',
                 '--capabilities.shardTestFiles=%s' % parsed_args.sharding,
                 '--capabilities.maxInstances=%s'
@@ -198,12 +203,16 @@ def main(argv=None):
         python_utils.PRINT('Running the tests on browserstack...')
         if not parsed_args.sharding or parsed_args.sharding_instances == '1':
             subprocess.call([
-                'node_modules/protractor/bin/protractor',
+                os.path.join(
+                    common.NODE_MODULES_PATH, 'protractor', 'bin',
+                    'protractor'),
                 'core/tests/protractor-browserstack.conf.js', '--suite',
                 parsed_args.suite, '--params.devMode="%s"' % dev_mode])
         else:
             subprocess.call([
-                'node_modules/protractor/bin/protractor',
+                os.path.join(
+                    common.NODE_MODULES_PATH, 'protractor', 'bin',
+                    'protractor'),
                 'core/tests/protractor-browserstack.conf.js',
                 '--capabilities.shardTestFiles=%s' % parsed_args.sharding,
                 '--capabilities.maxInstances=%s'
