@@ -186,8 +186,8 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         subprocess.call(['git', 'pull', remote_alias])
 
 
-def is_port_close(port):
-    """Checks if no process is listening to the port.
+def is_port_open(port):
+    """Checks if a process is listening to the port.
 
     Args:
         port: int. The port number.
@@ -197,7 +197,7 @@ def is_port_close(port):
     """
     with contextlib.closing(
         socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
-        return bool(s.connect_ex(('localhost', port)))
+        return bool(not s.connect_ex(('localhost', port)))
 
 
 # Credits: https://stackoverflow.com/a/20691431/11755830

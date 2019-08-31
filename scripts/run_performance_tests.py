@@ -52,7 +52,7 @@ def cleanup():
 
     # Wait for the servers to go down; suppress 'connection refused' error
     # output from nc since that is exactly what we are expecting to happen.
-    while not common.is_port_close(9501):
+    while common.is_port_open(9501):
         time.sleep(1)
 
     python_utils.PRINT('Done!')
@@ -84,7 +84,7 @@ def main(argv=None):
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
-    if not common.is_port_close(8181):
+    if common.is_port_open(8181):
         common.print_string_after_two_new_lines([
             'There is already a server running on localhost:8181',
             'Please terminate it before running the performance tests.',
@@ -110,7 +110,7 @@ def main(argv=None):
         '--skip_sdk_update_check=true', 'app_dev.yaml'])
 
     # Wait for the servers to come up.
-    while common.is_port_close(9501):
+    while not common.is_port_open(9501):
         time.sleep(1)
 
     # Install xvfb if not on travis, Used in frontend, e2e tests and performance

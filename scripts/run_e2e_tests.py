@@ -74,7 +74,7 @@ def cleanup():
 
     # Wait for the servers to go down; suppress 'connection refused' error
     # output from nc since that is exactly what we are expecting to happen.
-    while not common.is_port_close(4444) or not common.is_port_close(9001):
+    while common.is_port_open(4444) or common.is_port_open(9001):
         time.sleep(1)
 
     if os.path.isdir('../protractor-screenshots'):
@@ -97,14 +97,14 @@ def main(argv=None):
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
-    if not common.is_port_close(8181):
+    if common.is_port_open(8181):
         common.print_string_after_two_new_lines([
             'There is already a server running on localhost:8181.',
             'Please terminate it before running the end-to-end tests.',
             'Exiting.'])
         sys.exit(1)
 
-    if not common.is_port_close(9001):
+    if common.is_port_open(9001):
         common.print_string_after_two_new_lines([
             'There is already a server running on localhost:9001.',
             'Please terminate it before running the end-to-end tests.',
@@ -168,7 +168,7 @@ def main(argv=None):
             common.GOOGLE_APP_ENGINE_HOME, app_yaml_filepath), shell=True))
 
     # Wait for the servers to come up.
-    while common.is_port_close(4444) or common.is_port_close(9001):
+    while not common.is_port_open(4444) or not common.is_port_open(9001):
         time.sleep(1)
 
     # Delete outdated screenshots.

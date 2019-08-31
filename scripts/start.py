@@ -60,7 +60,7 @@ def cleanup():
     common.print_string_after_two_new_lines([
         'INFORMATION',
         'Cleaning up the servers.'])
-    while not common.is_port_close(8181):
+    while common.is_port_open(8181):
         time.sleep(1)
 
 
@@ -81,7 +81,7 @@ def main(argv=None):
     python_utils.PRINT('Oppia setup complete!')
 
     # Check that there isn't a server already running.
-    if not common.is_port_close(8181):
+    if common.is_port_open(8181):
         common.print_string_after_two_new_lines([
             'WARNING',
             'Could not start new server. There is already an existing server',
@@ -143,7 +143,7 @@ def main(argv=None):
             enable_console_arg, app_yaml_filepath), shell=True))
 
     # Wait for the servers to come up.
-    while common.is_port_close(8181):
+    while not common.is_port_open(8181):
         time.sleep(1)
 
     os_info = os.uname()
