@@ -134,7 +134,7 @@ describe('ExplorationFeedback', function() {
     var feedbackResponse = 'Thanks for the feedback!';
 
     // Creator creates and publishes an exploration.
-    users.login('user5@ExplorationFeedback.com');
+    users.login('user4@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
@@ -155,7 +155,7 @@ describe('ExplorationFeedback', function() {
     users.logout();
 
     // Creator reads the feedback and responds.
-    users.login('user5@ExplorationFeedback.com');
+    users.login('user4@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -261,7 +261,7 @@ describe('Suggestions on Explorations', function() {
   var explorationEditorFeedbackTab = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
