@@ -261,19 +261,20 @@ describe('Learner Action Render Service', function() {
         this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
         var learnerActions = this.PlaythroughService.getPlaythrough().actions;
-        var displayBlocks =
-          this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
+        var startingIndices =
+          this.LearnerActionRenderService.getStartingIndices(learnerActions);
 
-        expect(displayBlocks.length).toEqual(1);
+        expect(startingIndices.length).toEqual(1);
 
         var finalBlockHTML =
           this.LearnerActionRenderService
-            .renderFinalDisplayBlockForMISIssueHTML(displayBlocks[0], 1);
+            .renderFinalDisplayBlockForMISIssueHTML(
+              learnerActions.slice(startingIndices[0]), 1);
 
         expect(this.$sce.getTrustedHtml(finalBlockHTML)).toEqual(
           '1. Started exploration at card "stateName1".' +
-          '<span class="oppia-issues-learner-action">2. Submitted the ' +
-          'following answers in card "stateName1"</span>' +
+          '<div class="oppia-issues-learner-action">2. Submitted the ' +
+          'following answers in card "stateName1"</div>' +
           '<table class="oppia-issues-learner-action-table"><tr><th>Answer' +
           '</th><th>Feedback</th></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +

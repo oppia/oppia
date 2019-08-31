@@ -145,15 +145,28 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
             controller: [
               '$scope', '$uibModalInstance', 'playthroughIndex',
               'playthrough', 'AlertsService', 'LearnerActionRenderService',
+              'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
               function(
                   $scope, $uibModalInstance, playthroughIndex,
-                  playthrough, AlertsService, LearnerActionRenderService) {
+                  playthrough, AlertsService, LearnerActionRenderService,
+                  ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
                 $scope.playthroughIndex = playthroughIndex;
 
                 $scope.startingIndices =
                   LearnerActionRenderService.getStartingIndices(
                     playthrough.actions);
                 $scope.currentChoice = 0;
+
+                $scope.isIssueMIS = false;
+                if (playthrough.issueType === (
+                  ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)) {
+                  $scope.isIssueMIS = true;
+                  var lars = LearnerActionRenderService;
+                  $scope.issueMisTableHtml =
+                    lars.renderFinalDisplayBlockForMISIssueHTML(
+                      playthrough.actions.slice($scope.startingIndices[0]),
+                      $scope.startingIndices[0] + 1);
+                }
 
                 $scope.maxHidden = $scope.startingIndices.length - 1;
 
@@ -163,6 +176,11 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
                  * @returns {LearnerAction[]}
                  */
                 $scope.getActionsToRender = function() {
+                  if ($scope.isIssueMIS) {
+                    return playthrough.actions.slice(
+                      $scope.startingIndices[$scope.currentChoice],
+                      $scope.startingIndices[0]);
+                  }
                   return playthrough.actions.slice(
                     $scope.startingIndices[$scope.currentChoice]);
                 };
@@ -182,6 +200,9 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
                  * @returns {boolean}
                  */
                 $scope.isActionHighlighted = function(action) {
+                  if ($scope.startingIndices.length === 0) {
+                    return false;
+                  }
                   return $scope.getLearnerActionIndex(action) > (
                     $scope.startingIndices[0]);
                 };

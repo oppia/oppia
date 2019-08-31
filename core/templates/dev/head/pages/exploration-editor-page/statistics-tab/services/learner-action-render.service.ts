@@ -164,35 +164,6 @@ angular.module('oppia').factory('LearnerActionRenderService', [
     };
 
     /**
-     * Helper object to maintain the status of different display blocks while
-     * splitting up learner actions. This object will be updated as learner
-     * actions are inserted.
-     */
-    var groupedDisplayBlocks = {
-      displayBlocks: null,
-      localBlock: null,
-      latestStateName: null,
-      /**
-       * Inserts new learner action into existing block or creates a new block
-       * correctly, following a change in state.
-       */
-      handleChangeInState: function(action) {
-        this.latestStateName = action.actionCustomizationArgs.state_name.value;
-        if (withinBlockUpperBound(this.localBlock.length)) {
-          // Add action to block.
-          this.localBlock.unshift(action);
-          return;
-        }
-        // Push current block to list of blocks and action into new block.
-        this.displayBlocks.push(this.localBlock);
-        this.localBlock = [action];
-      },
-      handleSameState: function(action) {
-        this.localBlock.unshift(action);
-      }
-    };
-
-    /**
      * Helper object to maintain the status of starting indices while iterating
      * through the learner actions. This object will be updated as learner
      * actions are processed.
@@ -247,10 +218,10 @@ angular.module('oppia').factory('LearnerActionRenderService', [
           htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
         }
         htmlString +=
-          '<span class="oppia-issues-learner-action">' +
+          '<div class="oppia-issues-learner-action">' +
           (actionStartIndex + i).toString() +
           '. Submitted the following answers in card "' + stateName +
-          '"</span>';
+          '"</div>';
         htmlString += renderLearnerActionsTableForMultipleIncorrectIssue(block);
         htmlString += renderLearnerActionHTML(
           block[index], actionStartIndex + i + 1);
