@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""It runs unit tests for frontend JavaScript code (using Karma)."""
+"""This script runs unit tests for frontend JavaScript code (using Karma)."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse
@@ -50,7 +50,7 @@ def main(argv=None):
     parsed_args, _ = _PARSER.parse_known_args(args=argv)
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
-    common.print_string_after_two_new_lines([
+    common.print_each_string_after_two_new_lines([
         'View interactive frontend test coverage reports by navigating to',
         '../karma_coverage_reports',
         'on your filesystem.',

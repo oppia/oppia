@@ -63,7 +63,7 @@ def test_python_version():
         # path.
         os_info = os.uname()
         if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
-            common.print_string_after_two_new_lines([
+            common.print_each_string_after_two_new_lines([
                 'It looks like you are using Windows. If you have Python '
                 'installed,',
                 'make sure it is in your PATH and that PYTHONPATH is set.',
@@ -104,7 +104,7 @@ def main():
     if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
         # Node is a requirement for all installation scripts. Here, we check if
         # the OS supports node.js installation; if not, we exit with an error.
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'WARNING: Unsupported OS for installation of node.js.',
             'If you are running this script on Windows, see the instructions',
             'here regarding installation of node.js:',

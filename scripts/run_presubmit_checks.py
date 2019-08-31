@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""It runs the following tests in all cases.
+"""This script runs the following tests in all cases.
 - Javascript and Python Linting
 - Backend Python tests
 
@@ -78,7 +78,7 @@ def main(argv=None):
         python_utils.PRINT('Frontend tests passed.')
     else:
         # If files in common.FRONTEND_DIR were not changed, skip the tests.
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'No frontend files were changed.',
             'Skipped frontend tests'])
 

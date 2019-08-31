@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""It runs all the (Python) backend tests, in parallel."""
+"""This script runs all the (Python) backend tests, in parallel."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse

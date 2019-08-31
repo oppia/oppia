@@ -258,8 +258,8 @@ def recursive_chmod(path, mode):
             os.chmod(os.path.join(root, filename), mode)
 
 
-def print_string_after_two_new_lines(strings):
-    """Prints each string after two new lines.
+def print_each_string_after_two_new_lines(strings):
+    """Prints the given strings, separating adjacent strings with two newlines.
 
     Args:
         strings: list(str). The strings to print.
@@ -268,19 +268,20 @@ def print_string_after_two_new_lines(strings):
         python_utils.PRINT('%s\n' % string)
 
 
-def install_npm_library(library, version, path):
+def install_npm_library(library_name, version, path):
     """Installs the npm library after ensuring its not already installed.
 
     Args:
-        library: str. The library name.
+        library_name: str. The library name.
         version: str. The library version.
         path: str. The installation path for the library.
     """
     python_utils.PRINT(
-        'Checking whether %s is installed in %s' % (library, path))
-    if not os.path.exists(os.path.join(NODE_MODULES_PATH, library)):
-        python_utils.PRINT('Installing %s' % library)
-        subprocess.call([NPM_PATH, 'install', '%s@%s' % (library, version)])
+        'Checking whether %s is installed in %s' % (library_name, path))
+    if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
+        python_utils.PRINT('Installing %s' % library_name)
+        subprocess.call([
+            NPM_PATH, 'install', '%s@%s' % (library_name, version)])
 
 
 class CD(python_utils.OBJECT):

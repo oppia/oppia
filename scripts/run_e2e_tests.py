@@ -78,7 +78,7 @@ def cleanup():
         time.sleep(1)
 
     if os.path.isdir('../protractor-screenshots'):
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'Note: If ADD_SCREENSHOT_REPORTER is set to true in',
             'core/tests/protractor.conf.js, you can view screenshots',
             'of the failed tests in ../protractor-screenshots/'])
@@ -98,14 +98,14 @@ def main(argv=None):
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
     if common.is_port_open(8181):
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'There is already a server running on localhost:8181.',
             'Please terminate it before running the end-to-end tests.',
             'Exiting.'])
         sys.exit(1)
 
     if common.is_port_open(9001):
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'There is already a server running on localhost:9001.',
             'Please terminate it before running the end-to-end tests.',
             'Exiting.'])

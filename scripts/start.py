@@ -57,7 +57,7 @@ _PARSER.add_argument(
 
 def cleanup():
     """Function for waiting for the servers to go down."""
-    common.print_string_after_two_new_lines([
+    common.print_each_string_after_two_new_lines([
         'INFORMATION',
         'Cleaning up the servers.'])
     while common.is_port_open(8181):
@@ -82,7 +82,7 @@ def main(argv=None):
 
     # Check that there isn't a server already running.
     if common.is_port_open(8181):
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'WARNING',
             'Could not start new server. There is already an existing server',
             'running at port 8181.'])
@@ -153,13 +153,13 @@ def main(argv=None):
         if list(filter(
                 detect_virtualbox_pattern.match,
                 os.listdir('/dev/disk/by-id/'))):
-            common.print_string_after_two_new_lines([
+            common.print_each_string_after_two_new_lines([
                 'INFORMATION',
                 'Setting up a local development server. You can access this '
                 'server',
                 'by navigating to localhost:8181 in a browser window.'])
         else:
-            common.print_string_after_two_new_lines([
+            common.print_each_string_after_two_new_lines([
                 'INFORMATION',
                 'Setting up a local development server at localhost:8181. '
                 'Opening a',
@@ -168,7 +168,7 @@ def main(argv=None):
             background_processes.append(
                 subprocess.Popen(['xdg-open', 'http://localhost:8181/']))
     elif os_info[0] == 'Darwin' and not parsed_args.no_browser:
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'INFORMATION',
             'Setting up a local development server at localhost:8181. '
             'Opening a',
@@ -177,7 +177,7 @@ def main(argv=None):
         background_processes.append(
             subprocess.Popen(['open', 'http://localhost:8181/']))
     else:
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'INFORMATION',
             'Setting up a local development server. You can access this server',
             'by navigating to localhost:8181 in a browser window.'])

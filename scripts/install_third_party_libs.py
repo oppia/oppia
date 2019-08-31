@@ -54,7 +54,7 @@ def pip_install(package, version, install_path):
         python_utils.PRINT('Checking if pip is installed on the local machine')
         import pip
     except ImportError:
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
             'found',
             'on your local machine.',

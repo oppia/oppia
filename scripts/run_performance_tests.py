@@ -85,7 +85,7 @@ def main(argv=None):
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
     if common.is_port_open(8181):
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'There is already a server running on localhost:8181',
             'Please terminate it before running the performance tests.',
             'Exiting.'])

@@ -44,7 +44,7 @@ def main(argv=None):
         sys.exit(0)
 
     if os.path.isfile(vagrant_lock_file):
-        common.print_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'Another setup instance is already running',
             'Please wait for that instance to complete or terminate it',
             'If you ran $0 twice on purpose, you can override this with ',

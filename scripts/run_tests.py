@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""It runs all the tests, in this order:
+"""This script runs all the tests, in this order:
 - Frontend Karma unit tests
 - Backend Python tests
 - End-to-end Protractor tests
