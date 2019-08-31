@@ -6,7 +6,8 @@
     <div class="oppia-topic-name">
       <[::$ctrl.getTopicSummary().getName()]>
     </div>
-    <[::$ctrl.getTopicSummary().getCanonicalStoryCount()]> lessons
+    <[::$ctrl.getTopicSummary().getCanonicalStoryCount()]>
+    lesson<span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() !== 1">s</span>
   </div>
 </a>
 <style>
@@ -30,7 +31,7 @@
     display: block;
     text-align: center;
     font-size: 1.4em;
-    padding-bottom: 20px;
+    padding-bottom: 5px;
   }
   topic-summary-tile a:hover {
     text-decoration: none;
