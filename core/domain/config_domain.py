@@ -38,6 +38,30 @@ SET_OF_STRINGS_SCHEMA = {
     }],
 }
 
+SET_OF_CLASSROOM_DICTS_SCHEMA = {
+    'type': 'list',
+    'items': {
+        'type': 'dict',
+        'properties': [{
+            'name': 'name',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'topic_ids',
+            'schema': {
+                'type': 'list',
+                'items': {
+                    'type': 'unicode',
+                },
+                'validators': [{
+                    'id': 'is_uniquified',
+                }]
+            }
+        }]
+    }
+}
+
 VMID_SHARED_SECRET_KEY_SCHEMA = {
     'type': 'list',
     'items': {
@@ -284,6 +308,14 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
         'umPkwp0L1M0-', 'MjZzEVOG47_1', '9trAQhj6uUC2', 'rfX8jNkPnA-1',
         '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
         'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
+
+TOPIC_IDS_FOR_CLASSROOM_PAGES = ConfigProperty(
+    'topic_ids_for_classroom_pages', SET_OF_CLASSROOM_DICTS_SCHEMA,
+    'The set of topic IDs for each classroom page.', [{
+        'name': 'Math',
+        'topic_ids': []
+    }]
+)
 
 RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
