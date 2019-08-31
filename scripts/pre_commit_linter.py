@@ -50,6 +50,7 @@ CUSTOMIZATION OPTIONS
 Note that the root folder MUST be named 'oppia'.
  """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -239,6 +240,15 @@ MANDATORY_PATTERNS_REGEXP = [
         'included_types': ('.py', '.js', '.sh', '.ts'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
             '__init__.py', ),
+        'excluded_dirs': EXCLUDED_PATHS
+    },
+    {
+        'regexp': re.compile('from __future__ import unicode_literals'),
+        'message': 'Please ensure this file should contain unicode_literals '
+                   'future import.',
+        'included_types': ('.py'),
+        'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
+            '__init__.py',),
         'excluded_dirs': EXCLUDED_PATHS
     }
 ]
@@ -437,8 +447,10 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'\Wstr\('),
         'message': (
-            'Please try to use python_utils.STR. If you are getting an error, '
-            'use python_utils.convert_to_bytes() instead.'),
+            'Please try to use python_utils.convert_to_bytes() for the strings '
+            'used in webapp2\'s built-in methods or for strings used directly '
+            'in NDB datastore models. If you need to cast ints/floats to '
+            'strings, please use python_utils.UNICODE() instead.'),
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
     },
@@ -1821,10 +1833,11 @@ class JsTsLintChecksManager(LintChecksManager):
             js_and_ts_messages.append(js_and_ts_stdout.get())
 
         python_utils.PRINT('')
-        python_utils.PRINT('\n'.join(js_and_ts_messages))
+        # The output from the stdout are read as bytes, hence the b' prefix.
+        python_utils.PRINT(b'\n'.join(js_and_ts_messages))
 
         with _redirect_stdout(_TARGET_STDOUT):
-            python_utils.PRINT('\n'.join(js_and_ts_messages))
+            python_utils.PRINT(b'\n'.join(js_and_ts_messages))
             python_utils.PRINT('')
 
         return js_and_ts_messages
@@ -2693,7 +2706,7 @@ class OtherLintChecksManager(LintChecksManager):
                 summary_messages.append(result_queue.get())
 
         with _redirect_stdout(_TARGET_STDOUT):
-            python_utils.PRINT('\n'.join(summary_messages))
+            python_utils.PRINT(b'\n'.join(summary_messages))
             python_utils.PRINT('')
 
         return summary_messages

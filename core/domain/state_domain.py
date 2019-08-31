@@ -16,6 +16,7 @@
 
 """Domain object for states and their constituents."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
@@ -1455,10 +1456,11 @@ class State(python_utils.OBJECT):
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
         except Exception:
-            logging.info('Bad state dict: %s' % python_utils.STR(state_dict))
+            logging.info(
+                'Bad state dict: %s' % python_utils.UNICODE(state_dict))
             raise Exception('Could not convert state dict to YAML.')
 
-        return utils.yaml_from_dict(state.to_dict(), width=width)
+        return python_utils.yaml_from_dict(state.to_dict(), width=width)
 
     def get_translation_counts(self):
         """Return a dict representing the number of translations available in a

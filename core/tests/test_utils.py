@@ -16,6 +16,7 @@
 
 """Common utilities for test classes."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import copy
@@ -62,7 +63,8 @@ import webtest
 current_user_services = models.Registry.import_current_user_services()
 
 # Prefix to append to all lines printed by tests to the console.
-LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
+# We are using the b' prefix as all the stdouts are in bytes.
+LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 
 
 def empty_environ():
@@ -496,7 +498,9 @@ tags: []
         """Print the line with a prefix that can be identified by the
         script that calls the test.
         """
-        python_utils.PRINT('%s%s' % (LOG_LINE_PREFIX, line))
+        # We are using the b' prefix as all the stdouts are in bytes.
+        python_utils.PRINT(
+            b'%s%s' % (LOG_LINE_PREFIX, python_utils.convert_to_bytes(line)))
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -743,8 +747,14 @@ tags: []
         Returns:
             webtest.TestResponse: The response of the POST request.
         """
+        # Convert the files to bytes.
+        if upload_files is not None:
+            upload_files = tuple(
+                tuple(python_utils.convert_to_bytes(
+                    j) for j in i) for i in upload_files)
+
         json_response = app.post(
-            python_utils.STR(url), data, expect_errors=expect_errors,
+            url, data, expect_errors=expect_errors,
             upload_files=upload_files, headers=headers,
             status=expected_status_int)
         return json_response
@@ -794,7 +804,7 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
         json_response = self.testapp.put(
-            python_utils.STR(url), data, expect_errors=expect_errors)
+            python_utils.UNICODE(url), data, expect_errors=expect_errors)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -1832,7 +1842,8 @@ class AppEngineTestBase(TestBase):
                     if task.url.startswith('/task')
                     else self.testapp)
                 response = app.post(
-                    url=python_utils.STR(task.url), params=(task.payload or ''),
+                    url=python_utils.UNICODE(
+                        task.url), params=(task.payload or ''),
                     headers=headers, expect_errors=True)
                 if response.status_code != 200:
                     raise RuntimeError(

@@ -16,6 +16,7 @@
 
 """Tests for core.domain.stats_domain."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -1673,7 +1674,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             len(self.learner_answer_details.learner_answer_info_list), 1)
         for i in python_utils.RANGE(36):
             learner_answer_info = stats_domain.LearnerAnswerInfo(
-                id_base + python_utils.STR(
+                id_base + python_utils.UNICODE(
                     i), answer, answer_details, created_on)
             self.learner_answer_details.add_learner_answer_info(
                 learner_answer_info)
@@ -1862,7 +1863,7 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         learner_answer_info_id = (
             stats_domain.LearnerAnswerInfo.get_new_learner_answer_info_id())
         self.assertNotEqual(learner_answer_info_id, None)
-        self.assertEqual(isinstance(learner_answer_info_id, str), True)
+        self.assertTrue(isinstance(learner_answer_info_id, bytes))
 
     def test_id_must_be_string(self):
         self.learner_answer_info.id = 123

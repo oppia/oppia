@@ -16,6 +16,7 @@
 
 """Unit tests for core.domain.collection_services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -420,7 +421,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             observed_log_messages[0],
             'ValidationError Command invalid command is not allowed '
-            'collection_id [{\'cmd\': \'invalid command\'}]')
+            'collection_id [{u\'cmd\': u\'invalid command\'}]')
 
 
 class CollectionProgressUnitTests(CollectionServicesUnitTests):

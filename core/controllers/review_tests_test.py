@@ -14,6 +14,7 @@
 
 """Tests for the review tests page."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import story_domain

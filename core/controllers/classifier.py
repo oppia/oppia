@@ -14,6 +14,7 @@
 
 """Controllers for communicating with the VM for training classifiers."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import hashlib
 import hmac

@@ -20,6 +20,7 @@ execute:
     bash scripts/run_backend_tests.sh
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -88,11 +89,11 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
-    type=python_utils.STR)
+    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
-    type=python_utils.STR)
+    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--exclude_load_tests',
     help='optional; if specified, exclude load tests from being run',
@@ -125,6 +126,9 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
     last_stdout_str, last_stderr_str = p.communicate()
+    # Converting to unicode to stay compatible with the rest of the strings.
+    last_stdout_str = last_stdout_str.decode(encoding='utf-8')
+    last_stderr_str = last_stderr_str.decode(encoding='utf-8')
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:

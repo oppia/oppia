@@ -16,6 +16,7 @@
 
 """Classes for Rich Text Components in Oppia."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
@@ -76,8 +77,8 @@ class BaseRteComponent(python_utils.OBJECT):
                 set(required_attr_names) - set(attr_names))
             extra_attr_names = list(set(attr_names) - set(required_attr_names))
             raise Exception('Missing attributes: %s, Extra attributes: %s' % (
-                python_utils.STR(missing_attr_names),
-                python_utils.STR(extra_attr_names)))
+                ', '.join(missing_attr_names),
+                ', '.join(extra_attr_names)))
 
         for arg_name in required_attr_names:
             arg_obj_class = arg_names_to_obj_classes[arg_name]

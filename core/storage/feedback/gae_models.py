@@ -16,6 +16,7 @@
 
 """Models for Oppia feedback threads and messages."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -272,7 +273,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. Full message ID.
         """
-        return '.'.join([thread_id, python_utils.STR(message_id)])
+        return '.'.join([thread_id, python_utils.UNICODE(message_id)])
 
     @property
     def entity_id(self):

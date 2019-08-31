@@ -14,6 +14,7 @@
 
 """Main package for URL routing for incoming emails."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import incoming_emails
 from core.platform import models

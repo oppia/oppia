@@ -27,6 +27,7 @@ On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import collections
@@ -111,7 +112,7 @@ def _get_remote_name():
     task = subprocess.Popen(get_remotes_name_cmd, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     out, err = task.communicate()
-    remotes = python_utils.STR(out)[:-1].split('\n')
+    remotes = python_utils.UNICODE(out)[:-1].split('\n')
     if not err:
         for remote in remotes:
             get_remotes_url_cmd = (

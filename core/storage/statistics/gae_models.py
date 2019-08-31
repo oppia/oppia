@@ -16,6 +16,7 @@
 
 """Models for Oppia statistics."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import json
@@ -1090,7 +1091,7 @@ class PlaythroughModel(base_models.BaseModel):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    python_utils.STR(
+                    python_utils.UNICODE(
                         utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
@@ -1636,8 +1637,8 @@ class StateAnswersModel(base_models.BaseModel):
             str. Entity_id for a StateAnswersModel instance.
         """
         return ':'.join([
-            exploration_id, python_utils.STR(exploration_version), state_name,
-            python_utils.STR(shard_id)])
+            exploration_id, python_utils.UNICODE(exploration_version),
+            state_name, python_utils.UNICODE(shard_id)])
 
     @classmethod
     def _shard_answers(
@@ -1785,8 +1786,8 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                 given exploration state.
         """
         entity_id = cls._get_entity_id(
-            exploration_id, python_utils.STR(exploration_version), state_name,
-            calculation_id)
+            exploration_id, python_utils.UNICODE(exploration_version),
+            state_name, calculation_id)
         instance = cls.get(entity_id, strict=False)
         return instance
 
@@ -1806,5 +1807,5 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             str. The entity ID corresponding to the given exploration state.
         """
         return ':'.join([
-            exploration_id, python_utils.STR(exploration_version), state_name,
-            calculation_id])
+            exploration_id, python_utils.UNICODE(exploration_version),
+            state_name, calculation_id])

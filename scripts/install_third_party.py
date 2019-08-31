@@ -14,6 +14,7 @@
 
 """Installation script for Oppia third-party libraries."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import json
@@ -237,7 +238,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
                 python_utils.PRINT(dependency_dict)
                 python_utils.PRINT(
                     'Only one of these keys pair must be used: "%s".'
-                    % python_utils.STR(optional_keys))
+                    % ', '.join(optional_keys))
                 python_utils.PRINT('Exiting')
                 sys.exit(1)
 

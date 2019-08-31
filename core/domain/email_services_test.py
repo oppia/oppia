@@ -14,6 +14,7 @@
 
 """ Tests for services relating to emails."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import email_services
 from core.platform import models
