@@ -149,18 +149,6 @@ def main():
     # Mac OS.
     if os.environ.get('TRAVIS'):
         chrome_bin = '/usr/bin/chromium-browser'
-    elif os.environ.get('VAGRANT') or os.path.isfile('/etc/is_vagrant_vm'):
-        # XVFB is required for headless testing in Vagrant.
-        subprocess.call([
-            'sudo', 'apt-get', 'install', 'xvfb', 'chromium-browser'])
-        chrome_bin = '/usr/bin/chromium-browser'
-        # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
-        os.environ['XVFB_PREFIX'] = '/usr/bin/xvfb-run'
-        # Enforce proper ownership on oppia, oppia_tools, and node_modules or
-        # else NPM installs will fail.
-        common.recursive_chown('/home/vagrant/oppia', os.getuid(), -1)
-        common.recursive_chown('/home/vagrant/oppia_tools', os.getuid(), -1)
-        common.recursive_chown('/home/vagrant/node_modules', os.getuid(), -1)
     elif os.path.isfile('/usr/bin/google-chrome'):
         # Unix.
         chrome_bin = '/usr/bin/google-chrome'

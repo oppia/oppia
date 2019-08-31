@@ -44,9 +44,7 @@ def main(argv=None):
     """Runs the frontend tests."""
     setup.main()
     setup_gae.main()
-    xvfb_prefix = ''
-    if os.environ.get('VAGRANT') or os.path.isfile('/etc/is_vagrant_vm'):
-        xvfb_prefix = '/usr/bin/xvfb-run'
+
     parsed_args, _ = _PARSER.parse_known_args(args=argv)
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
@@ -58,30 +56,18 @@ def main(argv=None):
 
     build.main()
 
-    if xvfb_prefix:
-        subprocess.call([
-            xvfb_prefix, os.path.join(
-                common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'), 'start',
-            'core/tests/karma.conf.ts'])
-    else:
-        subprocess.call([
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', 'core/tests/karma.conf.ts'])
+    subprocess.call([
+        os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+        'start', 'core/tests/karma.conf.ts'])
 
     if parsed_args.run_minified_tests is True:
         python_utils.PRINT('Running test in production environment')
 
         build.main(argv=['--prod_env', '--minify_third_party_libs_only'])
 
-        if xvfb_prefix:
-            subprocess.call([
-                xvfb_prefix,
-                os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-                'start', 'core/tests/karma.conf.ts', '--prodEnv'])
-        else:
-            subprocess.call([
-                os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-                'start', 'core/tests/karma.conf.ts', '--prodEnv'])
+        subprocess.call([
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', 'core/tests/karma.conf.ts', '--prodEnv'])
 
     python_utils.PRINT('Done!')
 

@@ -34,7 +34,6 @@ from . import common
 from . import install_third_party_libs
 from . import setup
 from . import setup_gae
-from . import vagrant_lock
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -66,9 +65,6 @@ def cleanup():
 
 def main(argv=None):
     """Starts up a development server running Oppia."""
-    if os.path.isfile('/etc/is_vagrant_vm'):
-        vagrant_lock.main()
-
     setup.main()
     setup_gae.main()
 
