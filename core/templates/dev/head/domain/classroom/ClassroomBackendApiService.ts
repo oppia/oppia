@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to get topic data.
+ * @fileoverview Service to get classroom data.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
