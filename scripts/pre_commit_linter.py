@@ -617,12 +617,13 @@ _FILES = multiprocessing.Manager().dict()
 class FileCache(python_utils.OBJECT):
     """Provides thread-safe access to cached file content."""
 
-    _CACHE_DATA_DICT = {}
-    _CACHE_LOCK_DICT = {}
-    _CACHE_LOCK_DICT_LOCK = threading.Lock()
+    def __init__(self):
+        self._CACHE_DATA_DICT = {}
+        # self._CACHE_LOCK_DICT = {}
+        # self._CACHE_LOCK_DICT_LOCK = threading.Lock()
 
-    @classmethod
-    def read(cls, filepath, mode='r'):
+    # @classmethod
+    def read(self, filepath, mode='r'):
         """Returns the data read from the file in unicode form.
 
         Args:
@@ -632,10 +633,10 @@ class FileCache(python_utils.OBJECT):
         Returns:
             str. The data read from the file.
         """
-        return cls._get_data(filepath, mode)[0]
+        return self._get_data(filepath, mode)[0]
 
-    @classmethod
-    def readlines(cls, filepath, mode='r'):
+    # @classmethod
+    def readlines(self, filepath, mode='r'):
         """Returns the tuple containing data line by line as read from the
         file in unicode form.
 
@@ -647,27 +648,27 @@ class FileCache(python_utils.OBJECT):
             tuple(str). The tuple containing data line by line as read from the
                 file.
         """
-        return cls._get_data(filepath, mode)[1]
+        return self._get_data(filepath, mode)[1]
 
-    @classmethod
-    def _get_cache_lock(cls, key):
-        """Returns the cache lock corresponding to the given key.
+    # @classmethod
+    # def _get_cache_lock(self, key):
+    #     """Returns the cache lock corresponding to the given key.
 
-        Args:
-            key: str. The key corresponding to which the cache lock is to be
-                found.
+    #     Args:
+    #         key: str. The key corresponding to which the cache lock is to be
+    #             found.
 
-        Returns:
-            str. The cache lock corresponding to the given key.
-        """
-        if key not in cls._CACHE_LOCK_DICT:
-            with cls._CACHE_LOCK_DICT_LOCK:
-                if key not in cls._CACHE_LOCK_DICT:
-                    cls._CACHE_LOCK_DICT[key] = threading.Lock()
-        return cls._CACHE_LOCK_DICT[key]
+    #     Returns:
+    #         str. The cache lock corresponding to the given key.
+    #     """
+    #     if key not in self._CACHE_LOCK_DICT:
+    #         # with self._CACHE_LOCK_DICT_LOCK:
+    #             # if key not in self._CACHE_LOCK_DICT:
+    #         self._CACHE_LOCK_DICT[key] = threading.Lock()
+    #     return self._CACHE_LOCK_DICT[key]
 
-    @classmethod
-    def _get_data(cls, filepath, mode):
+    # @classmethod
+    def _get_data(self, filepath, mode):
         """Returns the collected data from the file corresponding to the given
         filepath.
 
@@ -681,13 +682,13 @@ class FileCache(python_utils.OBJECT):
                 second element.
         """
         key = (filepath, mode)
-        if key not in cls._CACHE_DATA_DICT:
-            with cls._get_cache_lock(key):
-                if key not in cls._CACHE_DATA_DICT:
-                    with python_utils.open_file(filepath, mode) as f:
-                        lines = f.readlines()
-                    cls._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
-        return cls._CACHE_DATA_DICT[key]
+        if key not in self._CACHE_DATA_DICT:
+            # with self._get_cache_lock(key):
+                # if key not in self._CACHE_DATA_DICT:
+            with python_utils.open_file(filepath, mode) as f:
+                lines = f.readlines()
+                self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
+        return self._CACHE_DATA_DICT[key]
 
 
 def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
@@ -3270,6 +3271,8 @@ def main():
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
+    for file in all_filepaths:
+        FileCache.read(file)
 
     if len(all_filepaths) == 0:
         python_utils.PRINT('---------------------------')
@@ -3311,4 +3314,13 @@ def main():
 
 
 if __name__ == '__main__':
+    import cProfile
+    # pr = cProfile.Profile()
+    # pr.enable()
+    name = multiprocessing.Manager().Namespace()
+    name.files = FileCache()
+    FileCache = name.files
     main()
+    # cProfile.run('main()')
+    # pr.disable()
+    # pr.print_stats()
