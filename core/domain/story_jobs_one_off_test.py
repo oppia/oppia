@@ -186,8 +186,5 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # If the story had been successfully migrated, this would include a
         # 'successfully migrated' message. Its absence means that the story
         # could not be processed.
-        expected = [[u'validation_error',
-                     [u'Story %s failed validation: \'unicode\' object has '
-                      'no attribute \'validate\'' % (self.STORY_ID)]]]
-        self.assertEqual(
-            expected, [ast.literal_eval(x) for x in output])
+        for x in output:
+            self.assertRegexpMatches(x, 'object has no attribute \'validate\'')
