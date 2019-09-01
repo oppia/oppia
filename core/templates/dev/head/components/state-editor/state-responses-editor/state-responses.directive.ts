@@ -450,8 +450,9 @@ angular.module('oppia').directive('stateResponses', [
                 $scope.openAddAnswerGroupModal();
               }
             }, function() {
-              
-              });
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           // When the page is scrolled so that the top of the page is above the

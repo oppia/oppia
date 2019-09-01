@@ -256,9 +256,9 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 CollectionEditorStateService.saveCollection(
                   commitMessage, _publishCollection);
               }, function() {
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
             } else {
               _publishCollection();
             }

@@ -209,7 +209,8 @@ angular.module('oppia').directive('questionEditor', [
                       contentId);
                   });
                 }, function() {
-
+                  // This callback is triggered when the Cancel button is clicked.
+                  // No further action is needed.
                 });
               }
             };
