@@ -45,7 +45,7 @@ describe('Preferences', function() {
     users.login('lou@preferences.com');
     preferencesPage.get();
     preferencesPage.uploadProfilePhoto(
-      '../data/dummy_assets/dummyLargeImage.jpg')
+      '../data/dummyLargeImage.jpg')
       .then(function() {
         preferencesPage.expectUploadError();
       });
