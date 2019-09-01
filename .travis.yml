@@ -94,6 +94,7 @@ install:
 - python -m scripts.setup_gae
 - sudo chown -R $(whoami) node_modules
 - sudo chmod -R 744 node_modules
+- export PATH=../oppia_tools/node-10.15.3/bin:$PATH
 - python -m scripts.install_third_party_libs
 
 script:
