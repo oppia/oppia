@@ -112,8 +112,6 @@ angular.module('oppia').directive('reviewTestPage', [
           };
           _fetchSkillDetails();
         }
-        }
-        }
-      ]
+      }]
     };
   }]);
