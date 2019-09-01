@@ -77,6 +77,52 @@ def _start_subprocess_for_result(cmd):
     return out, err
 
 
+def _does_diff_include_package_lock_file_and_no_package_file():
+    """Checks whether the diff includes package-lock.json.
+
+    Returns:
+        bool. Whether the diff includes package-lock.json.
+
+    Raises:
+        ValueError if git command fails.
+    """
+
+    git_cmd = ['git', 'diff', '--name-only', '--cached']
+    out, err = _start_subprocess_for_result(git_cmd)
+
+    if not err:
+        files_changed = out.split('\n')
+        return 'package-lock.json' in files_changed
+    else:
+        raise ValueError(err)
+
+
+def _remove_package_lock_file():
+    """Removes package-lock.json file.
+
+    Raises:
+        ValueError if any git command fails.
+    """
+
+    git_unstage_cmd = ['git', 'reset', '--', 'package-lock.json']
+    rm_cmd = ['rm', 'package-lock.json']
+
+    _, err_unstage_cmd = (
+        _start_subprocess_for_result(git_unstage_cmd))
+
+    if not err_unstage_cmd:
+        _, err_revert_cmd = (
+            _start_subprocess_for_result(rm_cmd))
+
+        if not err_revert_cmd:
+            python_utils.PRINT(
+                'Successfully removed package-lock.json!')
+        else:
+            raise ValueError(err_revert_cmd)
+    else:
+        raise ValueError(err_unstage_cmd)
+
+
 def main():
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
@@ -89,6 +135,15 @@ def main():
         _install_hook()
         sys.exit(0)
 
+    python_utils.PRINT('Running pre-commit check for package-lock.json ...')
+    if _does_diff_include_package_lock_file_and_no_package_file():
+        python_utils.PRINT(
+            'Oppia utilizies Yarn to manage npm packages. Please use Yarn '
+            'to modify packages.'
+        )
+        python_utils.PRINT('Removing package-lock.json ...')
+        _remove_package_lock_file()
+        sys.exit(1)
     sys.exit(0)
 
 
