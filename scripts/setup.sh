@@ -145,8 +145,6 @@ else
   export NPM_CMD=$NODE_PATH/bin/npm
 fi
 
-export NPM_INSTALL="$NPM_CMD install"
-
 # Download and install node.js.
 echo Checking if node.js is installed in $TOOLS_DIR
 if [ ! -d "$NODE_PATH" ]; then
