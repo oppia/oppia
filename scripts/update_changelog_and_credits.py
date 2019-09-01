@@ -59,7 +59,7 @@ _PARSER.add_argument(
     '--github_username', help=('Your GitHub username.'), type=str)
 
 
-def update_sorted_file(filepath, new_list, last_comment_line):
+def update_sorted_file(filepath, new_list):
     """Updates the files AUTHORS and CONTRIBUTORS with a sorted list of
     new authors or contributors.
 
@@ -67,13 +67,16 @@ def update_sorted_file(filepath, new_list, last_comment_line):
         filepath: str. The path of the file to update.
         new_list: list(str). The list of new authors or contributors to
             add to the file.
-        last_comment_line: str. The content of the line of last comment in
-            a line after which the file contains a new line followed by
-            a sorted list of authors/contributors.
     """
     file_lines = []
     with python_utils.open_file(filepath, 'r') as f:
         file_lines = f.readlines()
+
+
+    for line in file_lines:
+        if line.startswith('#'):
+            last_comment_line = line
+
     # start_index is the index of line where list of authors/contributors
     # starts. The line with the last comment is followed by a empty line
     # and then the sorted list. So, the start_index is the index of
@@ -167,9 +170,7 @@ def update_authors(release_summary_lines):
     new_authors = release_summary_lines[start_index:end_index]
     new_authors = [
         '%s\n' % (author.replace('* ', '').strip()) for author in new_authors]
-    update_sorted_file(
-        AUTHORS_FILEPATH, new_authors,
-        '# Please keep the list sorted alphabetically.\n')
+    update_sorted_file(AUTHORS_FILEPATH, new_authors)
     python_utils.PRINT('Updated AUTHORS file!')
 
 
@@ -191,9 +192,7 @@ def update_contributors(release_summary_lines):
         '%s\n' % (
             contributor.replace(
                 '* ', '').strip()) for contributor in new_contributors]
-    update_sorted_file(
-        CONTRIBUTORS_FILEPATH, new_contributors,
-        '# Please keep the list sorted alphabetically.\n')
+    update_sorted_file(CONTRIBUTORS_FILEPATH, new_contributors)
     python_utils.PRINT('Updated CONTRIBUTORS file!')
 
 
