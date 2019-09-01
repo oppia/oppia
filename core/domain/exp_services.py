@@ -22,6 +22,7 @@ delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import datetime
@@ -268,7 +269,7 @@ def export_to_zip_file(exploration_id, version=None):
             file_contents = fs.get(filepath, version=1)
 
             str_filepath = 'assets/%s' % filepath
-            assert isinstance(str_filepath, str)
+            assert isinstance(str_filepath, python_utils.UNICODE)
             unicode_filepath = str_filepath.decode('utf-8')
             zfile.writestr(unicode_filepath, file_contents)
 
@@ -296,7 +297,7 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
         exploration_id, version=version)
     exploration_dict = {}
     for state in exploration.states:
-        exploration_dict[state] = utils.yaml_from_dict(
+        exploration_dict[state] = python_utils.yaml_from_dict(
             exploration.states[state].to_dict(), width=width)
     return exploration_dict
 
@@ -1337,9 +1338,7 @@ def get_image_filenames_from_exploration(exploration):
                 html_string))
 
     for rte_comp in rte_components_in_exp:
-        if 'id' in rte_comp and (
-                python_utils.STR(
-                    rte_comp['id']) == 'oppia-noninteractive-image'):
+        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.
