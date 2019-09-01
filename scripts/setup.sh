@@ -181,9 +181,12 @@ echo Checking if yarn is installed in $TOOLS_DIR
 if [ ! -d "$YARN_PATH" ]; then
   echo Installing yarn
 
-  wget https://yarnpkg.com/latest.tar.gz
-  tar zvxf latest.tar.gz --directory $TOOLS_DIR
-  rm latest.tar.gz
+  YARN_VERSION=v1.17.3
+  YARN_FILE_NAME=yarn-$YARN_VERSION.tar.gz
+
+  wget https://github.com/yarnpkg/yarn/releases/download/$YARN_VERSION/$YARN_FILE_NAME
+  tar zvxf $YARN_FILE_NAME --directory $TOOLS_DIR
+  rm $YARN_FILE_NAME
 fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
