@@ -77,7 +77,7 @@ def _start_subprocess_for_result(cmd):
     return out, err
 
 
-def _does_diff_include_package_lock_file_and_no_package_file():
+def _does_diff_include_package_lock_file():
     """Checks whether the diff includes package-lock.json.
 
     Returns:
@@ -136,13 +136,14 @@ def main():
         sys.exit(0)
 
     python_utils.PRINT('Running pre-commit check for package-lock.json ...')
-    if _does_diff_include_package_lock_file_and_no_package_file():
+    if _does_diff_include_package_lock_file():
         python_utils.PRINT(
             'Oppia utilizies Yarn to manage npm packages. Please use Yarn '
             'to modify packages.'
         )
         python_utils.PRINT('Removing package-lock.json ...')
         _remove_package_lock_file()
+        python_utils.PRINT('COMMIT ABORTED')
         sys.exit(1)
     sys.exit(0)
 
