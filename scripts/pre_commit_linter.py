@@ -549,7 +549,8 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/core/storage/',
     '/export/',
     '/manifest.json',
-    '/package*.json',
+    '/package.json',
+    '/yarn.lock',
     '/scripts/install_third_party.sh',
     '/.github/']
 
