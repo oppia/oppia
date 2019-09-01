@@ -86,6 +86,44 @@ def update_sorted_file(filepath, new_list, last_comment_line):
             f.write(line)
 
 
+def check_ordering_of_sections(release_summary_lines):
+    """Checks that the ordering of sections in release_summary file
+    matches the expected ordering.
+
+    This is required to ensure that automatic updates to changelog
+    and credits are correct.
+
+    Args:
+        release_summary_lines: list(str). List of lines in
+            ../release_summary.md.
+
+    Raises:
+        Exception: If expected ordering does not match the ordering
+            in release_summary.md.
+    """
+    expected_ordering = {
+        '### Changelog:\n': '### Commit History:\n',
+        '### New Authors:\n': '### Existing Authors:\n',
+        '### New Contributors:\n': '### Email C&P Blurbs about authors:\n'
+    }
+    sections = [
+        line for line in release_summary_lines if line.startswith('###')
+    ]
+    for section, next_section in expected_ordering.iteritems():
+        if section not in sections:
+            raise Exception(
+                'Expected release_summary to have %s section to ensure '
+                'that automatic updates to changelog and credits are '
+                'correct.' % section.strip())
+        index = sections.index(section)
+        if index + 1 >= len(sections) or sections[index + 1] != next_section:
+            raise Exception(
+                'Expected %s section to be followed by %s section in '
+                'release_summary to ensure that automatic updates to '
+                'changelog and credits are correct.' % (
+                    section.strip(), next_section.strip()))
+
+
 def update_changelog(release_summary_lines, current_release_version):
     """Updates CHANGELOG file.
 
@@ -335,6 +373,8 @@ def main():
     with python_utils.open_file(
         feconf.RELEASE_SUMMARY_FILEPATH, 'r') as release_summary_file:
         release_summary_lines = release_summary_file.readlines()
+
+    check_ordering_of_sections(release_summary_lines)
 
     update_changelog(
         release_summary_lines, current_release_version)
