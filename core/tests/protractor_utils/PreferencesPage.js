@@ -52,11 +52,21 @@ var PreferencesPage = function() {
     by.css('.protractor-test-custom-photo'));
   var profilePhotoCropper = element(
     by.css('.protractor-test-photo-crop'));
+  var profilePhotoUploadError = element(
+    by.css('.protractor-test-upload-error'));
+
+  this.expectUploadError = function() {
+    expect(profilePhotoUploadError.isDisplayed()).toBe(true);
+  };
 
   this.uploadProfilePhoto = function(imgPath) {
     profilePhotoClickable.click();
     absPath = path.resolve(__dirname, imgPath);
-    return profilePhotoUploadInput.sendKeys(absPath).then(function() {
+    return profilePhotoUploadInput.sendKeys(absPath);
+  };
+
+  this.submitProfilePhoto = function(imgPath) {
+    return this.uploadProfilePhoto(imgPath).then(function() {
       waitFor.visibilityOf(
         profilePhotoCropper, 'photo cropper still invisible');
     }).then(function() {

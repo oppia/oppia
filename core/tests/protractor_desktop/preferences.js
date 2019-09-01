@@ -33,11 +33,22 @@ describe('Preferences', function() {
     expect(preferencesPage.getProfilePhotoSource())
       .not
       .toEqual(
-        preferencesPage.uploadProfilePhoto('../data/img.png')
+        preferencesPage.submitProfilePhoto('../data/img.png')
           .then(function() {
             return preferencesPage.getProfilePhotoSource();
           })
       );
+  });
+
+  it('shows an error if uploaded photo is too large', function() {
+    users.createUser('lou@preferences.com', 'louPreferences');
+    users.login('lou@preferences.com');
+    preferencesPage.get();
+    preferencesPage.uploadProfilePhoto(
+      '../data/dummy_assets/dummyLargeImage.jpg')
+      .then(function() {
+        preferencesPage.expectUploadError();
+      });
   });
 
   it('should change editor role email checkbox value', function() {
