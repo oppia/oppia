@@ -11,16 +11,21 @@ strategy:
 
 steps:
 
+
+- checkout: self
+  path: oppia
+
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
 
-- script: |
-    source scripts/setup.sh || exit 1
-    source scripts/setup_gae.sh || exit 1
-    sudo pip install pyyaml
-    bash scripts/install_third_party.sh
+- bash: python -m pip install pyyaml
+
+- bash: scripts/setup.sh
+  displayName: 'Install dependencies'
+
+- bash: scripts/install_third_party.sh
   displayName: 'Install dependencies'
 
 - script: |
