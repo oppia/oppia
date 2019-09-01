@@ -156,6 +156,14 @@ var ExplorationEditorFeedbackTab = function() {
     feedbackSendResponseButton.click();
   };
 
+  this.readFeedbackMessagesFromThread = function() {
+    var feedbackMessages = element.all(
+      by.css('.protractor-test-exploration-feedback'));
+    waitFor.visibilityOf(
+      feedbackMessages.first(), 'Feedback message text is not visible');
+    return feedbackMessages;
+  };
+
   this.expectFeedbackStatusNameToBe = function(feedbackStatus) {
     var feedbackStatusElement = element(
       by.css('.protractor-test-oppia-feedback-status-name'));

@@ -14,6 +14,7 @@
 
 """Models for storing the classification data models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -88,7 +89,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    python_utils.STR(
+                    python_utils.UNICODE(
                         utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):

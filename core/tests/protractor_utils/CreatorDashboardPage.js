@@ -24,7 +24,7 @@ var CreatorDashboardPage = function() {
   var activityCreationModal = element(
     by.css('.protractor-test-creation-modal'));
   var explorationFeedbackCount =
-    element(by.css('.protractor-test-exploration-feedback-count'));
+    element(by.css('.protractor-test-exp-summary-tile-open-feedback'));
   var explorationDashboardCard =
     element(by.css('.protractor-test-exploration-dashboard-card'));
   var collectionCard = element(by.css('.protractor-test-collection-card'));
@@ -37,6 +37,12 @@ var CreatorDashboardPage = function() {
     element(by.css('.protractor-test-create-exploration'));
   var createNewExplorationButton =
     element(by.css('.protractor-test-create-new-exploration-button'));
+  var listViewButton = element(by.css('.protractor-test-oppia-list-view-btn'));
+  // Dashboard stat elements.
+  var averageRating = element(by.css('.protractor-test-oppia-average-rating'));
+  var totalPlays = element(by.css('.protractor-test-oppia-total-plays'));
+  var openFeedbacks = element(by.css('.protractor-test-oppia-open-feedback'));
+  var subscribers = element(by.css('.protractor-test-oppia-total-subscribers'));
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(explorationTitle) {
@@ -132,6 +138,114 @@ var CreatorDashboardPage = function() {
       explorationElement.click();
       waitFor.pageToFullyLoad();
     });
+  };
+
+  this.getAverageRating = function() {
+    waitFor.visibilityOf(
+      averageRating, 'Unable to find average rating');
+    return averageRating.getText();
+  };
+
+  this.getTotalPlays = function() {
+    waitFor.visibilityOf(
+      totalPlays, 'Unable to find total plays');
+    return totalPlays.getText();
+  };
+
+  this.getOpenFeedbacks = function() {
+    waitFor.visibilityOf(
+      openFeedbacks, 'Unable to find open feedbacks count');
+    return openFeedbacks.getText();
+  };
+
+  this.getSubscribers = function() {
+    waitFor.visibilityOf(
+      subscribers, 'Unable to find subscribers count');
+    return subscribers.getText();
+  };
+
+  this.getListView = function() {
+    waitFor.visibilityOf(
+      listViewButton, 'Unable to find list view button');
+    listViewButton.click();
+  };
+
+  // Returns titles of each explorations in grid view.
+  this.getExpSummaryTileTitles = function() {
+    var expSummaryTileTitleElements = element.all(
+      by.css('.protractor-test-exp-summary-tile-title'));
+    waitFor.visibilityOf(
+      expSummaryTileTitleElements.first(), 'Unable to find exploration titles');
+    return expSummaryTileTitleElements;
+  };
+
+  // Returns ratings of each explorations in grid view.
+  this.getExpSummaryTileRatings = function() {
+    var expSummaryTileRatingElements = element.all(
+      by.css('.protractor-test-exp-summary-tile-rating'));
+    waitFor.visibilityOf(
+      expSummaryTileRatingElements.first(),
+      'Unable to find exploration ratings');
+    return expSummaryTileRatingElements;
+  };
+
+  // Returns open feedback count of each exploration in grid view.
+  this.getExpSummaryTileOpenFeedbackCount = function() {
+    var expSummaryTileFeedbackElements = element.all(
+      by.css('.protractor-test-exp-summary-tile-open-feedback'));
+    waitFor.visibilityOf(
+      expSummaryTileFeedbackElements.first(),
+      'Unable to find exploration feedbacks');
+    return expSummaryTileFeedbackElements;
+  };
+
+  // Returns total views count of each exploration in grid view.
+  this.getExpSummaryTileViewsCount = function() {
+    var expSummaryTileViewsElements = element.all(
+      by.css('.protractor-test-exp-summary-tile-num-views'));
+    waitFor.visibilityOf(
+      expSummaryTileViewsElements.first(),
+      'Unable to find exploration views');
+    return expSummaryTileViewsElements;
+  };
+
+  // Returns titles of each explorations in list view.
+  this.getExpSummaryRowTitles = function() {
+    var expSummaryRowTitleElements = element.all(
+      by.css('.protractor-test-exp-summary-row-title'));
+    waitFor.visibilityOf(
+      expSummaryRowTitleElements.first(), 'Unable to find exploration titles');
+    return expSummaryRowTitleElements;
+  };
+
+  // Returns ratings of each explorations in list view.
+  this.getExpSummaryRowRatings = function() {
+    var expSummaryRowRatingElements = element.all(
+      by.css('.protractor-test-exp-summary-row-rating'));
+    waitFor.visibilityOf(
+      expSummaryRowRatingElements.first(),
+      'Unable to find exploration ratings');
+    return expSummaryRowRatingElements;
+  };
+
+  // Returns open feedback count of each exploration in list view.
+  this.getExpSummaryRowOpenFeedbackCount = function() {
+    var expSummaryRowFeedbackElements = element.all(
+      by.css('.protractor-test-exp-summary-row-open-feedback'));
+    waitFor.visibilityOf(
+      expSummaryRowFeedbackElements.first(),
+      'Unable to find exploration feedbacks');
+    return expSummaryRowFeedbackElements;
+  };
+
+  // Returns total views count of each exploration in list view.
+  this.getExpSummaryRowViewsCount = function() {
+    var expSummaryRowViewsElements = element.all(
+      by.css('.protractor-test-exp-summary-row-num-views'));
+    waitFor.visibilityOf(
+      expSummaryRowViewsElements.first(),
+      'Unable to find exploration views');
+    return expSummaryRowViewsElements;
   };
 };
 
