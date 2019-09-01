@@ -51,40 +51,39 @@ angular.module('oppia').factory('StoryCreationService', [
                 $uibModalInstance.close(storyTitle);
               };
               $scope.cancel = function() {
-                $uibModalInstance.close('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
             }
           ]
         });
 
         modalInstance.result.then(function(storyTitle) {
-          if (storyTitle != 'cancel') {
-            if (storyTitle === '') {
-              throw Error('Story title cannot be empty');
+          if (storyTitle === '') {
+            throw Error('Story title cannot be empty');
+          }
+          storyCreationInProgress = true;
+          AlertsService.clearWarnings();
+          var topic = TopicEditorStateService.getTopic();
+          $rootScope.loadingMessage = 'Creating story';
+          var createStoryUrl = UrlInterpolationService.interpolateUrl(
+            STORY_CREATOR_URL_TEMPLATE, {
+              topic_id: topic.getId()
             }
-            storyCreationInProgress = true;
-            AlertsService.clearWarnings();
-            var topic = TopicEditorStateService.getTopic();
-            $rootScope.loadingMessage = 'Creating story';
-            var createStoryUrl = UrlInterpolationService.interpolateUrl(
-              STORY_CREATOR_URL_TEMPLATE, {
-                topic_id: topic.getId()
-              }
-            );
-            $http.post(createStoryUrl, {title: storyTitle})
-              .then(function(response) {
-                $window.location = UrlInterpolationService.interpolateUrl(
-                  STORY_EDITOR_URL_TEMPLATE, {
-                    story_id: response.data.storyId
-                  }
-                );
-              }, function() {
-                $rootScope.loadingMessage = '';
-              });
-            }
+          );
+          $http.post(createStoryUrl, {title: storyTitle})
+            .then(function(response) {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                STORY_EDITOR_URL_TEMPLATE, {
+                  story_id: response.data.storyId
+                }
+              );
+            }, function() {
+              $rootScope.loadingMessage = '';
+            });
         }, function() {
-                $rootScope.loadingMessage = '';
-              });
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
       }
     };
   }

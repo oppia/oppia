@@ -367,7 +367,7 @@ def convert_to_hash(input_string, max_length):
     # Encodes strings using the character set [A-Za-z0-9].
     encoded_string = base64.b64encode(
         hashlib.sha1(python_utils.convert_to_bytes(input_string)).digest(),
-        altchars='ab'
+        altchars=b'ab'
     ).replace('=', 'c')
 
     return encoded_string[:max_length]
