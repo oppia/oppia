@@ -75,7 +75,9 @@ angular.module('oppia').factory('TopicCreationService', [
             }, function() {
               $rootScope.loadingMessage = '';
             });
-        });
+        }, function() {
+
+            });
       }
     };
   }

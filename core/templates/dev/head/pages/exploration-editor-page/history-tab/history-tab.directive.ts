@@ -305,6 +305,8 @@ angular.module('oppia').directive('historyTab', [
               }).then(function() {
                 $window.location.reload();
               });
+            }, function() {
+              $rootScope.loadingMessage = '';
             });
           };
 
