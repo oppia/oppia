@@ -16,6 +16,7 @@
 
 """Tests for core.storage.classifier.gae_models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import types
@@ -232,7 +233,7 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
-        self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name1.encode(
+        self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name1.encode(
             encoding='utf-8')))
 
         state_name2 = u'टेक्स्ट'
@@ -243,7 +244,7 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
-        self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name2.encode(
+        self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name2.encode(
             encoding='utf-8')))
 
     def test_get_model_from_exploration_attributes(self):

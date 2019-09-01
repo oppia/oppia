@@ -10,7 +10,7 @@
     Please enter a brief description of what you have changed:
     <textarea rows="3" cols="50" style="resize: vertical" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
   </p>
-  <button class="btn btn-default" ng-click="onClickToggleDiffButton()">
+  <button class="btn btn-secondary" ng-click="onClickToggleDiffButton()">
     <span ng-if="!showDiff">Show Changes</span>
     <span ng-if="showDiff">Hide Changes</span>
   </button>
@@ -21,7 +21,7 @@
   </version-diff-visualization>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success protractor-test-save-draft-button" ng-disabled="!isExplorationPrivate && !commitMessage" ng-click="save(commitMessage)">
     <span ng-if="isExplorationPrivate">Save Draft</span>
     <span ng-if="!isExplorationPrivate">Publish Changes</span>
