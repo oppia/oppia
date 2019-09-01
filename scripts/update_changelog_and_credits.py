@@ -53,6 +53,12 @@ CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
     CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
     ABOUT_PAGE_FILEPATH)
+EXPECTED_ORDERING = {
+    '### Changelog:\n': '### Commit History:\n',
+    '### New Authors:\n': '### Existing Authors:\n',
+    '### New Contributors:\n': '### Email C&P Blurbs about authors:\n'
+}
+CURRENT_DATE = datetime.date.today().strftime('%d %b %Y')
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -105,15 +111,10 @@ def check_ordering_of_sections(release_summary_lines):
         Exception: If expected ordering does not match the ordering
             in release_summary.md.
     """
-    expected_ordering = {
-        '### Changelog:\n': '### Commit History:\n',
-        '### New Authors:\n': '### Existing Authors:\n',
-        '### New Contributors:\n': '### Email C&P Blurbs about authors:\n'
-    }
     sections = [
         line for line in release_summary_lines if line.startswith('###')
     ]
-    for section, next_section in expected_ordering.items():
+    for section, next_section in EXPECTED_ORDERING.items():
         if section not in sections:
             raise Exception(
                 'Expected release_summary to have %s section to ensure '
@@ -136,13 +137,11 @@ def update_changelog(release_summary_lines, current_release_version):
             ../release_summary.md.
         current_release_version: str. The version of current release.
     """
-
-    current_date = datetime.date.today().strftime('%d %b %Y')
     python_utils.PRINT('Updating Changelog...')
     start_index = release_summary_lines.index('### Changelog:\n') + 1
     end_index = release_summary_lines.index('### Commit History:\n')
     release_version_changelog = [
-        u'v%s (%s)\n' % (current_release_version, current_date),
+        u'v%s (%s)\n' % (current_release_version, CURRENT_DATE),
         u'------------------------\n'] + release_summary_lines[
             start_index:end_index]
     changelog_lines = []
@@ -230,7 +229,7 @@ def find_indentation(about_page_lines):
         #     <li>A*</li>.
         raise Exception(
             'Expected %s text to be followed by an unordered list in '
-            'about-page.directive.html')
+            'about-page.directive.html' % span_text)
     li_indent = li_line[:li_line.find('<li>')]
     return (span_indent, li_indent)
 
