@@ -122,7 +122,8 @@ mkdir -p $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
 export NODE_PATH=$TOOLS_DIR/node-10.15.3
-export PATH=$NODE_PATH/bin:$PATH
+export YARN_PATH=$TOOLS_DIR/yarn-v1.17.3
+export PATH=$NODE_PATH/bin:$YARN_PATH/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
 
@@ -173,6 +174,16 @@ if [ ! -d "$NODE_PATH" ]; then
   # Note: on some machines, these commands seem to take quite a long time.
   chown -R $ME $NODE_MODULE_DIR
   chmod -R 744 $NODE_MODULE_DIR
+fi
+
+# Download and install yarn.
+echo Checking if yarn is installed in $TOOLS_DIR
+if [ ! -d "$YARN_PATH" ]; then
+  echo Installing yarn
+
+  wget https://yarnpkg.com/latest.tar.gz
+  tar zvxf latest.tar.gz --directory $TOOLS_DIR
+  rm latest.tar.gz
 fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
