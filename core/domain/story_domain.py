@@ -14,6 +14,7 @@
 
 """Domain objects relating to stories."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import re
@@ -202,7 +203,7 @@ class StoryNode(python_utils.OBJECT):
             str. The new next node id.
         """
         current_number = StoryNode.get_number_from_node_id(node_id)
-        incremented_node_id = NODE_ID_PREFIX + python_utils.STR(
+        incremented_node_id = NODE_ID_PREFIX + python_utils.UNICODE(
             current_number + 1)
         return incremented_node_id
 
