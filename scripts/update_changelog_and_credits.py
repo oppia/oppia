@@ -43,23 +43,15 @@ sys.path.insert(0, _PY_GITHUB_PATH)
 import github # isort:skip
 # pylint: enable=wrong-import-position
 
-GIT_CMD_TEMPLATE_CHECKOUT = 'git checkout -- %s'
-# This should match the indentation of span and li elements used
-# in developer_names section of
-# core/templates/dev/head/pages/about-page/about-page.directive.html.
-SPAN_INDENT = '              '
-LI_INDENT = '                '
-# This line should match the line after div element for developer_names in
-# about-page.directive.html.
-LINE_AFTER_Z_DEVELOPER_NAMES = (
-    '            <p translate="I18N_ABOUT_PAGE_developer_nameS_'
-    'TAB_TEXT_BOTTOM" translate-values="{listOfNames: $ctrl.listOfNames}">\n')
 ABOUT_PAGE_FILEPATH = os.path.join(
     'core', 'templates', 'dev', 'head', 'pages', 'about-page',
     'about-page.directive.html')
 AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
 CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
+GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
+    CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
+    ABOUT_PAGE_FILEPATH)
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -218,6 +210,79 @@ def update_developer_names(release_summary_lines):
     python_utils.PRINT('Updated about-page file!')
 
 
+def remove_updates_and_delete_branch(repo_fork, target_branch):
+    """Remove changes made to AUTHORS, CHANGELOG, CONTRIBUTORS
+    and about-page and delete the branch created with these changes.
+
+    Args:
+        repo_fork: github.Repository.Repository. The PyGithub object for the
+            forked repo.
+        target_branch: str. The name of the target branch.
+    """
+
+    common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
+    # The get_git_ref code is wrapped in try except block since the
+    # function raises an exception if the target branch is not found.
+    try:
+        repo_fork.get_git_ref('heads/%s' % target_branch).delete()
+    except github.UnknownObjectException:
+        pass
+    except Exception:
+        raise Exception(
+            'Please ensure that %s branch is deleted before '
+            're-running the script' % target_branch)
+
+
+def create_branch(repo_fork, target_branch):
+    """Creates a new branch with updates to AUTHORS, CHANGELOG,
+    CONTRIBUTORS and about-page.
+
+    Args:
+        repo_fork: github.Repository.Repository. The PyGithub object for the
+            forked repo.
+        target_branch: str. The name of the target branch.
+    """
+    python_utils.PRINT(
+        'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
+        'CHANGELOG and about-page...')
+    sb = repo_fork.get_branch('develop')
+    repo_fork.create_git_ref(
+        ref='refs/heads/%s' % target_branch, sha=sb.commit.sha)
+
+    for filepath in [
+            CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
+            ABOUT_PAGE_FILEPATH]:
+        contents = repo_fork.get_contents(filepath, ref=target_branch)
+        with python_utils.open_file(filepath, 'r') as f:
+            repo_fork.update_file(
+                contents.path, 'Update %s' % filepath, f.read(),
+                contents.sha, branch=target_branch)
+    common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
+    common.open_new_tab_in_browser_if_possible(
+        'https://github.com/oppia/oppia/compare/develop...%s:%s?'
+        'expand=1' % (github_username, target_branch))
+    python_utils.PRINT(
+        'Pushed changes to Github. '
+        'Please create a pull request from the %s branch' % target_branch)
+
+
+def ask_user_to_confirm(message):
+    """Asks user to perform a task and confirm once they are done.
+
+    Args:
+        message: str. The message which specifies the task user has
+            to do.
+    """
+    while True:
+        python_utils.PRINT(
+            '******************************************************')
+        python_utils.PRINT(message)
+        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
+        answer = python_utils.INPUT().lower()
+        if answer in ['y', 'ye', 'yes']:
+            return
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
@@ -254,35 +319,17 @@ def main():
 
     current_release_version = branch_name[len(
         common.RELEASE_BRANCH_NAME_PREFIX):]
-    source_branch = 'develop'
     target_branch = 'update-changelog-for-releasev%s' % current_release_version
-    git_cmd_checkout = GIT_CMD_TEMPLATE_CHECKOUT % ('%s %s %s %s') % (
-        ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
-        CHANGELOG_FILEPATH)
 
-    common.run_cmd(git_cmd_checkout.split(' '))
-    # The get_git_ref code is wrapped in try except block since the
-    # function raises an exception if the target branch is not found.
-    try:
-        repo_fork.get_git_ref('heads/%s' % target_branch).delete()
-    except Exception:
-        python_utils.PRINT(
-            'Please ensure that %s branch is deleted before running '
-            'the script' % target_branch)
+    remove_updates_and_delete_branch(repo_fork, target_branch)
 
-    while True:
-        python_utils.PRINT(
-            '******************************************************')
-        python_utils.PRINT(
-            'Please update %s to:\n- have a correct changelog for '
-            'updating the CHANGELOG file\n- have a correct list of new '
-            'authors and contributors to update AUTHORS, CONTRIBUTORS '
-            'and developer_names section in about-page.directive.html\n'
-            'Confirm once you are done by entering y/ye/yes.\n' % (
-                feconf.RELEASE_SUMMARY_FILEPATH))
-        answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
-            break
+    message = (
+        'Please update %s to:\n- have a correct changelog for '
+        'updating the CHANGELOG file\n- have a correct list of new '
+        'authors and contributors to update AUTHORS, CONTRIBUTORS '
+        'and developer_names section in about-page.directive.html\n' % (
+            feconf.RELEASE_SUMMARY_FILEPATH))
+    ask_user_to_confirm(message)
 
     release_summary_lines = []
     with python_utils.open_file(
@@ -295,28 +342,14 @@ def main():
     update_contributors(release_summary_lines)
     update_developer_names(release_summary_lines)
 
-    python_utils.PRINT(
-        'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
-        'CHANGELOG and about-page...')
-    sb = repo_fork.get_branch(source_branch)
-    repo_fork.create_git_ref(
-        ref='refs/heads/%s' % target_branch, sha=sb.commit.sha)
+    message = (
+        'Please check the changes and make updates if required in the '
+        'following files:\n 1. %s\n2. %s\n3. %s\n4. %s\n' % (
+            CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
+            ABOUT_PAGE_FILEPATH))
+    ask_user_to_confirm(message)
 
-    for filepath in [
-            ABOUT_PAGE_FILEPATH, CONTRIBUTORS_FILEPATH, AUTHORS_FILEPATH,
-            CHANGELOG_FILEPATH]:
-        contents = repo_fork.get_contents(filepath, ref=target_branch)
-        with python_utils.open_file(filepath, 'r') as f:
-            repo_fork.update_file(
-                contents.path, 'Update %s' % filepath, f.read(),
-                contents.sha, branch=target_branch)
-    common.run_cmd(git_cmd_checkout.split(' '))
-    common.open_new_tab_in_browser_if_possible(
-        'https://github.com/oppia/oppia/compare/develop...%s:%s?'
-        'expand=1' % (github_username, target_branch))
-    python_utils.PRINT(
-        'Pushed changes to Github. '
-        'Please create a pull request from the %s branch' % target_branch)
+    create_branch(repo_fork, target_branch)
 
 
 if __name__ == '__main__':
