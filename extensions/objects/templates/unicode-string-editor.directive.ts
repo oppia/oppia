@@ -89,6 +89,6 @@ angular.module('oppia').directive('unicodeStringEditor', [
             ctrl.closeEditor();
           }
         }
-      ]
+      }]
     };
   }]);
