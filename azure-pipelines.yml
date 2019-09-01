@@ -1,0 +1,29 @@
+trigger:
+- 7496*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+strategy:
+  matrix:
+    Python27:
+      python.version: '2.7'
+
+steps:
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
+- script: |
+    source scripts/setup.sh || exit 1
+    source scripts/setup_gae.sh || exit 1
+    sudo pip install pyyaml
+    bash scripts/install_third_party.sh
+  displayName: 'Install dependencies'
+
+- script: |
+    python -m scripts.third_party_size_check
+    python -m scripts.pre_commit_linter --path=. --verbose
+  displayName: 'Run linter'
