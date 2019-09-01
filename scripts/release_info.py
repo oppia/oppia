@@ -54,6 +54,11 @@ FECONF_VAR_NAMES = ['CURRENT_STATE_SCHEMA_VERSION',
                     'CURRENT_COLLECTION_SCHEMA_VERSION']
 FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
+# PyGithub can fetch milestone only by using the milestone number. Milestones
+# are numbered sequentially as they are created and the number remains fixed.
+# The number for blocking_bugs milestone is 39 which is used to fetch this
+# milestone.
+BLOCKING_BUG_MILESTONE_NUMBER = 39
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
 
@@ -273,7 +278,8 @@ def get_blocking_bug_issue_count(repo):
     Returns:
         int: Number of unresolved blocking bugs.
     """
-    blocking_bugs_milestone = repo.get_milestone(number=39)
+    blocking_bugs_milestone = repo.get_milestone(
+        number=BLOCKING_BUG_MILESTONE_NUMBER)
     return blocking_bugs_milestone.open_issues
 
 
