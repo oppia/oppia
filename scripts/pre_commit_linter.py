@@ -57,6 +57,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import abc
 import argparse
 import ast
+import cProfile
 import collections
 import contextlib
 import fnmatch
@@ -626,7 +627,7 @@ _FILES = multiprocessing.Manager().dict()
 
 
 
-class FileCache(python_utils.OBJECT):
+class FileCacheClass(python_utils.OBJECT):
     """Provides thread-safe access to cached file content."""
 
     def __init__(self):
@@ -634,7 +635,6 @@ class FileCache(python_utils.OBJECT):
         # self._CACHE_LOCK_DICT = {}
         # self._CACHE_LOCK_DICT_LOCK = threading.Lock()
 
-    # @classmethod
     def read(self, filepath, mode='r'):
         """Returns the data read from the file in unicode form.
 
@@ -647,7 +647,6 @@ class FileCache(python_utils.OBJECT):
         """
         return self._get_data(filepath, mode)[0]
 
-    # @classmethod
     def readlines(self, filepath, mode='r'):
         """Returns the tuple containing data line by line as read from the
         file in unicode form.
@@ -662,24 +661,6 @@ class FileCache(python_utils.OBJECT):
         """
         return self._get_data(filepath, mode)[1]
 
-    # @classmethod
-    # def _get_cache_lock(self, key):
-    #     """Returns the cache lock corresponding to the given key.
-
-    #     Args:
-    #         key: str. The key corresponding to which the cache lock is to be
-    #             found.
-
-    #     Returns:
-    #         str. The cache lock corresponding to the given key.
-    #     """
-    #     if key not in self._CACHE_LOCK_DICT:
-    #         # with self._CACHE_LOCK_DICT_LOCK:
-    #             # if key not in self._CACHE_LOCK_DICT:
-    #         self._CACHE_LOCK_DICT[key] = threading.Lock()
-    #     return self._CACHE_LOCK_DICT[key]
-
-    # @classmethod
     def _get_data(self, filepath, mode):
         """Returns the collected data from the file corresponding to the given
         filepath.
@@ -695,8 +676,6 @@ class FileCache(python_utils.OBJECT):
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            # with self._get_cache_lock(key):
-                # if key not in self._CACHE_DATA_DICT:
             with python_utils.open_file(filepath, mode) as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
@@ -898,7 +877,7 @@ def _get_all_filepaths(input_path, input_filenames):
         if os.path.isfile(input_path):
             all_filepaths = [input_path]
         else:
-            excluded_glob_patterns = FileCache.readlines(eslintignore_path)
+            excluded_glob_patterns = FILE_CACHE.readlines(eslintignore_path)
             all_filepaths = _get_all_files_in_directory(
                 input_path, excluded_glob_patterns)
     elif input_filenames:
@@ -1475,7 +1454,7 @@ def _check_codeowner_file(verbose_mode_enabled):
         important_rules_in_critical_section = []
         file_patterns = []
         dir_patterns = []
-        for line_num, line in enumerate(FileCache.readlines(
+        for line_num, line in enumerate(FILE_CACHE.readlines(
                 CODEOWNER_FILEPATH)):
             stripped_line = line.strip()
             if '# Critical files' in line:
@@ -1589,7 +1568,6 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         """Constructs a LintChecksManager object.
 
         Args:
-            all_filepaths: list(str). The list of filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         # Set path for node.
@@ -1599,13 +1577,12 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
         os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
-        # self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
         self.process_manager = multiprocessing.Manager().dict()
 
     @abc.abstractproperty
     def all_filepaths(self):
-        """"""
+        """Returns all file paths."""
         pass
 
     def _run_multiple_checks(self, *checks):
@@ -1634,7 +1611,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         # This boolean list keeps track of the regex matches
         # found in the file.
         pattern_found_list = []
-        file_content = FileCache.readlines(filepath)
+        file_content = FILE_CACHE.readlines(filepath)
         for index, regexp_to_check in enumerate(
                 pattern_list):
             if (any([filepath.endswith(
@@ -1715,7 +1692,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         stdout = python_utils.string_io()
         with _redirect_stdout(stdout):
             for filepath in all_filepaths:
-                file_content = FileCache.read(filepath)
+                file_content = FILE_CACHE.read(filepath)
                 total_files_checked += 1
                 for pattern in BAD_PATTERNS:
                     if (pattern in file_content and
@@ -1801,28 +1778,30 @@ class JsTsLintChecksManager(LintChecksManager):
         """Constructs a JsTsLintChecksManager object.
 
         Args:
-            js_filepaths: list(str). The list of js filepaths to be linted.
-            ts_filepaths: list(str). The list of ts filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
         os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
-        super(JsTsLintChecksManager, self).__init__(verbose_mode_enabled=verbose_mode_enabled)
+        super(JsTsLintChecksManager, self).__init__(
+            verbose_mode_enabled=verbose_mode_enabled)
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
     @property
     def js_filepaths(self):
+        """Return all js filepaths."""
         return _FILES['.js']
 
     @property
     def ts_filepaths(self):
+        """Return all ts filepaths."""
         return _FILES['.ts']
 
     @property
     def all_filepaths(self):
+        """Return all filepaths."""
         return self.js_filepaths + self.ts_filepaths
 
     def _lint_all_files(self):
@@ -1901,7 +1880,7 @@ class JsTsLintChecksManager(LintChecksManager):
             if self.verbose_mode_enabled:
                 python_utils.PRINT(
                     'Validating and parsing %s file ...' % filepath)
-            file_content = FileCache.read(filepath)
+            file_content = FILE_CACHE.read(filepath)
 
             try:
                 # Use esprima to parse a JS or TS file.
@@ -1916,7 +1895,7 @@ class JsTsLintChecksManager(LintChecksManager):
                 try:
                     compiled_js_filepath = self._compile_ts_file(
                         filepath, compiled_js_dir)
-                    file_content = FileCache.read(compiled_js_filepath)
+                    file_content = FILE_CACHE.read(compiled_js_filepath)
                     parsed_js_and_ts_files[filepath] = esprima.parseScript(
                         file_content)
                 except Exception as e:
@@ -2318,7 +2297,7 @@ class JsTsLintChecksManager(LintChecksManager):
         stdout = python_utils.string_io()
         with _redirect_stdout(stdout):
             for filepath in files_to_check:
-                file_content = FileCache.read(filepath)
+                file_content = FILE_CACHE.read(filepath)
                 matched_patterns = re.findall(pattern_to_match, file_content)
                 for matched_pattern in matched_patterns:
                     stringfied_dependencies, function_parameters = (
@@ -2393,7 +2372,7 @@ class JsTsLintChecksManager(LintChecksManager):
                             compiled_js_filepath = self._compile_ts_file(
                                 corresponding_angularjs_filepath,
                                 compiled_js_dir)
-                            file_content = FileCache.read(
+                            file_content = FILE_CACHE.read(
                                 compiled_js_filepath).decode('utf-8')
 
                             parsed_script = esprima.parseScript(file_content)
@@ -2453,7 +2432,7 @@ class JsTsLintChecksManager(LintChecksManager):
                 # Check that the constants are declared only in a
                 # *.constants.ajs.ts file.
                 if not filepath.endswith('.constants.ajs.ts'):
-                    for line_num, line in enumerate(FileCache.readlines(
+                    for line_num, line in enumerate(FILE_CACHE.readlines(
                             filepath)):
                         if 'oppia.constant(' in line:
                             failed = True
@@ -2597,7 +2576,7 @@ class JsTsLintChecksManager(LintChecksManager):
             r'(?P<directive_name>[^\)]+)')
         with _redirect_stdout(_TARGET_STDOUT):
             for filepath in files_to_check:
-                file_content = FileCache.read(filepath)
+                file_content = FILE_CACHE.read(filepath)
                 total_files_checked += 1
                 matched_patterns = re.findall(pattern_to_match, file_content)
                 for matched_pattern in matched_patterns:
@@ -2638,24 +2617,13 @@ class OtherLintChecksManager(LintChecksManager):
     checks Python, CSS, and HTML files.
 
     Attributes:
-        all_filepaths: list(str). The list of filepaths to be linted.
-        py_filepaths: list(str). The list of python filepaths to be linted.
-        html_filepaths: list(str). The list of html filepaths to be linted.
-        css_filepaths: list(str). The list of css filepaths to be linted.
-        other_filepaths: list(str). The list of other filepaths to be linted.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     def __init__(
-            self,
-            verbose_mode_enabled=False):
+            self, verbose_mode_enabled=False):
         """Constructs a OtherLintChecksManager object.
 
         Args:
-            py_filepaths: list(str). The list of python filepaths to be linted.
-            html_filepaths: list(str). The list of html filepaths to be linted.
-            css_filepaths: list(str). The list of css filepaths to be linted.
-            other_filepaths: list(str). The list of other filepaths to be
-                linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         # self.py_filepaths = py_filepaths
@@ -2664,27 +2632,35 @@ class OtherLintChecksManager(LintChecksManager):
         # self.css_filepaths = css_filepaths
         # self.all_filepaths = (
         #     py_filepaths + html_filepaths + other_filepaths + css_filepaths)
-        super(OtherLintChecksManager, self).__init__(verbose_mode_enabled=verbose_mode_enabled)
+        super(OtherLintChecksManager, self).__init__(
+            verbose_mode_enabled=verbose_mode_enabled)
 
     @property
     def py_filepaths(self):
+        """Return all python filepaths."""
         return _FILES['.py']
 
     @property
     def html_filepaths(self):
+        """Return all html filepaths."""
         return _FILES['.html']
 
     @property
     def other_filepaths(self):
+        """Return other filepaths."""
         return _FILES['other']
 
     @property
     def css_filepaths(self):
+        """Return css filepaths."""
         return _FILES['.css']
 
     @property
     def all_filepaths(self):
-        return self.css_filepaths + self.html_filepaths + self.other_filepaths + self.py_filepaths
+        """Return all filepaths."""
+        return (
+            self.css_filepaths + self.html_filepaths +
+            self.other_filepaths + self.py_filepaths)
 
 
     def _lint_all_files(self):
@@ -2813,7 +2789,7 @@ class OtherLintChecksManager(LintChecksManager):
                 ast_file = ast.walk(
                     ast.parse(
                         python_utils.convert_to_bytes(
-                            FileCache.read(filepath))))
+                            FILE_CACHE.read(filepath))))
                 ast_divisions = [n for n in ast_file if isinstance(n, ast.Div)]
                 if ast_divisions:
                     python_utils.PRINT(
@@ -2924,7 +2900,7 @@ class OtherLintChecksManager(LintChecksManager):
         stdout = python_utils.string_io()
         with _redirect_stdout(stdout):
             for filepath in files_to_check:
-                file_content = FileCache.readlines(filepath)
+                file_content = FILE_CACHE.readlines(filepath)
                 file_length = len(file_content)
                 for line_num in python_utils.RANGE(file_length):
                     line = file_content[line_num].strip()
@@ -3018,7 +2994,7 @@ class OtherLintChecksManager(LintChecksManager):
                 ast_file = ast.walk(
                     ast.parse(
                         python_utils.convert_to_bytes(
-                            FileCache.read(filepath))))
+                            FILE_CACHE.read(filepath))))
                 func_defs = [n for n in ast_file if isinstance(
                     n, ast.FunctionDef)]
                 for func in func_defs:
@@ -3063,7 +3039,7 @@ class OtherLintChecksManager(LintChecksManager):
         stdout = python_utils.string_io()
         with _redirect_stdout(stdout):
             for filepath in files_to_check:
-                file_content = FileCache.readlines(filepath)
+                file_content = FILE_CACHE.readlines(filepath)
                 file_length = len(file_content)
                 for line_num in python_utils.RANGE(file_length):
                     line = file_content[line_num].strip()
@@ -3140,8 +3116,8 @@ class OtherLintChecksManager(LintChecksManager):
 
         with _redirect_stdout(_TARGET_STDOUT):
             for filepath in html_files_to_lint:
-                file_content = FileCache.read(filepath)
-                file_lines = FileCache.readlines(filepath)
+                file_content = FILE_CACHE.read(filepath)
+                file_lines = FILE_CACHE.readlines(filepath)
                 parser = CustomHTMLParser(filepath, file_lines, debug)
                 parser.feed(file_content)
 
@@ -3283,9 +3259,14 @@ def main():
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
+    threads = []
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
-    for file in all_filepaths:
-        FileCache.read(file)
+    for f in all_filepaths:
+        t = threading.Thread(target=FILE_CACHE.read, args=(f,))
+        t.start()
+        threads.append(t)
+    for t in threads:
+        t.join()
 
     if len(all_filepaths) == 0:
         python_utils.PRINT('---------------------------')
@@ -3304,9 +3285,11 @@ def main():
             all_filepaths_dict['other'].append(f)
     _FILES.update(all_filepaths_dict)
     code_owner_message = _check_codeowner_file(verbose_mode_enabled)
-    js_ts_lint_checks_manager = JsTsLintChecksManager(
+    # Pylint requires to provide paramter "this_bases" and "d", guess due to
+    # meta class.
+    js_ts_lint_checks_manager = JsTsLintChecksManager( # pylint: disable=no-value-for-parameter
         verbose_mode_enabled)
-    other_lint_checks_manager = OtherLintChecksManager(
+    other_lint_checks_manager = OtherLintChecksManager(   # pylint: disable=no-value-for-parameter
         verbose_mode_enabled)
     all_messages = code_owner_message
     all_messages += js_ts_lint_checks_manager.perform_all_lint_checks()
@@ -3327,13 +3310,8 @@ def main():
 
 
 if __name__ == '__main__':
-    import cProfile
-    # pr = cProfile.Profile()
-    # pr.enable()
-    name = multiprocessing.Manager().Namespace()
-    name.files = FileCache()
-    FileCache = name.files
+    PROFILE = cProfile
+    NAME_SPACE = multiprocessing.Manager().Namespace()
+    NAME_SPACE.files = FileCacheClass()
+    FILE_CACHE = NAME_SPACE.files
     main()
-    # cProfile.run('main()')
-    # pr.disable()
-    # pr.print_stats()
