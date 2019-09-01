@@ -171,9 +171,9 @@ angular.module('oppia').directive('storyEditor', [
                 $scope.setNodeToEdit(
                   $scope.story.getStoryContents().getInitialNodeId());
               }
-            } , function() {
+            }, function() {
 
-              });
+            });
           };
 
           $scope.NOTES_SCHEMA = {

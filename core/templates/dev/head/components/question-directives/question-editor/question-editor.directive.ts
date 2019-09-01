@@ -208,6 +208,8 @@ angular.module('oppia').directive('questionEditor', [
                     writtenTranslations.markAllTranslationsAsNeedingUpdate(
                       contentId);
                   });
+                }, function() {
+
                 });
               }
             };

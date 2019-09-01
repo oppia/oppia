@@ -120,7 +120,9 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
                     };
                   }
                 ]
-              }).result.then(function() {});
+              }).result.then(function() {}, function() {
+
+              });
             };
           }
         }]

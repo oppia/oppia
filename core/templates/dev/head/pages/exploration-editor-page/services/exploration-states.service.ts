@@ -460,8 +460,9 @@ angular.module('oppia').factory('ExplorationStatesService', [
           // state, they get updated in the view.
           $rootScope.$broadcast('refreshStateEditor');
         }, function() {
-
-              });
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
       },
       renameState: function(oldStateName, newStateName) {
         newStateName = $filter('normalizeWhitespace')(newStateName);

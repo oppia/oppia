@@ -285,7 +285,9 @@ angular.module('oppia').directive('stateHintsEditor', [
               if (index === $scope.activeHintIndex) {
                 $scope.activeHintIndex = null;
               }
-            });
+            }, function() {
+              
+              });
           };
 
           $scope.onSaveInlineHint = function() {

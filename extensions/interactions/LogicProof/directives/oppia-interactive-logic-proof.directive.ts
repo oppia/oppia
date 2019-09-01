@@ -305,7 +305,9 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
                     };
                   }
                 ]
-              }).result.then(function() {});
+              }).result.then(function() {},function() {
+
+              });
             };
           }
         }]

@@ -234,7 +234,10 @@ angular.module('oppia').directive('explorationEditorTab', [
                   ExplorationStatesService.saveWrittenTranslations(
                     stateName, writtenTranslations);
                 }
-              });
+              }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
             }
           };
 

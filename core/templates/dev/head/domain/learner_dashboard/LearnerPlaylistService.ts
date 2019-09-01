@@ -108,7 +108,7 @@ angular.module('oppia').factory('LearnerPlaylistService', [
         }
       }, function() {
 
-              });
+      });
     };
 
     return {

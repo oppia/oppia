@@ -82,7 +82,9 @@ angular.module('oppia').factory('StoryCreationService', [
                 $rootScope.loadingMessage = '';
               });
             }
-        });
+        }, function() {
+                $rootScope.loadingMessage = '';
+              });
       }
     };
   }

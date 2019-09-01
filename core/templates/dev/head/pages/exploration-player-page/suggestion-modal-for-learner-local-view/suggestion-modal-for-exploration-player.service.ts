@@ -119,8 +119,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
         }).result.catch(function() {
               });
       }, function() {
-
-              });
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
     };
 
     return {

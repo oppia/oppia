@@ -255,7 +255,10 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                   'Add metadata: ' + metadataList.join(', ') + '.');
                 CollectionEditorStateService.saveCollection(
                   commitMessage, _publishCollection);
-              });
+              }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
             } else {
               _publishCollection();
             }

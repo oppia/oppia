@@ -131,6 +131,8 @@ angular.module('oppia').factory('ExplorationCreationService', [
               });
             });
           }
+        }, function() {
+
         });
       }
     };

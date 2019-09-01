@@ -391,6 +391,8 @@ angular.module('oppia').directive('questionsList', [
                         });
                         modalInstance.result.then(function() {
                           $uibModalInstance.dismiss('cancel');
+                        }, function() {
+
                         });
                       } else {
                         $uibModalInstance.dismiss('cancel');

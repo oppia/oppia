@@ -449,7 +449,9 @@ angular.module('oppia').directive('stateResponses', [
               if (result.reopen) {
                 $scope.openAddAnswerGroupModal();
               }
-            });
+            }, function() {
+              
+              });
           };
 
           // When the page is scrolled so that the top of the page is above the
