@@ -91,8 +91,8 @@ def run_performance_test(test_name, xvfb_prefix):
 
 def main(args=None):
     """Main function to run the performance tests."""
-    setup.main()
-    setup_gae.main()
+    setup.main(args=[])
+    setup_gae.main(args=[])
 
     parsed_args = _PARSER.parse_args(args=args)
     install_third_party_libs.maybe_install_dependencies(

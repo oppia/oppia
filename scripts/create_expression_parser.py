@@ -16,6 +16,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
 import fileinput
 import os
 import re
@@ -26,10 +27,17 @@ import python_utils
 from . import common
 from . import setup
 
+_PARSER = argparse.ArgumentParser(description="""
+    Run this script from the oppia root folder:
+        python -m scripts.create_expression_parser
 
-def main():
+    The root folder MUST be named 'oppia'.""")
+
+
+def main(args=None):
     """Produces the expression parser."""
-    setup.main()
+    unused_parsed_args = _PARSER.parse_args(args=args)
+    setup.main(args=[])
 
     expression_parser_definition = os.path.join(
         'core', 'templates', 'dev', 'head', 'expressions', 'parser.pegjs')

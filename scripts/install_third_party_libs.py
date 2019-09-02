@@ -56,7 +56,9 @@ from . import setup_gae  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
-_PARSER = argparse.ArgumentParser()
+_PARSER = argparse.ArgumentParser(description="""
+    Installation script for Oppia third-party libraries.""")
+
 _PARSER.add_argument(
     '--nojsrepl',
     help='optional; if specified, skips installation of skulpt.',
@@ -226,8 +228,8 @@ def ensure_pip_library_is_installed(package, version, path):
 
 def main(args=None):
     """Install third-party libraries for Oppia."""
-    setup.main()
-    setup_gae.main()
+    setup.main(args=[])
+    setup_gae.main(args=[])
     pip_dependencies = [
         ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
         ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
@@ -246,7 +248,7 @@ def main(args=None):
 
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
-    install_third_party.main()
+    install_third_party.main(args=[])
 
     # Install third-party node modules needed for the build process.
     subprocess.call([common.NPM_PATH, 'install', '--only=dev'])

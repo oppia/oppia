@@ -18,6 +18,7 @@ scripts. Python execution environent set up for all scripts.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
 import os
 import shutil
 import sys
@@ -26,6 +27,12 @@ import tarfile
 import python_utils
 
 from . import common
+
+_PARSER = argparse.ArgumentParser(description="""
+    This file should not be invoked directly, but called from other Python
+    scripts.
+
+    Python execution environent set up for all scripts.""")
 
 
 def delete_directory_tree(directory_path):
@@ -78,8 +85,9 @@ def test_python_version():
         raise Exception
 
 
-def main():
+def main(args=None):
     """Runs the script to setup Oppia."""
+    unused_parsed_args = _PARSER.parse_args(args=args)
     test_python_version()
 
     # The second option allows this script to also be run from deployment

@@ -72,8 +72,8 @@ def cleanup():
 
 def main(args=None):
     """Starts up a development server running Oppia."""
-    setup.main()
-    setup_gae.main()
+    setup.main(args=[])
+    setup_gae.main(args=[])
     install_third_party_libs.main(args=[])
 
     # Runs cleanup function on exit.

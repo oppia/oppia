@@ -18,6 +18,7 @@ scripts. Python execution environment setup for scripts that require GAE.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
 import os
 import sys
 import tarfile
@@ -27,9 +28,16 @@ import python_utils
 
 from . import common
 
+_PARSER = argparse.ArgumentParser(description="""
+    This file should not be invoked directly, but called from other Python
+    scripts.
 
-def main():
+    Python execution environment setup for scripts that require GAE.""")
+
+
+def main(args=None):
     """Runs the script to setup GAE."""
+    unused_parsed_args = _PARSER.parse_args(args=args)
     coverage_home = os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')
 
     # Note that if the following line is changed so that it uses webob_1_1_1,

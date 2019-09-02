@@ -103,10 +103,10 @@ def cleanup():
 
 def main(args=None):
     """Runs the end to end tests."""
-    setup.main()
-    setup_gae.main()
+    setup.main(args=[])
+    setup_gae.main(args=[])
     if os.environ.get('TRAVIS'):
-        install_chrome_on_travis.main()
+        install_chrome_on_travis.main(args=[])
 
     parsed_args = _PARSER.parse_args(args=args)
     install_third_party_libs.maybe_install_dependencies(

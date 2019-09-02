@@ -36,22 +36,22 @@ from . import setup_gae
 
 def main():
     """Run all the tests."""
-    setup.main()
-    setup_gae.main()
+    setup.main(args=[])
+    setup_gae.main(args=[])
 
     # Run frontend unit tests.
     python_utils.PRINT('Running frontend unit tests')
-    run_frontend_tests.main()
+    run_frontend_tests.main(args=[])
     python_utils.PRINT('Frontend tests passed.')
 
     # Run backend tests.
     python_utils.PRINT('Running backend tests')
-    run_backend_tests.main()
+    run_backend_tests.main(args=[])
     python_utils.PRINT('Backend tests passed.')
 
     # Run end-to-end tests.
     python_utils.PRINT('Running end-to-end tests')
-    run_e2e_tests.main()
+    run_e2e_tests.main(args=[])
 
     python_utils.PRINT(
         'SUCCESS    All frontend, backend and end-to-end tests passed!')

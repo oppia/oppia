@@ -14,23 +14,30 @@
 
 """This script should only be ran by Travis to install and provide a constant
 version of Chrome.
-CHROME_SOURCE_URL is an environment variable set in Oppia's Travis repo
-settings. It can be found under 'Environment Variables' header here:
-https://travis-ci.org/oppia/oppia/settings.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
 import os
 import subprocess
 
 import python_utils
 
+_PARSER = argparse.ArgumentParser(description="""
+    This script should only be ran by Travis to install and provide a constant
+    version of Chrome.""")
 
-def main():
+
+def main(args=None):
     """Installs and provides a constant version of Chrome."""
+    unused_parsed_args = _PARSER.parse_args(args=args)
     home_directory = os.environ.get('HOME')
     oppia_dir = os.getcwd()
+
+    # CHROME_SOURCE_URL is an environment variable set in Oppia's Travis repo
+    # settings. It can be found under 'Environment Variables' header here:
+    # https://travis-ci.org/oppia/oppia/settings.
     chrome_source_url = os.environ.get('CHROME_SOURCE_URL')
     travis_chrome_path = os.path.join(
         home_directory, '.cache/TravisChrome/',
