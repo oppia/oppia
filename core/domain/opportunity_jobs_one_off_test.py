@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 import ast
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_jobs_one_off
 from core.domain import opportunity_services
@@ -29,10 +30,13 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
-(opportunity_models,) = models.Registry.import_models(
-    [models.NAMES.opportunity])
+
+memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
+(opportunity_models, story_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.opportunity, models.NAMES.story, models.NAMES.exploration])
 
 
 class ExplorationOpportunitySummaryModelRegenerationJobTest(
@@ -46,24 +50,42 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.topic_id = 'topic'
-        story_id = 'story'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            '0', title='title', category='category')
+        self.topic_id_1 = 'topic1'
+        self.topic_id_2 = 'topic2'
 
-        exp_services.save_new_exploration(self.owner_id, exploration)
+        story_id_1 = 'story1'
+        story_id_2 = 'story2'
 
-        topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.topic_id, name='topic')
-        topic_services.save_new_topic(self.owner_id, topic)
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(2)]
 
-        story = story_domain.Story.create_default_story(
-            story_id, title='A story', corresponding_topic_id=self.topic_id)
-        story_services.save_new_story(self.owner_id, story)
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        topic_1 = topic_domain.Topic.create_default_topic(
+            topic_id=self.topic_id_1, name='topic1')
+        topic_services.save_new_topic(self.owner_id, topic_1)
+
+        topic_2 = topic_domain.Topic.create_default_topic(
+            topic_id=self.topic_id_2, name='topic2')
+        topic_services.save_new_topic(self.owner_id, topic_2)
+
+        story_1 = story_domain.Story.create_default_story(
+            story_id_1, title='A story', corresponding_topic_id=self.topic_id_1)
+        story_2 = story_domain.Story.create_default_story(
+            story_id_2, title='A story', corresponding_topic_id=self.topic_id_2)
+
+        story_services.save_new_story(self.owner_id, story_1)
+        story_services.save_new_story(self.owner_id, story_2)
         topic_services.add_canonical_story(
-            self.owner_id, self.topic_id, story_id)
+            self.owner_id, self.topic_id_1, story_id_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.topic_id_2, story_id_2)
         story_services.update_story(
-            self.owner_id, story_id, [story_domain.StoryChange({
+            self.owner_id, story_id_1, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
                 'node_id': 'node_1',
                 'title': 'Node1',
@@ -73,6 +95,18 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
                 'node_id': 'node_1',
                 'old_value': None,
                 'new_value': '0'
+            })], 'Changes.')
+        story_services.update_story(
+            self.owner_id, story_id_2, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '1'
             })], 'Changes.')
 
 
@@ -84,7 +118,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         all_opportunity_models = list(
             opportunity_models.ExplorationOpportunitySummaryModel.get_all())
 
-        self.assertEqual(len(all_opportunity_models), 1)
+        self.assertEqual(len(all_opportunity_models), 2)
         old_opportunities, _, more = (
             opportunity_services.get_translation_opportunities('hi', None))
 
@@ -98,12 +132,12 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
 
-        expected = [['SUCCESS', 1]]
+        expected = [['SUCCESS', 2]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
         all_opportunity_models = list(
             opportunity_models.ExplorationOpportunitySummaryModel.get_all())
-        self.assertEqual(len(all_opportunity_models), 1)
+        self.assertEqual(len(all_opportunity_models), 2)
 
         new_opportunities, _, more = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -119,7 +153,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         all_opportunity_models = list(
             opportunity_models.ExplorationOpportunitySummaryModel.get_all())
 
-        self.assertEqual(len(all_opportunity_models), 1)
+        self.assertEqual(len(all_opportunity_models), 2)
 
         job_id = exp_opp_sumary_model_regen_job_class.create_new()
         exp_opp_sumary_model_regen_job_class.enqueue(job_id)
@@ -131,7 +165,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
 
-        expected = [['SUCCESS', 1]]
+        expected = [['SUCCESS', 2]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_regeneration_job_generates_expected_number_of_models(self):
@@ -142,7 +176,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         all_opportunity_models = list(
             opportunity_models.ExplorationOpportunitySummaryModel.get_all())
 
-        self.assertEqual(len(all_opportunity_models), 1)
+        self.assertEqual(len(all_opportunity_models), 2)
 
         job_id = exp_opp_sumary_model_regen_job_class.create_new()
         exp_opp_sumary_model_regen_job_class.enqueue(job_id)
@@ -154,12 +188,12 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
 
-        expected = [['SUCCESS', 1]]
+        expected = [['SUCCESS', 2]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
         all_opportunity_models = list(
             opportunity_models.ExplorationOpportunitySummaryModel.get_all())
-        self.assertEqual(len(all_opportunity_models), 1)
+        self.assertEqual(len(all_opportunity_models), 2)
 
     def test_regeneration_job_creates_new_models(self):
         exp_opp_sumary_model_regen_job_class = (
@@ -169,7 +203,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         all_opportunity_models = list(
             opportunity_models.ExplorationOpportunitySummaryModel.get_all())
 
-        self.assertEqual(len(all_opportunity_models), 1)
+        self.assertEqual(len(all_opportunity_models), 2)
 
         old_creation_time = all_opportunity_models[0].created_on
 
@@ -182,23 +216,134 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         self.process_and_flush_pending_tasks()
 
         output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
-        expected = [['SUCCESS', 1]]
+        expected = [['SUCCESS', 2]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        new_creation_time = all_opportunity_models[0].created_on
+
+        self.assertLess(old_creation_time, new_creation_time)
+
+    def test_regeneration_job_with_no_story_model_for_all_topics(self):
+        story_models.StoryModel.get('story1').delete(
+            self.owner_id, 'Delete story', force_deletion=True)
+        story_models.StoryModel.get('story2').delete(
+            self.owner_id, 'Delete story', force_deletion=True)
+        exp_opp_sumary_model_regen_job_class = (
+            opportunity_jobs_one_off
+            .ExplorationOpportunitySummaryModelRegenerationJob)
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        job_id = exp_opp_sumary_model_regen_job_class.create_new()
+        exp_opp_sumary_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
+        expected = [['FAILED (2)', [{
+            'missing_exp_with_ids': [],
+            'missing_story_with_ids': ['story1'],
+            'topic_id': 'topic1'
+        }, {
+            'missing_exp_with_ids': [],
+            'missing_story_with_ids': ['story2'],
+            'topic_id': 'topic2'
+        }]]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+
+    def test_regeneration_job_with_no_story_model_for_some_topics(self):
+        story_models.StoryModel.get('story1').delete(
+            self.owner_id, 'Delete story', force_deletion=True)
+
+        exp_opp_sumary_model_regen_job_class = (
+            opportunity_jobs_one_off
+            .ExplorationOpportunitySummaryModelRegenerationJob)
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        job_id = exp_opp_sumary_model_regen_job_class.create_new()
+        exp_opp_sumary_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
+        expected = [['FAILED (1)', [{
+            'missing_exp_with_ids': [],
+            'missing_story_with_ids': ['story1'],
+            'topic_id': 'topic1'
+        }]], ['SUCCESS', 1]]
+
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
         all_opportunity_models = list(
             opportunity_models.ExplorationOpportunitySummaryModel.get_all())
         self.assertEqual(len(all_opportunity_models), 1)
 
-        new_creation_time = all_opportunity_models[0].created_on
+    def test_regeneration_job_with_no_exp_model_for_some_topics(self):
+        exp_models.ExplorationModel.get('0').delete(
+            self.owner_id, 'Delete exploration', force_deletion=True)
+        exploration_memcache_key = exp_fetchers.get_exploration_memcache_key(
+            '0')
+        memcache_services.delete(exploration_memcache_key)
 
-        self.assertTrue(old_creation_time < new_creation_time)
+        exp_opp_sumary_model_regen_job_class = (
+            opportunity_jobs_one_off
+            .ExplorationOpportunitySummaryModelRegenerationJob)
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        job_id = exp_opp_sumary_model_regen_job_class.create_new()
+        exp_opp_sumary_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = exp_opp_sumary_model_regen_job_class.get_output(job_id)
+        expected = [['FAILED (1)', [{
+            'missing_exp_with_ids': ['0'],
+            'missing_story_with_ids': [],
+            'topic_id': 'topic1'
+        }]], ['SUCCESS', 1]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 1)
 
     def test_regeneration_job_for_deleted_topic_returns_empty_list_output(self):
         exp_opp_sumary_model_regen_job_class = (
             opportunity_jobs_one_off
             .ExplorationOpportunitySummaryModelRegenerationJob)
 
-        topic_services.delete_topic(self.owner_id, self.topic_id)
+        topic_services.delete_topic(self.owner_id, self.topic_id_1)
+        topic_services.delete_topic(self.owner_id, self.topic_id_2)
 
         job_id = exp_opp_sumary_model_regen_job_class.create_new()
         exp_opp_sumary_model_regen_job_class.enqueue(job_id)

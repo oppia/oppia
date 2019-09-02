@@ -65,7 +65,7 @@ def get_exploration_opportunity_summary_from_model(model):
         model.assigned_voice_artist_in_language_codes)
 
 
-def save_multi_exploration_opportunity_summary(
+def _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list):
     """Stores multiple ExplorationOpportunitySummary into datastore as a
     ExplorationOpportunitySummaryModel.
@@ -100,7 +100,7 @@ def save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_model_list)
 
 
-def create_exploration_opportunity_summary(topic, story, exploration):
+def _create_exploration_opportunity_summary(topic, story, exploration):
     """Create an ExplorationOpportunitySummary object with the given topic,
     story and exploration object.
 
@@ -171,9 +171,9 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     exploration_opportunity_summary_list = []
     for exploration in explorations.values():
         exploration_opportunity_summary_list.append(
-            create_exploration_opportunity_summary(
+            _create_exploration_opportunity_summary(
                 topic, story, exploration))
-    save_multi_exploration_opportunity_summary(
+    _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
 
 
@@ -216,7 +216,7 @@ def update_opportunity_with_updated_exploration(exp_id):
 
     exploration_opportunity_summary.validate()
 
-    save_multi_exploration_opportunity_summary(
+    _save_multi_exploration_opportunity_summary(
         [exploration_opportunity_summary])
 
 
@@ -247,7 +247,7 @@ def update_exploration_opportunities_with_story_changes(story, exp_ids):
         exploration_opportunity_summary_list.append(
             exploration_opportunity_summary)
 
-    save_multi_exploration_opportunity_summary(
+    _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
 
 
@@ -402,8 +402,65 @@ def update_opportunities_with_new_topic_name(topic_id, topic_name):
         exploration_opportunity_summary_list.append(
             exploration_opportunity_summary)
 
-    save_multi_exploration_opportunity_summary(
+    _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
+
+
+def regenerate_opportunities_related_to_topic(
+        topic_id, delete_existing_opportunities=False):
+    """Regenerates opportunity models which belongs to a given topic.
+
+    Args:
+        topic_id: str. The ID of the topic.
+        delete_existing_opportunities: bool. Whether to delete all the existing
+            opportunities related to the given topic.
+
+    Returns:
+        dict. A dict representing the result of the regeneration process.
+    """
+    if delete_existing_opportunities:
+        exp_opportunity_models = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
+                topic_id))
+        opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
+            exp_opportunity_models)
+
+    topic = topic_fetchers.get_topic_by_id(topic_id)
+    story_ids = topic.get_canonical_story_ids()
+    stories = story_fetchers.get_stories_by_ids(story_ids)
+    exp_ids = []
+    non_existing_story_ids = []
+
+    for index, story in enumerate(stories):
+        if story is None:
+            non_existing_story_ids.append(story_ids[index])
+        else:
+            exp_ids += story.story_contents.get_all_linked_exp_ids()
+
+    exp_ids_to_exp = exp_fetchers.get_multiple_explorations_by_id(
+        exp_ids, strict=False)
+    non_existing_exp_ids = set(exp_ids) - set(exp_ids_to_exp.keys())
+
+    if len(non_existing_exp_ids) > 0 or len(non_existing_story_ids) > 0:
+        return {
+            'status': 'FAILED',
+            'missing_exp_with_ids': list(non_existing_exp_ids),
+            'missing_story_with_ids': non_existing_story_ids
+        }
+
+    exploration_opportunity_summary_list = []
+    for story in stories:
+        for exp_id in story.story_contents.get_all_linked_exp_ids():
+            exploration_opportunity_summary_list.append(
+                _create_exploration_opportunity_summary(
+                    topic, story, exp_ids_to_exp[exp_id]))
+
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list)
+    return {
+        'status': 'SUCCESS',
+        'opportunities_count': len(exploration_opportunity_summary_list)
+    }
 
 
 def delete_all_exploration_opportunity_summary_models():
