@@ -1180,6 +1180,8 @@ def _lint_css_files(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         linter_stdout, linter_stderr = proc.communicate()
+        linter_stdout = linter_stdout.decode(encoding='utf-8')
+        linter_stderr = linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
             python_utils.PRINT('LINTER FAILED')
             python_utils.PRINT(linter_stderr)
@@ -1238,6 +1240,8 @@ def _lint_js_and_ts_files(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         linter_stdout, linter_stderr = proc.communicate()
+        linter_stdout = linter_stdout.decode(encoding='utf-8')
+        linter_stderr = linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
             python_utils.PRINT('LINTER FAILED')
             python_utils.PRINT(linter_stderr)
@@ -1833,11 +1837,10 @@ class JsTsLintChecksManager(LintChecksManager):
             js_and_ts_messages.append(js_and_ts_stdout.get())
 
         python_utils.PRINT('')
-        # The output from the stdout are read as bytes, hence the b' prefix.
-        python_utils.PRINT(b'\n'.join(js_and_ts_messages))
+        python_utils.PRINT('\n'.join(js_and_ts_messages))
 
         with _redirect_stdout(_TARGET_STDOUT):
-            python_utils.PRINT(b'\n'.join(js_and_ts_messages))
+            python_utils.PRINT('\n'.join(js_and_ts_messages))
             python_utils.PRINT('')
 
         return js_and_ts_messages
@@ -2706,7 +2709,7 @@ class OtherLintChecksManager(LintChecksManager):
                 summary_messages.append(result_queue.get())
 
         with _redirect_stdout(_TARGET_STDOUT):
-            python_utils.PRINT(b'\n'.join(summary_messages))
+            python_utils.PRINT('\n'.join(summary_messages))
             python_utils.PRINT('')
 
         return summary_messages
@@ -3097,6 +3100,7 @@ class OtherLintChecksManager(LintChecksManager):
                     proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
                 linter_stdout, _ = proc.communicate()
+                linter_stdout = linter_stdout.decode(encoding='utf-8')
                 # This line splits the output of the linter and extracts digits
                 # from it. The digits are stored in a list. The second last
                 # digit in the list represents the number of errors in the file.
