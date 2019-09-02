@@ -95,7 +95,7 @@ EXCLUDED_PHRASES = [
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*')
 
@@ -103,14 +103,6 @@ GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
     'extensions/interactions/LogicProof/static/js/generatedParser.ts',
     'core/templates/dev/head/expressions/ExpressionParserService.js')
-
-CONFIG_FILE_PATHS = (
-    'core/tests/.browserstack.env.example',
-    'core/tests/protractor.conf.js',
-    'core/tests/karma.conf.ts',
-    'core/templates/dev/head/mathjaxConfig.ts',
-    'assets/constants.ts',
-    'assets/rich_text_components_definitions.ts')
 
 BAD_PATTERNS = {
     '__author__': {
@@ -508,21 +500,6 @@ REQUIRED_STRINGS_CONSTANTS = {
 }
 
 ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
-
-EXCLUDED_PHRASES = [
-    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
-
-EXCLUDED_PATHS = (
-    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/'
-    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*')
-
-GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
