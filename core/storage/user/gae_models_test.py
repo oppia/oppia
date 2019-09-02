@@ -501,15 +501,6 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.DELETE)
 
 
-class UserSubscribersModelTests(test_utils.GenericTestBase):
-    """Tests for UserSubscribersModel."""
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserSubscriptionsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
-
 class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
