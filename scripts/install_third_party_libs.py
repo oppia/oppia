@@ -196,7 +196,7 @@ def maybe_install_dependencies(
     """Parse additional command line arguments."""
     if skip_installing_third_party_libs is False:
         # Install third party dependencies.
-        main()
+        main(argv=[])
         # Ensure that generated JS and CSS files are in place before running the
         # tests.
         python_utils.PRINT('Running build task with concatenation only')
