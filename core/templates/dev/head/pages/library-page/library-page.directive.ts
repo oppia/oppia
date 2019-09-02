@@ -120,7 +120,6 @@ angular.module('oppia').directive('libraryPage', [
             } else {
               $http.get('/libraryindexhandler').then(function(response) {
                 ctrl.libraryGroups = response.data.activity_summary_dicts_by_category;
-                console.log(JSON.stringify(response.data.activity_summary_dicts_by_category));
                 UserService.getUserInfoAsync().then(function(userInfo) {
                   ctrl.activitiesOwned = {explorations: {}, collections: {}};
                   if (userInfo.isLoggedIn()) {

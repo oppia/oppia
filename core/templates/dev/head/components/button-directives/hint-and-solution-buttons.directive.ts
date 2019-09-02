@@ -90,7 +90,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.activeHintIndex = index;
             var promise = (
               HintAndSolutionModalService.displayHintModal(index));
-            promise.result.catch(function() {
+            promise.result.then(null, function() {
               ctrl.activeHintIndex = null;
             });
           };
@@ -119,7 +119,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
                 PlayerPositionService.getCurrentStateName());
             }
             var promise = HintAndSolutionModalService.displaySolutionModal();
-            promise.result.catch(function() {
+            promise.result.then(null, function() {
               ctrl.solutionModalIsActive = false;
             });
           };
