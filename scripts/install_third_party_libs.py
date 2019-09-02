@@ -32,13 +32,13 @@ if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
         os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
 # Download and install future.
-if not os.path.exists(os.path.join('third_party', 'future==0.17.1')):
+if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
     subprocess.call([
         'pip', 'install', 'future==0.17.1', '--target',
         os.path.join('third_party', 'future-0.17.1')])
 
 # Download and install psutil.
-if not os.path.exists(os.path.join(TOOLS_DIR, 'psutil==5.6.3')):
+if not os.path.exists(os.path.join(TOOLS_DIR, 'psutil-5.6.3')):
     subprocess.call([
         'pip', 'install', 'psutil==5.6.3', '--target',
         os.path.join(TOOLS_DIR, 'psutil-5.6.3')])
