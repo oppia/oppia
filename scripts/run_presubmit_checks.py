@@ -98,7 +98,7 @@ def main(argv=None):
 
     # Run backend tests.
     python_utils.PRINT('Running backend tests')
-    run_backend_tests.main()
+    run_backend_tests.main(argv=[])
     python_utils.PRINT('Backend tests passed.')
 
 
