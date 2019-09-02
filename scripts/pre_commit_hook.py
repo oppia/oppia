@@ -115,14 +115,10 @@ def main():
         # quietly when the status is non-zero.
         python_utils.PRINT('-----------COMMIT ABORTED-----------')
         python_utils.PRINT(
-            'Oppia utilize Yarn to manage node packages. Please use Yarn '
-            'to add, update, or delete packages. For more information on how '
-            'to use yarn, see https://yarnpkg.com/en/docs/usage.'
-        )
-        python_utils.PRINT(
-            'Please delete package-lock.json, revert the changes in '
-            'package.json, and use yarn to add, update, or delete the '
-            'packages.'
+            'Oppia utilize Yarn to manage node packages. Please delete '
+            'package-lock.json, revert the changes in package.json, and use '
+            'yarn to add, update, or delete the packages. For more information '
+            'on how to use yarn, see https://yarnpkg.com/en/docs/usage.'
         )
         sys.exit(1)
     sys.exit(0)
