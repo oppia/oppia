@@ -30,5 +30,5 @@ steps:
 
 - script: |
     python -m scripts.third_party_size_check
-    python -m scripts.pre_commit_linter --path=. --verbose
+    time python -m scripts.pre_commit_linter --path=. --verbose
   displayName: 'Run linter'
