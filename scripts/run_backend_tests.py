@@ -335,12 +335,6 @@ def main(args=None):
 
     build.main(args=[])
 
-    # Compile typescript files.
-    python_utils.PRINT('Compiling typescript...')
-    subprocess.call([
-        os.path.join(common.NODE_MODULES_PATH, 'typescript', 'bin', 'tsc'),
-        '--project', '.'])
-
     python_utils.PRINT('Compiling webpack...')
     subprocess.call([
         os.path.join(common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
