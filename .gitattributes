@@ -29,8 +29,6 @@ AUTHORS      text eol=lf
 CHANGELOG    text eol=lf
 CONTRIBUTORS text eol=lf
 LICENSE      text eol=lf
-Vagrantfile  text eol=lf
-
 
 # Binary files
 # ============
