@@ -85,6 +85,8 @@ for arg in "$@"; do
   fi
 done
 
+$PYTHON_CMD scripts/build.py
+
 echo "Compiling webpack..."
 $NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts
 
