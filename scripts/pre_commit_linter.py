@@ -1841,23 +1841,7 @@ class JsTsLintChecksManager(LintChecksManager):
         for process in linting_processes:
             process.daemon = False
             process.start()
-
-        for process in linting_processes:
-            process.join()
-
-        js_and_ts_messages = []
-        while not js_and_ts_stdout.empty():
-            js_and_ts_messages.append(js_and_ts_stdout.get())
-
-        python_utils.PRINT('')
-        # The output from the stdout are read as bytes, hence the b' prefix.
-        python_utils.PRINT(b'\n'.join(js_and_ts_messages))
-
-        with _redirect_stdout(_TARGET_STDOUT):
-            python_utils.PRINT(b'\n'.join(js_and_ts_messages))
-            python_utils.PRINT('')
-
-        return js_and_ts_messages
+        return linting_processes, js_and_ts_stdout
 
     def _validate_and_parse_js_and_ts_files(self):
         """This function validates JavaScript and Typescript files and
@@ -2532,7 +2516,7 @@ class JsTsLintChecksManager(LintChecksManager):
             all_messages: str. All the messages returned by the lint checks.
         """
 
-        linter_messages = self._lint_all_files()
+        process, stdout = self._lint_all_files()
 
         common_messages = super(
             JsTsLintChecksManager, self).perform_all_lint_checks()
@@ -2550,10 +2534,10 @@ class JsTsLintChecksManager(LintChecksManager):
         controller_dependency_messages = self.process_manager['line_breaks']
 
         all_messages = (
-            linter_messages + common_messages + extra_js_files_messages +
+            common_messages + extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages)
-        return all_messages
+        return all_messages, process, stdout
 
     def _check_html_directive_name(self):
         """This function checks that all HTML directives end
@@ -2748,25 +2732,11 @@ class OtherLintChecksManager(LintChecksManager):
         for process in linting_processes:
             process.daemon = False
             process.start()
-
-        for process in linting_processes:
-            process.join()
-
-        summary_messages = []
-
         result_queues = [
             css_in_html_result, css_result, py_result,
             py_result_for_python3_compatibility]
 
-        for result_queue in result_queues:
-            while not result_queue.empty():
-                summary_messages.append(result_queue.get())
-
-        with _redirect_stdout(_TARGET_STDOUT):
-            python_utils.PRINT(b'\n'.join(summary_messages))
-            python_utils.PRINT('')
-
-        return summary_messages
+        return linting_processes, result_queues
 
     def _check_division_operator(self):
         """This function ensures that the division operator('/') is not used and
@@ -3213,7 +3183,7 @@ class OtherLintChecksManager(LintChecksManager):
             all_messages: str. All the messages returned by the lint checks.
         """
 
-        linter_messages = self._lint_all_files()
+        process, queues = self._lint_all_files()
         common_messages = super(
             OtherLintChecksManager, self).perform_all_lint_checks()
         # division_operator_messages = self._check_division_operator()
@@ -3233,11 +3203,11 @@ class OtherLintChecksManager(LintChecksManager):
         division_operator_messages = self.process_manager['division']
 
         all_messages = (
-            linter_messages + import_order_messages + common_messages +
+            import_order_messages + common_messages +
             docstring_messages + comment_messages +
             html_tag_and_attribute_messages + html_linter_messages +
             division_operator_messages)
-        return all_messages
+        return all_messages, process, queues
 
 
 def _print_complete_summary_of_errors():
@@ -3292,8 +3262,42 @@ def main():
     other_lint_checks_manager = OtherLintChecksManager(   # pylint: disable=no-value-for-parameter
         verbose_mode_enabled)
     all_messages = code_owner_message
-    all_messages += js_ts_lint_checks_manager.perform_all_lint_checks()
-    all_messages += other_lint_checks_manager.perform_all_lint_checks()
+    js_message, js_process, stdout = js_ts_lint_checks_manager.perform_all_lint_checks()   # pylint: disable=line-too-long
+    other_messages, other_process, queues = other_lint_checks_manager.perform_all_lint_checks()  # pylint: disable=line-too-long
+    all_messages += js_message + other_messages
+
+
+    for process in other_process:
+        process.join()
+
+    summary_messages = []
+
+    result_queues = queues
+
+    for result_queue in result_queues:
+        while not result_queue.empty():
+            summary_messages.append(result_queue.get())
+
+    with _redirect_stdout(_TARGET_STDOUT):
+        python_utils.PRINT(b'\n'.join(summary_messages))
+        python_utils.PRINT('')
+
+    for process in js_process:
+        process.join()
+
+    js_and_ts_stdout = stdout
+    js_and_ts_messages = []
+    while not js_and_ts_stdout.empty():
+        js_and_ts_messages.append(js_and_ts_stdout.get())
+
+    python_utils.PRINT('')
+    # The output from the stdout are read as bytes, hence the b' prefix.
+    python_utils.PRINT(b'\n'.join(js_and_ts_messages))
+
+    with _redirect_stdout(_TARGET_STDOUT):
+        python_utils.PRINT(b'\n'.join(js_and_ts_messages))
+        python_utils.PRINT('')
+    all_messages += js_and_ts_messages + summary_messages
 
     _print_complete_summary_of_errors()
 
@@ -3312,6 +3316,7 @@ def main():
 if __name__ == '__main__':
     PROFILE = cProfile
     NAME_SPACE = multiprocessing.Manager().Namespace()
+    PROCESSES = multiprocessing.Manager().dict()
     NAME_SPACE.files = FileCacheClass()
     FILE_CACHE = NAME_SPACE.files
     main()
