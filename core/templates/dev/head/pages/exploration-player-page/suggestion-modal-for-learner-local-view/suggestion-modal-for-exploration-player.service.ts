@@ -99,7 +99,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
         };
         var url = '/suggestionhandler/';
 
-        $http.post(url, data).catch(function(res) {
+        $http.post(url, data).then(null, function(res) {
           AlertsService.addWarning(res);
         });
         $uibModal.open({
@@ -116,8 +116,10 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
               };
             }
           ]
-        }).result.catch(function() {
-              });
+        }).result.then(function() {}, function() {
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
       }, function() {
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.

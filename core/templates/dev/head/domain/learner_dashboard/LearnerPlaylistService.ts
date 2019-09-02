@@ -108,7 +108,7 @@ angular.module('oppia').factory('LearnerPlaylistService', [
         }
       }, function() {
         // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.          
+        // No further action is needed.
       });
     };
 

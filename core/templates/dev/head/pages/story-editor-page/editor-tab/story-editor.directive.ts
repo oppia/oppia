@@ -121,9 +121,10 @@ angular.module('oppia').directive('storyEditor', [
 
             modalInstance.result.then(function(title) {
               StoryUpdateService.deleteStoryNode($scope.story, nodeId);
-            } , function() {
-
-              });
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.createNode = function() {

@@ -90,9 +90,9 @@ angular.module('oppia').directive('topicEditorNavbar', [
                     successToast, 1000);
                 });
               }, function() {
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
               return;
             }
             var redirectToDashboard = false;

@@ -136,9 +136,7 @@ angular.module('oppia').factory('RteHelperService', [
         });
 
         modalDialog.result.then(onSubmitCallback, onDismissCallback);
-        
-        modalDialog.result.catch(function() {
-              });
+
         // 'finally' is a JS keyword. If it is just used in its ".finally" form,
         // the minification process throws an error.
         modalDialog.result['finally'](refocusFn);

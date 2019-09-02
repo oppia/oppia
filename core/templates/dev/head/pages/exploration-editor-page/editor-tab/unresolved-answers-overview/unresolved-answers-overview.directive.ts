@@ -254,18 +254,16 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                   $scope.loadingDotsAreShown = true;
                   fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
                 }]
-            }).result.catch(function() {
-               // This callback is triggered when the Cancel button is clicked.
-               // No further action is needed.
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
-
           };
-
+          
           $scope.getUnresolvedStateStats = function() {
             return StateTopAnswersStatsService.getUnresolvedStateStats(
               StateEditorService.getActiveStateName());
           };
-        }
-      ]
+        }]
     };
   }]);

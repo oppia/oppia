@@ -392,9 +392,9 @@ angular.module('oppia').directive('audioTranslationBar', [
                   };
                 }
               ]
-            }).result.catch(function() {
-               // This callback is triggered when the Cancel button is clicked.
-               // No further action is needed.
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
