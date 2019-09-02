@@ -144,6 +144,15 @@ HASH_BLOCK_SIZE = 2**20
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
 
+_PARSER = argparse.ArgumentParser()
+_PARSER.add_argument(
+    '--prod_env', action='store_true', default=False, dest='prod_mode')
+_PARSER.add_argument(
+    '--minify_third_party_libs_only', action='store_true', default=False,
+    dest='minify_third_party_libs_only')
+_PARSER.add_argument(
+    '--enable_watcher', action='store_true', default=False)
+
 
 def generate_app_yaml():
     """Generate app.yaml from app_dev.yaml."""
@@ -1357,15 +1366,7 @@ def main(argv=None):
     built and stored. Depending on the options passed to the script, might also
     minify third-party libraries and/or generate a build directory.
     """
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--prod_env', action='store_true', default=False, dest='prod_mode')
-    parser.add_argument(
-        '--minify_third_party_libs_only', action='store_true', default=False,
-        dest='minify_third_party_libs_only')
-    parser.add_argument(
-        '--enable_watcher', action='store_true', default=False)
-    options = parser.parse_args(args=argv)
+    options = _PARSER.parse_args(args=argv)
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)

@@ -83,20 +83,23 @@ _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 _PARSER = argparse.ArgumentParser(description="""
     Run this script from the oppia root folder:
 
-        python -m scripts.run_backend_tests""")
+        python -m scripts.run_backend_tests
 
+    IMPORTANT: Only one of --test_path and --test_target should be specified""")
+
+_EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
+_EXCLUSIVE_GROUP.add_argument(
+    '--test_target',
+    help='optional dotted module name of the test(s) to run',
+    type=python_utils.UNICODE)
+_EXCLUSIVE_GROUP.add_argument(
+    '--test_path',
+    help='optional subdirectory path containing the test(s) to run',
+    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
     action='store_true')
-_PARSER.add_argument(
-    '--test_target',
-    help='optional dotted module name of the test(s) to run',
-    type=python_utils.UNICODE)
-_PARSER.add_argument(
-    '--test_path',
-    help='optional subdirectory path containing the test(s) to run',
-    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--exclude_load_tests',
     help='optional; if specified, exclude load tests from being run',
