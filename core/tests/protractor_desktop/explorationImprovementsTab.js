@@ -62,17 +62,14 @@ describe('Exploration Improvements', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
 
     users.createUser(
-      'creatorUser@ExplorationImprovements.com',
-      'creatorExplorationImprovements');
-    users.createUser(
       'learnerUser@ExplorationImprovements.com',
       'learnerExplorationImprovements');
     users.createUser(
       'suggesterUser@ExplorationImprovements.com',
       'suggesterExplorationImprovements');
     users.createAndLoginAdminUser(
-      'superUser@ExplorationImprovements.com',
-      'superUserExplorationImprovements');
+      'creatorUser@ExplorationImprovements.com',
+      'creatorExplorationImprovements');
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
       'Boolean', (elem) => elem.setValue(true));
@@ -90,7 +87,7 @@ describe('Exploration Improvements', function() {
 
     beforeAll(function() {
       // Creator creates and publishes an exploration.
-      users.login('superUser@ExplorationImprovements.com', true);
+      users.login('creatorUser@ExplorationImprovements.com', true);
 
       workflow.createExplorationAsAdmin();
       explorationEditorMainTab.exitTutorial();
