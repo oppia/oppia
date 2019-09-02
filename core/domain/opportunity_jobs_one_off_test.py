@@ -110,7 +110,6 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
                 'new_value': '1'
             })], 'Changes.')
 
-
     def test_regeneration_job_returns_the_initial_opportunity(self):
         exp_opp_summary_model_regen_job_class = (
             opportunity_jobs_one_off
