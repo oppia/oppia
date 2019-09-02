@@ -185,8 +185,8 @@ if [ ! -d "$YARN_PATH" ]; then
   YARN_VERSION=v1.17.3
   YARN_FILE_NAME=yarn-$YARN_VERSION.tar.gz
 
-  curl -o $YARN_FILE_NAME https://github.com/yarnpkg/yarn/releases/download/$YARN_VERSION/$YARN_FILE_NAME
-  tar zvxf $YARN_FILE_NAME --directory $TOOLS_DIR
+  curl -o $YARN_FILE_NAME -L https://github.com/yarnpkg/yarn/releases/download/$YARN_VERSION/$YARN_FILE_NAME
+  tar xvf $YARN_FILE_NAME --directory $TOOLS_DIR
   rm $YARN_FILE_NAME
 fi
 
