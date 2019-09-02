@@ -84,7 +84,13 @@ describe('Exploration translation and voiceover tab', function() {
       'Run tests using same exploration.');
     explorationEditorPage.saveChanges('Done!');
     workflow.addExplorationVoiceArtist('userVoiceArtist');
-    users.logout();
+    users.createAndLoginAdminUser('superUser@translationTab.com', 'superUser');
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean',
+      function(elem) {
+        elem.setValue(false);
+      });
   });
 
   it('should walkthrough translation tutorial when user clicks next',

@@ -54,6 +54,14 @@ describe('Full exploration editor', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+
+    users.createAndLoginAdminUser('superUser@stateEditor.com', 'superUser');
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean',
+      function(elem) {
+        elem.setValue(false);
+      });
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
