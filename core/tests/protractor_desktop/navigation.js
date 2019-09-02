@@ -220,5 +220,8 @@ describe('Static Pages Tour', function() {
     browser.getCurrentUrl().then(function(url) {
       expect(url).toBe('https://oppiatestserver.appspot.com/splash');
     });
+  }, function() {
+    // Promise is returned by getCurrentUrl which is handled here.
+    // No further action is needed.
   });
 });

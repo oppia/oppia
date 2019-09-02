@@ -72,6 +72,9 @@ describe('Issues visualization', function() {
     var expId;
     browser.getCurrentUrl().then(function(url) {
       expId = url.split('/')[4].slice(0, -1);
+    }, function() {
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
 
     explorationEditorPage.navigateToSettingsTab();

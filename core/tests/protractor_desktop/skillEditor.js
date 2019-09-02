@@ -50,6 +50,9 @@ describe('Skill Editor functionality', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 1');
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
+    }, function() {
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
   });
 
