@@ -314,9 +314,11 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     def put(self, update_last_updated_time=True):
         """Writes the given thread instance to the datastore.
+
         Args:
             update_last_updated_time: bool. Whether to update the
                 last_updated_field of the thread.
+
         Returns:
             GeneralFeedbackEmailReplyToIdModel. The thread entity.
         """
