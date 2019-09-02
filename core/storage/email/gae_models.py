@@ -16,6 +16,7 @@
 
 """Models for the content of sent emails."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -95,7 +96,7 @@ class SentEmailModel(base_models.BaseModel):
             new_id = '%s.%s' % (
                 id_prefix,
                 utils.convert_to_hash(
-                    python_utils.STR(utils.get_random_int(
+                    python_utils.UNICODE(utils.get_random_int(
                         base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):

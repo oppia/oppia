@@ -87,6 +87,9 @@ done
 
 $PYTHON_CMD scripts/build.py
 
+echo "Compiling webpack..."
+$NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts
+
 $PYTHON_CMD scripts/backend_tests.py $@
 
 for arg in "$@"; do

@@ -14,6 +14,7 @@
 
 """Controllers for the admin view."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 import random
@@ -219,7 +220,7 @@ class AdminHandler(base.BaseHandler):
                         topic_id, delete_existing_opportunities=True))
             self.render_json(result)
         except Exception as e:
-            self.render_json({'error': python_utils.STR(e)})
+            self.render_json({'error': python_utils.UNICODE(e)})
             raise
 
     def _reload_exploration(self, exploration_id):
