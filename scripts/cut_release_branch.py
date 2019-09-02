@@ -23,6 +23,7 @@ Usage: Run this script from your oppia root folder:
 where x.y.z is the new version of Oppia, e.g. 2.5.3.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import json

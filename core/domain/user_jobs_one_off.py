@@ -14,6 +14,7 @@
 
 """Jobs for queries personalized to individual users."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
@@ -388,7 +389,8 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                 yield (
                     'Successfully cleaned up UserSubscriptionsModel %s and '
                     'removed explorations %s' % (
-                        model_instance.id, python_utils.STR(exp_ids_removed)),
+                        model_instance.id,
+                        ', '.join(exp_ids_removed)),
                     1)
 
     @staticmethod
