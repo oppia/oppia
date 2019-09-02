@@ -58,7 +58,7 @@ def main(argv=None):
 
     # Run Javascript and Python linters.
     python_utils.PRINT('Linting files since the last commit')
-    pre_commit_linter.main()
+    pre_commit_linter.main(argv=[])
     python_utils.PRINT('Linting passed.')
     python_utils.PRINT('')
 
@@ -72,7 +72,7 @@ def main(argv=None):
         '-l'])
 
     # Set the origin branch to develop if it's not specified.
-    parsed_args, _ = _PARSER.parse_known_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=argv)
     if parsed_args.branch:
         branch = parsed_args.branch
     elif matched_branch_num == '1':
@@ -103,4 +103,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv)
+    main(argv=sys.argv[1:])

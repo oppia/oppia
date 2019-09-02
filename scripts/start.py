@@ -80,7 +80,7 @@ def main(argv=None):
     atexit.register(cleanup)
 
     # Install third party dependencies.
-    install_third_party_libs.main()
+    install_third_party_libs.main(argv=[])
 
     python_utils.PRINT('Oppia setup complete!')
 
@@ -92,7 +92,7 @@ def main(argv=None):
             'running at port %s.'
             % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
 
-    parsed_args, _ = _PARSER.parse_known_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=argv)
     clear_datastore_arg = (
         '' if parsed_args.save_datastore else '--clear_datastore=true')
     enable_console_arg = (
@@ -206,4 +206,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv)
+    main(argv=sys.argv[1:])

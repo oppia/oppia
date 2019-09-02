@@ -1365,9 +1365,7 @@ def main(argv=None):
         dest='minify_third_party_libs_only')
     parser.add_argument(
         '--enable_watcher', action='store_true', default=False)
-    # We use parse_known_args() to ignore the extra arguments which maybe used
-    # while calling this method from other Python scripts.
-    options, _ = parser.parse_known_args(args=argv)
+    options = parser.parse_args(args=argv)
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
@@ -1396,4 +1394,4 @@ def main(argv=None):
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when build.py is used as a script.
 if __name__ == '__main__':  # pragma: no cover
-    main(argv=sys.argv)
+    main(argv=sys.argv[1:])

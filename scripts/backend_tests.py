@@ -311,7 +311,7 @@ def main(argv=None):
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    parsed_args, _ = _PARSER.parse_known_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=argv)
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
                         'should be specified.')
@@ -452,4 +452,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv)
+    main(argv=sys.argv[1:])

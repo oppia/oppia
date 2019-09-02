@@ -95,7 +95,7 @@ def main(argv=None):
     setup.main()
     setup_gae.main()
 
-    parsed_args, _ = _PARSER.parse_known_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=argv)
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
@@ -165,4 +165,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv)
+    main(argv=sys.argv[1:])

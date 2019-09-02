@@ -92,10 +92,7 @@ def install_skulpt(argv):
     warning saying its dist command will not work properly without GitPython,
     but it does actually work due to the patches.
     """
-
-    # We use parse_known_args() to ignore the extra arguments which maybe used
-    # while calling this method from other Python scripts.
-    parsed_args, _ = _PARSER.parse_known_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=argv)
     no_skulpt = parsed_args.nojsrepl or parsed_args.noskulpt
 
     python_utils.PRINT('Checking whether Skulpt is installed in third_party')
@@ -178,7 +175,7 @@ def maybe_install_dependencies(
         # Ensure that generated JS and CSS files are in place before running the
         # tests.
         python_utils.PRINT('Running build task with concatenation only')
-        build.main()
+        build.main(argv=[])
 
     if run_minified_tests is True:
         python_utils.PRINT(
@@ -247,4 +244,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv)
+    main(argv=sys.argv[1:])

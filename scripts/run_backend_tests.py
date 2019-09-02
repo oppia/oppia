@@ -47,12 +47,12 @@ def main(argv=None):
     setup_gae.main()
 
     # Install third party dependencies.
-    install_third_party_libs.main()
+    install_third_party_libs.main(argv=[])
 
     coverage_home = os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')
     coverage_path = os.path.join(coverage_home, 'coverage')
 
-    parsed_args, _ = _PARSER.parse_known_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=argv)
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(
             'Checking whether coverage is installed in %s'
@@ -64,7 +64,7 @@ def main(argv=None):
                 'coverage', '4.5.4',
                 os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'))
 
-    build.main()
+    build.main(argv=[])
 
     # Compile typescript files.
     python_utils.PRINT('Compiling typescript...')
@@ -94,4 +94,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv)
+    main(argv=sys.argv[1:])
