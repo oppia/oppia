@@ -1180,8 +1180,8 @@ def _lint_css_files(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
-        linter_stdout = linter_stdout.decode(encoding='utf-8')
-        linter_stderr = linter_stderr.decode(encoding='utf-8')
+        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
             python_utils.PRINT('LINTER FAILED')
             python_utils.PRINT(linter_stderr)
@@ -1240,8 +1240,8 @@ def _lint_js_and_ts_files(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
-        linter_stdout = linter_stdout.decode(encoding='utf-8')
-        linter_stderr = linter_stderr.decode(encoding='utf-8')
+        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
             python_utils.PRINT('LINTER FAILED')
             python_utils.PRINT(linter_stderr)
@@ -3100,7 +3100,7 @@ class OtherLintChecksManager(LintChecksManager):
                     proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
                 encoded_linter_stdout, _ = proc.communicate()
-                linter_stdout = linter_stdout.decode(encoding='utf-8')
+                linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
                 # This line splits the output of the linter and extracts digits
                 # from it. The digits are stored in a list. The second last
                 # digit in the list represents the number of errors in the file.
