@@ -36,37 +36,36 @@ angular.module('oppia').directive('promoBar', [
         function() {
           var ctrl = this;
           this.$onInit = function() {
-          var isPromoDismissed = function() {
-            if (!$window.hasOwnProperty('sessionStorage')) {
-              return false;
-            }
-            return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
-          };
-          var setPromoDismissed = function(promoIsDismissed) {
-            if (!$window.hasOwnProperty('sessionStorage')) {
-              return;
-            }
-            $window.sessionStorage.promoIsDismissed = angular.toJson(
-              promoIsDismissed);
-          };
+            var isPromoDismissed = function() {
+              if (!$window.hasOwnProperty('sessionStorage')) {
+                return false;
+              }
+              return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
+            };
+            var setPromoDismissed = function(promoIsDismissed) {
+              if (!$window.hasOwnProperty('sessionStorage')) {
+                return;
+              }
+              $window.sessionStorage.promoIsDismissed = angular.toJson(
+                promoIsDismissed);
+            };
 
-          PromoBarService.getPromoBarData().then(function(promoBarObject) {
-            ctrl.promoBarIsEnabled = promoBarObject.promoBarEnabled;
-            ctrl.promoBarMessage = promoBarObject.promoBarMessage;
-          });
+            PromoBarService.getPromoBarData().then(function(promoBarObject) {
+              ctrl.promoBarIsEnabled = promoBarObject.promoBarEnabled;
+              ctrl.promoBarMessage = promoBarObject.promoBarMessage;
+            });
 
-          // TODO(bhenning): Utilize cookies for tracking when a promo is
-          // dismissed. Cookies allow for a longer-lived memory of whether the
-          // promo is dismissed.
-          ctrl.promoIsVisible = !isPromoDismissed();
+            // TODO(bhenning): Utilize cookies for tracking when a promo is
+            // dismissed. Cookies allow for a longer-lived memory of whether the
+            // promo is dismissed.
+            ctrl.promoIsVisible = !isPromoDismissed();
 
-          ctrl.dismissPromo = function() {
-            ctrl.promoIsVisible = false;
-            setPromoDismissed(true);
-          };
-        }
-      }
-      ]
+            ctrl.dismissPromo = function() {
+              ctrl.promoIsVisible = false;
+              setPromoDismissed(true);
+            };
+          }
+      }]
     };
   }
 ]);

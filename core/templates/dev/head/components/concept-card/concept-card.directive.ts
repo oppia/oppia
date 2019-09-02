@@ -40,54 +40,53 @@ angular.module('oppia').directive('conceptCard', [
             ConceptCardBackendApiService, ConceptCardObjectFactory) {
           var ctrl = this;
           this.$onInit = function() {
-          ctrl.conceptCards = [];
-          var currentConceptCard = null;
-          var numberOfWorkedExamplesShown = 0;
-          ctrl.loadingMessage = 'Loading';
+            ctrl.conceptCards = [];
+            var currentConceptCard = null;
+            var numberOfWorkedExamplesShown = 0;
+            ctrl.loadingMessage = 'Loading';
 
-          ConceptCardBackendApiService.loadConceptCards(
-            ctrl.getSkillIds()
-          ).then(function(conceptCardBackendDicts) {
-            conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
-              ctrl.conceptCards.push(
-                ConceptCardObjectFactory.createFromBackendDict(
-                  conceptCardBackendDict));
+            ConceptCardBackendApiService.loadConceptCards(
+              ctrl.getSkillIds()
+            ).then(function(conceptCardBackendDicts) {
+              conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
+                ctrl.conceptCards.push(
+                  ConceptCardObjectFactory.createFromBackendDict(
+                    conceptCardBackendDict));
+              });
+              ctrl.loadingMessage = '';
+              currentConceptCard = ctrl.conceptCards[ctrl.index];
             });
-            ctrl.loadingMessage = '';
-            currentConceptCard = ctrl.conceptCards[ctrl.index];
-          });
 
-          ctrl.getSkillExplanation = function() {
-            return $filter('formatRtePreview')(
-              currentConceptCard.getExplanation().getHtml());
-          };
+            ctrl.getSkillExplanation = function() {
+              return $filter('formatRtePreview')(
+                currentConceptCard.getExplanation().getHtml());
+            };
 
-          ctrl.isLastWorkedExample = function() {
-            return numberOfWorkedExamplesShown ===
-              currentConceptCard.getWorkedExamples().length;
-          };
+            ctrl.isLastWorkedExample = function() {
+              return numberOfWorkedExamplesShown ===
+                currentConceptCard.getWorkedExamples().length;
+            };
 
-          ctrl.showMoreWorkedExamples = function() {
-            numberOfWorkedExamplesShown++;
-          };
+            ctrl.showMoreWorkedExamples = function() {
+              numberOfWorkedExamplesShown++;
+            };
 
-          ctrl.showWorkedExamples = function() {
-            var workedExamplesShown = [];
-            for (var i = 0; i < numberOfWorkedExamplesShown; i++) {
-              workedExamplesShown.push(
-                $filter('formatRtePreview')(
-                  currentConceptCard.getWorkedExamples()[i].getHtml())
-              );
-            }
-            return workedExamplesShown;
-          };
+            ctrl.showWorkedExamples = function() {
+              var workedExamplesShown = [];
+              for (var i = 0; i < numberOfWorkedExamplesShown; i++) {
+                workedExamplesShown.push(
+                  $filter('formatRtePreview')(
+                    currentConceptCard.getWorkedExamples()[i].getHtml())
+                );
+              }
+              return workedExamplesShown;
+            };
 
-          $scope.$watch('$ctrl.index', function(newIndex) {
-            currentConceptCard = ctrl.conceptCards[newIndex];
-            numberOfWorkedExamplesShown = 0;
-          });
-        }
-      }
-      ]
+            $scope.$watch('$ctrl.index', function(newIndex) {
+              currentConceptCard = ctrl.conceptCards[newIndex];
+              numberOfWorkedExamplesShown = 0;
+            });
+          }
+      }]
     };
   }]);

@@ -24,7 +24,7 @@ describe('Rating display directive', function() {
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(
-    angular.mock.inject(function($compile, $rootScope, $templateCache) {
+    angular.mock.inject(function($compile, $rootScope, $rootElement, $document, $templateCache) {
       var templateHtml = $templateCache.get(
         '/components/ratings/rating-display/rating-display.directive.html');
       $compile(templateHtml)($rootScope);
@@ -34,6 +34,8 @@ describe('Rating display directive', function() {
         '<rating-display rating-value="5" is-editable="true">' +
         '</rating-display>');
       var compiledElem = $compile(elem)(outerScope);
+      $rootElement.append(elem);
+      $document.append($rootElement);
       outerScope.$digest();
       ctrlScope = compiledElem[0].getControllerScope();
     }));

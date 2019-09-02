@@ -54,49 +54,49 @@ angular.module('oppia').directive('rubricsEditor', [
             RubricObjectFactory, EVENT_SKILL_REINITIALIZED) {
           var ctrl = this;
           this.$onInit = function() {
-          ctrl.activeRubricIndex = 0;
-          ctrl.explanationEditorIsOpen = false;
-          var explanationMemento = null;
-
-          ctrl.isEditable = function() {
-            return true;
-          };
-
-          ctrl.setActiveDifficultyIndex = function(index) {
-            ctrl.activeRubricIndex = index;
-          };
-
-          ctrl.openExplanationEditor = function() {
-            explanationMemento = angular.copy(
-              ctrl.getRubrics()[ctrl.activeRubricIndex].getExplanation());
-            ctrl.editableExplanation = explanationMemento;
-            ctrl.explanationEditorIsOpen = true;
-          };
-
-          ctrl.EXPLANATION_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
-
-          ctrl.saveExplanation = function() {
+            ctrl.activeRubricIndex = 0;
             ctrl.explanationEditorIsOpen = false;
-            var explanationHasChanged = (
-              ctrl.editableExplanation !==
-              ctrl.getRubrics()[ctrl.activeRubricIndex].getExplanation());
+            var explanationMemento = null;
 
-            if (explanationHasChanged) {
-              ctrl.onSaveRubric(
-                ctrl.getRubrics()[ctrl.activeRubricIndex].getDifficulty(),
-                ctrl.editableExplanation);
-              explanationMemento = ctrl.editableExplanation;
-            }
-          };
+            ctrl.isEditable = function() {
+              return true;
+            };
 
-          ctrl.cancelEditExplanation = function() {
-            ctrl.editableExplanation = explanationMemento;
-            ctrl.explanationEditorIsOpen = false;
-          };
-        }
+            ctrl.setActiveDifficultyIndex = function(index) {
+              ctrl.activeRubricIndex = index;
+            };
+
+            ctrl.openExplanationEditor = function() {
+              explanationMemento = angular.copy(
+                ctrl.getRubrics()[ctrl.activeRubricIndex].getExplanation());
+              ctrl.editableExplanation = explanationMemento;
+              ctrl.explanationEditorIsOpen = true;
+            };
+
+            ctrl.EXPLANATION_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {}
+            };
+
+            ctrl.saveExplanation = function() {
+              ctrl.explanationEditorIsOpen = false;
+              var explanationHasChanged = (
+                ctrl.editableExplanation !==
+                ctrl.getRubrics()[ctrl.activeRubricIndex].getExplanation());
+
+              if (explanationHasChanged) {
+                ctrl.onSaveRubric(
+                  ctrl.getRubrics()[ctrl.activeRubricIndex].getDifficulty(),
+                  ctrl.editableExplanation);
+                explanationMemento = ctrl.editableExplanation;
+              }
+            };
+
+            ctrl.cancelEditExplanation = function() {
+              ctrl.editableExplanation = explanationMemento;
+              ctrl.explanationEditorIsOpen = false;
+            };
+          }
       }]
     };
   }
