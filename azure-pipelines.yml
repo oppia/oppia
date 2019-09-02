@@ -1,34 +1,34 @@
 trigger:
 - 7496*
+jobs:
+  - job: Lint test
+    timeoutInMinutes: 360
+    pool:
+      vmImage: 'ubuntu-latest'
 
-pool:
-  vmImage: 'ubuntu-latest'
+    strategy:
+      matrix:
+        Python27:
+          python.version: '2.7'
 
-strategy:
-  matrix:
-    Python27:
-      python.version: '2.7'
+    steps:
+      - checkout: self
+        path: oppia
 
-steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '$(python.version)'
+        displayName: 'Use Python $(python.version)'
 
+      - bash: python -m pip install pyyaml
 
-- checkout: self
-  path: oppia
+      - bash: scripts/setup.sh
+        displayName: 'Install dependencies'
 
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+      - bash: scripts/install_third_party.sh
+        displayName: 'Install dependencies'
 
-- bash: python -m pip install pyyaml
-
-- bash: scripts/setup.sh
-  displayName: 'Install dependencies'
-
-- bash: scripts/install_third_party.sh
-  displayName: 'Install dependencies'
-
-- script: |
-    python -m scripts.third_party_size_check
-    time python -m scripts.pre_commit_linter --path=. --verbose
-  displayName: 'Run linter'
+      - script: |
+          python -m scripts.third_party_size_check
+          time python -m scripts.pre_commit_linter --path=.
+        displayName: 'Run linter'
