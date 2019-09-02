@@ -76,7 +76,6 @@ describe('Exploration Improvements', function() {
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
       'Boolean', (elem) => elem.setValue(true));
-    users.logout();
   });
 
   // TODO(brianrodri): describe('Feedback Improvements').
@@ -91,7 +90,7 @@ describe('Exploration Improvements', function() {
 
     beforeAll(function() {
       // Creator creates and publishes an exploration.
-      users.login('superUserUser@ExplorationImprovements.com', true);
+      users.login('superUser@ExplorationImprovements.com', true);
 
       workflow.createExplorationAsAdmin();
       explorationEditorMainTab.exitTutorial();
