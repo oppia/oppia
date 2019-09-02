@@ -388,14 +388,14 @@ def main():
     if not os.path.exists(feconf.RELEASE_SUMMARY_FILEPATH):
         raise Exception(
             'Release summary file %s is missing. Please run the '
-            'release_info.py script and re-run this script.')
+            'release_info.py script and re-run this script.' % (
+                feconf.RELEASE_SUMMARY_FILEPATH))
 
     parsed_args = _PARSER.parse_args()
     if parsed_args.github_username is None:
-        python_utils.PRINT(
+        raise Exception(
             'No GitHub username provided. Please re-run the '
             'script specifying a username using --username=<Your username>')
-        return
     github_username = parsed_args.github_username
 
     personal_access_token = getpass.getpass(
@@ -404,11 +404,10 @@ def main():
             'You can create one at https://github.com/settings/tokens: '))
 
     if personal_access_token is None:
-        python_utils.PRINT(
+        raise Exception(
             'No personal access token provided, please set up a personal '
             'access token at https://github.com/settings/tokens and re-run '
             'the script')
-        return
     g = github.Github(personal_access_token)
     repo_fork = g.get_repo('%s/oppia' % github_username)
 

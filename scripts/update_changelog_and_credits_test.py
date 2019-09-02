@@ -18,12 +18,24 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import getpass
 import os
+import sys
 
 from core.tests import test_utils
+import feconf
 import python_utils
 
+from . import common
 from . import update_changelog_and_credits
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
@@ -46,18 +58,52 @@ MOCK_UPDATED_ABOUT_PAGE_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'updated-about-page.directive.html')
 
 
+def read_from_file(filepath):
+    """Reads the lines from a file.
+
+    Args:
+        filepath: str. The path of the file to read.
+
+    Returns:
+        list(str). The list of lines in the file.
+    """
+    with python_utils.open_file(filepath, 'r') as f:
+        return f.readlines()
+
+
+def write_to_file(filepath, filelines):
+    """Writes a list of lines to a file.
+
+    Args:
+        filepath: str. The path of the file to write to.
+        filelines: list(str). The lines to write to the file.
+    """
+    with python_utils.open_file(filepath, 'w') as f:
+        for line in filelines:
+            f.write(line)
+
+
 class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
     """Test the methods for automatic update of changelog and credits."""
     def setUp(self):
         super(ChangelogAndCreditsUpdateTests, self).setUp()
-        with python_utils.open_file(MOCK_RELEASE_SUMMARY_FILEPATH, 'r') as f:
-            self.release_summary_lines = f.readlines()
+        def mock_get_current_branch_name():
+            return 'release-1.2.3'
+        self.mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes='', completed='')
+        self.branch_name_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_current_branch_name)
+        self.release_summary_swap = self.swap(
+            feconf, 'RELEASE_SUMMARY_FILEPATH', MOCK_RELEASE_SUMMARY_FILEPATH)
+        self.args_swap = self.swap(
+            sys, 'argv', [
+                'update_changelog_and_credits.py',
+                '--github_username=test'])
 
     def test_update_changelog(self):
-        with python_utils.open_file(MOCK_CHANGELOG_FILEPATH, 'r') as f:
-            changelog_filelines = f.readlines()
-        with python_utils.open_file(MOCK_UPDATED_CHANGELOG_FILEPATH, 'r') as f:
-            expected_filelines = f.readlines()
+        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
+        changelog_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
+        expected_filelines = read_from_file(MOCK_UPDATED_CHANGELOG_FILEPATH)
         changelog_swap = self.swap(
             update_changelog_and_credits, 'CHANGELOG_FILEPATH',
             MOCK_CHANGELOG_FILEPATH)
@@ -66,68 +112,52 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             '29 Aug 2019')
         with changelog_swap, date_swap:
             update_changelog_and_credits.update_changelog(
-                self.release_summary_lines, '1.2.3')
-        with python_utils.open_file(MOCK_CHANGELOG_FILEPATH, 'r') as f:
-            actual_filelines = f.readlines()
-        with python_utils.open_file(MOCK_CHANGELOG_FILEPATH, 'w') as f:
-            for line in changelog_filelines:
-                f.write(line)
+                release_summary_lines, '1.2.3')
+        actual_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
+        write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
         self.assertEqual(actual_filelines, expected_filelines)
 
     def test_update_authors(self):
-        with python_utils.open_file(MOCK_AUTHORS_FILEPATH, 'r') as f:
-            authors_filelines = f.readlines()
-        with python_utils.open_file(MOCK_UPDATED_AUTHORS_FILEPATH, 'r') as f:
-            expected_filelines = f.readlines()
+        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
+        authors_filelines = read_from_file(MOCK_AUTHORS_FILEPATH)
+        expected_filelines = read_from_file(MOCK_UPDATED_AUTHORS_FILEPATH)
         with self.swap(
             update_changelog_and_credits, 'AUTHORS_FILEPATH',
             MOCK_AUTHORS_FILEPATH):
             update_changelog_and_credits.update_authors(
-                self.release_summary_lines)
-        with python_utils.open_file(MOCK_AUTHORS_FILEPATH, 'r') as f:
-            actual_filelines = f.readlines()
-        with python_utils.open_file(MOCK_AUTHORS_FILEPATH, 'w') as f:
-            for line in authors_filelines:
-                f.write(line)
+                release_summary_lines)
+        actual_filelines = read_from_file(MOCK_AUTHORS_FILEPATH)
+        write_to_file(MOCK_AUTHORS_FILEPATH, authors_filelines)
         self.assertEqual(actual_filelines, expected_filelines)
 
     def test_update_contributors(self):
-        with python_utils.open_file(MOCK_CONTRIBUTORS_FILEPATH, 'r') as f:
-            contributors_filelines = f.readlines()
-        with python_utils.open_file(
-            MOCK_UPDATED_CONTRIBUTORS_FILEPATH, 'r') as f:
-            expected_filelines = f.readlines()
+        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
+        contributors_filelines = read_from_file(MOCK_CONTRIBUTORS_FILEPATH)
+        expected_filelines = read_from_file(MOCK_UPDATED_CONTRIBUTORS_FILEPATH)
         with self.swap(
             update_changelog_and_credits, 'CONTRIBUTORS_FILEPATH',
             MOCK_CONTRIBUTORS_FILEPATH):
             update_changelog_and_credits.update_contributors(
-                self.release_summary_lines)
-        with python_utils.open_file(MOCK_CONTRIBUTORS_FILEPATH, 'r') as f:
-            actual_filelines = f.readlines()
-        with python_utils.open_file(MOCK_CONTRIBUTORS_FILEPATH, 'w') as f:
-            for line in contributors_filelines:
-                f.write(line)
+                release_summary_lines)
+        actual_filelines = read_from_file(MOCK_CONTRIBUTORS_FILEPATH)
+        write_to_file(MOCK_CONTRIBUTORS_FILEPATH, contributors_filelines)
         self.assertEqual(actual_filelines, expected_filelines)
 
     def test_update_developer_names(self):
-        with python_utils.open_file(MOCK_ABOUT_PAGE_FILEPATH, 'r') as f:
-            about_page_filelines = f.readlines()
-        with python_utils.open_file(
-            MOCK_UPDATED_ABOUT_PAGE_FILEPATH, 'r') as f:
-            expected_filelines = f.readlines()
+        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
+        about_page_filelines = read_from_file(MOCK_ABOUT_PAGE_FILEPATH)
+        expected_filelines = read_from_file(MOCK_UPDATED_ABOUT_PAGE_FILEPATH)
         with self.swap(
             update_changelog_and_credits, 'ABOUT_PAGE_FILEPATH',
             MOCK_ABOUT_PAGE_FILEPATH):
             update_changelog_and_credits.update_developer_names(
-                self.release_summary_lines)
-        with python_utils.open_file(MOCK_ABOUT_PAGE_FILEPATH, 'r') as f:
-            actual_filelines = f.readlines()
-        with python_utils.open_file(MOCK_ABOUT_PAGE_FILEPATH, 'w') as f:
-            for line in about_page_filelines:
-                f.write(line)
+                release_summary_lines)
+        actual_filelines = read_from_file(MOCK_ABOUT_PAGE_FILEPATH)
+        write_to_file(MOCK_ABOUT_PAGE_FILEPATH, about_page_filelines)
         self.assertEqual(actual_filelines, expected_filelines)
 
     def test_missing_section_in_release_summary(self):
+        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         invalid_ordering = {
             '### section1:\n': '### section2: \n'
         }
@@ -140,9 +170,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'ensure that automatic updates to changelog and credits are '
                 'correct.')):
             update_changelog_and_credits.check_ordering_of_sections(
-                self.release_summary_lines)
+                release_summary_lines)
 
     def test_invalid_ordering_of_sections_in_release_summary(self):
+        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         invalid_ordering = {
             '### New Authors:\n': '### section2: \n'
         }
@@ -155,7 +186,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'section2: section in release_summary to ensure that automatic '
                 'updates to changelog and credits are correct.')):
             update_changelog_and_credits.check_ordering_of_sections(
-                self.release_summary_lines)
+                release_summary_lines)
 
     def test_missing_span_in_about_page(self):
         about_page_lines = [
@@ -173,3 +204,184 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'Expected <span>A</span> text to be followed by an unordered '
                 'list in about-page.directive.html')):
             update_changelog_and_credits.find_indentation(about_page_lines)
+
+    def test_removal_of_updates_with_no_exception(self):
+        def mock_run_cmd(unused_cmd):
+            pass
+        def mock_get_git_ref(unused_self, unused_ref):
+            return github.GitRef.GitRef(
+                requester='', headers='', attributes='', completed='')
+        def mock_delete(unused_self):
+            pass
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        get_git_ref_swap = self.swap(
+            github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
+        delete_swap = self.swap(
+            github.GitRef.GitRef, 'delete', mock_delete)
+        with run_cmd_swap, get_git_ref_swap, delete_swap:
+            update_changelog_and_credits.remove_updates_and_delete_branch(
+                self.mock_repo, 'target_branch')
+
+    def test_removal_of_updates_with_unknown_object_exception(self):
+        def mock_run_cmd(unused_cmd):
+            pass
+        def mock_get_git_ref(unused_self, unused_ref):
+            return github.GitRef.GitRef(
+                requester='', headers='', attributes='', completed='')
+        def mock_delete(unused_self):
+            raise github.UnknownObjectException(status='', data='')
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        get_git_ref_swap = self.swap(
+            github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
+        delete_swap = self.swap(
+            github.GitRef.GitRef, 'delete', mock_delete)
+        with run_cmd_swap, get_git_ref_swap, delete_swap:
+            update_changelog_and_credits.remove_updates_and_delete_branch(
+                self.mock_repo, 'target_branch')
+
+    def test_removal_of_updates_with_valid_exception(self):
+        def mock_run_cmd(unused_cmd):
+            pass
+        def mock_get_git_ref(unused_self, unused_ref):
+            return github.GitRef.GitRef(
+                requester='', headers='', attributes='', completed='')
+        def mock_delete(unused_self):
+            raise Exception('Error')
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        get_git_ref_swap = self.swap(
+            github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
+        delete_swap = self.swap(
+            github.GitRef.GitRef, 'delete', mock_delete)
+        with run_cmd_swap, get_git_ref_swap, delete_swap:
+            with self.assertRaisesRegexp(
+                Exception, (
+                    'Please ensure that target_branch branch is deleted before '
+                    're-running the script')):
+                update_changelog_and_credits.remove_updates_and_delete_branch(
+                    self.mock_repo, 'target_branch')
+
+    def test_invalid_branch_name(self):
+        def mock_get_current_branch_name():
+            return 'invalid'
+        branch_name_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_current_branch_name)
+        with branch_name_swap, self.assertRaisesRegexp(
+            Exception, (
+                'This script should only be run from the latest release '
+                'branch.')):
+            update_changelog_and_credits.main()
+
+    def test_missing_release_summary_file(self):
+        release_summary_swap = self.swap(
+            feconf, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
+        with self.branch_name_swap, release_summary_swap:
+            with self.assertRaisesRegexp(
+                Exception, (
+                    'Release summary file invalid.md is missing. Please run '
+                    'the release_info.py script and re-run this script.')):
+                update_changelog_and_credits.main()
+
+    def test_missing_github_username(self):
+        args_swap = self.swap(
+            sys, 'argv', ['update_changelog_and_credits.py'])
+        with self.branch_name_swap, self.release_summary_swap, args_swap:
+            with self.assertRaisesRegexp(
+                Exception, (
+                    'No GitHub username provided. Please re-run the script '
+                    'specifying a username using --username=<Your username>')):
+                update_changelog_and_credits.main()
+
+    def test_missing_personal_access_token(self):
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return None
+        # pylint: enable=unused-argument
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+        with self.branch_name_swap, self.release_summary_swap, self.args_swap:
+            with getpass_swap, self.assertRaisesRegexp(
+                Exception, (
+                    'No personal access token provided, please set up a '
+                    'personal access token at https://github.com/settings/'
+                    'tokens and re-run the script')):
+                update_changelog_and_credits.main()
+
+    def test_function_calls(self):
+        check_function_calls = {
+            'remove_updates_and_delete_branch_gets_called': False,
+            'update_changelog_gets_called': False,
+            'update_authors_gets_called': False,
+            'update_contributors_gets_called': False,
+            'update_developer_names_gets_called': False,
+            'check_ordering_of_sections_gets_called': False,
+            'create_branch_gets_called': False
+        }
+        expected_check_function_calls = {
+            'remove_updates_and_delete_branch_gets_called': True,
+            'update_changelog_gets_called': True,
+            'update_authors_gets_called': True,
+            'update_contributors_gets_called': True,
+            'update_developer_names_gets_called': True,
+            'check_ordering_of_sections_gets_called': True,
+            'create_branch_gets_called': True
+        }
+        def mock_remove_updates_and_delete_branch(
+                unused_repo_fork, unused_target_branch):
+            check_function_calls[
+                'remove_updates_and_delete_branch_gets_called'] = True
+        def mock_update_changelog(
+                unused_release_summary_lines, unused_current_release_version):
+            check_function_calls['update_changelog_gets_called'] = True
+        def mock_update_authors(unused_release_summary_lines):
+            check_function_calls['update_authors_gets_called'] = True
+        def mock_update_contributors(unused_release_summary_lines):
+            check_function_calls['update_contributors_gets_called'] = True
+        def mock_update_developer_names(unused_release_summary_lines):
+            check_function_calls['update_developer_names_gets_called'] = True
+        def mock_check_ordering_of_sections(unused_release_summary_lines):
+            check_function_calls[
+                'check_ordering_of_sections_gets_called'] = True
+        def mock_create_branch(
+                unused_repo_fork, unused_target_branch, unused_github_username):
+            check_function_calls['create_branch_gets_called'] = True
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return 'test-token'
+        # pylint: enable=unused-argument
+        def mock_input():
+            return 'y'
+        def mock_get_repo(unused_self, unused_repo_name):
+            return self.mock_repo
+
+        remove_updates_swap = self.swap(
+            update_changelog_and_credits, 'remove_updates_and_delete_branch',
+            mock_remove_updates_and_delete_branch)
+        update_changelog_swap = self.swap(
+            update_changelog_and_credits, 'update_changelog',
+            mock_update_changelog)
+        update_authors_swap = self.swap(
+            update_changelog_and_credits, 'update_authors',
+            mock_update_authors)
+        update_contributors_swap = self.swap(
+            update_changelog_and_credits, 'update_contributors',
+            mock_update_contributors)
+        update_developer_names_swap = self.swap(
+            update_changelog_and_credits, 'update_developer_names',
+            mock_update_developer_names)
+        check_order_swap = self.swap(
+            update_changelog_and_credits, 'check_ordering_of_sections',
+            mock_check_ordering_of_sections)
+        create_branch_swap = self.swap(
+            update_changelog_and_credits, 'create_branch', mock_create_branch)
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
+
+        with self.branch_name_swap, self.release_summary_swap, self.args_swap:
+            with input_swap, remove_updates_swap, update_authors_swap:
+                with update_changelog_swap, update_contributors_swap:
+                    with update_developer_names_swap, check_order_swap:
+                        with create_branch_swap, getpass_swap, get_repo_swap:
+                            update_changelog_and_credits.main()
+
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
