@@ -36,7 +36,12 @@ from . import install_third_party_libs
 from . import setup
 from . import setup_gae
 
-_PARSER = argparse.ArgumentParser()
+_PARSER = argparse.ArgumentParser(description="""
+    Run the script from the oppia root folder:
+        python -m scripts.start
+
+    Note that the root folder MUST be named 'oppia'.""")
+
 _PARSER.add_argument(
     '--save_datastore',
     help='optional; if specified, does not clear the datastore.',

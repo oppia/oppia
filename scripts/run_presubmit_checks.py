@@ -37,7 +37,17 @@ from . import pre_commit_linter
 from . import run_backend_tests
 from . import run_frontend_tests
 
-_PARSER = argparse.ArgumentParser()
+_PARSER = argparse.ArgumentParser(description="""
+    Run this script from the oppia root folder prior to opening a PR:
+        python -m scripts.run_presubmit_checks
+
+    Set the origin branch to compare against by adding
+    --branch=your_branch or -b=your_branch
+
+    By default, if the current branch tip exists on remote origin,
+    the current branch is compared against its tip on GitHub.
+    Otherwise it's compared against 'develop'.""")
+
 _PARSER.add_argument(
     '--branch', '-b',
     help='optional; if specified, the origin branch to compare against.')

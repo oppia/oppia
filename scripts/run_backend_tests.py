@@ -30,7 +30,11 @@ from . import install_third_party_libs
 from . import setup
 from . import setup_gae
 
-_PARSER = argparse.ArgumentParser()
+_PARSER = argparse.ArgumentParser(description="""
+    Run this script from the oppia root folder:
+
+        python -m scripts.run_backend_tests""")
+
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
