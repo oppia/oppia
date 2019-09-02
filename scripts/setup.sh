@@ -177,6 +177,9 @@ fi
 # Download and install yarn.
 echo Checking if yarn is installed in $TOOLS_DIR
 if [ ! -d "$YARN_PATH" ]; then
+  echo Removing package-lock.json
+  rm -f package-lock.json
+
   echo Installing yarn
 
   YARN_VERSION=v1.17.3
