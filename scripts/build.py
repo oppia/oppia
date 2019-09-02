@@ -97,7 +97,7 @@ FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
 # /extensions.)
 JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
-GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
+GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
 # These files are present in both extensions and local_compiled_js/extensions.
 # They are required in local_compiled_js since they contain code used in
