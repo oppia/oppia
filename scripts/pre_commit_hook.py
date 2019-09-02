@@ -97,32 +97,6 @@ def _does_diff_include_package_lock_file():
         raise ValueError(err)
 
 
-def _remove_package_lock_file():
-    """Removes package-lock.json file.
-
-    Raises:
-        ValueError if any git command fails.
-    """
-
-    git_unstage_cmd = ['git', 'reset', '--', 'package-lock.json']
-    rm_cmd = ['rm', 'package-lock.json']
-
-    _, err_unstage_cmd = (
-        _start_subprocess_for_result(git_unstage_cmd))
-
-    if not err_unstage_cmd:
-        _, err_revert_cmd = (
-            _start_subprocess_for_result(rm_cmd))
-
-        if not err_revert_cmd:
-            python_utils.PRINT(
-                'Successfully removed package-lock.json!')
-        else:
-            raise ValueError(err_revert_cmd)
-    else:
-        raise ValueError(err_unstage_cmd)
-
-
 def main():
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
@@ -137,13 +111,19 @@ def main():
 
     python_utils.PRINT('Running pre-commit check for package-lock.json ...')
     if _does_diff_include_package_lock_file():
+        # The following message is necessary since there git commit aborts
+        # quietly when the status is non-zero.
+        python_utils.PRINT('-----------COMMIT ABORTED-----------')
         python_utils.PRINT(
-            'Oppia utilizies Yarn to manage npm packages. Please use Yarn '
-            'to modify packages.'
+            'Oppia utilize Yarn to manage node packages. Please use Yarn '
+            'to add, update, or delete packages. For more information on how '
+            'to use yarn, see https://yarnpkg.com/en/docs/usage.'
         )
-        python_utils.PRINT('Removing package-lock.json ...')
-        _remove_package_lock_file()
-        python_utils.PRINT('COMMIT ABORTED')
+        python_utils.PRINT(
+            'Please delete package-lock.json, revert the changes in '
+            'package.json, and use yarn to add, update, or delete the '
+            'packages.'
+        )
         sys.exit(1)
     sys.exit(0)
 
