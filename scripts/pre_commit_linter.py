@@ -73,7 +73,8 @@ import time
 
 import python_utils
 
-reload(sys)
+# The following is needed since the linter messages are encoded in UTF-8.
+reload(sys) # pylint: disable=reload-builtin
 sys.setdefaultencoding('utf-8')
 
 _PARSER = argparse.ArgumentParser()
