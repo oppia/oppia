@@ -24,17 +24,17 @@ import python_utils
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 
 
-def run_cmd(cmd_tokens):
+def run_cmd(cmd_str):
     """Runs the command and returns the output.
     Raises subprocess.CalledProcessError upon failure.
 
     Args:
-        cmd_tokens: list(str). The list of command tokens.
+        cmd_str: str. The command string to execute.
 
     Returns:
         str. The output of the command.
     """
-    return subprocess.check_output(cmd_tokens).strip()
+    return subprocess.check_output(cmd_str.split(' ')).strip()
 
 
 def ensure_directory_exists(d):

@@ -88,7 +88,7 @@ def get_extra_commits_in_new_release(base_commit, repo):
         the current commit, which haven't been cherrypicked already.
     """
     get_commits_cmd = GIT_CMD_TEMPLATE_GET_NEW_COMMITS % base_commit
-    out = common.run_cmd(get_commits_cmd.split(' ')).split('\n')
+    out = common.run_cmd(get_commits_cmd).split('\n')
     commits = []
     for line in out:
         # Lines that start with a - are already cherrypicked. The commits of
@@ -112,7 +112,7 @@ def _gather_logs(start, stop='HEAD'):
     """
     get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
         GROUP_SEP, start, stop)
-    out = common.run_cmd(get_logs_cmd.split(' ')).split('\x00')
+    out = common.run_cmd(get_logs_cmd).split('\x00')
     if len(out) == 1 and out[0] == '':
         return []
     else:
@@ -204,7 +204,7 @@ def _check_versions(current_release):
     """
     feconf_changed_version = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)
-    old_feconf = common.run_cmd(git_show_cmd.split(' '))
+    old_feconf = common.run_cmd(git_show_cmd)
     with python_utils.open_file('feconf.py', 'r') as feconf_file:
         new_feconf = feconf_file.read()
     for variable in FECONF_VAR_NAMES:
@@ -228,7 +228,7 @@ def _git_diff_names_only(left, right='HEAD'):
         list(str): List of files that are different between the two points.
     """
     diff_cmd = (GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING % (left, right))
-    return common.run_cmd(diff_cmd.split(' ')).splitlines()
+    return common.run_cmd(diff_cmd).splitlines()
 
 
 def _check_setup_scripts(base_release_tag, changed_only=True):
