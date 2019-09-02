@@ -15,11 +15,7 @@ anchor_for_job_defaults: &job_defaults
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
-    sudo pip install pyyaml
-    sudo pip install future
-    sudo pip install psutil
-    python -m scripts.setup
-    python -m scripts.setup_gae
+    python -m scripts.install_third_party_libs
 
 anchor_for_installing_cc_test_reporter: &install_cc
   name: Install codeclimate test reporter
@@ -62,7 +58,6 @@ jobs:
           # pre_commit_linter and third_party_size_check need to import other
           # Python files and that is only possible if we treat it as a module.
           command: |
-            python -m scripts.install_third_party_libs
             python -m scripts.third_party_size_check
             python -m scripts.pre_commit_linter --path=. --verbose
 
@@ -78,7 +73,6 @@ jobs:
       - run:
           name: Run typescript tests
           command: |
-            python -m scripts.install_third_party_libs
             python -m scripts.typescript_checks
 
   frontend_tests:

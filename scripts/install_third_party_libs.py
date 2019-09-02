@@ -23,14 +23,39 @@ import shutil
 import subprocess
 import sys
 
-import python_utils
+# These libraries need to be installed before running or importing any script.
+TOOLS_DIR = os.path.join('..', 'oppia_tools')
+# Download and install pyyaml.
+if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
+    subprocess.call([
+        'pip', 'install', 'pyyaml==5.1.2', '--target',
+        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
-from . import build
-from . import common
-from . import install_third_party
-from . import pre_commit_hook
-from . import pre_push_hook
-from . import setup
+# Download and install future.
+if not os.path.exists(os.path.join('third_party', 'future==0.17.1')):
+    subprocess.call([
+        'pip', 'install', 'future==0.17.1', '--target',
+        os.path.join('third_party', 'future-0.17.1')])
+
+# Download and install psutil.
+if not os.path.exists(os.path.join(TOOLS_DIR, 'psutil==5.6.3')):
+    subprocess.call([
+        'pip', 'install', 'psutil==5.6.3', '--target',
+        os.path.join(TOOLS_DIR, 'psutil-5.6.3')])
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import python_utils  # isort:skip
+
+from . import build  # isort:skip
+from . import common  # isort:skip
+from . import install_third_party  # isort:skip
+from . import pre_commit_hook  # isort:skip
+from . import pre_push_hook  # isort:skip
+from . import setup  # isort:skip
+from . import setup_gae  # isort:skip
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -203,8 +228,8 @@ def ensure_pip_library_is_installed(package, version, path):
 def main(argv=None):
     """Install third-party libraries for Oppia."""
     setup.main()
+    setup_gae.main()
     pip_dependencies = [
-        ('future', '0.17.1', common.THIRD_PARTY_DIR),
         ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
         ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
         ('pylint-quotes', '0.1.8', common.OPPIA_TOOLS_DIR),
@@ -215,7 +240,6 @@ def main(argv=None):
         ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
         ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),
         ('PyGithub', '1.43.7', common.OPPIA_TOOLS_DIR),
-        ('psutil', '5.6.3', common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in pip_dependencies:
