@@ -105,6 +105,17 @@ GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedParser.ts',
     'core/templates/dev/head/expressions/ExpressionParserService.js')
 
+CONFIG_FILE_PATHS = (
+    'core/tests/.browserstack.env.example',
+    'core/tests/protractor.conf.js',
+    'core/tests/karma.conf.ts',
+    'core/templates/dev/head/mathjaxConfig.ts',
+    'assets/constants.ts',
+    'assets/rich_text_components_definitions.ts',
+    'webpack.config.ts',
+    'webpack.dev.config.ts',
+    'webpack.prod.config.ts')
+
 BAD_PATTERNS = {
     '__author__': {
         'message': 'Please remove author tags from this file.',
@@ -501,17 +512,6 @@ REQUIRED_STRINGS_CONSTANTS = {
 }
 
 ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
-
-CONFIG_FILE_PATHS = (
-    'core/tests/.browserstack.env.example',
-    'core/tests/protractor.conf.js',
-    'core/tests/karma.conf.ts',
-    'core/templates/dev/head/mathjaxConfig.ts',
-    'assets/constants.ts',
-    'assets/rich_text_components_definitions.ts',
-    'webpack.config.ts',
-    'webpack.dev.config.ts',
-    'webpack.prod.config.ts')
 
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 
