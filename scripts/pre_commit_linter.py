@@ -1203,7 +1203,7 @@ def _check_codeowner_file(verbose_mode_enabled):
         important_rules_in_critical_section = []
         file_patterns = []
         dir_patterns = []
-        for line_num, line in enumerate(FileCache.readlines(
+        for line_num, line in enumerate(FILE_CACHE.readlines(
                 CODEOWNER_FILEPATH)):
             stripped_line = line.strip()
             if '# Critical files' in line:
@@ -1550,60 +1550,6 @@ def _lint_py_files_for_python3_compatibility(
             % (_MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
     python_utils.PRINT('Python linting for Python 3 compatibility finished.')
-
-
-def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
-    """Checks that the most important patterns are at the bottom
-    of the CODEOWNERS file.
-
-    Arguments:
-        important_patterns: list(str). List of the important
-            patterns for CODEOWNERS file.
-
-    Returns:
-        bool. Whether the CODEOWNERS "important pattern" check fails.
-    """
-
-    failed = False
-
-    # Check that there are no duplicate elements in the lists.
-    important_patterns_set = set(important_patterns)
-    codeowner_important_paths_set = set(CODEOWNER_IMPORTANT_PATHS)
-    if len(important_patterns_set) != len(important_patterns):
-        python_utils.PRINT(
-            '%s --> Duplicate pattern(s) found in critical rules'
-            ' section.' % CODEOWNER_FILEPATH)
-        failed = True
-    if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
-        python_utils.PRINT(
-            'scripts/pre_commit_linter.py --> Duplicate pattern(s) found '
-            'in CODEOWNER_IMPORTANT_PATHS list.')
-        failed = True
-
-    # Check missing rules by set difference operation.
-    critical_rule_section_minus_list_set = (
-        important_patterns_set.difference(codeowner_important_paths_set))
-    list_minus_critical_rule_section_set = (
-        codeowner_important_paths_set.difference(important_patterns_set))
-    for rule in critical_rule_section_minus_list_set:
-        python_utils.PRINT(
-            '%s --> Rule %s is not present in the '
-            'CODEOWNER_IMPORTANT_PATHS list in '
-            'scripts/pre_commit_linter.py. Please add this rule in the '
-            'mentioned list or remove this rule from the \'Critical files'
-            '\' section.' % (CODEOWNER_FILEPATH, rule))
-        failed = True
-    for rule in list_minus_critical_rule_section_set:
-        python_utils.PRINT(
-            '%s --> Rule \'%s\' is not present in the \'Critical files\' '
-            'section. Please place it under the \'Critical files\' '
-            'section since it is an important rule. Alternatively please '
-            'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
-            'scripts/pre_commit_linter.py if it is no longer an '
-            'important rule.' % (CODEOWNER_FILEPATH, rule))
-        failed = True
-
-    return failed
 
 
 def _check_codeowner_file(verbose_mode_enabled):
