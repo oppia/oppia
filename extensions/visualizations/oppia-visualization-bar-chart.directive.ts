@@ -61,8 +61,7 @@ angular.module('oppia').directive('oppiaVisualizationBarChart', [function() {
 
           var chart = new google.visualization.BarChart($element[0]);
           chart.draw(data, options);
-        }
-      }
-    ]
+        };
+      }]
   };
 }]);

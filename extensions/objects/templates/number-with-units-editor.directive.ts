@@ -56,7 +56,7 @@ angular.module('oppia').directive('numberWithUnitsEditor', [
           ctrl.getWarningText = function() {
             return errorMessage;
           };
-        }
+        };
       }]
     };
   }]);

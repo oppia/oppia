@@ -101,7 +101,7 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             ctrl.imageAltText = HtmlEscaperService.escapedJsonToObj(
               $attrs.altWithValue);
           }
-        }
+        };
       }]
     };
   }

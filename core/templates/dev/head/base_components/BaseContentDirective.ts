@@ -63,9 +63,8 @@ angular.module('oppia').directive('baseContent', [
               mainContentElement.scrollIntoView();
               mainContentElement.focus();
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

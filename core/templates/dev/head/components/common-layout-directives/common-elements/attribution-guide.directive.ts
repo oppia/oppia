@@ -36,8 +36,7 @@ angular.module('oppia').directive('attributionGuide', [
           this.$onInit = function() {
             ctrl.isMobileDevice = BrowserCheckerService.isMobileDevice();
             ctrl.iframed = UrlService.isIframed();
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

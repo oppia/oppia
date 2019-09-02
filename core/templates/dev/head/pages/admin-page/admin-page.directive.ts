@@ -54,31 +54,30 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
           this.$onInit = function() {
-          ctrl.userEmail = '';
-          AdminDataService.getDataAsync().then(function(response) {
-            ctrl.userEmail = response.user_email;
-          });
-          ctrl.inDevMode = DEV_MODE;
+            ctrl.userEmail = '';
+            AdminDataService.getDataAsync().then(function(response) {
+              ctrl.userEmail = response.user_email;
+            });
+            ctrl.inDevMode = DEV_MODE;
 
-          ctrl.statusMessage = '';
-          ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
-          ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
-          ctrl.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
-          ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
-          ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
+            ctrl.statusMessage = '';
+            ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
+            ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
+            ctrl.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
+            ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
+            ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
 
-          CsrfTokenService.initializeToken();
+            CsrfTokenService.initializeToken();
 
-          ctrl.setStatusMessage = function(statusMessage) {
-            ctrl.statusMessage = statusMessage;
+            ctrl.setStatusMessage = function(statusMessage) {
+              ctrl.statusMessage = statusMessage;
+            };
+
+            $scope.$on('$locationChangeSuccess', function() {
+              AdminRouterService.showTab($location.path().replace('/', '#'));
+            });
           };
-
-          $scope.$on('$locationChangeSuccess', function() {
-            AdminRouterService.showTab($location.path().replace('/', '#'));
-          });
-        }
-        }
-      ]
+        }]
     };
   }
 ]);

@@ -75,8 +75,10 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
               ctrl.localQuestionData.assumptions;
             ctrl.questionData.results = ctrl.localQuestionData.results;
 
-            // Deduce the new operators, as in logicProofTeacher.buildQuestion(),
-            // since these are not currently stored separately for each question.
+            // Deduce the new operators, as in
+            // logicProofTeacher.buildQuestion(),
+            // since these are not currently stored separately for each
+            // question.
             ctrl.expressions = [];
             ctrl.topTypes = [];
             for (var i = 0; i < ctrl.questionData.assumptions.length; i++) {
@@ -121,7 +123,8 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
 
             ctrl.questionInstance = logicProofStudent.buildInstance(
               ctrl.questionData);
-            // Denotes whether messages are in response to a submission, in which
+            // Denotes whether messages are in response to a submission, in
+            // which
             // case they persist for longer.
             ctrl.messageIsSticky = false;
 
@@ -147,12 +150,14 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
               // NOTE: we must use beforeChange rather than change here to avoid
               // an infinite loop (which code-mirror will not catch).
               editor.on('beforeChange', function(instance, change) {
-                var convertedText = logicProofConversion.convertToLogicCharacters(
+                var convertedText =
+                logicProofConversion.convertToLogicCharacters(
                   change.text.join('\n'));
                 if (convertedText !== change.text.join('\n')) {
                   // We update using the converted text, then cancel its being
                   // overwritten by the original text.
-                  editor.doc.replaceRange(convertedText, change.from, change.to);
+                  editor.doc.replaceRange(
+                    convertedText, change.from, change.to);
                   change.cancel();
                 }
               });
@@ -229,8 +234,8 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
               for (var i = 0; i < proofLines.length; i++) {
                 numberedLines.push((i + 1) + '  ' + proofLines[i]);
               }
-              // We split incorrect proofs into three parts so that response.html
-              // can make the invalid line bold.
+              // We split incorrect proofs into three parts so that
+              // response.html can make the invalid line bold.
               return (errorLineNum === undefined) ?
                 [numberedLines.join('\n')] :
                 [
@@ -305,11 +310,12 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
                     };
                   }
                 ]
-              }).result.then(function() {},function() {
-
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             };
-          }
+          };
         }]
     };
   }

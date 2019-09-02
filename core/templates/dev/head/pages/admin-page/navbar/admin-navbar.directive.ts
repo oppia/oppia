@@ -40,50 +40,50 @@ angular.module('oppia').directive('adminNavbar', [
       controller: ['UserService', function(UserService) {
         var ctrl = this;
         this.$onInit = function() {
-        ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
-        ctrl.showTab = AdminRouterService.showTab;
-        ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
-        ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
-        ctrl.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
-        ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
-        ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
+          ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
+          ctrl.showTab = AdminRouterService.showTab;
+          ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
+          ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
+          ctrl.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
+          ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
+          ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
 
-        UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-          ctrl.profilePictureDataUrl = dataUrl;
-        });
+          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+            ctrl.profilePictureDataUrl = dataUrl;
+          });
 
-        ctrl.username = '';
-        ctrl.isModerator = null;
-        ctrl.isSuperAdmin = null;
-        ctrl.profileUrl = '';
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.username = userInfo.getUsername();
-          ctrl.isModerator = userInfo.isModerator();
-          ctrl.isSuperAdmin = userInfo.isSuperAdmin();
+          ctrl.username = '';
+          ctrl.isModerator = null;
+          ctrl.isSuperAdmin = null;
+          ctrl.profileUrl = '';
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            ctrl.username = userInfo.getUsername();
+            ctrl.isModerator = userInfo.isModerator();
+            ctrl.isSuperAdmin = userInfo.isSuperAdmin();
 
-          ctrl.profileUrl = (
-            UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
-              username: ctrl.username
-            })
-          );
-        });
+            ctrl.profileUrl = (
+              UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
+                username: ctrl.username
+              })
+            );
+          });
 
-        ctrl.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
-          '/logo/288x128_logo_white.png');
+          ctrl.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/logo/288x128_logo_white.png');
 
-        ctrl.logoutUrl = LOGOUT_URL;
+          ctrl.logoutUrl = LOGOUT_URL;
 
-        ctrl.profileDropdownIsActive = false;
-        ctrl.onMouseoverProfilePictureOrDropdown = function(evt) {
-          angular.element(evt.currentTarget).parent().addClass('open');
-          ctrl.profileDropdownIsActive = true;
-        };
-
-        ctrl.onMouseoutProfilePictureOrDropdown = function(evt) {
-          angular.element(evt.currentTarget).parent().removeClass('open');
           ctrl.profileDropdownIsActive = false;
+          ctrl.onMouseoverProfilePictureOrDropdown = function(evt) {
+            angular.element(evt.currentTarget).parent().addClass('open');
+            ctrl.profileDropdownIsActive = true;
+          };
+
+          ctrl.onMouseoutProfilePictureOrDropdown = function(evt) {
+            angular.element(evt.currentTarget).parent().removeClass('open');
+            ctrl.profileDropdownIsActive = false;
+          };
         };
-      }
       }]
     };
   }

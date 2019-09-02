@@ -96,8 +96,8 @@ angular.module('oppia').directive('rubricsEditor', [
               ctrl.editableExplanation = explanationMemento;
               ctrl.explanationEditorIsOpen = false;
             };
-          }
-      }]
+          };
+        }]
     };
   }
 ]);

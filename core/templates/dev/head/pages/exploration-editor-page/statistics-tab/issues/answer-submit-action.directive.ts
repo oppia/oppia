@@ -49,7 +49,7 @@ angular.module('oppia').directive('answerSubmitAction', [
             return ExplorationHtmlFormatterService.getShortAnswerHtml(
               _answer, $attrs.interactionId, _customizationArgs);
           };
-        }
+        };
       }]
     };
   }

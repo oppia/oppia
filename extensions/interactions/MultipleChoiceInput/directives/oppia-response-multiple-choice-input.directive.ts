@@ -40,7 +40,7 @@ angular.module('oppia').directive('oppiaResponseMultipleChoiceInput', [
           var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
           var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
           ctrl.response = _choices[_answer];
-        }
+        };
       }]
     };
   }

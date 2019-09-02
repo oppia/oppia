@@ -44,7 +44,7 @@ angular.module('oppia').directive('dragAndDropHtmlStringEditor', [
           ctrl.selection = function(selectedItem) {
             ctrl.value = selectedItem;
           };
-        }
+        };
       }]
     };
   }]);

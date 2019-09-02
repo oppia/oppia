@@ -107,13 +107,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               ctrl.localValue = 0.0;
             }
 
-            // This prevents the red 'invalid input' warning message from flashing
-            // at the outset.
+            // This prevents the red 'invalid input' warning message from
+            // flashing at the outset.
             $timeout(function() {
               ctrl.hasLoaded = true;
             });
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

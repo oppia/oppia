@@ -55,8 +55,8 @@ angular.module('oppia').directive('oppiaNoninteractiveLink', [
               // their links.
               ctrl.text =
                 HtmlEscaperService.escapedJsonToObj($attrs.textWithValue);
-              // Note that this second 'if' condition is needed because a link may
-              // have an empty 'text' value.
+              // Note that this second 'if' condition is needed because a link
+              // may have an empty 'text' value.
               if (ctrl.text) {
                 ctrl.showUrlInTooltip = true;
               } else {
@@ -69,7 +69,7 @@ angular.module('oppia').directive('oppiaNoninteractiveLink', [
             if (ContextService.isInExplorationEditorMode()) {
               ctrl.tabIndexVal = -1;
             }
-          }
+          };
         }]
     };
   }

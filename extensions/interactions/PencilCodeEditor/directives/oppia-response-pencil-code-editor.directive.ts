@@ -39,7 +39,7 @@ angular.module('oppia').directive('oppiaResponsePencilCodeEditor', [
         this.$onInit = function() {
           ctrl.answerCode = HtmlEscaperService.escapedJsonToObj(
             $attrs.answer).code;
-        }
+        };
       }]
     };
   }

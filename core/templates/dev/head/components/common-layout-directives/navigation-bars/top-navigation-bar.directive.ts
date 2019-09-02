@@ -73,8 +73,8 @@ angular.module('oppia').directive('topNavigationBar', [
               }
 
               if (ctrl.userIsLoggedIn) {
-                // Show the number of unseen notifications in the navbar and page
-                // title, unless the user is already on the dashboard page.
+                // Show the number of unseen notifications in the navbar and
+                // page title, unless the user is already on the dashboard page.
                 $http.get('/notificationshandler').then(function(response) {
                   var data = response.data;
                   if ($window.location.pathname !== '/') {
@@ -160,14 +160,15 @@ angular.module('oppia').directive('topNavigationBar', [
              * @param {object} evt
              * @param {String} menuName - name of menu to perform action
              * on(aboutMenu/profileMenu)
-             * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
-             * corresponding actions to be performed(open/close).
+             * @param {object} eventsTobeHandled - Map keyboard events('Enter')
+             * to corresponding actions to be performed(open/close).
              *
              * @example
              *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
              */
             ctrl.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
-              NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
+              NavigationService.onMenuKeypress(
+                evt, menuName, eventsTobeHandled);
               ctrl.activeMenuName = NavigationService.activeMenuName;
             };
 
@@ -195,7 +196,8 @@ angular.module('oppia').directive('topNavigationBar', [
             WindowDimensionsService.registerOnResizeHook(function() {
               ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
               $scope.$apply();
-              // If window is resized larger, try displaying the hidden elements.
+              // If window is resized larger, try displaying
+              // the hidden elements.
               if (currentWindowWidth < WindowDimensionsService.getWidth()) {
                 for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
                   if (
@@ -287,15 +289,16 @@ angular.module('oppia').directive('topNavigationBar', [
             var truncateNavbarDebounced =
               DebouncerService.debounce(truncateNavbar, 500);
 
-            // The function needs to be run after i18n. A timeout of 0 appears to
-            // run after i18n in Chrome, but not other browsers. The function will
-            // check if i18n is complete and set a new timeout if it is not. Since
-            // a timeout of 0 works for at least one browser, it is used here.
+            // The function needs to be run after i18n. A timeout of 0 appears
+            // to run after i18n in Chrome, but not other browsers. The function
+            // will check if i18n is complete and set a new timeout if it is
+            // not. Since a timeout of 0 works for at least one browser,
+            // it is used here.
             $timeout(truncateNavbar, 0);
             $scope.$on('searchBarLoaded', function() {
               $timeout(truncateNavbar, 100);
             });
-          }
-      }]
+          };
+        }]
     };
   }]);

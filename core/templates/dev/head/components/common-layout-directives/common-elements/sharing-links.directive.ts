@@ -83,7 +83,7 @@ angular.module('oppia').directive('sharingLinks', [
 
             ctrl.classroomUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/classroom.png');
-          }
-      }]
+          };
+        }]
     };
   }]);

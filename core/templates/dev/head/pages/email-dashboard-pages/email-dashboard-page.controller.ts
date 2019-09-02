@@ -63,9 +63,10 @@ angular.module('oppia').directive('emailDashboardPage', [
                 edited_at_least_n_exps: ctrl.edited_at_least_n_exps,
                 edited_fewer_than_n_exps: ctrl.edited_fewer_than_n_exps
               };
-              EmailDashboardDataService.submitQuery(data).then(function(queries) {
-                ctrl.currentPageOfQueries = queries;
-              });
+              EmailDashboardDataService.submitQuery(data).then(
+                function(queries) {
+                  ctrl.currentPageOfQueries = queries;
+                });
               ctrl.resetForm();
               ctrl.showSuccessMessage = true;
             };
@@ -96,9 +97,10 @@ angular.module('oppia').directive('emailDashboardPage', [
 
             ctrl.recheckStatus = function(index) {
               var queryId = ctrl.currentPageOfQueries[index].id;
-              EmailDashboardDataService.fetchQuery(queryId).then(function(query) {
-                ctrl.currentPageOfQueries[index] = query;
-              });
+              EmailDashboardDataService.fetchQuery(queryId).then(
+                function(query) {
+                  ctrl.currentPageOfQueries[index] = query;
+                });
             };
 
             ctrl.showLinkToResultPage = function(submitter, status) {
@@ -108,7 +110,7 @@ angular.module('oppia').directive('emailDashboardPage', [
             EmailDashboardDataService.getNextQueries().then(function(queries) {
               ctrl.currentPageOfQueries = queries;
             });
-          }
+          };
         }
       ]};
   }]);

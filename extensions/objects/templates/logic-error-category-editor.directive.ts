@@ -74,7 +74,7 @@ angular.module('oppia').directive('logicErrorCategoryEditor', [
           $scope.$watch('$ctrl.localValue.category', function() {
             ctrl.value = ctrl.localValue.category.name;
           });
-        }
+        };
       }]
     };
   }]);

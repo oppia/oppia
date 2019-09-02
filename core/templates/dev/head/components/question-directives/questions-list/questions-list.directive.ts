@@ -392,8 +392,8 @@ angular.module('oppia').directive('questionsList', [
                         modalInstance.result.then(function() {
                           $uibModalInstance.dismiss('cancel');
                         }, function() {
-                          // This callback is triggered when the Cancel button is clicked.
-                          // No further action is needed.
+                          // This callback is triggered when the Cancel button
+                          // is clicked. No further action is needed.
                         });
                       } else {
                         $uibModalInstance.dismiss('cancel');
@@ -415,7 +415,6 @@ angular.module('oppia').directive('questionsList', [
 
             _initTab();
           };
-        }
-      ]
+        }]
     };
   }]);

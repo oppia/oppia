@@ -36,19 +36,18 @@ angular.module('oppia').directive('subtopicSummaryTile', [
         function(SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           this.$onInit = function() {
-          ctrl.getSubtopicLink = function() {
-            return UrlInterpolationService.interpolateUrl(
-              SUBTOPIC_VIEWER_URL_TEMPLATE, {
-                topic_name: ctrl.getTopicName(),
-                subtopic_id: ctrl.getSubtopicId().toString()
-              });
-          };
+            ctrl.getSubtopicLink = function() {
+              return UrlInterpolationService.interpolateUrl(
+                SUBTOPIC_VIEWER_URL_TEMPLATE, {
+                  topic_name: ctrl.getTopicName(),
+                  subtopic_id: ctrl.getSubtopicId().toString()
+                });
+            };
 
-          ctrl.getStaticImageUrl = function(url) {
-            return UrlInterpolationService.getStaticImageUrl(url);
+            ctrl.getStaticImageUrl = function(url) {
+              return UrlInterpolationService.getStaticImageUrl(url);
+            };
           };
-        }
-        }
-      ]
+        }]
     };
   }]);

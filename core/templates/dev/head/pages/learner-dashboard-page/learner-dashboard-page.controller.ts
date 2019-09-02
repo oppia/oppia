@@ -163,7 +163,8 @@ angular.module('oppia').directive('learnerDashboardPage', [
                 );
                 var threadSummaryDicts = responseData.thread_summaries;
                 ctrl.threadSummaries = [];
-                for (var index = 0; index < threadSummaryDicts.length; index++) {
+                for (var index = 0;
+                  index < threadSummaryDicts.length; index++) {
                   ctrl.threadSummaries.push(
                     FeedbackThreadSummaryObjectFactory.createFromBackendDict(
                       threadSummaryDicts[index]));
@@ -247,9 +248,9 @@ angular.module('oppia').directive('learnerDashboardPage', [
             };
 
             ctrl.showUsernamePopover = function(subscriberUsername) {
-              // The popover on the subscription card is only shown if the length
-              // of the subscriber username is greater than 10 and the user hovers
-              // over the truncated username.
+              // The popover on the subscription card is only shown if the
+              // length of the subscriber username is greater than 10 and the
+              // user hovers over the truncated username.
               if (subscriberUsername.length > 10) {
                 return 'mouseenter';
               } else {
@@ -313,7 +314,8 @@ angular.module('oppia').directive('learnerDashboardPage', [
                   subsection === (
                     LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
                   if (ctrl.startCompletedCollectionIndex +
-                    ctrl.PAGE_SIZE <= ctrl.startCompletedCollectionIndex.length) {
+                    ctrl.PAGE_SIZE <=
+                    ctrl.startCompletedCollectionIndex.length) {
                     ctrl.startCompletedCollectionIndex += ctrl.PAGE_SIZE;
                   }
                 }
@@ -413,8 +415,8 @@ angular.module('oppia').directive('learnerDashboardPage', [
 
             ctrl.collectionPlaylistSortableOptions = getPlaylistSortableOptions(
               ACTIVITY_TYPE_COLLECTION);
-            ctrl.explorationPlaylistSortableOptions = getPlaylistSortableOptions(
-              ACTIVITY_TYPE_EXPLORATION);
+            ctrl.explorationPlaylistSortableOptions =
+            getPlaylistSortableOptions(ACTIVITY_TYPE_EXPLORATION);
 
             ctrl.onClickThread = function(
                 threadStatus, explorationId, threadId, explorationTitle) {
@@ -429,7 +431,8 @@ angular.module('oppia').directive('learnerDashboardPage', [
               ctrl.explorationId = explorationId;
               ctrl.threadId = threadId;
 
-              for (var index = 0; index < ctrl.threadSummaries.length; index++) {
+              for (var index = 0;
+                index < ctrl.threadSummaries.length; index++) {
                 if (ctrl.threadSummaries[index].threadId === threadId) {
                   threadIndex = index;
                   var threadSummary = ctrl.threadSummaries[index];
@@ -571,13 +574,15 @@ angular.module('oppia').directive('learnerDashboardPage', [
                     LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
                   if (subsectionName ===
                       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-                    var index = ctrl.incompleteExplorationsList.indexOf(activity);
+                    var index =
+                  ctrl.incompleteExplorationsList.indexOf(activity);
                     if (index !== -1) {
                       ctrl.incompleteExplorationsList.splice(index, 1);
                     }
                   } else if (subsectionName ===
                             LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-                    var index = ctrl.incompleteCollectionsList.indexOf(activity);
+                    var index =
+                    ctrl.incompleteCollectionsList.indexOf(activity);
                     if (index !== -1) {
                       ctrl.incompleteCollectionsList.splice(index, 1);
                     }
@@ -599,13 +604,13 @@ angular.module('oppia').directive('learnerDashboardPage', [
                   }
                 }
               }, function() {
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
             };
-          }
-        }
-      ]};
+          };
+        }]
+    };
   }]).animation('.menu-sub-section', function() {
   var NG_HIDE_CLASS = 'ng-hide';
   return {

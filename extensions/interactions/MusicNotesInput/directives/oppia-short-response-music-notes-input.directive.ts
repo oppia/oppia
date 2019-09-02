@@ -50,7 +50,7 @@ angular.module('oppia').directive('oppiaShortResponseMusicNotesInput', [
           } else {
             ctrl.displayedAnswer = 'No answer given.';
           }
-        }
+        };
       }]
     };
   }

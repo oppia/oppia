@@ -52,7 +52,8 @@ angular.module('oppia').directive('coordTwoDimEditor', [
                 // Used for Retina screen devices.
                 iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
                   '/interactions/InteractiveMap/static/marker-icon-2x.png'),
-                shadowRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
+                shadowRetinaUrl:
+                UrlInterpolationService.getExtensionResourceUrl(
                   '/interactions/InteractiveMap/static/marker-shadow.png')
               }
             }
@@ -85,7 +86,7 @@ angular.module('oppia').directive('coordTwoDimEditor', [
             ctrl.mapMarkers.mainMarker.lat = lat;
             ctrl.mapMarkers.mainMarker.lng = lng;
           };
-        }
+        };
       }],
       restrict: 'E',
       scope: {},

@@ -43,7 +43,7 @@ angular.module('oppia').directive('oppiaShortResponseInteractiveMap', [
           ctrl.formattedCoords += ', ';
           ctrl.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
           ctrl.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
-        }
+        };
       }]
     };
   }

@@ -59,7 +59,8 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
                 // Convert tabs to spaces.
                 extraKeys: {
                   Tab: function(cm) {
-                    var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                    var spaces = Array(
+                      cm.getOption('indentUnit') + 1).join(' ');
                     cm.replaceSelection(spaces);
                     // Move the cursor to the end of the selection.
                     var endSelectionPos = cm.getDoc().getCursor('head');
@@ -134,9 +135,8 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
               return $sce.trustAsHtml(
                 $filter('convertUnicodeWithParamsToHtml')(ctrl.localValue));
             };
-          }
-      }
-      ]
+          };
+        }]
     };
   }
 ]);

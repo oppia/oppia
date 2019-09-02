@@ -65,9 +65,8 @@ angular.module('oppia').directive('parameterNameEditor', [
             $scope.$watch('$ctrl.localValue', function(newValue) {
               ctrl.value = newValue;
             });
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

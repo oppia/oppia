@@ -51,8 +51,7 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
                 $scope.$emit('submittedSchemaBasedIntForm');
               }
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

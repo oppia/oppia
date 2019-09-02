@@ -64,7 +64,7 @@ angular.module('oppia').directive('graphPropertyEditor', [
           $scope.$watch('$ctrl.localValue.property', function() {
             ctrl.value = ctrl.localValue.property.name;
           });
-        }
+        };
       }]
     };
   }]);

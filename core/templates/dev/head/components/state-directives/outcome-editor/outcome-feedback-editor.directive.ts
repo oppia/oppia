@@ -38,7 +38,7 @@ angular.module('oppia').directive('outcomeFeedbackEditor', [
           ctrl.OUTCOME_FEEDBACK_SCHEMA = {
             type: 'html'
           };
-        }
+        };
       }]
     };
   }]);

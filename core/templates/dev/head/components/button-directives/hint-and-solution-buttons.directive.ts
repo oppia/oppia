@@ -101,7 +101,8 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
                 ctrl.displaySolutionModal();
               } else {
                 var interstitialModalPromise = (
-                  HintAndSolutionModalService.displaySolutionInterstitialModal());
+                  HintAndSolutionModalService
+                    .displaySolutionInterstitialModal());
                 interstitialModalPromise.result.then(function() {
                   ctrl.displaySolutionModal();
                 }, function() {
@@ -146,7 +147,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
               }
             });
             resetLocalHintsArray();
-          }
-      }]
+          };
+        }]
     };
   }]);

@@ -45,7 +45,7 @@ angular.module('oppia').directive('realEditor', [
           if (ctrl.value === '') {
             ctrl.value = 0.0;
           }
-        }
+        };
       }]
     };
   }]);

@@ -45,64 +45,65 @@ angular.module('oppia').directive(
             TranslationLanguageService) {
           var ctrl = this;
           this.$onInit = function() {
-          ctrl.opportunities = [];
-          ctrl.opportunitiesAreLoading = true;
-          ctrl.moreOpportunitiesAvailable = true;
-          var updateWithNewOpportunities = function(opportunities, more) {
-            for (var index in opportunities) {
-              var opportunity = opportunities[index];
-              var subheading = (
-                opportunity.topic_name + ' - ' + opportunity.story_title);
-              var heading = opportunity.chapter_title;
-              var progressPercentage = '0.00';
-              var totalContentCount = opportunity.content_count;
-              var languageCode = (
-                TranslationLanguageService.getActiveLanguageCode());
-              var languageDescription = (
-                TranslationLanguageService.getActiveLanguageDescription());
-              if (
-                opportunity.translation_counts.hasOwnProperty(languageCode) && (
-                  totalContentCount > 0)) {
-                var progressPercentage = (
-                  (opportunity.translation_counts[languageCode] /
-                    totalContentCount) * 100).toFixed(2);
-              }
-              ctrl.opportunities.push({
-                heading: heading,
-                subheading: subheading,
-                progressPercentage: progressPercentage,
-                actionButtonTitle: 'Translate'
-              });
-            }
-            ctrl.moreOpportunitiesAvailable = more;
-            ctrl.opportunitiesAreLoading = false;
-          };
-
-          $scope.$on('activeLanguageChanged', function() {
             ctrl.opportunities = [];
             ctrl.opportunitiesAreLoading = true;
             ctrl.moreOpportunitiesAvailable = true;
+            var updateWithNewOpportunities = function(opportunities, more) {
+              for (var index in opportunities) {
+                var opportunity = opportunities[index];
+                var subheading = (
+                  opportunity.topic_name + ' - ' + opportunity.story_title);
+                var heading = opportunity.chapter_title;
+                var progressPercentage = '0.00';
+                var totalContentCount = opportunity.content_count;
+                var languageCode = (
+                  TranslationLanguageService.getActiveLanguageCode());
+                var languageDescription = (
+                  TranslationLanguageService.getActiveLanguageDescription());
+                if (
+                  opportunity.translation_counts.hasOwnProperty(
+                    languageCode) && (
+                    totalContentCount > 0)) {
+                  var progressPercentage = (
+                    (opportunity.translation_counts[languageCode] /
+                      totalContentCount) * 100).toFixed(2);
+                }
+                ctrl.opportunities.push({
+                  heading: heading,
+                  subheading: subheading,
+                  progressPercentage: progressPercentage,
+                  actionButtonTitle: 'Translate'
+                });
+              }
+              ctrl.moreOpportunitiesAvailable = more;
+              ctrl.opportunitiesAreLoading = false;
+            };
+
+            $scope.$on('activeLanguageChanged', function() {
+              ctrl.opportunities = [];
+              ctrl.opportunitiesAreLoading = true;
+              ctrl.moreOpportunitiesAvailable = true;
+              ContributionOpportunitiesService.getTranslationOpportunities(
+                TranslationLanguageService.getActiveLanguageCode(),
+                updateWithNewOpportunities);
+            });
+
+            ctrl.onLoadMoreOpportunities = function() {
+              if (
+                !ctrl.opportunitiesAreLoading &&
+                  ctrl.moreOpportunitiesAvailable) {
+                ctrl.opportunitiesAreLoading = true;
+                ContributionOpportunitiesService
+                  .getMoreTranslationOpportunities(
+                    TranslationLanguageService.getActiveLanguageCode(),
+                    updateWithNewOpportunities);
+              }
+            };
+
             ContributionOpportunitiesService.getTranslationOpportunities(
               TranslationLanguageService.getActiveLanguageCode(),
               updateWithNewOpportunities);
-          });
-
-          ctrl.onLoadMoreOpportunities = function() {
-            if (
-              !ctrl.opportunitiesAreLoading &&
-                ctrl.moreOpportunitiesAvailable) {
-              ctrl.opportunitiesAreLoading = true;
-              ContributionOpportunitiesService.getMoreTranslationOpportunities(
-                TranslationLanguageService.getActiveLanguageCode(),
-                updateWithNewOpportunities);
-            }
           };
-
-          ContributionOpportunitiesService.getTranslationOpportunities(
-            TranslationLanguageService.getActiveLanguageCode(),
-            updateWithNewOpportunities);
-        }
-        }
-      ]
+        }]
     };
   }]);

@@ -83,9 +83,8 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
 
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswerFn, validityCheckFn);
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

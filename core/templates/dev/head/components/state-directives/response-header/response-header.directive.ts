@@ -69,7 +69,8 @@ angular.module('oppia').directive('responseHeader', [
             // This returns false if the current interaction ID is null.
             ctrl.isCurrentInteractionLinear = function() {
               var interactionId = ctrl.getCurrentInteractionId();
-              return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+              return interactionId &&
+              INTERACTION_SPECS[interactionId].is_linear;
             };
 
             ctrl.isCorrect = function() {
@@ -90,7 +91,7 @@ angular.module('oppia').directive('responseHeader', [
             ctrl.deleteResponse = function(evt) {
               ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
             };
-          }
+          };
         }]
     };
   }]);

@@ -48,7 +48,7 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
               LearnerAnswerInfoService.recordLearnerAnswerInfo(
                 ctrl.answerDetails);
               PlayerTranscriptService.addNewInput(
-               {answerDetails: ctrl.answerDetails}, false);
+                {answerDetails: ctrl.answerDetails}, false);
               PlayerTranscriptService.addNewResponse(
                 LearnerAnswerInfoService.getSolicitAnswerDetailsFeedback());
               ctrl.getSubmitAnswerFn()(
@@ -61,9 +61,8 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
                 LearnerAnswerInfoService.getCurrentAnswer(), interaction.id,
                 interaction.customizationArgs);
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]

@@ -55,8 +55,8 @@ angular.module('oppia').directive('logicQuestionEditor', [
             proofString: ctrl.value.default_proof_string
           };
 
-          // NOTE: we use ng-change rather than $watch because the latter runs in
-          // response to any change to the watched value, and we only want to
+          // NOTE: we use ng-change rather than $watch because the latter runs
+          // in response to any change to the watched value, and we only want to
           // respond to changes made by the user.
           ctrl.changeAssumptions = function() {
             ctrl.convertThenBuild(
@@ -100,7 +100,7 @@ angular.module('oppia').directive('logicQuestionEditor', [
               ctrl.localValue.errorMessage = err.message;
             }
           };
-        }
+        };
       }]
     };
   }]);

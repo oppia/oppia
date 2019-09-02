@@ -42,7 +42,7 @@ angular.module('oppia').directive('oppiaShortResponseNumericInput', [
           if (ctrl.answer % 1 === 0) {
             ctrl.answer = Math.round(ctrl.answer);
           }
-        }
+        };
       }]
     };
   }

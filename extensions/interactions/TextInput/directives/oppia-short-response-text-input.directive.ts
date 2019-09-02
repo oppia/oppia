@@ -40,7 +40,7 @@ angular.module('oppia').directive('oppiaShortResponseTextInput', [
         var ctrl = this;
         this.$onInit = function() {
           ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        }
+        };
       }]
     };
   }

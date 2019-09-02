@@ -57,7 +57,7 @@ angular.module('oppia').directive('profileLinkImage', [
                 response.data.profile_picture_data_url_for_username ||
                 DEFAULT_PROFILE_IMAGE_PATH);
             });
-          }
+          };
         }]
     };
   }]);

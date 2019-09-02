@@ -60,9 +60,8 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
                 answer, MultipleChoiceInputRulesService);
             };
             CurrentInteractionService.registerCurrentInteraction(null, null);
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

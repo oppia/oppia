@@ -109,8 +109,7 @@ angular.module('oppia').directive('practiceSessionPage', [
             _fetchSkillDetails();
             PageTitleService.setPageTitle(
               'Practice Session: ' + ctrl.topicName + ' - Oppia');
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

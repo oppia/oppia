@@ -82,8 +82,8 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
                 'https://www.youtube.com/embed/' + ctrl.videoId + '?rel=0' +
                 ctrl.timingParams + ctrl.autoplaySuffix);
             }, 900);
-            // (^)Here timeout is set to 900ms. This is time it takes to bring the
-            // frame to correct point in browser and bring user to the main
+            // (^)Here timeout is set to 900ms. This is time it takes to bring
+            // the frame to correct point in browser and bring user to the main
             // content. Smaller delay causes checks to be performed even before
             // the player displays the content of the new card.
 
@@ -92,7 +92,7 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
             if (ContextService.isInExplorationEditorMode()) {
               ctrl.tabIndexVal = -1;
             }
-          }
+          };
         }]
     };
   }

@@ -32,7 +32,7 @@ angular.module('oppia').directive('profilePageNavbar', [
         var ctrl = this;
         this.$onInit = function() {
           ctrl.username = UrlService.getUsernameFromProfileUrl();
-        }
+        };
       }]
     };
   }

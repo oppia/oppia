@@ -123,10 +123,10 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
               }
             };
             if (!ctrl.interactionIsActive) {
-              /* The following lines highlight the learner's last answer for this
-                card. This need only be done at the beginning as if he submits
-                an answer, based on EVENT_NEW_CARD_AVAILABLE, the image is made
-                inactive, so his last selection would be higlighted.*/
+              /* The following lines highlight the learner's last answer for
+                this card. This need only be done at the beginning as if he
+                submits an answer, based on EVENT_NEW_CARD_AVAILABLE, the image
+                is made inactive, so his last selection would be higlighted.*/
               ctrl.mouseX = ctrl.getLastAnswer().clickPosition[0];
               ctrl.mouseY = ctrl.getLastAnswer().clickPosition[1];
               ctrl.updateCurrentlyHoveredRegions();
@@ -135,7 +135,8 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
               var image = $($element).find('.oppia-image-click-img');
               var labeledRegion = imageAndRegions.labeledRegions[index];
               var regionArea = labeledRegion.region.area;
-              var leftDelta = image.offset().left - image.parent().offset().left;
+              var leftDelta =
+              image.offset().left - image.parent().offset().left;
               var topDelta = image.offset().top - image.parent().offset().top;
               return {
                 left: regionArea[0][0] * image.width() + leftDelta,
@@ -204,9 +205,8 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             };
 
             CurrentInteractionService.registerCurrentInteraction(null, null);
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

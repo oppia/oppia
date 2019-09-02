@@ -43,7 +43,7 @@ angular.module('oppia').directive('oppiaNoninteractiveCollapsible', [
             $attrs.headingWithValue);
           ctrl.content = HtmlEscaperService.escapedJsonToObj(
             $attrs.contentWithValue);
-        }
+        };
       }]
     };
   }

@@ -44,8 +44,8 @@ angular.module('oppia').directive('codeStringEditor', [
             return '';
           };
 
-          // Reset the component each time the value changes (e.g. if this is part
-          // of an editable list).
+          // Reset the component each time the value changes (e.g. if this is
+          // part of an editable list).
           $scope.$watch('$ctrl.value', function() {
             ctrl.localValue = {
               label: ctrl.value || ''
@@ -55,7 +55,7 @@ angular.module('oppia').directive('codeStringEditor', [
           $scope.$watch('$ctrl.localValue.label', function(newValue) {
             ctrl.value = newValue;
           });
-        }
+        };
       }]
     };
   }]);

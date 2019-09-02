@@ -63,7 +63,7 @@ angular.module('oppia').directive('setOfHtmlStringEditor', [
               ctrl.value.push(choiceHtml);
             }
           };
-        }
+        };
       }]
     };
   }]);

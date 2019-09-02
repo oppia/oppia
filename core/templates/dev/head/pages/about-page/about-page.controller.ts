@@ -109,8 +109,7 @@ angular.module('oppia').directive('aboutPage', [
             ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
             ctrl.aboutPageMascotImgUrl = UrlInterpolationService
               .getStaticImageUrl('/general/about_page_mascot.png');
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

@@ -41,7 +41,7 @@ angular.module('oppia').directive('oppiaResponseMathExpressionInput', [
         this.$onInit = function() {
           ctrl.latexAnswer = HtmlEscaperService.escapedJsonToObj(
             $attrs.answer).latex;
-        }
+        };
       }]
     };
   }

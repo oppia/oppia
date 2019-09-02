@@ -124,7 +124,7 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
 
               });
             };
-          }
+          };
         }]
     };
   }

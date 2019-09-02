@@ -48,7 +48,7 @@ angular.module('oppia').directive('nonnegativeIntEditor', [
           if (!ctrl.value) {
             ctrl.value = 0;
           }
-        }
+        };
       }]
     };
   }]);

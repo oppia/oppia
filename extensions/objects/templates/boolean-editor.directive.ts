@@ -26,8 +26,8 @@ angular.module('oppia').directive('booleanEditor', [
       controller: ['$scope', function($scope) {
         var ctrl = this;
         this.$onInit = function() {
-          // Reset the component each time the value changes (e.g. if this is part
-          // of an editable list).
+          // Reset the component each time the value changes (e.g. if this is
+          // part of an editable list).
           $scope.$watch('$ctrl.value', function(newValue) {
             ctrl.localValue = {
               label: newValue || false
@@ -37,7 +37,7 @@ angular.module('oppia').directive('booleanEditor', [
           $scope.$watch('$ctrl.localValue.label', function(newValue) {
             ctrl.value = newValue;
           });
-        }
+        };
       }],
       restrict: 'E',
       scope: {},

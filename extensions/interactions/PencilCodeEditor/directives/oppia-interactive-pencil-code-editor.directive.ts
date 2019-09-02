@@ -127,9 +127,9 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               }).result.then(function() {
                 pce.setCode(ctrl.initialCode);
               }, function() {
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
             };
 
             var getNormalizedCode = function() {
@@ -191,7 +191,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             });
 
             CurrentInteractionService.registerCurrentInteraction(null, null);
-          }
+          };
         }]
     };
   }

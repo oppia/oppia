@@ -41,8 +41,8 @@ angular.module('oppia').directive('musicPhraseEditor', [
             items: {
               type: 'unicode',
               choices: [
-                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5',
-                'G5', 'A5'
+                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5',
+                'F5', 'G5', 'A5'
               ]
             },
             ui_config: {
@@ -54,8 +54,8 @@ angular.module('oppia').directive('musicPhraseEditor', [
             }]
           };
 
-          // Reset the component each time the value changes (e.g. if this is part
-          // of an editable list).
+          // Reset the component each time the value changes (e.g. if this is
+          // part of an editable list).
           $scope.$watch('$ctrl.value', function(newValue) {
             // TODO(sll): Check that $ctrl.value is a list.
             ctrl.localValue = [];
@@ -86,7 +86,7 @@ angular.module('oppia').directive('musicPhraseEditor', [
               }
             }
           }, true);
-        }
+        };
       }]
     };
   }]);

@@ -148,7 +148,8 @@ angular.module('oppia').directive('questionEditor', [
 
             ctrl.saveInteractionId = function(displayedValue) {
               _updateQuestion(function() {
-                StateEditorService.setInteractionId(angular.copy(displayedValue));
+                StateEditorService.setInteractionId(
+                  angular.copy(displayedValue));
               });
             };
 
@@ -209,8 +210,8 @@ angular.module('oppia').directive('questionEditor', [
                       contentId);
                   });
                 }, function() {
-                  // This callback is triggered when the Cancel button is clicked.
-                  // No further action is needed.
+                  // This callback is triggered when the Cancel button is
+                  // clicked. No further action is needed.
                 });
               }
             };
@@ -228,8 +229,7 @@ angular.module('oppia').directive('questionEditor', [
             });
 
             _init();
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

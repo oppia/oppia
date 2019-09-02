@@ -130,8 +130,7 @@ angular.module('oppia').directive('moderatorPage', [
                 AlertsService.addSuccessMessage('Featured activities saved.');
               });
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

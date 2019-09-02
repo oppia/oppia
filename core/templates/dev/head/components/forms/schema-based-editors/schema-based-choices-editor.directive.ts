@@ -50,8 +50,8 @@ angular.module('oppia').directive('schemaBasedChoicesEditor', [
             delete readonlySchema.choices;
             return readonlySchema;
           };
-        }
-     }]
+        };
+      }]
     };
   }
 ]);

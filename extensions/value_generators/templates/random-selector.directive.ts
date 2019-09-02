@@ -49,7 +49,7 @@ angular.module('oppia').directive('randomSelector', [
           if (!ctrl.customizationArgs.list_of_values) {
             ctrl.customizationArgs.list_of_values = [];
           }
-        }
+        };
       }
     };
   }]);

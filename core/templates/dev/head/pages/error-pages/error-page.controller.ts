@@ -42,7 +42,7 @@ angular.module('oppia').directive('errorPage', [
 
             PageTitleService.setPageTitle(
               'Error ' + ctrl.statusCode + ' - Oppia');
-          }
-        }
-      ]};
+          };
+        }]
+    };
   }]);

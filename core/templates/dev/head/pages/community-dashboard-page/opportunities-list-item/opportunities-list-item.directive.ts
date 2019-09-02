@@ -47,8 +47,7 @@ angular.module('oppia').directive('opportunitiesListItem', [
             } else {
               ctrl.loadingView = true;
             }
-          }
-      }
-      ]
+          };
+        }]
     };
   }]);

@@ -58,43 +58,42 @@ angular.module('oppia').directive('collectionSummaryTile', [
             COLLECTION_EDITOR_URL) {
           var ctrl = this;
           this.$onInit = function() {
-          ctrl.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          });
-          ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
-          ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;
+            ctrl.userIsLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+            });
+            ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
+            ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;
 
-          ctrl.getLastUpdatedDatetime = function() {
-            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-              ctrl.getLastUpdatedMsec());
-          };
+            ctrl.getLastUpdatedDatetime = function() {
+              return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+                ctrl.getLastUpdatedMsec());
+            };
 
-          ctrl.getCollectionLink = function() {
-            var targetUrl = (
-              ctrl.isLinkedToEditorPage ?
-                COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
-            return UrlInterpolationService.interpolateUrl(
-              targetUrl, {
-                collection_id: ctrl.getCollectionId()
-              }
-            );
-          };
+            ctrl.getCollectionLink = function() {
+              var targetUrl = (
+                ctrl.isLinkedToEditorPage ?
+                  COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
+              return UrlInterpolationService.interpolateUrl(
+                targetUrl, {
+                  collection_id: ctrl.getCollectionId()
+                }
+              );
+            };
 
-          ctrl.getCompleteThumbnailIconUrl = function() {
-            return UrlInterpolationService.getStaticImageUrl(
-              ctrl.getThumbnailIconUrl());
-          };
+            ctrl.getCompleteThumbnailIconUrl = function() {
+              return UrlInterpolationService.getStaticImageUrl(
+                ctrl.getThumbnailIconUrl());
+            };
 
-          ctrl.getStaticImageUrl = function(url) {
-            return UrlInterpolationService.getStaticImageUrl(url);
-          };
+            ctrl.getStaticImageUrl = function(url) {
+              return UrlInterpolationService.getStaticImageUrl(url);
+            };
 
-          ctrl.setHoverState = function(hoverState) {
-            ctrl.collectionIsCurrentlyHoveredOver = hoverState;
+            ctrl.setHoverState = function(hoverState) {
+              ctrl.collectionIsCurrentlyHoveredOver = hoverState;
+            };
           };
-        }
-        }
-      ]
+        }]
     };
   }]);

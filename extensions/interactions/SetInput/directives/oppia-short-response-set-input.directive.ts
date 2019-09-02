@@ -41,7 +41,7 @@ angular.module('oppia').directive('oppiaShortResponseSetInput', [
           ctrl.displayedAnswer = (
             _answer.length > 0 ? _answer.join(', ') :
             'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
-        }
+        };
       }]
     };
   }

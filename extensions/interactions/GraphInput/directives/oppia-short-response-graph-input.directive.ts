@@ -37,11 +37,11 @@ angular.module('oppia').directive('oppiaShortResponseGraphInput', [
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
         this.$onInit = function() {
-          // TODO(bhenning): Improve this short response by using a small version
-          // of the graph image instead of an arbitrary label of vertices and
-          // edges.
+          // TODO(bhenning): Improve this short response by using a small
+          // version of the graph image instead of an arbitrary label of
+          // vertices and edges.
           ctrl.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        }
+        };
       }]
     };
   }

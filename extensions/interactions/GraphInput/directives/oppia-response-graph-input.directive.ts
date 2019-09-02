@@ -56,7 +56,7 @@ angular.module('oppia').directive('oppiaResponseGraphInput', [
           ctrl.getEdgeCentre = function(index) {
             return GraphDetailService.getEdgeCentre(ctrl.graph, index);
           };
-        }
+        };
       }]
     };
   }

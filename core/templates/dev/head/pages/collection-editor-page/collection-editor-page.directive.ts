@@ -72,7 +72,7 @@ angular.module('oppia').directive('collectionEditorPage', [
 
             $scope.$on(EVENT_COLLECTION_INITIALIZED, setTitle);
             $scope.$on(EVENT_COLLECTION_REINITIALIZED, setTitle);
-          }
+          };
         }]
     };
   }

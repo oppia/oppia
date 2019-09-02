@@ -42,9 +42,8 @@ angular.module('oppia').directive('collectionLocalNav', [
                   ctrl.collectionId));
               ctrl.canEdit = collectionDetails.canEdit;
             });
-          }
-         }
-       ]
+          };
+        }]
     };
   }
 ]);

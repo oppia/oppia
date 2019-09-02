@@ -56,7 +56,7 @@ angular.module('oppia').directive('collectionEditorNavbarBreadcrumb', [
             };
 
             ctrl.collection = CollectionEditorStateService.getCollection();
-  
+
             ctrl.getCurrentTabName = function() {
               return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
                 RouterService.getActiveTabName()];
@@ -66,8 +66,7 @@ angular.module('oppia').directive('collectionEditorNavbarBreadcrumb', [
               RouterService.navigateToSettingsTab();
               FocusManagerService.setFocus(COLLECTION_TITLE_INPUT_FOCUS_LABEL);
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

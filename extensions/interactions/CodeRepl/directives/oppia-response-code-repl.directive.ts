@@ -46,9 +46,8 @@ angular.module('oppia').directive('oppiaResponseCodeRepl', [
               ctrl.errorFocusLabel = FocusManagerService.generateFocusLabel();
               FocusManagerService.setFocus(ctrl.errorFocusLabel);
             }
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

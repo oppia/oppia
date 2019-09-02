@@ -80,8 +80,7 @@ angular.module('oppia').directive('topicViewerPage', [
                 }
               }
             );
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

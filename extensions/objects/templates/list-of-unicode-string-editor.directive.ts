@@ -45,7 +45,7 @@ angular.module('oppia').directive('listOfUnicodeStringEditor', [
           if (!ctrl.value) {
             ctrl.value = [];
           }
-        }
+        };
       }]
     };
   }]);

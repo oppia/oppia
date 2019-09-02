@@ -47,7 +47,7 @@ angular.module('oppia').directive('dragAndDropPositiveIntEditor', [
           ctrl.selection = function(selectedRank) {
             ctrl.value = parseInt(selectedRank);
           };
-        }
+        };
       }]
     };
   }]);

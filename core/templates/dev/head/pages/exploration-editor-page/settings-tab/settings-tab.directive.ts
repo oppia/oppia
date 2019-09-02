@@ -119,394 +119,398 @@ angular.module('oppia').directive('settingsTab', [
             EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
           var ctrl = this;
           this.$onInit = function() {
-          ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
-            EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
-          ctrl.EditabilityService = EditabilityService;
-          ctrl.CATEGORY_LIST_FOR_SELECT2 = [];
-          for (var i = 0; i < ALL_CATEGORIES.length; i++) {
-            ctrl.CATEGORY_LIST_FOR_SELECT2.push({
-              id: ALL_CATEGORIES[i],
-              text: ALL_CATEGORIES[i]
-            });
-          }
+            ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
+              EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+            ctrl.EditabilityService = EditabilityService;
+            ctrl.CATEGORY_LIST_FOR_SELECT2 = [];
+            for (var i = 0; i < ALL_CATEGORIES.length; i++) {
+              ctrl.CATEGORY_LIST_FOR_SELECT2.push({
+                id: ALL_CATEGORIES[i],
+                text: ALL_CATEGORIES[i]
+              });
+            }
 
-          ctrl.isRolesFormOpen = false;
+            ctrl.isRolesFormOpen = false;
 
-          ctrl.TAG_REGEX = TAG_REGEX;
-          ctrl.canDelete = false;
-          ctrl.canModifyRoles = false;
-          ctrl.canReleaseOwnership = false;
-          ctrl.canUnpublish = false;
-          ctrl.explorationId = ExplorationDataService.explorationId;
+            ctrl.TAG_REGEX = TAG_REGEX;
+            ctrl.canDelete = false;
+            ctrl.canModifyRoles = false;
+            ctrl.canReleaseOwnership = false;
+            ctrl.canUnpublish = false;
+            ctrl.explorationId = ExplorationDataService.explorationId;
 
-          UserExplorationPermissionsService.getPermissionsAsync()
-            .then(function(permissions) {
-              ctrl.canDelete = permissions.can_delete;
-              ctrl.canModifyRoles = permissions.can_modify_roles;
-              ctrl.canReleaseOwnership = permissions.can_release_ownership;
-              ctrl.canUnpublish = permissions.can_unpublish;
-            });
+            UserExplorationPermissionsService.getPermissionsAsync()
+              .then(function(permissions) {
+                ctrl.canDelete = permissions.can_delete;
+                ctrl.canModifyRoles = permissions.can_modify_roles;
+                ctrl.canReleaseOwnership = permissions.can_release_ownership;
+                ctrl.canUnpublish = permissions.can_unpublish;
+              });
 
-          var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
-          var EXPLORE_PAGE_PREFIX = '/explore/';
+            var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
+            var EXPLORE_PAGE_PREFIX = '/explore/';
 
-          ctrl.getExplorePageUrl = function() {
-            return (
-              window.location.protocol + '//' + window.location.host +
-              EXPLORE_PAGE_PREFIX + ctrl.explorationId);
-          };
+            ctrl.getExplorePageUrl = function() {
+              return (
+                window.location.protocol + '//' + window.location.host +
+                EXPLORE_PAGE_PREFIX + ctrl.explorationId);
+            };
 
-          ctrl.initSettingsTab = function() {
-            ctrl.explorationTitleService = ExplorationTitleService;
-            ctrl.explorationCategoryService = ExplorationCategoryService;
-            ctrl.explorationObjectiveService = ExplorationObjectiveService;
-            ctrl.explorationLanguageCodeService = (
-              ExplorationLanguageCodeService);
-            ctrl.explorationTagsService = ExplorationTagsService;
-            ctrl.ExplorationRightsService = ExplorationRightsService;
-            ctrl.explorationInitStateNameService = (
-              ExplorationInitStateNameService);
-            ctrl.explorationParamSpecsService = ExplorationParamSpecsService;
-            ctrl.explorationParamChangesService = (
-              ExplorationParamChangesService);
-            ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
+            ctrl.initSettingsTab = function() {
+              ctrl.explorationTitleService = ExplorationTitleService;
+              ctrl.explorationCategoryService = ExplorationCategoryService;
+              ctrl.explorationObjectiveService = ExplorationObjectiveService;
+              ctrl.explorationLanguageCodeService = (
+                ExplorationLanguageCodeService);
+              ctrl.explorationTagsService = ExplorationTagsService;
+              ctrl.ExplorationRightsService = ExplorationRightsService;
+              ctrl.explorationInitStateNameService = (
+                ExplorationInitStateNameService);
+              ctrl.explorationParamSpecsService = ExplorationParamSpecsService;
+              ctrl.explorationParamChangesService = (
+                ExplorationParamChangesService);
+              ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
 
-            ExplorationDataService.getData().then(function() {
-              ctrl.refreshSettingsTab();
-              ctrl.hasPageLoaded = true;
-            });
-          };
+              ExplorationDataService.getData().then(function() {
+                ctrl.refreshSettingsTab();
+                ctrl.hasPageLoaded = true;
+              });
+            };
 
-          ctrl.refreshSettingsTab = function() {
-            // Ensure that ExplorationStatesService has been initialized before
-            // getting the state names from it. Otherwise, navigating to the
-            // settings tab directly (by entering a URL that ends with
-            // /settings) results in a console error.
-            if (ExplorationStatesService.isInitialized()) {
-              var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
-                function(categoryItem) {
-                  return (
-                    categoryItem.id === ExplorationCategoryService.savedMemento
-                  );
+            ctrl.refreshSettingsTab = function() {
+              // Ensure that ExplorationStatesService has been initialized
+              // before getting the state names from it. Otherwise, navigating
+              // to the settings tab directly (by entering a URL that ends with
+              // /settings) results in a console error.
+              if (ExplorationStatesService.isInitialized()) {
+                var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
+                  function(categoryItem) {
+                    return (
+                      categoryItem.id ===
+                      ExplorationCategoryService.savedMemento
+                    );
+                  }
+                );
+
+                // If the current category is not in the dropdown, add it
+                // as the first option.
+                if (!categoryIsInSelect2 &&
+                    ExplorationCategoryService.savedMemento) {
+                  ctrl.CATEGORY_LIST_FOR_SELECT2.unshift({
+                    id: ExplorationCategoryService.savedMemento,
+                    text: ExplorationCategoryService.savedMemento
+                  });
                 }
-              );
 
-              // If the current category is not in the dropdown, add it
-              // as the first option.
-              if (!categoryIsInSelect2 &&
-                  ExplorationCategoryService.savedMemento) {
-                ctrl.CATEGORY_LIST_FOR_SELECT2.unshift({
-                  id: ExplorationCategoryService.savedMemento,
-                  text: ExplorationCategoryService.savedMemento
-                });
+                ctrl.stateNames = ExplorationStatesService.getStateNames();
+              }
+            };
+
+            $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
+
+            ctrl.initSettingsTab();
+
+            ctrl.ROLES = [{
+              name: 'Manager (can edit permissions)',
+              value: 'owner'
+            }, {
+              name: 'Collaborator (can make changes)',
+              value: 'editor'
+            }, {
+              name: 'Voice Artist (can do voiceover)',
+              value: 'voice artist'
+            }, {
+              name: 'Playtester (can give feedback)',
+              value: 'viewer'
+            }];
+
+            ctrl.formStyle = JSON.stringify({
+              display: 'table-cell',
+              width: '16.66666667%',
+              'vertical-align': 'top'
+            });
+
+            ctrl.saveExplorationTitle = function() {
+              ExplorationTitleService.saveDisplayedValue();
+            };
+
+            ctrl.saveExplorationCategory = function() {
+              ExplorationCategoryService.saveDisplayedValue();
+            };
+
+            ctrl.saveExplorationObjective = function() {
+              ExplorationObjectiveService.saveDisplayedValue();
+            };
+
+            ctrl.saveExplorationLanguageCode = function() {
+              ExplorationLanguageCodeService.saveDisplayedValue();
+            };
+
+            ctrl.saveExplorationTags = function() {
+              ExplorationTagsService.saveDisplayedValue();
+            };
+
+            ctrl.saveExplorationInitStateName = function() {
+              var newInitStateName = ExplorationInitStateNameService.displayed;
+
+              if (!ExplorationStatesService.getState(newInitStateName)) {
+                AlertsService.addWarning(
+                  'Invalid initial state name: ' + newInitStateName);
+                ExplorationInitStateNameService.restoreFromMemento();
+                return;
               }
 
-              ctrl.stateNames = ExplorationStatesService.getStateNames();
-            }
-          };
+              ExplorationInitStateNameService.saveDisplayedValue();
 
-          $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
+              $rootScope.$broadcast('refreshGraph');
+            };
 
-          ctrl.initSettingsTab();
+            ctrl.postSaveParamChangesHook = function() {
+              ExplorationWarningsService.updateWarnings();
+            };
 
-          ctrl.ROLES = [{
-            name: 'Manager (can edit permissions)',
-            value: 'owner'
-          }, {
-            name: 'Collaborator (can make changes)',
-            value: 'editor'
-          }, {
-            name: 'Voice Artist (can do voiceover)',
-            value: 'voice artist'
-          }, {
-            name: 'Playtester (can give feedback)',
-            value: 'viewer'
-          }];
+            // Methods for enabling advanced features.
+            ctrl.areParametersEnabled =
+              ExplorationFeaturesService.areParametersEnabled;
+            ctrl.enableParameters = ExplorationFeaturesService.enableParameters;
 
-          ctrl.formStyle = JSON.stringify({
-            display: 'table-cell',
-            width: '16.66666667%',
-            'vertical-align': 'top'
-          });
-
-          ctrl.saveExplorationTitle = function() {
-            ExplorationTitleService.saveDisplayedValue();
-          };
-
-          ctrl.saveExplorationCategory = function() {
-            ExplorationCategoryService.saveDisplayedValue();
-          };
-
-          ctrl.saveExplorationObjective = function() {
-            ExplorationObjectiveService.saveDisplayedValue();
-          };
-
-          ctrl.saveExplorationLanguageCode = function() {
-            ExplorationLanguageCodeService.saveDisplayedValue();
-          };
-
-          ctrl.saveExplorationTags = function() {
-            ExplorationTagsService.saveDisplayedValue();
-          };
-
-          ctrl.saveExplorationInitStateName = function() {
-            var newInitStateName = ExplorationInitStateNameService.displayed;
-
-            if (!ExplorationStatesService.getState(newInitStateName)) {
-              AlertsService.addWarning(
-                'Invalid initial state name: ' + newInitStateName);
-              ExplorationInitStateNameService.restoreFromMemento();
-              return;
-            }
-
-            ExplorationInitStateNameService.saveDisplayedValue();
-
-            $rootScope.$broadcast('refreshGraph');
-          };
-
-          ctrl.postSaveParamChangesHook = function() {
-            ExplorationWarningsService.updateWarnings();
-          };
-
-          // Methods for enabling advanced features.
-          ctrl.areParametersEnabled =
-            ExplorationFeaturesService.areParametersEnabled;
-          ctrl.enableParameters = ExplorationFeaturesService.enableParameters;
-
-          ctrl.isAutomaticTextToSpeechEnabled = (
-            ExplorationAutomaticTextToSpeechService
-              .isAutomaticTextToSpeechEnabled);
-          ctrl.toggleAutomaticTextToSpeech = (
-            ExplorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech
-          );
-
-          ctrl.isCorrectnessFeedbackEnabled = (
-            ExplorationCorrectnessFeedbackService.isEnabled);
-          ctrl.toggleCorrectnessFeedback = (
-            ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
-
-          // Methods for rights management.
-          ctrl.openEditRolesForm = function() {
-            ctrl.isRolesFormOpen = true;
-            ctrl.newMemberUsername = '';
-            ctrl.newMemberRole = ctrl.ROLES[0];
-          };
-
-          ctrl.closeEditRolesForm = function() {
-            ctrl.newMemberUsername = '';
-            ctrl.newMemberRole = ctrl.ROLES[0];
-            ctrl.closeRolesForm();
-          };
-
-          ctrl.editRole = function(newMemberUsername, newMemberRole) {
-            ctrl.closeRolesForm();
-            ExplorationRightsService.saveRoleChanges(
-              newMemberUsername, newMemberRole);
-          };
-
-          ctrl.toggleViewabilityIfPrivate = function() {
-            ExplorationRightsService.setViewability(
-              !ExplorationRightsService.viewableIfPrivate());
-          };
-
-          // Methods for muting notifications.
-          ctrl.muteFeedbackNotifications = function() {
-            UserEmailPreferencesService.setFeedbackNotificationPreferences(
-              true);
-          };
-          ctrl.muteSuggestionNotifications = function() {
-            UserEmailPreferencesService.setSuggestionNotificationPreferences(
-              true
+            ctrl.isAutomaticTextToSpeechEnabled = (
+              ExplorationAutomaticTextToSpeechService
+                .isAutomaticTextToSpeechEnabled);
+            ctrl.toggleAutomaticTextToSpeech = (
+              ExplorationAutomaticTextToSpeechService
+                .toggleAutomaticTextToSpeech
             );
-          };
 
-          ctrl.unmuteFeedbackNotifications = function() {
-            UserEmailPreferencesService.setFeedbackNotificationPreferences(
-              false
-            );
-          };
-          ctrl.unmuteSuggestionNotifications = function() {
-            UserEmailPreferencesService.setSuggestionNotificationPreferences(
-              false);
-          };
+            ctrl.isCorrectnessFeedbackEnabled = (
+              ExplorationCorrectnessFeedbackService.isEnabled);
+            ctrl.toggleCorrectnessFeedback = (
+              ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
 
-          // Methods relating to control buttons.
-          ctrl.previewSummaryTile = function() {
-            AlertsService.clearWarnings();
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/settings-tab/templates/' +
-                'preview-summary-tile-modal.template.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.getExplorationTitle = function() {
-                    return ExplorationTitleService.displayed;
-                  };
-                  $scope.getExplorationObjective = function() {
-                    return ExplorationObjectiveService.displayed;
-                  };
-                  $scope.getExplorationCategory = function() {
-                    return ExplorationCategoryService.displayed;
-                  };
-                  $scope.getThumbnailIconUrl = function() {
-                    var category = ExplorationCategoryService.displayed;
-                    if (ALL_CATEGORIES.indexOf(category) === -1) {
-                      category = DEFAULT_CATEGORY_ICON;
-                    }
-                    return '/subjects/' + category + '.svg';
-                  };
-                  $scope.getThumbnailBgColor = function() {
-                    var category = ExplorationCategoryService.displayed;
-                    var color = null;
-                    if (!CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
-                      color = DEFAULT_COLOR;
-                    } else {
-                      color = CATEGORIES_TO_COLORS[category];
-                    }
-                    return color;
-                  };
+            // Methods for rights management.
+            ctrl.openEditRolesForm = function() {
+              ctrl.isRolesFormOpen = true;
+              ctrl.newMemberUsername = '';
+              ctrl.newMemberRole = ctrl.ROLES[0];
+            };
 
-                  $scope.close = function() {
-                    $uibModalInstance.dismiss();
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
-            }).result.catch(function() {
-               // This callback is triggered when the Cancel button is clicked.
-               // No further action is needed.
-            });
-          };
+            ctrl.closeEditRolesForm = function() {
+              ctrl.newMemberUsername = '';
+              ctrl.newMemberRole = ctrl.ROLES[0];
+              ctrl.closeRolesForm();
+            };
 
-          ctrl.showTransferExplorationOwnershipModal = function() {
-            AlertsService.clearWarnings();
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/settings-tab/templates/' +
-                'transfer-exploration-ownership-modal.template.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.transfer = $uibModalInstance.close;
+            ctrl.editRole = function(newMemberUsername, newMemberRole) {
+              ctrl.closeRolesForm();
+              ExplorationRightsService.saveRoleChanges(
+                newMemberUsername, newMemberRole);
+            };
 
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
-            }).result.then(function() {
-              ExplorationRightsService.makeCommunityOwned();
-            }, function() {
+            ctrl.toggleViewabilityIfPrivate = function() {
+              ExplorationRightsService.setViewability(
+                !ExplorationRightsService.viewableIfPrivate());
+            };
 
-            });
-          };
+            // Methods for muting notifications.
+            ctrl.muteFeedbackNotifications = function() {
+              UserEmailPreferencesService.setFeedbackNotificationPreferences(
+                true);
+            };
+            ctrl.muteSuggestionNotifications = function() {
+              UserEmailPreferencesService.setSuggestionNotificationPreferences(
+                true
+              );
+            };
 
-          ctrl.deleteExploration = function() {
-            AlertsService.clearWarnings();
+            ctrl.unmuteFeedbackNotifications = function() {
+              UserEmailPreferencesService.setFeedbackNotificationPreferences(
+                false
+              );
+            };
+            ctrl.unmuteSuggestionNotifications = function() {
+              UserEmailPreferencesService.setSuggestionNotificationPreferences(
+                false);
+            };
 
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/settings-tab/templates/' +
-                'delete-exploration-modal.template.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.reallyDelete = $uibModalInstance.close;
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
-            }).result.then(function() {
-              EditableExplorationBackendApiService.deleteExploration(
-                ctrl.explorationId).then(function() {
-                $window.location = CREATOR_DASHBOARD_PAGE_URL;
-              });
-            }, function() {
-
-            });
-          };
-
-          ctrl.unpublishExplorationAsModerator = function() {
-            AlertsService.clearWarnings();
-
-            var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
-
-            $http.get(moderatorEmailDraftUrl).then(function(response) {
-              // If the draft email body is empty, email functionality will not
-              // be exposed to the mdoerator.
-              var draftEmailBody = response.data.draft_email_body;
-
+            // Methods relating to control buttons.
+            ctrl.previewSummaryTile = function() {
+              AlertsService.clearWarnings();
               $uibModal.open({
-                bindToController: {},
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/settings-tab/templates/' +
-                  'moderator-unpublish-exploration-modal.template.html'),
+                  'preview-summary-tile-modal.template.html'),
                 backdrop: true,
-                resolve: {
-                  draftEmailBody: function() {
-                    return draftEmailBody;
-                  }
-                },
-                controllerAs: '$ctrl',
                 controller: [
-                  '$uibModalInstance', 'draftEmailBody',
-                  function($uibModalInstance, draftEmailBody) {
-                    var ctrl = this;
-                    this.$onInit = function() {
-                    ctrl.willEmailBeSent = Boolean(draftEmailBody);
-                    ctrl.emailBody = draftEmailBody;
-
-                    if (ctrl.willEmailBeSent) {
-                      ctrl.EMAIL_BODY_SCHEMA = {
-                        type: 'unicode',
-                        ui_config: {
-                          rows: 20
-                        }
-                      };
-                    }
-
-                    ctrl.reallyTakeAction = function() {
-                      $uibModalInstance.close({
-                        emailBody: ctrl.emailBody
-                      });
+                  '$scope', '$uibModalInstance', function(
+                      $scope, $uibModalInstance) {
+                    $scope.getExplorationTitle = function() {
+                      return ExplorationTitleService.displayed;
+                    };
+                    $scope.getExplorationObjective = function() {
+                      return ExplorationObjectiveService.displayed;
+                    };
+                    $scope.getExplorationCategory = function() {
+                      return ExplorationCategoryService.displayed;
+                    };
+                    $scope.getThumbnailIconUrl = function() {
+                      var category = ExplorationCategoryService.displayed;
+                      if (ALL_CATEGORIES.indexOf(category) === -1) {
+                        category = DEFAULT_CATEGORY_ICON;
+                      }
+                      return '/subjects/' + category + '.svg';
+                    };
+                    $scope.getThumbnailBgColor = function() {
+                      var category = ExplorationCategoryService.displayed;
+                      var color = null;
+                      if (!CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
+                        color = DEFAULT_COLOR;
+                      } else {
+                        color = CATEGORIES_TO_COLORS[category];
+                      }
+                      return color;
                     };
 
-                    ctrl.cancel = function() {
+                    $scope.close = function() {
+                      $uibModalInstance.dismiss();
+                      AlertsService.clearWarnings();
+                    };
+                  }
+                ]
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
+              });
+            };
+
+            ctrl.showTransferExplorationOwnershipModal = function() {
+              AlertsService.clearWarnings();
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/exploration-editor-page/settings-tab/templates/' +
+                  'transfer-exploration-ownership-modal.template.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance', function(
+                      $scope, $uibModalInstance) {
+                    $scope.transfer = $uibModalInstance.close;
+
+                    $scope.cancel = function() {
                       $uibModalInstance.dismiss('cancel');
                       AlertsService.clearWarnings();
                     };
                   }
+                ]
+              }).result.then(function() {
+                ExplorationRightsService.makeCommunityOwned();
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
+              });
+            };
+
+            ctrl.deleteExploration = function() {
+              AlertsService.clearWarnings();
+
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/exploration-editor-page/settings-tab/templates/' +
+                  'delete-exploration-modal.template.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance', function(
+                      $scope, $uibModalInstance) {
+                    $scope.reallyDelete = $uibModalInstance.close;
+
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                      AlertsService.clearWarnings();
+                    };
                   }
                 ]
-              }).result.then(function(result) {
-                ExplorationRightsService.saveModeratorChangeToBackend(
-                  result.emailBody);
+              }).result.then(function() {
+                EditableExplorationBackendApiService.deleteExploration(
+                  ctrl.explorationId).then(function() {
+                  $window.location = CREATOR_DASHBOARD_PAGE_URL;
+                });
               }, function() {
-                
+
               });
-            });
-          };
+            };
 
-          ctrl.isExplorationLockedForEditing = function() {
-            return ChangeListService.isExplorationLockedForEditing();
-          };
+            ctrl.unpublishExplorationAsModerator = function() {
+              AlertsService.clearWarnings();
 
-          ctrl.closeRolesForm = function() {
-            ctrl.isRolesFormOpen = false;
-          };
+              var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
 
-          ctrl.isTitlePresent = function() {
-            return ExplorationTitleService.savedMemento.length > 0;
+              $http.get(moderatorEmailDraftUrl).then(function(response) {
+                // If the draft email body is empty, email functionality will
+                // not be exposed to the mdoerator.
+                var draftEmailBody = response.data.draft_email_body;
+
+                $uibModal.open({
+                  bindToController: {},
+                  templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                    '/pages/exploration-editor-page/settings-tab/templates/' +
+                    'moderator-unpublish-exploration-modal.template.html'),
+                  backdrop: true,
+                  resolve: {
+                    draftEmailBody: function() {
+                      return draftEmailBody;
+                    }
+                  },
+                  controllerAs: '$ctrl',
+                  controller: [
+                    '$uibModalInstance', 'draftEmailBody',
+                    function($uibModalInstance, draftEmailBody) {
+                      var ctrl = this;
+                      this.$onInit = function() {
+                        ctrl.willEmailBeSent = Boolean(draftEmailBody);
+                        ctrl.emailBody = draftEmailBody;
+
+                        if (ctrl.willEmailBeSent) {
+                          ctrl.EMAIL_BODY_SCHEMA = {
+                            type: 'unicode',
+                            ui_config: {
+                              rows: 20
+                            }
+                          };
+                        }
+
+                        ctrl.reallyTakeAction = function() {
+                          $uibModalInstance.close({
+                            emailBody: ctrl.emailBody
+                          });
+                        };
+
+                        ctrl.cancel = function() {
+                          $uibModalInstance.dismiss('cancel');
+                          AlertsService.clearWarnings();
+                        };
+                      };
+                    }
+                  ]
+                }).result.then(function(result) {
+                  ExplorationRightsService.saveModeratorChangeToBackend(
+                    result.emailBody);
+                }, function() {
+                  // This callback is triggered when the Cancel button is
+                  // clicked. No further action is needed.
+                });
+              });
+            };
+
+            ctrl.isExplorationLockedForEditing = function() {
+              return ChangeListService.isExplorationLockedForEditing();
+            };
+
+            ctrl.closeRolesForm = function() {
+              ctrl.isRolesFormOpen = false;
+            };
+
+            ctrl.isTitlePresent = function() {
+              return ExplorationTitleService.savedMemento.length > 0;
+            };
           };
-        }
-      }
-      ]};
+        }]
+    };
   }]);

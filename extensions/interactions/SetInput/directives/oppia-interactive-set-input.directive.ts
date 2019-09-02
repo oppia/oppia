@@ -98,9 +98,8 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
 
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswerFn, ctrl.isAnswerValid);
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

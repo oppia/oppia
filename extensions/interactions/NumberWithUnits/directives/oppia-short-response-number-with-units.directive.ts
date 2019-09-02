@@ -38,7 +38,7 @@ angular.module('oppia').directive('oppiaShortResponseNumberWithUnits', [
           var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
           ctrl.answer = NumberWithUnitsObjectFactory.fromDict(
             answer).toString();
-        }
+        };
       }]
     };
   }

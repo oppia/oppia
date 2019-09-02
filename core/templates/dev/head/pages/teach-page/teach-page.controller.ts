@@ -90,8 +90,7 @@ angular.module('oppia').directive('teachPage', [
               }, 150);
               return false;
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

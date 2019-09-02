@@ -201,7 +201,8 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
               var userCodeNumLines = (
                 fullCodeNumLines - preCodeNumLines - postCodeNumLines);
 
-              // Mark pre- and post- code as uneditable, and give it some styling.
+              // Mark pre- and post- code as uneditable, and give it some
+              // styling.
               var markOptions = {
                 atomic: false,
                 readOnly: true,
@@ -264,9 +265,8 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
 
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswer, null);
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

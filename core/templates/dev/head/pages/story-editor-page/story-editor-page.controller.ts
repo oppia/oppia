@@ -75,9 +75,9 @@ angular.module('oppia').directive('storyEditorPage', [
                       };
                     }
                   ]
-                }).result.catch(function() {
-                  // This callback is triggered when the Cancel button is clicked.
-                  // No further action is needed.
+                }).result.then(function() {}, function() {
+                  // This callback is triggered when the Cancel button is
+                  // clicked. No further action is needed.
                 });
               } else {
                 $window.open(
@@ -97,8 +97,7 @@ angular.module('oppia').directive('storyEditorPage', [
             };
             $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
             $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

@@ -39,8 +39,7 @@ angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
               function(storyDataDict) {
                 ctrl.storyTitle = storyDataDict.story_title;
               });
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

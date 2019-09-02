@@ -73,7 +73,7 @@ angular.module('oppia').directive('skillMasteryViewer', [
                     'then practicing more questions for the skill.';
               }
             };
-          }
+          };
         }]
     };
   }]);

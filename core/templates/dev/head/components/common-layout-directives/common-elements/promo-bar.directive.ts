@@ -40,7 +40,8 @@ angular.module('oppia').directive('promoBar', [
               if (!$window.hasOwnProperty('sessionStorage')) {
                 return false;
               }
-              return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
+              return !!angular.fromJson(
+                $window.sessionStorage.promoIsDismissed);
             };
             var setPromoDismissed = function(promoIsDismissed) {
               if (!$window.hasOwnProperty('sessionStorage')) {
@@ -64,8 +65,8 @@ angular.module('oppia').directive('promoBar', [
               ctrl.promoIsVisible = false;
               setPromoDismissed(true);
             };
-          }
-      }]
+          };
+        }]
     };
   }
 ]);

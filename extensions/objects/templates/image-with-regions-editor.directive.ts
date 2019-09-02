@@ -69,7 +69,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
               }
             };
 
-            // Dynamically defines the CSS style for the region label text input.
+            // Dynamically defines the CSS style for the region label text
+            // input.
             ctrl.getRegionLabelEditorStyle = function() {
               if (ctrl.selectedRegion === null) {
                 return 'display: none';
@@ -98,7 +99,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
                 width: 0,
                 height: 0
               };
-              // Coordinates for currently drawn rectangle (when user is dragging)
+              // Coordinates for currently drawn rectangle (when user
+              // is dragging)
               ctrl.rectX = 0;
               ctrl.rectY = 0;
               ctrl.rectWidth = 0;
@@ -285,7 +287,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
                 x += ctrl.xDirectionToggled * (deltaX + marginX);
               }
               // Whenever the direction changes the value of newHeight and
-              // newWidth computed is negative, hence the absolute value is taken.
+              // newWidth computed is negative, hence the absolute value is
+              // taken.
               resizedRegion.area = regionAreaFromCornerAndDimensions(
                 x, y, Math.abs(newWidth), Math.abs(newHeight));
             };
@@ -520,9 +523,9 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
                 ctrl.value.labeledRegions = [];
                 ctrl.initializeEditor();
               }, function() {
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
             };
             ctrl.deleteRegion = function(index) {
               if (ctrl.selectedRegion === index) {
@@ -537,9 +540,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
               }
               ctrl.value.labeledRegions.splice(index, 1);
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

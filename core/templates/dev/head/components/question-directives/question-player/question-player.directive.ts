@@ -219,7 +219,8 @@ angular.module('oppia').directive('questionPlayer', [
               var worstSkillId = '';
               Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
                 var skillScoreData = ctrl.scorePerSkillMapping[skillId];
-                var scorePercentage = skillScoreData.score / skillScoreData.total;
+                var scorePercentage =
+                skillScoreData.score / skillScoreData.total;
                 if (scorePercentage < minScore) {
                   minScore = scorePercentage;
                   worstSkillId = skillId;
@@ -269,9 +270,9 @@ angular.module('oppia').directive('questionPlayer', [
                     };
                   }
                 ]
-              }).result.catch(function() {
-                 // This callback is triggered when the Cancel button is clicked.
-                 // No further action is needed.
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             };
 
@@ -417,7 +418,8 @@ angular.module('oppia').directive('questionPlayer', [
               answers.forEach(function(answer) {
                 if (!answer.isCorrect) {
                   if (answer.taggedSkillMisconceptionId) {
-                    var skillId = answer.taggedSkillMisconceptionId.split('-')[0];
+                    var skillId =
+                    answer.taggedSkillMisconceptionId.split('-')[0];
                     if (masteryChangePerQuestion.hasOwnProperty(skillId)) {
                       masteryChangePerQuestion[skillId] -=
                         WRONG_ANSWER_PENALTY_FOR_MASTERY;
@@ -486,8 +488,10 @@ angular.module('oppia').directive('questionPlayer', [
               var testIsPassed = true;
               var failedSkillIds = [];
               if (isInPassOrFailMode()) {
-                Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
-                  var correctionRate = ctrl.scorePerSkillMapping[skillId].score /
+                Object.keys(
+                  ctrl.scorePerSkillMapping).forEach(function(skillId) {
+                  var correctionRate =
+                  ctrl.scorePerSkillMapping[skillId].score /
                     ctrl.scorePerSkillMapping[skillId].total;
                   if (correctionRate <
                     ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
@@ -541,7 +545,8 @@ angular.module('oppia').directive('questionPlayer', [
                     $scope.skillId = skillId;
                     $scope.userIsLoggedIn = ctrl.userIsLoggedIn;
                     if ($scope.userIsLoggedIn) {
-                      $scope.masteryChange = ctrl.masteryPerSkillMapping[skillId];
+                      $scope.masteryChange =
+                      ctrl.masteryPerSkillMapping[skillId];
                     }
 
                     $scope.closeModal = function() {
@@ -553,9 +558,9 @@ angular.module('oppia').directive('questionPlayer', [
                     };
                   }
                 ]
-              }).result.catch(function() {
-                 // This callback is triggered when the Cancel button is clicked.
-                 // No further action is needed.
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             };
 
@@ -590,7 +595,7 @@ angular.module('oppia').directive('questionPlayer', [
                 ctrl.testIsPassed = hasUserPassedTest();
               }
             });
-          }
-      }]
+          };
+        }]
     };
   }]);

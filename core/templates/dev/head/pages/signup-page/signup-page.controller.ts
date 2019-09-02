@@ -90,7 +90,7 @@ angular.module('oppia').directive('signupPage', [
                     };
                   }
                 ]
-              }).result.catch(function() {
+              }).result.then(function() {}, function() {
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
               });
@@ -114,8 +114,9 @@ angular.module('oppia').directive('signupPage', [
               }
             };
 
-            // Returns the warning text corresponding to the validation error for
-            // the given username, or an empty string if the username is valid.
+            // Returns the warning text corresponding to the validation error
+            // for the given username, or an empty string if the username is
+            // valid.
             ctrl.updateWarningText = function(username) {
               var alphanumeric = /^[A-Za-z0-9]+$/;
               var admin = /admin/i;
@@ -124,15 +125,19 @@ angular.module('oppia').directive('signupPage', [
               if (!username) {
                 ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
               } else if (username.indexOf(' ') !== -1) {
-                ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
+                ctrl.warningI18nCode =
+                'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
               } else if (username.length > 50) {
-                ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
+                ctrl.warningI18nCode =
+                'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
               } else if (!alphanumeric.test(username)) {
-                ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
+                ctrl.warningI18nCode =
+                'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
               } else if (admin.test(username)) {
                 ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
               } else if (oppia.test(username)) {
-                ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
+                ctrl.warningI18nCode =
+                'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
               } else {
                 ctrl.warningI18nCode = '';
               }
@@ -145,7 +150,8 @@ angular.module('oppia').directive('signupPage', [
             ctrl.submitPrerequisitesForm = function(
                 agreedToTerms, username, canReceiveEmailUpdates) {
               if (!agreedToTerms) {
-                AlertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
+                AlertsService.addWarning(
+                  'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
                 return;
               }
 
@@ -176,7 +182,8 @@ angular.module('oppia').directive('signupPage', [
 
               if (ctrl.showEmailPreferencesForm && !ctrl.hasUsername) {
                 if (canReceiveEmailUpdates === null) {
-                  ctrl.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
+                  ctrl.emailPreferencesWarningText =
+                  'I18N_SIGNUP_FIELD_REQUIRED';
                   return;
                 }
 
@@ -235,13 +242,12 @@ angular.module('oppia').directive('signupPage', [
                     };
                   }
                 ]
-              }).result.catch(function() {
-               // This callback is triggered when the Cancel button is clicked.
-               // No further action is needed.
-            });
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

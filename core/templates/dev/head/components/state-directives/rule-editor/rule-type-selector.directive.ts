@@ -96,7 +96,7 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
             // get updated when the rule type is changed.
             $scope.$apply();
           });
-        }
+        };
       }]
   };
 }]);

@@ -33,7 +33,7 @@ angular.module('oppia').directive('sideNavigationBar', [
         this.$onInit = function() {
           ctrl.currentUrl = window.location.pathname;
           ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-        }
+        };
       }]
     };
   }]);

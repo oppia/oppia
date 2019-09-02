@@ -118,7 +118,7 @@ angular.module('oppia').directive('topicLandingPage', [
                 $window.location = '/library';
               }, 150);
             };
-          }
-        }
-      ]};
+          };
+        }]
+    };
   }]);

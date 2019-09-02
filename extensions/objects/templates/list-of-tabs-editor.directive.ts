@@ -67,7 +67,7 @@ angular.module('oppia').directive('listOfTabsEditor', [
           if (!ctrl.value) {
             ctrl.value = [];
           }
-        }
+        };
       }]
     };
   }]);

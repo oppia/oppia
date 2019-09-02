@@ -79,47 +79,51 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
 
             var _initDashboard = function() {
-              TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-                function(response) {
-                  ctrl.topicSummaries = response.data.topic_summary_dicts;
-                  ctrl.editableTopicSummaries = ctrl.topicSummaries.filter(
-                    function(summary) {
-                      return summary.can_edit_topic === true;
+              TopicsAndSkillsDashboardBackendApiService
+                .fetchDashboardData().then(
+                  function(response) {
+                    ctrl.topicSummaries = response.data.topic_summary_dicts;
+                    ctrl.editableTopicSummaries = ctrl.topicSummaries.filter(
+                      function(summary) {
+                        return summary.can_edit_topic === true;
+                      }
+                    );
+                    ctrl.untriagedSkillSummaries =
+                      response.data.untriaged_skill_summary_dicts;
+                    ctrl.mergeableSkillSummaries =
+                      response.data.mergeable_skill_summary_dicts;
+                    ctrl.unpublishedSkillSummaries =
+                      response.data.unpublished_skill_summary_dicts;
+                    ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
+                    ctrl.userCanCreateTopic = response.data.can_create_topic;
+                    ctrl.userCanCreateSkill = response.data.can_create_skill;
+                    $rootScope.$broadcast(
+                      EVENT_TYPE_TOPIC_CREATION_ENABLED,
+                      ctrl.userCanCreateTopic);
+                    $rootScope.$broadcast(
+                      EVENT_TYPE_SKILL_CREATION_ENABLED,
+                      ctrl.userCanCreateSkill);
+                    ctrl.userCanDeleteTopic = response.data.can_delete_topic;
+                    ctrl.userCanDeleteSkill = response.data.can_delete_skill;
+                    if (ctrl.topicSummaries.length === 0 &&
+                        ctrl.untriagedSkillSummaries.length !== 0) {
+                      ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
+                    } else if (
+                      ctrl.topicSummaries.length === 0 &&
+                      ctrl.unpublishedSkillSummaries.length !== 0) {
+                      ctrl.activeTab = ctrl.TAB_NAME_UNPUBLISHED_SKILLS;
                     }
-                  );
-                  ctrl.untriagedSkillSummaries =
-                    response.data.untriaged_skill_summary_dicts;
-                  ctrl.mergeableSkillSummaries =
-                    response.data.mergeable_skill_summary_dicts;
-                  ctrl.unpublishedSkillSummaries =
-                    response.data.unpublished_skill_summary_dicts;
-                  ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
-                  ctrl.userCanCreateTopic = response.data.can_create_topic;
-                  ctrl.userCanCreateSkill = response.data.can_create_skill;
-                  $rootScope.$broadcast(
-                    EVENT_TYPE_TOPIC_CREATION_ENABLED, ctrl.userCanCreateTopic);
-                  $rootScope.$broadcast(
-                    EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
-                  ctrl.userCanDeleteTopic = response.data.can_delete_topic;
-                  ctrl.userCanDeleteSkill = response.data.can_delete_skill;
-                  if (ctrl.topicSummaries.length === 0 &&
-                      ctrl.untriagedSkillSummaries.length !== 0) {
-                    ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
-                  } else if (
-                    ctrl.topicSummaries.length === 0 &&
-                    ctrl.unpublishedSkillSummaries.length !== 0) {
-                    ctrl.activeTab = ctrl.TAB_NAME_UNPUBLISHED_SKILLS;
+                  },
+                  function(errorResponse) {
+                    if (
+                      FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                      AlertsService.addWarning('Failed to get dashboard data');
+                    } else {
+                      AlertsService.addWarning(
+                        'Unexpected error code from the server.');
+                    }
                   }
-                },
-                function(errorResponse) {
-                  if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                    AlertsService.addWarning('Failed to get dashboard data');
-                  } else {
-                    AlertsService.addWarning(
-                      'Unexpected error code from the server.');
-                  }
-                }
-              );
+                );
             };
 
             ctrl.isTopicTabHelpTextVisible = function() {
@@ -172,7 +176,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
 
                     $scope.onSaveRubric = function(difficulty, explanation) {
                       for (var idx in $scope.rubrics) {
-                        if ($scope.rubrics[idx].getDifficulty() === difficulty) {
+                        if (
+                          $scope.rubrics[idx].getDifficulty() === difficulty) {
                           $scope.rubrics[idx].setExplanation(explanation);
                         }
                       }
@@ -195,16 +200,15 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 SkillCreationService.createNewSkill(
                   result.description, result.rubrics, []);
               }, function() {
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
             };
 
             _initDashboard();
             $scope.$on(
               EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, _initDashboard);
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

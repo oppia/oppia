@@ -89,7 +89,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
                   $timeout(function() {
                     $window.location.href = EMAIL_DASHBOARD_PAGE;
                   }, 4000);
-                }).catch(function() {
+                }).then(null, function() {
                   ctrl.errorHasOccurred = true;
                   ctrl.submitIsInProgress = false;
                 });
@@ -117,7 +117,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
                 $timeout(function() {
                   $window.location.href = EMAIL_DASHBOARD_PAGE;
                 }, 4000);
-              }).catch(function() {
+              }).then(null, function() {
                 ctrl.errorHasOccurred = true;
                 ctrl.submitIsInProgress = false;
               });
@@ -154,14 +154,15 @@ angular.module('oppia').directive('emailDashboardResultPage', [
             ctrl.maxRecipients = null;
             ctrl.POSSIBLE_EMAIL_INTENTS = [
               'bulk_email_marketing', 'bulk_email_improve_exploration',
-              'bulk_email_create_exploration', 'bulk_email_creator_reengagement',
+              'bulk_email_create_exploration',
+              'bulk_email_creator_reengagement',
               'bulk_email_learner_reengagement'];
             ctrl.emailIntent = ctrl.POSSIBLE_EMAIL_INTENTS[0];
             ctrl.emailSubmitted = false;
             ctrl.submitIsInProgress = false;
             ctrl.errorHasOccurred = false;
             ctrl.testEmailSentSuccesfully = false;
-          }
-        }
-      ]};
+          };
+        }]
+    };
   }]);

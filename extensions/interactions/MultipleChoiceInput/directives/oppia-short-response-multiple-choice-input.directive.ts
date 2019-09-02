@@ -45,7 +45,7 @@ angular.module('oppia').directive('oppiaShortResponseMultipleChoiceInput', [
             var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
             var response = $filter('convertToPlainText')(_choices[_answer]);
             ctrl.response = $filter('truncateAtFirstLine')(response);
-          }
+          };
         }]
     };
   }

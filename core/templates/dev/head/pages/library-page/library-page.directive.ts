@@ -114,12 +114,14 @@ angular.module('oppia').directive('libraryPage', [
                     response.data.preferred_language_codes);
 
                   $rootScope.loadingMessage = '';
-                },function (error){
-
-   });
+                }, function() {
+                  // This callback is triggered when the Cancel button is
+                  // clicked. No further action is needed.
+                });
             } else {
               $http.get('/libraryindexhandler').then(function(response) {
-                ctrl.libraryGroups = response.data.activity_summary_dicts_by_category;
+                ctrl.libraryGroups =
+                response.data.activity_summary_dicts_by_category;
                 UserService.getUserInfoAsync().then(function(userInfo) {
                   ctrl.activitiesOwned = {explorations: {}, collections: {}};
                   if (userInfo.isLoggedIn()) {
@@ -147,7 +149,8 @@ angular.module('oppia').directive('libraryPage', [
                               ', name: ' + activitySummaryDict.title +
                               ', type: ' + activitySummaryDict.activity_type +
                               ') has an invalid activity type, which could ' +
-                              'not be recorded as an exploration or a collection.'
+                              'not be recorded as an exploration or a ' +
+                              'collection.'
                               );
                             }
                           });
@@ -172,7 +175,8 @@ angular.module('oppia').directive('libraryPage', [
                 });
 
                 $rootScope.$broadcast(
-                  'preferredLanguageCodesLoaded', response.data.preferred_language_codes);
+                  'preferredLanguageCodesLoaded',
+                  response.data.preferred_language_codes);
 
                 // Initialize the carousel(s) on the library index page.
                 // Pause is necessary to ensure all elements have loaded.
@@ -185,9 +189,9 @@ angular.module('oppia').directive('libraryPage', [
                   var actualWidth = $('exploration-summary-tile').width();
                   if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
                     console.error(
-                      'The actual width of tile is different than the expected ' +
-                      'width. Actual size: ' + actualWidth + ', Expected size: ' +
-                      LIBRARY_TILE_WIDTH_PX);
+                      'The actual width of tile is different than the ' +
+                      'expected width. Actual size: ' + actualWidth +
+                      ', Expected size: ' + LIBRARY_TILE_WIDTH_PX);
                   }
                 }, 3000);
                 // The following initializes the tracker to have all
@@ -197,9 +201,10 @@ angular.module('oppia').directive('libraryPage', [
                 for (var i = 0; i < ctrl.libraryGroups.length; i++) {
                   ctrl.leftmostCardIndices.push(0);
                 }
-              },function (error){
-
-   });
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
+              });
             }
 
             ctrl.setActiveGroup = function(groupIndex) {
@@ -299,9 +304,9 @@ angular.module('oppia').directive('libraryPage', [
               });
             };
 
-            // The carousels do not work when the width is 1 card long, so we need
-            // to handle this case discretely and also prevent swiping past the
-            // first and last card.
+            // The carousels do not work when the width is 1 card long, so we
+            // need to handle this case discretely and also prevent swiping
+            // past the first and last card.
             ctrl.incrementLeftmostCardIndex = function(ind) {
               var lastItem = ((
                 ctrl.libraryGroups[ind].activity_summary_dicts.length -
@@ -346,9 +351,11 @@ angular.module('oppia').directive('libraryPage', [
                   selectedCategories[categories[i]] = true;
                 }
 
-                var targetSearchQueryUrl = SearchService.getSearchUrlQueryString(
+                var targetSearchQueryUrl =
+                SearchService.getSearchUrlQueryString(
                   '', selectedCategories, {});
-                $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
+                $window.location.href =
+                '/search/find?q=' + targetSearchQueryUrl;
               }
             };
 
@@ -361,7 +368,7 @@ angular.module('oppia').directive('libraryPage', [
                 WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
               $scope.$apply();
             });
-          }
+          };
         }]
     };
   }

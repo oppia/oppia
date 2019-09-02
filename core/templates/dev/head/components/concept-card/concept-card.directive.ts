@@ -86,7 +86,7 @@ angular.module('oppia').directive('conceptCard', [
               currentConceptCard = ctrl.conceptCards[newIndex];
               numberOfWorkedExamplesShown = 0;
             });
-          }
-      }]
+          };
+        }]
     };
   }]);

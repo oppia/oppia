@@ -40,7 +40,7 @@ angular.module('oppia').directive('htmlEditor', [
           ctrl.schema = {
             type: 'html'
           };
-        }
+        };
       }]
     };
   }]);

@@ -71,7 +71,8 @@ angular.module('oppia').directive('graphViz', [
               hoveredVertex: null,
               hoveredEdge: null,
               hoveredModeButton: null,
-              // If in ADD_EDGE mode, source vertex of the new edge, if it exists
+              // If in ADD_EDGE mode, source vertex of the new edge, if it
+              // exists
               addEdgeVertex: null,
               // Currently dragged vertex
               currentlyDraggedVertex: null,
@@ -596,9 +597,8 @@ angular.module('oppia').directive('graphViz', [
             if (ctrl.isInteractionActive()) {
               ctrl.init();
             }
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

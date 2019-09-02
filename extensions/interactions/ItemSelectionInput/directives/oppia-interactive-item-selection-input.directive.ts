@@ -111,9 +111,8 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
             };
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, validityCheckFn);
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

@@ -82,15 +82,16 @@ angular.module('oppia').directive('outcomeEditor', [
             // This returns false if the current interaction ID is null.
             ctrl.isCurrentInteractionLinear = function() {
               var interactionId = ctrl.getCurrentInteractionId();
-              return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+              return interactionId &&
+              INTERACTION_SPECS[interactionId].is_linear;
             };
 
             var onExternalSave = function() {
-              // The reason for this guard is because, when the editor page for an
-              // exploration is first opened, the 'initializeAnswerGroups' event
-              // (which fires an 'externalSave' event) only fires after the
-              // ctrl.savedOutcome is set above. Until then, ctrl.savedOutcome
-              // is undefined.
+              // The reason for this guard is because, when the editor page
+              // for an exploration is first opened, the
+              // 'initializeAnswerGroups' event (which fires an 'externalSave'
+              // event) only fires after the ctrl.savedOutcome is set above.
+              // Until then, ctrl.savedOutcome is undefined.
               if (ctrl.savedOutcome === undefined) {
                 ctrl.savedOutcome = angular.copy(ctrl.outcome);
               }
@@ -214,8 +215,7 @@ angular.module('oppia').directive('outcomeEditor', [
                 ctrl.savedOutcome.missingPrerequisiteSkillId;
               ctrl.destinationEditorIsOpen = false;
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

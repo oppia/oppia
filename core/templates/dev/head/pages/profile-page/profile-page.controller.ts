@@ -52,7 +52,8 @@ angular.module('oppia').directive('profilePage', [
               .getStaticImageUrl('/general/no_profile_picture.png');
 
             ctrl.getLocaleDateString = function(millisSinceEpoch) {
-              return DateTimeFormatService.getLocaleDateString(millisSinceEpoch);
+              return DateTimeFormatService.getLocaleDateString(
+                millisSinceEpoch);
             };
 
             $rootScope.loadingMessage = 'Loading';
@@ -144,7 +145,8 @@ angular.module('oppia').directive('profilePage', [
               ctrl.updateSubscriptionButtonPopoverText = function() {
                 if (ctrl.userNotLoggedIn) {
                   ctrl.subscriptionButtonPopoverText = (
-                    'Log in or sign up to subscribe to your favorite creators.');
+                    'Log in or sign up to subscribe to your ' +
+                    'favorite creators.');
                 } else if (ctrl.isAlreadySubscribed) {
                   ctrl.subscriptionButtonPopoverText = (
                     'Unsubscribe to stop receiving email notifications ' +
@@ -198,7 +200,8 @@ angular.module('oppia').directive('profilePage', [
                   ctrl.explorationIndexStart + ctrl.PAGE_SIZE - 1);
                 for (var ind = ctrl.explorationIndexStart;
                   ind <= ctrl.explorationIndexEnd; ind++) {
-                  ctrl.explorationsOnPage.push(ctrl.userEditedExplorations[ind]);
+                  ctrl.explorationsOnPage.push(
+                    ctrl.userEditedExplorations[ind]);
                   if (ind === ctrl.userEditedExplorations.length - 1) {
                     break;
                   }
@@ -214,8 +217,7 @@ angular.module('oppia').directive('profilePage', [
                 data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
               $rootScope.loadingMessage = '';
             });
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

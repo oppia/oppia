@@ -43,8 +43,8 @@ angular.module('oppia').directive('mathLatexStringEditor', [
           ctrl.placeholderText = '\\frac{x}{y}';
           ctrl.alwaysEditable = ctrl.getAlwaysEditable();
 
-          // Reset the component each time the value changes (e.g. if this is part
-          // of an editable list).
+          // Reset the component each time the value changes (e.g. if this is
+          // part of an editable list).
           $scope.$watch('$ctrl.value', function() {
             ctrl.localValue = {
               label: ctrl.value || ''
@@ -83,7 +83,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
 
             ctrl.closeEditor();
           }
-        }
+        };
       }]
     };
   }

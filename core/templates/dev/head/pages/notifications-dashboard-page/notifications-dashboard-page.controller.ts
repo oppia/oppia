@@ -47,7 +47,8 @@ angular.module('oppia').directive('notificationsDashboardPage', [
               window.location.href = '/profile/' + username;
             };
 
-            ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+            ctrl.getLocaleAbbreviatedDatetimeString = function(
+                millisSinceEpoch) {
               return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
                 millisSinceEpoch);
             };
@@ -62,8 +63,7 @@ angular.module('oppia').directive('notificationsDashboardPage', [
               ctrl.currentUsername = data.username;
               $rootScope.loadingMessage = '';
             });
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

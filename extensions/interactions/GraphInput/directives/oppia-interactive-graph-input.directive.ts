@@ -128,9 +128,8 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
               ctrl.submitGraph, validityCheckFn);
 
             init();
-          }
-        }
-      ]
+          };
+        }]
     };
   }
 ]);

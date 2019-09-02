@@ -52,131 +52,131 @@ angular.module('oppia').directive('learnerViewInfo', [
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var ctrl = this;
           this.$onInit = function() {
-          var explorationId = ContextService.getExplorationId();
-          var expInfo = null;
+            var explorationId = ContextService.getExplorationId();
+            var expInfo = null;
 
-          ctrl.explorationTitle = 'Loading...';
-          ReadOnlyExplorationBackendApiService.fetchExploration(
-            explorationId, UrlService.getExplorationVersionFromUrl())
-            .then(function(response) {
-              ctrl.explorationTitle = response.exploration.title;
-            });
-
-          ctrl.showInformationCard = function() {
-            if (expInfo) {
-              openInformationCardModal();
-            } else {
-              $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-                params: {
-                  stringified_exp_ids: JSON.stringify([explorationId]),
-                  include_private_explorations: JSON.stringify(
-                    true)
-                }
-              }).then(function(response) {
-                expInfo = response.data.summaries[0];
-                openInformationCardModal();
-              }, function() {
-                $log.error(
-                  'Information card failed to load for exploration ' +
-                  explorationId);
+            ctrl.explorationTitle = 'Loading...';
+            ReadOnlyExplorationBackendApiService.fetchExploration(
+              explorationId, UrlService.getExplorationVersionFromUrl())
+              .then(function(response) {
+                ctrl.explorationTitle = response.exploration.title;
               });
-            }
-          };
 
-          var openInformationCardModal = function() {
-            $uibModal.open({
-              animation: true,
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-player-page/templates/' +
-                'information-card-modal.directive.html'),
-              windowClass: 'oppia-modal-information-card',
-              resolve: {
-                expInfo: function() {
-                  return expInfo;
-                }
-              },
-              controller: [
-                '$scope', '$uibModalInstance',
-                'DateTimeFormatService', 'RatingComputationService', 'expInfo',
-                'UrlInterpolationService',
-                function(
-                    $scope, $uibModalInstance,
-                    DateTimeFormatService, RatingComputationService, expInfo,
-                    UrlInterpolationService) {
-                  var getExplorationTagsSummary = function(arrayOfTags) {
-                    var tagsToShow = [];
-                    var tagsInTooltip = [];
-                    var MAX_CHARS_TO_SHOW = 45;
+            ctrl.showInformationCard = function() {
+              if (expInfo) {
+                openInformationCardModal();
+              } else {
+                $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+                  params: {
+                    stringified_exp_ids: JSON.stringify([explorationId]),
+                    include_private_explorations: JSON.stringify(
+                      true)
+                  }
+                }).then(function(response) {
+                  expInfo = response.data.summaries[0];
+                  openInformationCardModal();
+                }, function() {
+                  $log.error(
+                    'Information card failed to load for exploration ' +
+                    explorationId);
+                });
+              }
+            };
 
-                    for (var i = 0; i < arrayOfTags.length; i++) {
-                      var newLength = (
-                        tagsToShow.toString() + arrayOfTags[i]).length;
+            var openInformationCardModal = function() {
+              $uibModal.open({
+                animation: true,
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/exploration-player-page/templates/' +
+                  'information-card-modal.directive.html'),
+                windowClass: 'oppia-modal-information-card',
+                resolve: {
+                  expInfo: function() {
+                    return expInfo;
+                  }
+                },
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  'DateTimeFormatService', 'RatingComputationService',
+                  'expInfo', 'UrlInterpolationService',
+                  function(
+                      $scope, $uibModalInstance,
+                      DateTimeFormatService, RatingComputationService, expInfo,
+                      UrlInterpolationService) {
+                    var getExplorationTagsSummary = function(arrayOfTags) {
+                      var tagsToShow = [];
+                      var tagsInTooltip = [];
+                      var MAX_CHARS_TO_SHOW = 45;
 
-                      if (newLength < MAX_CHARS_TO_SHOW) {
-                        tagsToShow.push(arrayOfTags[i]);
-                      } else {
-                        tagsInTooltip.push(arrayOfTags[i]);
+                      for (var i = 0; i < arrayOfTags.length; i++) {
+                        var newLength = (
+                          tagsToShow.toString() + arrayOfTags[i]).length;
+
+                        if (newLength < MAX_CHARS_TO_SHOW) {
+                          tagsToShow.push(arrayOfTags[i]);
+                        } else {
+                          tagsInTooltip.push(arrayOfTags[i]);
+                        }
                       }
-                    }
 
-                    return {
-                      tagsToShow: tagsToShow,
-                      tagsInTooltip: tagsInTooltip
+                      return {
+                        tagsToShow: tagsToShow,
+                        tagsInTooltip: tagsInTooltip
+                      };
                     };
-                  };
 
-                  var getLastUpdatedString = function(millisSinceEpoch) {
-                    return DateTimeFormatService
-                      .getLocaleAbbreviatedDatetimeString(
-                        millisSinceEpoch);
-                  };
+                    var getLastUpdatedString = function(millisSinceEpoch) {
+                      return DateTimeFormatService
+                        .getLocaleAbbreviatedDatetimeString(
+                          millisSinceEpoch);
+                    };
 
-                  $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
-                    DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
-                  $scope.averageRating = (
-                    RatingComputationService.computeAverageRating(
-                      expInfo.ratings));
-                  var contributorsSummary = (
-                    expInfo.human_readable_contributors_summary || {});
-                  $scope.contributorNames = Object.keys(
-                    contributorsSummary).sort(
-                    function(contributorUsername1, contributorUsername2) {
-                      var commitsOfContributor1 = contributorsSummary[
-                        contributorUsername1].num_commits;
-                      var commitsOfContributor2 = contributorsSummary[
-                        contributorUsername2].num_commits;
-                      return commitsOfContributor2 - commitsOfContributor1;
-                    }
-                  );
-                  $scope.explorationId = expInfo.id;
-                  $scope.explorationTags = getExplorationTagsSummary(
-                    expInfo.tags);
-                  $scope.explorationTitle = expInfo.title;
-                  $scope.infoCardBackgroundCss = {
-                    'background-color': expInfo.thumbnail_bg_color
-                  };
-                  $scope.infoCardBackgroundImageUrl = expInfo
-                    .thumbnail_icon_url;
-                  $scope.getStaticImageUrl = (
-                    UrlInterpolationService.getStaticImageUrl);
-                  $scope.lastUpdatedString = getLastUpdatedString(
-                    expInfo.last_updated_msec);
-                  $scope.numViews = expInfo.num_views;
-                  $scope.objective = expInfo.objective;
-                  $scope.explorationIsPrivate = (expInfo.status === 'private');
+                    $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
+                      DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+                    $scope.averageRating = (
+                      RatingComputationService.computeAverageRating(
+                        expInfo.ratings));
+                    var contributorsSummary = (
+                      expInfo.human_readable_contributors_summary || {});
+                    $scope.contributorNames = Object.keys(
+                      contributorsSummary).sort(
+                      function(contributorUsername1, contributorUsername2) {
+                        var commitsOfContributor1 = contributorsSummary[
+                          contributorUsername1].num_commits;
+                        var commitsOfContributor2 = contributorsSummary[
+                          contributorUsername2].num_commits;
+                        return commitsOfContributor2 - commitsOfContributor1;
+                      }
+                    );
+                    $scope.explorationId = expInfo.id;
+                    $scope.explorationTags = getExplorationTagsSummary(
+                      expInfo.tags);
+                    $scope.explorationTitle = expInfo.title;
+                    $scope.infoCardBackgroundCss = {
+                      'background-color': expInfo.thumbnail_bg_color
+                    };
+                    $scope.infoCardBackgroundImageUrl = expInfo
+                      .thumbnail_icon_url;
+                    $scope.getStaticImageUrl = (
+                      UrlInterpolationService.getStaticImageUrl);
+                    $scope.lastUpdatedString = getLastUpdatedString(
+                      expInfo.last_updated_msec);
+                    $scope.numViews = expInfo.num_views;
+                    $scope.objective = expInfo.objective;
+                    $scope.explorationIsPrivate = (
+                      expInfo.status === 'private');
 
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss();
-                  };
-                }
-              ]
-            }).result.catch(function() {
-               // This callback is triggered when the Cancel button is clicked.
-               // No further action is needed.
-            });
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss();
+                    };
+                  }
+                ]
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
+              });
+            };
           };
-        }
-        }
-      ]
+        }]
     };
   }]);

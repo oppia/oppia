@@ -41,7 +41,7 @@ angular.module('oppia').directive('sanitizedUrlEditor', [
               placeholder: 'https://www.example.com'
             }
           };
-        }
+        };
       }]
     };
   }]);

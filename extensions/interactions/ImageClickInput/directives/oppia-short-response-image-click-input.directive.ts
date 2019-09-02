@@ -41,7 +41,7 @@ angular.module('oppia').directive('oppiaShortResponseImageClickInput', [
           ctrl.clickRegionLabel = (
             _answer.clickedRegions.length > 0 ? _answer.clickedRegions[0] :
             'Clicked on image');
-        }
+        };
       }]
     };
   }

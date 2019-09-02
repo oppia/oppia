@@ -36,7 +36,7 @@ angular.module('oppia').directive('circularImage', [
           ctrl.isLinkAvailable = function() {
             return ctrl.link() ? true : false;
           };
-        }
+        };
       }]
     };
   }]);

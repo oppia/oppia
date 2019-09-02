@@ -73,10 +73,12 @@ angular.module('oppia').directive('communityDashboardPage', [
               allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
               prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
 
-            TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
+            TranslationLanguageService.setActiveLanguageCode(
+              ctrl.languageCode);
 
             ctrl.onChangeLanguage = function() {
-              TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
+              TranslationLanguageService.setActiveLanguageCode(
+                ctrl.languageCode);
               LocalStorageService.updateLastSelectedTranslationLanguageCode(
                 ctrl.languageCode);
             };
@@ -84,7 +86,8 @@ angular.module('oppia').directive('communityDashboardPage', [
             ctrl.showLanguageSelector = function() {
               var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
               return (
-                activeTabDetail.customizationOptions.indexOf('language') !== -1);
+                activeTabDetail.customizationOptions.indexOf(
+                  'language') !== -1);
             };
 
             ctrl.activeTabName = 'myContributionTab';
@@ -95,8 +98,7 @@ angular.module('oppia').directive('communityDashboardPage', [
             ctrl.onTabClick = function(activeTabName) {
               ctrl.activeTabName = activeTabName;
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

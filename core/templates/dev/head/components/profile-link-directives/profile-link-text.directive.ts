@@ -37,7 +37,7 @@ angular.module('oppia').directive('profileLinkText', [
           this.isUsernameLinkable = function(username) {
             return SYSTEM_USER_IDS.indexOf(username) === -1;
           };
-        }
-     }]
+        };
+      }]
     };
   }]);

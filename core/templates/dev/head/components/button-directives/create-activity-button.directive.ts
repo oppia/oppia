@@ -132,7 +132,7 @@ angular.module('oppia').directive('createActivityButton', [
                 ctrl.initCreationProcess();
               }
             }
-          }
+          };
         }]
     };
   }]);

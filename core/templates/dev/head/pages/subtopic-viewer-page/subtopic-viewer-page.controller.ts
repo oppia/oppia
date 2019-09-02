@@ -77,8 +77,7 @@ angular.module('oppia').directive('subtopicViewerPage', [
                 }
               }
             );
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

@@ -49,8 +49,7 @@ angular.module('oppia').directive('practiceTab', [
                 });
               $window.location.href = practiceSessionsUrl;
             };
-          }
-        }
-      ]
+          };
+        }]
     };
   }]);

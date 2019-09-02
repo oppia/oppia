@@ -134,7 +134,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           ctrl.getWarningText = function() {
             return errorMessage;
           };
-        }
+        };
       }]
     };
   }]);
