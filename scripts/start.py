@@ -32,7 +32,6 @@ import python_utils
 
 from . import build
 from . import common
-from . import install_third_party_libs
 from . import setup
 from . import setup_gae
 
@@ -78,9 +77,6 @@ def main(argv=None):
 
     # Runs cleanup function on exit.
     atexit.register(cleanup)
-
-    # Install third party dependencies.
-    install_third_party_libs.main(argv=[])
 
     python_utils.PRINT('Oppia setup complete!')
 

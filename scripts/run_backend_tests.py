@@ -310,9 +310,6 @@ def main(argv=None):
     setup.main()
     setup_gae.main()
 
-    # Install third party dependencies.
-    install_third_party_libs.main(argv=[])
-
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)

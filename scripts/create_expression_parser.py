@@ -24,7 +24,6 @@ import subprocess
 import python_utils
 
 from . import common
-from . import install_third_party_libs
 from . import setup
 
 
@@ -37,9 +36,6 @@ def main():
     expression_parser_js = os.path.join(
         'core', 'templates', 'dev', 'head', 'expressions',
         'ExpressionParserService.js')
-
-    # Install the basic environment, e.g. nodejs.
-    install_third_party_libs.main()
 
     common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
 
