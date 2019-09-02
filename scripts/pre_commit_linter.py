@@ -73,6 +73,9 @@ import time
 
 import python_utils
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
@@ -3160,13 +3163,13 @@ class OtherLintChecksManager(LintChecksManager):
         return all_messages
 
 
-def _print_complete_summary_of_errors():
+def _print_complete_summary_of_errors(error_messages):
     """Print complete summary of errors."""
-    error_messages = _TARGET_STDOUT.getvalue()
     if error_messages != '':
         python_utils.PRINT('Summary of Errors:')
         python_utils.PRINT('----------------------------------------')
-        python_utils.PRINT(error_messages)
+        for error_message in error_messages:
+            python_utils.PRINT(error_message)
 
 
 def main():
@@ -3203,7 +3206,7 @@ def main():
     all_messages = js_ts_lint_checks_manager.perform_all_lint_checks()
     all_messages += other_lint_checks_manager.perform_all_lint_checks()
 
-    _print_complete_summary_of_errors()
+    _print_complete_summary_of_errors(all_messages)
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
