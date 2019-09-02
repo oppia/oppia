@@ -31,6 +31,7 @@ import python_utils
 
 from . import build
 from . import common
+from . import install_third_party_libs
 from . import setup
 from . import setup_gae
 
@@ -73,6 +74,7 @@ def main(args=None):
     """Starts up a development server running Oppia."""
     setup.main()
     setup_gae.main()
+    install_third_party_libs.main(args=[])
 
     # Runs cleanup function on exit.
     atexit.register(cleanup)
@@ -201,4 +203,4 @@ def main(args=None):
 
 
 if __name__ == '__main__':
-    main(args=None)
+    main()
