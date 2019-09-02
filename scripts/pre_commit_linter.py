@@ -1179,7 +1179,7 @@ def _lint_css_files(
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        linter_stdout, linter_stderr = proc.communicate()
+        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
         linter_stdout = linter_stdout.decode(encoding='utf-8')
         linter_stderr = linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
@@ -1239,7 +1239,7 @@ def _lint_js_and_ts_files(
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        linter_stdout, linter_stderr = proc.communicate()
+        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
         linter_stdout = linter_stdout.decode(encoding='utf-8')
         linter_stderr = linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
@@ -3099,7 +3099,7 @@ class OtherLintChecksManager(LintChecksManager):
                 proc = subprocess.Popen(
                     proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-                linter_stdout, _ = proc.communicate()
+                encoded_linter_stdout, _ = proc.communicate()
                 linter_stdout = linter_stdout.decode(encoding='utf-8')
                 # This line splits the output of the linter and extracts digits
                 # from it. The digits are stored in a list. The second last
