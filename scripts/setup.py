@@ -143,7 +143,7 @@ def main():
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
     common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
-    common.recursive_chmod(common.NODE_MODULES_PATH, 744)
+    common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.

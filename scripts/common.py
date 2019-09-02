@@ -224,6 +224,7 @@ def recursive_chown(path, uid, gid):
         uid: int. Owner ID to be set.
         gid: int. Group ID to be set.
     """
+    os.chown(path, uid, gid)
     for root, directories, filenames in os.walk(path):
         for directory in directories:
             os.chown(os.path.join(root, directory), uid, gid)
@@ -238,6 +239,7 @@ def recursive_chmod(path, mode):
         path: str. The path for which mode would be set.
         mode: int. The mode to be set.
     """
+    os.chmod(path, mode)
     for root, directories, filenames in os.walk(path):
         for directory in directories:
             os.chmod(os.path.join(root, directory), mode)
