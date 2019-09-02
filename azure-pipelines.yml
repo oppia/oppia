@@ -1,7 +1,7 @@
 trigger:
 - 7496*
 jobs:
-  - job: Lint test
+  - job: lint_test
     timeoutInMinutes: 360
     pool:
       vmImage: 'ubuntu-latest'
