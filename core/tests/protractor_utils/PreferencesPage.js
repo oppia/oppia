@@ -68,12 +68,13 @@ var PreferencesPage = function() {
   this.submitProfilePhoto = function(imgPath) {
     return this.uploadProfilePhoto(imgPath).then(function() {
       waitFor.visibilityOf(
-        profilePhotoCropper, 'photo cropper still invisible');
+        profilePhotoCropper, 'Photo cropper is taking too long to appear');
     }).then(function() {
       profilePhotoSubmitButton.click();
     }).then(function() {
       return waitFor.invisibilityOf(
-        profilePhotoUploadInput, 'photo upload still visible');
+        profilePhotoUploadInput,
+        'Photo uploader is taking too long to disappear');
     });
   };
 
