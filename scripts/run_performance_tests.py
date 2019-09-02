@@ -20,7 +20,6 @@ import argparse
 import atexit
 import os
 import subprocess
-import sys
 import time
 
 import python_utils
@@ -90,12 +89,12 @@ def run_performance_test(test_name, xvfb_prefix):
             '--test_target=core.tests.performance_tests.%s' % test_name])
 
 
-def main(argv=None):
+def main(args=None):
     """Main function to run the performance tests."""
     setup.main()
     setup_gae.main()
 
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=args)
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
@@ -165,4 +164,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv[1:])
+    main(args=None)

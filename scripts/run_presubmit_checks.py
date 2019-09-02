@@ -28,7 +28,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import subprocess
-import sys
 
 import python_utils
 
@@ -53,12 +52,12 @@ _PARSER.add_argument(
     help='optional; if specified, the origin branch to compare against.')
 
 
-def main(argv=None):
+def main(args=None):
     """Run the presubmit checks."""
 
     # Run Javascript and Python linters.
     python_utils.PRINT('Linting files since the last commit')
-    pre_commit_linter.main(argv=[])
+    pre_commit_linter.main(args=[])
     python_utils.PRINT('Linting passed.')
     python_utils.PRINT('')
 
@@ -72,7 +71,7 @@ def main(argv=None):
         '-l'])
 
     # Set the origin branch to develop if it's not specified.
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=args)
     if parsed_args.branch:
         branch = parsed_args.branch
     elif matched_branch_num == '1':
@@ -88,7 +87,7 @@ def main(argv=None):
     if common.FRONTEND_DIR in all_changed_files:
         # Run frontend unit tests.
         python_utils.PRINT('Running frontend unit tests')
-        run_frontend_tests.main(argv=['--run_minified_tests'])
+        run_frontend_tests.main(args=['--run_minified_tests'])
         python_utils.PRINT('Frontend tests passed.')
     else:
         # If files in common.FRONTEND_DIR were not changed, skip the tests.
@@ -98,9 +97,9 @@ def main(argv=None):
 
     # Run backend tests.
     python_utils.PRINT('Running backend tests')
-    run_backend_tests.main(argv=[])
+    run_backend_tests.main(args=[])
     python_utils.PRINT('Backend tests passed.')
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv[1:])
+    main(args=None)

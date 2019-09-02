@@ -25,7 +25,6 @@ import fileinput
 import os
 import re
 import subprocess
-import sys
 import time
 
 import python_utils
@@ -70,7 +69,7 @@ def cleanup():
         time.sleep(1)
 
 
-def main(argv=None):
+def main(args=None):
     """Starts up a development server running Oppia."""
     setup.main()
     setup_gae.main()
@@ -88,7 +87,7 @@ def main(argv=None):
             'running at port %s.'
             % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
 
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=args)
     clear_datastore_arg = (
         '' if parsed_args.save_datastore else '--clear_datastore=true')
     enable_console_arg = (
@@ -103,7 +102,7 @@ def main(argv=None):
             python_utils.PRINT(
                 re.sub(
                     r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
-        build.main(argv=['--prod_env', '--enable_watcher'])
+        build.main(args=['--prod_env', '--enable_watcher'])
         app_yaml_filepath = 'app.yaml'
     else:
         constants_env_variable = '\'DEV_MODE\': true'
@@ -114,7 +113,7 @@ def main(argv=None):
             python_utils.PRINT(
                 re.sub(
                     r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
-        build.main(argv=['--enable_watcher'])
+        build.main(args=['--enable_watcher'])
         app_yaml_filepath = 'app_dev.yaml'
 
     # Set up a local dev instance.
@@ -202,4 +201,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv[1:])
+    main(args=None)

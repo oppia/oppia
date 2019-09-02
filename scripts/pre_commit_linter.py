@@ -3147,11 +3147,11 @@ def _print_complete_summary_of_errors():
         python_utils.PRINT(error_messages)
 
 
-def main(argv=None):
+def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
     """
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=args)
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
@@ -3198,4 +3198,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv[1:])
+    main(args=None)

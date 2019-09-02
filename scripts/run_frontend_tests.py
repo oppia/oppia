@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import os
 import subprocess
-import sys
 
 import python_utils
 
@@ -50,12 +49,12 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def main(argv=None):
+def main(args=None):
     """Runs the frontend tests."""
     setup.main()
     setup_gae.main()
 
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=args)
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
     common.print_each_string_after_two_new_lines([
@@ -64,7 +63,7 @@ def main(argv=None):
         'on your filesystem.',
         'Running test in development environment'])
 
-    build.main(argv=[])
+    build.main(args=[])
 
     subprocess.call([
         os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
@@ -73,7 +72,7 @@ def main(argv=None):
     if parsed_args.run_minified_tests is True:
         python_utils.PRINT('Running test in production environment')
 
-        build.main(argv=['--prod_env', '--minify_third_party_libs_only'])
+        build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
         subprocess.call([
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
@@ -84,4 +83,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv[1:])
+    main(args=None)

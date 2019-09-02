@@ -308,7 +308,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     return result
 
 
-def main(argv=None):
+def main(args=None):
     """Run the tests."""
     setup.main()
     setup_gae.main()
@@ -321,7 +321,7 @@ def main(argv=None):
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=args)
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(
             'Checking whether coverage is installed in %s'
@@ -333,7 +333,7 @@ def main(argv=None):
                 'coverage', '4.5.4',
                 os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'))
 
-    build.main(argv=[])
+    build.main(args=[])
 
     # Compile typescript files.
     python_utils.PRINT('Compiling typescript...')
@@ -499,4 +499,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv[1:])
+    main(args=None)

@@ -23,7 +23,6 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import time
 
 import python_utils
@@ -102,14 +101,14 @@ def cleanup():
     python_utils.PRINT('Done!')
 
 
-def main(argv=None):
+def main(args=None):
     """Runs the end to end tests."""
     setup.main()
     setup_gae.main()
     if os.environ.get('TRAVIS'):
         install_chrome_on_travis.main()
 
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args = _PARSER.parse_args(args=args)
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
@@ -145,7 +144,7 @@ def main(argv=None):
             python_utils.PRINT(
                 re.sub(r'\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
-        build.main(argv=['--prod_env'])
+        build.main(args=['--prod_env'])
         app_yaml_filepath = 'app.yaml'
     else:
         dev_mode = 'true'
@@ -157,7 +156,7 @@ def main(argv=None):
             python_utils.PRINT(
                 re.sub(r'\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
-        build.main(argv=[])
+        build.main(args=[])
         app_yaml_filepath = 'app_dev.yaml'
 
     # Start a selenium server using chromedriver 2.41.
@@ -249,4 +248,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv[1:])
+    main(args=None)
