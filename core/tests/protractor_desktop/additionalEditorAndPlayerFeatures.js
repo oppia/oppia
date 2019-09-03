@@ -64,6 +64,7 @@ describe('Full exploration editor', function() {
       function(elem) {
         elem.setValue(false);
       });
+    users.logout();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',

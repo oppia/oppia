@@ -53,6 +53,7 @@ describe('Library index page', function() {
       function(elem) {
         elem.setValue(false);
       });
+    users.logout();
   });
 
   it('should display private and published explorations', function() {
