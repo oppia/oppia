@@ -97,6 +97,15 @@ def _does_diff_include_package_lock_file():
         raise ValueError(err)
 
 
+def _does_current_folder_contain_have_package_lock_file():
+    """Checks whether package-lock.json exists in the current folder.
+
+    Returns:
+        bool. Whether the current folder includes package-lock.json.
+    """
+    return os.path.isfile('package-lock.json')
+
+
 def main():
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
@@ -110,7 +119,8 @@ def main():
         sys.exit(0)
 
     python_utils.PRINT('Running pre-commit check for package-lock.json ...')
-    if _does_diff_include_package_lock_file():
+    if _does_diff_include_package_lock_file() and (
+        not _does_current_folder_contain_have_package_lock_file()):
         # The following message is necessary since there git commit aborts
         # quietly when the status is non-zero.
         python_utils.PRINT('-----------COMMIT ABORTED-----------')
