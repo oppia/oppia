@@ -1614,7 +1614,7 @@ tags: []
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
     def create_skill_opportunity(
-        self, skill_id, skill_description, topic_id=None, topic_name=None):
+            self, skill_id, skill_description, topic_id=None, topic_name=None):
         """Creates a SkillOpportunity and saves it to storage.
 
         Args:

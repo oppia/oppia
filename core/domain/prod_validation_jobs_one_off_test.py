@@ -2445,8 +2445,9 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         for i in python_utils.RANGE(3):
-            self.save_new_skill('%s' % i, self.admin_id, 'description %d' % i)
-            skill_services.publish_skill(skill.id, self.admin_id)
+            skill_id = '%s' % i
+            self.save_new_skill(skill_id, self.admin_id, 'description %d' % i)
+            skill_services.publish_skill(skill_id, self.admin_id)
 
         topic_services.add_uncategorized_skill(
             self.owner_id, self.TOPIC_ID, '0')

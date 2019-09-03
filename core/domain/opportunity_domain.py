@@ -228,10 +228,12 @@ class SkillOpportunity(python_utils.OBJECT):
         Raises:
             ValidationError: One or more attributes of the object are invalid.
         """
-        if not isinstance(self.topic_id, python_utils.BASESTRING) and self.topic_id is not None:
+        if (not isinstance(self.topic_id, python_utils.BASESTRING) and
+                self.topic_id is not None):
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' % self.topic_id)
-        if not isinstance(self.topic_name, python_utils.BASESTRING) and self.topic_name is not None:
+        if (not isinstance(self.topic_name, python_utils.BASESTRING) and
+                self.topic_name is not None):
             raise utils.ValidationError(
                 'Expected topic_name to be a string, received %s' %
                 self.topic_name)

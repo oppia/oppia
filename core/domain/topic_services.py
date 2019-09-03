@@ -358,6 +358,12 @@ def apply_change_list(topic_id, change_list):
 
 
 def _add_uncategorized_skill_id_to_topic(topic, uncategorized_skill_id):
+    """Adds an uncategorized skill_id to a topic.
+
+    Args:
+        topic: Topic. Topic to be modified.
+        uncategorized_skill_id: str. Skill ID to be added.
+    """
     skill_ids_for_unpublished_skills = [
         skill_rights.id for skill_rights in (
             skill_services.get_all_unpublished_skill_rights())]

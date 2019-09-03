@@ -177,7 +177,7 @@ def _update_linked_skill_ids_of_question(
     update_question(
         user_id, question_id, change_list, 'updated linked skill ids')
     opportunity_services.compute_question_linked_skill_ids_update(
-            old_linked_skill_ids, new_linked_skill_ids)
+        old_linked_skill_ids, new_linked_skill_ids)
 
 
 def delete_question_skill_link(user_id, question_id, skill_id):

@@ -358,7 +358,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillOpportunityDomainTest, self).setUp()
         self.valid_skill_opportunity = (
-                opportunity_domain.SkillOpportunity.from_dict({
+            opportunity_domain.SkillOpportunity.from_dict({
                     'topic_id': 'topic_1',
                     'topic_name': 'A topic',
                     'skill_id': 'skill_1',
@@ -414,7 +414,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
     def test_invalid_skill_id_fails_validation_check(self):
         self.assertTrue(isinstance(
             self.valid_skill_opportunity.skill_id, python_utils.BASESTRING))
-         # Object with skill_id as string passes the validation check.
+        # Object with skill_id as string passes the validation check.
         self.valid_skill_opportunity.validate()
         self.valid_skill_opportunity.skill_id = 5
         # Object with skill_id as int fails the validation check.
@@ -424,7 +424,8 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
 
     def test_invalid_skill_description_fails_validation_check(self):
         self.assertTrue(isinstance(
-            self.valid_skill_opportunity.skill_description, python_utils.BASESTRING))
+            self.valid_skill_opportunity.skill_description,
+            python_utils.BASESTRING))
 
         # Object with skill_description as string passes the validation check.
         self.valid_skill_opportunity.validate()
@@ -438,7 +439,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(
             self.valid_skill_opportunity.question_count, int))
 
-         # Object with question_count as int passes the validation check.
+        # Object with question_count as int passes the validation check.
         self.valid_skill_opportunity.validate()
         self.valid_skill_opportunity.question_count = '123abc'
         self._assert_validation_error(

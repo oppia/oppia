@@ -476,8 +476,8 @@ def apply_change_list(skill_id, change_list, committer_id):
                             'skill description.')
                     skill.update_description(change.new_value)
                     (opportunity_services
-                        .update_skill_opportunites_skill_description(skill.id,
-                            change.new_value))
+                     .update_skill_opportunites_skill_description(
+                         skill.id, change.new_value))
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
                     skill.update_language_code(change.new_value)

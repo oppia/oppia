@@ -451,6 +451,7 @@ def create_skill_opportunity(skill_opportunity):
     )
     skill_opportunity_model.put()
 
+
 def update_skill_opportunites_skill_description(skill_id, new_description):
     """Updates the skill_description of SkillOpportunityModel(s) with
     new_description.
@@ -465,6 +466,7 @@ def update_skill_opportunites_skill_description(skill_id, new_description):
         model.skill_description = new_description
         model.put()
 
+
 def delete_skill_opportunities(skill_id):
     """Deletes the SkillOpportunityModel(s) corresponding to the supplied
     skill_id.
@@ -477,6 +479,7 @@ def delete_skill_opportunities(skill_id):
         opportunity_models.SkillOpportunityModel.get_by_skill_id(skill_id))
     opportunity_models.SkillOpportunityModel.delete_multi(
         skill_opportunity_models)
+
 
 def add_topic_to_skill_opportunity(topic_id, skill_id):
     """Adds a topic_id and corresponding topic_name to an existing
@@ -509,6 +512,7 @@ def add_topic_to_skill_opportunity(topic_id, skill_id):
             )
         )
 
+
 def update_skill_opportunities_with_topic_name(topic_id, topic_name):
     """Updates the SkillOpportunityModel(s) with a new topic_name.
 
@@ -521,6 +525,7 @@ def update_skill_opportunities_with_topic_name(topic_id, topic_name):
     for model in skill_opportunity_models:
         model.topic_name = topic_name
         model.put()
+
 
 def delete_topic_from_skill_opportunity(topic_id, skill_id):
     """Deletes topic_id and topic_name from SkillOpportunityModel(s).
@@ -537,6 +542,7 @@ def delete_topic_from_skill_opportunity(topic_id, skill_id):
             model.topic_name = None
             model.put()
 
+
 def delete_topic_from_all_skill_opportunities(topic_id):
     """Deletes topic_id and topic_name from SkillOpportunityModel(s).
 
@@ -550,6 +556,7 @@ def delete_topic_from_all_skill_opportunities(topic_id):
         model.topic_name = None
         model.put()
 
+
 def update_skill_opportunity_question_counts(skill_ids, delta):
     """Increments question_count(s) of SkillOpportunityModel(s) with
     corresponding skill_ids.
@@ -561,6 +568,7 @@ def update_skill_opportunity_question_counts(skill_ids, delta):
     """
     for skill_id in skill_ids:
         _update_skill_opportunity_question_count(skill_id, delta)
+
 
 def compute_question_linked_skill_ids_update(old_skill_ids, new_skill_ids):
     """Updates question_count(s) of SkillOpportunityModel(s) by the set
@@ -578,6 +586,7 @@ def compute_question_linked_skill_ids_update(old_skill_ids, new_skill_ids):
         _update_skill_opportunity_question_count(skill_id, 1)
     for skill_id in removed:
         _update_skill_opportunity_question_count(skill_id, -1)
+
 
 def _update_skill_opportunity_question_count(skill_id, delta):
     """Updates question_count(s) of SkillOpportunityModel(s) with corresponding

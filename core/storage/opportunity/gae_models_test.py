@@ -138,6 +138,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             .get_by_topic('non_existing_topic_id'))
         self.assertEqual(len(model_list), 0)
 
+
 class SkillOpportunityModelTest(test_utils.GenericTestBase):
     """Tests for the SkillOpportunityModel class."""
 
