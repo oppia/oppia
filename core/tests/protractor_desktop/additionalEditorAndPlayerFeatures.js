@@ -41,21 +41,23 @@ describe('Full exploration editor', function() {
   var adminPage = null;
   var collectionEditorPage = null;
   var creatorDashboardPage = null;
-  var explorationEditorMainTab = null;
   var explorationEditorPage = null;
-  var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
   var libraryPage = null;
+
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
+
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
     users.createAndLoginAdminUser('superUser@stateEditor.com', 'superUser');
     adminPage.editConfigProperty(
