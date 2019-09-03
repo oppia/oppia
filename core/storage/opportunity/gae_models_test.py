@@ -169,7 +169,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, basestring))
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_get_skill_opportunities_pagination(self):
         results, cursor, more = (
@@ -178,7 +178,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
-        self.assertTrue(isinstance(cursor, basestring))
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel
@@ -186,4 +186,4 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, basestring))
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
