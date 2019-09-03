@@ -1905,9 +1905,8 @@ class JsTsLintChecksManager(LintChecksManager):
 
         super(JsTsLintChecksManager, self).__init__(
             verbose_mode_enabled=verbose_mode_enabled)
-        self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
-        self.parsed_expressions_in_files = (
-            self._get_expressions_from_parsed_script())
+        self.parsed_js_and_ts_files = []
+        self.parsed_expressions_in_files = []
 
     @property
     def js_filepaths(self):
@@ -2637,6 +2636,10 @@ class JsTsLintChecksManager(LintChecksManager):
         """
 
         process, stdout = self._lint_all_files()
+
+        self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
+        self.parsed_expressions_in_files = (
+            self._get_expressions_from_parsed_script())
 
         common_messages = super(
             JsTsLintChecksManager, self).perform_all_lint_checks()
