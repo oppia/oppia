@@ -29,10 +29,10 @@ import python_utils
 from . import common
 
 _PARSER = argparse.ArgumentParser(description="""
-    This file should not be invoked directly, but called from other Python
-    scripts.
-
-    Python execution environent set up for all scripts.""")
+This file should not be invoked directly, but called from other Python
+scripts.
+Python execution environent set up for all scripts.
+""")
 
 
 def delete_directory_tree(directory_path):

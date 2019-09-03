@@ -31,16 +31,14 @@ from . import setup
 from . import setup_gae
 
 _PARSER = argparse.ArgumentParser(description="""
-    The root folder MUST be named 'oppia'.
-
-    Run all tests sequentially:
-        python -m scripts.run_performance_tests without args in order to run all
-        tests sequentially.
-
-    Run test for a specific page:
-        python -m scripts.run_performance_tests --test_name=page_test
-
-    page_test is the name of the file containing that test eg. splash_test.""")
+The root folder MUST be named 'oppia'.
+Run all tests sequentially:
+    python -m scripts.run_performance_tests without args in order to run all
+    tests sequentially.
+Run test for a specific page:
+    python -m scripts.run_performance_tests --test_name=page_test
+page_test is the name of the file containing that test eg. splash_test.
+""")
 
 _PARSER.add_argument(
     '--skip_install',
@@ -91,10 +89,11 @@ def run_performance_test(test_name, xvfb_prefix):
 
 def main(args=None):
     """Main function to run the performance tests."""
+    parsed_args = _PARSER.parse_args(args=args)
+
     setup.main(args=[])
     setup_gae.main(args=[])
 
-    parsed_args = _PARSER.parse_args(args=args)
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 

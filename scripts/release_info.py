@@ -55,7 +55,11 @@ NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
 
-_PARSER = argparse.ArgumentParser()
+_PARSER = argparse.ArgumentParser(description="""
+Script that simplifies releases by collecting various information.
+Should be run from the oppia root dir.
+""")
+
 _PARSER.add_argument(
     '--personal_access_token',
     help=(
@@ -293,14 +297,15 @@ def _check_storage_models(current_release):
     return [item for item in diff_list if item.startswith('core/storage')]
 
 
-def main():
+def main(args=None):
     """Collects necessary info and dumps it to disk."""
+    parsed_args = _PARSER.parse_args(args=args)
+
     branch_name = _get_current_branch()
     if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
         raise Exception(
             'This script should only be run from the latest release branch.')
 
-    parsed_args = _PARSER.parse_args()
     if parsed_args.personal_access_token is None:
         python_utils.PRINT(
             'No personal access token provided, please set up a personal '

@@ -35,14 +35,12 @@ from . import setup
 from . import setup_gae
 
 _PARSER = argparse.ArgumentParser(description="""
-    Run this script from the oppia root folder:
-
-        python -m scripts.run_e2e_tests
-
-    The root folder MUST be named 'oppia'.
-
-    Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run
-    a single test or test suite.""")
+Run this script from the oppia root folder:
+    python -m scripts.run_e2e_tests
+The root folder MUST be named 'oppia'.
+Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run
+a single test or test suite.
+""")
 
 _PARSER.add_argument(
     '--skip_install',
@@ -103,12 +101,13 @@ def cleanup():
 
 def main(args=None):
     """Runs the end to end tests."""
+    parsed_args = _PARSER.parse_args(args=args)
+
     setup.main(args=[])
     setup_gae.main(args=[])
     if os.environ.get('TRAVIS'):
         install_chrome_on_travis.main(args=[])
 
-    parsed_args = _PARSER.parse_args(args=args)
     install_third_party_libs.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
@@ -174,21 +173,18 @@ def main(args=None):
     # info logs to stderr so we discard them.
     # TODO(jacob): Find a webdriver or selenium argument that controls log
     # level.
-    background_processes = []
-    background_processes.append(subprocess.Popen([
-        os.path.join(common.NODE_MODULES_PATH, '.bin', 'webdriver-manager'),
-        'start', '2>/dev/null']))
+    subprocess.Popen(
+        '(%s start 2>/dev/null)&'
+        % os.path.join(common.NODE_MODULES_PATH, '.bin', 'webdriver-manager'),
+        shell=True)
     # Start a demo server.
-    background_processes.append(subprocess.Popen(
-        'python %s/dev_appserver.py --host=0.0.0.0 --port=%s '
+    subprocess.Popen(
+        '(python %s/dev_appserver.py --host=0.0.0.0 --port=%s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
-        '--log_level=critical --skip_sdk_update_check=true %s' % (
+        '--log_level=critical --skip_sdk_update_check=true %s)&' % (
             common.GOOGLE_APP_ENGINE_HOME,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            app_yaml_filepath), shell=True))
-
-    for process in background_processes:
-        process.wait()
+            app_yaml_filepath), shell=True)
 
     # Wait for the servers to come up.
     while not common.is_port_open(

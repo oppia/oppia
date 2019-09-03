@@ -28,10 +28,10 @@ from . import common
 from . import setup
 
 _PARSER = argparse.ArgumentParser(description="""
-    Run this script from the oppia root folder:
-        python -m scripts.create_expression_parser
-
-    The root folder MUST be named 'oppia'.""")
+Run this script from the oppia root folder:
+    python -m scripts.create_expression_parser
+The root folder MUST be named 'oppia'.
+""")
 
 
 def main(args=None):

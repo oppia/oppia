@@ -17,11 +17,6 @@
 - Backend Python tests
 
 Only when frontend files are changed will it run Frontend Karma unit tests.
-
-If any of these tests result in errors, this script will terminate.
-
-Note: The test scripts are arranged in increasing order of time taken. This
-enables a broken build to be detected as quickly as possible.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -37,15 +32,21 @@ from . import run_backend_tests
 from . import run_frontend_tests
 
 _PARSER = argparse.ArgumentParser(description="""
-    Run this script from the oppia root folder prior to opening a PR:
-        python -m scripts.run_presubmit_checks
-
-    Set the origin branch to compare against by adding
-    --branch=your_branch or -b=your_branch
-
-    By default, if the current branch tip exists on remote origin,
-    the current branch is compared against its tip on GitHub.
-    Otherwise it's compared against 'develop'.""")
+Run this script from the oppia root folder prior to opening a PR:
+    python -m scripts.run_presubmit_checks
+Set the origin branch to compare against by adding
+--branch=your_branch or -b=your_branch
+By default, if the current branch tip exists on remote origin,
+the current branch is compared against its tip on GitHub.
+Otherwise it's compared against 'develop'.
+This script runs the following tests in all cases.
+- Javascript and Python Linting
+- Backend Python tests
+Only when frontend files are changed will it run Frontend Karma unit tests.
+If any of these tests result in errors, this script will terminate.
+Note: The test scripts are arranged in increasing order of time taken. This
+enables a broken build to be detected as quickly as possible.
+""")
 
 _PARSER.add_argument(
     '--branch', '-b',
@@ -54,6 +55,7 @@ _PARSER.add_argument(
 
 def main(args=None):
     """Run the presubmit checks."""
+    parsed_args = _PARSER.parse_args(args=args)
 
     # Run Javascript and Python linters.
     python_utils.PRINT('Linting files since the last commit')
@@ -71,7 +73,6 @@ def main(args=None):
         '-l'])
 
     # Set the origin branch to develop if it's not specified.
-    parsed_args = _PARSER.parse_args(args=args)
     if parsed_args.branch:
         branch = parsed_args.branch
     elif matched_branch_num == '1':

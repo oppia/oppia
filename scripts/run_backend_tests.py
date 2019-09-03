@@ -81,11 +81,10 @@ _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
 
 _PARSER = argparse.ArgumentParser(description="""
-    Run this script from the oppia root folder:
-
-        python -m scripts.run_backend_tests
-
-    IMPORTANT: Only one of --test_path and --test_target should be specified""")
+Run this script from the oppia root folder:
+    python -m scripts.run_backend_tests
+IMPORTANT: Only one of --test_path and --test_target should be specified.
+""")
 
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
@@ -310,6 +309,8 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 
 def main(args=None):
     """Run the tests."""
+    parsed_args = _PARSER.parse_args(args=args)
+
     setup.main(args=[])
     setup_gae.main(args=[])
 
@@ -321,7 +322,6 @@ def main(args=None):
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    parsed_args = _PARSER.parse_args(args=args)
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(
             'Checking whether coverage is installed in %s'

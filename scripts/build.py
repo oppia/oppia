@@ -143,7 +143,12 @@ HASH_BLOCK_SIZE = 2**20
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
 
-_PARSER = argparse.ArgumentParser()
+_PARSER = argparse.ArgumentParser(description="""
+Creates a third-party directory where all the JS and CSS dependencies are
+built and stored. Depending on the options passed to the script, might also
+minify third-party libraries and/or generate a build directory.
+""")
+
 _PARSER.add_argument(
     '--prod_env', action='store_true', default=False, dest='prod_mode')
 _PARSER.add_argument(
@@ -1359,12 +1364,7 @@ def compile_typescript_files_continuously(project_dir):
 
 
 def main(args=None):
-    """The main method of this script.
-
-    Creates a third-party directory where all the JS and CSS dependencies are
-    built and stored. Depending on the options passed to the script, might also
-    minify third-party libraries and/or generate a build directory.
-    """
+    """The main method of this script."""
     options = _PARSER.parse_args(args=args)
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)

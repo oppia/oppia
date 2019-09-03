@@ -57,7 +57,8 @@ from . import setup_gae  # isort:skip
 # pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser(description="""
-    Installation script for Oppia third-party libraries.""")
+Installation script for Oppia third-party libraries.
+""")
 
 _PARSER.add_argument(
     '--nojsrepl',
@@ -108,7 +109,7 @@ def pip_install(package, version, install_path):
         install_path])
 
 
-def install_skulpt(args):
+def install_skulpt(parsed_args):
     """Download and install Skulpt. Skulpt is built using a Python script
     included within the Skulpt repository (skulpt.py). This script normally
     requires GitPython, however the patches to it below
@@ -118,7 +119,6 @@ def install_skulpt(args):
     warning saying its dist command will not work properly without GitPython,
     but it does actually work due to the patches.
     """
-    parsed_args = _PARSER.parse_args(args=args)
     no_skulpt = parsed_args.nojsrepl or parsed_args.noskulpt
 
     python_utils.PRINT('Checking whether Skulpt is installed in third_party')
@@ -228,6 +228,8 @@ def ensure_pip_library_is_installed(package, version, path):
 
 def main(args=None):
     """Install third-party libraries for Oppia."""
+    parsed_args = _PARSER.parse_args(args=args)
+
     setup.main(args=[])
     setup_gae.main(args=[])
     pip_dependencies = [
@@ -257,7 +259,7 @@ def main(args=None):
     # 374076889.
     subprocess.call([common.NPM_PATH, 'dedupe'])
 
-    install_skulpt(args)
+    install_skulpt(parsed_args)
 
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')

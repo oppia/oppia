@@ -36,10 +36,10 @@ from . import setup
 from . import setup_gae
 
 _PARSER = argparse.ArgumentParser(description="""
-    Run the script from the oppia root folder:
-        python -m scripts.start
-
-    Note that the root folder MUST be named 'oppia'.""")
+Run the script from the oppia root folder:
+    python -m scripts.start
+Note that the root folder MUST be named 'oppia'.
+""")
 
 _PARSER.add_argument(
     '--save_datastore',
@@ -72,6 +72,8 @@ def cleanup():
 
 def main(args=None):
     """Starts up a development server running Oppia."""
+    parsed_args = _PARSER.parse_args(args=args)
+
     setup.main(args=[])
     setup_gae.main(args=[])
     install_third_party_libs.main(args=[])
@@ -89,7 +91,6 @@ def main(args=None):
             'running at port %s.'
             % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
 
-    parsed_args = _PARSER.parse_args(args=args)
     clear_datastore_arg = (
         '' if parsed_args.save_datastore else '--clear_datastore=true')
     enable_console_arg = (

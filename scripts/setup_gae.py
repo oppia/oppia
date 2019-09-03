@@ -29,10 +29,10 @@ import python_utils
 from . import common
 
 _PARSER = argparse.ArgumentParser(description="""
-    This file should not be invoked directly, but called from other Python
-    scripts.
-
-    Python execution environment setup for scripts that require GAE.""")
+This file should not be invoked directly, but called from other Python
+scripts.
+Python execution environment setup for scripts that require GAE.
+""")
 
 
 def main(args=None):

@@ -25,6 +25,8 @@ enables a broken build to be detected as quickly as possible.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
+
 import python_utils
 
 from . import run_backend_tests
@@ -33,9 +35,20 @@ from . import run_frontend_tests
 from . import setup
 from . import setup_gae
 
+_PARSER = argparse.ArgumentParser(description="""
+Run this script from the oppia root folder:
+    python -m scripts.run_tests
+This script runs all the tests, in this order:
+- Frontend Karma unit tests
+- Backend Python tests
+- End-to-end Protractor tests
+""")
 
-def main():
+
+def main(args=None):
     """Run all the tests."""
+    unused_parsed_args = _PARSER.parse_args(args=args)
+
     setup.main(args=[])
     setup_gae.main(args=[])
 
