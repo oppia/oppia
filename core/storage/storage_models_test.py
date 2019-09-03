@@ -67,15 +67,15 @@ class StorageModelsTest(test_utils.GenericTestBase):
 
         for clazz in model_subclasses:
             base_classes = [base.__name__ for base in inspect.getmro(clazz)]
-            # BaseSnapshotMetadataModel adopts the policy of parent
+            # BaseSnapshotMetadataModel adopts the policy of the associated
             # VersionedModel.
             if 'BaseSnapshotMetadataModel' in base_classes:
                 continue
-            # BaseSnapshotContentModel adopts the policy of parent
+            # BaseSnapshotContentModel adopts the policy of the associated
             # VersionedModel.
             if 'BaseSnapshotContentModel' in base_classes:
                 continue
-            # BaseCommitLogEntryModel adopts the policy of parent
+            # BaseCommitLogEntryModel adopts the policy of the associated
             # VersionedModel.
             if 'BaseCommitLogEntryModel' in base_classes:
                 continue
