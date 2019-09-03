@@ -26,6 +26,7 @@ import os
 import random
 import re
 import string
+import sys
 import time
 import unicodedata
 
@@ -33,7 +34,10 @@ from constants import constants
 import feconf
 import python_utils
 
-import yaml
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+sys.path.insert(0, _YAML_PATH)
+
+import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 
 class InvalidInputException(Exception):

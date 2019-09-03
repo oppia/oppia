@@ -15,7 +15,6 @@ anchor_for_job_defaults: &job_defaults
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
-    sudo pip install pyyaml
     python -m scripts.install_third_party_libs
 
 anchor_for_installing_cc_test_reporter: &install_cc
