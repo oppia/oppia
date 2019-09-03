@@ -383,5 +383,4 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                         with create_branch_swap, getpass_swap, get_repo_swap:
                             update_changelog_and_credits.main()
 
-
         self.assertEqual(check_function_calls, expected_check_function_calls)
