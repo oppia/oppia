@@ -916,11 +916,10 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'compile_typescript_files', mock_compile_typescript_files)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
-        args_swap = self.swap(sys, 'argv', ['build.py', '--prod_env'])
 
         with ensure_files_exist_swap, build_using_webpack_swap, (
-            compile_typescript_files_swap), compare_file_count_swap, args_swap:
-            build.main(args=[])
+            compile_typescript_files_swap), compare_file_count_swap:
+            build.main(args=['--prod_env'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -946,11 +945,10 @@ class BuildTests(test_utils.GenericTestBase):
         compile_typescript_files_continuously_swap = self.swap(
             build, 'compile_typescript_files_continuously',
             mock_compile_typescript_files_continuously)
-        args_swap = self.swap(sys, 'argv', ['build.py', '--enable_watcher'])
 
         with ensure_files_exist_swap, (
-            compile_typescript_files_continuously_swap), args_swap:
-            build.main(args=[])
+            compile_typescript_files_continuously_swap):
+            build.main(args=['--enable_watcher'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -974,15 +972,13 @@ class BuildTests(test_utils.GenericTestBase):
             build, '_ensure_files_exist', mock_ensure_files_exist)
         compile_typescript_files_swap = self.swap(
             build, 'compile_typescript_files', mock_compile_typescript_files)
-        args_swap = self.swap(
-            sys, 'argv', ['build.py', '--minify_third_party_libs_only'])
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception,
             'minify_third_party_libs_only should not be set in non-prod mode.')
 
         with ensure_files_exist_swap, compile_typescript_files_swap, (
-            assert_raises_regexp_context_manager), args_swap:
-            build.main(args=[])
+            assert_raises_regexp_context_manager):
+            build.main(args=['--minify_third_party_libs_only'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
