@@ -22,7 +22,6 @@ import copy
 
 from constants import constants
 from core.domain import change_domain
-# from core.domain import skill_services
 from core.domain import user_services
 from core.platform import models
 import feconf

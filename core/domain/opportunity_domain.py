@@ -209,11 +209,11 @@ class SkillOpportunity(python_utils.OBJECT):
         """Constructs a SkillOpportunity domain object.
 
         Args:
-            topic_id: str. The unique id of the topic.
-            topic_name: str. The name of the topic.
             skill_id: str. The unique id of the skill.
             skill_description: str. The title of the skill.
             question_count: int. The total number of questions for the skill.
+            topic_id: str. The unique id of the topic.
+            topic_name: str. The name of the topic.
         """
         self.topic_id = topic_id
         self.topic_name = topic_name
