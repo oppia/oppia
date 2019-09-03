@@ -2420,6 +2420,79 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(SkillOpportunityModelValidatorTests, self).setUp()
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SkillOpportunityModelAuditOneOffJob)
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
+        self.TOPIC_ID = 'topic'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id=self.TOPIC_ID, name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
+
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            description='description %d' % i,
+            rubrics=rubrics,
+        ) for i in python_utils.RANGE(3)]
+        for skill in skills:
+            skill_services.save_new_skill(self.admin_id, skill)
+            skill_services.publish_skill(skill.id, self.admin_id)
+
+        topic_services.add_uncategorized_skill(
+            self.owner_id, self.TOPIC_ID, '0')
+
+        self.QUESTION_ID = question_services.get_new_question_id()
+        self.save_new_question(
+            self.QUESTION_ID, self.owner_id,
+            self._create_valid_question_data('ABC'), ['0'])
+        question_services.create_new_question_skill_link(
+            self.owner_id, self.QUESTION_ID, '0', 0.3)
+
+        self.model_instance_0 = (
+            opportunity_models.SkillOpportunityModel.get_by_skill_id('0')[0])
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated SkillOpportunityModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_skill_related_property(self):
+        self.model_instance_0.skill_description = 'invalid'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for skill_description field '
+                'check of SkillOpportunityModel\', '
+                '[u\'Entity id %s: skill_description field in entity: invalid '
+                'does not match corresponding skill description field: '
+                'description 0\']]'
+            ) % 1,
+            u'[u\'fully-validated SkillOpportunityModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
 class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
