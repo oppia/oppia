@@ -36,7 +36,7 @@ angular.module('oppia').directive('copier', ['$compile', function($compile) {
       getObjType: '&',
     },
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.generatorId = $scope.getGeneratorId();
       $scope.initArgs = $scope.getInitArgs();
       $scope.objType = $scope.getObjType();
@@ -47,6 +47,6 @@ angular.module('oppia').directive('copier', ['$compile', function($compile) {
       $scope.$watch('objType', function() {
         $scope.objType = $scope.getObjType();
       }, true);
-    }
+    }]
   };
 }]);
