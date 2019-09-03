@@ -187,6 +187,9 @@ def main(args=None):
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             app_yaml_filepath), shell=True))
 
+    for process in background_processes:
+        process.wait()
+
     # Wait for the servers to come up.
     while not common.is_port_open(
             PORT_NUMBER_FOR_SELENIUM_SERVER) or not common.is_port_open(
@@ -242,9 +245,6 @@ def main(args=None):
                 '--capabilities.maxInstances=%s'
                 % parsed_args.sharding_instances, '--suite', parsed_args.suite,
                 '--params.devMode="%s"' % dev_mode])
-
-    for process in background_processes:
-        process.wait()
 
 
 if __name__ == '__main__':
