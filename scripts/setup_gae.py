@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This file should not be invoked directly, but called from other Python
-scripts. Python execution environment setup for scripts that require GAE.
-"""
+"""Python execution environment setup for scripts that require GAE."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -29,8 +27,6 @@ import python_utils
 from . import common
 
 _PARSER = argparse.ArgumentParser(description="""
-This file should not be invoked directly, but called from other Python
-scripts.
 Python execution environment setup for scripts that require GAE.
 """)
 
