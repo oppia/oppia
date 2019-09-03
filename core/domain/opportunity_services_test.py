@@ -60,14 +60,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             category='category%d' % i,
         ) for i in python_utils.RANGE(5)]
 
-        self.rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
@@ -391,12 +383,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
-        skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID,
-            description='skill_description',
-            rubrics=self.rubrics)
-        skill_services.save_new_skill(
-            self.USER_ID, skill)
+        self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
@@ -406,10 +393,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['skill_description'], 'skill_description')
 
     def test_updateSkillDescription_updatesSkillOpportunity(self):
-        skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, description='skill_description', rubrics=self.rubrics)
-        skill_services.save_new_skill(
-            self.USER_ID, skill)
+        self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -435,12 +419,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['skill_description'], 'new_description')
 
     def test_deleteSkill_deletesSkillOpportunity(self):
-        skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID,
-            description='skill_description',
-            rubrics=self.rubrics)
-        skill_services.save_new_skill(
-            self.USER_ID, skill)
+        self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
@@ -452,12 +431,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_opportunities), 0)
 
     def test_addUncategorizedSkillToTopic_availableExistingOpportunity_updatesSkillOpportunity(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(self.SKILL_ID, 'description')
 
         topic_services.add_uncategorized_skill(
             self.USER_ID, self.TOPIC_ID, self.SKILL_ID)
@@ -470,14 +444,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['topic_name'], 'topic')
 
     def test_addUncategorizedSkillToTopic_noAvailableExistingOpportunity_createsNewSkillOpportunity(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                topic_id='topic_id_2',
-                topic_name='topic_name_2',
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(
+            self.SKILL_ID, 'description', 'topic_id_2', 'topic_name_2')
 
         topic_services.add_uncategorized_skill(
             self.USER_ID, self.TOPIC_ID, self.SKILL_ID)
@@ -490,14 +458,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['topic_name'], 'topic')
 
     def test_addUncategorizedSkillToTopic_opportunityWithTopicExists_noDuplicates(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                topic_id=self.TOPIC_ID,
-                topic_name='topic',
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(
+            self.SKILL_ID, 'description', self.TOPIC_ID, 'topic')
 
         topic_services.add_uncategorized_skill(
             self.USER_ID, self.TOPIC_ID, self.SKILL_ID)
@@ -507,14 +469,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_opportunities), 1)
 
     def test_updateTopicName_updatesSkillOpportunity(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                topic_id=self.TOPIC_ID,
-                topic_name='topic',
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(
+            self.SKILL_ID, 'description', self.TOPIC_ID, 'topic')
 
         topic_services.update_topic_and_subtopic_pages(
             self.USER_ID, self.TOPIC_ID, [topic_domain.TopicChange({
@@ -532,12 +488,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['topic_name'], 'A new topic')
 
     def test_deleteUncategorizedSkillFromTopic_deletesTopicFromSkillOpportunity(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(self.SKILL_ID, 'description')
         topic_services.add_uncategorized_skill(
             self.USER_ID, self.TOPIC_ID, self.SKILL_ID)
 
@@ -552,14 +503,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertIsNone(opportunity['topic_name'])
 
     def test_deleteTopic_deletesTopicFromSkillOpportunities(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                topic_id=self.TOPIC_ID,
-                topic_name='topic',
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(
+            self.SKILL_ID, 'description', self.TOPIC_ID, 'topic')
 
         topic_services.delete_topic(self.USER_ID, self.TOPIC_ID)
 
@@ -571,12 +516,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertIsNone(opportunity['topic_name'])
 
     def test_addQuestion_incrementsSkillOpportunityQuestionCount(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(self.SKILL_ID, 'description')
 
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
@@ -589,12 +529,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['question_count'], 1)
 
     def test_createQuestionSkillLink_incrementsSkillOpportunityQuestionCount(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC'), ['skill_2'])
@@ -608,12 +543,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['question_count'], 1)
 
     def test_linkMultipleSkillsForQuestion_incrementsSkillOpportunityQuestionCount(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC'), ['skill_2'])
@@ -627,12 +557,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['question_count'], 1)
 
     def test_deleteQuestion_decrementsSkillOpportunityQuestionCount(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC'), [self.SKILL_ID])
@@ -646,12 +571,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['question_count'], 0)
 
     def test_deleteQuestionSkillLink_decrementsSkillOpportunityQuestionCount(self):
-        opportunity_services.create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                skill_id=self.SKILL_ID,
-                skill_description='description',
-            )
-        )
+        self.create_skill_opportunity(self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC'), ['skill_2'])

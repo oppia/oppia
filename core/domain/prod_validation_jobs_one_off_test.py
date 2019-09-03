@@ -2443,21 +2443,8 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID, name='topic')
         topic_services.save_new_topic(self.owner_id, topic)
 
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics,
-        ) for i in python_utils.RANGE(3)]
-        for skill in skills:
-            skill_services.save_new_skill(self.admin_id, skill)
+        for i in python_utils.RANGE(3):
+            self.save_new_skill('%s' % i, self.admin_id, 'description %d' % i)
             skill_services.publish_skill(skill.id, self.admin_id)
 
         topic_services.add_uncategorized_skill(

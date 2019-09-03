@@ -31,6 +31,8 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import opportunity_domain
+from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -1600,6 +1602,25 @@ tags: []
         skill_model.commit(
             owner_id, 'New skill created.',
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
+
+    def create_skill_opportunity(
+        self, skill_id, skill_description, topic_id=None, topic_name=None):
+        """Creates a SkillOpportunity and saves it to storage.
+
+        Args:
+            skill_id: str. ID of the corresponding skill.
+            skill_description: str. Description of the corresponding skill.
+            topic_id: str. ID of the corresponding topic, if any.
+            topic_name: str. Name of the corresponding topic, if any.
+        """
+        opportunity_services.create_skill_opportunity(
+            opportunity_domain.SkillOpportunity(
+                topic_id=topic_id,
+                topic_name=topic_name,
+                skill_id=skill_id,
+                skill_description=skill_description,
+            )
+        )
 
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):
