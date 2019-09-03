@@ -16,6 +16,7 @@
 
 """Unit tests for core.domain.exp_services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -868,7 +869,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
                 duration.microseconds, 1E6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)' %
-                (exploration.title.encode('utf-8'), processing_time))
+                (exploration.title, processing_time))
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(),
@@ -3477,9 +3478,9 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """) % (
-    feconf.DEFAULT_INIT_STATE_NAME,
+    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
+    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'

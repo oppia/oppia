@@ -16,6 +16,7 @@
 
 """Commands for operations on topics, and related models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import logging
@@ -51,6 +52,25 @@ def get_all_topic_summaries():
     topic_summaries = [
         get_topic_summary_from_model(summary)
         for summary in topic_summaries_models]
+    return topic_summaries
+
+
+def get_multi_topic_summaries(topic_ids):
+    """Returns the summaries of all topics whose topic ids are passed in.
+
+    Args:
+        topic_ids: list(str). The IDs of topics for which summaries are to be
+            returned.
+
+    Returns:
+        list(TopicSummary). The list of summaries of all given topics present in
+            the datastore.
+    """
+    topic_summaries_models = topic_models.TopicSummaryModel.get_multi(topic_ids)
+    topic_summaries = [
+        get_topic_summary_from_model(summary)
+        for summary in topic_summaries_models
+        if summary is not None]
     return topic_summaries
 
 
@@ -967,6 +987,28 @@ def get_all_topic_rights():
         rights = get_topic_rights_from_model(model)
         topic_rights[rights.id] = rights
     return topic_rights
+
+
+def filter_published_topic_ids(topic_ids):
+    """Given list of topic IDs, returns the IDs of all topics that are published
+    in that list.
+
+    Args:
+        topic_ids: list(str). The list of topic ids.
+
+    Returns:
+        list(str). The topic IDs in the passed in list corresponding to
+            published topics.
+    """
+    topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
+    published_topic_ids = []
+    for ind, model in enumerate(topic_rights_models):
+        if model is None:
+            continue
+        rights = get_topic_rights_from_model(model)
+        if rights.topic_is_published:
+            published_topic_ids.append(topic_ids[ind])
+    return published_topic_ids
 
 
 def check_can_edit_topic(user, topic_rights):

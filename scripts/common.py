@@ -14,6 +14,7 @@
 
 """Common utility functions and classes used by multiple Python scripts."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import subprocess

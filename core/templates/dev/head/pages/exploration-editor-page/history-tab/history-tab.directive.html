@@ -26,7 +26,7 @@
     <br>
 
     <div ng-hide="!$ctrl.explorationVersionMetadata || $ctrl.compareVersionsButtonIsHidden">
-      <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': $ctrl.areCompareVersionsSelected(), 'btn-default': !$ctrl.areCompareVersionsSelected()}" ng-click="$ctrl.compareSelectedVersions()" ng-disabled="!$ctrl.areCompareVersionsSelected()">Compare selected revisions</button>
+      <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': $ctrl.areCompareVersionsSelected(), 'btn-secondary': !$ctrl.areCompareVersionsSelected()}" ng-click="$ctrl.compareSelectedVersions()" ng-disabled="!$ctrl.areCompareVersionsSelected()">Compare selected revisions</button>
       <div class="version-count-prompt">
         <[$ctrl.versionCountPrompt]>
       </div>

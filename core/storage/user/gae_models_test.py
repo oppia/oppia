@@ -16,6 +16,7 @@
 
 """Tests for core.storage.user.gae_models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -490,6 +491,15 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
                 Exception, 'UserSubscriptionsModel does not exist.'))
         with export_data_exception:
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)
+
+
+class UserSubscribersModelTests(test_utils.GenericTestBase):
+    """Tests for UserSubscribersModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserSubscribersModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
 
 class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):

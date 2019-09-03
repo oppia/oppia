@@ -38,11 +38,6 @@ then
   exit 1
 fi
 
-if [ -e "/etc/is_vagrant_vm" ]
-then
-  source $(dirname $0)/vagrant_lock.sh || exit 1
-fi
-
 set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1

@@ -14,6 +14,7 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -22,6 +23,7 @@ from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import classifier
+from core.controllers import classroom
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import community_dashboard
@@ -266,6 +268,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
+    get_redirect_route(
+        r'%s/<classroom_name>' % feconf.CLASSROOM_URL_PREFIX,
+        classroom.ClassroomPage),
+    get_redirect_route(
+        r'%s/<classroom_name>' % feconf.CLASSROOM_DATA_HANDLER,
+        classroom.ClassroomDataHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),

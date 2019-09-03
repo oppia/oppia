@@ -83,6 +83,36 @@ var ExplorationPlayerPage = function() {
     nextCardButton.click();
   };
 
+  this.clickSuggestChangesButton = function() {
+    waitFor.elementToBeClickable(suggestionPopupLink,
+      'Suggest changes button taking too long to appear');
+    suggestionPopupLink.click();
+  };
+
+  this.fillAndSubmitSuggestion = function(
+      suggestionTitle, suggestionDescription) {
+    var suggestionModal = element(
+      by.css('.protractor-test-exploration-suggestion-modal'));
+    waitFor.visibilityOf(suggestionModal,
+      'Suggestion Modal is taking too long to appear.');
+    var suggestionHeader = element(by.css('.oppia-rte'));
+    suggestionHeader.click();
+    suggestionHeader.sendKeys(suggestionTitle);
+    var suggestionModalDescription = element(
+      by.css('.protractor-test-suggestion-description-input'));
+    suggestionModalDescription.click();
+    suggestionModalDescription.sendKeys(suggestionDescription);
+    var submitSuggestionBtn = element(
+      by.css('.protractor-test-suggestion-submit-btn'));
+
+    submitSuggestionBtn.click();
+    var AFTER_SUBMIT_RESPONSE_STRING =
+        'Your suggestion has been forwarded to the ' +
+        'exploration author for review.';
+    var afterSubmitModalText = element(by.tagName('p')).getText();
+    expect(afterSubmitModalText).toMatch(AFTER_SUBMIT_RESPONSE_STRING);
+  };
+
   this.reportExploration = function() {
     waitFor.elementToBeClickable(reportExplorationButton,
       'Report Exploration Button takes too long to be clickable');
