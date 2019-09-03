@@ -365,8 +365,8 @@ def convert_to_hash(input_string, max_length):
             (input_string, type(input_string)))
 
     # Encodes strings using the character set [A-Za-z0-9].
-    # Prefixing altchars with b' to stay compatible with other bytestring
-    # arguments.
+    # Prefixing altchars with b' to ensure that all characters in encoded_string
+    # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
         hashlib.sha1(python_utils.convert_to_bytes(input_string)).digest(),
         altchars=b'ab'
