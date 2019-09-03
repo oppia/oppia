@@ -535,6 +535,13 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     # Total number of feedback threads for this exploration.
     num_total_threads = ndb.IntegerProperty(default=None, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Feedback analytic model should be kept if the associated exploration
+        is public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def create(cls, model_id, num_open_threads, num_total_threads):
         """Creates a new FeedbackAnalyticsModel entry.

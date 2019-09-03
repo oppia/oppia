@@ -64,6 +64,13 @@ class QuestionModel(base_models.VersionedModel):
     linked_skill_ids = ndb.StringProperty(
         indexed=True, repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question should be kept if it belongs to at least one
+        published skill.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def _get_new_id(cls):
         """Generates a unique ID for the question of the form
@@ -539,6 +546,13 @@ class QuestionSummaryModel(base_models.BaseModel):
     # The html content for the question.
     question_content = ndb.TextProperty(indexed=False, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question summary should be kept if associated question belongs to at
+        least one published skill.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def get_by_creator_id(cls, creator_id):
         """Gets QuestionSummaryModel by creator_id.
@@ -576,3 +590,10 @@ class QuestionRightsModel(base_models.VersionedModel):
 
     # The user ID of the creator of the question.
     creator_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Question rights should be kept if associated question belongs to at
+        least one published skill.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC

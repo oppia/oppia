@@ -25,7 +25,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(base_models, topic_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.topic])
 
 
 class TopicModelUnitTests(test_utils.GenericTestBase):
@@ -33,6 +34,11 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     TOPIC_NAME = 'tOpic_NaMe'
     TOPIC_CANONICAL_NAME = 'topic_name'
     TOPIC_ID = 'topic_id'
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            topic_models.TopicModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
@@ -114,9 +120,23 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         )
 
 
+class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
+    """Tests the TopicSummaryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            topic_models.TopicSummaryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
-    """Tests the SubtopicPageModelUnitTest class."""
+    """Tests the SubtopicPageModel class."""
     SUBTOPIC_PAGE_ID = 'subtopic_page_id'
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            topic_models.SubtopicPageModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
@@ -178,3 +198,12 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             subtopic_page_commit_log_entry.id,
             'subtopicpage-entity_id-1'
         )
+
+
+class TopicRightsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the TopicRightsModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            topic_models.TopicRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)

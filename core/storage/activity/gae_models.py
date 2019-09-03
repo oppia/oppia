@@ -34,6 +34,11 @@ class ActivityReferencesModel(base_models.BaseModel):
     # in this list is a dict with two keys: 'type' and 'id'.
     activity_references = ndb.JsonProperty(repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Activity references are not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_or_create(cls, list_name):
         """This creates the relevant model instance, if it does not already
