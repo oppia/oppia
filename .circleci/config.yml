@@ -32,6 +32,10 @@ anchor_for_restoring_cache: &restore_cache
 
 version: 2
 jobs:
+  build:
+    branches:
+      only:
+        - 7496*
   setup:
     <<: *job_defaults
     steps:

@@ -1,6 +1,8 @@
 trigger:
 - 7496*
 
+timeoutInMinutes: 360
+
 pool:
   vmImage: 'ubuntu-latest'
 
