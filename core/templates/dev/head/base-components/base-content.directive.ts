@@ -16,7 +16,7 @@
  * @fileoverview Directive for the Base Transclusion Component.
  */
 
-require('base_components/WarningLoaderDirective.ts');
+require('base-components/warning-loader.directive.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/sidebar/SidebarStatusService.ts');
@@ -38,7 +38,7 @@ angular.module('oppia').directive('baseContent', [
         navOptions: '?navOptions',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/base_components/base_content_directive.html'),
+        '/base-components/base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', 'BackgroundMaskService',
         'SidebarStatusService', 'UrlService', 'SITE_FEEDBACK_FORM_URL',
