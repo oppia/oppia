@@ -429,7 +429,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
-    def test_add_uncategorized_skill_to_topic_available_existing_opportunity_updates_skill_opportunity(
+    def test_add_skill_to_topic_available_opportunity_updates_skill_opportunity(
             self):
         self.create_skill_opportunity(self.SKILL_ID, 'description')
 
@@ -443,7 +443,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['topic_id'], self.TOPIC_ID)
         self.assertEqual(opportunity['topic_name'], 'topic')
 
-    def test_add_uncategorized_skill_to_topic_no_available_existing_opportunity_creates_new_skill_opportunity(
+    def test_add_skill_to_topic_no_opportunity_creates_new_skill_opportunity(
             self):
         self.create_skill_opportunity(
             self.SKILL_ID,
@@ -461,8 +461,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['topic_id'], self.TOPIC_ID)
         self.assertEqual(opportunity['topic_name'], 'topic')
 
-    def test_add_uncategorized_skill_to_topic_opportunity_with_topic_exists_no_duplicates(
-            self):
+    def test_add_skill_to_topic_opportunity_with_topic_no_duplicates(self):
         self.create_skill_opportunity(
             self.SKILL_ID,
             'description',
@@ -498,8 +497,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['topic_id'], self.TOPIC_ID)
         self.assertEqual(opportunity['topic_name'], 'A new topic')
 
-    def test_delete_uncategorized_skill_from_topic_deletes_topic_from_skill_opportunity(
-            self):
+    def test_delete_skill_from_topic_deletes_topic_from_skill_opportunity(self):
         self.create_skill_opportunity(self.SKILL_ID, 'description')
         topic_services.add_uncategorized_skill(
             self.USER_ID, self.TOPIC_ID, self.SKILL_ID)
@@ -543,8 +541,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_opportunities), 1)
         self.assertEqual(opportunity['question_count'], 1)
 
-    def test_create_question_skill_link_increments_skill_opportunity_question_count(
-            self):
+    def test_create_question_skill_link_increments_question_count(self):
         self.create_skill_opportunity(self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
@@ -558,8 +555,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity['question_count'], 1)
 
-    def test_link_multiple_skills_for_question_increments_skill_opportunity_question_count(
-            self):
+    def test_link_multiple_skills_for_question_increments_question_count(self):
         self.create_skill_opportunity(self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
@@ -573,7 +569,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity['question_count'], 1)
 
-    def test_delete_question_decrements_skill_opportunity_question_count(self):
+    def test_delete_question_decrements_question_count(self):
         self.create_skill_opportunity(self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
@@ -587,8 +583,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_opportunities), 1)
         self.assertEqual(opportunity['question_count'], 0)
 
-    def test_delete_question_skill_link_decrements_skill_opportunity_question_count(
-            self):
+    def test_delete_question_skill_link_decrements_question_count(self):
         self.create_skill_opportunity(self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
