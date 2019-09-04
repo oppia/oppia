@@ -451,6 +451,7 @@ def main():
 
     create_branch(repo_fork, target_branch, github_username)
 
+
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when build.py is used as a script.
 if __name__ == '__main__': # pragma: no cover
