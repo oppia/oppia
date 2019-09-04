@@ -21,7 +21,7 @@
 require('pages/library-page/library-page.module.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require('pages/library-page/library-page.directive.ts');
 require('pages/library-page/library-footer/library-footer.directive.ts');
 require('pages/library-page/search-bar/search-bar.directive.ts');

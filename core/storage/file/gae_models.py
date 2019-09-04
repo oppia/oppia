@@ -49,6 +49,11 @@ class FileMetadataModel(base_models.VersionedModel):
     # The size of the file.
     size = ndb.IntegerProperty(indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """File metadata are not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_new_id(cls, entity_name):
         """Base classmethod to be implemented in sub classes.
@@ -186,6 +191,11 @@ class FileModel(base_models.VersionedModel):
 
     # The contents of the file.
     content = ndb.BlobProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """File is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _reconstitute(self, snapshot_blob):
         """Overrides the superclass method. Reconstitutes a FileModel
