@@ -45,5 +45,10 @@ class ConfigPropertyModel(base_models.VersionedModel):
     # The property value.
     value = ndb.JsonProperty(indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Config property is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)

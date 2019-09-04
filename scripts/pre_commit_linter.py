@@ -95,9 +95,10 @@ EXCLUDED_PHRASES = [
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*')
+    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
+    'webpack_bundles/*')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
@@ -110,7 +111,10 @@ CONFIG_FILE_PATHS = (
     'core/tests/karma.conf.ts',
     'core/templates/dev/head/mathjaxConfig.ts',
     'assets/constants.ts',
-    'assets/rich_text_components_definitions.ts')
+    'assets/rich_text_components_definitions.ts',
+    'webpack.config.ts',
+    'webpack.dev.config.ts',
+    'webpack.prod.config.ts')
 
 BAD_PATTERNS = {
     '__author__': {
@@ -508,32 +512,6 @@ REQUIRED_STRINGS_CONSTANTS = {
 }
 
 ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
-
-EXCLUDED_PHRASES = [
-    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
-
-EXCLUDED_PATHS = (
-    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*')
-
-GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
-
-CONFIG_FILE_PATHS = (
-    'core/tests/.browserstack.env.example',
-    'core/tests/protractor.conf.js',
-    'core/tests/karma.conf.ts',
-    'core/templates/dev/head/mathjaxConfig.ts',
-    'assets/constants.ts',
-    'assets/rich_text_components_definitions.ts',
-    'webpack.config.ts',
-    'webpack.dev.config.ts',
-    'webpack.prod.config.ts')
 
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 
@@ -1433,7 +1411,9 @@ def _lint_css_files(
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        linter_stdout, linter_stderr = proc.communicate()
+        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
+        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
             python_utils.PRINT('LINTER FAILED')
             python_utils.PRINT(linter_stderr)
@@ -1491,7 +1471,9 @@ def _lint_js_and_ts_files(
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        linter_stdout, linter_stderr = proc.communicate()
+        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
+        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
             python_utils.PRINT('LINTER FAILED')
             python_utils.PRINT(linter_stderr)
@@ -3221,7 +3203,8 @@ class OtherLintChecksManager(LintChecksManager):
                 proc = subprocess.Popen(
                     proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-                linter_stdout, _ = proc.communicate()
+                encoded_linter_stdout, _ = proc.communicate()
+                linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
                 # This line splits the output of the linter and extracts digits
                 # from it. The digits are stored in a list. The second last
                 # digit in the list represents the number of errors in the file.
