@@ -359,12 +359,12 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         super(SkillOpportunityDomainTest, self).setUp()
         self.valid_skill_opportunity = (
             opportunity_domain.SkillOpportunity.from_dict({
-                    'topic_id': 'topic_1',
-                    'topic_name': 'A topic',
-                    'skill_id': 'skill_1',
-                    'skill_description': 'A new skill',
-                    'question_count': 10
-                }))
+                'topic_id': 'topic_1',
+                'topic_name': 'A topic',
+                'skill_id': 'skill_1',
+                'skill_description': 'A new skill',
+                'question_count': 10
+            }))
 
     def test_to_and_from_dict_works_correctly(self):
         skill_opportunity_dict = {
