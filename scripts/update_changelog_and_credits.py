@@ -53,6 +53,10 @@ CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
     CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
     ABOUT_PAGE_FILEPATH)
+# This ordering should not be changed. The automatic updates to
+# changelog and credits performed using this script will work
+# correctly only if the ordering of sections in release summary
+# file matches this expected ordering.
 EXPECTED_ORDERING = {
     '### Changelog:\n': '### Commit History:\n',
     '### New Authors:\n': '### Existing Authors:\n',
@@ -447,6 +451,7 @@ def main():
 
     create_branch(repo_fork, target_branch, github_username)
 
-
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when build.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

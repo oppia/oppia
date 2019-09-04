@@ -63,7 +63,7 @@ BLOCKING_BUG_MILESTONE_NUMBER = 39
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
 
 
-def _get_current_version_tag(repo):
+def get_current_version_tag(repo):
     """Retrieves the most recent version tag.
 
     Args:
@@ -100,7 +100,7 @@ def get_extra_commits_in_new_release(base_commit, repo):
     return commits
 
 
-def _gather_logs(start, stop='HEAD'):
+def gather_logs(start, stop='HEAD'):
     """Gathers the logs between the start and endpoint.
 
     Args:
@@ -119,7 +119,7 @@ def _gather_logs(start, stop='HEAD'):
         return [Log(*line.strip().split(GROUP_SEP)) for line in out]
 
 
-def _extract_issues(logs):
+def extract_issues(logs):
     """Extract references to issues out of a list of Logs
 
     Args:
@@ -133,7 +133,7 @@ def _extract_issues(logs):
     return links
 
 
-def _extract_pr_numbers(logs):
+def extract_pr_numbers(logs):
     """Extract PR numbers out of a list of Logs.
 
     Args:
@@ -192,7 +192,7 @@ def get_changelog_categories(pulls):
     return dict(result)
 
 
-def _check_versions(current_release):
+def check_versions(current_release):
     """Checks if the versions for the exploration or collection schemas have
     changed.
 
@@ -231,7 +231,7 @@ def _git_diff_names_only(left, right='HEAD'):
     return common.run_cmd(diff_cmd).splitlines()
 
 
-def _check_setup_scripts(base_release_tag, changed_only=True):
+def check_setup_scripts(base_release_tag, changed_only=True):
     """Check if setup scripts have changed.
 
     Args:
@@ -256,7 +256,7 @@ def _check_setup_scripts(base_release_tag, changed_only=True):
         return changes_dict
 
 
-def _check_storage_models(current_release):
+def check_storage_models(current_release):
     """Check if files in core/storage have changed and returns them.
 
     Args:
@@ -316,11 +316,10 @@ def main():
             'You can create one at https://github.com/settings/tokens: '))
 
     if personal_access_token is None:
-        python_utils.PRINT(
+        raise Exception(
             'No personal access token provided, please set up a personal '
             'access token at https://github.com/settings/tokens and re-run '
             'the script')
-        return
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
@@ -343,11 +342,11 @@ def main():
             'a \'PR: released\' label. Please ensure that they are released '
             'before release summary generation.')
 
-    current_release = _get_current_version_tag(repo)
+    current_release = get_current_version_tag(repo)
     current_release_tag = current_release.name
     base_commit = current_release.commit.sha
     new_commits = get_extra_commits_in_new_release(base_commit, repo)
-    new_release_logs = _gather_logs(base_commit)
+    new_release_logs = gather_logs(base_commit)
 
     for index, log in enumerate(new_release_logs):
         is_cherrypicked = all(
@@ -355,13 +354,13 @@ def main():
         if is_cherrypicked:
             del new_release_logs[index]
 
-    past_logs = _gather_logs(FIRST_OPPIA_COMMIT, stop=base_commit)
-    issue_links = _extract_issues(new_release_logs)
-    feconf_version_changes = _check_versions(current_release_tag)
-    setup_changes = _check_setup_scripts(current_release_tag)
-    storage_changes = _check_storage_models(current_release_tag)
+    past_logs = gather_logs(FIRST_OPPIA_COMMIT, stop=base_commit)
+    issue_links = extract_issues(new_release_logs)
+    feconf_version_changes = check_versions(current_release_tag)
+    setup_changes = check_setup_scripts(current_release_tag)
+    storage_changes = check_storage_models(current_release_tag)
 
-    pr_numbers = _extract_pr_numbers(new_release_logs)
+    pr_numbers = extract_pr_numbers(new_release_logs)
     prs = get_prs_from_pr_numbers(pr_numbers, repo)
     categorized_pr_titles = get_changelog_categories(prs)
 
@@ -427,7 +426,7 @@ def main():
             'possible.``\n' % existing_author_comma_list)
 
         if personal_access_token:
-            out.write('\n### Changelog: \n')
+            out.write('\n### Changelog:\n')
             for category in categorized_pr_titles:
                 out.write('%s\n' % category)
                 for pr_title in categorized_pr_titles[category]:

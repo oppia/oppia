@@ -89,8 +89,14 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         super(ChangelogAndCreditsUpdateTests, self).setUp()
         def mock_get_current_branch_name():
             return 'release-1.2.3'
+        def mock_run_cmd(unused_cmd):
+            pass
+        def mock_get_git_ref(unused_self, unused_ref):
+            return github.GitRef.GitRef(
+                requester='', headers='', attributes={}, completed='')
+
         self.mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes='', completed='')
+            requester='', headers='', attributes={}, completed='')
         self.branch_name_swap = self.swap(
             common, 'get_current_branch_name', mock_get_current_branch_name)
         self.release_summary_swap = self.swap(
@@ -99,6 +105,9 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             sys, 'argv', [
                 'update_changelog_and_credits.py',
                 '--github_username=test'])
+        self.run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        self.get_git_ref_swap = self.swap(
+            github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
 
     def test_update_changelog(self):
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
@@ -206,53 +215,29 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits.find_indentation(about_page_lines)
 
     def test_removal_of_updates_with_no_exception(self):
-        def mock_run_cmd(unused_cmd):
-            pass
-        def mock_get_git_ref(unused_self, unused_ref):
-            return github.GitRef.GitRef(
-                requester='', headers='', attributes='', completed='')
         def mock_delete(unused_self):
             pass
-        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
-        get_git_ref_swap = self.swap(
-            github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
         delete_swap = self.swap(
             github.GitRef.GitRef, 'delete', mock_delete)
-        with run_cmd_swap, get_git_ref_swap, delete_swap:
+        with self.run_cmd_swap, self.get_git_ref_swap, delete_swap:
             update_changelog_and_credits.remove_updates_and_delete_branch(
                 self.mock_repo, 'target_branch')
 
     def test_removal_of_updates_with_unknown_object_exception(self):
-        def mock_run_cmd(unused_cmd):
-            pass
-        def mock_get_git_ref(unused_self, unused_ref):
-            return github.GitRef.GitRef(
-                requester='', headers='', attributes='', completed='')
         def mock_delete(unused_self):
             raise github.UnknownObjectException(status='', data='')
-        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
-        get_git_ref_swap = self.swap(
-            github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
         delete_swap = self.swap(
             github.GitRef.GitRef, 'delete', mock_delete)
-        with run_cmd_swap, get_git_ref_swap, delete_swap:
+        with self.run_cmd_swap, self.get_git_ref_swap, delete_swap:
             update_changelog_and_credits.remove_updates_and_delete_branch(
                 self.mock_repo, 'target_branch')
 
     def test_removal_of_updates_with_valid_exception(self):
-        def mock_run_cmd(unused_cmd):
-            pass
-        def mock_get_git_ref(unused_self, unused_ref):
-            return github.GitRef.GitRef(
-                requester='', headers='', attributes='', completed='')
         def mock_delete(unused_self):
             raise Exception('Error')
-        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
-        get_git_ref_swap = self.swap(
-            github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
         delete_swap = self.swap(
             github.GitRef.GitRef, 'delete', mock_delete)
-        with run_cmd_swap, get_git_ref_swap, delete_swap:
+        with self.run_cmd_swap, self.get_git_ref_swap, delete_swap:
             with self.assertRaisesRegexp(
                 Exception, (
                     'Please ensure that target_branch branch is deleted before '
@@ -304,6 +289,66 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                     'personal access token at https://github.com/settings/'
                     'tokens and re-run the script')):
                 update_changelog_and_credits.main()
+
+    def test_create_branch(self):
+        check_function_calls = {
+            'get_branch_gets_called': False,
+            'create_git_ref_gets_called': False,
+            'get_contents_gets_called': False,
+            'update_file_gets_called': False,
+            'run_cmd_gets_called': False,
+            'open_new_tab_in_browser_if_possible_gets_called': False
+        }
+        expected_check_function_calls = {
+            'get_branch_gets_called': True,
+            'create_git_ref_gets_called': True,
+            'get_contents_gets_called': True,
+            'update_file_gets_called': True,
+            'run_cmd_gets_called': True,
+            'open_new_tab_in_browser_if_possible_gets_called': True
+        }
+        def mock_get_branch(unused_self, unused_branch_name):
+            check_function_calls['get_branch_gets_called'] = True
+            return github.Branch.Branch(
+                requester='', headers='',
+                attributes={'commit': {'sha': 'test'}}, completed='')
+        # pylint: disable=unused-argument
+        def mock_create_git_ref(unused_self, ref, sha):
+            check_function_calls['create_git_ref_gets_called'] = True
+        def mock_get_contents(unused_self, unused_filepath, ref):
+            check_function_calls['get_contents_gets_called'] = True
+            return github.ContentFile.ContentFile(
+                requester='', headers='',
+                attributes={'path': 'path', 'sha': 'sha'}, completed='')
+        def mock_update_file(
+                unused_self, unused_path, unused_msg, unused_content,
+                unused_sha, branch):
+            check_function_calls['update_file_gets_called'] = True
+        # pylint: enable=unused-argument
+        def mock_run_cmd(unused_cmd):
+            check_function_calls['run_cmd_gets_called'] = True
+        def mock_open_new_tab_in_browser_if_possible(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_gets_called'] = True
+
+        get_branch_swap = self.swap(
+            github.Repository.Repository, 'get_branch', mock_get_branch)
+        git_ref_swap = self.swap(
+            github.Repository.Repository, 'create_git_ref', mock_create_git_ref)
+        get_contents_swap = self.swap(
+            github.Repository.Repository, 'get_contents', mock_get_contents)
+        update_file_swap = self.swap(
+            github.Repository.Repository, 'update_file', mock_update_file)
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible',
+            mock_open_new_tab_in_browser_if_possible)
+
+        with get_branch_swap, git_ref_swap, get_contents_swap, update_file_swap:
+            with run_cmd_swap, open_tab_swap:
+                update_changelog_and_credits.create_branch(
+                    self.mock_repo, 'target_branch', 'username')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls(self):
         check_function_calls = {
