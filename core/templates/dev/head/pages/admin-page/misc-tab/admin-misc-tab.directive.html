@@ -57,10 +57,7 @@
         <input type="reset" value="reset">
       </div>
     </form>
-    <p ng-if="$ctrl.regenerationMessage">
-      <strong>Status:</strong>
-      <pre ng-if="$ctrl.regenerationMessage"><[$ctrl.regenerationMessage | json]></pre>
-    </p>
+    <p ng-if="$ctrl.regenerationMessage"><[$ctrl.regenerationMessage]></p>
   </div>
 </md-card>
 

@@ -250,15 +250,14 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         self.process_and_flush_pending_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
-        expected = [['FAILED (2)', [{
-            'missing_exp_with_ids': [],
-            'missing_story_with_ids': ['story1'],
-            'topic_id': 'topic1'
-        }, {
-            'missing_exp_with_ids': [],
-            'missing_story_with_ids': ['story2'],
-            'topic_id': 'topic2'
-        }]]]
+        expected = [['FAILED (2)', [
+            'Failed to regenerate opportunities for topic id: topic1, '
+            'missing_exp_with_ids: [], '
+            'missing_story_with_ids: [u\'story1\']',
+            'Failed to regenerate opportunities for topic id: topic2, '
+            'missing_exp_with_ids: [], '
+            'missing_story_with_ids: [u\'story2\']'
+        ]]]
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
@@ -288,11 +287,11 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         self.process_and_flush_pending_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
-        expected = [['FAILED (1)', [{
-            'missing_exp_with_ids': [],
-            'missing_story_with_ids': ['story1'],
-            'topic_id': 'topic1'
-        }]], ['SUCCESS', 1]]
+        expected = [['FAILED (1)', [
+            'Failed to regenerate opportunities for topic id: topic1, '
+            'missing_exp_with_ids: [], '
+            'missing_story_with_ids: [u\'story1\']'
+        ]], ['SUCCESS', 1]]
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
@@ -325,11 +324,11 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         self.process_and_flush_pending_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
-        expected = [['FAILED (1)', [{
-            'missing_exp_with_ids': ['0'],
-            'missing_story_with_ids': [],
-            'topic_id': 'topic1'
-        }]], ['SUCCESS', 1]]
+        expected = [['FAILED (1)', [
+            'Failed to regenerate opportunities for topic id: topic1, '
+            'missing_exp_with_ids: [u\'0\'], '
+            'missing_story_with_ids: []'
+        ]], ['SUCCESS', 1]]
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 

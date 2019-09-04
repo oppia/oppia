@@ -106,7 +106,9 @@ angular.module('oppia').directive('adminMiscTab', [
             action: 'regenerate_topic_related_opportunities',
             topic_id: ctrl.topicIdForRegeneratingOpportunities
           }).then(function(response) {
-            ctrl.regenerationMessage = response.data;
+            ctrl.regenerationMessage = (
+              'No. of opportunities model created: ' +
+              response.data.opportunities_count);
           }, function(errorResponse) {
             ctrl.regenerationMessage = (
               'Server error: ' + errorResponse.data.error);

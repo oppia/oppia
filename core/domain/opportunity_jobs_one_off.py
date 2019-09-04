@@ -43,20 +43,18 @@ class ExplorationOpportunitySummaryModelRegenerationJob(
     def map(topic_model):
         if topic_model.deleted:
             return
-
-        result = opportunity_services.regenerate_opportunities_related_to_topic(
-            topic_model.id)
-        if result['status'] == 'SUCCESS':
-            yield ('SUCCESS', result['opportunities_count'])
-        else:
-            del result['status']
-            result['topic_id'] = topic_model.id
-            yield ('FAILED', result)
+        try:
+            result = (
+                opportunity_services.regenerate_opportunities_related_to_topic(
+                    topic_model.id))
+            yield ('SUCCESS', result)
+        except Exception as e:
+            yield ('FAILED', e)
 
     @staticmethod
     def reduce(key, values):
-        values = [ast.literal_eval(value) for value in values]
         if key == 'SUCCESS':
+            values = [ast.literal_eval(value) for value in values]
             yield (key, sum(values))
         else:
-            yield (key + ' (%s)' % len(values), values)
+            yield ('%s (%s)' % (key, len(values)), values)

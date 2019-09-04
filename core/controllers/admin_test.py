@@ -271,7 +271,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             result, {
-                'status': 'SUCCESS',
                 'opportunities_count': 1
             })
 

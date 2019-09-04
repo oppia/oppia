@@ -214,10 +214,13 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == (
                     'regenerate_topic_related_opportunities'):
                 topic_id = self.payload.get('topic_id')
-                result = (
+                opportunities_count = (
                     opportunity_services
                     .regenerate_opportunities_related_to_topic(
                         topic_id, delete_existing_opportunities=True))
+                result = {
+                    'opportunities_count': opportunities_count
+                }
             self.render_json(result)
         except Exception as e:
             self.render_json({'error': python_utils.UNICODE(e)})

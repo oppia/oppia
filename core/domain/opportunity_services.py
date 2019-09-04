@@ -417,7 +417,7 @@ def regenerate_opportunities_related_to_topic(
             opportunities related to the given topic.
 
     Returns:
-        dict. A dict representing the result of the regeneration process.
+        int. The number of opportunity models created.
     """
     if delete_existing_opportunities:
         exp_opportunity_models = (
@@ -443,11 +443,10 @@ def regenerate_opportunities_related_to_topic(
     non_existing_exp_ids = set(exp_ids) - set(exp_ids_to_exp.keys())
 
     if len(non_existing_exp_ids) > 0 or len(non_existing_story_ids) > 0:
-        return {
-            'status': 'FAILED',
-            'missing_exp_with_ids': list(non_existing_exp_ids),
-            'missing_story_with_ids': non_existing_story_ids
-        }
+        raise Exception(
+            'Failed to regenerate opportunities for topic id: %s, '
+            'missing_exp_with_ids: %s, missing_story_with_ids: %s' % (
+                topic_id, list(non_existing_exp_ids), non_existing_story_ids))
 
     exploration_opportunity_summary_list = []
     for story in stories:
@@ -458,10 +457,7 @@ def regenerate_opportunities_related_to_topic(
 
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
-    return {
-        'status': 'SUCCESS',
-        'opportunities_count': len(exploration_opportunity_summary_list)
-    }
+    return len(exploration_opportunity_summary_list)
 
 
 def delete_all_exploration_opportunity_summary_models():
