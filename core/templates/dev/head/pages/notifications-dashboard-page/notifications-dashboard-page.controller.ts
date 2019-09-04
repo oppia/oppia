@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the user's notifications dashboard.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 
 require('services/DateTimeFormatService.ts');
 

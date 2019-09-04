@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');

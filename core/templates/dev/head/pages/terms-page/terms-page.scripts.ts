@@ -21,4 +21,4 @@
 require('pages/terms-page/terms-page.module.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');

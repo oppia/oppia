@@ -27,7 +27,7 @@ angular.module('oppia').directive('warningLoader', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/base_components/warning_loader_directive.html'),
+        '/base-components/warning-loader.directive.html'),
       controllerAs: '$ctrl',
       controller: ['AlertsService',
         function(AlertsService) {

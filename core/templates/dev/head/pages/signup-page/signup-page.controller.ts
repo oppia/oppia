@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');

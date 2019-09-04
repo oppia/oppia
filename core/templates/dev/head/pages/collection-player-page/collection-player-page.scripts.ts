@@ -21,7 +21,7 @@
 require('pages/collection-player-page/collection-player-page.module.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'pages/collection-player-page/collection-footer/' +
   'collection-footer.directive.ts');

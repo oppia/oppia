@@ -16,7 +16,7 @@
  * @fileoverview Directive for the donate page.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
