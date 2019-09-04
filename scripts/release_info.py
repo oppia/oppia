@@ -55,10 +55,9 @@ NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
 
-_PARSER = argparse.ArgumentParser(description="""
-Script that simplifies releases by collecting various information.
-Should be run from the oppia root dir.
-""")
+_PARSER = argparse.ArgumentParser(
+    description='Script that simplifies releases by collecting various '
+    'information. Should be run from the oppia root dir.')
 
 _PARSER.add_argument(
     '--personal_access_token',

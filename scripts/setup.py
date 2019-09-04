@@ -26,9 +26,8 @@ import python_utils
 
 from . import common
 
-_PARSER = argparse.ArgumentParser(description="""
-Python execution environent set up for all scripts.
-""")
+_PARSER = argparse.ArgumentParser(
+    description='Python execution environent set up for all scripts.')
 
 
 def delete_directory_tree(directory_path):

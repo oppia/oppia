@@ -143,11 +143,11 @@ HASH_BLOCK_SIZE = 2**20
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
 
-_PARSER = argparse.ArgumentParser(description="""
-Creates a third-party directory where all the JS and CSS dependencies are
-built and stored. Depending on the options passed to the script, might also
-minify third-party libraries and/or generate a build directory.
-""")
+_PARSER = argparse.ArgumentParser(
+    description='Creates a third-party directory where all the JS and CSS '
+    'dependencies are built and stored. Depending on the options passed to the '
+    'script, might also minify third-party libraries and/or generate a build '
+    'directory.')
 
 _PARSER.add_argument(
     '--prod_env', action='store_true', default=False, dest='prod_mode')
