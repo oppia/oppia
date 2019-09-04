@@ -18,6 +18,7 @@
 
 export class StatisticsDomainConstants {
   public static LEARNER_ACTION_SCHEMA_LATEST_VERSION = 1;
+  public static ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE = 'answer-details';
   public static PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = 'playthrough';
   public static FEEDBACK_IMPROVEMENT_CARD_TYPE = 'feedback';
   public static SUBMIT_LEARNER_ANSWER_DETAILS_URL =

@@ -16,6 +16,7 @@
 
 """Tests for core.storage.email.gae_models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import types
@@ -24,11 +25,17 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(email_models,) = models.Registry.import_models([models.NAMES.email])
+(base_models, email_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.email])
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.SentEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
 
     def setUp(self):
         super(SentEmailModelUnitTests, self).setUp()
@@ -171,6 +178,25 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'already exists.'):
             email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 'user1', 'exploration.exp1.1')
+
+
+class BulkEmailModelUnitTests(test_utils.GenericTestBase):
+    """Test the BulkEmailModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.BulkEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+
+class GeneralFeedbackEmailReplyToIdModelUnitTests(test_utils.GenericTestBase):
+    """Test the GeneralFeedbackEmailReplyToIdModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
 
 class GenerateHashTests(test_utils.GenericTestBase):

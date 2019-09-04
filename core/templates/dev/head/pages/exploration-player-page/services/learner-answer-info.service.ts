@@ -57,7 +57,8 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
 
     return {
       initLearnerAnswerInfoService: function(
-          entityId, state, answer, interactionRulesService) {
+          entityId, state, answer, interactionRulesService,
+          alwaysAskLearnerForAnswerInfo) {
         currentEntityId = entityId;
         currentAnswer = answer;
         currentInteractionRulesService = interactionRulesService;
@@ -79,6 +80,11 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
         }
 
         if (visitedStates.indexOf(stateName) !== -1) {
+          return;
+        }
+
+        if (alwaysAskLearnerForAnswerInfo === true) {
+          canAskLearnerForAnswerInfo = true;
           return;
         }
 

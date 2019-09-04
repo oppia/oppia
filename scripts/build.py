@@ -14,6 +14,7 @@
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # pylint: disable=invalid-name
 import collections
@@ -75,8 +76,8 @@ WEBPACK_DIRNAMES_TO_DIRPATHS = {
     'out_dir': os.path.join('build', 'webpack_bundles', '')
 }
 
-HASHES_TS_FILENAME = 'hashes.json'
-HASHES_TS_FILEPATH = os.path.join('assets', HASHES_TS_FILENAME)
+HASHES_JSON_FILENAME = 'hashes.json'
+HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
@@ -96,7 +97,7 @@ FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
 # /extensions.)
 JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
-GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
+GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
 # These files are present in both extensions and local_compiled_js/extensions.
 # They are required in local_compiled_js since they contain code used in
@@ -205,7 +206,7 @@ def write_to_file_stream(file_stream, content):
         file_stream: file. A stream handling object to do write operation on.
         content: str. String content to write to file object.
     """
-    file_stream.write(python_utils.STR(content))
+    file_stream.write(python_utils.UNICODE(content))
 
 
 def _join_files(source_paths, target_file_stream):
@@ -822,10 +823,11 @@ def save_hashes_to_file(file_hashes):
     # Only some of the hashes are needed in the frontend.
     filtered_hashes = filter_hashes(file_hashes)
 
-    ensure_directory_exists(HASHES_TS_FILEPATH)
-    with python_utils.open_file(HASHES_TS_FILEPATH, 'w+') as hashes_json_file:
+    ensure_directory_exists(HASHES_JSON_FILEPATH)
+    with python_utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
         hashes_json_file.write(
-            python_utils.STR(json.dumps(filtered_hashes, ensure_ascii=False)))
+            python_utils.UNICODE(
+                json.dumps(filtered_hashes, ensure_ascii=False)))
         hashes_json_file.write(u'\n')
 
 
@@ -1062,7 +1064,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         file_extensions_to_always_rebuild = ('.html', '.py',)
         python_utils.PRINT(
             'Staging dir exists, re-building all %s files'
-            % python_utils.STR(file_extensions_to_always_rebuild))
+            % ', '.join(file_extensions_to_always_rebuild))
 
         filenames_to_always_rebuild = get_filepaths_by_extensions(
             source_dir, file_extensions_to_always_rebuild)
@@ -1156,7 +1158,7 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
 def _verify_hashes(output_dirnames, file_hashes):
     """Verify a few metrics after build process finishes:
         1) The hashes in filenames belongs to the hash dict.
-        2) hashes.js, third_party.min.css and third_party.min.js are built and
+        2) hashes.json, third_party.min.css and third_party.min.js are built and
         hashes are inserted.
 
     Args:
@@ -1180,7 +1182,7 @@ def _verify_hashes(output_dirnames, file_hashes):
                     _verify_filepath_hash(relative_filepath, file_hashes)
 
     hash_final_filename = _insert_hash(
-        HASHES_TS_FILENAME, file_hashes[HASHES_TS_FILENAME])
+        HASHES_JSON_FILENAME, file_hashes[HASHES_JSON_FILENAME])
 
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
@@ -1221,9 +1223,10 @@ def generate_hashes():
     save_hashes_to_file(hashes)
 
     # Update hash dict with newly created hashes.json.
-    hashes.update({HASHES_TS_FILENAME: generate_md5_hash(HASHES_TS_FILEPATH)})
-    # Make sure /assets/hashes.js is available to the frontend.
-    _ensure_files_exist([HASHES_TS_FILEPATH])
+    hashes.update(
+        {HASHES_JSON_FILENAME: generate_md5_hash(HASHES_JSON_FILEPATH)})
+    # Make sure /assets/hashes.json is available to the frontend.
+    _ensure_files_exist([HASHES_JSON_FILEPATH])
     return hashes
 
 

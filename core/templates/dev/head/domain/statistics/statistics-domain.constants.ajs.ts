@@ -25,6 +25,9 @@ angular.module('oppia').constant(
   'LEARNER_ACTION_SCHEMA_LATEST_VERSION',
   StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
 angular.module('oppia').constant(
+  'ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE',
+  StatisticsDomainConstants.ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE);
+angular.module('oppia').constant(
   'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
   StatisticsDomainConstants.PLAYTHROUGH_IMPROVEMENT_CARD_TYPE);
 
