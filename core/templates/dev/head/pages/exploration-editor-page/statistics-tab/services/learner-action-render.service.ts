@@ -26,6 +26,7 @@
  * learner actions and then returns a giant HTML string.
  */
 
+require('domain/statistics/GroupedStartingIndicesObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
@@ -33,11 +34,11 @@ require(
 require('services/ExplorationHtmlFormatterService.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
-  '$sce', 'ExplorationStatesService',
+  '$sce', 'ExplorationStatesService', 'GroupedStartingIndicesObjectFactory',
   'HtmlEscaperService', 'ACTION_TYPE_ANSWER_SUBMIT',
   'ACTION_TYPE_EXPLORATION_QUIT', 'ACTION_TYPE_EXPLORATION_START',
   function(
-      $sce, ExplorationStatesService,
+      $sce, ExplorationStatesService, GroupedStartingIndicesObjectFactory,
       HtmlEscaperService, ACTION_TYPE_ANSWER_SUBMIT,
       ACTION_TYPE_EXPLORATION_QUIT, ACTION_TYPE_EXPLORATION_START) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
@@ -153,53 +154,6 @@ angular.module('oppia').factory('LearnerActionRenderService', [
       }
     };
 
-    /**
-     * Checks whether the block length is less than an explicit maximum value.
-     * The block is limitied to a maximum number of learner actions so that the
-     * display modal is cleaner. When this bound is exceeded, actions are added
-     * to the next block which can be accessed by an 'extend' button.
-     */
-    var withinBlockUpperBound = function(blockLength) {
-      return blockLength < 4;
-    };
-
-    /**
-     * Helper object to maintain the status of starting indices while iterating
-     * through the learner actions. This object will be updated as learner
-     * actions are processed.
-     */
-    var groupedStartingIndices = {
-      startingIndices: null,
-      localIndex: null,
-      latestStateName: null,
-      lastIndex: null,
-      /**
-       * Updates the local starting index or finalises the current index and
-       * start calculating the next stop.
-       */
-      handleChangeInState: function(action) {
-        this.latestStateName = action.actionCustomizationArgs.state_name.value;
-        var diff;
-        if (this.startingIndices.length === 0) {
-          diff = this.lastIndex - this.localIndex;
-        } else {
-          diff = this.startingIndices[this.startingIndices.length - 1] -
-            this.localIndex;
-        }
-        if (withinBlockUpperBound(diff)) {
-          // Updates local starting index.
-          this.localIndex -= 1;
-          return;
-        }
-        // Updates current stop.
-        this.startingIndices.push(this.localIndex);
-        this.localIndex -= 1;
-      },
-      handleSameState: function(action) {
-        this.localIndex -= 1;
-      }
-    };
-
     return {
       /**
        * Returns the HTML for the final display block in a MultipleIncorrect
@@ -239,11 +193,10 @@ angular.module('oppia').factory('LearnerActionRenderService', [
       getStartingIndices: function(learnerActions) {
         var lastIndex = learnerActions.length - 1;
 
-        groupedStartingIndices.startingIndices = [];
-        groupedStartingIndices.localIndex = lastIndex;
-        groupedStartingIndices.latestStateName =
-          learnerActions[lastIndex].actionCustomizationArgs.state_name.value;
-        groupedStartingIndices.lastIndex = lastIndex;
+        var groupedStartingIndices =
+          GroupedStartingIndicesObjectFactory.createNew(
+            lastIndex,
+            learnerActions[lastIndex].actionCustomizationArgs.state_name.value);
 
         for (var i = lastIndex - 1; i >= 0; i--) {
           var action = learnerActions[i];

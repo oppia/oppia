@@ -33,9 +33,15 @@ import { EditabilityService } from 'services/EditabilityService';
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { GroupedStartingIndicesObjectFactory } from
+  'domain/statistics/GroupedStartingIndicesObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
+/* eslint-disable max-len */
+import { LearnerActionRenderService } from
+  'pages/exploration-editor-page/statistics-tab/services/learner-action-render.service';
+/* eslint-enable max-len */
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
@@ -96,10 +102,15 @@ describe('Learner Action Render Service', function() {
       'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
+      'GroupedStartingIndicesObjectFactory',
+      new GroupedStartingIndicesObjectFactory());
+    $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));
     $provide.value(
       'LearnerActionObjectFactory', new LearnerActionObjectFactory());
+    $provide.value(
+      'LearnerActionRenderService', new LearnerActionRenderService());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
