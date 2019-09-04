@@ -57,7 +57,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import abc
 import argparse
 import ast
-import cProfile
 import collections
 import contextlib
 import fnmatch
@@ -625,9 +624,7 @@ _STDOUTS = multiprocessing.Manager().list()
 _FILES = multiprocessing.Manager().dict()
 
 
-
-
-class FileCacheClass(python_utils.OBJECT):
+class FileCache(python_utils.OBJECT):
     """Provides thread-safe access to cached file content."""
 
     def __init__(self):
@@ -680,6 +677,105 @@ class FileCacheClass(python_utils.OBJECT):
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]
+
+
+def _lint_all_files(
+        js_filepaths, ts_filepaths, py_filepaths, html_filepaths,
+        css_filepaths, verbose_mode_enabled):
+    """This function is used to check if node-eslint dependencies are
+    installed and pass ESLint binary path and lint all the files(JS, Python,
+    HTML, CSS) with their respective third party linters.
+    """
+
+    python_utils.PRINT('Starting Js, Ts, Python, HTML, and CSS linter...')
+
+    pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
+
+    config_pylint = '--rcfile=%s' % pylintrc_path
+
+    config_pycodestyle = os.path.join(os.getcwd(), 'tox.ini')
+
+    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+    node_path = os.path.join(
+        parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
+    eslint_path = os.path.join(
+        'node_modules', 'eslint', 'bin', 'eslint.js')
+    stylelint_path = os.path.join(
+        'node_modules', 'stylelint', 'bin', 'stylelint.js')
+    config_path_for_css_in_html = os.path.join(
+        parent_dir, 'oppia', '.stylelintrc')
+    config_path_for_oppia_css = os.path.join(
+        parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
+        'css', '.stylelintrc')
+    if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
+        python_utils.PRINT('')
+        python_utils.PRINT(
+            'ERROR    Please run start.sh first to install node-eslint ')
+        python_utils.PRINT(
+            '         or node-stylelint and its dependencies.')
+        sys.exit(1)
+
+    js_and_ts_files_to_lint = js_filepaths + ts_filepaths
+
+    linting_processes = []
+
+    js_and_ts_result = multiprocessing.Queue()
+    js_and_ts_stdout = multiprocessing.Queue()
+
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_js_and_ts_files, args=(
+            node_path, eslint_path, js_and_ts_files_to_lint,
+            js_and_ts_stdout, js_and_ts_result, verbose_mode_enabled)))
+
+    css_in_html_result = multiprocessing.Queue()
+    css_in_html_stdout = multiprocessing.Queue()
+
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_css_files, args=(
+            node_path,
+            stylelint_path,
+            config_path_for_css_in_html,
+            html_filepaths, css_in_html_stdout,
+            css_in_html_result, verbose_mode_enabled)))
+
+    css_result = multiprocessing.Queue()
+    css_stdout = multiprocessing.Queue()
+
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_css_files, args=(
+            node_path,
+            stylelint_path,
+            config_path_for_oppia_css,
+            css_filepaths, css_stdout,
+            css_result, verbose_mode_enabled)))
+
+    py_result = multiprocessing.Queue()
+
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_py_files,
+        args=(
+            config_pylint, config_pycodestyle, py_filepaths,
+            py_result, verbose_mode_enabled)))
+
+    py_result_for_python3_compatibility = multiprocessing.Queue()
+
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_py_files_for_python3_compatibility,
+        args=(
+            py_filepaths, py_result_for_python3_compatibility,
+            verbose_mode_enabled)))
+
+    for process in linting_processes:
+        process.daemon = False
+        process.start()
+
+    result_queues = [
+        js_and_ts_stdout, css_in_html_result, css_result, py_result,
+        py_result_for_python3_compatibility
+    ]
+
+    return linting_processes, result_queues
 
 
 def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
@@ -1923,45 +2019,6 @@ class JsTsLintChecksManager(LintChecksManager):
         """Return all filepaths."""
         return self.js_filepaths + self.ts_filepaths
 
-    def _lint_all_files(self):
-        """This function is used to check if node-eslint dependencies are
-        installed and pass ESLint binary path and lint all the Js and Ts files
-        with third party linters.
-        """
-
-        python_utils.PRINT('Starting Js and Ts linter...')
-
-        parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-        node_path = os.path.join(
-            parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
-        eslint_path = os.path.join(
-            'node_modules', 'eslint', 'bin', 'eslint.js')
-
-        if not os.path.exists(eslint_path):
-            python_utils.PRINT('')
-            python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
-            python_utils.PRINT('         and its dependencies.')
-            sys.exit(1)
-
-        js_and_ts_files_to_lint = self.js_filepaths + self.ts_filepaths
-
-        linting_processes = []
-
-        js_and_ts_result = multiprocessing.Queue()
-        js_and_ts_stdout = multiprocessing.Queue()
-
-        linting_processes.append(multiprocessing.Process(
-            target=_lint_js_and_ts_files, args=(
-                node_path, eslint_path, js_and_ts_files_to_lint,
-                js_and_ts_stdout, js_and_ts_result, self.verbose_mode_enabled)))
-
-        for process in linting_processes:
-            process.daemon = False
-            process.start()
-        return linting_processes, js_and_ts_stdout
-
     def _validate_and_parse_js_and_ts_files(self):
         """This function validates JavaScript and Typescript files and
         returns the parsed contents as a Python dictionary.
@@ -2635,8 +2692,6 @@ class JsTsLintChecksManager(LintChecksManager):
             all_messages: str. All the messages returned by the lint checks.
         """
 
-        process, stdout = self._lint_all_files()
-
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
@@ -2660,7 +2715,7 @@ class JsTsLintChecksManager(LintChecksManager):
             common_messages + extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages)
-        return all_messages, process, stdout
+        return all_messages
 
     def _check_html_directive_name(self):
         """This function checks that all HTML directives end
@@ -2733,12 +2788,6 @@ class OtherLintChecksManager(LintChecksManager):
         Args:
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
-        # self.py_filepaths = py_filepaths
-        # self.html_filepaths = html_filepaths
-        # self.other_filepaths = other_filepaths
-        # self.css_filepaths = css_filepaths
-        # self.all_filepaths = (
-        #     py_filepaths + html_filepaths + other_filepaths + css_filepaths)
         super(OtherLintChecksManager, self).__init__(
             verbose_mode_enabled=verbose_mode_enabled)
 
@@ -2768,98 +2817,6 @@ class OtherLintChecksManager(LintChecksManager):
         return (
             self.css_filepaths + self.html_filepaths +
             self.other_filepaths + self.py_filepaths)
-
-
-    def _lint_all_files(self):
-        """This function is used to check if node-eslint dependencies are
-        installed and pass ESLint binary path and lint all the Python,
-        HTML, CSS files with their respective third party linters.
-        """
-
-        python_utils.PRINT('Starting Python, HTML, and CSS linter...')
-
-        pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
-
-        config_pylint = '--rcfile=%s' % pylintrc_path
-
-        config_pycodestyle = os.path.join(os.getcwd(), 'tox.ini')
-
-        parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-        node_path = os.path.join(
-            parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
-        eslint_path = os.path.join(
-            'node_modules', 'eslint', 'bin', 'eslint.js')
-        stylelint_path = os.path.join(
-            'node_modules', 'stylelint', 'bin', 'stylelint.js')
-        config_path_for_css_in_html = os.path.join(
-            parent_dir, 'oppia', '.stylelintrc')
-        config_path_for_oppia_css = os.path.join(
-            parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
-            'css', '.stylelintrc')
-        if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
-            python_utils.PRINT('')
-            python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
-            python_utils.PRINT(
-                '         or node-stylelint and its dependencies.')
-            sys.exit(1)
-
-        py_files_to_lint = self.py_filepaths
-        html_files_to_lint_for_css = self.html_filepaths
-        css_files_to_lint = self.css_filepaths
-
-        css_in_html_result = multiprocessing.Queue()
-        css_in_html_stdout = multiprocessing.Queue()
-
-        linting_processes = []
-        linting_processes.append(multiprocessing.Process(
-            target=_lint_css_files, args=(
-                node_path,
-                stylelint_path,
-                config_path_for_css_in_html,
-                html_files_to_lint_for_css, css_in_html_stdout,
-                css_in_html_result, self.verbose_mode_enabled)))
-
-        css_result = multiprocessing.Queue()
-        css_stdout = multiprocessing.Queue()
-
-        linting_processes.append(multiprocessing.Process(
-            target=_lint_css_files, args=(
-                node_path,
-                stylelint_path,
-                config_path_for_oppia_css,
-                css_files_to_lint, css_stdout,
-                css_result, self.verbose_mode_enabled)))
-
-        py_result = multiprocessing.Queue()
-
-        linting_processes.append(multiprocessing.Process(
-            target=_lint_py_files,
-            args=(
-                config_pylint, config_pycodestyle, py_files_to_lint,
-                py_result, self.verbose_mode_enabled)))
-
-        py_result_for_python3_compatibility = multiprocessing.Queue()
-
-        linting_processes.append(multiprocessing.Process(
-            target=_lint_py_files_for_python3_compatibility,
-            args=(
-                py_files_to_lint, py_result_for_python3_compatibility,
-                self.verbose_mode_enabled)))
-
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting CSS, Javascript and Python Linting')
-            python_utils.PRINT('----------------------------------------')
-
-        for process in linting_processes:
-            process.daemon = False
-            process.start()
-        result_queues = [
-            css_in_html_result, css_result, py_result,
-            py_result_for_python3_compatibility]
-
-        return linting_processes, result_queues
 
     def _check_division_operator(self):
         """This function ensures that the division operator('/') is not used and
@@ -3306,7 +3263,6 @@ class OtherLintChecksManager(LintChecksManager):
             all_messages: str. All the messages returned by the lint checks.
         """
 
-        process, queues = self._lint_all_files()
         common_messages = super(
             OtherLintChecksManager, self).perform_all_lint_checks()
         # division_operator_messages = self._check_division_operator()
@@ -3330,7 +3286,7 @@ class OtherLintChecksManager(LintChecksManager):
             docstring_messages + comment_messages +
             html_tag_and_attribute_messages + html_linter_messages +
             division_operator_messages)
-        return all_messages, process, queues
+        return all_messages
 
 
 def _print_complete_summary_of_errors():
@@ -3344,58 +3300,39 @@ def _print_complete_summary_of_errors():
         python_utils.PRINT(error_messages)
 
 
-def main():
-    """Main method for pre commit linter script that lints Python, JavaScript,
-    HTML, and CSS files.
+def read_files(file_paths):
+    """Read all files to be checked and cache them. This will spin off multiple
+    threads to increase the efficiency.
     """
-    parsed_args = _PARSER.parse_args()
-    # Default mode is non-verbose mode, if arguments contains --verbose flag it
-    # will be made True, which will represent verbose mode.
-    verbose_mode_enabled = bool(parsed_args.verbose)
     threads = []
-    all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
-    for f in all_filepaths:
-        t = threading.Thread(target=FILE_CACHE.read, args=(f,))
-        t.start()
-        threads.append(t)
-    for t in threads:
-        t.join()
+    for file_path in file_paths:
+        thread = threading.Thread(target=FILE_CACHE.read, args=(file_path,))
+        thread.start()
+        threads.append(thread)
+    for thread in threads:
+        thread.join()
 
-    if len(all_filepaths) == 0:
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('No files to check.')
-        python_utils.PRINT('---------------------------')
-        sys.exit(1)
 
+def categorize_files(file_paths):
+    """Categorize all the files and store them in shared variable _FILES."""
     all_filepaths_dict = {
         '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []
     }
-    for f in all_filepaths:
-        _, extension = os.path.splitext(f)
+    for file_path in file_paths:
+        _, extension = os.path.splitext(file_path)
         if extension in all_filepaths_dict:
-            all_filepaths_dict[extension].append(f)
+            all_filepaths_dict[extension].append(file_path)
         else:
-            all_filepaths_dict['other'].append(f)
+            all_filepaths_dict['other'].append(file_path)
     _FILES.update(all_filepaths_dict)
-    code_owner_message = _check_codeowner_file(verbose_mode_enabled)
-    # Pylint requires to provide paramter "this_bases" and "d", guess due to
-    # meta class.
-    js_ts_lint_checks_manager = JsTsLintChecksManager( # pylint: disable=no-value-for-parameter
-        verbose_mode_enabled)
-    other_lint_checks_manager = OtherLintChecksManager(   # pylint: disable=no-value-for-parameter
-        verbose_mode_enabled)
-    all_messages = code_owner_message
-    js_message, js_process, stdout = js_ts_lint_checks_manager.perform_all_lint_checks()   # pylint: disable=line-too-long
-    other_messages, other_process, queues = other_lint_checks_manager.perform_all_lint_checks()  # pylint: disable=line-too-long
-    all_messages += js_message + other_messages
 
 
-    for process in other_process:
+def _join_linting_process(linting_processes, result_queues):
+    """Join process spawn off by _lint_all_files and capture the outputs."""
+    for process in linting_processes:
         process.join()
 
     summary_messages = []
-
-    result_queues = queues
 
     for result_queue in result_queues:
         while not result_queue.empty():
@@ -3405,22 +3342,44 @@ def main():
         python_utils.PRINT(b'\n'.join(summary_messages))
         python_utils.PRINT('')
 
-    for process in js_process:
-        process.join()
-
-    js_and_ts_stdout = stdout
-    js_and_ts_messages = []
-    while not js_and_ts_stdout.empty():
-        js_and_ts_messages.append(js_and_ts_stdout.get())
-
     python_utils.PRINT('')
-    # The output from the stdout are read as bytes, hence the b' prefix.
-    python_utils.PRINT(b'\n'.join(js_and_ts_messages))
+    return summary_messages
 
-    with _redirect_stdout(_TARGET_STDOUT):
-        python_utils.PRINT(b'\n'.join(js_and_ts_messages))
-        python_utils.PRINT('')
-    all_messages += js_and_ts_messages + summary_messages
+
+def main():
+    """Main method for pre commit linter script that lints Python, JavaScript,
+    HTML, and CSS files.
+    """
+    parsed_args = _PARSER.parse_args()
+    # Default mode is non-verbose mode, if arguments contains --verbose flag it
+    # will be made True, which will represent verbose mode.
+    verbose_mode_enabled = bool(parsed_args.verbose)
+    all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
+
+    if len(all_filepaths) == 0:
+        python_utils.PRINT('---------------------------')
+        python_utils.PRINT('No files to check.')
+        python_utils.PRINT('---------------------------')
+        sys.exit(1)
+
+    read_files(all_filepaths)
+    categorize_files(all_filepaths)
+    linting_processes, result_queues = _lint_all_files(
+        _FILES['.js'], _FILES['.ts'], _FILES['.py'], _FILES['.html'],
+        _FILES['.css'], verbose_mode_enabled)
+    code_owner_message = _check_codeowner_file(verbose_mode_enabled)
+    # Pylint requires to provide paramter "this_bases" and "d", guess due to
+    # meta class.
+    js_ts_lint_checks_manager = JsTsLintChecksManager( # pylint: disable=no-value-for-parameter
+        verbose_mode_enabled)
+    other_lint_checks_manager = OtherLintChecksManager(   # pylint: disable=no-value-for-parameter
+        verbose_mode_enabled)
+    all_messages = code_owner_message
+    js_message = js_ts_lint_checks_manager.perform_all_lint_checks()
+    other_messages = other_lint_checks_manager.perform_all_lint_checks()
+    all_messages += js_message + other_messages
+
+    all_messages += _join_linting_process(linting_processes, result_queues)
 
     _print_complete_summary_of_errors()
 
@@ -3437,9 +3396,8 @@ def main():
 
 
 if __name__ == '__main__':
-    PROFILE = cProfile
     NAME_SPACE = multiprocessing.Manager().Namespace()
     PROCESSES = multiprocessing.Manager().dict()
-    NAME_SPACE.files = FileCacheClass()
+    NAME_SPACE.files = FileCache()
     FILE_CACHE = NAME_SPACE.files
     main()

@@ -11,8 +11,6 @@
 # - The dev workflow team will review the code quality to see if the e2e tests
 #   can be optimized further.
 
-# Azure temp file
-/azure-pipelines.yml @cuichenli
 
 # Angular Migration team
 /typings/ @ankita240796
