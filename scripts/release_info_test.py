@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/update_changelog_and_credits.py."""
+"""Unit tests for scripts/release_info.py."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -39,11 +39,19 @@ sys.path.insert(0, _PY_GITHUB_PATH)
 import github # isort:skip
 # pylint: enable=wrong-import-position
 
+RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
+
+GENERATED_RELEASE_SUMMARY_FILEPATH = os.path.join(
+    RELEASE_TEST_DIR, 'generated_release_summary.md')
+MOCK_FECONF_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'feconf.py')
+
 
 class ReleaseInfoTests(test_utils.GenericTestBase):
     """Test the methods for generation of release summary."""
     def setUp(self):
         super(ReleaseInfoTests, self).setUp()
+        self.mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
         def mock_get_current_branch_name():
             return 'release-1.2.3'
         def mock_open_browser(unused_url):
@@ -52,8 +60,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             return github.Organization.Organization(
                 requester='', headers='', attributes={}, completed='')
         def mock_get_repo(unused_self, unused_org):
-            return github.Repository.Repository(
-                requester='', headers='', attributes={}, completed='')
+            return self.mock_repo
         # pylint: disable=unused-argument
         def mock_getpass(prompt):
             return 'test-token'
@@ -132,7 +139,237 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                             'generation.')):
                         release_info.main()
 
-    def test_ordering_of_sections(self):
+    def test_get_current_version_tag(self):
+        def mock_get_tags(unused_self):
+            return ['tags']
+        with self.swap(github.Repository.Repository, 'get_tags', mock_get_tags):
+            tags = release_info.get_current_version_tag(self.mock_repo)
+        self.assertEqual(tags, 'tags')
+
+    def test_get_extra_commits_in_new_release(self):
+        def mock_run_cmd(unused_cmd):
+            return '+ sha1 commit1\n+ sha2 commit2\n- sha3 commit3'
+        def mock_get_commit(unused_self, sha):
+            return sha
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        get_commit_swap = self.swap(
+            github.Repository.Repository, 'get_commit', mock_get_commit)
+        with run_cmd_swap, get_commit_swap:
+            actual_commits = release_info.get_extra_commits_in_new_release(
+                'base_commit', self.mock_repo)
+        self.assertEqual(actual_commits, ['sha1', 'sha2'])
+
+    def test_gather_logs_with_no_logs(self):
+        def mock_run_cmd(unused_cmd):
+            return ''
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        with run_cmd_swap:
+            actual_logs = release_info.gather_logs('start')
+        self.assertEqual(actual_logs, [])
+
+    def test_gather_logs_with_logs(self):
+        def mock_run_cmd(unused_cmd):
+            log1 = 'sha1{0}author1{0}email1{0}msg1'.format(
+                release_info.GROUP_SEP)
+            log2 = 'sha2{0}author2{0}email2{0}msg2'.format(
+                release_info.GROUP_SEP)
+            return '%s\x00%s' % (log1, log2)
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        with run_cmd_swap:
+            actual_logs = release_info.gather_logs('start')
+        expected_logs = [
+            release_info.Log('sha1', 'author1', 'email1', 'msg1'),
+            release_info.Log('sha2', 'author2', 'email2', 'msg2')]
+        self.assertEqual(actual_logs, expected_logs)
+
+    def test_extract_issues(self):
+        log1 = release_info.Log('sha1', 'author1', 'email1', 'msg#1234')
+        log2 = release_info.Log('sha2', 'author2', 'email2', 'msg#6789')
+        log3 = release_info.Log('sha2', 'author2', 'email2', 'msg(#4588)')
+        log4 = release_info.Log('sha2', 'author2', 'email2', 'msg1')
+        actual_issues = release_info.extract_issues([log1, log2, log3, log4])
+        expected_issues = {
+            'https://github.com/oppia/oppia/issues/1234',
+            'https://github.com/oppia/oppia/issues/4588',
+            'https://github.com/oppia/oppia/issues/6789'}
+        self.assertEqual(actual_issues, expected_issues)
+
+    def test_extract_pr_numbers(self):
+        log1 = release_info.Log('sha1', 'author1', 'email1', 'msg(#1234)')
+        log2 = release_info.Log('sha2', 'author2', 'email2', 'msg#6789')
+        log3 = release_info.Log('sha2', 'author2', 'email2', 'msg(#4588)')
+        log4 = release_info.Log('sha2', 'author2', 'email2', 'msg1')
+        actual_prs = release_info.extract_pr_numbers([log1, log2, log3, log4])
+        expected_prs = ['4588', '1234']
+        self.assertEqual(actual_prs, expected_prs)
+
+    def test_get_prs_from_pr_numbers(self):
+        def mock_get_pull(unused_self, pull_num):
+            return 'pull-%s' % pull_num
+        with self.swap(github.Repository.Repository, 'get_pull', mock_get_pull):
+            actual_prs = release_info.get_prs_from_pr_numbers(
+                ['1234', '4588'], self.mock_repo)
+        expected_prs = ['pull-1234', 'pull-4588']
+        self.assertEqual(set(actual_prs), set(expected_prs))
+
+    def test_get_changelog_categories(self):
+        pull1 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR1', 'number': 1, 'labels': [
+                    {'name': 'CHANGELOG: Test-changes-1'},
+                    {'name': 'Test-label'}]}, completed='')
+        pull2 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR2', 'number': 2, 'labels': [
+                    {'name': 'CHANGELOG: Test-changes-1'}]}, completed='')
+        pull3 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR3', 'number': 3, 'labels': [
+                    {'name': 'CHANGELOG: Test-changes-2'}]}, completed='')
+        pull4 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR4', 'number': 4,
+                'labels': [{'name': 'Test-label'}]}, completed='')
+        actual_categories = release_info.get_changelog_categories([
+            pull1, pull2, pull3, pull4])
+        expected_categories = {
+            'Test-changes-1': ['PR1 (#1)', 'PR2 (#2)'],
+            'Test-changes-2': ['PR3 (#3)'],
+            'Uncategorized': ['PR4 (#4)']}
+        self.assertEqual(actual_categories, expected_categories)
+
+    def test_check_versions_with_no_diff(self):
+        def mock_run_cmd(unused_cmd):
+            return (
+                'CURRENT_STATE_SCHEMA_VERSION = 3'
+                '\nCURRENT_COLLECTION_SCHEMA_VERSION = 4\n')
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        feconf_swap = self.swap(
+            release_info, 'FECONF_FILEPATH', MOCK_FECONF_FILEPATH)
+        with run_cmd_swap, feconf_swap:
+            actual_version_changes = release_info.check_versions(
+                'current_release')
+        self.assertEqual(actual_version_changes, [])
+
+    def test_check_versions_with_diff(self):
+        def mock_run_cmd(unused_cmd):
+            return (
+                'CURRENT_STATE_SCHEMA_VERSION = 8'
+                '\nCURRENT_COLLECTION_SCHEMA_VERSION = 4\n')
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        feconf_swap = self.swap(
+            release_info, 'FECONF_FILEPATH', MOCK_FECONF_FILEPATH)
+        with run_cmd_swap, feconf_swap:
+            actual_version_changes = release_info.check_versions(
+                'current_release')
+        self.assertEqual(
+            actual_version_changes, ['CURRENT_STATE_SCHEMA_VERSION'])
+
+    def test_check_setup_scripts_to_get_changed_scripts_status(self):
+        def mock_run_cmd(unused_cmd):
+            return 'scripts/setup.sh\nscripts/setup_gae.sh'
+        with self.swap(common, 'run_cmd', mock_run_cmd):
+            actual_scripts = release_info.check_setup_scripts(
+                'release_tag')
+        expected_scripts = {
+            'scripts/setup.sh': True,
+            'scripts/setup_gae.sh': True
+        }
+        self.assertEqual(actual_scripts, expected_scripts)
+
+    def test_check_setup_scripts_to_get_all_scripts_status(self):
+        def mock_run_cmd(unused_cmd):
+            return 'scripts/setup.sh\nscripts/setup_gae.sh'
+        with self.swap(common, 'run_cmd', mock_run_cmd):
+            actual_scripts = release_info.check_setup_scripts(
+                'release_tag', changed_only=False)
+        expected_scripts = {
+            'scripts/setup.sh': True,
+            'scripts/setup_gae.sh': True,
+            'scripts/install_third_party.sh': False,
+            'scripts/install_third_party.py': False
+        }
+        self.assertEqual(actual_scripts, expected_scripts)
+
+    def test_check_storage_models(self):
+        def mock_run_cmd(unused_cmd):
+            return (
+                'scripts/setup.sh\nextensions/test.ts\n'
+                'core/storage/activity/gae_models.py\n'
+                'core/storage/user/gae_models.py')
+        with self.swap(common, 'run_cmd', mock_run_cmd):
+            actual_storgae_models = release_info.check_storage_models(
+                'current_release')
+        expected_storage_models = [
+            'core/storage/activity/gae_models.py',
+            'core/storage/user/gae_models.py']
+        self.assertEqual(actual_storgae_models, expected_storage_models)
+
+    def test_get_blocking_bug_issue_count(self):
+        # pylint: disable=unused-argument
+        def mock_get_milestone(unused_self, number):
+            return github.Milestone.Milestone(
+                requester='', headers='',
+                attributes={'open_issues': 10}, completed='')
+        # pylint: enable=unused-argument
+        with self.swap(
+            github.Repository.Repository, 'get_milestone', mock_get_milestone):
+            self.assertEqual(
+                release_info.get_blocking_bug_issue_count(self.mock_repo),
+                10)
+
+    def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
+            self):
+        pull1 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR1', 'number': 1, 'labels': [
+                    {'name': 'PR: released'},
+                    {'name': 'PR: for current release'}]}, completed='')
+        pull2 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR2', 'number': 2, 'labels': [
+                    {'name': 'PR: released'},
+                    {'name': 'PR: for current release'}]}, completed='')
+        # pylint: disable=unused-argument
+        def mock_get_pulls(unused_self, state):
+            return [pull1, pull2]
+        # pylint: enable=unused-argument
+        with self.swap(
+            github.Repository.Repository, 'get_pulls', mock_get_pulls):
+            self.assertEqual(
+                release_info.check_prs_for_current_release_are_released(
+                    self.mock_repo), True)
+
+    def test_check_prs_for_current_release_are_released_with_unreleased_prs(
+            self):
+        pull1 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR1', 'number': 1, 'labels': [
+                    {'name': 'PR: for current release'}]}, completed='')
+        pull2 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR2', 'number': 2, 'labels': [
+                    {'name': 'PR: released'},
+                    {'name': 'PR: for current release'}]}, completed='')
+        # pylint: disable=unused-argument
+        def mock_get_pulls(unused_self, state):
+            return [pull1, pull2]
+        # pylint: enable=unused-argument
+        with self.swap(
+            github.Repository.Repository, 'get_pulls', mock_get_pulls):
+            self.assertEqual(
+                release_info.check_prs_for_current_release_are_released(
+                    self.mock_repo), False)
+
+    def test_release_summary_content(self):
         def mock_get_blocking_bug_issue_count(unused_repo):
             return 0
         def mock_check_prs_for_current_release_are_released(unused_repo):
@@ -156,25 +393,27 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
         def mock_gather_logs(unused_start, stop='HEAD'):
             new_log1 = release_info.Log('sha1', 'author1', 'email1', 'message1')
             new_log2 = release_info.Log('sha2', 'author2', 'email2', 'message2')
-            old_log1 = release_info.Log('sha3', 'author3', 'email3', 'message3')
+            old_log = release_info.Log('sha3', 'author3', 'email3', 'message3')
+            cherrypick_log = release_info.Log(
+                'sha4', 'author4', 'email4', 'message4')
             if stop == 'HEAD':
-                return [new_log1, new_log2, old_log1]
+                return [new_log1, new_log2, old_log, cherrypick_log]
             else:
-                return [old_log1]
+                return [old_log]
         def mock_extract_issues(unused_logs):
-            return {}
+            return {'issues'}
         def mock_check_versions(unused_current_release):
-            return []
+            return ['version_change']
         def mock_check_setup_scripts(unused_base_release_tag):
-            return []
+            return {'setup_changes': True}
         def mock_check_storage_models(unused_current_release):
-            return []
+            return ['storage_changes']
         def mock_extract_pr_numbers(unused_logs):
             return []
         def mock_get_prs_from_pr_numbers(unused_pr_numbers, unused_repo):
             return []
         def mock_get_changelog_categories(unused_pulls):
-            return []
+            return {'category': ['pr1', 'pr2']}
 
         blocking_bug_swap = self.swap(
             release_info, 'get_blocking_bug_issue_count',
@@ -220,6 +459,10 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                                 with storage_models_swap, release_summary_swap:
                                     with get_changelog_swap, extract_prs_swap:
                                         release_info.main()
+        with python_utils.open_file(
+            GENERATED_RELEASE_SUMMARY_FILEPATH, 'r') as f:
+            expected_lines = f.readlines()
         with python_utils.open_file(tmp_file.name, 'r') as f:
-            update_changelog_and_credits.check_ordering_of_sections(
-                f.readlines())
+            actual_lines = f.readlines()
+        update_changelog_and_credits.check_ordering_of_sections(actual_lines)
+        self.assertEqual(actual_lines, expected_lines)

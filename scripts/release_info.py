@@ -59,6 +59,7 @@ NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
 # The number for blocking_bugs milestone is 39 which is used to fetch this
 # milestone.
 BLOCKING_BUG_MILESTONE_NUMBER = 39
+FECONF_FILEPATH = os.path.join('', 'feconf.py')
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
 
@@ -205,7 +206,7 @@ def check_versions(current_release):
     feconf_changed_version = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)
     old_feconf = common.run_cmd(git_show_cmd)
-    with python_utils.open_file('feconf.py', 'r') as feconf_file:
+    with python_utils.open_file(FECONF_FILEPATH, 'r') as feconf_file:
         new_feconf = feconf_file.read()
     for variable in FECONF_VAR_NAMES:
         old_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
@@ -371,17 +372,17 @@ def main():
             out.write('\n### Feconf version changes:\nThis indicates that a '
                       'migration may be needed\n\n')
             for var in feconf_version_changes:
-                out.write('* %s  \n' % var)
+                out.write('* %s\n' % var)
 
         if setup_changes:
             out.write('\n### Changed setup scripts:\n')
             for var in setup_changes.keys():
-                out.write('* %s  \n' % var)
+                out.write('* %s\n' % var)
 
         if storage_changes:
             out.write('\n### Changed storage models:\n')
             for item in storage_changes:
-                out.write('* %s  \n' % item)
+                out.write('* %s\n' % item)
 
         past_authors = {
             log.email: log.author for log in past_logs
@@ -441,11 +442,13 @@ def main():
         if issue_links:
             out.write('\n### Issues mentioned in commits:\n')
             for link in issue_links:
-                out.write('* [%s](%s)  \n' % (link, link))
+                out.write('* [%s](%s)\n' % (link, link))
 
     python_utils.PRINT('Done. Summary file generated in %s' % (
         feconf.RELEASE_SUMMARY_FILEPATH))
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when build.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()
