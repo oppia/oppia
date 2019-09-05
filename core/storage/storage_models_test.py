@@ -81,10 +81,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
             # VersionedModel.
             if 'BaseCommitLogEntryModel' in base_classes:
                 continue
-            try:
-                clazz.get_deletion_policy()
-            except NotImplementedError:
-                print(clazz.__name__)
-        self.assertTrue(False)
-
-#TODO: add check for tests for the get_deletion_policy
+            self.assertIn(
+                clazz.get_deletion_policy(),
+                base_models.DELETION_POLICY.__dict__)
