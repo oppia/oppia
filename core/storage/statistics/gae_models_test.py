@@ -26,10 +26,16 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(base_models, stats_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.statistics])
 
 
 class StateCounterModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StateCounterModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_state_counter_model_gets_created(self):
         # This tests whether get_or_create() can create the model.
@@ -60,6 +66,12 @@ class StateCounterModelTests(test_utils.GenericTestBase):
 class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the AnswerSubmittedEventLogEntryModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.AnswerSubmittedEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_create_and_get_event_models(self):
         event_id = (
             stats_models.AnswerSubmittedEventLogEntryModel.create(
@@ -80,6 +92,12 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the ExplorationActualStartEventLogEntryModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.ExplorationActualStartEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_create_and_get_event_models(self):
         event_id = (
             stats_models.ExplorationActualStartEventLogEntryModel.create(
@@ -96,6 +114,11 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
 
 class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the SolutionHitEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.SolutionHitEventLogEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -114,6 +137,12 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
 class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StartExplorationEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StartExplorationEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -136,10 +165,22 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
     test_utils.GenericTestBase):
     """Test the MaybeLeaveExplorationEventLogEntryModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
 
 class CompleteExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the CompleteExplorationEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.CompleteExplorationEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -163,9 +204,20 @@ class RateExplorationEventLogEntryModelUnitTests(
     test_utils.GenericTestBase):
     """Test the RateExplorationEventLogEntryModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.RateExplorationEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
 
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateHitEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StateHitEventLogEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -186,6 +238,11 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateCompleteEventLogEntryModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StateCompleteEventLogEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_create_and_get_event_models(self):
         event_id = (
             stats_models.StateCompleteEventLogEntryModel.create(
@@ -204,6 +261,12 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the LeaveForRefresherExplorationEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.LeaveForRefresherExplorationEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -227,6 +290,11 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
 
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationStatsModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.ExplorationStatsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_analytics_model(self):
         model_id = (
@@ -275,6 +343,11 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
 class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationIssuesModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.ExplorationIssuesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_create_and_get_exp_issues_model(self):
         model_id = (
             stats_models.ExplorationIssuesModel.create(
@@ -290,6 +363,11 @@ class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
 
 class PlaythroughModelUnitTests(test_utils.GenericTestBase):
     """Test the PlaythroughModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.PlaythroughModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_playthrough_model(self):
         model_id = (
@@ -337,6 +415,11 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
     """Tests the LearnerAnswerDetailsModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.LearnerAnswerDetailsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_get_state_reference_for_exploration(self):
         exp_id_1 = 'expid1'
         state_name_1 = 'intro'
@@ -366,7 +449,6 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_5, state_name_5)) #pylint: disable=line-too-long
         self.assertEqual(
             state_reference_5, '1234:%s' % (state_name_5))
-
 
     def test_get_state_reference_for_question(self):
         question_id_1 = 'first question'
@@ -459,7 +541,13 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             model_instance.state_reference, '123:%s' % (state_name))
 
 
-class ExplorationAnnotationsModelTests(test_utils.GenericTestBase):
+class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the ExplorationAnnotationsModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.ExplorationAnnotationsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_models(self):
         stats_models.ExplorationAnnotationsModel.create(
@@ -491,7 +579,13 @@ class ExplorationAnnotationsModelTests(test_utils.GenericTestBase):
         self.assertEqual(versions, [])
 
 
-class StateAnswersModelTests(test_utils.GenericTestBase):
+class StateAnswersModelUnitTests(test_utils.GenericTestBase):
+    """Tests the StateAnswersModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StateAnswersModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_shard_count_is_updated_when_data_overflows(self):
 
@@ -545,7 +639,13 @@ class StateAnswersModelTests(test_utils.GenericTestBase):
         self.assertEqual(model1.shard_count, 2)
 
 
-class StateAnswersCalcOutputModelTests(test_utils.GenericTestBase):
+class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
+    """Tests the StateAnswersCalcOutputModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StateAnswersCalcOutputModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_model_returns_created_properties(self):
 
