@@ -570,6 +570,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),
     get_redirect_route(
+        r'/getreviewablesuggestions/<target_type>/<suggestion_type>',
+        suggestion.ReviewableSuggestionsHandler),
+    get_redirect_route(
+        r'/getsubmittedsuggestions/<target_type>/<suggestion_type>',
+        suggestion.UserSubmittedSuggestionsHandler),
+    get_redirect_route(
         r'%s' % feconf.SUBSCRIBE_URL_PREFIX,
         subscriptions.SubscribeHandler),
     get_redirect_route(

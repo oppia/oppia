@@ -73,8 +73,13 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
-        exploration.validate_exploration_matches_content(
-            change['state_name'], change['content_id'], change['content_html'])
+        content_html = (
+            exploration.get_content_html(
+                change['state_name'], change['content_id']))
+        if content_html != change['content_html']:
+            raise Exception(
+                'The given content_html does not matches the content of the '
+                'exploration.')
     elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
@@ -339,6 +344,46 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
          for s in suggestion_models.GeneralSuggestionModel
          .get_in_review_suggestions_in_score_categories(
              score_categories, user_id)])
+
+
+def get_reviewable_suggestions(user_id, suggestion_type):
+    """Returns a list of suggestions of given suggestion_type which the user
+    can review.
+
+    Args:
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of the suggestion.
+
+    Returns:
+        list(Suggestion). A list of suggestions which the given user is allowed
+            to review.
+    """
+    return ([
+        get_suggestion_from_model(s) for s in (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_suggestions_of_suggestion_type(
+                suggestion_type, user_id))
+        ])
+
+
+def get_submitted_suggestions(user_id, suggestion_type):
+    """Returns a list of suggestions of given suggestion_type which the user
+    has submitted.
+
+    Args:
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of the suggestion.
+
+    Returns:
+        list(Suggestion). A list of suggestions which the given user is
+        submitted.
+    """
+    return ([
+        get_suggestion_from_model(s) for s in (
+            suggestion_models.GeneralSuggestionModel
+            .get_user_created_suggestions_of_suggestion_type(
+                suggestion_type, user_id))
+        ])
 
 
 def get_all_scores_of_user(user_id):

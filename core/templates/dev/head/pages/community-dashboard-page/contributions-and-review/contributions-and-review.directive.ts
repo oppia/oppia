@@ -168,7 +168,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               ctrl.reviewTabActive = false;
               ctrl.contributionsDataLoading = true;
               ctrl.contributionSummaries = [];
-              ContributionAndReviewService.getUserTranslationContributions(
+              ContributionAndReviewService.getUserCreatedTranslationSuggestions(
                 username, function(suggestionIdToSuggestions) {
                   ctrl.contributions = suggestionIdToSuggestions;
                   ctrl.contributionSummaries = (

@@ -30,47 +30,45 @@ angular.module('oppia').factory('ContributionAndReviewService', [
   '$http', '$q', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
   function(
       $http, $q, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
-    var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
+    var _SUBMITTED_SUGGESTION_LIST_HANDLER_URL_TEMPLATE = (
+      '/getsubmittedsuggestions/<target_type>/<suggestion_type>');
+    var _REVIEWABLE_SUGGESTIONS_HANDLER_URL_TEMPLATE = (
+      '/getreviewablesuggestions/<target_type>/<suggestion_type>');
     var _SUGGESTION_ACTION_HANDLER_URL = (
       '/suggestionactionhandler/exploration/<exp_id>/<thread_id>');
 
-    var _fetchSuggestions = function(params, onSuccess) {
-      var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-        params: params
-      });
+    var _fetchSuggestions = function(url, onSuccess) {
+      var suggestionsPromise = $http.get(url);
 
       return $q.when(suggestionsPromise, function(res) {
         var suggestionIdToSuggestions = {};
-        var expIdToSuggestions = res.data.exp_id_to_suggestions;
-        Object.keys(expIdToSuggestions).forEach(function(key) {
-          var suggestions = expIdToSuggestions[key].suggestions;
-          var details = expIdToSuggestions[key].details;
-          suggestions.forEach(function(suggestion) {
-            suggestionIdToSuggestions[suggestion.suggestion_id] = {
-              suggestion: suggestion,
-              details: details
-            };
-          });
+        var targetIdToDetails = res.data.tagret_id_to_details;
+        res.data.suggestions.forEach(function(suggestion) {
+          suggestionIdToSuggestions[suggestion.suggestion_id] = {
+            suggestion: suggestion,
+            details: targetIdToDetails[suggestion.target_id]
+          };
         });
         onSuccess(suggestionIdToSuggestions);
       });
     };
 
     return {
-      getUserTranslationContributions: function(
-          username, onSuccess, onFailure) {
-        var params = {
-          author_name: username,
-          suggestion_type: 'translate_content'
-        };
-        return _fetchSuggestions(params, onSuccess);
+      getUserCreatedTranslationSuggestions: function(username, onSuccess) {
+        var url = UrlInterpolationService.interpolateUrl(
+          _SUBMITTED_SUGGESTION_LIST_HANDLER_URL_TEMPLATE, {
+            target_type: 'exploration',
+            suggestion_type: 'translate_content'
+          });
+        return _fetchSuggestions(url, onSuccess);
       },
       getReviewableTranslationSuggestions: function(onSuccess) {
-        var params = {
-          suggestion_type: 'translate_content',
-          status: 'review'
-        };
-        return _fetchSuggestions(params, onSuccess);
+        var url = UrlInterpolationService.interpolateUrl(
+          _REVIEWABLE_SUGGESTIONS_HANDLER_URL_TEMPLATE, {
+            target_type: 'exploration',
+            suggestion_type: 'translate_content'
+          });
+        return _fetchSuggestions(url, onSuccess);
       },
       resolveSuggestion: function(targetId, threadId, action, onSuccess) {
         var url = UrlInterpolationService.interpolateUrl(

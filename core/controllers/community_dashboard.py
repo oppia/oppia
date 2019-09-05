@@ -108,16 +108,3 @@ class TranslatableTextHandler(base.BaseHandler):
         }
 
         self.render_json(self.values)
-
-
-class ReviewableSuggestionsHandler(base.BaseHandler):
-    """Provides all suggestion which can be reviewed by the user for a given
-    suggestion type.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self, suggestion_type):
-        """Handles GET requests."""
-        pass
