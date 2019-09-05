@@ -16,6 +16,7 @@
 
 """Unit tests for core.domain.user_services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -1249,7 +1250,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'User id invalid_user_id not known in list of user_ids '
-                '[\'invalid_user_id\']'
+                '[u\'invalid_user_id\']'
             ])
 
     def test_get_human_readable_user_ids(self):

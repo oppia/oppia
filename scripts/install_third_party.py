@@ -14,6 +14,7 @@
 
 """Installation script for Oppia third-party libraries."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import json
@@ -25,12 +26,6 @@ import zipfile
 import python_utils
 
 from . import common
-
-# These two lines prevent a "IOError: [Errno socket error]
-# [Errno -2] Name or service not known" error
-# in urllib.urlretrieve, if the user is behind a proxy.
-if 'VAGRANT' in os.environ:
-    os.environ['http_proxy'] = ''
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -237,7 +232,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
                 python_utils.PRINT(dependency_dict)
                 python_utils.PRINT(
                     'Only one of these keys pair must be used: "%s".'
-                    % python_utils.STR(optional_keys))
+                    % ', '.join(optional_keys))
                 python_utils.PRINT('Exiting')
                 sys.exit(1)
 
