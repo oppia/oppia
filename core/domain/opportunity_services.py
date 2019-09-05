@@ -483,8 +483,8 @@ def delete_skill_opportunities(skill_id):
 
 def add_topic_to_skill_opportunity(topic_id, skill_id):
     """Adds a topic_id and corresponding topic_name to an existing
-    SkillOpportunityModel with the supplied skill_id if available, creating a
-    new SkillOpportunityModel otherwise.
+    SkillOpportunityModel with the supplied skill_id if available. Otherwise,
+    creates a new SkillOpportunityModel with the given skill and topic IDs.
 
     Args:
         topic_id: str. The topic_id of the to-be-added topic.

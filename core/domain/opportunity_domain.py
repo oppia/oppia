@@ -215,11 +215,11 @@ class SkillOpportunity(python_utils.OBJECT):
             topic_id: str. The unique id of the topic.
             topic_name: str. The name of the topic.
         """
-        self.topic_id = topic_id
-        self.topic_name = topic_name
         self.skill_id = skill_id
         self.skill_description = skill_description
         self.question_count = question_count
+        self.topic_id = topic_id
+        self.topic_name = topic_name
         self.validate()
 
     def validate(self):

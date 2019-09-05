@@ -93,9 +93,9 @@ def create_new_question(committer_id, question, commit_message):
 
 def link_multiple_skills_for_question(
         user_id, question_id, skill_ids, skill_difficulties):
-    """Links multiple skill IDxs to a question. To do that, it creates
-    multiple new QuestionSkillLink models. It also adds
-    the skill ids to the linked_skill_ids of the Question.
+    """Links multiple skill IDs to a question. To do that, it creates multiple
+    new QuestionSkillLink models. It also adds the skill ids to the
+    linked_skill_ids of the Question.
 
     Args:
         user_id: str. ID of the creator.
