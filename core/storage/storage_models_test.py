@@ -14,9 +14,9 @@
 
 """Tests for Oppia storage models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import unittest
 
 from core.platform import models
 from core.tests import test_utils

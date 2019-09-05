@@ -162,7 +162,7 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
 
 class MaybeLeaveExplorationEventLogEntryModelUnitTests(
-    test_utils.GenericTestBase):
+        test_utils.GenericTestBase):
     """Test the MaybeLeaveExplorationEventLogEntryModel class."""
 
     def test_get_deletion_policy(self):
@@ -201,7 +201,7 @@ class CompleteExplorationEventLogEntryModelUnitTests(
 
 
 class RateExplorationEventLogEntryModelUnitTests(
-    test_utils.GenericTestBase):
+        test_utils.GenericTestBase):
     """Test the RateExplorationEventLogEntryModel class."""
 
     def test_get_deletion_policy(self):
