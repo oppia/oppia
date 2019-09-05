@@ -325,7 +325,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         if self.created_on is None:
             self.created_on = datetime.datetime.utcnow()
 
-        if update_last_updated_time:
+        if update_last_updated_time or self.last_updated is None:
             self.last_updated = datetime.datetime.utcnow()
 
         return super(GeneralFeedbackEmailReplyToIdModel, self).put()
