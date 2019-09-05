@@ -29,25 +29,6 @@ import feconf
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
-    """Test the AnswerSubmittedEventLogEntryModel class."""
-
-    def test_create_and_get_event_models(self):
-        event_id = (
-            stats_models.AnswerSubmittedEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True))
-
-        event_model = stats_models.AnswerSubmittedEventLogEntryModel.get(
-            event_id)
-
-        self.assertEqual(event_model.exp_id, 'exp_id1')
-        self.assertEqual(event_model.exp_version, 1)
-        self.assertEqual(event_model.state_name, 'state_name1')
-        self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
-        self.assertEqual(event_model.is_feedback_useful, True)
-
-
 class StateCounterModelTests(test_utils.GenericTestBase):
 
     def test_state_counter_model_gets_created(self):
@@ -76,139 +57,23 @@ class StateCounterModelTests(test_utils.GenericTestBase):
         self.assertEqual(model_instance.active_answer_count, 0)
 
 
-class ExplorationAnnotationsModelTests(test_utils.GenericTestBase):
+class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Test the AnswerSubmittedEventLogEntryModel class."""
 
-    def test_create_and_get_models(self):
-        stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', '1', 5, 4, {})
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stats_models.AnswerSubmittedEventLogEntryModel.create(
+                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True))
 
-        model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
+        event_model = stats_models.AnswerSubmittedEventLogEntryModel.get(
+            event_id)
 
-        self.assertEqual(model1.exploration_id, 'exp_id1')
-        self.assertEqual(model1.version, '1')
-        self.assertEqual(model1.num_starts, 5)
-        self.assertEqual(model1.num_completions, 4)
-        self.assertEqual(model1.state_hit_counts, {})
-
-    def test_get_versions(self):
-        stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', '1', 5, 4, {})
-        stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', '2', 5, 4, {})
-
-        versions = stats_models.ExplorationAnnotationsModel.get_versions(
-            'exp_id1')
-
-        self.assertEqual(sorted(versions), ['1', '2'])
-
-    def test_get_version_for_invalid_exploration_id(self):
-        versions = stats_models.ExplorationAnnotationsModel.get_versions(
-            'invalid_exp_id')
-
-        self.assertEqual(versions, [])
-
-
-class StateAnswersModelTests(test_utils.GenericTestBase):
-
-    def test_shard_count_is_updated_when_data_overflows(self):
-
-        submitted_answer_list = [{'answer': 'value'}]
-
-        stats_models.StateAnswersModel.insert_submitted_answers(
-            'exp_id', 1, 'state_name', 'interaction_id',
-            submitted_answer_list)
-
-        model1 = stats_models.StateAnswersModel.get_master_model(
-            'exp_id', 1, 'state_name')
-
-        # Ensure we got the correct model.
-        self.assertEqual(model1.exploration_id, 'exp_id')
-        self.assertEqual(model1.exploration_version, 1)
-        self.assertEqual(model1.state_name, 'state_name')
-        self.assertEqual(model1.submitted_answer_list, submitted_answer_list)
-        self.assertEqual(model1.shard_count, 0)
-
-        # Use a smaller max answer list size so fewer answers are needed to
-        # exceed a shard. This will increase the 'shard_count'.
-        with self.swap(
-            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
-            stats_models.StateAnswersModel.insert_submitted_answers(
-                'exp_id', 1, 'state_name', 'interaction_id',
-                submitted_answer_list)
-
-            model1 = stats_models.StateAnswersModel.get_master_model(
-                'exp_id', 1, 'state_name')
-
-            self.assertEqual(model1.shard_count, 1)
-
-            stats_models.StateAnswersModel.insert_submitted_answers(
-                'exp_id', 1, 'state_name', 'interaction_id',
-                submitted_answer_list)
-
-            model1 = stats_models.StateAnswersModel.get_master_model(
-                'exp_id', 1, 'state_name')
-
-            self.assertEqual(model1.shard_count, 2)
-
-        # 'shard_count' will not increase as number of answers are less than
-        # the max answer list size.
-        stats_models.StateAnswersModel.insert_submitted_answers(
-            'exp_id', 1, 'state_name', 'interaction_id',
-            submitted_answer_list)
-
-        model1 = stats_models.StateAnswersModel.get_master_model(
-            'exp_id', 1, 'state_name')
-
-        self.assertEqual(model1.shard_count, 2)
-
-
-class StateAnswersCalcOutputModelTests(test_utils.GenericTestBase):
-
-    def test_get_model_returns_created_properties(self):
-
-        stats_models.StateAnswersCalcOutputModel.create_or_update(
-            'exp_id', '1', 'state_name', '', 'calculation_id', '', {})
-
-        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
-            'exp_id', '1', 'state_name', 'calculation_id')
-
-        self.assertEqual(model1.exploration_id, 'exp_id')
-        self.assertEqual(model1.exploration_version, '1')
-        self.assertEqual(model1.state_name, 'state_name')
-        self.assertEqual(model1.calculation_id, 'calculation_id')
-
-        # Model with 'invalid_exp_id' does not exist.
-        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
-            'invalid_exp_id', '1', 'state_name', 'calculation_id')
-
-        self.assertIsNone(model1)
-
-    def test_raise_exception_with_large_calculation_output(self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.exception."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
-
-        large_calculation_output = {'key': 'a' * 1200000}
-
-        with logging_swap:
-            stats_models.StateAnswersCalcOutputModel.create_or_update(
-                'exp_id', '1', 'state_name', '', 'calculation_id', '',
-                large_calculation_output)
-
-            self.assertEqual(len(observed_log_messages), 1)
-            self.assertEqual(
-                observed_log_messages[0],
-                (
-                    'Failed to add calculation output for exploration ID '
-                    'exp_id, version 1, state name state_name, and '
-                    'calculation ID calculation_id'
-                )
-            )
+        self.assertEqual(event_model.exp_id, 'exp_id1')
+        self.assertEqual(event_model.exp_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+        self.assertEqual(event_model.is_feedback_useful, True)
 
 
 class ExplorationActualStartEventLogEntryModelUnitTests(
@@ -245,6 +110,58 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+
+
+class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Test the StartExplorationEventLogEntryModel class."""
+
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stats_models.StartExplorationEventLogEntryModel.create(
+                'exp_id1', 1, 'state_name1', 'session_id1', {},
+                feconf.PLAY_TYPE_NORMAL))
+
+        event_model = stats_models.StartExplorationEventLogEntryModel.get(
+            event_id)
+
+        self.assertEqual(event_model.exploration_id, 'exp_id1')
+        self.assertEqual(event_model.exploration_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.params, {})
+        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+
+class MaybeLeaveExplorationEventLogEntryModelUnitTests(
+    test_utils.GenericTestBase):
+    """Test the MaybeLeaveExplorationEventLogEntryModel class."""
+
+
+class CompleteExplorationEventLogEntryModelUnitTests(
+        test_utils.GenericTestBase):
+    """Test the CompleteExplorationEventLogEntryModel class."""
+
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stats_models.CompleteExplorationEventLogEntryModel.create(
+                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, {},
+                feconf.PLAY_TYPE_NORMAL))
+
+        event_model = stats_models.CompleteExplorationEventLogEntryModel.get(
+            event_id)
+
+        self.assertEqual(event_model.exploration_id, 'exp_id1')
+        self.assertEqual(event_model.exploration_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
+        self.assertEqual(event_model.params, {})
+        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+
+class RateExplorationEventLogEntryModelUnitTests(
+    test_utils.GenericTestBase):
+    """Test the RateExplorationEventLogEntryModel class."""
 
 
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -306,48 +223,6 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
         self.assertEqual(
             event_model.event_schema_version,
             feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
-
-
-class CompleteExplorationEventLogEntryModelUnitTests(
-        test_utils.GenericTestBase):
-    """Test the CompleteExplorationEventLogEntryModel class."""
-
-    def test_create_and_get_event_models(self):
-        event_id = (
-            stats_models.CompleteExplorationEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, {},
-                feconf.PLAY_TYPE_NORMAL))
-
-        event_model = stats_models.CompleteExplorationEventLogEntryModel.get(
-            event_id)
-
-        self.assertEqual(event_model.exploration_id, 'exp_id1')
-        self.assertEqual(event_model.exploration_version, 1)
-        self.assertEqual(event_model.state_name, 'state_name1')
-        self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
-        self.assertEqual(event_model.params, {})
-        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
-
-
-class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
-    """Test the StartExplorationEventLogEntryModel class."""
-
-    def test_create_and_get_event_models(self):
-        event_id = (
-            stats_models.StartExplorationEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', {},
-                feconf.PLAY_TYPE_NORMAL))
-
-        event_model = stats_models.StartExplorationEventLogEntryModel.get(
-            event_id)
-
-        self.assertEqual(event_model.exploration_id, 'exp_id1')
-        self.assertEqual(event_model.exploration_version, 1)
-        self.assertEqual(event_model.state_name, 'state_name1')
-        self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.params, {})
-        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
 
 
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
@@ -582,3 +457,138 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual(model_instance, None)
         self.assertEqual(
             model_instance.state_reference, '123:%s' % (state_name))
+
+
+class ExplorationAnnotationsModelTests(test_utils.GenericTestBase):
+
+    def test_create_and_get_models(self):
+        stats_models.ExplorationAnnotationsModel.create(
+            'exp_id1', '1', 5, 4, {})
+
+        model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
+
+        self.assertEqual(model1.exploration_id, 'exp_id1')
+        self.assertEqual(model1.version, '1')
+        self.assertEqual(model1.num_starts, 5)
+        self.assertEqual(model1.num_completions, 4)
+        self.assertEqual(model1.state_hit_counts, {})
+
+    def test_get_versions(self):
+        stats_models.ExplorationAnnotationsModel.create(
+            'exp_id1', '1', 5, 4, {})
+        stats_models.ExplorationAnnotationsModel.create(
+            'exp_id1', '2', 5, 4, {})
+
+        versions = stats_models.ExplorationAnnotationsModel.get_versions(
+            'exp_id1')
+
+        self.assertEqual(sorted(versions), ['1', '2'])
+
+    def test_get_version_for_invalid_exploration_id(self):
+        versions = stats_models.ExplorationAnnotationsModel.get_versions(
+            'invalid_exp_id')
+
+        self.assertEqual(versions, [])
+
+
+class StateAnswersModelTests(test_utils.GenericTestBase):
+
+    def test_shard_count_is_updated_when_data_overflows(self):
+
+        submitted_answer_list = [{'answer': 'value'}]
+
+        stats_models.StateAnswersModel.insert_submitted_answers(
+            'exp_id', 1, 'state_name', 'interaction_id',
+            submitted_answer_list)
+
+        model1 = stats_models.StateAnswersModel.get_master_model(
+            'exp_id', 1, 'state_name')
+
+        # Ensure we got the correct model.
+        self.assertEqual(model1.exploration_id, 'exp_id')
+        self.assertEqual(model1.exploration_version, 1)
+        self.assertEqual(model1.state_name, 'state_name')
+        self.assertEqual(model1.submitted_answer_list, submitted_answer_list)
+        self.assertEqual(model1.shard_count, 0)
+
+        # Use a smaller max answer list size so fewer answers are needed to
+        # exceed a shard. This will increase the 'shard_count'.
+        with self.swap(
+            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
+            stats_models.StateAnswersModel.insert_submitted_answers(
+                'exp_id', 1, 'state_name', 'interaction_id',
+                submitted_answer_list)
+
+            model1 = stats_models.StateAnswersModel.get_master_model(
+                'exp_id', 1, 'state_name')
+
+            self.assertEqual(model1.shard_count, 1)
+
+            stats_models.StateAnswersModel.insert_submitted_answers(
+                'exp_id', 1, 'state_name', 'interaction_id',
+                submitted_answer_list)
+
+            model1 = stats_models.StateAnswersModel.get_master_model(
+                'exp_id', 1, 'state_name')
+
+            self.assertEqual(model1.shard_count, 2)
+
+        # 'shard_count' will not increase as number of answers are less than
+        # the max answer list size.
+        stats_models.StateAnswersModel.insert_submitted_answers(
+            'exp_id', 1, 'state_name', 'interaction_id',
+            submitted_answer_list)
+
+        model1 = stats_models.StateAnswersModel.get_master_model(
+            'exp_id', 1, 'state_name')
+
+        self.assertEqual(model1.shard_count, 2)
+
+
+class StateAnswersCalcOutputModelTests(test_utils.GenericTestBase):
+
+    def test_get_model_returns_created_properties(self):
+
+        stats_models.StateAnswersCalcOutputModel.create_or_update(
+            'exp_id', '1', 'state_name', '', 'calculation_id', '', {})
+
+        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
+            'exp_id', '1', 'state_name', 'calculation_id')
+
+        self.assertEqual(model1.exploration_id, 'exp_id')
+        self.assertEqual(model1.exploration_version, '1')
+        self.assertEqual(model1.state_name, 'state_name')
+        self.assertEqual(model1.calculation_id, 'calculation_id')
+
+        # Model with 'invalid_exp_id' does not exist.
+        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
+            'invalid_exp_id', '1', 'state_name', 'calculation_id')
+
+        self.assertIsNone(model1)
+
+    def test_raise_exception_with_large_calculation_output(self):
+
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+
+        large_calculation_output = {'key': 'a' * 1200000}
+
+        with logging_swap:
+            stats_models.StateAnswersCalcOutputModel.create_or_update(
+                'exp_id', '1', 'state_name', '', 'calculation_id', '',
+                large_calculation_output)
+
+            self.assertEqual(len(observed_log_messages), 1)
+            self.assertEqual(
+                observed_log_messages[0],
+                (
+                    'Failed to add calculation output for exploration ID '
+                    'exp_id, version 1, state name state_name, and '
+                    'calculation ID calculation_id'
+                )
+            )
