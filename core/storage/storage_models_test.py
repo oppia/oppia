@@ -27,21 +27,24 @@ from core.tests import test_utils
 class StorageModelsTest(test_utils.GenericTestBase):
     """Tests for Oppia storage models."""
 
-    def _get_model_module_names(self):
+    def _get_model_module_names(self, skip_base_models):
         """Get all module names in storage."""
         all_model_module_names = []
 
         # As models.NAMES is an enum, it cannot be iterated. So we use the
         # __dict__ property which can be iterated.
         for name in models.NAMES.__dict__:
-            if '__' not in name:
-                all_model_module_names.append(name)
+            if '__' in name:
+                continue
+            if skip_base_models and name == 'base_model':
+                continue
+            all_model_module_names.append(name)
         return all_model_module_names
 
-    def _get_model_classes(self):
+    def _get_model_classes(self, skip_base_models=False):
         """Get all model classes in storage."""
         model_subclasses = []
-        for module_name in self._get_model_module_names():
+        for module_name in self._get_model_module_names(skip_base_models):
             (module,) = models.Registry.import_models([module_name])
             for member_name, member_obj in inspect.getmembers(module):
                 if inspect.isclass(member_obj):
@@ -61,9 +64,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
             len(set(names_of_ndb_model_subclasses)),
             len(names_of_ndb_model_subclasses))
 
-    @unittest.skip('get_deletion_policy is not yet implemented on all models')
     def test_all_models_have_get_deletion_policy(self):
-        model_subclasses = self._get_model_classes()
+        model_subclasses = self._get_model_classes(skip_base_models=True)
 
         for clazz in model_subclasses:
             base_classes = [base.__name__ for base in inspect.getmro(clazz)]
@@ -79,6 +81,10 @@ class StorageModelsTest(test_utils.GenericTestBase):
             # VersionedModel.
             if 'BaseCommitLogEntryModel' in base_classes:
                 continue
-            self.assertIn(
-                clazz.get_deletion_policy(),
-                base_models.DELETION_POLICY.__dict__)
+            try:
+                clazz.get_deletion_policy()
+            except NotImplementedError:
+                print(clazz.__name__)
+        self.assertTrue(False)
+
+#TODO: add check for tests for the get_deletion_policy

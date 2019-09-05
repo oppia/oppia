@@ -89,6 +89,11 @@ class StateCounterModel(base_models.BaseModel):
     # subsequently resolved by an exploration admin.
     active_answer_count = ndb.IntegerProperty(default=0, indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """State counter is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_or_create(cls, exploration_id, state_name):
         """Gets or creates an entity by exploration_id and state_name.
@@ -123,6 +128,11 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     is_feedback_useful = ndb.BooleanProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Answer submitted event log is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -171,6 +181,11 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration actual start event log is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
@@ -212,6 +227,11 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Solution hit event log is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -282,6 +302,11 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Start exploration event log is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -397,6 +422,11 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Maybe leave exploration event log is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates entity ID for a new event based on its
@@ -502,6 +532,11 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Complete exploration event log is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates entity ID for a new event based on its
@@ -578,6 +613,11 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     old_rating = ndb.IntegerProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Rate exploration event log is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
@@ -660,6 +700,11 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """State hit event log is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates entity ID for a new event based on its
@@ -730,6 +775,11 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """State complete event log is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
@@ -776,6 +826,11 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Leave for refresher exploration event log is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -845,6 +900,11 @@ class ExplorationStatsModel(base_models.BaseModel):
     #   'num_completions_v1': ...,
     #   'num_completions_v2': ...}}
     state_stats_mapping = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration stats are not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -997,6 +1057,11 @@ class ExplorationIssuesModel(base_models.BaseModel):
     # playthroughs.
     unresolved_issues = ndb.JsonProperty(repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration issues are not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
         """Generates an ID for the instance of the form
@@ -1069,6 +1134,11 @@ class PlaythroughModel(base_models.BaseModel):
     # where each dict represents a single playthrough action. The list is
     # ordered by the time of occurence of the action.
     actions = ndb.JsonProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Playthrough is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -1174,6 +1244,11 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     # sizes of all answer info dicts stored inside learner_answer_info_list.
     accumulated_answer_info_json_size_bytes = ndb.IntegerProperty(
         indexed=True, required=False, default=0)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Learner answer details are not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_state_reference_for_exploration(cls, exp_id, state_name):
@@ -1304,6 +1379,11 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     #               'no_answer_count': ...}}
     state_hit_counts = ndb.JsonProperty(indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration annotations are not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_entity_id(cls, exploration_id, exploration_version):
         """Gets entity_id for a batch model based on given exploration state.
@@ -1415,6 +1495,11 @@ class StateAnswersModel(base_models.BaseModel):
     # CURRENT_SCHEMA_VERSION in this class needs to be incremented.
     schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION)
+
+    @staticmethod
+    def get_deletion_policy():
+        """State answers are not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_model(
@@ -1720,6 +1805,11 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     calculation_output_type = ndb.StringProperty(indexed=True)
     # Calculation output dict stored as JSON blob.
     calculation_output = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """State answers calc output is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create_or_update(

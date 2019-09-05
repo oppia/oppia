@@ -183,6 +183,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     # The difficulty of the skill.
     skill_difficulty = ndb.FloatProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question skill link is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_model_id(cls, question_id, skill_id):
         """Returns the model id by combining the questions and skill id.

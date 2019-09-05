@@ -36,6 +36,12 @@ class ExplorationRecommendationsModel(
     recommended_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration recommendations are deleted only if the corresponding
+        exploration is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
 class TopicSimilaritiesModel(base_models.BaseModel):
     """This model stores the similarity between any two topics. The topic
@@ -50,3 +56,8 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     change in the future.
     """
     content = ndb.JsonProperty(required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Topic similarities is one instance only model."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
