@@ -20,7 +20,7 @@ var waitFor = require('./waitFor.js');
 
 var ProfilePage = function() {
   var currUserProfilePhoto = element(
-    by.css('.protractor-test-profile-curr-user-photo'));
+    by.css('.protractor-test-profile-current-user-photo'));
   var otherUserProfilePhoto = element(
     by.css('.protractor-test-profile-other-user-photo'));
   var bio = element(

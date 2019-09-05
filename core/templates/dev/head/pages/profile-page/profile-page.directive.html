@@ -13,7 +13,7 @@
             </div>
           </a>
           <img ng-src="<[$ctrl.profilePictureDataUrl]>"
-               class="oppia-profile-picture-fullsize protractor-test-profile-curr-user-photo"
+               class="oppia-profile-picture-fullsize protractor-test-profile-current-user-photo"
                alt="">
           <img ng-if="!$ctrl.profileIsOfCurrentUser" ng-src="<[$ctrl.profilePictureDataUrl]>"
                class="oppia-profile-picture-fullsize protractor-test-profile-other-user-photo"
@@ -59,8 +59,7 @@
       Interests:
       <span ng-if="$ctrl.subjectInterests.length > 0"><br>
         <span ng-repeat="interest in $ctrl.subjectInterests track by $index">
-          <span
-                class="oppia-profile-subject-interest protractor-test-profile-interest"
+          <span class="oppia-profile-subject-interest protractor-test-profile-interest"
           ><[interest]></span>
         </span>
       </span>
