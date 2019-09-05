@@ -24,3 +24,7 @@ import { ClassroomDomainConstants } from
 angular.module('oppia').constant(
   'CLASSROOOM_DATA_URL_TEMPLATE',
   ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'TOPIC_VIEWER_URL_TEMPLATE',
+  ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE);

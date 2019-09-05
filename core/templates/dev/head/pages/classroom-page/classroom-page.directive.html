@@ -1,0 +1,81 @@
+<background-banner></background-banner>
+<div class="oppia-classroom-viewer-container" style="position: relative;">
+  <div class="oppia-classroom-header">
+    <div class="classroom-header" translate="I18N_CLASSROOM_PAGE_HEADING"></div>
+    <div class="classroom-name"><[$ctrl.classroomName]></div>
+  </div>
+  <div class="oppia-classroom-banner">
+    <img ng-src="<[$ctrl.bannerImageFileUrl]>" align="center" width="100%" alt="">
+  </div>
+  <div class="oppia-topic-summary-tiles">
+    <md-card ng-repeat="topicSummary in $ctrl.topicSummaries" class="oppia-topic-summary-tile">
+      <topic-summary-tile topic-summary="topicSummary">
+      </topic-summary-tile>
+    </md-card>
+  </div>
+</div>
+<style>
+  .oppia-classroom-viewer-container .oppia-classroom-header {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    text-align: left;
+    margin-bottom: 25px;
+    margin-left: 15vw;
+    margin-top: 0;
+    padding-top: 66.5px;
+  }
+
+  .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
+    margin-left: 13.5vw;
+    margin-right: 10vw;
+  }
+
+  .oppia-classroom-viewer-container .oppia-topic-summary-tile {
+    background-color: #fca000;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-block;
+    height: 30vh;
+    margin: 25px;
+    padding: 0;
+    position: relative;
+    text-align: left;
+    transition: all 300ms;
+    vertical-align: top;
+    -webkit-transition: all 300ms;
+    white-space: normal;
+    width: 275px;
+  }
+  .oppia-classroom-viewer-container .classroom-name {
+    font-size: 3em;
+  }
+  .oppia-classroom-viewer-container .classroom-header {
+    font-size: 1.2em;
+  }
+  .oppia-classroom-viewer-container .oppia-classroom-banner {
+    margin-left: 65vw;
+    margin-top: -18vh;
+    width: 30vw;
+  }
+  @media (max-width: 750px) {
+    .oppia-classroom-viewer-container .classroom-header {
+      margin-top: -3vh;
+    }
+    .oppia-classroom-viewer-container .oppia-classroom-header {
+      margin-left: 8vw;
+    }
+    .oppia-classroom-viewer-container .oppia-classroom-banner {
+      margin-left: 20vw;
+      margin-top: -5vh;
+      width: 60vw;
+    }
+    .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
+      margin-top: 5vh;
+      margin-left: 8%;
+    }
+
+    .oppia-classroom-viewer-container .oppia-topic-summary-tile {
+      width: 75vw;
+    }
+  }
+</style>

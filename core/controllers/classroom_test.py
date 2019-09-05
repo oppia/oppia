@@ -17,6 +17,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import config_domain
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.tests import test_utils
 import feconf
 
@@ -55,11 +58,45 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
     def test_get(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_2 = topic_services.get_new_topic_id()
+        private_topic = topic_domain.Topic.create_default_topic(
+            topic_id_1, 'private_topic_name')
+        topic_services.save_new_topic(admin_id, private_topic)
+        public_topic = topic_domain.Topic.create_default_topic(
+            topic_id_2, 'public_topic_name')
+        topic_services.save_new_topic(admin_id, public_topic)
+        topic_services.publish_topic(topic_id_2, admin_id)
+
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
+            'name': 'Math',
+            'topic_ids': [topic_id_1, topic_id_2]
+        }]
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'Math'))
+            topic_summary_dict = (
+                topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
+
             expected_dict = {
-                'topic_summary_dicts': []
+                'topic_summary_dicts': [topic_summary_dict]
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 

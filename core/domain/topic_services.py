@@ -67,9 +67,8 @@ def get_multi_topic_summaries(topic_ids):
     """
     topic_summaries_models = topic_models.TopicSummaryModel.get_multi(topic_ids)
     topic_summaries = [
-        get_topic_summary_from_model(summary)
-        for summary in topic_summaries_models
-        if summary is not None]
+        get_topic_summary_from_model(summary) if summary else None
+        for summary in topic_summaries_models]
     return topic_summaries
 
 
@@ -939,6 +938,24 @@ def get_topic_rights(topic_id, strict=True):
         return None
 
     return get_topic_rights_from_model(model)
+
+
+def get_multi_topic_rights(topic_ids):
+    """Returns the rights of all topics whose topic ids are passed in.
+
+    Args:
+        topic_ids: list(str). The IDs of topics for which rights are to be
+            returned.
+
+    Returns:
+        list(TopicRights). The list of rights of all given topics present in
+            the datastore.
+    """
+    topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
+    topic_rights = [
+        get_topic_rights_from_model(rights) if rights else None
+        for rights in topic_rights_models]
+    return topic_rights
 
 
 def get_topic_rights_with_user(user_id):
