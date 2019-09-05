@@ -44,6 +44,7 @@ class ExplorationRecommendationsModel(
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+
 class TopicSimilaritiesModel(base_models.BaseModel):
     """This model stores the similarity between any two topics. The topic
     similarities are stored as a JSON object, representing a 2D dict where the
