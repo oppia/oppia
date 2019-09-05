@@ -31,20 +31,17 @@ angular.module('oppia').directive('contributionsAndReview', [
       UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-      },
+      scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/community-dashboard-page/contributions-and-review/' +
         'contributions-and-review.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$http', '$scope', '$uibModal',
-        'ContributionAndReviewService', 'UserService',
+        '$filter', '$uibModal', 'ContributionAndReviewService', 'UserService',
         function(
-            $filter, $http, $scope, $uibModal,
-            ContributionAndReviewService, UserService) {
-          var SUGGETION_LABELS = {
+            $filter, $uibModal, ContributionAndReviewService, UserService) {
+          var SUGGESTION_LABELS = {
             review: {
               text: 'Awaiting review',
               color: '#eeeeee'
@@ -73,23 +70,21 @@ angular.module('oppia').directive('contributionsAndReview', [
             Object.keys(ctrl.contributions).forEach(function(key) {
               var suggestion = ctrl.contributions[key].suggestion;
               var details = ctrl.contributions[key].details;
-              var requiredData = {};
               var change = suggestion.change;
-              requiredData.heading = $filter('formatRtePreview')(
-                change.translation_html);
-              requiredData.subheading = details.topic_name + ' / ' +
-                details.story_title + ' / ' + details.chapter_title;
-              requiredData.id = suggestion.suggestion_id;
-              requiredData.labelText = (
-                SUGGETION_LABELS[suggestion.status].text);
-              requiredData.labelColor = (
-                SUGGETION_LABELS[suggestion.status].color);
-              requiredData.actionButtonTitle = (
-                ctrl.reviewTabActive ? 'Review' : 'View');
+              var requiredData = {
+                id: suggestion.suggestion_id,
+                heading: $filter('formatRtePreview')(change.translation_html),
+                subheading: (details.topic_name + ' / ' + details.story_title +
+                  ' / ' + details.chapter_title),
+                labelText: SUGGESTION_LABELS[suggestion.status].text,
+                labelColor: SUGGESTION_LABELS[suggestion.status].color,
+                actionButtonTitle: (ctrl.reviewTabActive ? 'Review' : 'View')
+              };
               translationContributionsSummaryList.push(requiredData);
             });
             return translationContributionsSummaryList;
           };
+
           var removeContributionToReview = function(suggestionId) {
             ctrl.contributionSummaries = (
               ctrl.contributionSummaries.filter(function(suggestion) {

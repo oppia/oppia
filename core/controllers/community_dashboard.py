@@ -89,16 +89,34 @@ class TranslatableTextHandler(base.BaseHandler):
         language_code = self.request.get('language_code')
         exp_id = self.request.get('exp_id')
 
+        if not utils.is_supported_audio_language_code(language_code):
+            raise self.InvalidInputException('Invalid language_code: %s' % (
+                language_code))
+
         if not opportunity_services.is_exploration_available_for_contribution(
                 exp_id):
             raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
 
         exp = exp_fetchers.get_exploration_by_id(exp_id)
-        state_wise_translatable_text = exp.get_translatable_text(language_code)
+        state_names_to_content_id_mapping = exp.get_translatable_text(
+            language_code)
 
         self.values = {
-            'state_wise_contents': state_wise_translatable_text,
+            'state_wise_contents': state_names_to_content_id_mapping,
             'version': exp.version
         }
 
         self.render_json(self.values)
+
+
+class ReviewableSuggestionsHandler(base.BaseHandler):
+    """Provides all suggestion which can be reviewed by the user for a given
+    suggestion type.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self, suggestion_type):
+        """Handles GET requests."""
+        pass

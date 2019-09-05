@@ -171,6 +171,49 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(observed_training_data, expected_training_data)
 
+    def test_get_content_with_correct_state_name_returns_html(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>hint one</p>')
+
+        hints_list[0]['hint_content']['html'] = '<p>Changed hint one</p>'
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
+
+    def test_get_content_with_invalid_content_id_raise_error(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>hint one</p>')
+
+        with self.assertRaisesRegexp(
+            ValueError, 'Content ID Invalid id does not exist'):
+            init_state.get_content_html('Invalid id')
+
     def test_state_operations(self):
         """Test adding, updating and checking existence of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')

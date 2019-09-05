@@ -53,7 +53,7 @@ def _get_translation_suggestion_represntable_data(translation_suggestions):
         list(contributions.keys()))
 
     for opportunity_id, opportunity in opportunities.items():
-        contributions[opportunity_id]['details'] = opportunity
+        contributions[opportunity_id]['details'] = opportunity.to_dict()
     return contributions
 
 

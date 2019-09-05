@@ -45,9 +45,9 @@ angular.module('oppia').directive(
       'translation-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$scope', '$uibModal', 'ContributionOpportunitiesService',
+        '$scope', '$uibModal', 'ContributionOpportunitiesService',
         'TranslateTextService', 'TranslationLanguageService', function(
-            $http, $scope, $uibModal, ContributionOpportunitiesService,
+            $scope, $uibModal, ContributionOpportunitiesService,
             TranslateTextService, TranslationLanguageService) {
           var ctrl = this;
           ctrl.opportunities = [];

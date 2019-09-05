@@ -967,19 +967,24 @@ class Exploration(python_utils.OBJECT):
                 'It is impossible to complete the exploration from the '
                 'following states: %s' % ', '.join(dead_end_states))
 
-    def validate_exploration_matches_content(
-            self, state_name, content_id, content_html):
-        """Validates whether the given content matches the content available in
-        the given state.
+    def get_content_html(self, state_name, content_id):
+        """Return the content for a given content id of a state.
 
         Args:
             state_name: str. The name of the state.
-            content_id: str. The id of the content which is required to be
-                validate.
-            content_html: str. The html string which is to be validated.
+            content_id: str. The id of the content.
+
+        Returns:
+            str. The html content corresponding to the given content id of a
+            state.
+
+        Raises:
+            ValueError: The given state_name does not exist.
         """
-        self.states[state_name].validate_matches_content(
-            content_id, content_html)
+        if state_name not in self.states:
+            raise ValueError('State %s does not exist' % state_name)
+
+        return self.states[state_name].get_content_html(content_id)
 
     # Derived attributes of an exploration.
     @property
@@ -1256,15 +1261,16 @@ class Exploration(python_utils.OBJECT):
             language_code: The language code in which translation is required.
 
         Returns:
-            dict(str, str). A dict where state_name is the key and a dict with
-                content_id as the key and html content as value.
+            dict(str, dict(str, str)). A dict where state_name is the key and a
+            dict with content_id as the key and html content as value.
         """
-        state_wise_translatable_text = {}
+        state_names_to_content_id_mapping = {}
         for state_name, state in self.states.items():
-            state_wise_translatable_text[state_name] = (
-                state.get_translatable_text(language_code))
+            state_names_to_content_id_mapping[state_name] = (
+                state.get_content_id_mapping_needing_translations(
+                    language_code))
 
-        return state_wise_translatable_text
+        return state_names_to_content_id_mapping
 
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration

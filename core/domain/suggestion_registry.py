@@ -386,7 +386,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change, score_category, last_updated):
-        """Initializes an object of type SuggestionEditStateContent
+        """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
         self.suggestion_id = suggestion_id
@@ -403,11 +403,11 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.last_updated = last_updated
 
     def validate(self):
-        """Validates a suggestion object of type SuggestionEditStateContent.
+        """Validates a suggestion object of type SuggestionTranslateContent.
 
         Raises:
             ValidationError: One or more attributes of the
-                SuggestionEditStateContent object are invalid.
+                SuggestionTranslateContent object are invalid.
         """
         super(SuggestionTranslateContent, self).validate()
 
@@ -449,9 +449,12 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Expected %s to be a valid state name' %
                 self.change.state_name)
 
-        exploration.validate_exploration_matches_content(
-            self.change.state_name, self.change.content_id,
-            self.change.content_html)
+        # Validate whether the reviewer accepts the translation for the correct
+        # content.
+        if exploration.get_content_html(
+                self.change.state_name, self.change.content_id) != (
+                    self.change.content_html):
+            raise utils.ValidationError('Incorrect content_html found.')
 
     def accept(self, commit_message):
         """Accepts the suggestion.

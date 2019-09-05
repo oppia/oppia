@@ -26,7 +26,7 @@ angular.module('oppia').directive('opportunitiesList', [
     return {
       restrict: 'E',
       scope: {
-        loadingView: '=',
+        loadingViewShow: '=',
         getOpportunities: '&opportunities',
         isMoreOpportunitiesAvailable: '&moreAvailable',
         isLabelRequired: '&labelRequired',

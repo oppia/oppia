@@ -379,8 +379,7 @@ def get_opportunities_by_ids(ids):
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities[exp_opportunity_summary.id] = (
-            exp_opportunity_summary.to_dict())
+        opportunities[exp_opportunity_summary.id] = exp_opportunity_summary
 
     return opportunities
 

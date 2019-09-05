@@ -63,7 +63,12 @@ angular.module('oppia').factory('TranslateTextService', [
         activeExpId = expId;
         activeExpVersion = null;
         $http.get(
-          '/gettranslatabletexthandler?exp_id=' + expId).then(
+          '/gettranslatabletexthandler', {
+            params: {
+              exp_id: expId,
+              language_code: languageCode
+            }
+          }).then(
           function(response) {
             stateWiseContents = response.data.state_wise_contents;
             activeExpVersion = response.data.version;

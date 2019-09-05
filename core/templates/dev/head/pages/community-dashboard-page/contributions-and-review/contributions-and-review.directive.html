@@ -22,11 +22,11 @@
     </div>
   </div>
   <div class="oppia-contributions-show-review-container">
-    <div class="oppia-login-required" ng-if="ctrl.userDeatilsLoading && !$ctrl.userIsLoggedIn">
+    <div class="oppia-login-required" ng-if="!ctrl.userDeatilsLoading && !$ctrl.userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
-    <div class="oppia-login-required">
-      <opportunities-list loading-view="$ctrl.contributionsDataLoading"
+    <div class="oppia-login-required" ng-if="$ctrl.userIsLoggedIn">
+      <opportunities-list loading-view-show="$ctrl.contributionsDataLoading"
                           opportunities="$ctrl.contributionSummaries"
                           on-click-action-button="$ctrl.onClickViewSuggestion"
                           label-required="!$ctrl.reviewTabActive">
@@ -36,7 +36,7 @@
 </div>
 
 <style>
-  .oppia-contributions-show-review {
+  contributions-and-review .oppia-contributions-show-review {
     display: flex;
     justify-content: center;
     height: 70vh;
@@ -45,50 +45,50 @@
     width: 80%;
   }
 
-  .oppia-contributions-show-review-side-navbar-container {
+  contributions-and-review .oppia-contributions-show-review-side-navbar-container {
     width: 25%;
     display: flex;
     flex-wrap: wrap;
     background-color: #009688;
   }
 
-  .oppia-contributions-show-review-container {
+  contributions-and-review .oppia-contributions-show-review-container {
     width: 75%;
     background-color: white;
     overflow-y: auto;
   }
-  .oppia-contributions-show-review-container::-webkit-scrollbar {
+  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar {
     width: 7px;
   }
-  .oppia-contributions-show-review-container::-webkit-scrollbar-track {
+  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar-track {
     box-shadow: inset 0 0 3px grey;
     border-radius: 5px;
   }
-  .oppia-contributions-show-review-container::-webkit-scrollbar-thumb {
+  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar-thumb {
     background: grey;
     border-radius: 5px;
     transition: background 0.5s ease;
   }
-  .oppia-contributions-show-review-container::-webkit-scrollbar-thumb:hover {
+  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar-thumb:hover {
     background: black;
   }
 
-  .oppia-contributions-side-navbar-part {
+  contributions-and-review .oppia-contributions-side-navbar-part {
     height: 50%;
     width: 100%;
     padding-top: 20%;
   }
 
-  .oppia-contributions-navbar-items-list {
+  contributions-and-review .oppia-contributions-navbar-items-list {
     position: relative;
   }
 
-  .oppia-contributions-navbar-item {
+  contributions-and-review .oppia-contributions-navbar-item {
     display: flex;
     flex-direction: column;
   }
 
-  .oppia-contributions-navbar-button {
+  contributions-and-review .oppia-contributions-navbar-button {
     border-top-right-radius: 10px;
     font-size: 16px;
     font-weight: bold;
@@ -103,24 +103,24 @@
     text-align: left;
   }
 
-  .oppia-contributions-active-navbar,
-  .oppia-contributions-navbar-button:hover {
+  contributions-and-review .oppia-contributions-active-navbar,
+  contributions-and-review .oppia-contributions-navbar-button:hover {
     background-color: #0b6c63;
   }
 
-  .oppia-contributions-navbar-items-list::before {
+  contributions-and-review .oppia-contributions-navbar-items-list::before {
+    border-bottom: 1px solid #fff;
+    bottom: 35px;
     color: #fff;
     content: attr(navbar-label);
     font-size: 20px;
     font-weight: bold;
-    position: absolute;
-    bottom: 35px;
-    border-bottom: 1px solid #fff;
-    width: 90%;
     margin-left: 10%;
+    position: absolute;
+    width: 90%;
   }
 
-  .oppia-login-required {
+  contributions-and-review .oppia-login-required {
     width: 100%;
     height: 100%;
   }
