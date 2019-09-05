@@ -438,7 +438,7 @@ angular.module('oppia').directive('conversationSkin', [
 
           $scope.canAskLearnerForAnswerInfo = (
             LearnerAnswerInfoService.canAskLearnerForAnswerInfo);
-          
+
           var initLearnerAnswerInfoService = (
             LearnerAnswerInfoService.initLearnerAnswerInfoService);
 
