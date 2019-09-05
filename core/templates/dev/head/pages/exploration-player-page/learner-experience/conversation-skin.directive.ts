@@ -438,7 +438,7 @@ angular.module('oppia').directive('conversationSkin', [
 
           $scope.canAskLearnerForAnswerInfo = (
             LearnerAnswerInfoService.canAskLearnerForAnswerInfo);
-
+          
           var initLearnerAnswerInfoService = (
             LearnerAnswerInfoService.initLearnerAnswerInfoService);
 
@@ -858,7 +858,8 @@ angular.module('oppia').directive('conversationSkin', [
               }
             }
 
-            if (!$scope.isInPreviewMode &&
+            if (!ExplorationPlayerStateService.isInQuestionMode() &&
+              !$scope.isInPreviewMode &&
               ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
               initLearnerAnswerInfoService(
                 $scope.explorationId, ExplorationEngineService.getState(),
