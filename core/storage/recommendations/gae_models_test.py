@@ -39,4 +39,4 @@ class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             recommendations_models.TopicSimilaritiesModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.NOT_APPLICABLE)

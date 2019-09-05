@@ -81,6 +81,10 @@ class StorageModelsTest(test_utils.GenericTestBase):
             # VersionedModel.
             if 'BaseCommitLogEntryModel' in base_classes:
                 continue
-            self.assertIn(
-                clazz.get_deletion_policy(),
-                base_models.DELETION_POLICY.__dict__)
+            try:
+                self.assertIn(
+                    clazz.get_deletion_policy(),
+                    base_models.DELETION_POLICY.__dict__)
+            except NotImplementedError:
+                self.fail(msg='get_deletion_policy is not defined for %s' % (
+                    clazz.__name__))
