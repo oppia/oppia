@@ -187,8 +187,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question skill link is not related to users."""
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
+        """Question skill link should be deleted only if all associated skills
+        or questions are deleted.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):

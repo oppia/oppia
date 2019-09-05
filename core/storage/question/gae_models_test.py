@@ -122,6 +122,11 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
 class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionSkillLinkModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
         skill_id = 'A Test Skill Id'
