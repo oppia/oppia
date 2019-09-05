@@ -16,17 +16,23 @@
 
 """Tests for core.storage.file.gae_models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(file_models, base_models) = models.Registry.import_models(
-    [models.NAMES.file, models.NAMES.base_model])
+(base_models, file_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.file])
 
 
 class FileMetadataModelTest(test_utils.GenericTestBase):
     """Tests the FileMetadataModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            file_models.FileMetadataModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_new_id_raises_not_implemented_error(self):
         with self.assertRaises(NotImplementedError):
@@ -139,6 +145,11 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
 
 class FileModelTest(test_utils.GenericTestBase):
     """Tests the FileModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            file_models.FileModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_file_model_content_is_reconstituted_correctly(self):
         file_model = file_models.FileModel.create(

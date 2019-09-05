@@ -16,6 +16,7 @@
 
 """Tests for core.storage.feedback.gae_models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import types
 
@@ -353,6 +354,15 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             actual_model_2.message_ids_read_by_user,
             expected_model_2.message_ids_read_by_user)
+
+
+class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
+    """Tests for the FeedbackAnalyticsModelTests class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            feedback_models.FeedbackAnalyticsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):

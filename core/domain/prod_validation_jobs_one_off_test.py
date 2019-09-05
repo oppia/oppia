@@ -16,6 +16,7 @@
 
 """Unit tests for core.domain.prod_validation_jobs_one_off."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
@@ -328,7 +329,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for fetch properties of '
             'ActivityReferencesModel\', '
             '[u"Entity id featured: Entity properties cannot be fetched '
-            'completely with the error \'id\'"]]')]
+            'completely with the error u\'id\'"]]')]
 
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -5820,7 +5821,9 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         model_with_invalid_version_in_id = (
             file_models.FileSnapshotContentModel(
                 id='%s-3' % self.id_0))
-        model_with_invalid_version_in_id.content = 'content'
+        # We are using the b' prefix here as NDB datastore models don't accept
+        # unicode.
+        model_with_invalid_version_in_id.content = b'content'
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -5840,7 +5843,7 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(JobModelValidatorTests, self).setUp()
 
-        current_time_str = python_utils.STR(
+        current_time_str = python_utils.UNICODE(
             int(utils.get_current_time_in_millisecs()))
         random_int = random.randint(0, 1000)
         self.model_instance = job_models.JobModel(
