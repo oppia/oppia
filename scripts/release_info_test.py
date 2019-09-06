@@ -43,7 +43,7 @@ RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
 GENERATED_RELEASE_SUMMARY_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'generated_release_summary.md')
-MOCK_FECONF_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'feconf.py')
+MOCK_FECONF_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
 
 
 class ReleaseInfoTests(test_utils.GenericTestBase):

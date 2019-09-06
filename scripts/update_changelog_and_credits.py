@@ -318,7 +318,7 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
         target_branch: str. The name of the target branch.
     """
 
-    common.run_cmd(GIT_CMD_CHECKOUT)
+    common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
     # The get_git_ref code is wrapped in try except block since the
     # function raises an exception if the target branch is not found.
     try:
@@ -356,7 +356,7 @@ def create_branch(repo_fork, target_branch, github_username):
             repo_fork.update_file(
                 contents.path, 'Update %s' % filepath, f.read(),
                 contents.sha, branch=target_branch)
-    common.run_cmd(GIT_CMD_CHECKOUT)
+    common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia/compare/develop...%s:%s?'
         'expand=1' % (github_username, target_branch))

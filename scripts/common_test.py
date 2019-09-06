@@ -31,7 +31,7 @@ class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
     def test_run_cmd(self):
         self.assertEqual(
-            common.run_cmd('echo Test for common.py '),
+            common.run_cmd(('echo Test for common.py ').split(' ')),
             'Test for common.py')
 
     def test_ensure_directory_exists_with_existing_dir(self):
