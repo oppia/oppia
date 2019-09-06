@@ -14,6 +14,7 @@
 
 """Controllers for the classroom page."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -69,7 +70,11 @@ class ClassroomDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic_summaries = topic_services.get_multi_topic_summaries(topic_ids)
-        topic_summary_dicts = [summary.to_dict() for summary in topic_summaries]
+        topic_rights = topic_services.get_multi_topic_rights(topic_ids)
+        topic_summary_dicts = [
+            summary.to_dict() for ind, summary in enumerate(topic_summaries)
+            if summary is not None and topic_rights[ind].topic_is_published
+        ]
 
         self.values.update({
             'topic_summary_dicts': topic_summary_dicts

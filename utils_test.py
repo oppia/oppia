@@ -16,7 +16,9 @@
 
 """Unit tests for utils.py."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import base64
 import copy
 import datetime
 import os
@@ -70,7 +72,7 @@ class UtilsTests(test_utils.GenericTestBase):
         test_dicts = [{}, {'a': 'b'}, {'a': 2}, {'a': ['b', 2, {'c': 3.5}]}]
 
         for adict in test_dicts:
-            yaml_str = utils.yaml_from_dict(adict)
+            yaml_str = python_utils.yaml_from_dict(adict)
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
@@ -309,3 +311,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_asset_dir_prefix_with_prod_mode(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.assertEqual(utils.get_asset_dir_prefix(), '/build')
+
+    def test_base64_from_int(self):
+        base64_number = utils.base64_from_int(108)
+        self.assertEqual(base64.b64decode(base64_number), '[108]')

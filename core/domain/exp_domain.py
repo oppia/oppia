@@ -21,6 +21,7 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
@@ -297,7 +298,7 @@ class ExpVersionReference(python_utils.OBJECT):
             ValidationError: One or more attributes of the ExpVersionReference
             are invalid.
         """
-        if not isinstance(self.exp_id, str):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a str, received %s' % self.exp_id)
 
@@ -832,12 +833,12 @@ class Exploration(python_utils.OBJECT):
             try:
                 self._verify_all_states_reachable()
             except utils.ValidationError as e:
-                warnings_list.append(python_utils.STR(e))
+                warnings_list.append(python_utils.UNICODE(e))
 
             try:
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
-                warnings_list.append(python_utils.STR(e))
+                warnings_list.append(python_utils.UNICODE(e))
 
             if not self.title:
                 warnings_list.append(
@@ -3240,7 +3241,7 @@ class Exploration(python_utils.OBJECT):
         # YAML representation.
         del exp_dict['id']
 
-        return utils.yaml_from_dict(exp_dict)
+        return python_utils.yaml_from_dict(exp_dict)
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all

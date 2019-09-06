@@ -16,6 +16,7 @@
 
 """Models for the content of sent emails."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -74,6 +75,11 @@ class SentEmailModel(base_models.BaseModel):
     # The hash of the recipient id, email subject and message body.
     email_hash = ndb.StringProperty(indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Sent email should be kept for audit purposes."""
+        return base_models.DELETION_POLICY.KEEP
+
     @classmethod
     def _generate_id(cls, intent):
         """Generates an ID for a new SentEmailModel instance.
@@ -95,7 +101,7 @@ class SentEmailModel(base_models.BaseModel):
             new_id = '%s.%s' % (
                 id_prefix,
                 utils.convert_to_hash(
-                    python_utils.STR(utils.get_random_int(
+                    python_utils.UNICODE(utils.get_random_int(
                         base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
@@ -264,6 +270,11 @@ class BulkEmailModel(base_models.BaseModel):
     # The datetime the email was sent, in UTC.
     sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Sent email should be kept for audit purposes."""
+        return base_models.DELETION_POLICY.KEEP
+
     @classmethod
     def create(
             cls, instance_id, recipient_ids, sender_id, sender_email,
@@ -301,6 +312,11 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     """
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Feedback email reply to id should be deleted."""
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):

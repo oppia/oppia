@@ -17,8 +17,12 @@ var suites = {
       'protractor/accessibility.js'
     ],
 
-    additionalEditorAndPlayerFeatures: [
-      'protractor_desktop/additionalEditorAndPlayerFeatures.js'
+    additionalEditorFeatures: [
+      'protractor_desktop/additionalEditorFeatures.js'
+    ],
+
+    additionalPlayerFeatures: [
+      'protractor_desktop/additionalPlayerFeatures.js'
     ],
 
     collections: [

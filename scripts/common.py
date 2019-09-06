@@ -14,6 +14,7 @@
 
 """Common utility functions and classes used by multiple Python scripts."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import subprocess
@@ -21,6 +22,19 @@ import subprocess
 import python_utils
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
+
+
+def run_cmd(cmd_tokens):
+    """Runs the command and returns the output.
+    Raises subprocess.CalledProcessError upon failure.
+
+    Args:
+        cmd_tokens: list(str). The list of command tokens to execute.
+
+    Returns:
+        str. The output of the command.
+    """
+    return subprocess.check_output(cmd_tokens).strip()
 
 
 def ensure_directory_exists(d):
