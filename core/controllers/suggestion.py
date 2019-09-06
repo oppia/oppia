@@ -223,7 +223,6 @@ class UserSubmittedSuggestionsHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
 
-
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 

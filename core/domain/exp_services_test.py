@@ -2374,6 +2374,35 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
 
+    def test_add_translation(self):
+        """Test updating of content."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+        self.assertEqual(exploration.get_translation_counts(), {})
+
+        change_list = _get_change_list(
+            self.init_state_name, 'content', {
+                'html': '<p><strong>Test content</strong></p>',
+                'content_id': 'content',
+            })
+
+        change_list.append(exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': self.init_state_name,
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p><strong>Test content</strong></p>',
+            'translation_html': '<p>Translated text</p>'
+        }))
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+        self.assertEqual(exploration.get_translation_counts(), {
+            'hi': 1
+        })
+
     def test_update_solicit_answer_details(self):
         """Test updating of solicit_answer_details."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
