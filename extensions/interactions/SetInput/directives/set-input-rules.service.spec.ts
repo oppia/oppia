@@ -16,21 +16,21 @@
  * @fileoverview Unit tests for Set Input rules.
  */
 
-require('interactions/SetInput/directives/set-input-rules.service.ts');
+import { SetInputRulesService } from
+  'interactions/SetInput/directives/set-input-rules.service'
 
-describe('Set Input rules service', function() {
-  beforeEach(angular.mock.module('oppia'));
+fdescribe('Set Input rules service', () => {
 
-  var sirs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    sirs = $injector.get('SetInputRulesService');
-  }));
+  let sirs: SetInputRulesService = null;
+  beforeEach(() => {
+    sirs = new SetInputRulesService();
+  });
 
-  var RULE_INPUT = {
+  let RULE_INPUT: {x: string[]} = {
     x: ['a', 'b']
   };
 
-  it('should have a correct \'equals\' rule', function() {
+  it('should have a correct \'equals\' rule', () => {
     expect(sirs.Equals(['a', 'b'], RULE_INPUT)).toBe(true);
     expect(sirs.Equals(['b', 'a'], RULE_INPUT)).toBe(true);
     expect(sirs.Equals(['a'], RULE_INPUT)).toBe(false);
@@ -42,7 +42,7 @@ describe('Set Input rules service', function() {
     })).toBe(false);
   });
 
-  it('should have a correct \'is subset of\' rule', function() {
+  it('should have a correct \'is subset of\' rule', () => {
     expect(sirs.IsSubsetOf(['a'], RULE_INPUT)).toBe(true);
     expect(sirs.IsSubsetOf(['b'], RULE_INPUT)).toBe(true);
     expect(sirs.IsSubsetOf([], RULE_INPUT)).toBe(true);
@@ -51,7 +51,7 @@ describe('Set Input rules service', function() {
     expect(sirs.IsSubsetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'is superset of\' rule', function() {
+  it('should have a correct \'is superset of\' rule', () => {
     expect(sirs.IsSupersetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(true);
     expect(sirs.IsSupersetOf(['a', 'b', 'ab'], RULE_INPUT)).toBe(true);
     expect(sirs.IsSupersetOf(['a', 'c'], RULE_INPUT)).toBe(false);
@@ -60,7 +60,7 @@ describe('Set Input rules service', function() {
     expect(sirs.IsSupersetOf([], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'has elements in\' rule', function() {
+  it('should have a correct \'has elements in\' rule', () => {
     expect(sirs.HasElementsIn(['a', 'b', 'c'], RULE_INPUT)).toBe(true);
     expect(sirs.HasElementsIn(['a', 'b'], RULE_INPUT)).toBe(true);
     expect(sirs.HasElementsIn(['a'], RULE_INPUT)).toBe(true);
@@ -68,7 +68,7 @@ describe('Set Input rules service', function() {
     expect(sirs.HasElementsIn([], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'has elements not in\' rule', function() {
+  it('should have a correct \'has elements not in\' rule', () => {
     expect(sirs.HasElementsNotIn(['a', 'b', 'c'], RULE_INPUT)).toBe(true);
     expect(sirs.HasElementsNotIn(['c'], RULE_INPUT)).toBe(true);
     expect(sirs.HasElementsNotIn(['a', 'b'], RULE_INPUT)).toBe(false);
@@ -76,7 +76,7 @@ describe('Set Input rules service', function() {
     expect(sirs.HasElementsNotIn([], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'omits elements in\' rule', function() {
+  it('should have a correct \'omits elements in\' rule', () => {
     expect(sirs.OmitsElementsIn(['c', 'ab'], RULE_INPUT)).toBe(true);
     expect(sirs.OmitsElementsIn(['c'], RULE_INPUT)).toBe(true);
     expect(sirs.OmitsElementsIn(['a'], RULE_INPUT)).toBe(true);
@@ -85,7 +85,7 @@ describe('Set Input rules service', function() {
     expect(sirs.OmitsElementsIn(['a', 'b'], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'is disjoint\' rule', function() {
+  it('should have a correct \'is disjoint\' rule', () => {
     expect(sirs.IsDisjointFrom(['c', 'ab'], RULE_INPUT)).toBe(true);
     expect(sirs.IsDisjointFrom(['c'], RULE_INPUT)).toBe(true);
     expect(sirs.IsDisjointFrom([], RULE_INPUT)).toBe(true);
