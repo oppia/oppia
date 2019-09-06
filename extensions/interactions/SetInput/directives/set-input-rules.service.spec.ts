@@ -17,10 +17,9 @@
  */
 
 import { SetInputRulesService } from
-  'interactions/SetInput/directives/set-input-rules.service'
+  'interactions/SetInput/directives/set-input-rules.service';
 
-fdescribe('Set Input rules service', () => {
-
+describe('Set Input rules service', () => {
   let sirs: SetInputRulesService = null;
   beforeEach(() => {
     sirs = new SetInputRulesService();
