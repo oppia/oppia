@@ -1083,6 +1083,10 @@ textarea {
   width: 100%;
 }
 
+#oppia-main-content:focus {
+  outline: 0;
+}
+
 .oppia-align-center {
   float: none;
   margin: 0 auto;
