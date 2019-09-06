@@ -3164,7 +3164,7 @@ def main():
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('No files to check.')
         python_utils.PRINT('---------------------------')
-        sys.exit(1)
+        return
 
     all_filepaths_dict = {
         '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []
