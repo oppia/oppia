@@ -21,7 +21,7 @@
 require('pages/collection-editor-page/collection-editor-page.module.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require('pages/collection-editor-page/collection-editor-page.directive.ts');
 require(
   'pages/collection-editor-page/navbar/' +
