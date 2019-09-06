@@ -26,7 +26,7 @@ describe('Preferences', function() {
     preferencesPage = new PreferencesPage.PreferencesPage();
   });
 
-  it('should upload a profile photo', function() {
+  it('should let a user upload a profile photo', function() {
     users.createUser('eve@preferences.com', 'evePreferences');
     users.login('eve@preferences.com');
     preferencesPage.get();
@@ -40,7 +40,7 @@ describe('Preferences', function() {
       );
   });
 
-  it('shows an error if uploaded photo is too large', function() {
+  it('should show an error if uploaded photo is too large', function() {
     users.createUser('lou@preferences.com', 'louPreferences');
     users.login('lou@preferences.com');
     preferencesPage.get();
