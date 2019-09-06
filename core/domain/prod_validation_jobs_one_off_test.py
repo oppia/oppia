@@ -2439,18 +2439,10 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.admin = user_services.UserActionsInfo(self.admin_id)
 
-        self.TOPIC_ID = 'topic'
-        topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic')
-        topic_services.save_new_topic(self.owner_id, topic)
-
         for i in python_utils.RANGE(3):
             skill_id = '%s' % i
             self.save_new_skill(skill_id, self.admin_id, 'description %d' % i)
             skill_services.publish_skill(skill_id, self.admin_id)
-
-        topic_services.add_uncategorized_skill(
-            self.owner_id, self.TOPIC_ID, '0')
 
         self.QUESTION_ID = question_services.get_new_question_id()
         self.save_new_question(
@@ -2460,7 +2452,7 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
             self.owner_id, self.QUESTION_ID, '0', 0.3)
 
         self.model_instance_0 = (
-            opportunity_models.SkillOpportunityModel.get_by_skill_id('0')[0])
+            opportunity_models.SkillOpportunityModel.get('0'))
 
     def test_standard_operation(self):
         expected_output = [
@@ -2477,7 +2469,7 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id %s: skill_description field in entity: invalid '
                 'does not match corresponding skill description field: '
                 'description 0\']]'
-            ) % 1,
+            ) % self.model_instance_0.id,
             u'[u\'fully-validated SkillOpportunityModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 

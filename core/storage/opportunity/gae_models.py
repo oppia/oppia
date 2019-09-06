@@ -146,8 +146,6 @@ class SkillOpportunityModel(base_models.BaseModel):
     A new instance of this model is created and saved every time a commit to
     SkillModel occurs.
     """
-    # The ID of the opportunity's skill.
-    skill_id = ndb.StringProperty(required=True, indexed=True)
     # The description of the opportunity's skill.
     skill_description = ndb.StringProperty(required=True, indexed=True)
     # The number of questions associated with this opportunity's skill.
@@ -185,13 +183,3 @@ class SkillOpportunityModel(base_models.BaseModel):
         results, cursor, more = cls.get_all().order(
             cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
-
-    @classmethod
-    def get_by_skill_id(cls, skill_id):
-        """Returns all models matching the supplied skill_id.
-
-        Returns:
-            list(SkillOpportunityModel)|None. A list of
-            SkillOpportunityModel(s) with the supplied skill_id.
-        """
-        return cls.query(cls.skill_id == skill_id).fetch()

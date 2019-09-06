@@ -399,7 +399,7 @@ def get_skill_opportunity_from_model(model):
     """
 
     return opportunity_domain.SkillOpportunity(
-        model.skill_id, model.skill_description, model.question_count)
+        model.id, model.skill_description, model.question_count)
 
 
 def get_skill_opportunities(cursor):
@@ -442,42 +442,37 @@ def create_skill_opportunity(skill_opportunity):
             the datastore.
     """
     skill_opportunity_model = opportunity_models.SkillOpportunityModel(
-        topic_id=skill_opportunity.topic_id,
-        topic_name=skill_opportunity.topic_name,
-        skill_id=skill_opportunity.skill_id,
+        id=skill_opportunity.id,
         skill_description=skill_opportunity.skill_description,
         question_count=skill_opportunity.question_count,
     )
     skill_opportunity_model.put()
 
 
-def update_skill_opportunites_skill_description(skill_id, new_description):
-    """Updates the skill_description of SkillOpportunityModel(s) with
+def update_skill_opportunity_skill_description(skill_id, new_description):
+    """Updates the skill_description of the SkillOpportunityModel with
     new_description.
 
     Args:
         skill_id: str. The corresponding skill_id of the opportunity.
         new_description: str. The new skill_description.
     """
-    skill_opportunity_models = (
-        opportunity_models.SkillOpportunityModel.get_by_skill_id(skill_id))
-    for model in skill_opportunity_models:
-        model.skill_description = new_description
-        model.put()
+    skill_opportunity_model = (
+        opportunity_models.SkillOpportunityModel.get(skill_id))
+    skill_opportunity_model.skill_description = new_description
+    skill_opportunity_model.put()
 
 
 def delete_skill_opportunities(skill_id):
-    """Deletes the SkillOpportunityModel(s) corresponding to the supplied
-    skill_id.
+    """Deletes the SkillOpportunityModel corresponding to the supplied skill_id.
 
     Args:
         skill_id: str. The skill_id corresponding to the to-be-deleted
-            SkillOpportunityModel(s)
+            SkillOpportunityModel.
     """
-    skill_opportunity_models = (
-        opportunity_models.SkillOpportunityModel.get_by_skill_id(skill_id))
-    opportunity_models.SkillOpportunityModel.delete_multi(
-        skill_opportunity_models)
+    skill_opportunity_model = (
+        opportunity_models.SkillOpportunityModel.get(skill_id))
+    opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
 
 
 def update_skill_opportunity_question_counts(skill_ids, delta):
@@ -489,8 +484,8 @@ def update_skill_opportunity_question_counts(skill_ids, delta):
             SkillOpportunityModel(s).
         delta: int. The delta for which to update each question_count.
     """
-    for skill_id in skill_ids:
-        _update_skill_opportunity_question_count(skill_id, delta)
+    updated_models = _update_skill_opportunity_question_count(skill_ids, delta)
+    opportunity_models.SkillOpportunityModel.put_multi(updated_models)
 
 
 def compute_question_linked_skill_ids_update(old_skill_ids, new_skill_ids):
@@ -505,22 +500,30 @@ def compute_question_linked_skill_ids_update(old_skill_ids, new_skill_ids):
     new_skill_ids_set = set(new_skill_ids)
     added = new_skill_ids_set - old_skill_ids_set
     removed = old_skill_ids_set - new_skill_ids_set
-    for skill_id in added:
-        _update_skill_opportunity_question_count(skill_id, 1)
-    for skill_id in removed:
-        _update_skill_opportunity_question_count(skill_id, -1)
+    updated_models = []
+    updated_models.extend(_update_skill_opportunity_question_count(added, 1))
+    updated_models.extend(_update_skill_opportunity_question_count(removed, -1))
+    opportunity_models.SkillOpportunityModel.put_multi(updated_models)
 
 
-def _update_skill_opportunity_question_count(skill_id, delta):
-    """Updates question_count(s) of SkillOpportunityModel(s) with corresponding
-    skill_id.
+def _update_skill_opportunity_question_count(skill_ids, delta):
+    """Returns a list of SkillOpportunityModel(s) with corresponding skill_ids
+    with question_count(s) updated by delta.
 
     Args:
-        skill_id: str. The skill_id of the SkillOpportunityModel(s).
-        delta: int. The delta for which to update each question_count.
+        skill_ids: iterable(str). The skill_ids of the SkillOpportunityModel(s).
+        delta: int. The delta for which to update each question_count (can be
+            negative).
+
+    Returns:
+        updated_models. list(SkillOpportunityModel) The updated
+            SkillOpportunityModel(s).
     """
-    skill_opportunity_models = (
-        opportunity_models.SkillOpportunityModel.get_by_skill_id(skill_id))
-    for model in skill_opportunity_models:
-        model.question_count += delta
-        model.put()
+    updated_models = []
+    for skill_id in skill_ids:
+        skill_opportunity_model = (
+            opportunity_models.SkillOpportunityModel.get(skill_id))
+        if skill_opportunity_model:
+            skill_opportunity_model.question_count += delta
+            updated_models.append(skill_opportunity_model)
+    return updated_models

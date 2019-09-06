@@ -212,7 +212,7 @@ class SkillOpportunity(python_utils.OBJECT):
             skill_description: str. The title of the skill.
             question_count: int. The total number of questions for the skill.
         """
-        self.skill_id = skill_id
+        self.id = skill_id
         self.skill_description = skill_description
         self.question_count = question_count
         self.validate()
@@ -223,9 +223,6 @@ class SkillOpportunity(python_utils.OBJECT):
         Raises:
             ValidationError: One or more attributes of the object are invalid.
         """
-        if not isinstance(self.skill_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected skill_id to be a string, received %s' % self.skill_id)
         if not isinstance(self.skill_description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected skill_description to be a string, received %s' %
@@ -253,7 +250,7 @@ class SkillOpportunity(python_utils.OBJECT):
                 SkillOpportunity domain object.
         """
         return cls(
-            skill_opportunity_dict['skill_id'],
+            skill_opportunity_dict['id'],
             skill_opportunity_dict['skill_description'],
             skill_opportunity_dict['question_count'])
 
@@ -270,7 +267,7 @@ class SkillOpportunity(python_utils.OBJECT):
             contributor.
         """
         return {
-            'skill_id': self.skill_id,
+            'id': self.id,
             'skill_description': self.skill_description,
             'question_count': self.question_count
         }

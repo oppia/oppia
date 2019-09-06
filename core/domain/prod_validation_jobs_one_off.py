@@ -1385,7 +1385,7 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
     def _get_external_id_relationships(cls, item):
         return {
             'skill_ids': (
-                skill_models.SkillModel, [item.skill_id])
+                skill_models.SkillModel, [item.id])
         }
 
     @classmethod

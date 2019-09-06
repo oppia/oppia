@@ -359,14 +359,14 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         super(SkillOpportunityDomainTest, self).setUp()
         self.valid_skill_opportunity = (
             opportunity_domain.SkillOpportunity.from_dict({
-                'skill_id': 'skill_1',
+                'id': 'skill_1',
                 'skill_description': 'A new skill',
                 'question_count': 10
             }))
 
     def test_to_and_from_dict_works_correctly(self):
         skill_opportunity_dict = {
-            'skill_id': 'skill_1',
+            'id': 'skill_1',
             'skill_description': 'A new skill',
             'question_count': 5,
         }
@@ -377,21 +377,10 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(
             skill_opportunity, opportunity_domain.SkillOpportunity))
         self.assertEqual(skill_opportunity.to_dict(), {
-            'skill_id': 'skill_1',
+            'id': 'skill_1',
             'skill_description': 'A new skill',
             'question_count': 5,
         })
-
-    def test_invalid_skill_id_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_skill_opportunity.skill_id, python_utils.BASESTRING))
-        # Object with skill_id as string passes the validation check.
-        self.valid_skill_opportunity.validate()
-        self.valid_skill_opportunity.skill_id = 5
-        # Object with skill_id as int fails the validation check.
-        self._assert_validation_error(
-            self.valid_skill_opportunity,
-            'Expected skill_id to be a string, received 5')
 
     def test_invalid_skill_description_fails_validation_check(self):
         self.assertTrue(isinstance(
