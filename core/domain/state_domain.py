@@ -1843,7 +1843,7 @@ class State(python_utils.OBJECT):
 
         content_id_to_html[self.content.content_id] = self.content.html
 
-        # TODO(@DubeySandeep): Remove empty html checks once we add a validation
+        # TODO(#6178): Remove empty html checks once we add a validation
         # check that ensures each content in state should be non-empty html.
         default_outcome = self.interaction.default_outcome
         if default_outcome is not None and default_outcome.feedback.html != '':
