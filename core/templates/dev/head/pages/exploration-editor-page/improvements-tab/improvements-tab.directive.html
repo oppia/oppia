@@ -29,21 +29,18 @@
       </div>
 
       <div ng-show="isCardOpen(card)" ng-switch="card.getDirectiveType()" class="modal-body">
-        <answer-details-improvement-card
-          ng-switch-when="answer-details" data="card.getDirectiveData()"
-          class="protractor-test-card-body">
+        <answer-details-improvement-card ng-switch-when="answer-details"
+                                         data="card.getDirectiveData()"
+                                         class="protractor-test-card-body">
         </answer-details-improvement-card>
-        <feedback-improvement-card
-          ng-switch-when="feedback" data="card.getDirectiveData()"
-          class="protractor-test-card-body">
+        <feedback-improvement-card ng-switch-when="feedback" data="card.getDirectiveData()"
+                                   class="protractor-test-card-body">
         </feedback-improvement-card>
-        <playthrough-improvement-card
-          ng-switch-when="playthrough" data="card.getDirectiveData()"
-          class="protractor-test-card-body">
+        <playthrough-improvement-card ng-switch-when="playthrough" data="card.getDirectiveData()"
+                                      class="protractor-test-card-body">
         </playthrough-improvement-card>
-        <suggestion-improvement-card
-          ng-switch-when="suggestion" data="card.getDirectiveData()"
-          class="protractor-test-card-body">
+        <suggestion-improvement-card ng-switch-when="suggestion" data="card.getDirectiveData()"
+                                     class="protractor-test-card-body">
         </suggestion-improvement-card>
       </div>
 
