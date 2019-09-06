@@ -36,7 +36,7 @@ var customizeInteraction = function(elem, richTextInstructionsArray) {
 // the options.
 var expectInteractionDetailsToMatch = function(
     elem, richTextInstructionsArray) {
-  elem.all(by.repeater('choice in choices track by $index'))
+  elem.all(by.repeater('choice in $ctrl.choices track by $index'))
     .then(function(optionElements) {
       expect(optionElements.length).toEqual(richTextInstructionsArray.length);
       for (var i = 0; i < optionElements.length; i++) {

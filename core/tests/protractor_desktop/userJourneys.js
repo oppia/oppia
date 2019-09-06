@@ -26,7 +26,6 @@ var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
-var ThanksPage = require('../protractor_utils/ThanksPage.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -84,101 +83,7 @@ describe('Basic user journeys', function() {
       general.checkForConsoleErrors([]);
     });
   });
-
-  describe('Preferences', function() {
-    var preferencesPage = null;
-
-    beforeEach(function() {
-      preferencesPage = new PreferencesPage.PreferencesPage();
-    });
-
-    it('should change editor role email checkbox value', function() {
-      users.createUser('alice@preferences.com', 'alicePreferences');
-      users.login('alice@preferences.com');
-      preferencesPage.get();
-      expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(true);
-      preferencesPage.toggleEditorRoleEmailsCheckbox();
-      expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
-      browser.refresh();
-      expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
-    });
-
-    it('should change feedback message email checkbox value', function() {
-      users.createUser('bob@preferences.com', 'bobPreferences');
-      users.login('bob@preferences.com');
-      preferencesPage.get();
-      expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(true);
-      preferencesPage.toggleFeedbackEmailsCheckbox();
-      expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
-      browser.refresh();
-      expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
-    });
-
-    afterEach(function() {
-      general.checkForConsoleErrors([]);
-      users.logout();
-    });
-  });
 });
-
-describe('Oppia static pages tour', function() {
-  var thanksPage = null;
-
-  beforeEach(function() {
-    browser.get(general.SERVER_URL_PREFIX);
-    waitFor.pageToFullyLoad();
-  });
-
-  it('visits the links in About dropdown', function() {
-    var LINKS_CLASS_NAMES = [
-      '.protractor-test-about-link',
-      '.protractor-test-get-started-link',
-      '.protractor-test-playbook-link'
-    ];
-
-    LINKS_CLASS_NAMES.forEach(function(className) {
-      var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
-      browser.actions().mouseMove(dropdown).perform();
-      dropdown.element(by.css(className)).click();
-      waitFor.pageToFullyLoad();
-    });
-  });
-
-  it('visits the donate link', function() {
-    element(by.css('.protractor-test-donate-link')).click();
-    waitFor.pageToFullyLoad();
-  });
-
-  it('visits the thanks for donating page', function() {
-    thanksPage = new ThanksPage.ThanksPage();
-    thanksPage.get();
-  });
-
-  it('visits the terms page', function() {
-    element(by.css('.protractor-test-terms-link')).click();
-    waitFor.pageToFullyLoad();
-  });
-
-  it('visits the privacy page', function() {
-    element(by.css('.protractor-test-privacy-policy-link')).click();
-    waitFor.pageToFullyLoad();
-  });
-
-  afterEach(function() {
-    general.checkForConsoleErrors([
-      // TODO (Jacob) Remove when
-      // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
-      'cast_sender.js - Failed to load resource: net::ERR_FAILED',
-      'Uncaught ReferenceError: ytcfg is not defined',
-      // TODO (@pranavsid98) This error is caused by the upgrade from Chrome 60
-      // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
-      'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
-      'Error parsing header X-XSS-Protection: 1; mode=block; ' +
-      'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
-    ]);
-  });
-});
-
 
 describe('Site language', function() {
   var adminPage = null;
@@ -228,9 +133,9 @@ describe('Site language', function() {
       explorationEditorMainTab.setInteraction('EndExploration');
 
       // Save changes.
-      title = 'Language Test';
-      category = 'Languages';
-      objective = 'To test site language.';
+      var title = 'Language Test';
+      var category = 'Languages';
+      var objective = 'To test site language.';
       explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.setTitle(title);
       explorationEditorSettingsTab.setCategory(category);
@@ -268,15 +173,19 @@ describe('Site language', function() {
     browser.get('/about');
     waitFor.pageToFullyLoad();
     _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('About us - Oppia');
+    libraryPage.get();
+    libraryPage.expectMainHeaderTextToBe(
+      'Imagine what you could learn today...');
   });
 
   it('should change after selecting a different language', function() {
     browser.get('/about');
     waitFor.pageToFullyLoad();
     _selectLanguage('Español');
+
     libraryPage.get();
-    expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
+    libraryPage.expectMainHeaderTextToBe(
+      'Imagina lo que podrías aprender hoy...');
     general.ensurePageHasNoTranslationIds();
   });
 
@@ -290,6 +199,21 @@ describe('Site language', function() {
     users.logout();
   });
 
+  it('should set preferred audio language selected in the Preferences page.',
+    function() {
+      users.createUser('audioPlayer@example.com', 'audioPlayer');
+      users.login('audioPlayer@example.com');
+      preferencesPage.get();
+      preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
+      preferencesPage.selectPreferredAudioLanguage('Chinese');
+      // TODO(DubeySandeep): Add the test to check preferred audio language
+      // choice gets reflected to the exploration player. This can be done once
+      // we will finalize a way to upload an audio file in e2e test.
+      preferencesPage.expectPreferredAudioLanguageToBe('Chinese');
+      general.ensurePageHasNoTranslationIds();
+      users.logout();
+    });
+
   it('should save the language selected in the footer into the preferences.',
     function() {
       users.createUser('feanor@example.com', 'Feanor');
@@ -298,27 +222,16 @@ describe('Site language', function() {
       waitFor.pageToFullyLoad();
       _selectLanguage('Español');
       libraryPage.get();
-      expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
+      libraryPage.expectMainHeaderTextToBe(
+        'Imagina lo que podrías aprender hoy...');
 
       // The preference page shows the last selected language
       preferencesPage.get();
       preferencesPage.expectPreferredSiteLanguageToBe('Español');
-      expect(browser.getTitle()).toEqual(
-        'Cambiar sus preferencias de perfil - Oppia');
       general.ensurePageHasNoTranslationIds();
       users.logout();
     }
   );
-
-  it('should be used in titles of pages without controllers', function() {
-    browser.get('/about');
-    waitFor.pageToFullyLoad();
-    _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('About us - Oppia');
-    _selectLanguage('Español');
-    expect(browser.getTitle()).toEqual('Acerca de nosotros - Oppia');
-    general.ensurePageHasNoTranslationIds();
-  });
 
   it('should not change in an exploration', function() {
     users.login('langCreator@explorations.com', true);

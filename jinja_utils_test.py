@@ -14,10 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: disable=relative-import
+"""Unit tests for jinja_utils.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
 import jinja_utils
+import python_utils
 
 
 class JinjaUtilsUnitTests(test_utils.GenericTestBase):
@@ -28,7 +31,7 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
             ('a', '\\"a\\"'),
             (2, '2'),
             (5.5, '5.5'),
-            ("'", '\\"\\\'\\"'),
+            ('\'', '\\"\\\'\\"'),
             (u'¡Hola!', '\\"\\\\u00a1Hola!\\"'),
             (['a', '¡Hola!', 2], '[\\"a\\", \\"\\\\u00a1Hola!\\", 2]'),
             ({'a': 4, '¡Hola!': 2}, '{\\"a\\": 4, \\"\\\\u00a1Hola!\\": 2}'),
@@ -72,7 +75,8 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
 
         # Invalid expression is used.
         parsed_str = jinja_utils.parse_string('{{ a/b }}', {'a': 1, 'b': 0})
-        self.assertEqual(parsed_str, unicode('[CONTENT PARSING ERROR]'))
+        self.assertEqual(
+            parsed_str, python_utils.UNICODE('[CONTENT PARSING ERROR]'))
 
     def test_evaluate_object(self):
         parsed_object = jinja_utils.evaluate_object('abc', {})

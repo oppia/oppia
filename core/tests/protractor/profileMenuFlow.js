@@ -29,6 +29,8 @@ describe('Profile menu flow', function() {
   beforeAll(function() {
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     var VISITOR_USERNAME = 'desktopAndMobileVisitor';
+    users.createAdmin(
+      'desktopAndMobileAdm@profileMenuFlow.com', 'desktopAndMobileAdm');
     users.createAndLoginUser(
       'desktopAndMobileVisitor@profileMenuFlow.com', VISITOR_USERNAME);
   });
@@ -84,6 +86,38 @@ describe('Profile menu flow', function() {
         waitFor.pageToFullyLoad();
         expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/learner_dashboard');
       });
+
+    it('should not show the topics and skills dashboard link in the profile ' +
+      'dropdown menu when user is not admin', function() {
+      element.all(
+        by.css(
+          '.protractor-test-topics-and-skills-dashboard-link')
+      ).then(function(links) {
+        expect(links.length).toEqual(0);
+      });
+    });
+
+    it('should visit the topics and skills dashboard from the profile ' +
+      'dropdown menu when user is admin', function() {
+      users.logout();
+
+      users.login('desktopAndMobileAdm@profileMenuFlow.com');
+      learnerDashboardPage.get();
+      var profileDropdown = element(by.css(
+        '.protractor-test-profile-dropdown'));
+      waitFor.elementToBeClickable(
+        profileDropdown, 'Could not click profile dropdown');
+      profileDropdown.click();
+
+      var topicsAndSkillsDashboardLink = element(by.css(
+        '.protractor-test-topics-and-skills-dashboard-link'));
+      waitFor.elementToBeClickable(
+        topicsAndSkillsDashboardLink,
+        'Could not click on the topics and skills dashboard link');
+      topicsAndSkillsDashboardLink.click();
+      waitFor.pageToFullyLoad();
+      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/topics_and_skills_dashboard');
+    });
 
     it('should visit the notifications page from the profile dropdown menu',
       function() {

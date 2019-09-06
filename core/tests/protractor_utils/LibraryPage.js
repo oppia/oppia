@@ -20,7 +20,7 @@
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
-var LibraryPage = function(){
+var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/library';
   var allCollectionSummaryTile = element.all(
     by.css('.protractor-test-collection-summary-tile'));
@@ -38,6 +38,8 @@ var LibraryPage = function(){
   var categorySelector = forms.MultiSelectEditor(
     element(by.css('.protractor-test-search-bar-category-selector'))
   );
+  var explorationObjective = element(
+    by.css('.protractor-test-exp-summary-tile-objective'));
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );
@@ -46,6 +48,7 @@ var LibraryPage = function(){
   );
   var searchInputs = element.all(
     by.css('.protractor-test-search-input'));
+  var mainHeader = element(by.css('.protractor-test-library-main-header'));
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(name) {
@@ -78,6 +81,19 @@ var LibraryPage = function(){
     return waitFor.pageToFullyLoad();
   };
 
+  this.addSelectedExplorationToPlaylist = function() {
+    var addToPlaylistButton = element(by.css(
+      '.protractor-test-add-to-playlist-btn')
+    );
+
+    browser.actions().mouseMove(element(by.css(
+      '.protractor-test-exp-summary-tile-title'))).perform();
+
+    waitFor.elementToBeClickable(
+      addToPlaylistButton, 'Add to playlist Icon taking too long to load');
+    addToPlaylistButton.click();
+  };
+
   this.selectLanguages = function(languages) {
     languageSelector.selectValues(languages);
   };
@@ -100,6 +116,10 @@ var LibraryPage = function(){
 
   this.expectCurrentCategorySelectionToBe = function(expectedCategories) {
     categorySelector.expectCurrentSelectionToBe(expectedCategories);
+  };
+
+  this.expectMainHeaderTextToBe = function(expectedHeaderText) {
+    expect(mainHeader.getText()).toEqual(expectedHeaderText);
   };
 
   this.expectExplorationToBeVisible = function(name) {
@@ -157,9 +177,16 @@ var LibraryPage = function(){
     });
   };
 
-  this.clickCreateActivity = function(){
+  this.clickCreateActivity = function() {
     createActivityButton.click();
     waitFor.pageToFullyLoad();
+  };
+
+  this.clickExplorationObjective = function() {
+    waitFor.elementToBeClickable(
+      explorationObjective,
+      'Exploration Objective takes too long to be clickable');
+    explorationObjective.click();
   };
 
   this.findExploration = function(explorationTitle) {

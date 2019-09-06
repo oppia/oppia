@@ -37,6 +37,10 @@ var ExplorationEditorFeedbackTab = function() {
   var suggestionRowClassName = '.protractor-test-oppia-feedback-tab-row';
   var suggestionCommitMessageInput = element(
     by.css('.protractor-test-suggestion-commit-message'));
+  var suggestionReviewMessageInput = element(
+    by.css('.protractor-test-suggestion-review-message'));
+  var feedbackStatusDropdown = element(
+    by.css('.protractor-test-oppia-feedback-status-menu'));
   /*
    * Buttons
    */
@@ -44,6 +48,8 @@ var ExplorationEditorFeedbackTab = function() {
     by.css('.protractor-test-exploration-accept-suggestion-btn'));
   var feedbackSendResponseButton = element(
     by.css('.protractor-test-oppia-feedback-response-send-btn'));
+  var rejectSuggestionButton = element(
+    by.css('.protractor-test-exploration-reject-suggestion-btn'));
   var viewSuggestionButton = element(
     by.css('.protractor-test-view-suggestion-btn'));
 
@@ -57,8 +63,8 @@ var ExplorationEditorFeedbackTab = function() {
           return suggestionDescription.indexOf(subject) !== -1;
         });
       });
-      expect(matchingSuggestionRows[0].isDisplayed()).toBe(true);
-      matchingSuggestionRows[0].click();
+      expect(matchingSuggestionRows[1].isDisplayed()).toBe(true);
+      matchingSuggestionRows[1].click();
       expect(viewSuggestionButton.isDisplayed()).toBe(true);
       viewSuggestionButton.click();
       expect(acceptSuggestionButton.isDisplayed()).toBe(true);
@@ -88,6 +94,10 @@ var ExplorationEditorFeedbackTab = function() {
     });
   };
 
+  this.goBackToAllFeedbacks = function() {
+    feedbackBackButton.click();
+  };
+
   this.readFeedbackMessages = function() {
     var messages = [];
     waitFor.visibilityOf(
@@ -107,11 +117,59 @@ var ExplorationEditorFeedbackTab = function() {
     });
   };
 
+  this.rejectSuggestion = function(suggestionDescription) {
+    return element.all(by.css(suggestionRowClassName)).then(function(rows) {
+      var matchingSuggestionRows = rows.filter(function() {
+        return explorationFeedbackSubject.getText().then(function(subject) {
+          return suggestionDescription.indexOf(subject) !== -1;
+        });
+      });
+      expect(matchingSuggestionRows[1].isDisplayed()).toBe(true);
+      matchingSuggestionRows[1].click();
+      expect(viewSuggestionButton.isDisplayed()).toBe(true);
+      viewSuggestionButton.click();
+      expect(rejectSuggestionButton.isDisplayed()).toBe(true);
+      suggestionReviewMessageInput.sendKeys('Review message');
+      rejectSuggestionButton.click();
+      waitFor.invisibilityOf(
+        acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
+    });
+  };
+
+  this.selectLatestFeedbackThread = function() {
+    waitFor.visibilityOf(
+      element.all(by.css(suggestionRowClassName)).first(),
+      'No feedback messages are visible.');
+    element.all(by.css(suggestionRowClassName)).first().click();
+  };
+
   this.sendResponseToLatestFeedback = function(feedbackResponse) {
-    element.all(by.css('.protractor-test-oppia-feedback-tab-row')).
-      first().click();
+    this.selectLatestFeedbackThread();
     feedbackResponseTextArea.sendKeys(feedbackResponse);
     feedbackSendResponseButton.click();
+  };
+
+  this.changeFeedbackStatus = function(feedbackStatus, feedbackResponse) {
+    feedbackResponseTextArea.sendKeys(feedbackResponse);
+    feedbackStatusDropdown.click();
+    element(by.css('option[label="' + feedbackStatus + '"]')).click();
+    feedbackSendResponseButton.click();
+  };
+
+  this.readFeedbackMessagesFromThread = function() {
+    var feedbackMessages = element.all(
+      by.css('.protractor-test-exploration-feedback'));
+    waitFor.visibilityOf(
+      feedbackMessages.first(), 'Feedback message text is not visible');
+    return feedbackMessages;
+  };
+
+  this.expectFeedbackStatusNameToBe = function(feedbackStatus) {
+    var feedbackStatusElement = element(
+      by.css('.protractor-test-oppia-feedback-status-name'));
+    waitFor.visibilityOf(
+      feedbackStatusElement, 'Feedback status is not visible.');
+    expect(feedbackStatusElement.getText()).toEqual(feedbackStatus);
   };
 };
 

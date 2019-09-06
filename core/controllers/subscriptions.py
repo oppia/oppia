@@ -13,9 +13,11 @@
 # limitations under the License.
 
 """Controllers related to user subscriptions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import subscription_services
 from core.domain import user_services
 

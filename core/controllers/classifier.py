@@ -13,17 +13,21 @@
 # limitations under the License.
 
 """Controllers for communicating with the VM for training classifiers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import hashlib
 import hmac
 import json
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import classifier_services
 from core.domain import config_domain
+from core.domain import email_manager
 import feconf
+import python_utils
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
@@ -56,7 +60,7 @@ def validate_job_result_message_dict(message):
     classifier_data_with_floats_stringified = message.get(
         'classifier_data_with_floats_stringified')
 
-    if not isinstance(job_id, basestring):
+    if not isinstance(job_id, python_utils.BASESTRING):
         return False
     if not isinstance(classifier_data_with_floats_stringified, dict):
         return False
@@ -77,7 +81,7 @@ def verify_signature(message, vm_id, received_signature):
     secret = None
     for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
         if val['vm_id'] == vm_id:
-            secret = str(val['shared_secret_key'])
+            secret = python_utils.convert_to_bytes(val['shared_secret_key'])
             break
     if secret is None:
         return False
@@ -123,6 +127,9 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (
                 feconf.TRAINING_JOB_STATUS_FAILED):
+            # Send email to admin and admin-specified email recipients.
+            # Other email recipients are specified on admin config page.
+            email_manager.send_job_failure_email(job_id)
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
         try:

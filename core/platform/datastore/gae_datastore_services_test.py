@@ -15,9 +15,11 @@
 # limitations under the License.
 
 """Tests for the appengine datastore API wrapper."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import collection_services
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.platform.datastore import gae_datastore_services
 from core.tests import test_utils
 
@@ -66,7 +68,7 @@ class FetchMultipleEntitiesTests(test_utils.GenericTestBase):
         collection_summary_models = summary_models[1]
 
         exploration_summaries = (
-            [exp_services.get_exploration_summary_from_model(model)
+            [exp_fetchers.get_exploration_summary_from_model(model)
              if model else None for model in exploration_summary_models])
         collection_summaries = (
             [collection_services.get_collection_summary_from_model(model)

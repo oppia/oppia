@@ -13,10 +13,11 @@
 # limitations under the License.
 
 """Controllers for the Oppia collection learner view."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
-from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.platform import models
@@ -30,27 +31,10 @@ class CollectionPage(base.BaseHandler):
     """Page describing a single collection."""
 
     @acl_decorators.can_play_collection
-    def get(self, collection_id):
+    def get(self, _):
         """Handles GET requests."""
-        (collection, collection_rights) = (
-            collection_services.get_collection_and_collection_rights_by_id(
-                collection_id))
-        if collection is None:
-            raise self.PageNotFoundException
 
-        self.values.update({
-            'nav_mode': feconf.NAV_MODE_COLLECTION,
-            'can_edit': rights_manager.check_can_edit_activity(
-                self.user, collection_rights),
-            'is_logged_in': bool(self.user_id),
-            'collection_id': collection_id,
-            'collection_title': collection.title,
-            'is_private': rights_manager.is_collection_private(collection_id),
-            'meta_name': collection.title,
-            'meta_description': utils.capitalize_string(collection.objective)
-        })
-
-        self.render_template('pages/collection_player/collection_player.html')
+        self.render_template('collection-player-page.mainpage.html')
 
 
 class CollectionDataHandler(base.BaseHandler):
@@ -61,13 +45,11 @@ class CollectionDataHandler(base.BaseHandler):
     @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
-        try:
-            collection_dict = (
-                summary_services.get_learner_collection_dict_by_id(
-                    collection_id, self.user,
-                    allow_invalid_explorations=False))
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        collection_dict = (
+            summary_services.get_learner_collection_dict_by_id(
+                collection_id, self.user,
+                allow_invalid_explorations=False))
+
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
         self.values.update({
@@ -76,6 +58,9 @@ class CollectionDataHandler(base.BaseHandler):
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
+            'meta_name': collection_dict['title'],
+            'meta_description': utils.capitalize_string(
+                collection_dict['objective'])
         })
 
         self.render_json(self.values)

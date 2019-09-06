@@ -15,15 +15,19 @@
 # limitations under the License.
 
 """Registry for interactions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import itertools
 import os
 import pkgutil
 
+from constants import constants
 import feconf
+import python_utils
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all interactions."""
 
     # Dict mapping interaction ids to instances of the interactions.
@@ -34,11 +38,14 @@ class Registry(object):
         """Get a list of all interaction ids."""
         return list(itertools.chain(*[
             interaction_category['interaction_ids']
-            for interaction_category in feconf.ALLOWED_INTERACTION_CATEGORIES
+            for interaction_category in constants.ALLOWED_INTERACTION_CATEGORIES
         ]))
 
     @classmethod
     def _refresh(cls):
+        """Refreshes and updates all the interaction ids to add new interaction
+        instances to the registry.
+        """
         cls._interactions.clear()
 
         all_interaction_ids = cls.get_all_interaction_ids()
@@ -64,7 +71,7 @@ class Registry(object):
         """Get a list of instances of all interactions."""
         if len(cls._interactions) == 0:
             cls._refresh()
-        return cls._interactions.values()
+        return list(cls._interactions.values())
 
     @classmethod
     def get_interaction_by_id(cls, interaction_id):
@@ -76,13 +83,6 @@ class Registry(object):
         if interaction_id not in cls._interactions:
             cls._refresh()
         return cls._interactions[interaction_id]
-
-    @classmethod
-    def get_interaction_html(cls, interaction_ids):
-        """Returns the HTML bodies for the given list of interaction ids."""
-        return ' \n'.join([
-            cls.get_interaction_by_id(interaction_id).html_body
-            for interaction_id in interaction_ids])
 
     @classmethod
     def get_deduplicated_dependency_ids(cls, interaction_ids):

@@ -57,15 +57,7 @@ function maybeInstallDependencies {
     echo "  Running build task with concatenation only "
     echo ""
 
-    $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
-    bash scripts/install_frontend_tests_dependencies.sh
-
-    $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.41
-    # Start a selenium server using chromedriver 2.41.
-    # The 'detach' option continues the flow once the server is up and runnning.
-    # The 'quiet' option prints only the necessary information about the server start-up
-    # process.
-    $NODE_MODULE_DIR/.bin/webdriver-manager start --versions.chrome 2.41 --detach --quiet
+    $PYTHON_CMD scripts/build.py
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
@@ -73,7 +65,7 @@ function maybeInstallDependencies {
     echo "  Running build task with concatenation and minification"
     echo ""
 
-    $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build --minify=True
+    $PYTHON_CMD scripts/build.py --prod_env
   fi
 }
 
@@ -121,7 +113,7 @@ export OPPIA_DIR=`pwd`
 export COMMON_DIR=$(cd $OPPIA_DIR/..; pwd)
 export TOOLS_DIR=$COMMON_DIR/oppia_tools
 export THIRD_PARTY_DIR=$OPPIA_DIR/third_party
-export NODE_MODULE_DIR=$COMMON_DIR/node_modules
+export NODE_MODULE_DIR=$OPPIA_DIR/node_modules
 export ME=$(whoami)
 
 mkdir -p $TOOLS_DIR
@@ -129,7 +121,7 @@ mkdir -p $THIRD_PARTY_DIR
 mkdir -p $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
-export NODE_PATH=$TOOLS_DIR/node-6.9.1
+export NODE_PATH=$TOOLS_DIR/node-10.15.3
 export PATH=$NODE_PATH/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
@@ -160,19 +152,19 @@ if [ ! -d "$NODE_PATH" ]; then
   echo Installing Node.js
   if [ ${OS} == "Darwin" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v6.9.1-darwin-x64
+      NODE_FILE_NAME=node-v10.15.3-darwin-x64
     else
-      NODE_FILE_NAME=node-v6.9.1-darwin-x86
+      NODE_FILE_NAME=node-v10.15.3-darwin-x86
     fi
   elif [ ${OS} == "Linux" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v6.9.1-linux-x64
+      NODE_FILE_NAME=node-v10.15.3-linux-x64
     else
-      NODE_FILE_NAME=node-v6.9.1-linux-x86
+      NODE_FILE_NAME=node-v10.15.3-linux-x86
     fi
   fi
 
-  curl -o node-download.tgz https://nodejs.org/dist/v6.9.1/$NODE_FILE_NAME.tar.gz
+  curl -o node-download.tgz https://nodejs.org/dist/v10.15.3/$NODE_FILE_NAME.tar.gz
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz
@@ -186,14 +178,6 @@ fi
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
 if [ "$TRAVIS" == true ]; then
   export CHROME_BIN="/usr/bin/chromium-browser"
-elif [ "$VAGRANT" == true ] || [ -f "/etc/is_vagrant_vm" ]; then
-  # XVFB is required for headless testing in Vagrant
-  sudo apt-get install xvfb chromium-browser
-  export CHROME_BIN="/usr/bin/chromium-browser"
-  # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
-  export XVFB_PREFIX="/usr/bin/xvfb-run"
-  # Enforce proper ownership on oppia, oppia_tools, and node_modules or else NPM installs will fail.
-  sudo chown -R vagrant.vagrant /home/vagrant/oppia /home/vagrant/oppia_tools /home/vagrant/node_modules
 elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"
@@ -203,9 +187,15 @@ elif [ -f "/usr/bin/chromium-browser" ]; then
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
   # Windows.
   export CHROME_BIN="/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
-else
+elif [ -f "/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
+  # WSL
+  export CHROME_BIN="/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+elif [ -f "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then
   # Mac OS.
   export CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+else
+  echo "Chrome is not found, stopping ..."
+  exit 1
 fi
 
 # This function takes a command for python as its only input.
@@ -253,33 +243,5 @@ if ! test_python_version $PYTHON_CMD; then
   fi
 fi
 export PYTHON_CMD
-
-# List all node modules that are currently installed. The "npm list" command is
-# slow, so we precompute this here and refer to it as needed.
-echo "Generating list of installed node modules..."
-NPM_INSTALLED_MODULES="$($NPM_CMD list)"
-export NPM_INSTALLED_MODULES
-echo "Generation completed."
-
-install_node_module() {
-  # Usage: install_node_module [module_name] [module_version]
-  #
-  # module_name: the name of the node module
-  # module_version: the expected version of the module
-
-  echo Checking whether $1 is installed
-  if [ ! -d "$NODE_MODULE_DIR/$1" ]; then
-    echo installing $1
-    $NPM_INSTALL $1@$2
-  else
-    if [[ $NPM_INSTALLED_MODULES != *"$1@$2"* ]]; then
-      echo Version of $1 does not match $2. Reinstalling $1...
-      $NPM_INSTALL $1@$2
-      # Regenerate the list of installed modules.
-      NPM_INSTALLED_MODULES="$($NPM_CMD list)"
-    fi
-  fi
-}
-export -f install_node_module
 
 export SETUP_DONE=true

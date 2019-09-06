@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for value generators."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
 from extensions.value_generators.models import generators
@@ -29,11 +31,20 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(generator.generate_value(
             {}, **{'value': 'a', 'parse_with_jinja': False}), 'a')
         self.assertEqual(generator.generate_value(
+            None, **{'value': 'a', 'parse_with_jinja': False}), 'a')
+        self.assertEqual(generator.generate_value(
             {}, **{'value': '{{a}}', 'parse_with_jinja': False}), '{{a}}')
         self.assertEqual(generator.generate_value(
             {'a': 'b'}, **{'value': '{{a}}', 'parse_with_jinja': True}), 'b')
+        self.assertIn(
+            'init-args="initArgs" value="customizationArgs.value"',
+            generator.get_html_template())
 
     def test_random_selector(self):
         generator = generators.RandomSelector()
         self.assertIn(generator.generate_value(
             {}, **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
+        self.assertIn(
+            'schema="$ctrl.SCHEMA" '
+            'local-value="$ctrl.customizationArgs.list_of_values"',
+            generator.get_html_template())

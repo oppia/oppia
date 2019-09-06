@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Config properties and functions for managing email notifications."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -26,6 +28,7 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
@@ -101,24 +104,24 @@ SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
 
 EXPLORATION_ROLE_MANAGER = 'manager rights'
 EXPLORATION_ROLE_EDITOR = 'editor rights'
-EXPLORATION_ROLE_TRANSLATOR = 'translator rights'
+EXPLORATION_ROLE_VOICE_ARTIST = 'voice artist rights'
 EXPLORATION_ROLE_PLAYTESTER = 'playtest access'
 
 EDITOR_ROLE_EMAIL_HTML_ROLES = {
     rights_manager.ROLE_OWNER: EXPLORATION_ROLE_MANAGER,
     rights_manager.ROLE_EDITOR: EXPLORATION_ROLE_EDITOR,
-    rights_manager.ROLE_TRANSLATOR: EXPLORATION_ROLE_TRANSLATOR,
+    rights_manager.ROLE_VOICE_ARTIST: EXPLORATION_ROLE_VOICE_ARTIST,
     rights_manager.ROLE_VIEWER: EXPLORATION_ROLE_PLAYTESTER
 }
 
 _EDITOR_ROLE_EMAIL_HTML_RIGHTS = {
     'can_manage': '<li>Change the exploration permissions</li><br>',
     'can_edit': '<li>Edit the exploration</li><br>',
-    'can_translate': '<li>Translate the exploration</li><br>',
+    'can_voiceover': '<li>Voiceover the exploration</li><br>',
     'can_play': '<li>View and playtest the exploration</li><br>'
 }
 
-# We don't include "can_translate" for managers and editors, since this is
+# We don't include "can_voiceover" for managers and editors, since this is
 # implied by the email description for "can_edit".
 EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
     EXPLORATION_ROLE_MANAGER: (
@@ -128,8 +131,8 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
     EXPLORATION_ROLE_EDITOR: (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
-    EXPLORATION_ROLE_TRANSLATOR: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_translate'] +
+    EXPLORATION_ROLE_VOICE_ARTIST: (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_voiceover'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
@@ -265,6 +268,7 @@ def _send_email(
         return
 
     def _send_email_in_transaction():
+        """Sends the email to a single recipient."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
         email_services.send_mail(
@@ -312,6 +316,7 @@ def _send_bulk_mail(
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
     def _send_bulk_mail_in_transaction(instance_id=None):
+        """Sends the emails in bulk to the recipients."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
         email_services.send_bulk_mail(
@@ -328,6 +333,30 @@ def _send_bulk_mail(
         _send_bulk_mail_in_transaction, instance_id)
 
 
+def send_job_failure_email(job_id):
+    """Sends an email to admin email as well as any email addresses
+    specificed on the admin config page.
+
+    Args:
+        job_id: str. The Job ID of the failing job.
+    """
+    mail_subject = 'Failed ML Job'
+    mail_body = ((
+        'ML job %s has failed. For more information,'
+        'please visit the admin page at:\n'
+        'https://www.oppia.org/admin#/jobs') % job_id)
+    send_mail_to_admin(mail_subject, mail_body)
+    other_recipients = (
+        NOTIFICATION_EMAILS_FOR_FAILED_TASKS.value)
+    system_name_email = '%s <%s>' % (
+        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
+    if other_recipients:
+        email_services.send_bulk_mail(
+            system_name_email, other_recipients,
+            mail_subject, mail_body,
+            mail_body.replace('\n', '<br/>'))
+
+
 def send_mail_to_admin(email_subject, email_body):
     """Send an email to the admin email address.
 
@@ -340,9 +369,10 @@ def send_mail_to_admin(email_subject, email_body):
 
     app_id = app_identity_services.get_application_id()
     body = '(Sent from %s)\n\n%s' % (app_id, email_body)
-
+    system_name_email = '%s <%s>' % (
+        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
     email_services.send_mail(
-        feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
+        system_name_email, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
         body, body.replace('\n', '<br/>'), bcc_admin=False)
 
 
@@ -356,7 +386,7 @@ def send_post_signup_email(user_id):
         user_id: str. User ID of the user that signed up.
     """
 
-    for key, content in SIGNUP_EMAIL_CONTENT.value.iteritems():
+    for key, content in SIGNUP_EMAIL_CONTENT.value.items():
         if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
             log_new_error(
                 'Please ensure that the value for the admin config property '
@@ -632,7 +662,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
 
     messages_html = ''
     count_messages = 0
-    for exp_id, reference in feedback_messages.iteritems():
+    for exp_id, reference in feedback_messages.items():
         messages_html += (
             '<li><a href="https://www.oppia.org/create/%s#/feedback">'
             '%s</a>:<br><ul>' % (exp_id, reference['title']))
@@ -672,7 +702,8 @@ def can_users_receive_thread_email(
     users_exploration_prefs = (
         user_services.get_users_email_preferences_for_exploration(
             recipient_ids, exploration_id))
-    zipped_preferences = zip(users_global_prefs, users_exploration_prefs)
+    zipped_preferences = list(
+        python_utils.ZIP(users_global_prefs, users_exploration_prefs))
 
     result = []
     if has_suggestion:

@@ -15,11 +15,14 @@
 # limitations under the License.
 
 """Models for the content of sent emails."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -72,6 +75,11 @@ class SentEmailModel(base_models.BaseModel):
     # The hash of the recipient id, email subject and message body.
     email_hash = ndb.StringProperty(indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Sent email should be kept for audit purposes."""
+        return base_models.DELETION_POLICY.KEEP
+
     @classmethod
     def _generate_id(cls, intent):
         """Generates an ID for a new SentEmailModel instance.
@@ -89,11 +97,12 @@ class SentEmailModel(base_models.BaseModel):
         """
         id_prefix = '%s.' % intent
 
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 id_prefix,
                 utils.convert_to_hash(
-                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    python_utils.UNICODE(utils.get_random_int(
+                        base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -261,6 +270,11 @@ class BulkEmailModel(base_models.BaseModel):
     # The datetime the email was sent, in UTC.
     sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Sent email should be kept for audit purposes."""
+        return base_models.DELETION_POLICY.KEEP
+
     @classmethod
     def create(
             cls, instance_id, recipient_ids, sender_id, sender_email,
@@ -299,6 +313,11 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Feedback email reply to id should be deleted."""
+        return base_models.DELETION_POLICY.DELETE
+
     @classmethod
     def _generate_id(cls, user_id, thread_id):
         """Returns the unique id corresponding to the given user and thread ids.
@@ -323,7 +342,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             str. The unique reply-to id if there are no collisions.
         """
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s' % (utils.get_random_int(base_models.RAND_RANGE)),
                 REPLY_TO_ID_LENGTH)
@@ -341,7 +360,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread_id: str. ID of the corresponding thread.
 
         Returns:
-            str. A unique ID that can be used in 'reply-to' email address.
+            FeedbackEmailReplyToIdModel. The created instance
+            with the unique reply_to_id generated.
 
         Raises:
             Exception: Model instance for given user_id and
@@ -365,8 +385,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             reply_to_id: str. The unique 'reply-to' id.
 
         Returns:
-            str or None. The FeedbackEmailReplyToIdModel instance corresponding
-                to the given 'reply-to' id if it is fetched else None.
+            FeedbackEmailReplyToIdModel or None. The instance corresponding to
+            the given 'reply_to_id' if it is present in the datastore,
+            else None.
         """
         model = cls.query(cls.reply_to_id == reply_to_id).get()
         return model
@@ -410,44 +431,5 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                         for user_id in user_ids]
         user_models = cls.get_multi(instance_ids)
         return {
-            user_id: model for user_id, model in zip(user_ids, user_models)}
-
-    @property
-    def user_id(self):
-        """Returns the user id corresponding to this FeedbackEmailReplyToIdModel
-        instance.
-
-        Returns:
-            str. The user id.
-        """
-        return self.id.split('.')[0]
-
-
-    @property
-    def entity_type(self):
-        """Returns the entity type extracted from the unique id.
-
-        Returns:
-            str. The entity type.
-        """
-        return self.id.split('.')[1]
-
-
-    @property
-    def entity_id(self):
-        """Returns the entity id extracted from the unique id.
-
-        Returns:
-            str. The entity id.
-        """
-        return self.id.split('.')[2]
-
-    @property
-    def thread_id(self):
-        """Returns the thread id extracted from the unique id.
-
-        Returns:
-            str. The thread id.
-        """
-        return '.'.join(
-            [self.entity_type, self.entity_id, self.id.split('.')[3]])
+            user_id: model for user_id, model in python_utils.ZIP(
+                user_ids, user_models)}

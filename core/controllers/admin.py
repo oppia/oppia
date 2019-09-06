@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the admin view."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 import random
@@ -20,24 +22,26 @@ import random
 from constants import constants
 from core import jobs
 from core import jobs_registry
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import editor
-from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import search_services
 from core.domain import stats_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
-
-import jinja2
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -47,14 +51,31 @@ class AdminPage(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
-        demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
+
+        self.render_template('admin-page.mainpage.html')
+
+
+class AdminHandler(base.BaseHandler):
+    """Handler for the admin page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        """Handles GET requests."""
+        demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
 
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
+        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summary_dicts = [
+            summary.to_dict() for summary in topic_summaries]
         for job in unfinished_job_data:
             job['can_be_canceled'] = job['is_cancelable'] and any([
                 klass.__name__ == job['job_type']
-                for klass in jobs_registry.ONE_OFF_JOB_MANAGERS])
+                for klass in (
+                    jobs_registry.ONE_OFF_JOB_MANAGERS + (
+                        jobs_registry.AUDIT_JOB_MANAGERS))])
 
         queued_or_running_job_types = set([
             job['job_type'] for job in unfinished_job_data])
@@ -63,6 +84,11 @@ class AdminPage(base.BaseHandler):
             'is_queued_or_running': (
                 klass.__name__ in queued_or_running_job_types)
         } for klass in jobs_registry.ONE_OFF_JOB_MANAGERS]
+        audit_job_specs = [{
+            'job_type': klass.__name__,
+            'is_queued_or_running': (
+                klass.__name__ in queued_or_running_job_types)
+        } for klass in jobs_registry.AUDIT_JOB_MANAGERS]
 
         continuous_computations_data = jobs.get_continuous_computations_info(
             jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS)
@@ -80,19 +106,20 @@ class AdminPage(base.BaseHandler):
                     utils.get_human_readable_time_string(
                         computation['last_finished_msec']))
 
-        self.values.update({
+        self.render_json({
+            'config_properties': (
+                config_domain.Registry.get_config_property_schemas()),
             'continuous_computations_data': continuous_computations_data,
-            'demo_collections': sorted(feconf.DEMO_COLLECTIONS.iteritems()),
-            'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.iteritems()),
+            'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
+            'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),
             'one_off_job_specs': one_off_job_specs,
+            'audit_job_specs': audit_job_specs,
             'recent_job_data': recent_job_data,
             'unfinished_job_data': unfinished_job_data,
-            'value_generators_js': jinja2.utils.Markup(
-                editor.get_value_generators_js()),
             'updatable_roles': {
                 role: role_services.HUMAN_READABLE_ROLES[role]
                 for role in role_services.UPDATABLE_ROLES
@@ -101,24 +128,8 @@ class AdminPage(base.BaseHandler):
                 role: role_services.HUMAN_READABLE_ROLES[role]
                 for role in role_services.VIEWABLE_ROLES
             },
+            'topic_summaries': topic_summary_dicts,
             'role_graph_data': role_services.get_role_graph_data()
-        })
-
-        self.render_template('pages/admin/admin.html')
-
-
-class AdminHandler(base.BaseHandler):
-    """Handler for the admin page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        """Handles GET requests."""
-
-        self.render_json({
-            'config_properties': (
-                config_domain.Registry.get_config_property_schemas()),
         })
 
     @acl_decorators.can_access_admin_page
@@ -149,13 +160,17 @@ class AdminHandler(base.BaseHandler):
                     self._generate_dummy_explorations(
                         num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif self.payload.get('action') == 'clear_search_index':
-                exp_services.clear_search_index()
+                search_services.clear_collection_search_index()
+                search_services.clear_exploration_search_index()
+            elif self.payload.get('action') == (
+                    'flush_migration_bot_contribution_data'):
+                user_services.flush_migration_bot_contributions_model()
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
                 logging.info('[ADMIN] %s saved config property values: %s' %
                              (self.user_id, new_config_property_values))
-                for (name, value) in new_config_property_values.iteritems():
+                for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
@@ -164,14 +179,18 @@ class AdminHandler(base.BaseHandler):
                 config_services.revert_property(
                     self.user_id, config_property_id)
             elif self.payload.get('action') == 'start_new_job':
-                for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
+                for klass in (
+                        jobs_registry.ONE_OFF_JOB_MANAGERS + (
+                            jobs_registry.AUDIT_JOB_MANAGERS)):
                     if klass.__name__ == self.payload.get('job_type'):
                         klass.enqueue(klass.create_new())
                         break
             elif self.payload.get('action') == 'cancel_job':
                 job_id = self.payload.get('job_id')
                 job_type = self.payload.get('job_type')
-                for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
+                for klass in (
+                        jobs_registry.ONE_OFF_JOB_MANAGERS + (
+                            jobs_registry.AUDIT_JOB_MANAGERS)):
                     if klass.__name__ == job_type:
                         klass.cancel(job_id, self.user_id)
                         break
@@ -192,28 +211,50 @@ class AdminHandler(base.BaseHandler):
                 recommendations_services.update_topic_similarities(data)
             self.render_json({})
         except Exception as e:
-            self.render_json({'error': unicode(e)})
+            self.render_json({'error': python_utils.UNICODE(e)})
             raise
 
     def _reload_exploration(self, exploration_id):
+        """Reloads the exploration in dev_mode corresponding to the given
+        exploration id.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Raises:
+            Exception: Cannot reload an exploration in production.
+        """
         if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(unicode(exploration_id))
+            exp_services.load_demo(python_utils.convert_to_bytes(
+                exploration_id))
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(), unicode(exploration_id))
+                user_services.get_system_user(), python_utils.convert_to_bytes(
+                    exploration_id))
         else:
             raise Exception('Cannot reload an exploration in production.')
 
     def _reload_collection(self, collection_id):
+        """Reloads the collection in dev_mode corresponding to the given
+        collection id.
+
+        Args:
+            collection_id: str. The collection id.
+
+        Raises:
+            Exception: Cannot reload a collection in production.
+        """
         if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
-            collection_services.load_demo(unicode(collection_id))
+            collection_services.load_demo(
+                python_utils.convert_to_bytes(collection_id))
             rights_manager.release_ownership_of_collection(
-                user_services.get_system_user(), unicode(collection_id))
+                user_services.get_system_user(), python_utils.convert_to_bytes(
+                    collection_id))
         else:
             raise Exception('Cannot reload a collection in production.')
 
@@ -240,10 +281,10 @@ class AdminHandler(base.BaseHandler):
                                'Elvish, language of "Lord of the Rings',
                                'The Science of Superheroes']
             exploration_ids_to_publish = []
-            for i in range(num_dummy_exps_to_generate):
+            for i in python_utils.RANGE(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
-                category = random.choice(feconf.SEARCH_DROPDOWN_CATEGORIES)
-                new_exploration_id = exp_services.get_new_exploration_id()
+                category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
+                new_exploration_id = exp_fetchers.get_new_exploration_id()
                 exploration = exp_domain.Exploration.create_default_exploration(
                     new_exploration_id, title=title, category=category,
                     objective='Dummy Objective')
@@ -297,18 +338,33 @@ class AdminRoleHandler(base.BaseHandler):
     def post(self):
         username = self.payload.get('username')
         role = self.payload.get('role')
+        topic_id = self.payload.get('topic_id')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
+
+        if (
+                user_services.get_user_role_from_id(user_id) ==
+                feconf.ROLE_ID_TOPIC_MANAGER):
+            topic_services.deassign_user_from_all_topics(
+                user_services.get_system_user(), user_id)
+
         user_services.update_user_role(user_id, role)
         role_services.log_role_query(
             self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
             username=username)
+
+        if topic_id:
+            user = user_services.UserActionsInfo(user_id)
+            topic_services.assign_role(
+                user_services.get_system_user(), user,
+                topic_domain.ROLE_MANAGER, topic_id)
+
         self.render_json({})
 
 
-class AdminJobOutput(base.BaseHandler):
+class AdminJobOutputHandler(base.BaseHandler):
     """Retrieves job output to show on the admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -322,36 +378,37 @@ class AdminJobOutput(base.BaseHandler):
         })
 
 
-class AdminTopicsCsvDownloadHandler(base.BaseHandler):
+class AdminTopicsCsvFileDownloader(base.BaseHandler):
     """Retrieves topic similarity data for download."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        self.response.headers['Content-Type'] = 'text/csv'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=topic_similarities.csv')
-        self.response.write(
-            recommendations_services.get_topic_similarities_as_csv())
+        self.render_downloadable_file(
+            recommendations_services.get_topic_similarities_as_csv(),
+            'topic_similarities.csv', 'text/csv')
 
 
 class DataExtractionQueryHandler(base.BaseHandler):
     """Handler for data extraction query."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):
         exp_id = self.request.get('exp_id')
-        exp_version = self.request.get('exp_version')
+        try:
+            exp_version = int(self.request.get('exp_version'))
+            exploration = exp_fetchers.get_exploration_by_id(
+                exp_id, version=exp_version)
+        except Exception:
+            raise self.InvalidInputException(
+                'Entity for exploration with id %s and version %s not found.'
+                % (exp_id, self.request.get('exp_version')))
+
         state_name = self.request.get('state_name')
         num_answers = int(self.request.get('num_answers'))
-
-        exploration = exp_services.get_exploration_by_id(
-            exp_id, strict=False, version=exp_version)
-
-        if exploration is None:
-            raise self.InvalidInputException(
-                'No exploration with ID \'%s\' exists.' % exp_id)
 
         if state_name not in exploration.states:
             raise self.InvalidInputException(

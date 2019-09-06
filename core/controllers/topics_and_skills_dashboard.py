@@ -15,13 +15,17 @@
 """Controllers for the topics and skills dashboard, from where topics and skills
 are created.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
+from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
 
@@ -31,16 +35,8 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
-
-        if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
-        self.values.update({
-            'nav_mode': feconf.NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD
-        })
         self.render_template(
-            'pages/topics_and_skills_dashboard/'
-            'topics_and_skills_dashboard.html', redirect_url_on_logout='/')
+            'topics-and-skills-dashboard-page.mainpage.html')
 
 
 class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
@@ -62,6 +58,8 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
         skill_ids_assigned_to_some_topic = (
             topic_services.get_all_skill_ids_assigned_to_some_topic())
+        merged_skill_ids = (
+            skill_services.get_merged_skill_ids())
         topic_rights_dict = topic_services.get_all_topic_rights()
         for topic_summary in topic_summary_dicts:
             if topic_rights_dict[topic_summary['id']]:
@@ -84,11 +82,17 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                 skill_services.get_all_unpublished_skill_rights())]
 
         untriaged_skill_summary_dicts = []
+        mergeable_skill_summary_dicts = []
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
-                    skill_id not in skill_ids_for_unpublished_skills):
+                    skill_id not in skill_ids_for_unpublished_skills) and (
+                        skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
+            if (skill_id in skill_ids_assigned_to_some_topic) and (
+                    skill_id not in skill_ids_for_unpublished_skills) and (
+                        skill_id not in merged_skill_ids):
+                mergeable_skill_summary_dicts.append(skill_summary_dict)
 
         unpublished_skill_summary_dicts = [
             summary.to_dict() for summary in (
@@ -109,6 +113,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
         self.values.update({
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
+            'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'unpublished_skill_summary_dicts': unpublished_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
             'can_delete_topic': can_delete_topic,
@@ -125,8 +130,6 @@ class NewTopicHandler(base.BaseHandler):
     @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
         name = self.payload.get('name')
 
         topic_domain.Topic.require_valid_name(name)
@@ -144,14 +147,16 @@ class NewSkillHandler(base.BaseHandler):
 
     @acl_decorators.can_create_skill
     def post(self):
-        if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
         description = self.payload.get('description')
         linked_topic_ids = self.payload.get('linked_topic_ids')
+        rubrics = self.payload.get('rubrics')
+        if not isinstance(rubrics, list):
+            raise self.InvalidInputException('Rubrics should be a list.')
+
+        rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
-            topics = topic_services.get_topics_by_ids(linked_topic_ids)
+            topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
             for topic in topics:
                 if topic is None:
                     raise self.InvalidInputException
@@ -161,9 +166,53 @@ class NewSkillHandler(base.BaseHandler):
         skill_domain.Skill.require_valid_description(description)
 
         skill = skill_domain.Skill.create_default_skill(
-            new_skill_id, description)
+            new_skill_id, description, rubrics)
         skill_services.save_new_skill(self.user_id, skill)
 
         self.render_json({
             'skillId': new_skill_id
+        })
+
+
+class MergeSkillHandler(base.BaseHandler):
+    """Handles merging of the skills."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def post(self):
+        """Handles the POST request."""
+        old_skill_id = self.payload.get('old_skill_id')
+        new_skill_id = self.payload.get('new_skill_id')
+        new_skill = skill_services.get_skill_by_id(new_skill_id, strict=False)
+        if new_skill is None:
+            raise self.PageNotFoundException(
+                Exception('The new skill with the given id doesn\'t exist.'))
+        old_skill = skill_services.get_skill_by_id(old_skill_id, strict=False)
+        if old_skill is None:
+            raise self.PageNotFoundException(
+                Exception('The old skill with the given id doesn\'t exist.'))
+        question_services.replace_skill_id_for_all_questions(
+            old_skill_id, old_skill.description, new_skill_id)
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': old_skill.superseding_skill_id,
+                'new_value': new_skill_id
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
+                'old_value': False,
+                'new_value': True
+            })
+        ]
+        skill_services.update_skill(
+            self.user_id, old_skill_id, changelist,
+            'Marking the skill as having being merged successfully.')
+        self.render_json({
+            'merged_into_skill': new_skill_id
         })

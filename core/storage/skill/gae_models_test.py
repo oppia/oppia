@@ -15,17 +15,42 @@
 # limitations under the License.
 
 """Tests for Skill models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 
-(skill_models,) = models.Registry.import_models(
-    [models.NAMES.skill])
+(base_models, skill_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.skill])
+
+
+class SkillModelUnitTest(test_utils.GenericTestBase):
+    """Test the SkillModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            skill_models.SkillModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+
+class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
+    """Test the SkillSummaryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            skill_models.SkillSummaryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
 
 class SkillRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillRightsModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            skill_models.SkillRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def setUp(self):
         super(SkillRightsModelUnitTest, self).setUp()

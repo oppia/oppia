@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Model for an Oppia exploration."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -97,6 +99,11 @@ class ExplorationModel(base_models.VersionedModel):
     # DEPRECATED in v2.5.4. Do not use.
     skin_customizations = ndb.JsonProperty(indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration is deleted only if it is not public."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
@@ -169,8 +176,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to translate this exploration.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to voiceover this exploration.
+    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
@@ -194,6 +201,15 @@ class ExplorationRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
+    # DEPRECATED in v2.8.3. Do not use.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration rights are deleted only if the corresponding exploration
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration
@@ -263,6 +279,39 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export user-relevant properties of ExplorationRightsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. The user-relevant properties of ExplorationRightsModel
+            in a python dict format. In this case, we are returning all the
+            ids of explorations that the user is connected to, so they either
+            own, edit, voice, or have permission to view.
+        """
+        owned_explorations = cls.get_all().filter(cls.owner_ids == user_id)
+        editable_explorations = cls.get_all().filter(cls.editor_ids == user_id)
+        voiced_explorations = (
+            cls.get_all().filter(cls.voice_artist_ids == user_id))
+        viewable_explorations = cls.get_all().filter(cls.viewer_ids == user_id)
+
+        owned_exploration_ids = [exp.key.id() for exp in owned_explorations]
+        editable_exploration_ids = (
+            [exp.key.id() for exp in editable_explorations])
+        voiced_exploration_ids = [exp.key.id() for exp in voiced_explorations]
+        viewable_exploration_ids = (
+            [exp.key.id() for exp in viewable_explorations])
+
+        return {
+            'owned_exploration_ids': owned_exploration_ids,
+            'editable_exploration_ids': editable_exploration_ids,
+            'voiced_exploration_ids': voiced_exploration_ids,
+            'viewable_exploration_ids': viewable_exploration_ids
+        }
+
 
 class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to explorations.
@@ -275,6 +324,26 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def get_multi(cls, exp_id, exp_versions):
+        """Gets the ExplorationCommitLogEntryModels for the given exploration
+        id and exploration versions.
+
+        Args:
+            exp_id: str. The id of the exploration.
+            exp_versions: list(int). The versions of the exploration.
+
+        Returns:
+            list(ExplorationCommitLogEntryModel). The list of
+            ExplorationCommitLogEntryModel instances which matches the given
+            exp_id and exp_versions.
+        """
+        instance_ids = [cls._get_instance_id(exp_id, exp_version)
+                        for exp_version in exp_versions]
+
+        return super(ExplorationCommitLogEntryModel, cls).get_multi(
+            instance_ids)
 
     @classmethod
     def _get_instance_id(cls, exp_id, exp_version):
@@ -389,8 +458,8 @@ class ExpSummaryModel(base_models.BaseModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to translate this exploration.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to voiceover this exploration.
+    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
@@ -403,6 +472,15 @@ class ExpSummaryModel(base_models.BaseModel):
     # The version number of the exploration after this commit. Only populated
     # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
+    # DEPRECATED in v2.8.3. Do not use.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration summary is deleted only if the corresponding exploration
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def get_non_private(cls):
@@ -454,7 +532,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
                    ExpSummaryModel.editor_ids == user_id,
-                   ExpSummaryModel.translator_ids == user_id,
+                   ExpSummaryModel.voice_artist_ids == user_id,
                    ExpSummaryModel.viewer_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
@@ -500,13 +578,12 @@ class ExpSummaryModel(base_models.BaseModel):
 
 
 class StateIdMappingModel(base_models.BaseModel):
-    """State ID model for Oppia explorations.
-
+    """DEPRECATED: DO NOT USE.
+    State ID model for Oppia explorations.
     This model maps each exploration version's state to a unique id.
     Note: use the state id only for derived data, but not for data that’s
     regarded as the source of truth, as the rules for assigning state id may
     change in future.
-
     The key of each instance is a combination of exploration id and version.
     """
 
@@ -525,25 +602,10 @@ class StateIdMappingModel(base_models.BaseModel):
     largest_state_id_used = ndb.IntegerProperty(indexed=True, required=True)
 
     @classmethod
-    def _generate_instance_id(cls, exp_id, exp_version):
-        """Generates ID of the state id mapping model instance.
-
-        Args:
-            exp_id: str. The exploration id whose states are mapped.
-            exp_version: int. The version of the exploration.
-
-        Returns:
-            str. A string containing exploration ID and
-                exploration version.
-        """
-        return '%s.%d' % (exp_id, exp_version)
-
-    @classmethod
     def create(
             cls, exp_id, exp_version, state_names_to_ids,
             largest_state_id_used, overwrite=False):
         """Creates a new instance of state id mapping model.
-
         Args:
             exp_id: str. The exploration id whose states are mapped.
             exp_version: int. The version of that exploration.
@@ -552,7 +614,6 @@ class StateIdMappingModel(base_models.BaseModel):
                 used as a state ID for this exploration.
             overwrite: bool. Whether overwriting of an existing model should
                 be allowed.
-
         Returns:
             StateIdMappingModel. Instance of the state id mapping model.
         """
@@ -571,14 +632,23 @@ class StateIdMappingModel(base_models.BaseModel):
         return model
 
     @classmethod
+    def _generate_instance_id(cls, exp_id, exp_version):
+        """Generates ID of the state id mapping model instance.
+        Args:
+            exp_id: str. The exploration id whose states are mapped.
+            exp_version: int. The version of the exploration.
+        Returns:
+            str. A string containing exploration ID and
+                exploration version.
+        """
+        return '%s.%d' % (exp_id, exp_version)
+
+    @classmethod
     def get_state_id_mapping_model(cls, exp_id, exp_version):
         """Retrieve state id mapping model from the datastore.
-
         Args:
             exp_id: str. The exploration id.
             exp_version: int. The exploration version.
-
-
         Returns:
             StateIdMappingModel. The model retrieved from the datastore.
         """
@@ -589,7 +659,6 @@ class StateIdMappingModel(base_models.BaseModel):
     @classmethod
     def delete_state_id_mapping_models(cls, exp_id, exp_versions):
         """Removes state id mapping models present in state_id_mapping_models.
-
         Args:
             exp_id: str. The id of the exploration.
             exp_versions: list(int). A list of exploration versions for which

@@ -15,9 +15,12 @@
 """Registry for Oppia suggestions. Contains a BaseSuggestion class and
 subclasses for each type of suggestion.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -27,12 +30,13 @@ from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-class BaseSuggestion(object):
+class BaseSuggestion(python_utils.OBJECT):
     """Base class for a suggestion.
 
     Attributes:
@@ -131,7 +135,7 @@ class BaseSuggestion(object):
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, basestring):
+        if not isinstance(self.target_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -146,18 +150,18 @@ class BaseSuggestion(object):
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, basestring):
+        if not isinstance(self.author_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if not isinstance(self.final_reviewer_id, basestring):
+        if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
             if self.final_reviewer_id:
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
 
-        if not isinstance(self.score_category, basestring):
+        if not isinstance(self.score_category, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected score_category to be a string, received %s' % type(
                     self.score_category))
@@ -186,7 +190,8 @@ class BaseSuggestion(object):
                 ' choices, received %s' % self.get_score_type())
 
     def accept(self):
-        """Accepts the suggestion. Each subclass must implement this function.
+        """Accepts the suggestion. Each subclass must implement this
+        function.
         """
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement accept.')
@@ -212,6 +217,14 @@ class BaseSuggestion(object):
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement '
             'populate_old_value_of_change.')
+
+    def pre_update_validate(self, change):
+        """Performs the pre update validation. This function needs to be called
+        before updating the suggestion.
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'pre_update_validate.')
 
     @property
     def is_handled(self):
@@ -291,7 +304,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         before accepting the suggestion.
         """
         self.validate()
-        states = exp_services.get_exploration_by_id(self.target_id).states
+        states = exp_fetchers.get_exploration_by_id(self.target_id).states
         if self.change.state_name not in states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' %
@@ -305,7 +318,7 @@ class SuggestionEditStateContent(BaseSuggestion):
                 suggestion.
         """
         change = self.change
-        exploration = exp_services.get_exploration_by_id(self.target_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         old_content = (
             exploration.states[self.change.state_name].content.to_dict())
 
@@ -316,9 +329,14 @@ class SuggestionEditStateContent(BaseSuggestion):
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
-        exploration = exp_services.get_exploration_by_id(self.target_id)
-        old_content = (
-            exploration.states[self.change.state_name].content.to_dict())
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+        if self.change.state_name not in exploration.states:
+            # As the state doesn't exist now, we cannot find the content of the
+            # state to populate the old_value field. So we set it as None.
+            old_content = None
+        else:
+            old_content = (
+                exploration.states[self.change.state_name].content.to_dict())
 
         self.change.old_value = old_content
 
@@ -332,6 +350,32 @@ class SuggestionEditStateContent(BaseSuggestion):
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, change_list,
             commit_message, is_suggestion=True)
+
+    def pre_update_validate(self, change):
+        """Performs the pre update validation. This function needs to be called
+        before updating the suggestion.
+
+        Args:
+            change: ExplorationChange. The new change.
+
+        Raises:
+            ValidationError: Invalid new change.
+        """
+        if self.change.cmd != change.cmd:
+            raise utils.ValidationError(
+                'The new change cmd must be equal to %s' %
+                self.change.cmd)
+        elif self.change.property_name != change.property_name:
+            raise utils.ValidationError(
+                'The new change property_name must be equal to %s' %
+                self.change.property_name)
+        elif self.change.state_name != change.state_name:
+            raise utils.ValidationError(
+                'The new change state_name must be equal to %s' %
+                self.change.state_name)
+        elif self.change.new_value['html'] == change.new_value['html']:
+            raise utils.ValidationError(
+                'The new html must not match the old html')
 
 
 class SuggestionAddQuestion(BaseSuggestion):
@@ -410,18 +454,19 @@ class SuggestionAddQuestion(BaseSuggestion):
         question = question_domain.Question(
             None, state_domain.State.from_dict(
                 self.change.question_dict['question_state_data']),
-            self.change.question_dict['question_state_schema_version'],
-            self.change.question_dict['language_code'], None)
+            self.change.question_dict['question_state_data_schema_version'],
+            self.change.question_dict['language_code'], None,
+            self.change.question_dict['linked_skill_ids'])
         question.partial_validate()
-        question_state_schema_version = (
-            self.change.question_dict['question_state_schema_version'])
+        question_state_data_schema_version = (
+            self.change.question_dict['question_state_data_schema_version'])
         if not (
-                question_state_schema_version >= 1 and
-                question_state_schema_version <=
-                feconf.CURRENT_STATES_SCHEMA_VERSION):
+                question_state_data_schema_version >= 1 and
+                question_state_data_schema_version <=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Expected question state schema version to be between 1 and '
-                '%s' % feconf.CURRENTSTATES_SCHEMA_VERSION)
+                '%s' % feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
@@ -433,8 +478,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_dict = self.change.question_dict
         self.validate()
         if (
-                question_dict['question_state_schema_version'] !=
-                feconf.CURRENT_STATES_SCHEMA_VERSION):
+                question_dict['question_state_data_schema_version'] !=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Question state schema version is not up to date.')
 
@@ -460,15 +505,47 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
+        question_dict['linked_skill_ids'] = [self.change.skill_id]
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
         question_services.add_question(self.author_id, question)
+        skill = skill_services.get_skill_by_id(
+            self.change.skill_id, strict=False)
+        if skill is None:
+            raise utils.ValidationError(
+                'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
-            question_dict['id'], self.change.skill_id)
+            self.author_id, question_dict['id'], self.change.skill_id,
+            constants.DEFAULT_SKILL_DIFFICULTY)
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
         pass
+
+
+    def pre_update_validate(self, change):
+        """Performs the pre update validation. This functions need to be called
+        before updating the suggestion.
+
+        Args:
+            change: QuestionChange. The new change.
+
+        Raises:
+            ValidationError: Invalid new change.
+        """
+        if self.change.cmd != change.cmd:
+            raise utils.ValidationError(
+                'The new change cmd must be equal to %s' %
+                self.change.cmd)
+        if self.change.skill_id != change.skill_id:
+            raise utils.ValidationError(
+                'The new change skill_id must be equal to %s' %
+                self.change.skill_id)
+        if self.change.question_dict == change.question_dict:
+            raise utils.ValidationError(
+                'The new change question_dict must not be equal to the old '
+                'question_dict')
+
 
 
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {

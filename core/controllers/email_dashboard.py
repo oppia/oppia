@@ -13,9 +13,11 @@
 # limitations under the License.
 
 """Controller for user query related pages and handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import email_manager
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
@@ -34,11 +36,13 @@ class EmailDashboardPage(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/email_dashboard/email_dashboard.html')
+        self.render_template('email-dashboard-page.mainpage.html')
 
 
 class EmailDashboardDataHandler(base.BaseHandler):
     """Query data handler."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_email_dashboard
     def get(self):
@@ -115,7 +119,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
             'created_at_least_n_exps', 'created_fewer_than_n_exps',
             'edited_at_least_n_exps', 'edited_fewer_than_n_exps']
 
-        for key, value in data.iteritems():
+        for key, value in data.items():
             if (key not in possible_keys or not isinstance(value, int) or
                     value < 0):
                 # Raise exception if key is not one of the allowed keys or
@@ -123,13 +127,19 @@ class EmailDashboardDataHandler(base.BaseHandler):
                 raise self.InvalidInputException('400 Invalid input for query.')
 
 
-class QueryStatusCheck(base.BaseHandler):
+class QueryStatusCheckHandler(base.BaseHandler):
     """Handler for checking status of individual queries."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_email_dashboard
     def get(self):
         query_id = self.request.get('query_id')
-        query_model = user_models.UserQueryModel.get(query_id)
+        try:
+            query_model = user_models.UserQueryModel.get(query_id)
+        except:
+            raise self.InvalidInputException('400 Invalid query id.')
+
         query_data = {
             'id': query_model.id,
             'submitter_username': (
@@ -164,7 +174,7 @@ class EmailDashboardResultPage(base.BaseHandler):
             'query_id': query_id,
         })
         self.render_template(
-            'pages/email_dashboard/email_dashboard_result.html')
+            'email-dashboard-result.mainpage.html')
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):

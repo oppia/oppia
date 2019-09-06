@@ -33,16 +33,20 @@ dicts, each representing a customization arg -- viz.:
         ...
     }]
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import json
 import os
+import sys
 
 from core.domain import obj_services
 from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
 import feconf
+import python_utils
 import utils
 
 # Indicates that the learner view of the interaction should be displayed in the
@@ -55,7 +59,7 @@ DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
 ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
 
 
-class BaseInteraction(object):
+class BaseInteraction(python_utils.OBJECT):
     """Base interaction definition class.
 
     This class is not meant to be user-editable. The only methods on it should

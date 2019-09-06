@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Models for storing the audit logs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf
@@ -44,3 +46,8 @@ class RoleQueryAuditModel(base_models.BaseModel):
     role = ndb.StringProperty(default=None, indexed=True)
     # The username in the query.
     username = ndb.StringProperty(default=None, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Audit logs are kept for investigation purposes."""
+        return base_models.DELETION_POLICY.KEEP

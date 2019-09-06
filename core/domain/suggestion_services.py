@@ -15,12 +15,13 @@
 """Funtions to create, accept, reject, update and perform other operations on
 suggestions.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import email_manager
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import suggestion_registry
-from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -63,7 +64,7 @@ def create_suggestion(
     status = suggestion_models.STATUS_IN_REVIEW
 
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        exploration = exp_services.get_exploration_by_id(target_id)
+        exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
@@ -159,7 +160,7 @@ def _update_suggestion(suggestion):
 
     suggestion_model.status = suggestion.status
     suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
-    suggestion_model.change = suggestion.change.to_dict()
+    suggestion_model.change_cmd = suggestion.change.to_dict()
     suggestion_model.score_category = suggestion.score_category
 
     suggestion_model.put()
@@ -244,7 +245,7 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
                     suggestion.score_category in scores and
                     scores[suggestion.score_category] >=
                     feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
-                if check_if_email_has_been_sent_to_user(
+                if not check_if_email_has_been_sent_to_user(
                         suggestion.author_id, suggestion.score_category):
                     email_manager.send_mail_to_onboard_new_reviewers(
                         suggestion.author_id, suggestion.score_category)
@@ -277,6 +278,38 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
         None, review_message)
 
 
+def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
+    """Resubmit a rejected suggestion.
+
+     Args:
+        suggestion: Suggestion. The rejected suggestion.
+        summary_message: str. The message provided by the author to
+            summarize new suggestion.
+        author_id: str. The ID of the author creating the suggestion.
+
+    Raises:
+        Exception: The summary message is empty.
+        Exception: The suggestion has not been handled yet.
+        Exception: The suggestion has already been accepted.
+    """
+    if not summary_message:
+        raise Exception('Summary message cannot be empty.')
+    if not suggestion.is_handled:
+        raise Exception('The suggestion is not yet handled.')
+    if suggestion.status == suggestion_models.STATUS_ACCEPTED:
+        raise Exception(
+            'The suggestion was accepted. '
+            'Only rejected suggestions can be resubmitted.')
+
+    suggestion.status = suggestion_models.STATUS_IN_REVIEW
+    _update_suggestion(suggestion)
+
+    thread_id = suggestion.suggestion_id
+    feedback_services.create_message(
+        thread_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
+        None, summary_message)
+
+
 def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     """Returns a list of suggestions which need to be reviewed, in categories
     where the user has crossed the minimum score to review.
@@ -300,24 +333,6 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
          for s in suggestion_models.GeneralSuggestionModel
          .get_in_review_suggestions_in_score_categories(
              score_categories, user_id)])
-
-
-def get_user_contribution_scoring_from_model(userContributionScoringModel):
-    """Returns the UserContributionScoring domain object corresponding to the
-    UserContributionScoringModel
-
-    Args:
-        userContributionScoringModel: UserContributionScoringModel. The model
-            instance.
-
-    Returns:
-        UserContributionScoring. The corresponding domain object.
-    """
-    return user_domain.UserContributionScoring(
-        userContributionScoringModel.user_id,
-        userContributionScoringModel.score_category,
-        userContributionScoringModel.score,
-        userContributionScoringModel.has_email_been_sent)
 
 
 def get_all_scores_of_user(user_id):
@@ -350,7 +365,7 @@ def check_user_can_review_in_category(user_id, score_category):
 
     Returns:
         bool. Whether the user can review suggestions under category
-            score_category
+            score_category.
     """
     score = (
         user_models.UserContributionScoringModel.get_score_of_user_for_category(
@@ -494,3 +509,19 @@ def update_position_in_rotation(score_category, user_id):
     """
     suggestion_models.ReviewerRotationTrackingModel.update_position_in_rotation(
         score_category, user_id)
+
+
+def check_can_resubmit_suggestion(suggestion_id, user_id):
+    """Checks whether the given user can resubmit the suggestion.
+
+    Args:
+        suggestion_id: str. The ID of the suggestion.
+        user_id: str. The ID of the user.
+
+    Returns:
+        bool: Whether the user can resubmit the suggestion.
+    """
+
+    suggestion = get_suggestion_by_id(suggestion_id)
+
+    return suggestion.author_id == user_id

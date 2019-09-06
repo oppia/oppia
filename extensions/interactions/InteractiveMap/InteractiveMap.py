@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Python configuration for InteractiveMap interaction."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from extensions.interactions import base
 
 
@@ -24,7 +28,7 @@ class InteractiveMap(base.BaseInteraction):
     description = 'Allows learners to specify a position on a world map.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     is_trainable = False
-    _dependency_ids = ['google_maps']
+    _dependency_ids = ['ui_leaflet']
     answer_type = 'CoordTwoDim'
     instructions = 'Click on the map'
     narrow_instructions = 'View map'

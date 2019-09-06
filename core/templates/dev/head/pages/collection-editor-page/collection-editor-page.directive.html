@@ -1,0 +1,17 @@
+<div>
+  <div ng-if="$ctrl.getActiveTabName() === 'main'">
+    <collection-editor-tab></collection-editor-tab>
+  </div>
+
+  <div ng-show="$ctrl.getActiveTabName() === 'settings'">
+    <collection-settings-tab></collection-settings-tab>
+  </div>
+
+  <div ng-show="$ctrl.getActiveTabName() === 'history'">
+    <collection-history-tab></collection-history-tab>
+  </div>
+
+  <div ng-show="$ctrl.getActiveTabName() === 'stats'">
+    <collection-statistics-tab></collection-statistics-tab>
+  </div>
+</div>

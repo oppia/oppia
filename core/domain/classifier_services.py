@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Services for classifier data models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -21,6 +23,7 @@ import re
 from core.domain import classifier_domain
 from core.platform import models
 import feconf
+import python_utils
 
 (classifier_models, exp_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.exploration])
@@ -115,6 +118,10 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
     Raises:
         Exception. This method should not be called by exploration with version
             number 1.
+
+    Returns:
+        list(str). State names which don't have classifier model for previous
+            version of exploration.
     """
     exp_id = exploration.id
     current_exp_version = exploration.version
@@ -135,12 +142,15 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
         exp_id, old_exp_version, state_names_to_retrieve)
 
     job_exploration_mappings = []
+    state_names_without_classifier = []
     for index, classifier_training_job in enumerate(classifier_training_jobs):
         if classifier_training_job is None:
             logging.error(
                 'The ClassifierTrainingJobModel for the %s state of Exploration'
                 ' with exp_id %s and exp_version %s does not exist.' % (
                     state_names_to_retrieve[index], exp_id, old_exp_version))
+            state_names_without_classifier.append(
+                state_names_to_retrieve[index])
             continue
         new_state_name = state_names[index]
         job_exploration_mapping = (
@@ -152,6 +162,8 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
 
     classifier_models.TrainingJobExplorationMappingModel.create_multi(
         job_exploration_mappings)
+
+    return state_names_without_classifier
 
 
 def convert_strings_to_float_numbers_in_classifier_data(
@@ -188,7 +200,8 @@ def convert_strings_to_float_numbers_in_classifier_data(
             classifier_data.append(
                 convert_strings_to_float_numbers_in_classifier_data(item))
         return classifier_data
-    elif isinstance(classifier_data_with_floats_stringified, basestring):
+    elif isinstance(
+            classifier_data_with_floats_stringified, python_utils.BASESTRING):
         if re.match(
                 feconf.FLOAT_VERIFIER_REGEX,
                 classifier_data_with_floats_stringified):
@@ -265,7 +278,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
     classifier_training_job_models = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
-    for index in range(len(job_ids)):
+    for index in python_utils.RANGE(len(job_ids)):
         if classifier_training_job_models[index] is None:
             raise Exception(
                 'The ClassifierTrainingJobModel corresponding to the job_id '
@@ -320,11 +333,6 @@ def _update_scheduled_check_time_for_new_training_job(job_id):
     """
     classifier_training_job_model = (
         classifier_models.ClassifierTrainingJobModel.get(job_id))
-
-    if not classifier_training_job_model:
-        raise Exception(
-            'The ClassifierTrainingJobModel corresponding to the job_id '
-            'of the ClassifierTrainingJob does not exist.')
 
     classifier_training_job_model.next_scheduled_check_time = (
         datetime.datetime.utcnow() + datetime.timedelta(
@@ -386,7 +394,7 @@ def store_classifier_data(job_id, classifier_data):
         classifier_models.ClassifierTrainingJobModel.get(job_id, strict=False))
     if not classifier_training_job_model:
         raise Exception(
-            'The ClassifierTrainingJobModel corresponding to the job_id of the'
+            'The ClassifierTrainingJobModel corresponding to the job_id of the '
             'ClassifierTrainingJob does not exist.')
 
     classifier_training_job = get_classifier_training_job_from_model(
@@ -443,3 +451,31 @@ def get_classifier_training_jobs(exp_id, exp_version, state_names):
         if mapping_model is None:
             classifier_training_jobs.insert(index, None)
     return classifier_training_jobs
+
+
+def create_classifier_training_job_for_reverted_exploration(
+        exploration, exploration_to_revert_to):
+    """Create classifier training job model when an exploration is reverted.
+
+    Args:
+        exploration: Exploration. Exploration domain object.
+        exploration_to_revert_to: Exploration. Exploration to revert to.
+    """
+    classifier_training_jobs_for_old_version = get_classifier_training_jobs(
+        exploration.id, exploration_to_revert_to.version,
+        list(exploration_to_revert_to.states.keys()))
+    job_exploration_mappings = []
+    state_names = list(exploration_to_revert_to.states.keys())
+    for index, classifier_training_job in enumerate(
+            classifier_training_jobs_for_old_version):
+        if classifier_training_job is not None:
+            state_name = state_names[index]
+            job_exploration_mapping = (
+                classifier_domain.TrainingJobExplorationMapping(
+                    exploration.id, exploration.version + 1, state_name,
+                    classifier_training_job.job_id))
+            job_exploration_mapping.validate()
+            job_exploration_mappings.append(job_exploration_mapping)
+
+    classifier_models.TrainingJobExplorationMappingModel.create_multi(
+        job_exploration_mappings)

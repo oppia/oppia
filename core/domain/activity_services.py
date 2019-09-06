@@ -15,12 +15,15 @@
 # limitations under the License.
 
 """Commands for operating on lists of activity references."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
 from constants import constants
 from core.domain import activity_domain
 from core.platform import models
+import feconf
 
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
 
@@ -34,7 +37,7 @@ def get_featured_activity_references():
     """
     featured_model_instance = (
         activity_models.ActivityReferencesModel.get_or_create(
-            activity_models.ACTIVITY_REFERENCE_LIST_FEATURED))
+            feconf.ACTIVITY_REFERENCE_LIST_FEATURED))
 
     return [
         activity_domain.ActivityReference(reference['type'], reference['id'])
@@ -63,7 +66,7 @@ def update_featured_activity_references(featured_activity_references):
 
     featured_model_instance = (
         activity_models.ActivityReferencesModel.get_or_create(
-            activity_models.ACTIVITY_REFERENCE_LIST_FEATURED))
+            feconf.ACTIVITY_REFERENCE_LIST_FEATURED))
     featured_model_instance.activity_references = [
         reference.to_dict() for reference in featured_activity_references]
     featured_model_instance.put()

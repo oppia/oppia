@@ -14,12 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base class for defining acctions."""
+"""Base class for defining actions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions import domain
+import python_utils
 
 
-class BaseLearnerActionSpec(object):
+class BaseLearnerActionSpec(python_utils.OBJECT):
     """Base action definition class.
 
     This class is not meant to be user-editable. The only methods in it should
@@ -32,6 +35,7 @@ class BaseLearnerActionSpec(object):
 
     @property
     def customization_arg_specs(self):
+        """The customization arg specs for the action definition."""
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]

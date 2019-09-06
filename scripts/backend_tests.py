@@ -19,22 +19,60 @@ execute:
 
     bash scripts/run_backend_tests.sh
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
 import argparse
 import datetime
+import importlib
+import inspect
 import os
 import re
 import subprocess
+import sys
 import threading
 import time
 
+import python_utils
 # pylint: enable=wrong-import-order
 
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+PYTHONPATH = os.environ['PYTHONPATH']
+
+DIRS_TO_ADD_TO_SYS_PATH = [
+    os.path.join(OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
+        'lib', 'webob_0_9'),
+    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
+    os.path.join(OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
+    CURR_DIR,
+    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
+    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
+    os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.0'),
+    os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
+    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
+    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.42.0'),
+    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.16.0'),
+    os.path.join(THIRD_PARTY_DIR, 'six-1.12.0'),
+    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
+    os.path.join(THIRD_PARTY_DIR, 'webencodings-0.5.1'),
+]
 
 COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.1', 'coverage')
+    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.3', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -51,11 +89,11 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
-    type=str)
+    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
-    type=str)
+    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--exclude_load_tests',
     help='optional; if specified, exclude load tests from being run',
@@ -74,9 +112,10 @@ def log(message, show_time=False):
     """
     with LOG_LOCK:
         if show_time:
-            print datetime.datetime.utcnow().strftime('%H:%M:%S'), message
+            python_utils.PRINT(
+                datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
         else:
-            print message
+            python_utils.PRINT(message)
 
 
 def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
@@ -87,6 +126,9 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
     last_stdout_str, last_stderr_str = p.communicate()
+    # Converting to unicode to stay compatible with the rest of the strings.
+    last_stdout_str = last_stdout_str.decode(encoding='utf-8')
+    last_stderr_str = last_stderr_str.decode(encoding='utf-8')
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
@@ -128,13 +170,14 @@ class TaskThread(threading.Thread):
             self.finished = True
         except Exception as e:
             self.exception = e
-            if 'KeyboardInterrupt' not in str(self.exception):
+            if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
+                    self.exception):
                 log('ERROR %s: %.1f secs' %
                     (self.name, time.time() - self.start_time), show_time=True)
             self.finished = True
 
 
-class TestingTaskSpec(object):
+class TestingTaskSpec(python_utils.OBJECT):
     """Executes a set of tests given a test class name."""
 
     def __init__(self, test_target, generate_coverage_report):
@@ -145,6 +188,11 @@ class TestingTaskSpec(object):
         """Runs all tests corresponding to the given test target."""
         test_target_flag = '--test_target=%s' % self.test_target
 
+        # This is done because PYTHONPATH is modified while using importlib
+        # to import modules. PYTHONPATH is changed to comma separated list
+        # after which python is unable to find certain modules. So, the old
+        # PYTHONPATH is copied here to avoid import errors.
+        os.environ['PYTHONPATH'] = PYTHONPATH
         if self.generate_coverage_report:
             exc_list = [
                 'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
@@ -209,36 +257,67 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
-    def _convert_to_test_target(path):
-        """Remove the .py suffix and replace all slashes with periods."""
-        return os.path.relpath(path, os.getcwd())[:-3].replace('/', '.')
+    def _get_test_target_classes(path):
+        """Returns a list of all test classes in a given test file path.
+
+        Args:
+            path: str. The path of the test file from which all test classes
+                are to be extracted.
+
+        Returns:
+            list. A list of all test classes in a given test file path.
+        """
+        class_names = []
+        test_target_path = os.path.relpath(
+            path, os.getcwd())[:-3].replace('/', '.')
+        python_module = importlib.import_module(test_target_path)
+        for name, clazz in inspect.getmembers(
+                python_module, predicate=inspect.isclass):
+            all_base_classes = [base_class.__name__ for base_class in
+                                (inspect.getmro(clazz))]
+            # Check that it is a subclass of 'AppEngineTestBase'.
+            if 'AppEngineTestBase' in all_base_classes:
+                class_names.append(name)
+
+        return [
+            '%s.%s' % (test_target_path, class_name)
+            for class_name in class_names]
 
     base_path = os.path.join(os.getcwd(), test_path or '')
     result = []
+    excluded_dirs = ['.git', 'third_party', 'core/tests', 'node_modules']
     for root in os.listdir(base_path):
-        if any([s in root for s in ['.git', 'third_party', 'core/tests']]):
+        if any([s in root for s in excluded_dirs]):
             continue
         if root.endswith('_test.py'):
-            result.append(_convert_to_test_target(
-                os.path.join(base_path, root)))
+            result = result + (
+                _get_test_target_classes(os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
             if _LOAD_TESTS_DIR in subroot and include_load_tests:
                 for f in files:
                     if f.endswith('_test.py'):
-                        result.append(_convert_to_test_target(
-                            os.path.join(subroot, f)))
+                        result = result + (
+                            _get_test_target_classes(os.path.join(subroot, f)))
 
             for f in files:
                 if (f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
-                    result.append(_convert_to_test_target(
-                        os.path.join(subroot, f)))
+                    result = result + (
+                        _get_test_target_classes(os.path.join(subroot, f)))
 
     return result
 
 
 def main():
     """Run the tests."""
+    for directory in DIRS_TO_ADD_TO_SYS_PATH:
+        if not os.path.exists(os.path.dirname(directory)):
+            raise Exception('Directory %s does not exist.' % directory)
+        sys.path.insert(0, directory)
+
+    import dev_appserver
+    dev_appserver.fix_sys_path()
+
     parsed_args = _PARSER.parse_args()
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
@@ -249,7 +328,20 @@ def main():
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     if parsed_args.test_target:
-        all_test_targets = [parsed_args.test_target]
+        if '_test' in parsed_args.test_target:
+            all_test_targets = [parsed_args.test_target]
+        else:
+            python_utils.PRINT('')
+            python_utils.PRINT(
+                '---------------------------------------------------------')
+            python_utils.PRINT(
+                'WARNING : test_target flag should point to the test file.')
+            python_utils.PRINT(
+                '---------------------------------------------------------')
+            python_utils.PRINT('')
+            time.sleep(3)
+            python_utils.PRINT('Redirecting to its corresponding test file...')
+            all_test_targets = [parsed_args.test_target + '_test']
     else:
         include_load_tests = not parsed_args.exclude_load_tests
         all_test_targets = _get_all_test_targets(
@@ -274,13 +366,13 @@ def main():
 
     for task in tasks:
         if task.exception:
-            log(str(task.exception))
+            log(python_utils.convert_to_bytes(task.exception))
 
-    print ''
-    print '+------------------+'
-    print '| SUMMARY OF TESTS |'
-    print '+------------------+'
-    print ''
+    python_utils.PRINT('')
+    python_utils.PRINT('+------------------+')
+    python_utils.PRINT('| SUMMARY OF TESTS |')
+    python_utils.PRINT('+------------------+')
+    python_utils.PRINT('')
 
     # Check we ran all tests as expected.
     total_count = 0
@@ -290,19 +382,21 @@ def main():
         spec = task_to_taskspec[task]
 
         if not task.finished:
-            print 'CANCELED  %s' % spec.test_target
+            python_utils.PRINT('CANCELED  %s' % spec.test_target)
             test_count = 0
-        elif 'No tests were run' in str(task.exception):
-            print 'ERROR     %s: No tests found.' % spec.test_target
+        elif 'No tests were run' in python_utils.convert_to_bytes(
+                task.exception):
+            python_utils.PRINT(
+                'ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
-            exc_str = str(task.exception).decode(encoding='utf-8')
-            print exc_str[exc_str.find('='): exc_str.rfind('-')]
+            exc_str = python_utils.convert_to_bytes(task.exception)
+            python_utils.PRINT(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
                 '([0-9]+) failures',
-                str(task.exception))
+                python_utils.convert_to_bytes(task.exception))
 
             try:
                 test_count = int(tests_failed_regex_match.group(1))
@@ -310,46 +404,52 @@ def main():
                 failures = int(tests_failed_regex_match.group(3))
                 total_errors += errors
                 total_failures += failures
-                print 'FAILED    %s: %s errors, %s failures' % (
-                    spec.test_target, errors, failures)
+                python_utils.PRINT('FAILED    %s: %s errors, %s failures' % (
+                    spec.test_target, errors, failures))
             except AttributeError:
                 # There was an internal error, and the tests did not run (The
                 # error message did not match `tests_failed_regex_match`).
                 test_count = 0
                 total_errors += 1
-                print ''
-                print '------------------------------------------------------'
-                print '    WARNING: FAILED TO RUN %s' % spec.test_target
-                print ''
-                print '    This is most likely due to an import error.'
-                print '------------------------------------------------------'
+                python_utils.PRINT('')
+                python_utils.PRINT(
+                    '------------------------------------------------------')
+                python_utils.PRINT(
+                    '    WARNING: FAILED TO RUN %s' % spec.test_target)
+                python_utils.PRINT('')
+                python_utils.PRINT(
+                    '    This is most likely due to an import error.')
+                python_utils.PRINT(
+                    '------------------------------------------------------')
         else:
             try:
                 tests_run_regex_match = re.search(
                     r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
-                print ('SUCCESS   %s: %d tests (%.1f secs)' %
-                       (spec.test_target, test_count, test_time))
+                python_utils.PRINT(
+                    'SUCCESS   %s: %d tests (%.1f secs)' %
+                    (spec.test_target, test_count, test_time))
             except Exception:
-                print (
+                python_utils.PRINT(
                     'An unexpected error occurred. '
                     'Task output:\n%s' % task.output)
 
         total_count += test_count
 
-    print ''
+    python_utils.PRINT('')
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
     else:
-        print 'Ran %s test%s in %s test class%s.' % (
+        python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
             total_count, '' if total_count == 1 else 's',
-            len(tasks), '' if len(tasks) == 1 else 'es')
+            len(tasks), '' if len(tasks) == 1 else 'es'))
 
         if total_errors or total_failures:
-            print '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures)
+            python_utils.PRINT(
+                '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
         else:
-            print 'All tests passed.'
+            python_utils.PRINT('All tests passed.')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')

@@ -15,8 +15,9 @@
 # limitations under the License.
 
 """Common classes and methods for managing long running jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import collections
 import copy
 import datetime
@@ -25,6 +26,7 @@ import logging
 import traceback
 
 from core.platform import models
+import python_utils
 import utils
 
 from google.appengine.api import app_identity
@@ -33,7 +35,6 @@ from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
-from mapreduce import model as mapreduce_model
 from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
 from pipeline import pipeline
@@ -74,7 +75,7 @@ DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
 NUM_JOBS_IN_DASHBOARD_LIMIT = 100
 
 
-class BaseJobManager(object):
+class BaseJobManager(python_utils.OBJECT):
     """Base class for managing long-running jobs.
 
     These jobs are not transaction-safe, and multiple jobs of the same kind
@@ -101,6 +102,11 @@ class BaseJobManager(object):
     """
     @classmethod
     def _is_abstract(cls):
+        """Checks if the job is created using the abstract base manager class.
+
+        Returns:
+            bool. Whether the job is created using abstract base manager class.
+        """
         return cls in ABSTRACT_BASE_CLASSES
 
     @classmethod
@@ -120,6 +126,12 @@ class BaseJobManager(object):
                 'manager class %s, which is not allowed.' % cls.__name__)
 
         def _create_new_job():
+            """Creates a new job by generating a unique id and inserting
+            it into the model.
+
+            Returns:
+                str. The unique job id.
+            """
             job_id = job_models.JobModel.get_new_id(cls.__name__)
             job_models.JobModel(id=job_id, job_type=cls.__name__).put()
             return job_id
@@ -203,7 +215,8 @@ class BaseJobManager(object):
             cls, output_list, test_only_max_output_len_chars=None):
         """Returns compressed list of strings within a max length of chars.
 
-        Ensures that the payload (i.e., [str(output) for output in output_list])
+        Ensures that the payload (i.e.,
+        [python_utils.UNICODE(output) for output in output_list])
         makes up at most max_output_chars of the final output data.
 
         Args:
@@ -214,7 +227,7 @@ class BaseJobManager(object):
         Returns:
             list(str). The compressed stringified output values.
         """
-        _MAX_OUTPUT_LEN_CHARS = 900000
+        _max_output_len_chars = 900000
 
         class _OrderedCounter(collections.Counter, collections.OrderedDict):
             """Counter that remembers the order elements are first encountered.
@@ -226,15 +239,16 @@ class BaseJobManager(object):
             pass
 
         # Consolidate the lines of output since repeating them isn't useful.
-        counter = _OrderedCounter(str(output) for output in output_list)
+        counter = _OrderedCounter(
+            python_utils.UNICODE(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
-            for (output_str, count) in counter.iteritems()
+            for (output_str, count) in counter.items()
         ]
 
         # Truncate outputs to fit within given max length.
         remaining_len = (
-            _MAX_OUTPUT_LEN_CHARS if test_only_max_output_len_chars is None else
+            _max_output_len_chars if test_only_max_output_len_chars is None else
             test_only_max_output_len_chars)
         for idx, output_str in enumerate(output_str_list):
             remaining_len -= len(output_str)
@@ -484,34 +498,83 @@ class BaseJobManager(object):
 
     @classmethod
     def _pre_enqueue_hook(cls, job_id):
+        """A hook or a callback function triggered before enqueuing a job.
+
+        Args:
+            job_id: str. The unique ID of the job which is to be enqueued.
+        """
         pass
 
     @classmethod
     def _post_enqueue_hook(cls, job_id):
+        """A hook or a callback function triggered after enqueuing a job.
+
+        Args:
+            job_id: str. The unique ID of the job which was enqueued.
+        """
         pass
 
     @classmethod
     def _pre_start_hook(cls, job_id):
+        """A hook or a callback function triggered before marking a job
+        as started.
+
+        Args:
+            job_id: str. The unique ID of the job to be marked as started.
+        """
         pass
 
     @classmethod
     def _post_start_hook(cls, job_id):
+        """A hook or a callback function triggered after marking a job as
+        started.
+
+        Args:
+            job_id: str. The unique ID of the job marked as started.
+        """
         pass
 
     @classmethod
     def _post_completed_hook(cls, job_id):
+        """A hook or a callback function triggered after marking a job as
+        completed.
+
+        Args:
+            job_id: str. The unique ID of the job marked as completed.
+        """
         pass
 
     @classmethod
     def _post_failure_hook(cls, job_id):
+        """A hook or a callback function triggered after marking a job as
+        failed.
+
+        Args:
+            job_id: str. The unique ID of the job marked as failed.
+        """
         pass
 
     @classmethod
     def _pre_cancel_hook(cls, job_id, cancel_message):
+        """A hook or a callback function triggered before marking a job as
+        cancelled.
+
+        Args:
+            job_id: str. The unique ID of the job to be marked as cancelled.
+            cancel_message: str. The message to be displayed before
+                cancellation.
+        """
         pass
 
     @classmethod
     def _post_cancel_hook(cls, job_id, cancel_message):
+        """A hook or a callback function triggered after marking a job as
+        cancelled.
+
+        Args:
+            job_id: str. The unique ID of the job marked as cancelled.
+            cancel_message: str. The message to be displayed after cancellation.
+        """
         pass
 
 
@@ -553,9 +616,11 @@ class BaseDeferredJobManager(BaseJobManager):
                 'Job %s failed at %s' %
                 (job_id, utils.get_current_time_in_millisecs()))
             cls.register_failure(
-                job_id, '%s\n%s' % (unicode(e), traceback.format_exc()))
+                job_id, '%s\n%s'
+                % (python_utils.UNICODE(e), traceback.format_exc()))
             raise taskqueue_services.PermanentTaskFailure(
-                'Task failed: %s\n%s' % (unicode(e), traceback.format_exc()))
+                'Task failed: %s\n%s'
+                % (python_utils.UNICODE(e), traceback.format_exc()))
 
         # Note that the job may have been canceled after it started and before
         # it reached this stage. This will result in an exception when the
@@ -646,7 +711,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                 (job_id, utils.get_current_time_in_millisecs()))
             job_class.register_failure(
                 job_id,
-                '%s\n%s' % (unicode(e), traceback.format_exc()))
+                '%s\n%s' % (python_utils.UNICODE(e), traceback.format_exc()))
 
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
@@ -664,7 +729,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
             data: *. Data to be serialized in JSON format.
         """
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
-            '%s\n' % json.dumps(data))
+            python_utils.convert_to_bytes('%s\n' % json.dumps(data)))
 
 
 class BaseMapReduceJobManager(BaseJobManager):
@@ -693,10 +758,6 @@ class BaseMapReduceJobManager(BaseJobManager):
         Raises:
             Exception: The parameter is not associated to this job type.
         """
-        mapper_params = context.get().mapreduce_spec.mapper.params
-        if param_name not in mapper_params:
-            raise Exception(
-                'Could not find %s in %s' % (param_name, mapper_params))
         return context.get().mapreduce_spec.mapper.params[param_name]
 
     @classmethod
@@ -786,7 +847,7 @@ class BaseMapReduceJobManager(BaseJobManager):
                 # strings. Also note that the value for this key is determined
                 # just before enqueue time, so it will be roughly equal to the
                 # actual enqueue time.
-                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: str(
+                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: python_utils.UNICODE(
                     utils.get_current_time_in_millisecs()),
             },
             'reducer_params': {
@@ -814,12 +875,20 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @classmethod
     def _pre_cancel_hook(cls, job_id, cancel_message):
+        """A hook or a callback function triggered before marking a job as
+        cancelled.
+
+        Args:
+            job_id: str. The unique ID of the job to be marked as cancelled.
+            cancel_message: str. The message to be displayed before
+                cancellation.
+        """
         metadata = cls.get_metadata(job_id)
         root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
         pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
     @staticmethod
-    def _entity_created_before_job_queued(entity):
+    def entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was
         queued.
 
@@ -950,7 +1019,8 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         Returns:
             bool. Whether mapper spec and all mapper patterns are valid.
         """
-        return True  # TODO.
+        # TODO(seanlip): Actually implement the validation.
+        return True
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
@@ -977,7 +1047,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
 
     @staticmethod
-    def _entity_created_before_job_queued(entity):
+    def entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was
         queued.
 
@@ -1000,14 +1070,33 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
 
     @classmethod
     def _post_completed_hook(cls, job_id):
+        """A hook or a callback function triggered after marking a job as
+        completed.
+
+        Args:
+            job_id: str. The unique ID of the job marked as completed.
+        """
         cls._get_continuous_computation_class().on_batch_job_completion()
 
     @classmethod
     def _post_cancel_hook(cls, job_id, cancel_message):
+        """A hook or a callback function triggered after marking a job as
+        cancelled.
+
+        Args:
+            job_id: str. The unique ID of the job marked as cancelled.
+            cancel_message: str. The message to be displayed after cancellation.
+        """
         cls._get_continuous_computation_class().on_batch_job_canceled()
 
     @classmethod
     def _post_failure_hook(cls, job_id):
+        """A hook or a callback function triggered after marking a job as
+        failed.
+
+        Args:
+            job_id: str. The unique ID of the job marked as failed.
+        """
         cls._get_continuous_computation_class().on_batch_job_failure()
 
 
@@ -1107,7 +1196,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             realtime_layer. The realtime layer entity.
         """
         if (self.realtime_layer is None or
-                str(self.realtime_layer) != self.id[0]):
+                python_utils.UNICODE(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
                 (self.realtime_layer, self.id))
@@ -1116,7 +1205,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             BaseRealtimeDatastoreClassForContinuousComputations, self).put()
 
 
-class BaseContinuousComputationManager(object):
+class BaseContinuousComputationManager(python_utils.OBJECT):
     """This class represents a manager for a continuously-running computation.
 
     Such computations consist of two parts: a batch job to compute summary
@@ -1237,6 +1326,13 @@ class BaseContinuousComputationManager(object):
             str. The active realtime layer index of this class.
         """
         def _get_active_realtime_index_transactional():
+            """Finds the Continous Computation Model corresponding to this
+            class type or inserts it in the database if not found and extracts
+            the active realtime layer index.
+
+            Returns:
+                str. The active realtime layer index of this class.
+            """
             cc_model = job_models.ContinuousComputationModel.get(
                 cls.__name__, strict=False)
             if cc_model is None:
@@ -1289,6 +1385,9 @@ class BaseContinuousComputationManager(object):
         computation.
         """
         def _switch_active_realtime_class_transactional():
+            """Retrieves currently-active realtime layer index, switches it
+            and inserts the new model to the database.
+            """
             cc_model = job_models.ContinuousComputationModel.get(
                 cls.__name__)
             cc_model.active_realtime_layer_index = (
@@ -1314,11 +1413,6 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _kickoff_batch_job(cls):
         """Create and enqueue a new batch job."""
-        if job_models.JobModel.do_unfinished_jobs_exist(cls.__name__):
-            logging.error(
-                'Tried to start a new batch job of type %s while an existing '
-                'job was still running ' % cls.__name__)
-            return
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
         job_manager.enqueue(
@@ -1469,6 +1563,10 @@ class BaseContinuousComputationManager(object):
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
         def _update_last_finished_time_transactional():
+            """Updates the time at which a batch job for this computation was
+            last completed or failed, in milliseconds since the epoch, setting
+            it to the current time.
+            """
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
             cc_model.last_finished_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
@@ -1691,97 +1789,6 @@ def get_continuous_computations_info(cc_classes):
         result.append(cc_dict)
 
     return result
-
-
-def get_stuck_jobs(recency_msecs):
-    """Returns a list of jobs which were last updated at most recency_msecs
-    milliseconds ago and have experienced more than one retry.
-
-    Returns:
-        list(job_models.JobModel). Jobs which have retried at least once and
-            haven't finished yet.
-    """
-    threshold_time = (
-        datetime.datetime.utcnow() -
-        datetime.timedelta(0, 0, 0, recency_msecs))
-    shard_state_model_class = mapreduce_model.ShardState
-
-    # TODO(sll): Clean up old jobs so that this query does not have to iterate
-    # over so many elements in a full table scan.
-    recent_job_models = shard_state_model_class.all()
-
-    stuck_jobs = []
-    for job_model in recent_job_models:
-        if job_model.update_time > threshold_time and job_model.retries > 0:
-            stuck_jobs.append(job_model)
-
-    return stuck_jobs
-
-
-class JobCleanupManager(BaseMapReduceOneOffJobManager):
-    """One-off job for cleaning up old auxiliary entities for MR jobs."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """The entity types this job will handle."""
-        return [
-            mapreduce_model.MapreduceState,
-            mapreduce_model.ShardState
-        ]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function which will clean up jobs that have not
-        finished.
-
-        Args:
-            item: mapreduce_model.MapreduceState or mapreduce_model.ShardState.
-                A shard or job which may still be running.
-        Yields:
-            tuple(str, int). Describes the action taken for the item, and the
-                number of items this action was applied to.
-        """
-        max_start_time_msec = JobCleanupManager.get_mapper_param(
-            MAPPER_PARAM_MAX_START_TIME_MSEC)
-
-        if isinstance(item, mapreduce_model.MapreduceState):
-            if (item.result_status == 'success' and
-                    utils.get_time_in_millisecs(item.start_time) <
-                    max_start_time_msec):
-                item.delete()
-                yield ('mr_state_deleted', 1)
-            else:
-                yield ('mr_state_remaining', 1)
-
-        if isinstance(item, mapreduce_model.ShardState):
-            if (item.result_status == 'success' and
-                    utils.get_time_in_millisecs(item.update_time) <
-                    max_start_time_msec):
-                item.delete()
-                yield ('shard_state_deleted', 1)
-            else:
-                yield ('shard_state_remaining', 1)
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        """Implements the reduce function which logs the results of the mapping
-        function.
-
-        Args:
-            key: str. Describes the action taken by a map call. One of:
-                'mr_state_deleted', 'mr_state_remaining', 'shard_state_deleted',
-                'shard_state_remaining'.
-            stringified_values: list(str). A list where each element is a
-                stringified number, counting the mapped items sharing the key.
-        """
-        values = [ast.literal_eval(v) for v in stringified_values]
-        if key.endswith('_deleted'):
-            logging.warning(
-                'Delete count: %s entities (%s)' % (sum(values), key))
-        else:
-            logging.warning(
-                'Entities remaining count: %s entities (%s)' %
-                (sum(values), key))
 
 
 ABSTRACT_BASE_CLASSES = frozenset([

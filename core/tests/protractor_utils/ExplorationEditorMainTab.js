@@ -139,6 +139,10 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-save-state-content'));
   var stateNameSubmitButton = stateNameContainer.element(
     by.css('.protractor-test-state-name-submit'));
+  var answerCorrectnessToggle = element(
+    by.css('.protractor-test-editor-correctness-toggle'));
+  var solicitAnswerDetailsCheckbox = element(
+    by.css('.protractor-test-solicit-answer-details-checkbox'));
 
   /*
    * Actions
@@ -273,8 +277,10 @@ var ExplorationEditorMainTab = function() {
     // If the destination is being changed, open the corresponding editor.
     if (destStateName || destStateName !== '(try again)') {
     // Set destination contents.
-      _setOutcomeDest(
-        destStateName, createNewState, null);
+      if (destStateName !== null) {
+        _setOutcomeDest(
+          destStateName, createNewState, null);
+      }
     }
 
     // Close new response modal.
@@ -360,6 +366,9 @@ var ExplorationEditorMainTab = function() {
         expect(saveOutcomeDestButton.isDisplayed()).toBe(true);
         saveOutcomeDestButton.click();
       },
+      markAsCorrect: function() {
+        answerCorrectnessToggle.click();
+      },
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: function(stateNames) {
       // Begin editing destination.
@@ -382,9 +391,9 @@ var ExplorationEditorMainTab = function() {
         cancelOutcomeDestButton.click();
       },
       addRule: function(interactionId, ruleName) {
-      // Additional parameters may be provided after ruleName.
+        // Additional parameters may be provided after ruleName.
 
-      // Add the rule.
+        // Add the rule.
         addAnswerButton.click();
 
         // Set the rule description.
@@ -414,7 +423,7 @@ var ExplorationEditorMainTab = function() {
         expect(addAnswerButton.isPresent()).toBeFalsy();
       },
       expectCannotDeleteRule: function(ruleNum) {
-        ruleElem = ruleBlock.get(ruleNum);
+        var ruleElem = ruleBlock.get(ruleNum);
         expect(deleteAnswerButton.isPresent()).toBeFalsy();
       },
       expectCannotDeleteResponse: function() {
@@ -431,9 +440,10 @@ var ExplorationEditorMainTab = function() {
       destName, createNewDest, refresherExplorationId) {
     expect(destName === null && createNewDest).toBe(false);
 
+    var targetOption = null;
     if (createNewDest) {
       targetOption = _NEW_STATE_OPTION;
-    } else if (destName === null | destName === '(try again)') {
+    } else if (destName === null || destName === '(try again)') {
       targetOption = _CURRENT_STATE_OPTION;
     } else {
       targetOption = destName;
@@ -607,6 +617,8 @@ var ExplorationEditorMainTab = function() {
     closeAddResponseModal();
     waitFor.invisibilityOf(
       addResponseHeader, 'Add Response modal takes too long to close');
+    waitFor.visibilityOf(
+      interaction, 'interaction takes too long to appear');
   };
 
   // This function should not usually be invoked directly; please consider
@@ -691,7 +703,7 @@ var ExplorationEditorMainTab = function() {
   // opposed to the preview tab, which uses the corresponding function in
   // ExplorationPlayerPage.js).
   this.expectInteractionToMatch = function(interactionId) {
-  // Convert additional arguments to an array to send on.
+    // Convert additional arguments to an array to send on.
     var args = [interaction];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
@@ -976,6 +988,13 @@ var ExplorationEditorMainTab = function() {
       stateNameContainer, name,
       'Current state name is:' + stateNameContainer.getAttribute(
         'textContent') + 'instead of expected ' + name);
+  };
+
+  this.setSolicitAnswerDetailsFeature = function() {
+    waitFor.elementToBeClickable(
+      solicitAnswerDetailsCheckbox,
+      'Solicit answer details checkbox takes too long to be clickable');
+    solicitAnswerDetailsCheckbox.click();
   };
 
   this.expectCurrentStateToBe = function(name) {

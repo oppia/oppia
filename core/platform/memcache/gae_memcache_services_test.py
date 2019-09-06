@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for methods in the gae_memcache_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform.memcache import gae_memcache_services
 from core.tests import test_utils

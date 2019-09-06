@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for core.storage.email.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 import types
 
@@ -21,25 +25,29 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(email_models,) = models.Registry.import_models([models.NAMES.email])
+(base_models, email_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.email])
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.SentEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
     def setUp(self):
         super(SentEmailModelUnitTests, self).setUp()
 
-        # pylint: disable=unused-argument
-        def _generate_hash_for_tests(
-                cls, recipient_id, email_subject, email_body):
+        def mock_generate_hash(
+                unused_cls, unused_recipient_id, unused_email_subject,
+                unused_email_body):
             return 'Email Hash'
 
         self.generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
-            types.MethodType(
-                _generate_hash_for_tests,
-                email_models.SentEmailModel))
+            types.MethodType(mock_generate_hash, email_models.SentEmailModel))
 
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:
@@ -126,6 +134,69 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 results = email_models.SentEmailModel.get_by_hash(
                     'Email Hash',
                     sent_datetime_lower_bound='Not a datetime object')
+
+    def test_raise_exception_by_mocking_collision(self):
+        # Test Exception for SentEmailModel.
+        with self.assertRaisesRegexp(
+            Exception, 'The id generator for SentEmailModel is '
+            'producing too many collisions.'
+            ):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                email_models.SentEmailModel, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    email_models.SentEmailModel)):
+                email_models.SentEmailModel.create(
+                    'recipient_id', 'recipient@email.com', 'sender_id',
+                    'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+                    'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
+        # Test Exception for GeneralFeedbackEmailReplyToIdModel.
+        with self.assertRaisesRegexp(
+            Exception, 'Unique id generator is producing too many collisions.'
+            ):
+            # Swap dependent method get_by_reply_to_id to simulate collision
+            # every time.
+            with self.swap(
+                email_models.GeneralFeedbackEmailReplyToIdModel,
+                'get_by_reply_to_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    email_models.GeneralFeedbackEmailReplyToIdModel)):
+                email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                    'user', 'exploration.exp0.0')
+
+    def test_raise_exception_with_existing_reply_to_id(self):
+        # Test Exception for GeneralFeedbackEmailReplyToIdModel.
+        model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user1', 'exploration.exp1.1')
+        model.put()
+
+        with self.assertRaisesRegexp(
+            Exception, 'Unique reply-to ID for given user and thread '
+            'already exists.'):
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                'user1', 'exploration.exp1.1')
+
+
+class BulkEmailModelUnitTests(test_utils.GenericTestBase):
+    """Test the BulkEmailModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.BulkEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+
+class GeneralFeedbackEmailReplyToIdModelUnitTests(test_utils.GenericTestBase):
+    """Test the GeneralFeedbackEmailReplyToIdModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
 
 class GenerateHashTests(test_utils.GenericTestBase):

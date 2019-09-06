@@ -24,7 +24,7 @@ var waitFor = require('./waitFor.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
-var login = function(email, isSuperAdmin) {
+var login = function(email, isSuperAdmin = false) {
   // Use of element is not possible because the login page is non-angular.
   // The full url is also necessary.
   var driver = browser.driver;

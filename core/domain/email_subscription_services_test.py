@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for email_subscription_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import email_subscription_services
 from core.domain import subscription_services
@@ -78,7 +80,7 @@ class InformSubscribersTest(test_utils.GenericTestBase):
             email_subscription_services.inform_subscribers(
                 self.editor_id, 'A', 'Title')
 
-            # make sure correct number of emails is sent and no email is sent
+            # Make sure correct number of emails is sent and no email is sent
             # to the person who has unsubscribed from subscription emails.
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)

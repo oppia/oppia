@@ -17,32 +17,30 @@
 set -e
 source $(dirname $0)/setup.sh || exit 1
 
+function pip_install {
+  # Attempt standard pip install, or pass in --system if the local environment requires it.
+  # See https://github.com/pypa/pip/issues/3826 for context on when this situation may occur.
+  pip install "$@" || pip install --system "$@"
+}
+
+# Future is needed to be installed first before executing
+# scripts/install_third_party.py.
+echo Checking if Future is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/future-0.17.1" ]; then
+  echo Installing Future
+
+  pip_install future==0.17.1 --target="$THIRD_PARTY_DIR/future-0.17.1"
+fi
+
 # Download and install required JS and zip files.
 echo Installing third-party JS libraries and zip files.
-$PYTHON_CMD scripts/install_third_party.py
+$PYTHON_CMD -m scripts.install_third_party
 
 # Install third-party node modules needed for the build process.
-install_node_module ajv 5.0.0
-install_node_module browserstack-local 1.3.3
-install_node_module dotenv 6.0.0
-install_node_module eslint 4.19.0
-install_node_module eslint-plugin-angular 0.12.0
-install_node_module eslint-plugin-html 4.0.1
-install_node_module gulp 3.9.0
-install_node_module gulp-clean-css 2.0.2
-install_node_module gulp-concat 2.6.0
-install_node_module gulp-sourcemaps 1.6.0
-install_node_module gulp-uglify 2.0.1
-install_node_module gulp-util 3.0.7
-install_node_module htmllint 0.7.2
-install_node_module htmllint-cli 0.0.7
-install_node_module @mapbox/stylelint-processor-arbitrary-tags 0.2.0
-install_node_module postcss-syntax 0.10.0
-install_node_module stylelint 9.2.1
-install_node_module stylelint-config-standard 18.2.0
-install_node_module through2 2.0.0
-install_node_module uglify-js 3.3.11
-install_node_module yargs 3.29.0
+$NPM_INSTALL --only=dev
+# This line removes the "npm ERR! missing:" messages. For reference, see this
+# thread: https://github.com/npm/npm/issues/19393#issuecomment-374076889
+$NPM_CMD dedupe
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
@@ -75,7 +73,12 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
     # third party commands. These are only used for unit tests and generating
     # documentation and are not necessary when building Skulpt.
     sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
-    sed -e "s/  doc()/  pass#doc()/" > $TMP_FILE
+    sed -e "s/  doc()/  pass#doc()/" |\
+    # This and the next command disable unit and compressed unit tests for the
+    # compressed distribution of Skulpt. These tests don't work on some
+    # Ubuntu environments and cause a libreadline dependency issue.
+    sed -e "s/ret = os.system(\"{0}/ret = 0 #os.system(\"{0}/" |\
+    sed -e "s/ret = rununits(opt=True)/ret = 0/" > $TMP_FILE
     mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
     $PYTHON_CMD $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
 
@@ -110,82 +113,100 @@ if ! type pip > /dev/null 2>&1 ; then
 fi
 
 echo Checking if pylint is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/pylint-1.8.4" ]; then
+if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.8.4 --target="$TOOLS_DIR/pylint-1.8.4"
-  # Add __init__.py file so that pylint dependency backports are resolved
-  # correctly.
-  touch $TOOLS_DIR/pylint-1.8.4/backports/__init__.py
+  pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4"
+fi
+
+echo Checking if Pillow is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/Pillow-6.0.0" ]; then
+  echo Installing Pillow
+
+  pip_install Pillow==6.0.0 --target="$TOOLS_DIR/Pillow-6.0.0"
+
+  if [[ $? != 0 && ${OS} == "Darwin" ]]; then
+    echo "  Pillow install failed. See troubleshooting instructions at:"
+    echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
+  fi
+
+fi
+
+echo Checking if pylint-quotes is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/pylint-quotes-0.2.1" ]; then
+  echo Installing pylint-quotes
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o pylint-quotes-0.2.1.tar.gz -L https://github.com/edaniszewski/pylint-quotes/archive/0.2.1.tar.gz
+  tar xzf pylint-quotes-0.2.1.tar.gz -C $TOOLS_DIR
+  rm pylint-quotes-0.2.1.tar.gz
 fi
 
 # Install webtest.
 echo Checking if webtest is installed in third_party
-if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
+if [ ! -d "$TOOLS_DIR/webtest-2.0.33" ]; then
   echo Installing webtest framework
   # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o webtest-download.zip -L https://github.com/Pylons/webtest/archive/1.4.2.zip
-  unzip webtest-download.zip -d $TOOLS_DIR
-  rm webtest-download.zip
+  curl -o webtest-2.0.33.zip -L https://github.com/Pylons/webtest/archive/2.0.33.zip
+  unzip webtest-2.0.33.zip -d $TOOLS_DIR
+  rm webtest-2.0.33.zip
 fi
 
 # Install isort.
 echo Checking if isort is installed in third_party
-if [ ! -d "$TOOLS_DIR/isort-4.2.15" ]; then
+if [ ! -d "$TOOLS_DIR/isort-4.3.20" ]; then
   echo Installing isort
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o isort-4.2.15.tar.gz -L https://pypi.python.org/packages/4d/d5/7c8657126a43bcd3b0173e880407f48be4ac91b4957b51303eab744824cf/isort-4.2.15.tar.gz
-  tar xzf isort-4.2.15.tar.gz -C $TOOLS_DIR
-  rm isort-4.2.15.tar.gz
+  curl -o isort-4.3.20.tar.gz -L https://files.pythonhosted.org/packages/f1/84/5d66ddbe565e36682c336c841e51430384495b272c622ac229029f671be2/isort-4.3.20.tar.gz
+  tar xzf isort-4.3.20.tar.gz -C $TOOLS_DIR
+  rm isort-4.3.20.tar.gz
 fi
 
 # Install pycodestyle.
 echo Checking if pycodestyle is installed in third_party
-if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
+if [ ! -d "$TOOLS_DIR/pycodestyle-2.5.0" ]; then
   echo Installing pycodestyle
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pycodestyle-2.3.1.tar.gz -L https://pypi.python.org/packages/e1/88/0e2cbf412bd849ea6f1af1f97882add46a374f4ba1d2aea39353609150ad/pycodestyle-2.3.1.tar.gz
-  tar xzf pycodestyle-2.3.1.tar.gz -C $TOOLS_DIR
-  rm pycodestyle-2.3.1.tar.gz
+  curl -o pycodestyle-2.5.0.tar.gz -L https://files.pythonhosted.org/packages/1c/d1/41294da5915f4cae7f4b388cea6c2cd0d6cd53039788635f6875dfe8c72f/pycodestyle-2.5.0.tar.gz
+  tar xzf pycodestyle-2.5.0.tar.gz -C $TOOLS_DIR
+  rm pycodestyle-2.5.0.tar.gz
 fi
 
-# Install pyjsparser.
-echo Checking if pyjsparser is installed in third_party
-if [ ! -d "$TOOLS_DIR/pyjsparser-2.5.2" ]; then
-  echo Installing pyjsparser
+# Install esprima.
+echo Checking if esprima is installed in third_party
+if [ ! -d "$TOOLS_DIR/esprima-4.0.1" ]; then
+  echo Installing esprima
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pyjsparser-2.5.2.tar.gz -L https://pypi.python.org/packages/17/3d/59f7f0cd6a7cdab611b36d8921c9d2d6c5564033d938ec2eb934cdca0e48/pyjsparser-2.5.2.tar.gz
-  tar xzf pyjsparser-2.5.2.tar.gz -C $TOOLS_DIR
-  rm pyjsparser-2.5.2.tar.gz
+  curl -o esprima-4.0.1.tar.gz -L https://files.pythonhosted.org/packages/cc/a1/50fccd68a12bcfc27adfc9969c090286670a9109a0259f3f70943390b721/esprima-4.0.1.tar.gz
+  tar xzf esprima-4.0.1.tar.gz -C $TOOLS_DIR
+  rm esprima-4.0.1.tar.gz
 fi
 
 # Python API for browsermob-proxy.
 echo Checking if browsermob-proxy is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
+if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.8.0" ]; then
   echo Installing browsermob-proxy
 
-  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  pip_install browsermob-proxy==0.8.0 --target="$TOOLS_DIR/browsermob-proxy-0.8.0"
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
+if [ ! -d "$TOOLS_DIR/selenium-3.13.0" ]; then
   echo Installing selenium
 
-  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+  pip_install selenium==3.13.0 --target="$TOOLS_DIR/selenium-3.13.0"
 fi
 
-echo Checking if PIL is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
-  echo Installing PIL
+echo Checking if PyGithub is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/PyGithub-1.43.7" ]; then
+  echo Installing PyGithub
 
-  pip install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
-
-  if [[ $? != 0 && ${OS} == "Darwin" ]]; then
-    echo "  PIL install failed. See troubleshooting instructions at:"
-    echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
-  fi
+  pip_install PyGithub==1.43.7 --target="$TOOLS_DIR/PyGithub-1.43.7"
 fi
+
+# install pre-commit script
+echo Installing pre-commit hook for git
+$PYTHON_CMD -m scripts.pre_commit_hook --install
 
 # install pre-push script
 echo Installing pre-push hook for git
-$PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install
+$PYTHON_CMD -m scripts.pre_push_hook --install

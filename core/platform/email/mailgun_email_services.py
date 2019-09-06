@@ -15,11 +15,41 @@
 # limitations under the License.
 
 """Provides mailgun api to send email."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import base64
 
 from core.platform.email import gae_email_services
 import feconf
+import python_utils
 
-import requests
+
+def post_to_mailgun(data):
+    """Send POST HTTP request to mailgun api. This method is adopted from
+    the requests library's post method.
+
+    Args:
+        - data: dict. The data to be sent in the request's body.
+
+    Returns:
+         Response from the server. The object is a file-like object.
+         https://docs.python.org/2/library/urllib2.html
+    """
+    if not feconf.MAILGUN_API_KEY:
+        raise Exception('Mailgun API key is not available.')
+
+    if not feconf.MAILGUN_DOMAIN_NAME:
+        raise Exception('Mailgun domain name is not set.')
+
+    encoded = base64.b64encode(b'api:%s' % feconf.MAILGUN_API_KEY).strip()
+    auth_str = 'Basic %s' % encoded
+    header = {'Authorization': auth_str}
+    server = (
+        'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
+    data = python_utils.url_encode(data)
+    req = python_utils.url_request(server, data, header)
+    return python_utils.url_open(req)
 
 
 def send_mail(
@@ -39,6 +69,7 @@ def send_mail(
       - html_body: str. The HTML body of the email. Must fit in a datastore
           entity.
       - bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
+      - reply_to_id: str. The unique id of the sender.
 
     Raises:
       Exception: if the configuration in feconf.py forbids emails from being
@@ -48,15 +79,6 @@ def send_mail(
         feconf.MAILGUN_DOMAIN_NAME.
       (and possibly other exceptions, due to mail.send_mail() failures)
     """
-    if not feconf.MAILGUN_API_KEY:
-        raise Exception('Mailgun API key is not available.')
-
-    if not feconf.MAILGUN_DOMAIN_NAME:
-        raise Exception('Mailgun domain name is not set.')
-
-    mailgun_domain_name = (
-        'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
-
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
@@ -74,9 +96,7 @@ def send_mail(
         reply_to = gae_email_services.get_incoming_email_address(reply_to_id)
         data['h:Reply-To'] = reply_to
 
-    requests.post(
-        mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
-        data=data)
+    post_to_mailgun(data)
 
 
 def send_bulk_mail(
@@ -105,15 +125,6 @@ def send_bulk_mail(
         feconf.MAILGUN_DOMAIN_NAME.
       (and possibly other exceptions, due to mail.send_mail() failures)
     """
-    if not feconf.MAILGUN_API_KEY:
-        raise Exception('Mailgun API key is not available.')
-
-    if not feconf.MAILGUN_DOMAIN_NAME:
-        raise Exception('Mailgun domain name is not set.')
-
-    mailgun_domain_name = (
-        'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
-
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
@@ -123,7 +134,7 @@ def send_bulk_mail(
     # https://documentation.mailgun.com/user_manual.html#batch-sending
     recipient_email_sets = [
         recipient_emails[i:i + 1000]
-        for i in xrange(0, len(recipient_emails), 1000)]
+        for i in python_utils.RANGE(0, len(recipient_emails), 1000)]
 
     for email_set in recipient_email_sets:
         # 'recipient-variable' in post data forces mailgun to send individual
@@ -137,6 +148,4 @@ def send_bulk_mail(
             'html': html_body,
             'recipient-variables': '{}'}
 
-        requests.post(
-            mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
-            data=data)
+        post_to_mailgun(data)
