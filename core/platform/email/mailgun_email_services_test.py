@@ -16,6 +16,7 @@
 
 """Tests for the Mailgun API wrapper."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
@@ -140,7 +141,7 @@ class EmailTests(test_utils.GenericTestBase):
             lambda data=None:
             self.assertEqual(
                 data['h:Reply-To'],
-                'reply+' + python_utils.STR(reply_id) + '@' +
+                'reply+' + python_utils.UNICODE(reply_id) + '@' +
                 feconf.INCOMING_EMAILS_DOMAIN_NAME))
         post_request = self.swap(
             mailgun_email_services, 'post_to_mailgun', req_post_lambda)
