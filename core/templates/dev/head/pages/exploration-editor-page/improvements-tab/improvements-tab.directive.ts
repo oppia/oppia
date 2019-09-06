@@ -70,6 +70,14 @@ angular.module('oppia').directive('improvementsTab', [
             return ImprovementsDisplayService.isOpen(card.getStatus());
           };
 
+          $scope.getCardCssClasses = function(card) {
+            var mainCssClass = $scope.isCardOpen(card) ?
+              'oppia-improvement-card' : 'oppia-improvement-closed-card';
+            var protractorTestCssClass =
+              'protractor-test-' + card.getDirectiveType() + '-body';
+            return mainCssClass + ' ' + protractorTestCssClass;
+          };
+
           $scope.getCardTitle = function(card) {
             return card.getTitle();
           };

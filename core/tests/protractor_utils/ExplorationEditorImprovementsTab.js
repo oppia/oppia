@@ -25,46 +25,187 @@ var ruleTemplates = require(
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorImprovementsTab = function() {
-  var answerDetailsCardStateName = element(
-    by.css('.protractor-test-answer-details-state'));
-  var answerInfoCount = element(
-    by.css('.protractor-test-answer-info-count'));
-  var reviewAnswerDetailsButton = element(
-    by.css('.protractor-test-review-answer-details'));
-  var answerDetails = element(by.css('.protractor-test-answer-details'));
-  var closeAnswerDetailsButton = element(
-    by.css('.protractor-test-close-answer-details'));
+  const cardsContainer = $('.protractor-test-cards');
+  const closeModalButton = $('.protractor-test-close-modal-button');
 
-  var _getAnswerDetailsCardStateName = function() {
-    return answerDetailsCardStateName.getText();
+  const answerDetails = $('.protractor-test-answer-details');
+  const answerInfoCount = $('.protractor-test-answer-info-count');
+
+  const threadMessagesContainer = $('.protractor-test-thread-messages');
+  const responseTextarea = $('.protractor-test-response-textarea');
+  const responseStatusSelect = $('.protractor-test-response-status-select');
+  const responseSendButton = $('.protractor-test-response-send-button');
+  const reviewSuggestionButton = $('.protractor-test-review-suggestion-button');
+
+  const suggestionRows = $$('.protractor-test-oppia-feedback-tab-row');
+  const acceptSuggestionButton = $(
+    '.protractor-test-exploration-accept-suggestion-btn');
+  var rejectSuggestionButton = element(
+    by.css('.protractor-test-exploration-reject-suggestion-btn'));
+  var suggestionReviewMessageInput =
+    $('.protractor-test-suggestion-review-message');
+  var suggestionCommitMessageInput =
+    $('.protractor-test-suggestion-commit-message');
+
+  const threadMessageLocator =
+    by.css('.protractor-test-thread-message-body');
+  const threadMessageAuthorLocator =
+    by.css('.protractor-test-thread-message-author');
+  const threadMessageStatusChangeLocator =
+    by.css('.protractor-test-thread-message-status-change');
+
+  const actionButtonLocator = by.css('.protractor-test-action-button');
+  const cardLocator = by.css('.protractor-test-card');
+  const cardBodyLocator = by.css('.protractor-test-card-body');
+  const cardStatusLocator = by.css('.protractor-test-card-status');
+  const cardTitleLocator = by.css('.protractor-test-card-title');
+  const stateNameLocator = by.css('.protractor-test-card-state-name');
+
+  const suggestionRowClassName = '.protractor-test-oppia-feedback-tab-row';
+
+  var _cardHasStateName = function(card, stateName) {
+    return card.element(stateNameLocator).getText()
+      .then(text => text === stateName);
   };
 
-  var _getAnswerInfoCount = function() {
-    return answerInfoCount.getText();
+  var _cardHasTitle = function(card, titleSubstring) {
+    return card.element(cardTitleLocator).getText()
+      .then(text => text.includes(titleSubstring));
   };
 
-  var _getAnswerDetails = function() {
-    return answerDetails.getText();
+  var _cardHasContent = function(card, content) {
+    return card.element(cardBodyLocator).getText()
+      .then(text => text.includes(content));
   };
 
-  this.navigateReviewAnswerDetails = function() {
+  var _cardHasType = function(card, cardType) {
+    return card.getAttribute('class')
+      .then(cardCssClass => cardCssClass.includes(cardType));
+  };
+
+  /**
+   * @typedef CardMatchOptions
+   * @property {string} card_type - the type of the card.
+   * @property {string} card_content - the content on the card we expect to see.
+   * @property {string} state_name - the state the card should be associated to.
+   */
+
+  /** @return {Array.<(HTMLElement) => boolean>} */
+  var _buildCardPredicate = function(cardMatchOptions) {
+    var predicates = [];
+    if (cardMatchOptions.state_name !== undefined) {
+      predicates.push(c => _cardHasStateName(c, cardMatchOptions.state_name));
+    }
+    if (cardMatchOptions.card_title !== undefined) {
+      predicates.push(c => _cardHasTitle(c, cardMatchOptions.card_title));
+    }
+    if (cardMatchOptions.card_type !== undefined) {
+      predicates.push(c => _cardHasType(c, cardMatchOptions.card_type));
+    }
+    if (cardMatchOptions.card_content !== undefined) {
+      predicates.push(c => _cardHasContent(c, cardMatchOptions.card_content));
+    }
+    return (cardElement) => {
+      return Promise.all(predicates.map(predicate => predicate(cardElement)))
+        .then(results => results.every(booleanValue => booleanValue));
+    };
+  };
+
+  /** @param {CardMatchOptions} cardMatchOptions */
+  var _getFirstMatchingCard = function(cardMatchOptions) {
+    const isMatchingCard = _buildCardPredicate(cardMatchOptions);
+    return cardsContainer.all(cardLocator).filter(isMatchingCard).first();
+  };
+
+  this.verifyAnswerDetails = function(
+      expectedAnswerDetails, expectedAnswerInfoCount) {
+    expect(answerDetails.getText()).toMatch(expectedAnswerDetails);
+    expect(answerInfoCount.getText()).toMatch(String(expectedAnswerInfoCount));
+  };
+
+  this.closeModal = function() {
     waitFor.elementToBeClickable(
-      reviewAnswerDetailsButton,
-      'Answer details button takes too long to be clickable');
-    reviewAnswerDetailsButton.click();
+      closeModalButton, 'Close button takes too long to become clickable');
+    closeModalButton.click();
   };
 
-  this.checkAnswerDetailsCard = function(stateName, count) {
-    expect(_getAnswerDetailsCardStateName()).toMatch(stateName);
-    expect(_getAnswerInfoCount()).toMatch(count);
+  this.getMatchingAnswerDetailsCard = function(stateName) {
+    return _getFirstMatchingCard({
+      state_name: stateName,
+      card_type: 'answer-details',
+    });
   };
 
-  this.verifyAnswerDetails = function(answerDetails) {
-    expect(_getAnswerDetails()).toMatch(answerDetails);
+  this.getThreadMessages = function() {
+    return threadMessagesContainer.all(threadMessageLocator)
+      .map(m => m.getText());
+  };
+
+  this.sendResponseAndCloseModal = function(feedbackResponse, feedbackStatus) {
+    responseTextarea.sendKeys(feedbackResponse);
+    if (feedbackStatus) {
+      responseStatusSelect.click();
+      $('option[label="' + feedbackStatus + '"]').click();
+    }
+    responseSendButton.click();
+    browser.waitForAngular();
+  };
+
+  this.getMatchingFeedbackCard = function(titleSubstring) {
+    return _getFirstMatchingCard({
+      card_title: titleSubstring,
+      card_type: 'feedback',
+    });
+  };
+
+  this.getMatchingSuggestionCard = function(description) {
+    return _getFirstMatchingCard({
+      card_content: description,
+      card_type: 'suggestion',
+    });
+  };
+
+  this.acceptSuggestion = function() {
     waitFor.elementToBeClickable(
-      closeAnswerDetailsButton,
-      'Answer details close button takes too long to be clickable');
-    closeAnswerDetailsButton.click();
+      reviewSuggestionButton,
+      'View Suggestion button takes too long to become clickable');
+    reviewSuggestionButton.click();
+
+    suggestionCommitMessageInput.sendKeys('Commit message');
+    waitFor.elementToBeClickable(
+      acceptSuggestionButton,
+      'Accept Suggestion button takes too long to become clickable');
+    acceptSuggestionButton.click();
+
+    browser.waitForAngular();
+  };
+
+  this.rejectSuggestion = function() {
+    waitFor.elementToBeClickable(
+      reviewSuggestionButton,
+      'View Suggestion button takes too long to become clickable');
+    reviewSuggestionButton.click();
+
+    suggestionReviewMessageInput.sendKeys('Commit message');
+    waitFor.elementToBeClickable(
+      rejectSuggestionButton,
+      'Accept Suggestion button takes too long to become clickable');
+    rejectSuggestionButton.click();
+
+    browser.waitForAngular();
+  };
+
+  this.getCardStatus = function(card) {
+    return card.element(cardStatusLocator).getText();
+  };
+
+  this.clickCardActionButton = function(card, buttonText) {
+    var buttonElement = card.element(
+      buttonText ? by.buttonText(buttonText) : actionButtonLocator);
+    waitFor.elementToBeClickable(
+      buttonElement, 'Action button takes too long to become clickable');
+    buttonElement.click();
+    browser.waitForAngular();
   };
 };
 
