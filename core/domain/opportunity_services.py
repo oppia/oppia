@@ -399,8 +399,7 @@ def get_skill_opportunity_from_model(model):
     """
 
     return opportunity_domain.SkillOpportunity(
-        model.skill_id, model.skill_description, model.question_count,
-        model.topic_id, model.topic_name)
+        model.skill_id, model.skill_description, model.question_count)
 
 
 def get_skill_opportunities(cursor):
@@ -479,82 +478,6 @@ def delete_skill_opportunities(skill_id):
         opportunity_models.SkillOpportunityModel.get_by_skill_id(skill_id))
     opportunity_models.SkillOpportunityModel.delete_multi(
         skill_opportunity_models)
-
-
-def add_topic_to_skill_opportunity(topic_id, skill_id):
-    """Adds a topic_id and corresponding topic_name to an existing
-    SkillOpportunityModel with the supplied skill_id if available. Otherwise,
-    creates a new SkillOpportunityModel with the given skill and topic IDs.
-
-    Args:
-        topic_id: str. The topic_id of the to-be-added topic.
-        skill_id: str. The skill_id of the SkillOpportunityModel.
-    """
-    skill_opportunity_models = (
-        opportunity_models.SkillOpportunityModel.get_by_skill_id(skill_id))
-    topic = topic_fetchers.get_topic_by_id(topic_id)
-    for model in skill_opportunity_models:
-        if model.topic_id == topic_id:
-            return
-        if model.topic_id is None:
-            model.topic_id = topic_id
-            model.topic_name = topic.name
-            model.put()
-            return
-
-    if skill_opportunity_models:
-        create_skill_opportunity(
-            opportunity_domain.SkillOpportunity(
-                topic_id=topic_id,
-                topic_name=topic.name,
-                skill_id=skill_id,
-                skill_description=skill_opportunity_models[0].skill_description
-            )
-        )
-
-
-def update_skill_opportunities_with_topic_name(topic_id, topic_name):
-    """Updates the SkillOpportunityModel(s) with a new topic_name.
-
-    Args:
-        topic_id: str. The corresponding topic id of the opportunity.
-        topic_name: str. The new topic name.
-    """
-    skill_opportunity_models = (
-        opportunity_models.SkillOpportunityModel.get_by_topic_id(topic_id))
-    for model in skill_opportunity_models:
-        model.topic_name = topic_name
-        model.put()
-
-
-def delete_topic_from_skill_opportunity(topic_id, skill_id):
-    """Deletes topic_id and topic_name from SkillOpportunityModel(s).
-
-    Args:
-        topic_id: str. The topic_id of the to-be-deleted topic.
-        skill_id: str. The skill_id of the SkillOpportunityModel.
-    """
-    skill_opportunity_models = (
-        opportunity_models.SkillOpportunityModel.get_by_skill_id(skill_id))
-    for model in skill_opportunity_models:
-        if model.topic_id == topic_id:
-            model.topic_id = None
-            model.topic_name = None
-            model.put()
-
-
-def delete_topic_from_all_skill_opportunities(topic_id):
-    """Deletes topic_id and topic_name from SkillOpportunityModel(s).
-
-    Args:
-        topic_id: str. The topic_id of the to-be-added topic.
-    """
-    skill_opportunity_models = (
-        opportunity_models.SkillOpportunityModel.get_by_topic_id(topic_id))
-    for model in skill_opportunity_models:
-        model.topic_id = None
-        model.topic_name = None
-        model.put()
 
 
 def update_skill_opportunity_question_counts(skill_ids, delta):

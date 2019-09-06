@@ -146,10 +146,6 @@ class SkillOpportunityModel(base_models.BaseModel):
     A new instance of this model is created and saved every time a commit to
     SkillModel occurs.
     """
-    # The ID of the topic assigned to the opportunity's skill.
-    topic_id = ndb.StringProperty(indexed=True)
-    # The name of the topic assigned to the opportunity's skill.
-    topic_name = ndb.StringProperty(indexed=True)
     # The ID of the opportunity's skill.
     skill_id = ndb.StringProperty(required=True, indexed=True)
     # The description of the opportunity's skill.
@@ -199,13 +195,3 @@ class SkillOpportunityModel(base_models.BaseModel):
             SkillOpportunityModel(s) with the supplied skill_id.
         """
         return cls.query(cls.skill_id == skill_id).fetch()
-
-    @classmethod
-    def get_by_topic_id(cls, topic_id):
-        """Returns all models matching the supplied topic_id.
-
-        Returns:
-            list(SkillOpportunityModel)|None. A list of
-            SkillOpportunityModel(s) with the supplied topic_id.
-        """
-        return cls.query(cls.topic_id == topic_id).fetch()

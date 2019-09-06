@@ -1625,10 +1625,9 @@ tags: []
         """
         opportunity_services.create_skill_opportunity(
             opportunity_domain.SkillOpportunity(
-                topic_id=topic_id,
-                topic_name=topic_name,
                 skill_id=skill_id,
                 skill_description=skill_description,
+                question_count=0
             )
         )
 

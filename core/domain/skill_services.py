@@ -431,7 +431,8 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
     opportunity_services.create_skill_opportunity(
         opportunity_domain.SkillOpportunity(
             skill_id=skill.id,
-            skill_description=skill.description
+            skill_description=skill.description,
+            question_count=0
         )
     )
 

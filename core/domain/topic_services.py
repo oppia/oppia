@@ -22,7 +22,6 @@ import collections
 import logging
 
 from core.domain import exp_fetchers
-from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_services
@@ -482,12 +481,6 @@ def update_topic_and_subtopic_pages(
                 subtopic_page_change_list)
     create_topic_summary(topic_id)
 
-    if old_topic.name != updated_topic.name:
-        opportunity_services.update_opportunities_with_new_topic_name(
-            updated_topic.id, updated_topic.name)
-        opportunity_services.update_skill_opportunities_with_topic_name(
-            updated_topic.id, updated_topic.name)
-
 
 def delete_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
     """Removes skill with given id from the topic.
@@ -505,8 +498,6 @@ def delete_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
     update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
         'Removed %s from uncategorized skill ids' % uncategorized_skill_id)
-    opportunity_services.delete_topic_from_skill_opportunity(
-        topic_id, uncategorized_skill_id)
 
 
 def add_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
@@ -525,8 +516,6 @@ def add_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
     update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
         'Added %s to uncategorized skill ids' % uncategorized_skill_id)
-    opportunity_services.add_topic_to_skill_opportunity(
-        topic_id, uncategorized_skill_id)
 
 
 def publish_story(topic_id, story_id, committer_id):
@@ -741,10 +730,6 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     # key will be reinstated.
     topic_memcache_key = topic_fetchers.get_topic_memcache_key(topic_id)
     memcache_services.delete(topic_memcache_key)
-    (
-        opportunity_services
-        .delete_exploration_opportunities_corresponding_to_topic(topic_id))
-    opportunity_services.delete_topic_from_all_skill_opportunities(topic_id)
 
 
 def delete_topic_summary(topic_id):

@@ -204,22 +204,17 @@ class SkillOpportunity(python_utils.OBJECT):
     """The domain object for skill opportunities."""
 
     def __init__(
-            self, skill_id, skill_description,
-            question_count=0, topic_id=None, topic_name=None):
+            self, skill_id, skill_description, question_count):
         """Constructs a SkillOpportunity domain object.
 
         Args:
             skill_id: str. The unique id of the skill.
             skill_description: str. The title of the skill.
             question_count: int. The total number of questions for the skill.
-            topic_id: str. The unique id of the topic.
-            topic_name: str. The name of the topic.
         """
         self.skill_id = skill_id
         self.skill_description = skill_description
         self.question_count = question_count
-        self.topic_id = topic_id
-        self.topic_name = topic_name
         self.validate()
 
     def validate(self):
@@ -228,15 +223,6 @@ class SkillOpportunity(python_utils.OBJECT):
         Raises:
             ValidationError: One or more attributes of the object are invalid.
         """
-        if (not isinstance(self.topic_id, python_utils.BASESTRING) and
-                self.topic_id is not None):
-            raise utils.ValidationError(
-                'Expected topic_id to be a string, received %s' % self.topic_id)
-        if (not isinstance(self.topic_name, python_utils.BASESTRING) and
-                self.topic_name is not None):
-            raise utils.ValidationError(
-                'Expected topic_name to be a string, received %s' %
-                self.topic_name)
         if not isinstance(self.skill_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected skill_id to be a string, received %s' % self.skill_id)
@@ -269,9 +255,7 @@ class SkillOpportunity(python_utils.OBJECT):
         return cls(
             skill_opportunity_dict['skill_id'],
             skill_opportunity_dict['skill_description'],
-            skill_opportunity_dict['question_count'],
-            skill_opportunity_dict['topic_id'],
-            skill_opportunity_dict['topic_name'])
+            skill_opportunity_dict['question_count'])
 
     def to_dict(self):
         """Returns a copy of the object as a dictionary. It includes all
@@ -287,8 +271,6 @@ class SkillOpportunity(python_utils.OBJECT):
         """
         return {
             'skill_id': self.skill_id,
-            'topic_id': self.topic_id,
-            'topic_name': self.topic_name,
             'skill_description': self.skill_description,
             'question_count': self.question_count
         }

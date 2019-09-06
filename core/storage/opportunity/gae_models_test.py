@@ -147,16 +147,12 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
 
         opportunity_models.SkillOpportunityModel(
             id='opportunity_id1',
-            topic_id='topic_id1',
-            topic_name='Topic 1',
             skill_id='skill_id1',
             skill_description='A skill description',
             question_count=20,
         ).put()
         opportunity_models.SkillOpportunityModel(
             id='opportunity_id2',
-            topic_id='topic_id2',
-            topic_name='Topic 2',
             skill_id='skill_id2',
             skill_description='A skill description',
             question_count=30,
