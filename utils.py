@@ -268,7 +268,14 @@ def convert_png_binary_to_data_url(content):
 
 
 def convert_png_to_data_url(filepath):
-    """Converts the png file at filepath to a data URL."""
+    """Converts the png file at filepath to a data URL.
+
+    Args:
+        filepath: str. path of the file.
+
+    Returns:
+        converting png binary to data url.
+    """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
     return convert_png_binary_to_data_url(file_contents)
 
@@ -408,6 +415,12 @@ def get_current_time_in_millisecs():
 def get_human_readable_time_string(time_msec):
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.
+
+    Args:
+        time_msec: double. time in msec
+
+    Returns:
+        time in human readable string.
     """
     return time.strftime(
         '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
@@ -416,6 +429,14 @@ def get_human_readable_time_string(time_msec):
 def are_datetimes_close(later_datetime, earlier_datetime):
     """Given two datetimes, determines whether they are separated by less than
     feconf.PROXIMAL_TIMEDELTA_SECS seconds.
+
+    Args:
+        later_datetime: func. later date and time
+        earlier_datetime: func. earlier date and time
+
+    Returns:
+        whether they are separated by less than
+        feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     """
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
     return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
@@ -443,7 +464,15 @@ def generate_new_session_id():
 
 
 def vfs_construct_path(base_path, *path_components):
-    """Mimics behavior of os.path.join on Posix machines."""
+    """Mimics behavior of os.path.join on Posix machines.
+
+    Args:
+        base_path: str. base path
+        path_components: str. The path to the assets folder for an entity.
+
+    Returns:
+        constructed path.
+    """
     path = base_path
     for component in path_components:
         if component.startswith('/'):
@@ -456,7 +485,14 @@ def vfs_construct_path(base_path, *path_components):
 
 
 def vfs_normpath(path):
-    """Normalize path from posixpath.py, eliminating double slashes, etc."""
+    """Normalize path from posixpath.py, eliminating double slashes, etc.
+
+    Args:
+        path: str. path
+
+    Returns:
+        normalized path.
+    """
     # Preserve unicode (if path is unicode).
     slash, dot = (u'/', u'.') if isinstance(path, python_utils.UNICODE) else (
         '/', '.')
@@ -600,7 +636,14 @@ def is_valid_language_code(language_code):
 
 
 def unescape_encoded_uri_component(escaped_string):
-    """Unescape a string that is encoded with encodeURIComponent."""
+    """Unescape a string that is encoded with encodeURIComponent.
+
+    Args:
+        escaped_string: str. escaped string
+
+    Returns:
+        Unescape a string that is encoded with encodeURIComponent.
+    """
     return python_utils.urllib_unquote(escaped_string).decode('utf-8')
 
 
