@@ -264,6 +264,14 @@ describe('Url Service', function() {
     expect(UrlService.getExplorationVersionFromUrl()).toBe(null);
   });
 
+  it('should correctly retrieve status code from url', function() {
+    mockLocation.search = '?status=400';
+    expect(UrlService.getStatusCodeFromUrl()).toBe(400);
+
+    mockLocation.search = '?stats=400';
+    expect(UrlService.getStatusCodeFromUrl()).toBe(null);
+  });
+
   it('should correctly retrieve username from url', function() {
     mockLocation.pathname = '/profile/abcdefgijklm';
     expect(UrlService.getUsernameFromProfileUrl()).toBe('abcdefgijklm');
