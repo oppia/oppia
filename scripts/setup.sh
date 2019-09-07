@@ -181,6 +181,11 @@ if [ ! -d "$YARN_PATH" ]; then
   rm -f package-lock.json
 
   echo Installing yarn
+  echo ""
+  echo "WARNING: Please note that Oppia uses Yarn to manage node packages,"
+  echo "do *NOT* use npm. For more information on how to use yarn,"
+  echo "visit https://yarnpkg.com/en/docs/usage."
+  echo ""
 
   YARN_VERSION=v1.17.3
   YARN_FILE_NAME=yarn-$YARN_VERSION.tar.gz
