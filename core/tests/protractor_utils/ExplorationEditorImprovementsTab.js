@@ -26,6 +26,7 @@ var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorImprovementsTab = function() {
   const cardsContainer = $('.protractor-test-cards');
+  const onlyOpenInput = $('.protractor-test-only-open-input');
   const closeModalButton = $('.protractor-test-close-modal-button');
 
   const answerDetails = $('.protractor-test-answer-details');
@@ -115,6 +116,12 @@ var ExplorationEditorImprovementsTab = function() {
   var _getFirstMatchingCard = function(cardMatchOptions) {
     const isMatchingCard = _buildCardPredicate(cardMatchOptions);
     return cardsContainer.all(cardLocator).filter(isMatchingCard).first();
+  };
+
+  this.setOnlyShowOpenCards = function(choice) {
+    if (choice !== onlyOpenInput.isSelected()) {
+      onlyOpenInput.click();
+    }
   };
 
   this.verifyAnswerDetails = function(

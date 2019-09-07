@@ -2980,6 +2980,7 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-bottom: 30px;
   max-width: 800px;
   padding: 32px 32px 24px 32px;
+  background-color: #fff;
 }
 
 .oppia-improvement-closed-card {

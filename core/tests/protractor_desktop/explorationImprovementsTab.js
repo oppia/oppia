@@ -132,7 +132,7 @@ describe('Answer Details Improvements', function() {
 });
 
 
-describe('Feedback Improvements', function() {
+fdescribe('Feedback Improvements', function() {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
   var EXPLORATION_TITLE_2 = 'Exploration for testing feedback status';
   var EXPLORATION_OBJECTIVE = 'To explore something';
@@ -210,7 +210,7 @@ describe('Feedback Improvements', function() {
     users.logout();
   });
 
-  it('should change status of feedback thread', function() {
+  fit('should change status of feedback thread', function() {
     var feedback = 'Hey! This exploration looks awesome';
     var feedbackResponse = 'Thanks for the feedback!';
 
@@ -246,6 +246,7 @@ describe('Feedback Improvements', function() {
     explorationEditorPage.navigateToImprovementsTab();
 
     // Mark thread as fixed.
+    improvementsTab.setOnlyShowOpenTasks(false);
     var card = improvementsTab.getMatchingFeedbackCard('Introduction');
     expect(improvementsTab.getCardStatus(card)).toEqual('Open');
     improvementsTab.clickCardActionButton(card);

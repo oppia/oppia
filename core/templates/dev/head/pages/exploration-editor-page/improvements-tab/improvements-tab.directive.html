@@ -8,7 +8,9 @@
         </h1>
       </div>
       <div class="options-card" style="text-align: right; padding: 10px">
-        <input type="checkbox" ng-model="onlyShowOpenTasks"> Show only "Open" tasks.
+        <input type="checkbox" class="protractor-test-only-open-input"
+               ng-model="onlyShowOpenTasks">
+        Show only "Open" tasks.
       </div>
     </md-card>
   </div>
@@ -16,7 +18,8 @@
   <div class="protractor-test-cards">
 
     <md-card ng-repeat="card in getCards() | orderBy:getCardTitle:true | filter:isCardShown"
-             ng-if="!isCardObsolete(card)" ng-class="getCardCssClasses(card)"
+             ng-if="!isCardObsolete(card)"
+             ng-class="[oppia-improvement-{{card.getDirectiveType()}}-card, {'oppia-improvement-card': isCardOpen(card), 'oppia-improvement-closed-card': !isCardOpen(card)}]"
              class="protractor-test-card">
 
       <div class="oppia-improvement-card-header modal-header">
