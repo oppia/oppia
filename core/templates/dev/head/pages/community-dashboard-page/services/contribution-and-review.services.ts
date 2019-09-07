@@ -70,7 +70,8 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return _fetchSuggestions(url, onSuccess);
       },
-      resolveSuggestion: function(targetId, threadId, action, onSuccess) {
+      resolveSuggestion: function(
+          targetId, threadId, action, reviewMessage, commitMessage, onSuccess) {
         var url = UrlInterpolationService.interpolateUrl(
           _SUGGESTION_ACTION_HANDLER_URL, {
             exp_id: targetId,
@@ -78,9 +79,11 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return $http.put(url, {
           action: action,
-          review_message: 'Done',
+          review_message: reviewMessage,
           commit_message: (
-            action === ACTION_ACCEPT_SUGGESTION ? 'Accepted' : 'Rejected')
+            action === ACTION_ACCEPT_SUGGESTION ? commitMessage : null)
+        }).then(function() {
+          onSuccess(threadId);
         });
       }
     };

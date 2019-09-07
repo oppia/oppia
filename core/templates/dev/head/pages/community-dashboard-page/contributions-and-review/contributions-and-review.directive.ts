@@ -124,14 +124,16 @@ angular.module('oppia').directive('contributionsAndReview', [
                   $scope.translationHtml = translationHtml;
                   $scope.contentHtml = contentHtml;
                   $scope.reviewable = reviewable;
+                  $scope.commitMessage = '';
+                  $scope.reviewMessage = '';
 
                   $scope.accept = function() {
                     SuggestionModalService.acceptSuggestion(
                       $uibModalInstance,
                       {
                         action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-                        commitMessage: 'Adds translation to the content.',
-                        reviewMessage: 'Accepted translation.'
+                        commitMessage: $scope.commitMessage,
+                        reviewMessage: $scope.reviewMessage
                       });
                   };
 
@@ -140,7 +142,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                       $uibModalInstance,
                       {
                         action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-                        reviewMessage: 'Rejected'
+                        reviewMessage: $scope.reviewMessage
                       });
                   };
                   $scope.cancel = function() {
@@ -150,8 +152,8 @@ angular.module('oppia').directive('contributionsAndReview', [
               ]
             }).result.then(function(result) {
               ContributionAndReviewService.resolveSuggestion(
-                targetId, suggestionId, result.action,
-                removeContributionToReview);
+                targetId, suggestionId, result.action, result.reviewMessage,
+                result.commitMessage, removeContributionToReview);
             });
           };
 
