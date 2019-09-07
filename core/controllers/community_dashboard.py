@@ -103,7 +103,8 @@ class TranslatableTextHandler(base.BaseHandler):
             language_code)
 
         self.values = {
-            'state_wise_contents': state_names_to_content_id_mapping,
+            'state_names_to_content_id_mapping': (
+                state_names_to_content_id_mapping),
             'version': exp.version
         }
 

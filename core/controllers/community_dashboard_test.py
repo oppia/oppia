@@ -320,7 +320,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
         expected_output = {
             'version': 2,
-            'state_wise_contents': {
+            'state_names_to_content_id_mapping': {
                 'Introduction': {
                     'content': '<p>A content to translate.</p>'
                 }

@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import skill_services
@@ -616,7 +617,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'final_reviewer_id': self.reviewer_id,
             'change': {
                 'cmd': exp_domain.CMD_ADD_TRANSLATION,
-                'state_name': 'state_1',
+                'state_name': 'Introduction',
                 'content_id': 'content',
                 'language_code': 'hi',
                 'content_html': '<p>This is a content.</p>',
@@ -971,6 +972,30 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected invalid_state_name to be a valid state name'):
             suggestion.pre_accept_validate()
+
+    def test_accept_suggestion_adds_translation_in_exploration(self):
+        self.save_new_default_exploration('exp1', self.author_id)
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {})
+
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.')
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+
+        self.assertEqual(exploration.get_translation_counts(), {
+            'hi': 1
+        })
 
 
 class SuggestionAddQuestionTest(test_utils.GenericTestBase):

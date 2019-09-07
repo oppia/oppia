@@ -224,6 +224,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is content</p>'
             }))
         init_state.update_interaction_id('TextInput')
+        default_outcome_dict = {
+            'dest': 'Introduction',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': '<p>The default outcome.</p>'},
+            'labelled_as_correct': False,
+            'missing_prerequisite_skill_id': None,
+            'param_changes': [],
+            'refresher_exploration_id': None
+        }
+
+        init_state.update_interaction_default_outcome(default_outcome_dict)
+
         answer_group_dict = {
             'outcome': {
                 'dest': exploration.init_state_name,
@@ -291,7 +304,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             init_state.get_content_id_mapping_needing_translations('hi'), {
                 'hint_1': '<p>hint one</p>',
                 'solution': '<p>hello_world is a string</p>',
-                'feedback_1': '<p>Feedback</p>'
+                'feedback_1': '<p>Feedback</p>',
+                'default_outcome': '<p>The default outcome.</p>'
             })
 
     def test_add_translation_works_correctly(self):

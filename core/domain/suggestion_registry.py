@@ -450,13 +450,6 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Expected %s to be a valid state name' %
                 self.change.state_name)
 
-        # Validate whether the reviewer accepts the translation for the correct
-        # content.
-        if exploration.get_content_html(
-                self.change.state_name, self.change.content_id) != (
-                    self.change.content_html):
-            raise utils.ValidationError('Incorrect content_html found.')
-
     def accept(self, commit_message):
         """Accepts the suggestion.
 

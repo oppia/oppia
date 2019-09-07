@@ -179,13 +179,13 @@ class ReviewableSuggestionsHandler(base.BaseHandler):
                 self.user_id, suggestion_type)
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                tagret_id_to_details = (
+                target_id_to_details = (
                     opportunity_services.get_opportunities_by_ids(
                         [s.target_id for s in suggestions]))
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
-                    'tagret_id_to_details': {
-                        t: d.to_dict() for t, d in tagret_id_to_details.items()
+                    'target_id_to_details': {
+                        t: d.to_dict() for t, d in target_id_to_details.items()
                     }
                 })
         except Exception as e:
@@ -210,13 +210,13 @@ class UserSubmittedSuggestionsHandler(base.BaseHandler):
                 self.user_id, suggestion_type)
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                tagret_id_to_details = (
+                target_id_to_details = (
                     opportunity_services.get_opportunities_by_ids(
                         [s.target_id for s in suggestions]))
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
-                    'tagret_id_to_details': {
-                        t: d.to_dict() for t, d in tagret_id_to_details.items()
+                    'target_id_to_details': {
+                        t: d.to_dict() for t, d in target_id_to_details.items()
                     }
                 })
         except Exception as e:

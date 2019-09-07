@@ -41,7 +41,7 @@ angular.module('oppia').directive('opportunitiesListItem', [
       controller: [
         '$scope', function($scope) {
           var ctrl = this;
-          ctrl.loadingViewShow = false;
+          ctrl.opportunityDataIsLoading = false;
           ctrl.opportunity = $scope.getOpportunity();
           if ($scope.isLabelRequired()) {
             ctrl.labelText = ctrl.opportunity.labelText;
@@ -56,7 +56,7 @@ angular.module('oppia').directive('opportunitiesListItem', [
               ctrl.progresBarStyle = {width: ctrl.progressPercentage};
             }
           } else {
-            ctrl.loadingViewShow = true;
+            ctrl.opportunityDataIsLoading = true;
           }
         }
       ]

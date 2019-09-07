@@ -10,11 +10,11 @@
       </opportunities-list-item>
     </div>
   </div>
-  <div ng-show="loadingViewShow">
+  <div ng-show="opportunityDataIsLoading">
     <opportunities-list-item></opportunities-list-item>
     <opportunities-list-item></opportunities-list-item>
   </div>
-  <div class="oppia-end-availability" ng-if="!loadingViewShow && !isMoreOpportunitiesAvailable()">
+  <div class="oppia-end-availability" ng-if="!opportunityDataIsLoading && !isMoreOpportunitiesAvailable()">
     <div class="oppia-end-availability-line"></div>
     <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length === 0">No opportunity available!</div>
     <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length !== 0">***</div>
