@@ -797,7 +797,11 @@ class WrittenTranslations(python_utils.OBJECT):
     """
 
     def __init__(self, translations_mapping):
-        """Initializes a WrittenTranslations domain object."""
+        """Initializes a WrittenTranslations domain object.
+
+        Args:
+            translations_mapping: dict. traskations mapping.
+        """
         self.translations_mapping = translations_mapping
 
     def to_dict(self):
@@ -961,7 +965,11 @@ class RecordedVoiceovers(python_utils.OBJECT):
     """
 
     def __init__(self, voiceovers_mapping):
-        """Initializes a RecordedVoiceovers domain object."""
+        """Initializes a RecordedVoiceovers domain object.
+
+        Args:
+            voiceovers_mapping: dict. voiceovers mapping.
+        """
         self.voiceovers_mapping = voiceovers_mapping
 
     def to_dict(self):
@@ -1283,7 +1291,13 @@ class SubtitledHtml(python_utils.OBJECT):
 
     @classmethod
     def create_default_subtitled_html(cls, content_id):
-        """Create a default SubtitledHtml domain object."""
+        """Create a default SubtitledHtml domain object.
+
+        Args:
+            content_id: str. id of content.
+        Returns:
+            SubtitledHtml domain object.
+        """
         return cls(content_id, '')
 
 
@@ -1406,7 +1420,11 @@ class State(python_utils.OBJECT):
         self.recorded_voiceovers.validate(content_id_list)
 
     def get_training_data(self):
-        """Retrieves training data from the State domain object."""
+        """Retrieves training data from the State domain object.
+
+        Returns:
+            list of state training data by answer group.
+        """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):
