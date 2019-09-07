@@ -115,11 +115,11 @@ def get_redirect_route(regex_route, handler, defaults=None):
     Args:
         regex_route: str. regex for routing
         handler: function. handler function
-        defaults: dict. 
-    
-    Returs:
+        defaults: dict.
+
+    Returns:
         routes.RedirectRoute: return RedirectRoute module
-        
+
     Warning: this method strips off parameters after the trailing slash. URLs
     with parameters should be formulated without the trailing slash.
     """
