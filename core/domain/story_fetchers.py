@@ -198,7 +198,7 @@ def get_stories_by_ids(story_ids):
         story_ids: list(str). List of IDs to get stories for.
 
     Returns:
-        list(Story|None). The list of stories corresponding to given ids.  If an
+        list(Story|None). The list of stories corresponding to given ids.  If a
         Story does not exist, the corresponding returned list element is None.
     """
     all_story_models = story_models.StoryModel.get_multi(story_ids)

@@ -90,7 +90,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.description, 'Description')
         self.assertEqual(story_summary.node_count, 1)
 
-    def test_get_story_by_id(self):
+    def test_get_story_by_id_with_valid_ids_returns_correct_dict(self):
         expected_story = self.story.to_dict()
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.to_dict(), expected_story)
