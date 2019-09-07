@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/UrlService.ts');
 require('services/PageTitleService.ts');
 
 angular.module('oppia').directive('errorPage', [
@@ -30,14 +31,14 @@ angular.module('oppia').directive('errorPage', [
         '/pages/error-pages/error-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'PageTitleService', 'UrlInterpolationService',
+        'PageTitleService', 'UrlInterpolationService', 'UrlService',
         function(
-            PageTitleService, UrlInterpolationService) {
+            PageTitleService, UrlInterpolationService, UrlService) {
           var ctrl = this;
           ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/oops_mint.png');
 
-          ctrl.statusCode = GLOBALS.status_code;
+          ctrl.statusCode = UrlService.getStatusCodeFromUrl();
 
           PageTitleService.setPageTitle(
             'Error ' + ctrl.statusCode + ' - Oppia');

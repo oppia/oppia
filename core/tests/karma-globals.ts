@@ -17,7 +17,6 @@
  */
 
 var GLOBALS = {
-  status_code: '',
   TRANSLATOR_PROVIDER_FOR_TESTS: null,
 };
 

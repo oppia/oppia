@@ -180,6 +180,13 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
         return Number(version);
       }
       return null;
+    },
+    getStatusCodeFromUrl: function() {
+      var urlParams = this.getUrlParams();
+      if (urlParams.hasOwnProperty('status')) {
+        return Number(urlParams.status);
+      }
+      return null;
     }
   };
 }]);

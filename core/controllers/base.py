@@ -362,12 +362,20 @@ class BaseHandler(webapp2.RequestHandler):
         if return_type == feconf.HANDLER_TYPE_HTML and (
                 method == 'GET'):
             self.values.update(values)
-            if 'iframed' in self.values and self.values['iframed']:
-                self.render_template(
-                    'error-iframed.mainpage.html',
-                    iframe_restriction=None)
+            status = self.request.get('status', default_value=None)
+            # self.render_json(status)
+            if status:
+                if 'iframed' in self.values and self.values['iframed']:
+                    self.render_template(
+                        'error-iframed.mainpage.html',
+                        iframe_restriction=None)
+                else:
+                    self.render_template('error-page.mainpage.html')
             else:
-                self.render_template('error-page.mainpage.html')
+                redirect_uri = python_utils.convert_to_bytes(
+                    '%s?status=%s' % (self.request.uri, values['status_code']))
+                self.redirect(redirect_uri)
+
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
