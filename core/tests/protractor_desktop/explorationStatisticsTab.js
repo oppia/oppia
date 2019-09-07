@@ -130,6 +130,7 @@ describe('Issues visualization', function() {
       function(elem) {
         elem.setValue(1.0);
       });
+    // TODO(#7569): Change this test to work with the improvements tab.
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
       'Boolean',

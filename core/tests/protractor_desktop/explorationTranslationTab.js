@@ -52,12 +52,10 @@ describe('Exploration translation and voiceover tab', function() {
     users.createUser('voiceArtist@translationTab.com', 'userVoiceArtist');
     users.createUser('user@editorTab.com', 'userEditor');
     users.createAndLoginAdminUser('superUser@translationTab.com', 'superUser');
+    // TODO(#7569): Change this test to work with the improvements tab.
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
-      'Boolean',
-      function(elem) {
-        elem.setValue(false);
-      });
+      'Boolean', (elem) => elem.setValue(false));
     users.login('user@editorTab.com');
     workflow.createExploration();
 

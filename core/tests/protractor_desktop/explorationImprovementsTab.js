@@ -67,6 +67,14 @@ describe('Answer Details Improvements', function() {
     users.createAndLoginAdminUser(
       'creator@user.com', 'creatorUser');
 
+    adminPage.editConfigProperty(
+      'Always ask learners for answer details. For testing -- do not use',
+      'Boolean', (element) => element.setValue(true));
+    // TODO(#7569): Remove redundant set after feedback tab is phased out.
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean', (element) => element.setValue(true));
+
     // Creator creates and publishes an exploration.
     workflow.createExplorationAsAdmin();
     explorationEditorMainTab.exitTutorial();
@@ -92,13 +100,6 @@ describe('Answer Details Improvements', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
-
-    adminPage.editConfigProperty(
-      'Always ask learners for answer details. For testing -- do not use',
-      'Boolean', (element) => element.setValue(true));
-    adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor',
-      'Boolean', (element) => element.setValue(true));
   });
 
   it('checks solicit answer details feature', function() {
@@ -157,6 +158,7 @@ describe('Feedback Improvements', function() {
     users.createAndLoginAdminUser(
       'superUser@ExplorationFeedback.com',
       'superUserExplorationFeedback');
+    // TODO(#7569): Remove redundant set after feedback tab is phased out.
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
       'Boolean', (element) => element.setValue(true));
@@ -308,6 +310,7 @@ describe('Suggestions on Explorations', function() {
     users.createAndLoginAdminUser(
       'user4@ExplorationSuggestions.com',
       'configExplorationSuggestions');
+    // TODO(#7569): Remove redundant set after feedback tab is phased out.
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
       'Boolean', (element) => element.setValue(true));
