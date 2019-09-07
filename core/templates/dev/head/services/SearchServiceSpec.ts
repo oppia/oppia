@@ -290,7 +290,7 @@ describe('Search service', function() {
     }
   );
 
-  fit('should omit language selection url component if it is malformed',
+  it('should omit language selection url component if it is malformed',
     function() {
       var results = {
         categories: {
