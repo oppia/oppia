@@ -408,7 +408,10 @@ def get_time_in_millisecs(datetime_obj):
 
 
 def get_current_time_in_millisecs():
-    """Returns time in milliseconds since the Epoch."""
+    """Returns time in milliseconds since the Epoch.
+    Returns:
+        time in milliseconds.
+    """
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
@@ -650,6 +653,9 @@ def unescape_encoded_uri_component(escaped_string):
 def get_asset_dir_prefix():
     """Returns prefix for asset directory depending whether dev or prod.
     It is used as a prefix in urls for images, css and script files.
+
+    Returns:
+        asset directory prefix.
     """
     asset_dir_prefix = ''
     if not constants.DEV_MODE:
