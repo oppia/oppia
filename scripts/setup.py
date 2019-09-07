@@ -155,7 +155,7 @@ def main(args=None):
     if not os.path.exists(common.YARN_PATH):
         python_utils.PRINT('Removing package-lock.json')
         clean.delete_file('package-lock.json')
-        python_utils.print_each_string_after_two_new_lines([
+        common.print_each_string_after_two_new_lines([
             'Installing yarn',
             'WARNING: Please note that Oppia uses Yarn to manage node packages',
             'do *NOT* use npm. For more information on how to use yarn,',

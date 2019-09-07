@@ -120,7 +120,7 @@ def main(args=None):
 
     python_utils.PRINT('Running pre-commit check for package-lock.json ...')
     if _does_diff_include_package_lock_file() and (
-            not _does_current_folder_contain_have_package_lock_file()):
+            _does_current_folder_contain_have_package_lock_file()):
         # The following message is necessary since there git commit aborts
         # quietly when the status is non-zero.
         python_utils.PRINT('-----------COMMIT ABORTED-----------')
