@@ -37,10 +37,7 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD -m scripts.install_third_party
 
 # Install third-party node modules needed for the build process.
-$NPM_INSTALL --only=dev
-# This line removes the "npm ERR! missing:" messages. For reference, see this
-# thread: https://github.com/npm/npm/issues/19393#issuecomment-374076889
-$NPM_CMD dedupe
+yarn
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
