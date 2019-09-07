@@ -23,6 +23,8 @@ import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { SetInputRulesService } from
+  'interactions/SetInput/directives/set-input-rules.service';
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
@@ -37,6 +39,7 @@ describe('Rule spec services', function() {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value('SetInputRulesService', new SetInputRulesService());
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The

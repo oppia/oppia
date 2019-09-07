@@ -22,12 +22,18 @@ from core.platform import models
 from core.tests import test_utils
 import python_utils
 
-(opportunity_models,) = models.Registry.import_models(
-    [models.NAMES.opportunity])
+(base_models, opportunity_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.opportunity])
 
 
 class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationOpportunitySummaryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def setUp(self):
         super(ExplorationOpportunitySummaryModelUnitTest, self).setUp()

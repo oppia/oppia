@@ -71,7 +71,8 @@ describe('Classroom backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleDataResults.topic_summary_dicts);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

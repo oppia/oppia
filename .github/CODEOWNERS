@@ -434,7 +434,7 @@
 # Speed Improvement team.
 /app_dev.yaml @vojtechjelinek
 /core/templates/dev/head/google-analytics.initializer.ts @vojtechjelinek
-/core/templates/dev/head/base_components/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/base-components/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/Base.ts @vojtechjelinek
 /core/templates/dev/head/pages/oppia_footer_directive.html @vojtechjelinek
 /core/templates/dev/head/pages/OppiaFooterDirective.ts @vojtechjelinek
