@@ -76,14 +76,6 @@ angular.module('oppia').directive('improvementsTab', [
             return $scope.isCardOpen(card) || !$scope.onlyShowOpenTasks;
           };
 
-          $scope.getCardCssClasses = function(card) {
-            var mainCssClass = $scope.isCardOpen(card) ?
-              'oppia-improvement-card' : 'oppia-improvement-closed-card';
-            var protractorTestCssClass =
-              'protractor-test-' + card.getDirectiveType() + '-body';
-            return mainCssClass + ' ' + protractorTestCssClass;
-          };
-
           $scope.getCardTitle = function(card) {
             return card.getTitle();
           };

@@ -25,44 +25,36 @@ var ruleTemplates = require(
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorImprovementsTab = function() {
-  const cardsContainer = $('.protractor-test-cards');
-  const onlyOpenInput = $('.protractor-test-only-open-input');
-  const closeModalButton = $('.protractor-test-close-modal-button');
+  const cardsContainer = $('.protractor-test-improvements-cards');
+  const onlyOpenInput = $('.protractor-test-improvements-only-open-input');
+  const closeModalButton = $('.protractor-test-improvements-close-modal-button');
 
-  const answerDetails = $('.protractor-test-answer-details');
-  const answerInfoCount = $('.protractor-test-answer-info-count');
+  const answerDetails = $('.protractor-test-improvements-answer-details');
+  const answerInfoCount = $('.protractor-test-improvements-answer-info-count');
 
-  const threadMessagesContainer = $('.protractor-test-thread-messages');
-  const responseTextarea = $('.protractor-test-response-textarea');
-  const responseStatusSelect = $('.protractor-test-response-status-select');
-  const responseSendButton = $('.protractor-test-response-send-button');
-  const reviewSuggestionButton = $('.protractor-test-review-suggestion-button');
+  const threadMessagesContainer = $('.protractor-test-improvements-thread-messages');
+  const responseTextarea = $('.protractor-test-improvements-response-textarea');
+  const responseStatusSelect = $('.protractor-test-improvements-response-status-select');
+  const responseSendButton = $('.protractor-test-improvements-response-send-button');
+  const reviewSuggestionButton = $('.protractor-test-improvements-review-suggestion-button');
 
-  const suggestionRows = $$('.protractor-test-oppia-feedback-tab-row');
   const acceptSuggestionButton = $(
     '.protractor-test-exploration-accept-suggestion-btn');
-  var rejectSuggestionButton =
+  const rejectSuggestionButton =
     $('.protractor-test-exploration-reject-suggestion-btn');
-  var suggestionReviewMessageInput =
+  const suggestionReviewMessageInput =
     $('.protractor-test-suggestion-review-message');
-  var suggestionCommitMessageInput =
+  const suggestionCommitMessageInput =
     $('.protractor-test-suggestion-commit-message');
 
   const threadMessageLocator =
-    by.css('.protractor-test-thread-message-body');
-  const threadMessageAuthorLocator =
-    by.css('.protractor-test-thread-message-author');
-  const threadMessageStatusChangeLocator =
-    by.css('.protractor-test-thread-message-status-change');
+    by.css('.protractor-test-improvements-thread-message-body');
 
-  const actionButtonLocator = by.css('.protractor-test-action-button');
-  const cardLocator = by.css('.protractor-test-card');
-  const cardBodyLocator = by.css('.protractor-test-card-body');
-  const cardStatusLocator = by.css('.protractor-test-card-status');
-  const cardTitleLocator = by.css('.protractor-test-card-title');
-  const stateNameLocator = by.css('.protractor-test-card-state-name');
-
-  const suggestionRowClassName = '.protractor-test-oppia-feedback-tab-row';
+  const cardLocator = by.css('.protractor-test-improvements-card');
+  const cardBodyLocator = by.css('.protractor-test-improvements-card-body');
+  const cardStatusLocator = by.css('.protractor-test-improvements-card-status');
+  const cardTitleLocator = by.css('.protractor-test-improvements-card-title');
+  const stateNameLocator = by.css('.protractor-test-improvements-card-state-name');
 
   var _cardHasStateName = function(card, stateName) {
     return card.element(stateNameLocator).getText()
@@ -118,7 +110,7 @@ var ExplorationEditorImprovementsTab = function() {
     return cardsContainer.all(cardLocator).filter(isMatchingCard).first();
   };
 
-  this.setOnlyShowOpenCards = function(choice) {
+  this.setOnlyShowOpenTasks = function(choice) {
     if (choice !== onlyOpenInput.isSelected()) {
       onlyOpenInput.click();
     }

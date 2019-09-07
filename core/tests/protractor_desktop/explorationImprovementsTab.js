@@ -120,7 +120,7 @@ describe('Answer Details Improvements', function() {
 
     var card = improvementsTab.getMatchingAnswerDetailsCard('One');
     // The action button opens the details modal.
-    improvementsTab.clickCardActionButton(card);
+    improvementsTab.clickCardActionButton(card, 'Review Answer Details');
     improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
     improvementsTab.closeModal();
     users.logout();
@@ -197,12 +197,12 @@ fdescribe('Feedback Improvements', function() {
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
     var card = improvementsTab.getMatchingFeedbackCard('Introduction');
-    improvementsTab.clickCardActionButton(card);
+    improvementsTab.clickCardActionButton(card, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual([feedback]);
     improvementsTab.sendResponseAndCloseModal(feedbackResponse);
 
     var closedCard = improvementsTab.getMatchingFeedbackCard('Introduction');
-    improvementsTab.clickCardActionButton(closedCard);
+    improvementsTab.clickCardActionButton(closedCard, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [feedback, feedbackResponse]);
     improvementsTab.closeModal();
@@ -249,7 +249,7 @@ fdescribe('Feedback Improvements', function() {
     improvementsTab.setOnlyShowOpenTasks(false);
     var card = improvementsTab.getMatchingFeedbackCard('Introduction');
     expect(improvementsTab.getCardStatus(card)).toEqual('Open');
-    improvementsTab.clickCardActionButton(card);
+    improvementsTab.clickCardActionButton(card, 'Review Thread');
     improvementsTab.sendResponseAndCloseModal(feedbackResponse, 'Fixed');
     expect(improvementsTab.getCardStatus(card)).toEqual('Fixed');
 
@@ -258,7 +258,7 @@ fdescribe('Feedback Improvements', function() {
     // Re-open the thread.
     card = improvementsTab.getMatchingFeedbackCard('Introduction');
     expect(improvementsTab.getCardStatus(card)).toEqual('Fixed');
-    improvementsTab.clickCardActionButton(card);
+    improvementsTab.clickCardActionButton(card, 'Review Thread');
     improvementsTab.sendResponseAndCloseModal(feedbackResponse, 'Open');
     expect(improvementsTab.getCardStatus(card)).toEqual('Open');
 
@@ -345,7 +345,7 @@ describe('Suggestions on Explorations', function() {
 
     var cardToAccept = improvementsTab.getMatchingSuggestionCard(
       suggestionDescription1);
-    improvementsTab.clickCardActionButton(cardToAccept);
+    improvementsTab.clickCardActionButton(cardToAccept, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription1]);
     improvementsTab.acceptSuggestion();
@@ -353,7 +353,7 @@ describe('Suggestions on Explorations', function() {
 
     var cardToReject = improvementsTab.getMatchingSuggestionCard(
       suggestionDescription2);
-    improvementsTab.clickCardActionButton(cardToReject);
+    improvementsTab.clickCardActionButton(cardToReject, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription2]);
     improvementsTab.rejectSuggestion();
