@@ -38,6 +38,7 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
+  var adminPage = null;
   var collectionEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
@@ -47,6 +48,7 @@ describe('Full exploration editor', function() {
   var libraryPage = null;
 
   beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -54,6 +56,12 @@ describe('Full exploration editor', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+
+    users.createAndLoginAdminUser('superUser@test.com', 'superUser');
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean', (elem) => elem.setValue(false));
+    users.logout();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
