@@ -232,13 +232,22 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.signup('user1@example.com', 'user1')
 
     def _assert_validation_error(self, expected_error_substring):
-        """Checks that the story passes validation."""
+        """Checks that the story passes validation.
+
+        Args:
+            expected_error_substring: str. substring of expected error.
+        """
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             self.story.validate()
 
     def _assert_valid_story_id(self, expected_error_substring, story_id):
-        """Checks that the story id is valid."""
+        """Checks that the story id is valid.
+
+        Args:
+            expected_error_substring: str. substring of expected error.
+            story_id: str. id of story.
+        """
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             story_domain.Story.require_valid_story_id(story_id)
