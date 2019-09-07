@@ -281,6 +281,9 @@ class BaseModelValidator(python_utils.OBJECT):
 
         Each validation function should accept only a single arg, which is the
         model instance to validate.
+
+        Returns:
+            Returns the list of custom validation functions to run.
         """
         return []
 
