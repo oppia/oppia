@@ -253,7 +253,6 @@ describe('Feedback Improvements', function() {
     expect(improvementsTab.getCardStatus(card)).toEqual('Fixed');
 
     browser.driver.navigate().refresh();
-    browser.waitForAngular();
 
     // Re-open the thread.
     card = improvementsTab.getMatchingFeedbackCard('Introduction');
@@ -271,7 +270,7 @@ describe('Feedback Improvements', function() {
 });
 
 
-fdescribe('Suggestions on Explorations', function() {
+describe('Suggestions on Explorations', function() {
   var EXPLORATION_TITLE = 'Exploration with Suggestion';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
@@ -310,7 +309,7 @@ fdescribe('Suggestions on Explorations', function() {
       'Boolean', (element) => element.setValue(true));
   });
 
-  fit('accepts & rejects a suggestion on a published exploration', function() {
+  it('accepts & rejects a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,

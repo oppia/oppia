@@ -148,7 +148,6 @@ var ExplorationEditorImprovementsTab = function() {
       $('option[label="' + feedbackStatus + '"]').click();
     }
     responseSendButton.click();
-    browser.waitForAngular();
   };
 
   this.getMatchingFeedbackCard = function(titleSubstring) {
@@ -176,8 +175,6 @@ var ExplorationEditorImprovementsTab = function() {
       acceptSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     acceptSuggestionButton.click();
-
-    browser.waitForAngular();
   };
 
   this.rejectSuggestion = function() {
@@ -191,8 +188,6 @@ var ExplorationEditorImprovementsTab = function() {
       rejectSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     rejectSuggestionButton.click();
-
-    browser.waitForAngular();
   };
 
   this.getCardStatus = function(card) {
@@ -205,7 +200,6 @@ var ExplorationEditorImprovementsTab = function() {
     waitFor.elementToBeClickable(
       buttonElement, 'Action button takes too long to become clickable');
     buttonElement.click();
-    browser.waitForAngular();
   };
 };
 
