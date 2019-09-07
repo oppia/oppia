@@ -485,6 +485,7 @@
 /core/domain/user*.py @seanlip
 /export/ @seanlip
 /manifest.json @seanlip @vojtechjelinek
-/package*.json @seanlip @vojtechjelinek
+/package.json @seanlip @vojtechjelinek
+/yarn.lock @seanlip @vojtechjelinek
 /scripts/install_third_party.sh @seanlip @vojtechjelinek
 /.github/ @DubeySandeep

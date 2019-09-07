@@ -122,7 +122,8 @@ mkdir -p $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
 export NODE_PATH=$TOOLS_DIR/node-10.15.3
-export PATH=$NODE_PATH/bin:$PATH
+export YARN_PATH=$TOOLS_DIR/yarn-v1.17.3
+export PATH=$NODE_PATH/bin:$YARN_PATH/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
 
@@ -143,8 +144,6 @@ else
   # Otherwise, npm will be installed locally, in NODE_PATH.
   export NPM_CMD=$NODE_PATH/bin/npm
 fi
-
-export NPM_INSTALL="$NPM_CMD install"
 
 # Download and install node.js.
 echo Checking if node.js is installed in $TOOLS_DIR
@@ -173,6 +172,27 @@ if [ ! -d "$NODE_PATH" ]; then
   # Note: on some machines, these commands seem to take quite a long time.
   chown -R $ME $NODE_MODULE_DIR
   chmod -R 744 $NODE_MODULE_DIR
+fi
+
+# Download and install yarn.
+echo Checking if yarn is installed in $TOOLS_DIR
+if [ ! -d "$YARN_PATH" ]; then
+  echo Removing package-lock.json
+  rm -f package-lock.json
+
+  echo Installing yarn
+  echo ""
+  echo "WARNING: Please note that Oppia uses Yarn to manage node packages,"
+  echo "do *NOT* use npm. For more information on how to use yarn,"
+  echo "visit https://yarnpkg.com/en/docs/usage."
+  echo ""
+
+  YARN_VERSION=v1.17.3
+  YARN_FILE_NAME=yarn-$YARN_VERSION.tar.gz
+
+  curl -o $YARN_FILE_NAME -L https://github.com/yarnpkg/yarn/releases/download/$YARN_VERSION/$YARN_FILE_NAME
+  tar xvf $YARN_FILE_NAME --directory $TOOLS_DIR
+  rm $YARN_FILE_NAME
 fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
