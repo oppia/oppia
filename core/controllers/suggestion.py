@@ -30,11 +30,11 @@ import utils
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-def _check_valid_suggestion_type_and_target_type(target_type, suggestion_type):
+def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
     """Checks whether the given target_type and suggestion_type are valid.
 
     Args:
-        target_type: str. The type of the entity suggestion targets.
+        target_type: str. The type of the suggestion target.
         suggestion_type: str. The type of the suggestion.
 
     Raises:
@@ -172,20 +172,22 @@ class ReviewableSuggestionsHandler(base.BaseHandler):
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
         try:
-            _check_valid_suggestion_type_and_target_type(
+            _require_valid_suggestion_and_target_types(
                 target_type, suggestion_type)
 
             suggestions = suggestion_services.get_reviewable_suggestions(
                 self.user_id, suggestion_type)
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_id_to_details = (
+                target_ids = set([s.target_id for s in suggestions])
+                target_ids_to_opportunities = (
                     opportunity_services.get_opportunities_by_ids(
-                        [s.target_id for s in suggestions]))
+                        list(target_ids)))
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
-                    'target_id_to_details': {
-                        t: d.to_dict() for t, d in target_id_to_details.items()
+                    'target_ids_to_opportunity_dicts': {
+                        t: d.to_dict() for (
+                            t, d) in target_ids_to_opportunities.items()
                     }
                 })
         except Exception as e:
@@ -203,20 +205,21 @@ class UserSubmittedSuggestionsHandler(base.BaseHandler):
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
         try:
-            _check_valid_suggestion_type_and_target_type(
+            _require_valid_suggestion_and_target_types(
                 target_type, suggestion_type)
 
             suggestions = suggestion_services.get_submitted_suggestions(
                 self.user_id, suggestion_type)
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_id_to_details = (
+                target_ids_to_opportunities = (
                     opportunity_services.get_opportunities_by_ids(
                         [s.target_id for s in suggestions]))
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
-                    'target_id_to_details': {
-                        t: d.to_dict() for t, d in target_id_to_details.items()
+                    'target_ids_to_opportunity_dicts': {
+                        t: d.to_dict() for (
+                            t, d) in target_ids_to_opportunities.items()
                     }
                 })
         except Exception as e:
