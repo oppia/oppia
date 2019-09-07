@@ -132,7 +132,7 @@ describe('Answer Details Improvements', function() {
 });
 
 
-fdescribe('Feedback Improvements', function() {
+describe('Feedback Improvements', function() {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
   var EXPLORATION_TITLE_2 = 'Exploration for testing feedback status';
   var EXPLORATION_OBJECTIVE = 'To explore something';
@@ -210,7 +210,7 @@ fdescribe('Feedback Improvements', function() {
     users.logout();
   });
 
-  fit('should change status of feedback thread', function() {
+  it('should change status of feedback thread', function() {
     var feedback = 'Hey! This exploration looks awesome';
     var feedbackResponse = 'Thanks for the feedback!';
 
