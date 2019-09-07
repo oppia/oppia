@@ -145,7 +145,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
           result.reviewMessage, result.audioUpdateRequired
         ).then(
           function() {
-            setActiveThread(activeThread.threadId);
+            if (setActiveThread) {
+              setActiveThread(activeThread.threadId);
+            }
             // Immediately update editor to reflect accepted suggestion.
             if (result.action ===
                 SuggestionModalService.ACTION_ACCEPT_SUGGESTION) {
@@ -180,7 +182,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
             extraParams.activeThread,
-            extraParams.setActiveThread || () => {},
+            extraParams.setActiveThread,
             extraParams.isSuggestionHandled,
             extraParams.hasUnsavedChanges,
             extraParams.isSuggestionValid
