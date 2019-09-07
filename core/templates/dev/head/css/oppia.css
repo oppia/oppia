@@ -2455,6 +2455,7 @@ oppia-parameter {
   -o-transition: -o-transform .3s ease-out;
   transition: transform .3s ease-out;
 }
+
 @media(min-width: 768px) {
   .modal-dialog {
     width: 600px;
@@ -2468,6 +2469,13 @@ oppia-parameter {
     width: 300px
   }
 }
+
+@media(min-width: 1024px) {
+  .modal-lg {
+    width: 900px;
+  }
+}
+
 .oppia-large-modal-window .modal-body {
   height: 60vh;
 }
@@ -3874,7 +3882,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
   .oppia-dashboard-aggregated-stats .stats-card {
     font-size: 12px;
-    padding-left: 10px;
+    text-align: center;
   }
 }
 

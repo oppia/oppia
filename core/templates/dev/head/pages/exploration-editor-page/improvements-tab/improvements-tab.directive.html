@@ -1,16 +1,19 @@
 <div class="oppia-dashboard-container improvements-tab-dashboard" style="position: relative;">
   <div class="oppia-dashboard-aggregated-stats" style="padding-top: 30px; margin-bottom: 30px">
     <md-card layout="row" style="margin: 0">
-      <div class="open-issues stats-card">
-        <p class="stat-description">Open Cards</p>
-        <h1 class="stat-value-with-rating protractor-test-improvements-open-cards-count">
+      <div class="open-issues stats-card" style="text-align: center; padding: 0">
+        <span class="stat-description">Open Cards</span>
+        <h1 class="stat-value-with-rating protractor-test-improvements-open-cards-count"
+            style="margin: 0">
           <[getOpenCardCount()]>
         </h1>
       </div>
-      <div class="options-card" style="text-align: right; padding: 10px">
-        <input type="checkbox" class="protractor-test-improvements-only-open-input"
-               ng-model="onlyShowOpenTasks">
-        Show only "Open" tasks.
+      <div class="options-card" style="padding: 10px; margin: auto">
+        <input ng-model="onlyShowOpenTasks" ng-init="true" type="checkbox"
+               class="protractor-test-improvements-only-open-input">
+        <span style="font-size: 14px">
+          Show only "Open" tasks.
+        </p>
       </div>
     </md-card>
   </div>
