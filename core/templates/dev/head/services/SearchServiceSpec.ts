@@ -290,7 +290,7 @@ describe('Search service', function() {
     }
   );
 
-  it('should error when language selection url component is malformed',
+  fit('should omit language selection url component if it is malformed',
     function() {
       var results = {
         categories: {
@@ -312,10 +312,7 @@ describe('Search service', function() {
       };
       var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
                          '&language_code="en" OR "ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'languageCodes: language_code="en" OR "ar")'));
+      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({
         Mathematics: true
@@ -323,10 +320,7 @@ describe('Search service', function() {
 
       var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
                          '&language_code="en" OR "ar"';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'languageCodes: language_code="en" OR "ar"'));
+      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({
         Mathematics: true
