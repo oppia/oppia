@@ -183,7 +183,9 @@ angular.module('oppia').factory('SearchService', [
             updateSearchFields(itemsType, urlComponent, selectionDetails);
           } catch (error) {
             selectionDetails[itemsType].selections = {};
-            throw error;
+            if (itemsType !== 'languageCodes') {
+              throw error;
+            }
           }
         }
 
