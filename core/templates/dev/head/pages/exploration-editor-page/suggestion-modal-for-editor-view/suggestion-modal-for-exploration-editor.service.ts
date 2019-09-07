@@ -180,7 +180,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
             extraParams.activeThread,
-            extraParams.setActiveThread,
+            extraParams.setActiveThread || () => {},
             extraParams.isSuggestionHandled,
             extraParams.hasUnsavedChanges,
             extraParams.isSuggestionValid

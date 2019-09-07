@@ -40,8 +40,8 @@ var ExplorationEditorImprovementsTab = function() {
   const suggestionRows = $$('.protractor-test-oppia-feedback-tab-row');
   const acceptSuggestionButton = $(
     '.protractor-test-exploration-accept-suggestion-btn');
-  var rejectSuggestionButton = element(
-    by.css('.protractor-test-exploration-reject-suggestion-btn'));
+  var rejectSuggestionButton =
+    $('.protractor-test-exploration-reject-suggestion-btn');
   var suggestionReviewMessageInput =
     $('.protractor-test-suggestion-review-message');
   var suggestionCommitMessageInput =
@@ -90,7 +90,7 @@ var ExplorationEditorImprovementsTab = function() {
    * @property {string} state_name - the state the card should be associated to.
    */
 
-  /** @return {Array.<(HTMLElement) => boolean>} */
+  /** @return {Array.<(ElementFinder) => boolean>} */
   var _buildCardPredicate = function(cardMatchOptions) {
     var predicates = [];
     if (cardMatchOptions.state_name !== undefined) {
