@@ -34,7 +34,7 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
-fdescribe('Answer Details Improvements', function() {
+describe('Answer Details Improvements', function() {
   var EXPLORATION_TITLE = 'Check';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
@@ -101,7 +101,7 @@ fdescribe('Answer Details Improvements', function() {
       'Boolean', (element) => element.setValue(true));
   });
 
-  fit('checks solicit answer details feature', function() {
+  it('checks solicit answer details feature', function() {
     users.login('learner@user.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
@@ -119,7 +119,6 @@ fdescribe('Answer Details Improvements', function() {
     explorationEditorPage.navigateToImprovementsTab();
 
     var card = improvementsTab.getAnswerDetailsCard('One');
-    browser.pause();
     improvementsTab.clickCardActionButton(card);
     improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
     improvementsTab.closeModal();
