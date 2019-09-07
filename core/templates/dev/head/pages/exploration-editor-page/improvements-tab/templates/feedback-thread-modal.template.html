@@ -13,9 +13,8 @@
   <div style="clear: both"></div>
 </div>
 
-<div class="modal-body protractor-test-improvements-thread-messages">
-  <ol ng-if="activeThread.messages.length > 0" style="padding: 0 10px"
-      class="thread-messages">
+<div class="modal-body">
+  <ol ng-if="activeThread.messages.length > 0" style="padding: 0 10px" class="thread-messages">
     <li ng-repeat="m in activeThread.messages | orderBy:'m.message_id'"
         class="protractor-test-improvements-thread-message">
       <div style="float: left">
@@ -41,7 +40,9 @@
         </span>
       </div>
 
-      <p class="protractor-test-improvements-thread-message-body" style="clear: both"><[m.text]></p>
+      <div style="clear: both"></div>
+
+      <p class="protractor-test-improvements-thread-message-body"><[m.text]></p>
     </li>
   </ol>
 </div>
@@ -54,43 +55,41 @@
     </label>
     <textarea ng-model="tmpMessage.text" ng-disabled="messageSendingInProgress"
               class="form-control protractor-test-improvements-response-textarea"
-              id="tmpMessageText" rows="6">
+              style="margin-bottom: 10px" id="tmpMessageText" rows="6">
     </textarea>
 
-    <div style="margin-top: 12px">
-      <div ng-show="EditabilityService.isEditable()" style="float: left">
-        Change status (optional):
-        <select ng-model="tmpMessage.status"
-                class="protractor-test-improvements-response-status-select"
-                ng-options="choice.id as choice.text for choice in STATUS_CHOICES"
-                ng-disabled="messageSendingInProgress"
-                style="height: 34px; border-color: #ccc">
-        </select>
-        <div ng-if="!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable')"
-             style="margin: 8px 0; color: red">
-          <span style="font-size: 19px" class="material-icons">error_outline</span>
-          Please specify a reason for setting the status to
-          "<[getHumanReadableStatus(tmpMessage.status)]>".
-        </div>
+    <div ng-show="EditabilityService.isEditable()" style="float: left">
+      Change status (optional):
+      <select ng-model="tmpMessage.status"
+              ng-options="choice.id as choice.text for choice in STATUS_CHOICES"
+              ng-disabled="messageSendingInProgress"
+              class="protractor-test-improvements-response-status-select"
+              style="height: 34px; border-color: #ccc">
+      </select>
+      <div ng-if="!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable')"
+           style="margin: 8px 0; color: red">
+        <span style="font-size: 19px" class="material-icons">error_outline</span>
+        Please specify a reason for setting the status to
+        "<[getHumanReadableStatus(tmpMessage.status)]>".
       </div>
-
-      <div class="text-right" style="float: right">
-        <button ng-click="addNewMessage(activeThread.threadId, tmpMessage.text, tmpMessage.status)"
-                ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status) || (!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable'))"
-                class="btn btn-success protractor-test-improvements-response-send-button"
-                style="margin-left: 8px">
-          <span ng-if="messageSendingInProgress">Sending...</span>
-          <span ng-if="!messageSendingInProgress">Send and Close</span>
-        </button>
-        <button ng-click="close()" ng-disabled="messageSendingInProgress"
-                class="btn btn-secondary protractor-test-improvements-close-modal-button"
-                style="margin-right: 0">
-          Close
-        </button>
-      </div>
-
-      <div style="clear: both"></div>
     </div>
+
+    <div class="text-right" style="float: right">
+      <button ng-click="addNewMessage(activeThread.threadId, tmpMessage.text, tmpMessage.status)"
+              ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status) || (!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable'))"
+              class="btn btn-success protractor-test-improvements-response-send-button"
+              style="margin-left: 8px">
+        <span ng-if="messageSendingInProgress">Sending...</span>
+        <span ng-if="!messageSendingInProgress">Send and Close</span>
+      </button>
+      <button ng-click="close()" ng-disabled="messageSendingInProgress"
+              class="btn btn-secondary protractor-test-improvements-close-modal-button"
+              style="margin-right: 0">
+        Close
+      </button>
+    </div>
+
+    <div style="clear: both"></div>
   </div>
   <div ng-if="!isUserLoggedIn">
     <em style="float: left; padding: 6px 0">To respond to a feedback thread, please log in.</em>
