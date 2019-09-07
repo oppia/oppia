@@ -56,77 +56,59 @@ var ExplorationEditorImprovementsTab = function() {
     by.css('.protractor-test-improvements-action-button');
   var cardBodyLocator = by.css('.protractor-test-improvements-card-body');
   var cardStatusLocator = by.css('.protractor-test-improvements-card-status');
-  var cardTitleLocator = by.css('.protractor-test-improvements-card-title');
   var stateNameLocator =
     by.css('.protractor-test-improvements-card-state-name');
 
-  /**
-   * @typedef CardMatchOptions
-   * @property {string?} card_type - the expected type of the card.
-   * @property {string?} card_content - the expected content in the card.
-   * @property {string?} state_name - the expected state associated to the card.
-   *
-   * @param {CardMatchOptions} cardMatchOptions
-   * @return {(ElementFinder) => boolean}
-   */
-  var _buildCardMatcher = function(cardMatchOptions) {
-    var predicates = [];
-    if (cardMatchOptions.state_name) {
-      predicates.push(card => {
-        return card.element(stateNameLocator).getText()
-          .then(stateName => stateName === cardMatchOptions.state_name);
-      });
-    }
-    if (cardMatchOptions.card_type) {
-      predicates.push(card => {
-        return card.getAttribute('class')
-          .then(cssClass => cssClass.includes(cardMatchOptions.card_type));
-      });
-    }
-    if (cardMatchOptions.card_content) {
-      predicates.push(card => {
-        return card.element(cardBodyLocator).getText()
-          .then(body => body.includes(cardMatchOptions.card_content));
-      });
-    }
-
+  var _buildCardStateNameMatcher = function(stateName) {
     return (card) => {
-      return Promise.all(predicates.map(predicate => predicate(card)))
+      return card.element(stateNameLocator).getText()
+        .then(stateName => stateName === cardMatchOptions.state_name);
+    };
+  };
+
+  var _buildCardTypeMatcher = function(cardType) {
+    return (card) => {
+      return card.getAttribute('class')
+        .then(cssClass => cssClass.includes(cardMatchOptions.card_type));
+    };
+  };
+
+  var _buildCardContentMatcher = function(content) {
+    return (card) => {
+      return card.element(cardBodyLocator).getText()
+        .then(body => body.includes(cardMatchOptions.card_content));
+    };
+  };
+
+  var _reduceCardMatchers = function(matchers) {
+    return (card) => {
+      return Promise.all(matchers.map(matcher => matcher(card)))
         .then(results => results.every(Boolean));
     };
   };
 
-  /** @param {CardMatchOptions} cardMatchOptions */
-  var _getFirstMatchingCard = function(cardMatchOptions) {
-    // return allCards.filter(_buildCardMatcher(cardMatchOptions)).first();
-    return allCards.first();
-  };
-
-  this.setShowOnlyOpenTasks = function(choice = true) {
-    if (choice !== onlyOpenInput.isSelected()) {
-      onlyOpenInput.click();
-    }
-  };
-
   this.getAnswerDetailsCard = function(stateName) {
-    return _getFirstMatchingCard({
-      state_name: stateName,
-      card_type: 'answer-details',
-    });
+    var answerDetailsCardMatcher = _reduceCardMatchers([
+      _buildCardTypeMatcher('answer-details'),
+      _buildCardStateNameMatcher(stateName),
+    ]);
+    return allCards.filter(answerDetailsCardMatcher).first();
   };
 
   this.getFeedbackCard = function(latestMessage) {
-    return _getFirstMatchingCard({
-      card_content: latestMessage,
-      card_type: 'feedback',
-    });
+    var feedbackCardMatcher = _reduceCardMatchers([
+      _buildCardTypeMatcher('feedback'),
+      _buildCardContentMatcher(latestMessage),
+    ]);
+    return allCards.filter(feedbackCardMatcher).first();
   };
 
   this.getSuggestionCard = function(description) {
-    return _getFirstMatchingCard({
-      card_content: description,
-      card_type: 'suggestion',
-    });
+    var suggestionCardMatcher = _reduceCardMatchers([
+      _buildCardTypeMatcher('suggestion'),
+      _buildCardContentMatcher(description),
+    ]);
+    return allCards.filter(suggestionCardMatcher).first();
   };
 
   this.getCardStatus = function(card) {
@@ -182,6 +164,12 @@ var ExplorationEditorImprovementsTab = function() {
       rejectSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     rejectSuggestionButton.click();
+  };
+
+  this.setShowOnlyOpenTasks = function(choice = true) {
+    if (choice !== onlyOpenInput.isSelected()) {
+      onlyOpenInput.click();
+    }
   };
 
   this.closeModal = function() {
