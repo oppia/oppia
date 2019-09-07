@@ -42,9 +42,23 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
-NPM_PATH = os.path.join(NODE_PATH, 'bin', 'npm')
+YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-v1.17.3')
 # Add path for node which is required by the node_modules.
-os.environ['PATH'] = '%s/bin:' % NODE_PATH + os.environ['PATH']
+os.environ['PATH'] = (
+    '%s/bin:' % NODE_PATH + '%s/bin:' % YARN_PATH + os.environ['PATH'])
+
+
+def run_cmd(cmd_tokens):
+    """Runs the command and returns the output.
+    Raises subprocess.CalledProcessError upon failure.
+
+    Args:
+        cmd_tokens: list(str). The list of command tokens to execute.
+
+    Returns:
+        str. The output of the command.
+    """
+    return subprocess.check_output(cmd_tokens).strip()
 
 
 def ensure_directory_exists(d):
@@ -270,7 +284,7 @@ def install_npm_library(library_name, version, path):
     if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
         python_utils.PRINT('Installing %s' % library_name)
         subprocess.call([
-            NPM_PATH, 'install', '%s@%s' % (library_name, version)])
+            'yarn', 'add', '%s@%s' % (library_name, version)])
 
 
 class CD(python_utils.OBJECT):

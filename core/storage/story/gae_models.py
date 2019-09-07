@@ -63,6 +63,11 @@ class StoryModel(base_models.VersionedModel):
     # The topic id to which the story belongs.
     corresponding_topic_id = ndb.StringProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Story should be kept if the corresponding topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -156,3 +161,10 @@ class StorySummaryModel(base_models.BaseModel):
     # The number of nodes that are part of this story.
     node_count = ndb.IntegerProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Story summary should be kept if the corresponding topic is
+        published.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC

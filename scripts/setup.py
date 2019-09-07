@@ -24,6 +24,7 @@ import tarfile
 
 import python_utils
 
+from . import clean
 from . import common
 
 _PARSER = argparse.ArgumentParser(
@@ -147,6 +148,29 @@ def main(args=None):
     # Note: on some machines, these commands seem to take quite a long time.
     common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
     common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
+
+    # Download and install yarn.
+    python_utils.PRINT(
+        'Checking if yarn is installed in %s' % common.OPPIA_TOOLS_DIR)
+    if not os.path.exists(common.YARN_PATH):
+        python_utils.PRINT('Removing package-lock.json')
+        clean.delete_file('package-lock.json')
+        python_utils.print_each_string_after_two_new_lines([
+            'Installing yarn',
+            'WARNING: Please note that Oppia uses Yarn to manage node packages',
+            'do *NOT* use npm. For more information on how to use yarn,',
+            'visit https://yarnpkg.com/en/docs/usage.'])
+
+        yarn_version = 'v1.17.3'
+        yarn_file_name = 'yarn-%s.tar.gz' % yarn_version
+        python_utils.url_retrieve(
+            'https://github.com/yarnpkg/yarn/releases/download/%s/%s'
+            % (yarn_version, yarn_file_name),
+            filename=yarn_file_name)
+        tar = tarfile.open(name=yarn_file_name)
+        tar.extractall(path=common.OPPIA_TOOLS_DIR)
+        tar.close()
+        os.remove(yarn_file_name)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.

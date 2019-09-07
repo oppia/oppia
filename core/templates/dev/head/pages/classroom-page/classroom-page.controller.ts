@@ -16,16 +16,20 @@
  * @fileoverview Directive for the classroom.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require('components/summary-tile/topic-summary-tile.directive.ts');
+
+require('domain/classroom/ClassroomBackendApiService.ts');
+require('domain/topic/TopicSummaryObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-angular.module('oppia').directive('topicViewerPage', [
+angular.module('oppia').directive('classroomPage', [
   'UrlInterpolationService', function(
       UrlInterpolationService) {
     return {
@@ -36,20 +40,37 @@ angular.module('oppia').directive('topicViewerPage', [
         '/pages/classroom-page/classroom-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$window', 'AlertsService',
-        'PageTitleService', 'UrlService', 'WindowDimensionsService',
-        'FATAL_ERROR_CODES',
+        '$rootScope', '$window', 'AlertsService', 'ClassroomBackendApiService',
+        'PageTitleService', 'TopicSummaryObjectFactory', 'UrlService',
+        'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
-            $rootScope, $window, AlertsService,
-            PageTitleService, UrlService, WindowDimensionsService,
-            FATAL_ERROR_CODES) {
+            $rootScope, $window, AlertsService, ClassroomBackendApiService,
+            PageTitleService, TopicSummaryObjectFactory, UrlService,
+            WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
 
           ctrl.classroomName = UrlService.getClassroomNameFromUrl();
+          ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+            '/splash/books.svg');
 
           PageTitleService.setPageTitle(ctrl.classroomName + ' - Oppia');
 
           $rootScope.loadingMessage = 'Loading';
+          ClassroomBackendApiService.fetchClassroomData(
+            ctrl.classroomName).then(function(topicSummaryDicts) {
+            ctrl.topicSummaries = topicSummaryDicts.map(
+              function(summaryDict) {
+                return TopicSummaryObjectFactory.createFromBackendDict(
+                  summaryDict);
+              }
+            );
+            $rootScope.loadingMessage = '';
+          },
+          function(errorResponse) {
+            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+              AlertsService.addWarning('Failed to get dashboard data');
+            }
+          });
         }
       ]
     };

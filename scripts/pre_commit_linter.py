@@ -527,7 +527,8 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/core/storage/',
     '/export/',
     '/manifest.json',
-    '/package*.json',
+    '/package.json',
+    '/yarn.lock',
     '/scripts/install_third_party_libs.py',
     '/.github/']
 
@@ -3165,7 +3166,7 @@ def main(args=None):
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('No files to check.')
         python_utils.PRINT('---------------------------')
-        sys.exit(1)
+        return
 
     all_filepaths_dict = {
         '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []

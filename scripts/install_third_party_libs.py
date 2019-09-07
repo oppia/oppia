@@ -252,11 +252,7 @@ def main(args=None):
     install_third_party.main(args=[])
 
     # Install third-party node modules needed for the build process.
-    subprocess.call([common.NPM_PATH, 'install', '--only=dev'])
-    # This line removes the 'npm ERR! missing:' messages. For reference, see
-    # this thread: https://github.com/npm/npm/issues/19393#issuecomment-
-    # 374076889.
-    subprocess.call([common.NPM_PATH, 'dedupe'])
+    subprocess.call(['yarn'])
 
     install_skulpt(parsed_args)
 
