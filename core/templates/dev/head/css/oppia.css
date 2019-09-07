@@ -2982,6 +2982,7 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-top: 0;
   max-width: 800px;
   padding: 32px 32px 24px 32px;
+  background-color: rgb(218, 218, 218);
 }
 
 .oppia-improvement-card-header {

@@ -14,7 +14,7 @@
 
     <md-card ng-repeat="card in getCards() | orderBy:getCardTitle:true"
              ng-if="!isCardObsolete(card)" ng-class="getCardCssClasses(card)"
-             class="md-default-theme protractor-test-card">
+             class="protractor-test-card">
 
       <div class="oppia-improvement-card-header modal-header">
         <h2 class="oppia-improvement-card-header-title protractor-test-card-title">
