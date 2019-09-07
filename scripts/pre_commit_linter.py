@@ -962,7 +962,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
     def __init__(self, filepath, file_lines, debug, failed=False):
-        """Define various variables to parse HTML."""
+        """Define various variables to parse HTML.
+
+        Args:
+            filepath: str. path of file.
+            file_lines: str. line of the file
+            debug: bool. debug true/false
+            failed: bool. check fail.
+        """
         html.parser.HTMLParser.__init__(self)
         self.tag_stack = []
         self.debug = debug
@@ -977,7 +984,12 @@ class CustomHTMLParser(html.parser.HTMLParser):
             'param', 'source', 'track', 'wbr']
 
     def handle_starttag(self, tag, attrs):
-        """Handle start tag of a HTML line."""
+        """Handle start tag of a HTML line.
+
+        Args:
+            tag: str. tag in line of html file.
+            attrs: str. attribute in line of html file.
+        """
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
         expected_indentation = self.indentation_level * self.indentation_width
@@ -1075,7 +1087,11 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 self.failed = True
 
     def handle_endtag(self, tag):
-        """Handle end tag of a HTML line."""
+        """Handle end tag of a HTML line.
+
+        Args:
+            tag: string. tag in the line on html file.
+        """
         line_number, _ = self.getpos()
         tag_line = self.file_lines[line_number - 1]
         leading_spaces_count = len(tag_line) - len(tag_line.lstrip())
@@ -1109,7 +1125,10 @@ class CustomHTMLParser(html.parser.HTMLParser):
             python_utils.PRINT(self.tag_stack)
 
     def handle_data(self, data):
-        """Handle indentation level."""
+        """Handle indentation level.
+        Args:
+            data: str. string of html.
+        """
         data_lines = data.split('\n')
         opening_block = tuple(
             ['{% block', '{% macro', '{% if', '% for', '% if'])
@@ -1126,7 +1145,7 @@ def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
     """Checks that the most important patterns are at the bottom
     of the CODEOWNERS file.
 
-    Arguments:
+    Args:
         important_patterns: list(str). List of the important
             patterns for CODEOWNERS file.
 
@@ -1184,6 +1203,11 @@ def _check_codeowner_file(verbose_mode_enabled):
     please refer https://docs.python.org/2/library/glob.html.
     This function also ensures that the most important rules are at the
     bottom of the CODEOWNERS file.
+
+    Args:
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+    Returns:
+        A list of summery messages.
     """
     if verbose_mode_enabled:
         python_utils.PRINT('Starting CODEOWNERS file check')
@@ -1626,6 +1650,9 @@ class LintChecksManager( # pylint: disable=inherit-non-class
     def _check_mandatory_patterns(self):
         """This function checks that all files contain the mandatory
         patterns.
+
+        Returns:
+            A list of summery messages.
         """
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting mandatory patterns check')
@@ -1658,7 +1685,11 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         return summary_messages
 
     def _check_bad_patterns(self):
-        """This function is used for detecting bad patterns."""
+        """This function is used for detecting bad patterns.
+
+        Returns:
+            A list of summery messages.
+        """
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting Pattern Checks')
             python_utils.PRINT('----------------------------------------')
@@ -1773,6 +1804,9 @@ class JsTsLintChecksManager(LintChecksManager):
         """This function is used to check if node-eslint dependencies are
         installed and pass ESLint binary path and lint all the Js and Ts files
         with third party linters.
+
+        Returns:
+            A list of js and ts listing messages.
         """
 
         python_utils.PRINT('Starting Js and Ts linter...')
@@ -1826,6 +1860,9 @@ class JsTsLintChecksManager(LintChecksManager):
     def _validate_and_parse_js_and_ts_files(self):
         """This function validates JavaScript and Typescript files and
         returns the parsed contents as a Python dictionary.
+
+        Returns:
+            A list of parsed js files.
         """
 
         # Select JS files which need to be checked.
@@ -1873,6 +1910,9 @@ class JsTsLintChecksManager(LintChecksManager):
     def _get_expressions_from_parsed_script(self):
         """This function returns the expressions in the script parsed using
         js and ts files.
+
+        Returns:
+            A list of parsed expressions in files.
         """
 
         parsed_expressions_in_files = collections.defaultdict(dict)
@@ -1894,6 +1934,12 @@ class JsTsLintChecksManager(LintChecksManager):
     def _compile_ts_file(self, filepath, dir_path):
         """Compiles a typescript file and returns the path for compiled
         js file.
+
+        Args:
+            filepath: str. filepath
+            dir_path: str. directory path
+        Returns:
+            A list of path of compiled js files.
         """
         allow_js = 'true'
         lib = 'es2017,dom'
@@ -1916,6 +1962,9 @@ class JsTsLintChecksManager(LintChecksManager):
         """Checks if the changes made include extra js files in core
         or extensions folder which are not specified in
         build.JS_FILEPATHS_NOT_TO_BUILD.
+
+        Returns:
+            A list of summery messages.
         """
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting extra js files check')
@@ -2143,6 +2192,9 @@ class JsTsLintChecksManager(LintChecksManager):
         imported in the controllers/directives/factories in JS
         files are in following pattern: dollar imports, regular
         imports, and constant imports, all in sorted order.
+
+        Returns:
+            A list of summery messages.
         """
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting sorted dependencies check')
@@ -2237,6 +2289,9 @@ class JsTsLintChecksManager(LintChecksManager):
         """This function checks whether the line breaks between the dependencies
         listed in the controller of a directive or service exactly match those
         between the arguments of the controller function.
+
+        Returns:
+            A list of summery messages.
         """
         if self.verbose_mode_enabled:
             python_utils.PRINT(
@@ -2301,6 +2356,9 @@ class JsTsLintChecksManager(LintChecksManager):
         and that the constants are declared only single time. This also checks
         that the constants are declared in both *.constants.ajs.ts (for
         AngularJS) and in *.constants.ts (for Angular 8).
+
+        Returns:
+            A list of summery messages.
         """
 
         if self.verbose_mode_enabled:
@@ -2499,6 +2557,9 @@ class JsTsLintChecksManager(LintChecksManager):
     def _check_html_directive_name(self):
         """This function checks that all HTML directives end
         with _directive.html.
+
+        Returns:
+            A list of summery messages.
         """
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting HTML directive name check')
@@ -2591,6 +2652,9 @@ class OtherLintChecksManager(LintChecksManager):
         """This function is used to check if node-eslint dependencies are
         installed and pass ESLint binary path and lint all the Python,
         HTML, CSS files with their respective third party linters.
+
+        Returns:
+            A list of summery messages.
         """
 
         python_utils.PRINT('Starting Python, HTML, and CSS linter...')
@@ -2738,6 +2802,9 @@ class OtherLintChecksManager(LintChecksManager):
     def _check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
+
+        Returns:
+            A list of summary messages.
         """
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting import-order checks')
@@ -2931,7 +2998,11 @@ class OtherLintChecksManager(LintChecksManager):
         return summary_messages
 
     def _check_comments(self):
-        """This function ensures that comments follow correct style."""
+        """This function ensures that comments follow correct style.
+
+        Returns:
+            A list of summery messages.
+        """
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting comment checks')
             python_utils.PRINT('----------------------------------------')
@@ -3009,7 +3080,13 @@ class OtherLintChecksManager(LintChecksManager):
         return summary_messages
 
     def _check_html_tags_and_attributes(self, debug=False):
-        """This function checks the indentation of lines in HTML files."""
+        """This function checks the indentation of lines in HTML files.
+
+        Args:
+            debug: bool. trigger debug to true/false
+        Returns:
+            A list of summery messages.
+        """
 
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting HTML tag and attribute check')
@@ -3050,7 +3127,11 @@ class OtherLintChecksManager(LintChecksManager):
         return summary_messages
 
     def _lint_html_files(self):
-        """This function is used to check HTML files for linting errors."""
+        """This function is used to check HTML files for linting errors.
+
+        Returns:
+            A list of summary messages.
+        """
         parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
         node_path = os.path.join(
