@@ -562,8 +562,14 @@ p:last-child {
 .label, .badge {
   margin: auto 4px;
 }
+.label-default, .badge-default {
+  background-color: #888;
+}
 .label-info, .badge-info {
   background-color: #18447E;
+}
+.label-success, .badge-success {
+  background-color: #009688;
 }
 
 /*
