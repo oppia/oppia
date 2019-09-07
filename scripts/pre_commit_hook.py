@@ -130,6 +130,7 @@ def main(args=None):
             'yarn to add, update, or delete the packages. For more information '
             'on how to use yarn, see https://yarnpkg.com/en/docs/usage.'
         )
+        sys.exit(1)
     return
 
 
