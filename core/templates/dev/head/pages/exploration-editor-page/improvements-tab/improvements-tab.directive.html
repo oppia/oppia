@@ -18,53 +18,48 @@
     </md-card>
   </div>
 
-  <div class="protractor-test-improvements-cards">
+  <md-card ng-repeat="card in getCards() | orderBy:getCardTitle:true | filter:isCardShown"
+           ng-if="!isCardObsolete(card)"
+           ng-class="[oppia-improvement-<[card.getDirectiveType()]>-card, {'oppia-improvement-card': isCardOpen(card), 'oppia-improvement-closed-card': !isCardOpen(card)}]"
+           class="protractor-test-improvements-card">
 
-    <md-card ng-repeat="card in getCards() | orderBy:getCardTitle:true | filter:isCardShown"
-             ng-if="!isCardObsolete(card)"
-             ng-class="[oppia-improvement-<[card.getDirectiveType()]>-card, {'oppia-improvement-card': isCardOpen(card), 'oppia-improvement-closed-card': !isCardOpen(card)}]"
-             class="protractor-test-improvements-card">
+    <div class="oppia-improvement-card-header modal-header">
+      <h2 class="oppia-improvement-card-header-title protractor-test-improvements-card-title">
+        <[card.getTitle()]>
+      </h2>
 
-      <div class="oppia-improvement-card-header modal-header">
-        <h2 class="oppia-improvement-card-header-title protractor-test-improvements-card-title">
-          <[card.getTitle()]>
-        </h2>
-
-        <div class="oppia-improvement-card-header-status-pill">
-          <span ng-class="getStatusCssClass(card.getStatus())"
-                class="protractor-test-improvements-card-status">
-            <[getHumanReadableStatus(card.getStatus())]>
-          </span>
-        </div>
+      <div class="oppia-improvement-card-header-status-pill">
+        <span ng-class="getStatusCssClass(card.getStatus())"
+              class="protractor-test-improvements-card-status">
+          <[getHumanReadableStatus(card.getStatus())]>
+        </span>
       </div>
+    </div>
 
-      <div ng-show="isCardOpen(card)" ng-switch="card.getDirectiveType()" class="modal-body">
-        <answer-details-improvement-card ng-switch-when="answer-details"
-                                         data="card.getDirectiveData()"
-                                         class="protractor-test-improvements-card-body">
-        </answer-details-improvement-card>
-        <feedback-improvement-card ng-switch-when="feedback" data="card.getDirectiveData()"
+    <div ng-show="isCardOpen(card)" ng-switch="card.getDirectiveType()" class="modal-body">
+      <answer-details-improvement-card ng-switch-when="answer-details"
+                                       data="card.getDirectiveData()"
+                                       class="protractor-test-improvements-card-body">
+      </answer-details-improvement-card>
+      <feedback-improvement-card ng-switch-when="feedback" data="card.getDirectiveData()"
+                                 class="protractor-test-improvements-card-body">
+      </feedback-improvement-card>
+      <playthrough-improvement-card ng-switch-when="playthrough" data="card.getDirectiveData()"
+                                    class="protractor-test-improvements-card-body">
+      </playthrough-improvement-card>
+      <suggestion-improvement-card ng-switch-when="suggestion" data="card.getDirectiveData()"
                                    class="protractor-test-improvements-card-body">
-        </feedback-improvement-card>
-        <playthrough-improvement-card ng-switch-when="playthrough" data="card.getDirectiveData()"
-                                      class="protractor-test-improvements-card-body">
-        </playthrough-improvement-card>
-        <suggestion-improvement-card ng-switch-when="suggestion" data="card.getDirectiveData()"
-                                     class="protractor-test-improvements-card-body">
-        </suggestion-improvement-card>
-      </div>
+      </suggestion-improvement-card>
+    </div>
 
-      <div class="oppia-improvement-card-footer modal-footer">
-        <button ng-repeat="actionButton in card.getActionButtons()"
-                ng-click="actionButton.execute()" ng-disabled="!actionButton.isEnabled()"
-                ng-class="actionButton.getCssClass()"
-                class="btn protractor-test-improvements-action-button"
-                style="margin-left: 15px" type="button">
-          <[actionButton.getText()]>
-        </button>
-      </div>
-
-    </md-card>
-
-  </div>
+    <div class="oppia-improvement-card-footer modal-footer">
+      <button ng-repeat="actionButton in card.getActionButtons()"
+              ng-click="actionButton.execute()" ng-disabled="!actionButton.isEnabled()"
+              ng-class="actionButton.getCssClass()"
+              class="btn protractor-test-improvements-action-button"
+              style="margin-left: 15px" type="button">
+        <[actionButton.getText()]>
+      </button>
+    </div>
+  </md-card>
 </div>
