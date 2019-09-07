@@ -1291,7 +1291,7 @@ class Exploration(python_utils.OBJECT):
         """Returns a list of language code in which the exploration translation
         is 100%.
 
-        Return:
+        Returns:
             list(str). A list of language code in which the translation for the
             exploration is complete i.e, 100%.
         """
@@ -1327,7 +1327,7 @@ class Exploration(python_utils.OBJECT):
 
         (The content field includes state content, feedback, hints, solutions.)
 
-        Return:
+        Returns:
             int. The total number of distinct content fields available inside
             the exploration.
         """
@@ -2610,8 +2610,14 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_v12_dict_to_v13_dict(cls, exploration_dict):
-        """Converts a v12 exploration dict into a v13 exploration dict."""
+        """Converts a v12 exploration dict into a v13 exploration dict.
 
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
+        """
         exploration_dict['schema_version'] = 13
 
         exploration_dict['states'] = cls._convert_states_v9_dict_to_v10_dict(
@@ -2623,7 +2629,14 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_v13_dict_to_v14_dict(cls, exploration_dict):
-        """Converts a v13 exploration dict into a v14 exploration dict."""
+        """Converts a v13 exploration dict into a v14 exploration dict.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
+        """
 
         exploration_dict['schema_version'] = 14
 
@@ -2636,7 +2649,14 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_v14_dict_to_v15_dict(cls, exploration_dict):
-        """Converts a v14 exploration dict into a v15 exploration dict."""
+        """Converts a v14 exploration dict into a v15 exploration dict.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
+        """
 
         exploration_dict['schema_version'] = 15
 
@@ -2649,7 +2669,14 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_v15_dict_to_v16_dict(cls, exploration_dict):
-        """Converts a v15 exploration dict into a v16 exploration dict."""
+        """Converts a v15 exploration dict into a v16 exploration dict.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
+        """
         exploration_dict['schema_version'] = 16
 
         exploration_dict['states'] = cls._convert_states_v12_dict_to_v13_dict(
@@ -2664,6 +2691,12 @@ class Exploration(python_utils.OBJECT):
         """Converts a v16 exploration dict into a v17 exploration dict.
 
         Removes gadgets and skins.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 17
 
@@ -2677,6 +2710,12 @@ class Exploration(python_utils.OBJECT):
         """Converts a v17 exploration dict into a v18 exploration dict.
 
         Adds auto_tts_enabled property.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 18
 
@@ -2692,6 +2731,12 @@ class Exploration(python_utils.OBJECT):
         """Converts a v18 exploration dict into a v19 exploration dict.
 
         Adds audio translations to feedback, hints, and solutions.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 19
 
@@ -2707,6 +2752,12 @@ class Exploration(python_utils.OBJECT):
 
         Introduces a correctness property at the top level, and changes each
         answer group's "correct" field to "labelled_as_correct" instead.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 20
 
@@ -2724,6 +2775,12 @@ class Exploration(python_utils.OBJECT):
 
         Adds a refresher_exploration_id field to each answer group outcome, and
         to the default outcome (if it exists).
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 21
 
@@ -2740,6 +2797,12 @@ class Exploration(python_utils.OBJECT):
         Moves the labelled_as_correct field from the answer group level to the
         outcome level, and adds two extra customization args to the
         FractionInput interaction.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 22
 
@@ -2755,6 +2818,12 @@ class Exploration(python_utils.OBJECT):
 
         Adds a new customization arg to FractionInput interactions
         which allows you to add custom placeholders.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 23
 
@@ -2770,6 +2839,12 @@ class Exploration(python_utils.OBJECT):
 
         Adds training_data parameter to each answer group to store training
         data of corresponding answer group.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 24
 
@@ -2786,6 +2861,12 @@ class Exploration(python_utils.OBJECT):
         Adds additional tagged_misconception_id and
         missing_prerequisite_skill_id fields to answer groups and outcomes
         respectively.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 25
 
@@ -2800,6 +2881,12 @@ class Exploration(python_utils.OBJECT):
         """Converts a v25 exploration dict into a v26 exploration dict.
 
         Move audio_translations into a seperate dict.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 26
 
@@ -2815,6 +2902,12 @@ class Exploration(python_utils.OBJECT):
 
         Converts all Rich Text Editor content to be compatible with the
         textAngular format.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 27
 
@@ -2829,6 +2922,12 @@ class Exploration(python_utils.OBJECT):
         """Converts a v27 exploration dict into a v28 exploration dict.
 
         Adds caption attribute to all oppia-noninteractive-image tags.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 28
 
@@ -2844,6 +2943,12 @@ class Exploration(python_utils.OBJECT):
 
         Converts all Rich Text Editor content to be compatible with the
         CKEditor format.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 29
 
@@ -2858,6 +2963,13 @@ class Exploration(python_utils.OBJECT):
         """Converts a v29 exploration dict into a v30 exploration dict.
 
         Adds dimensions to all oppia-noninteractive-image tags.
+
+        Args:
+            exp_id: str. explorarion id
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 30
 
@@ -2873,6 +2985,12 @@ class Exploration(python_utils.OBJECT):
 
         Adds a new customization arg to DragAndDropSortInput interactions
         which allows multiple sort items in the same position.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 31
 
@@ -2887,6 +3005,12 @@ class Exploration(python_utils.OBJECT):
         """Converts a v31 exploration dict into a v32 exploration dict.
 
         Adds content_tranlations in state for adding text translation.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 32
 
@@ -2902,6 +3026,12 @@ class Exploration(python_utils.OBJECT):
 
         Replaces content_ids_to_audio_translations with recorded_voiceovers in
         each state of the exploration.
+
+        Args:
+            exploration_dict: dict. exploration in dict
+
+        Returns:
+            converted exploration.
         """
         exploration_dict['schema_version'] = 33
 
