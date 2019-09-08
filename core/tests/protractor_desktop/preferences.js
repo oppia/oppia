@@ -109,6 +109,21 @@ describe('Preferences', function() {
       'http://localhost:9001/learner_dashboard');
   });
 
+  it('should set the subject interest', function() {
+    users.createUser('nipan@preferences.com', 'nipanPreferences');
+    users.login('nipan@preferences.com');
+    preferencesPage.get();
+    preferencesPage.setSubInterest('maths, physics, biology');
+    browser.refresh();
+    preferencesPage.expectSubToBe('maths, physics, biology');
+    preferencesPage.setSubInterest('Chemistry');
+    browser.refresh();
+    preferencesPage.expectSubToBe('Chemistry');
+    preferencesPage.editSubInterest(', Computer Science, Hindi');
+    preferencesPage.editSubInterest(', English');
+    preferencesPage.expectSubToBe('Chemistry, Computer Science, Hindi, English');
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
     users.logout();
