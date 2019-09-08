@@ -368,7 +368,6 @@ describe('Suggestions on Explorations', function() {
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
 
-    browser.sleep(3000);
     users.logout();
 
     // Student logs in and plays the exploration, finds the updated content.
