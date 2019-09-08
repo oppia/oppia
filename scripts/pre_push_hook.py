@@ -59,7 +59,7 @@ PYTHON_CMD = 'python'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 NPM_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'npm')
-FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
+FRONTEND_TEST_SCRIPT = 'run_frontend_tests'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -269,9 +269,11 @@ def _start_linter(files):
     return task.returncode
 
 
-def _start_sh_script(scriptname):
-    """Runs the 'start.sh' script and returns the returncode of the task."""
-    cmd = ['bash', os.path.join(SCRIPTS_DIR, scriptname)]
+def _start_python_script(scriptname):
+    """Runs the 'start.py' script and returns the returncode of the task."""
+    cmd = [
+        'python', '-m',
+        os.path.join(SCRIPTS_DIR, scriptname).replace('/', '.')]
     task = subprocess.Popen(cmd)
     task.communicate()
     return task.returncode
@@ -399,7 +401,7 @@ def main(args=None):
                     sys.exit(1)
             frontend_status = 0
             if _does_diff_include_js_or_ts_files(files_to_lint):
-                frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
+                frontend_status = _start_python_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')

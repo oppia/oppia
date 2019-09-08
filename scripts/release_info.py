@@ -245,7 +245,7 @@ def check_setup_scripts(base_release_tag, changed_only=True):
             changed (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in
-                     ['setup.sh', 'setup_gae.sh', 'install_third_party.sh',
+                     ['setup.py', 'setup_gae.py', 'install_third_party_libs.py',
                       'install_third_party.py']]
     changed_files = _git_diff_names_only(base_release_tag)
     changes_dict = {script: script in changed_files
