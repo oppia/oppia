@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Answer details Improvement card directive.
+ * @fileoverview Answer details Improvement task directive.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('oppia').directive('answerDetailsImprovementCard', [
+angular.module('oppia').directive('answerDetailsImprovementTask', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -27,8 +27,8 @@ angular.module('oppia').directive('answerDetailsImprovementCard', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-editor-page/improvements-tab/' +
-        'answer-details-improvement-card/' +
-        'answer-details-improvement-card.directive.html'),
+        'answer-details-improvement-task/' +
+        'answer-details-improvement-task.directive.html'),
       controller: ['$scope', function($scope) {
         $scope.getStateName = function() {
           return $scope.getData().stateName;

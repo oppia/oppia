@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Playthrough Improvement card directive.
+ * @fileoverview Playthrough Improvement task directive.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-angular.module('oppia').directive('playthroughImprovementCard', [
+angular.module('oppia').directive('playthroughImprovementTask', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -28,8 +28,8 @@ angular.module('oppia').directive('playthroughImprovementCard', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-editor-page/improvements-tab/' +
-        'playthrough-improvement-card/' +
-        'playthrough-improvement-card.directive.html'),
+        'playthrough-improvement-task/' +
+        'playthrough-improvement-task.directive.html'),
       controller: [
         '$scope', 'PlaythroughIssuesService',
         function($scope, PlaythroughIssuesService) {
