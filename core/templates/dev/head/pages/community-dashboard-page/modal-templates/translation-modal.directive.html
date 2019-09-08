@@ -23,14 +23,21 @@
         <lazy-loading></lazy-loading>
       </div>
     </div>
-    <!-- Should allow translation while the earlier translation is still uploading? -->
     <div ng-if="!loadingData && !uploadingTranslation">
       <angular-html-bind html-data="textToTranslate"
                          class="oppia-rte-editor">
       </angular-html-bind>
     </div>
 
-    <div class="oppia-translation-editor-section">
+    <div class="oppia-login-required-to-translate" ng-if="!userIsLoggedIn">
+      <div class="oppia-login-required-message">
+        Oops! You haven't logged in yet.
+        <br>
+        Log in <a style="color: #009688;" ng-click="$ctrl.onLoginButtonClicked()">here</a> to start contributing!
+      </div>
+    </div>
+
+    <div class="oppia-translation-editor-section" ng-if="userIsLoggedIn">
       <div class="protractor-test-state-translation-editor">
         <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
         </schema-based-editor>
@@ -38,7 +45,7 @@
     </div>
   </div>
 </div>
-<div class="modal-footer">
+<div class="modal-footer" ng-if="userIsLoggedIn">
   <div>
     <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
     <button class="btn btn-success oppia-upload-translated-text-button"
@@ -75,6 +82,14 @@
   .oppia-translation-editor-section {
     padding: 25px 0px;
     word-wrap: break-word;
+  }
+  .oppia-login-required-to-translate {
+    padding: 50px;
+    text-align: center;
+  }
+  .oppia-login-required-message {
+    font-size: 28px;
+    color: #4a4a4a;
   }
   .oppia-skip-button {
     color: #ababab;

@@ -364,7 +364,7 @@ def get_reviewable_suggestions(user_id, suggestion_type):
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
-        ])
+    ])
 
 
 def get_submitted_suggestions(user_id, suggestion_type):
@@ -376,7 +376,7 @@ def get_submitted_suggestions(user_id, suggestion_type):
         suggestion_type: str. The type of the suggestion.
 
     Returns:
-        list(Suggestion). A list of suggestions which the given user is
+        list(Suggestion). A list of suggestions which the given user has
         submitted.
     """
     return ([
@@ -384,7 +384,7 @@ def get_submitted_suggestions(user_id, suggestion_type):
             suggestion_models.GeneralSuggestionModel
             .get_user_created_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
-        ])
+    ])
 
 
 def get_all_scores_of_user(user_id):

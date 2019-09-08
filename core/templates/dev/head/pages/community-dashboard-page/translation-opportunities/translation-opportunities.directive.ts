@@ -46,14 +46,20 @@ angular.module('oppia').directive(
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$uibModal', 'ContributionOpportunitiesService',
-        'TranslateTextService', 'TranslationLanguageService', function(
+        'TranslateTextService', 'TranslationLanguageService', 'UserService',
+        function(
             $scope, $uibModal, ContributionOpportunitiesService,
-            TranslateTextService, TranslationLanguageService) {
+            TranslateTextService, TranslationLanguageService, UserService) {
           var ctrl = this;
+          var userIsLoggedIn = false;
           ctrl.opportunities = [];
           ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
           ctrl.progressBarRequired = true;
+
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            userIsLoggedIn = userInfo.isLoggedIn();
+          });
 
           var getOpportunitySummary = function(expId) {
             for (var index in ctrl.opportunities) {
@@ -126,10 +132,15 @@ angular.module('oppia').directive(
                 opportunity: function() {
                   return opportunity;
                 },
+                userIsLoggedIn: function() {
+                  return userIsLoggedIn;
+                }
               },
               controller: [
-                '$scope', '$uibModalInstance', 'opportunity',
-                function($scope, $uibModalInstance, opportunity) {
+                '$scope', '$uibModalInstance', 'opportunity', 'userIsLoggedIn',
+                function(
+                    $scope, $uibModalInstance, opportunity, userIsLoggedIn) {
+                  $scope.userIsLoggedIn = userIsLoggedIn;
                   $scope.uploadingTranslation = false;
                   $scope.activeWrittenTranslation = {};
                   $scope.activeWrittenTranslation.html = '';

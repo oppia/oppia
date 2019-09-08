@@ -1259,7 +1259,8 @@ class Exploration(python_utils.OBJECT):
         language.
 
         Args:
-            language_code: The language code in which translation is required.
+            language_code: str. The language code in which translation is
+                required.
 
         Returns:
             dict(str, dict(str, str)). A dict where state_name is the key and a

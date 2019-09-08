@@ -408,12 +408,16 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'new_value': '0'
             })], 'Changes.')
 
-    def test_get_opportunities_by_ids_returns_list_of_objects(self):
-        output = opportunity_services.get_opportunities_by_ids([])
+    def test_get_exploration_opportunity_summaries_by_ids_returns_list_of_objects(self): # pylint: disable=line-too-long
+        output = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                []))
 
         self.assertEqual(output, {})
 
-        opportunities = opportunity_services.get_opportunities_by_ids(['0'])
+        opportunities = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['0']))
 
         self.assertEqual(len(opportunities), 1)
         self.assertIsInstance(

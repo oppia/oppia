@@ -844,8 +844,8 @@ class WrittenTranslations(python_utils.OBJECT):
         return cls(translations_mapping)
 
     def get_content_ids_that_are_correctly_translated(self, language_code):
-        """Returns a list of content ids in which translations are available in
-        the give language.
+        """Returns a list of content ids in which a correct translation are
+        available in the given language.
 
         Args:
             language_code: str. The abbreviated code of the language.
@@ -1871,11 +1871,11 @@ class State(python_utils.OBJECT):
         """Returns all text html which can be translated in the given language.
 
         Args:
-            language_code: The abbreviated code of the language.
+            language_code: str. The abbreviated code of the language.
 
         Returns:
-            dict(str, str). Returns a dict with key as content id and value as
-            the content html.
+            dict(str, str). A dict with key as content id and value as the
+            content html.
         """
         content_id_to_html = self._get_all_translatable_content()
         available_translation_content_ids = (
@@ -1885,7 +1885,7 @@ class State(python_utils.OBJECT):
         for content_id in available_translation_content_ids:
             del content_id_to_html[content_id]
 
-        # TODO(@DubeySandeep): Add functionality to return the list of
+        # TODO(#7571): Add functionality to return the list of
         # translations which needs update.
 
         return content_id_to_html
