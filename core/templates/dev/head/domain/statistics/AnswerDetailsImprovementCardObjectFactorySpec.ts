@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the FeedbackImprovementCardObjectFactory.
+ * @fileoverview Unit tests for the FeedbackImprovementTaskObjectFactory.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// FeedbackImprovementCardObjectFactory.ts is upgraded to Angular 8.
+// FeedbackImprovementTaskObjectFactory.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -73,16 +73,16 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/statistics/AnswerDetailsImprovementCardObjectFactory.ts');
+require('domain/statistics/AnswerDetailsImprovementTaskObjectFactory.ts');
 
-describe('AnswerDetailsImprovementCardObjectFactory', function() {
+describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
-  var AnswerDetailsImprovementCardObjectFactory = null;
+  var AnswerDetailsImprovementTaskObjectFactory = null;
   var ImprovementModalService = null;
   var LearnerAnswerDetailsDataService = null;
-  var ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE = null;
+  var ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE = null;
   var STATUS_NOT_ACTIONABLE = null;
   var STATUS_OPEN = null;
 
@@ -147,19 +147,19 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
-      _AnswerDetailsImprovementCardObjectFactory_, _ImprovementModalService_,
+      _AnswerDetailsImprovementTaskObjectFactory_, _ImprovementModalService_,
       _LearnerAnswerDetailsDataService_,
-      _ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE_,
+      _ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE_,
       _STATUS_NOT_ACTIONABLE_, _STATUS_OPEN_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
-    AnswerDetailsImprovementCardObjectFactory =
-      _AnswerDetailsImprovementCardObjectFactory_;
+    AnswerDetailsImprovementTaskObjectFactory =
+      _AnswerDetailsImprovementTaskObjectFactory_;
     ImprovementModalService = _ImprovementModalService_;
     LearnerAnswerDetailsDataService = _LearnerAnswerDetailsDataService_;
-    ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE =
-      _ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE_;
+    ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE =
+      _ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE_;
     STATUS_NOT_ACTIONABLE = _STATUS_NOT_ACTIONABLE_;
     STATUS_OPEN = _STATUS_OPEN_;
   }));
@@ -167,16 +167,16 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
   describe('.createNew', function() {
     it('retrieves data from passed thread', function() {
       var mockLearnerAnswerDetails = {learnerAnswerInfoData: 'sample'};
-      var card = AnswerDetailsImprovementCardObjectFactory.createNew(
+      var card = AnswerDetailsImprovementTaskObjectFactory.createNew(
         mockLearnerAnswerDetails);
 
       expect(card.getDirectiveData()).toBe(mockLearnerAnswerDetails);
       expect(card.getDirectiveType()).toEqual(
-        ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE);
+        ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
     });
   });
 
-  describe('.fetchCards', function() {
+  describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
       spyOn(
         LearnerAnswerDetailsDataService,
@@ -184,7 +184,7 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
       spyOn(LearnerAnswerDetailsDataService, 'getData').and.returnValue(
         [{learnerAnswerInfoData: 'abc1'}, {learnerAnswerInfoData: 'def2'}]);
 
-      AnswerDetailsImprovementCardObjectFactory.fetchCards().then(
+      AnswerDetailsImprovementTaskObjectFactory.fetchTasks().then(
         function(cards) {
           expect(
             cards[0].getDirectiveData().learnerAnswerInfoData).toEqual('abc1');
@@ -198,7 +198,7 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
     });
   });
 
-  describe('AnswerDetailsImprovementCard', function() {
+  describe('AnswerDetailsImprovementTask', function() {
     beforeEach(function() {
       this.mockLearnerAnswerDetails = {
         expId: 12,
@@ -211,7 +211,7 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
         }]
       };
       this.card =
-        AnswerDetailsImprovementCardObjectFactory.createNew(
+        AnswerDetailsImprovementTaskObjectFactory.createNew(
           this.mockLearnerAnswerDetails);
     });
 
@@ -247,7 +247,7 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
     describe('.getDirectiveType', function() {
       it('returns answer details as directive type', function() {
         expect(this.card.getDirectiveType())
-          .toEqual(ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE);
+          .toEqual(ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
       });
     });
 

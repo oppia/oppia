@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the PlaythroughImprovementCardObjectFactory.
+ * @fileoverview Unit tests for the PlaythroughImprovementTaskObjectFactory.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// PlaythroughImprovementCardObjectFactory.ts is upgraded to Angular 8.
+// PlaythroughImprovementTaskObjectFactory.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -79,16 +79,16 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/statistics/PlaythroughImprovementCardObjectFactory');
+require('domain/statistics/PlaythroughImprovementTaskObjectFactory');
 
-describe('PlaythroughImprovementCardObjectFactory', function() {
+describe('PlaythroughImprovementTaskObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
-  var PlaythroughImprovementCardObjectFactory = null;
+  var PlaythroughImprovementTaskObjectFactory = null;
   var playthroughIssueObjectFactory = null;
   var PlaythroughIssuesService = null;
-  var PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = null;
+  var PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -158,17 +158,17 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
-      _PlaythroughImprovementCardObjectFactory_,
+      _PlaythroughImprovementTaskObjectFactory_,
       _PlaythroughIssueObjectFactory_, _PlaythroughIssuesService_,
-      _PLAYTHROUGH_IMPROVEMENT_CARD_TYPE_) {
+      _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
-    PlaythroughImprovementCardObjectFactory =
-      _PlaythroughImprovementCardObjectFactory_;
+    PlaythroughImprovementTaskObjectFactory =
+      _PlaythroughImprovementTaskObjectFactory_;
     playthroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
-    PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = _PLAYTHROUGH_IMPROVEMENT_CARD_TYPE_;
+    PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_;
 
     PlaythroughIssuesService.initSession(expId, expVersion);
 
@@ -190,7 +190,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         is_valid: true,
       });
 
-      var card = PlaythroughImprovementCardObjectFactory.createNew(issue);
+      var card = PlaythroughImprovementTaskObjectFactory.createNew(issue);
 
       expect(card.getTitle()).toEqual(
         PlaythroughIssuesService.renderIssueStatement(issue));
@@ -201,11 +201,11 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         playthroughIds: ['1', '2'],
       });
       expect(card.getDirectiveType()).toEqual(
-        PLAYTHROUGH_IMPROVEMENT_CARD_TYPE);
+        PLAYTHROUGH_IMPROVEMENT_TASK_TYPE);
     });
   });
 
-  describe('.fetchCards', function() {
+  describe('.fetchTasks', function() {
     it('returns a card for each existing issue', function(done) {
       var earlyQuitIssue =
         playthroughIssueObjectFactory.createFromBackendDict({
@@ -257,7 +257,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           cyclicTransitionsIssue,
         ]));
 
-      PlaythroughImprovementCardObjectFactory.fetchCards()
+      PlaythroughImprovementTaskObjectFactory.fetchTasks()
         .then(function(cards) {
           expect(cards.length).toEqual(3);
           expect(cards[0].getTitle()).toEqual(earlyQuitCardTitle);
@@ -270,7 +270,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     });
   });
 
-  describe('PlaythroughImprovementCard', function() {
+  describe('PlaythroughImprovementTask', function() {
     beforeEach(function() {
       this.issue = playthroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
@@ -282,7 +282,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         schema_version: 1,
         is_valid: true,
       });
-      this.card = PlaythroughImprovementCardObjectFactory.createNew(this.issue);
+      this.card = PlaythroughImprovementTaskObjectFactory.createNew(this.issue);
     });
 
     describe('.getActionButtons', function() {
