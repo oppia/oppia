@@ -197,7 +197,7 @@ describe('Feedback Improvements', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
-    card = improvementsTab.getFeedbackCard(feedback);
+    var card = improvementsTab.getFeedbackCard(feedback);
     improvementsTab.clickCardActionButton(card, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual([feedback]);
     improvementsTab.sendResponseAndCloseModal(feedbackResponse);
