@@ -41,11 +41,17 @@ var PreferencesPage = function() {
     by.css('.protractor-test-creator-dashboard-radio'));
   var learnerDashboardRadio = element(
     by.css('.protractor-test-learner-dashboard-radio'));
+  var subInterest = element(
+    by.css('select2-search__field'));
 
   this.editUserBio = function(bio) {
     userBioElement.sendKeys(bio);
     navBar.click();
     preferencesLink.click();
+  };
+
+  this.editSubInterest = function(subject) {
+    subInterest.sendkeys(subject);
   };
 
   this.get = function() {
@@ -88,6 +94,11 @@ var PreferencesPage = function() {
     userBioElement.sendKeys(bio);
     navBar.click();
     preferencesLink.click();
+  };
+
+  this.setSubInterest = function(subject) {
+    subInterest.clear();
+    subInterest.sendkeys(subject);
   };
 
   this.isFeedbackEmailsCheckboxSelected = function() {
@@ -136,6 +147,10 @@ var PreferencesPage = function() {
 
   this.expectUserBioToBe = function(bio) {
     expect(userBioElement.getAttribute('value')).toMatch(bio);
+  };
+
+  this.expectSubToBe = function(subject) {
+    expect(subInterest.getText().toMatch(subject);
   };
 
   this.selectCreatorDashboard = function() {
