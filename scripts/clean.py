@@ -25,8 +25,9 @@ import python_utils
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 
-_PARSER = argparse.ArgumentParser(
-    description='Deletes temporary and installed files.')
+_PARSER = argparse.ArgumentParser(description="""
+Deletes temporary and installed files.
+""")
 
 
 def delete_directory_tree(directory_path):

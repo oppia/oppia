@@ -24,9 +24,10 @@ import subprocess
 
 import python_utils
 
-_PARSER = argparse.ArgumentParser(
-    description='This script should only be run by Travis to install and '
-    'provide a constant version of Chrome.')
+_PARSER = argparse.ArgumentParser(description="""
+This script should only be run by Travis to install and provide a constant
+version of Chrome.
+""")
 
 
 def main(args=None):

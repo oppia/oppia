@@ -70,8 +70,9 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
     }
 }
 
-_PARSER = argparse.ArgumentParser(
-    description='Installation script for Oppia third-party libraries.')
+_PARSER = argparse.ArgumentParser(description="""
+Installation script for Oppia third-party libraries.
+""")
 
 
 def download_files(source_url_root, target_dir, source_filenames):

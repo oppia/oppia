@@ -50,8 +50,9 @@ from . import setup_gae  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
-_PARSER = argparse.ArgumentParser(
-    description='Installation script for Oppia third-party libraries.')
+_PARSER = argparse.ArgumentParser(description="""
+Installation script for Oppia third-party libraries.
+""")
 
 _PARSER.add_argument(
     '--nojsrepl',

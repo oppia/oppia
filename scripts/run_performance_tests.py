@@ -31,14 +31,15 @@ from . import install_third_party_libs
 from . import setup
 from . import setup_gae
 
-_PARSER = argparse.ArgumentParser(
-    description='The root folder MUST be named \'oppia\'. '
-    'Run all tests sequentially: '
-    'python -m scripts.run_performance_tests without args in order to run all '
-    'tests sequentially. '
-    'Run test for a specific page: '
-    'python -m scripts.run_performance_tests --test_name=page_test. '
-    'page_test is the name of the file containing that test eg. splash_test.')
+_PARSER = argparse.ArgumentParser(description="""
+The root folder MUST be named 'oppia'.
+Run all tests sequentially:
+    python -m scripts.run_performance_tests without args in order to run all
+    tests sequentially.
+Run test for a specific page:
+    python -m scripts.run_performance_tests --test_name=page_test
+page_test is the name of the file containing that test eg. splash_test.
+""")
 
 _PARSER.add_argument(
     '--skip_install',
