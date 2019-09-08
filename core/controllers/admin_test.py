@@ -92,12 +92,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        new_config_value = True
+        new_config_value = False
 
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': False,
+            'value': True,
         }, response_config_properties[
             config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name])
 

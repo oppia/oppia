@@ -23,6 +23,7 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
@@ -38,27 +39,50 @@ describe('ExplorationFeedback', function() {
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
+  var adminPage = null;
   var explorationEditorPage = null;
   var explorationEditorFeedbackTab = null;
   var creatorDashboardPage = null;
   var libraryPage = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-  });
 
-  it('should add feedback to an exploration', function() {
     users.createUser(
       'user1@ExplorationFeedback.com',
       'creatorExplorationFeedback');
     users.createUser(
       'user2@ExplorationFeedback.com',
       'learnerExplorationFeedback');
+    users.createUser(
+      'user3@ExplorationFeedback.com',
+      'creatorExplorationFeedbackStatusChange');
+    users.createUser(
+      'user4@ExplorationFeedback.com',
+      'learnerExplorationFeedbackStatusChange');
+    users.createUser(
+      'user5@ExplorationFeedback.com',
+      'creatorFeedback');
+    users.createUser(
+      'user6@ExplorationFeedback.com',
+      'learnerFeedback');
+    users.createAndLoginAdminUser(
+      'user7@ExplorationFeedback.com',
+      'superUserExplorationFeedback');
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor.',
+      'Boolean', function(elem) {
+        elem.setValue(false);
+      });
+  });
+
+  it('should add feedback to an exploration', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
@@ -106,13 +130,6 @@ describe('ExplorationFeedback', function() {
   it('should change status of feedback thread', function() {
     var feedback = 'Hey! This exploration looks awesome';
     var feedbackResponse = 'Thanks for the feedback!';
-
-    users.createUser(
-      'user3@ExplorationFeedback.com',
-      'creatorExplorationFeedbackStatusChange');
-    users.createUser(
-      'user4@ExplorationFeedback.com',
-      'learnerExplorationFeedbackStatusChange');
 
     // Creator creates and publishes an exploration.
     users.login('user3@ExplorationFeedback.com');
@@ -166,12 +183,6 @@ describe('ExplorationFeedback', function() {
   });
 
   it('should send message to feedback thread', function() {
-    users.createUser(
-      'user5@ExplorationFeedback.com',
-      'creatorFeedback');
-    users.createUser(
-      'user6@ExplorationFeedback.com',
-      'learnerFeedback');
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
@@ -241,21 +252,21 @@ describe('Suggestions on Explorations', function() {
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
   var EXPLORATION_LANGUAGE = 'English';
+  var adminPage = null;
   var creatorDashboardPage = null;
   var libraryPage = null;
   var explorationEditorPage = null;
   var explorationEditorFeedbackTab = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
-  });
 
-  beforeEach(function() {
     users.createUser(
       'user1@ExplorationSuggestions.com',
       'authorExplorationSuggestions');
@@ -265,6 +276,14 @@ describe('Suggestions on Explorations', function() {
     users.createUser(
       'user3@ExplorationSuggestions.com',
       'studentExplorationSuggestions');
+    users.createAndLoginAdminUser(
+      'user4@ExplorationSuggestions.com',
+      'configExplorationSuggestions');
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor.',
+      'Boolean', function(elem) {
+        elem.setValue(false);
+      });
   });
 
   it('accepts & rejects a suggestion on a published exploration', function() {

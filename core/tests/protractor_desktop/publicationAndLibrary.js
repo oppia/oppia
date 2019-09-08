@@ -22,6 +22,7 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
@@ -29,18 +30,31 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Library index page', function() {
+  var adminPage = null;
   var libraryPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+
+    users.createAndLoginAdminUser(
+      'superUser@publicationAndLibrary.com', 'superUser');
+    // TODO(#7569): Change this test to work with the improvements tab.
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean',
+      function(elem) {
+        elem.setValue(false);
+      });
+    users.logout();
   });
 
   it('should display private and published explorations', function() {
