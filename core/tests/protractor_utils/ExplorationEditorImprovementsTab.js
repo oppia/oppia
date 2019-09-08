@@ -73,7 +73,7 @@ var ExplorationEditorImprovementsTab = function() {
     };
   };
 
-  var _buildCardContentMatcher = function(expectedContent) {
+  var _buildCardHasContentMatcher = function(expectedContent) {
     return function(card) {
       return card.element(cardBodyLocator).getText()
         .then(body => body.includes(expectedContent));
@@ -83,7 +83,7 @@ var ExplorationEditorImprovementsTab = function() {
   var _reduceCardMatchers = function(matchers) {
     return function(card) {
       return Promise.all(matchers.map(isMatch => isMatch(card)))
-        .then(matchResults => matchResults.every(Boolean));
+        .then(matchResults => matchResults.every(m => m));
     };
   };
 
@@ -98,7 +98,7 @@ var ExplorationEditorImprovementsTab = function() {
   this.getFeedbackCard = function(latestMessage) {
     var feedbackCardMatcher = _reduceCardMatchers([
       _buildCardTypeMatcher('feedback'),
-      _buildCardContentMatcher(latestMessage),
+      _buildCardHasContentMatcher(latestMessage),
     ]);
     return allCards.filter(feedbackCardMatcher).first();
   };
@@ -106,7 +106,7 @@ var ExplorationEditorImprovementsTab = function() {
   this.getSuggestionCard = function(description) {
     var suggestionCardMatcher = _reduceCardMatchers([
       _buildCardTypeMatcher('suggestion'),
-      _buildCardContentMatcher(description),
+      _buildCardHasContentMatcher(description),
     ]);
     return allCards.filter(suggestionCardMatcher).first();
   };
@@ -115,10 +115,10 @@ var ExplorationEditorImprovementsTab = function() {
     return card.element(cardStatusLocator).getText();
   };
 
-  this.clickCardActionButton = function(card, index = 0) {
-    var buttonElement = card.all(actionButtonLocator).get(index);
-    // waitFor.elementToBeClickable(
-    //   buttonElement, 'Action button takes too long to become clickable');
+  this.clickCardActionButton = function(card, buttonText) {
+    var buttonElement = card.element(by.buttonText(buttonText));
+    waitFor.elementToBeClickable(
+      buttonElement, 'Action button takes too long to become clickable');
     buttonElement.click();
   };
 

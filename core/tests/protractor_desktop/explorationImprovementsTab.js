@@ -120,7 +120,7 @@ describe('Answer Details Improvements', function() {
     explorationEditorPage.navigateToImprovementsTab();
 
     var card = improvementsTab.getAnswerDetailsCard('One');
-    improvementsTab.clickCardActionButton(card);
+    improvementsTab.clickCardActionButton(card, 'Review Answer Details');
     improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
     improvementsTab.closeModal();
     users.logout();
@@ -132,7 +132,7 @@ describe('Answer Details Improvements', function() {
 });
 
 
-describe('Feedback Improvements', function() {
+fdescribe('Feedback Improvements', function() {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
   var EXPLORATION_TITLE_2 = 'Exploration for testing feedback status';
   var EXPLORATION_OBJECTIVE = 'To explore something';
@@ -198,12 +198,12 @@ describe('Feedback Improvements', function() {
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
     card = improvementsTab.getFeedbackCard(feedback);
-    improvementsTab.clickCardActionButton(card);
+    improvementsTab.clickCardActionButton(card, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual([feedback]);
     improvementsTab.sendResponseAndCloseModal(feedbackResponse);
 
     card = improvementsTab.getFeedbackCard(feedbackResponse);
-    improvementsTab.clickCardActionButton(card);
+    improvementsTab.clickCardActionButton(card, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [feedback, feedbackResponse]);
     improvementsTab.closeModal();
@@ -211,7 +211,7 @@ describe('Feedback Improvements', function() {
     users.logout();
   });
 
-  it('should change status of feedback thread', function() {
+  fit('should change status of feedback thread', function() {
     var feedback = 'Hey! This exploration looks awesome';
     var feedbackResponse = 'Thanks for the feedback!';
 
@@ -249,7 +249,7 @@ describe('Feedback Improvements', function() {
     // Mark thread as fixed.
     var card = improvementsTab.getFeedbackCard(feedback);
     expect(improvementsTab.getCardStatus(card)).toEqual('Open');
-    improvementsTab.clickCardActionButton(card);
+    improvementsTab.clickCardActionButton(card, 'Review Thread');
     improvementsTab.sendResponseAndCloseModal(feedbackResponse, 'Fixed');
 
     improvementsTab.setShowOnlyOpenTasks(false);
@@ -262,7 +262,7 @@ describe('Feedback Improvements', function() {
     improvementsTab.setShowOnlyOpenTasks(false);
     card = improvementsTab.getFeedbackCard(feedbackResponse);
     expect(improvementsTab.getCardStatus(card)).toEqual('Fixed');
-    improvementsTab.clickCardActionButton(card);
+    improvementsTab.clickCardActionButton(card, 'Review Thread');
     improvementsTab.sendResponseAndCloseModal(feedbackResponse, 'Open');
     improvementsTab.setShowOnlyOpenTasks(true);
     expect(improvementsTab.getCardStatus(card)).toEqual('Open');
@@ -351,7 +351,7 @@ describe('Suggestions on Explorations', function() {
 
     var cardToAccept = improvementsTab.getSuggestionCard(
       suggestionDescription1);
-    improvementsTab.clickCardActionButton(cardToAccept);
+    improvementsTab.clickCardActionButton(cardToAccept, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription1]);
     improvementsTab.acceptSuggestion();
@@ -359,7 +359,7 @@ describe('Suggestions on Explorations', function() {
 
     var cardToReject = improvementsTab.getSuggestionCard(
       suggestionDescription2);
-    improvementsTab.clickCardActionButton(cardToReject);
+    improvementsTab.clickCardActionButton(cardToReject, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription2]);
     improvementsTab.rejectSuggestion();
@@ -367,6 +367,8 @@ describe('Suggestions on Explorations', function() {
 
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
+
+    browser.sleep(3000);
     users.logout();
 
     // Student logs in and plays the exploration, finds the updated content.

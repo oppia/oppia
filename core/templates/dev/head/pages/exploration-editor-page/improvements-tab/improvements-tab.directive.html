@@ -20,7 +20,7 @@
 
   <md-card ng-repeat="card in getCards() | orderBy:getCardTitle:true | filter:isCardShown"
            ng-if="!isCardObsolete(card)"
-           ng-class="[oppia-improvement-<[card.getDirectiveType()]>-card, {'oppia-improvement-card': isCardOpen(card), 'oppia-improvement-closed-card': !isCardOpen(card)}]"
+           ng-class="[card.getDirectiveType(), {'oppia-improvement-card': isCardOpen(card), 'oppia-improvement-closed-card': !isCardOpen(card)}]"
            class="protractor-test-improvements-card">
 
     <div class="oppia-improvement-card-header modal-header">
@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <div ng-show="isCardOpen(card)" ng-switch="card.getDirectiveType()" class="modal-body">
+    <div ng-switch="card.getDirectiveType()" class="modal-body">
       <answer-details-improvement-card ng-switch-when="answer-details"
                                        data="card.getDirectiveData()"
                                        class="protractor-test-improvements-card-body">
