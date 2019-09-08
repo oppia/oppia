@@ -38,22 +38,33 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
+  var adminPage = null;
   var collectionEditorPage = null;
-  var explorationPlayerPage = null;
-  var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
-  var explorationEditorSettingsTab = null;
   var creatorDashboardPage = null;
+  var explorationEditorPage = null;
+  var explorationPlayerPage = null;
   var libraryPage = null;
 
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
+
   beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    libraryPage = new LibraryPage.LibraryPage();
+
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    libraryPage = new LibraryPage.LibraryPage();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+
+    users.createAndLoginAdminUser('superUser@stateEditor.com', 'superUser');
+    // TODO(#7569): Change this test to work with the improvements tab.
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean', (elem) => elem.setValue(false));
+    users.logout();
   });
 
   it('should report an exploration to moderators', function() {
