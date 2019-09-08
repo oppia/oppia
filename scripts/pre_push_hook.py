@@ -356,7 +356,7 @@ def _does_diff_include_package_json(files_to_lint):
     return False
 
 
-def main():
+def main(args=None):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
     """
@@ -365,10 +365,10 @@ def main():
     parser.add_argument('url', nargs='?', help='provided by git before push')
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_push_hook to the .git/hooks dir')
-    args = parser.parse_args()
+    args = parser.parse_args(args=args)
     if args.install:
         _install_hook()
-        sys.exit(0)
+        return
 
     remote = _get_remote_name()
     remote = remote if remote else args.remote
@@ -404,7 +404,7 @@ def main():
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
-    sys.exit(0)
+    return
 
 
 if __name__ == '__main__':
