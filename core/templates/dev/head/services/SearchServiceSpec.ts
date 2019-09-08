@@ -290,7 +290,7 @@ describe('Search service', function() {
     }
   );
 
-  it('should omit language selection url component if it is malformed',
+  it('should omit url component if it is malformed',
     function() {
       var results = {
         categories: {
@@ -325,6 +325,12 @@ describe('Search service', function() {
       expect(results.categories.selections).toEqual({
         Mathematics: true
       });
+
+      var urlComponent = '?q=protractor%20test&category="Mathematics"' +
+      '&language_code="en" OR "ar"';
+      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+      expect(results.languageCodes.selections).toEqual({});
+      expect(results.categories.selections).toEqual({});
     }
   );
 });
