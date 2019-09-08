@@ -175,7 +175,7 @@ angular.module('oppia').directive('settingsTab', [
 
           ctrl.refreshSettingsTab = function() {
             // Ensure that ExplorationStatesService has been initialized before
-            // getting the state names from it. (Otherwise, navigating to the
+            // getting the state names from it. Otherwise, navigating to the
             // settings tab directly (by entering a URL that ends with
             // /settings) results in a console error.
 

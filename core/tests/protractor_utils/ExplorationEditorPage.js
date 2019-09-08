@@ -115,6 +115,8 @@ var ExplorationEditorPage = function() {
       '.protractor-test-exploration-title-input'));
     var expObjective = element(by.css(
       '.protractor-test-exploration-objective-input'));
+    var expTags = element(by.css('.protractor-test-tags'));
+    var expInput = expTags.element(by.tagName('input'));
 
     waitFor.elementToBeClickable(expTitle,
       'Exploration Title input is taking too long to appear');
@@ -125,13 +127,15 @@ var ExplorationEditorPage = function() {
     element(by.css('.select2-container')).click();
     element(by.css('.select2-dropdown')).element(
       by.css('.select2-search input')).sendKeys(category + '\n');
+
     element(by.css('.protractor-test-exploration-language-select')).click();
     element(by.css('.protractor-test-exploration-language-select'))
       .sendKeys(language + '\n');
-    const expTags = element(by.css('.protractor-test-tags'));
+
+
     expTags.click();
-    const expInput = expTags.element(by.tagName('input'));
     expInput.click();
+
     tags.forEach(function(element) {
       expInput.sendKeys(element, protractor.Key.ENTER);
     });
@@ -141,15 +145,19 @@ var ExplorationEditorPage = function() {
     waitFor.elementToBeClickable(saveChangesButton,
       'Save changes button taking too long to be clickable');
     saveChangesButton.click();
+
     waitFor.visibilityOf(element(by.css('.modal-content')),
       'Modal Content taking too long to appear');
+
     const confirmPublish = element(by.css('.protractor-test-confirm-publish'));
     waitFor.elementToBeClickable(confirmPublish,
       'Confirm publish button taking too long to appear');
     confirmPublish.click();
+
     waitFor.visibilityOf(element(by.css(
       '.protractor-test-share-publish-modal')),
     'Awesome modal taking too long to appear');
+
     const closeButton = element(by.css('.protractor-test-share-publish-close'));
     waitFor.elementToBeClickable(closeButton,
       'Close button taking too long to be clickable');

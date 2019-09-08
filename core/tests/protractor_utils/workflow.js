@@ -139,7 +139,7 @@ var createAndPublishExploration = function(
   publishExploration();
 };
 
-var createAddAndPublish = function(
+var createAddExpDetailsAndPublishExp = function(
     title, category, objective, language, tags) {
   createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -225,4 +225,4 @@ exports.getExplorationManagers = getExplorationManagers;
 exports.getExplorationCollaborators = getExplorationCollaborators;
 exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
-exports.createAddAndPublish = createAddAndPublish;
+exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
