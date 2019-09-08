@@ -80,6 +80,13 @@ var ExplorationEditorImprovementsTab = function() {
     };
   };
 
+  /**
+   * Combines a collection of matchers into a single one which requires all of
+   * them to pass.
+   *
+   * @param {Iterable.<(ElementFinder) => Promise.<boolean>>} matchers
+   * @returns {(ElementFinder) => Promise.<boolean>}
+   */
   var _reduceCardMatchers = function(matchers) {
     return function(card) {
       return Promise.all(matchers.map(isMatch => isMatch(card)))
