@@ -59,24 +59,24 @@ var ExplorationEditorImprovementsTab = function() {
   var stateNameLocator =
     by.css('.protractor-test-improvements-card-state-name');
 
-  var _buildCardStateNameMatcher = function(stateName) {
+  var _buildCardStateNameMatcher = function(expectedStateName) {
     return function(card) {
       return card.element(stateNameLocator).getText()
-        .then(stateName => stateName === stateName);
+        .then(stateName => stateName === expectedStateName);
     };
   };
 
-  var _buildCardTypeMatcher = function(cardType) {
+  var _buildCardTypeMatcher = function(expectedCardType) {
     return function(card) {
       return card.getAttribute('class')
-        .then(cssClass => cssClass.includes(cardType));
+        .then(cssClass => cssClass.includes(expectedCardType));
     };
   };
 
-  var _buildCardContentMatcher = function(content) {
+  var _buildCardContentMatcher = function(expectedContent) {
     return function(card) {
       return card.element(cardBodyLocator).getText()
-        .then(body => body.includes(content));
+        .then(body => body.includes(expectedContent));
     };
   };
 
