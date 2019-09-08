@@ -3882,6 +3882,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
   .oppia-dashboard-aggregated-stats .stats-card {
     font-size: 12px;
+    padding-left: 10px;
   }
 }
 
