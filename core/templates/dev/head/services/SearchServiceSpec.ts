@@ -250,46 +250,6 @@ describe('Search service', function() {
     }
   );
 
-  it('should error when category selection url component is malformed',
-    function() {
-      var results = {
-        categories: {
-          description: '',
-          itemsName: 'categories',
-          masterList: [],
-          numSelections: 0,
-          selections: {},
-          summary: ''
-        },
-        languageCodes: {
-          description: '',
-          itemsName: 'languages',
-          masterList: [],
-          numSelections: 0,
-          selections: {},
-          summary: ''
-        }
-      };
-      var urlComponent = '?q=protractor%20test&category=(("Mathematics")' +
-                         '&language_code=("en"%20OR%20"ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'categories: category=(("Mathematics")'));
-      expect(results.languageCodes.selections).toEqual({});
-      expect(results.categories.selections).toEqual({});
-
-      var urlComponent = '?q=protractor%20test&category=("Mathematics"' +
-                         '&language_code=("en"%20OR%20"ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'categories: category=("Mathematics"'));
-      expect(results.languageCodes.selections).toEqual({});
-      expect(results.categories.selections).toEqual({});
-    }
-  );
-
   it('should omit url component if it is malformed',
     function() {
       var results = {
