@@ -18,10 +18,10 @@
 
 export class StatisticsDomainConstants {
   public static LEARNER_ACTION_SCHEMA_LATEST_VERSION = 1;
-  public static ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE = 'answer-details';
-  public static PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = 'playthrough';
-  public static FEEDBACK_IMPROVEMENT_CARD_TYPE = 'feedback';
+  public static ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE = 'answer-details';
+  public static PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = 'playthrough';
+  public static FEEDBACK_IMPROVEMENT_TASK_TYPE = 'feedback';
   public static SUBMIT_LEARNER_ANSWER_DETAILS_URL =
     '/learneranswerdetailshandler/<entity_type>/<entity_id>';
-  public static SUGGESTION_IMPROVEMENT_CARD_TYPE = 'suggestion';
+  public static SUGGESTION_IMPROVEMENT_TASK_TYPE = 'suggestion';
 }
