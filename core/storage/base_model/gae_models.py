@@ -14,6 +14,7 @@
 
 """Base model class."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -34,7 +35,13 @@ _VERSION_DELIMITER = '-'
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
-    'KEEP', 'DELETE', 'ANONYMIZE', 'LOCALLY_PSEUDONYMIZE', 'KEEP_IF_PUBLIC')
+    'KEEP',
+    'DELETE',
+    'ANONYMIZE',
+    'LOCALLY_PSEUDONYMIZE',
+    'KEEP_IF_PUBLIC',
+    'NOT_APPLICABLE'
+)
 
 # Constants used for generating ids.
 MAX_RETRIES = 10
@@ -210,8 +217,6 @@ class BaseModel(ndb.Model):
             Exception: An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        entity_name = python_utils.convert_to_bytes(entity_name)
-
         for _ in python_utils.RANGE(MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
@@ -577,7 +582,7 @@ class VersionedModel(BaseModel):
             current_version = self.version
 
             version_numbers = [
-                python_utils.STR(num + 1) for num in python_utils.RANGE(
+                python_utils.UNICODE(num + 1) for num in python_utils.RANGE(
                     current_version)]
             snapshot_ids = [
                 self._get_snapshot_id(self.id, version_number)

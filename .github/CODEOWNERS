@@ -99,7 +99,6 @@
 /tox.ini @kevinlee12
 /scripts/ @kevinlee12
 /ubuntu_dockerfile @ezl-13 @kevinlee12
-/Vagrantfile @kevinlee12
 
 
 # Exploration project.
@@ -435,7 +434,7 @@
 # Speed Improvement team.
 /app_dev.yaml @vojtechjelinek
 /core/templates/dev/head/google-analytics.initializer.ts @vojtechjelinek
-/core/templates/dev/head/base_components/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/base-components/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/Base.ts @vojtechjelinek
 /core/templates/dev/head/pages/oppia_footer_directive.html @vojtechjelinek
 /core/templates/dev/head/pages/OppiaFooterDirective.ts @vojtechjelinek
@@ -486,6 +485,7 @@
 /core/domain/user*.py @seanlip
 /export/ @seanlip
 /manifest.json @seanlip @vojtechjelinek
-/package*.json @seanlip @vojtechjelinek
+/package.json @seanlip @vojtechjelinek
+/yarn.lock @seanlip @vojtechjelinek
 /scripts/install_third_party.sh @seanlip @vojtechjelinek
 /.github/ @DubeySandeep
