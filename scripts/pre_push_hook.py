@@ -53,7 +53,6 @@ GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 LINTER_MODULE = 'scripts.pre_commit_linter'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
-SCRIPTS_DIR = os.path.join(OPPIA_DIR, 'scripts')
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
@@ -273,7 +272,7 @@ def _start_python_script(scriptname):
     """Runs the 'start.py' script and returns the returncode of the task."""
     cmd = [
         'python', '-m',
-        os.path.join(SCRIPTS_DIR, scriptname).replace('/', '.')]
+        os.path.join('scripts', scriptname).replace('/', '.')]
     task = subprocess.Popen(cmd)
     task.communicate()
     return task.returncode
