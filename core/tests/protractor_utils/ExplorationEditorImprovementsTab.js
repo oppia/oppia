@@ -62,21 +62,21 @@ var ExplorationEditorImprovementsTab = function() {
   var _buildCardStateNameMatcher = function(stateName) {
     return function(card) {
       return card.element(stateNameLocator).getText()
-        .then(stateName => stateName === cardMatchOptions.state_name);
+        .then(stateName => stateName === stateName);
     };
   };
 
   var _buildCardTypeMatcher = function(cardType) {
     return function(card) {
       return card.getAttribute('class')
-        .then(cssClass => cssClass.includes(cardMatchOptions.card_type));
+        .then(cssClass => cssClass.includes(cardType));
     };
   };
 
   var _buildCardContentMatcher = function(content) {
     return function(card) {
       return card.element(cardBodyLocator).getText()
-        .then(body => body.includes(cardMatchOptions.card_content));
+        .then(body => body.includes(content));
     };
   };
 
