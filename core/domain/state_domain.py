@@ -844,7 +844,7 @@ class WrittenTranslations(python_utils.OBJECT):
         return cls(translations_mapping)
 
     def get_content_ids_that_are_correctly_translated(self, language_code):
-        """Returns a list of content ids in which a correct translation are
+        """Returns a list of content ids in which a correct translation is
         available in the given language.
 
         Args:
