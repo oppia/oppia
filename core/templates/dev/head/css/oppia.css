@@ -2983,21 +2983,21 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-improvement-card {
+  background-color: #fff;
+  margin-bottom: 30px;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 30px;
   max-width: 800px;
   padding: 32px 32px 24px 32px;
-  background-color: #fff;
 }
 
 .oppia-improvement-closed-card {
+  background-color: #dadada;
+  margin-bottom: 30px;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 0;
   max-width: 800px;
   padding: 32px 32px 24px 32px;
-  background-color: rgb(218, 218, 218);
 }
 
 .oppia-improvement-card-header {
