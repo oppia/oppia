@@ -18,18 +18,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import os
-import signal
 import socket
 import subprocess
-import sys
 
 import python_utils
-
-PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-PSUTIL_PATH = os.path.join(PARENT_DIR, 'oppia_tools', 'psutil-5.6.3')
-sys.path.insert(0, PSUTIL_PATH)
-
-import psutil  # isort:skip  # pylint: disable=wrong-import-position
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -214,19 +206,6 @@ def is_port_open(port):
     with contextlib.closing(
         socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
         return bool(not s.connect_ex(('localhost', port)))
-
-
-def kill_process(port):
-    """Kills a process that is listening to a specific port.
-    Credits: https://stackoverflow.com/a/20691431/11755830
-
-    Args:
-        port: int. The port number.
-    """
-    for process in psutil.process_iter():
-        for conns in process.connections(kind='inet'):
-            if conns.laddr.port == port:
-                process.send_signal(signal.SIGTERM)
 
 
 def recursive_chown(path, uid, gid):

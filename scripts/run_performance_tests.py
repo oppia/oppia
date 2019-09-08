@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import atexit
 import os
+import signal
 import subprocess
 import time
 
@@ -57,9 +58,9 @@ PORT_NUMBER_FOR_GAE_SERVER = 9501
 USUAL_PORT_NUMBER_FOR_GAE_SERVER_IN_START = 8181
 
 
-def cleanup():
+def cleanup(pid):
     """Send a kill signal to the dev server."""
-    common.kill_process(PORT_NUMBER_FOR_GAE_SERVER)
+    os.kill(pid, signal.SIGTERM)
 
     # Wait for the servers to go down; suppress 'connection refused' error
     # output from nc since that is exactly what we are expecting to happen.
@@ -104,17 +105,12 @@ def main(args=None):
             'Exiting.'])
         raise Exception
 
-    # Forces the cleanup function to run on exit.
-    # Developers: note that at the end of this script, the cleanup() function at
-    # the top of the file is run.
-    atexit.register(cleanup)
-
     browsermob_proxy_path = os.path.join(
         common.OPPIA_TOOLS_DIR, 'browsermob-proxy-2.1.1', 'bin',
         'browsermob-proxy')
 
     # Change execute status of browsermob-proxy.
-    common.recursive_chmod(browsermob_proxy_path, 744)
+    common.recursive_chmod(browsermob_proxy_path, 0o744)
 
     # Start a demo server.
     background_process = subprocess.Popen(
@@ -123,6 +119,11 @@ def main(args=None):
         '--log_level=critical --skip_sdk_update_check=true app_dev.yaml' % (
             common.GOOGLE_APP_ENGINE_HOME,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)), shell=True)
+
+    # Forces the cleanup function to run on exit.
+    # Developers: note that at the end of this script, the cleanup() function at
+    # the top of the file is run.
+    atexit.register(cleanup, background_process.pid)
 
     # Wait for the servers to come up.
     while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
@@ -154,7 +155,7 @@ def main(args=None):
         run_performance_test('profile_page_test', xvfb_prefix)
         run_performance_test('splash_test', xvfb_prefix)
 
-    common.recursive_chmod(browsermob_proxy_path, 644)
+    common.recursive_chmod(browsermob_proxy_path, 0o644)
     clean.delete_file('bmp.log')
     clean.delete_file('server.log')
 

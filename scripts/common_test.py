@@ -18,8 +18,15 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import contextlib
+import http.server
 import os
+import shutil
+import socketserver
+import stat
 import subprocess
+import sys
+import tempfile
 
 from core.tests import test_utils
 import python_utils
@@ -255,3 +262,88 @@ class CommonTests(test_utils.GenericTestBase):
                         common
                         .ensure_release_scripts_folder_exists_and_is_up_to_date(
                             ))
+
+    def test_is_port_open(self):
+        self.assertFalse(common.is_port_open(4444))
+
+        handler = http.server.SimpleHTTPRequestHandler
+        httpd = socketserver.TCPServer(('', 4444), handler)
+
+        self.assertTrue(common.is_port_open(4444))
+        httpd.server_close()
+
+    def test_permissions_of_file(self):
+        root_temp_dir = tempfile.mkdtemp()
+        temp_dirpath = tempfile.mkdtemp(dir=root_temp_dir)
+        temp_file = tempfile.NamedTemporaryFile(dir=temp_dirpath)
+        temp_file.name = 'temp_file'
+        temp_file_path = os.path.join(temp_dirpath, 'temp_file')
+        with python_utils.open_file(temp_file_path, 'w') as f:
+            f.write('content')
+
+        common.recursive_chown(root_temp_dir, os.getuid(), -1)
+        common.recursive_chmod(root_temp_dir, 0o744)
+
+        for root, directories, filenames in os.walk(root_temp_dir):
+            for directory in directories:
+                self.assertEqual(
+                    oct(stat.S_IMODE(
+                        os.stat(os.path.join(root, directory)).st_mode)),
+                    '0744')
+                self.assertEqual(
+                    os.stat(os.path.join(root, directory)).st_uid, os.getuid())
+
+            for filename in filenames:
+                self.assertEqual(
+                    oct(stat.S_IMODE(
+                        os.stat(os.path.join(root, filename)).st_mode)), '0744')
+                self.assertEqual(
+                    os.stat(os.path.join(root, filename)).st_uid, os.getuid())
+
+        shutil.rmtree(root_temp_dir)
+
+    def test_print_each_string_after_two_new_lines(self):
+        @contextlib.contextmanager
+        def _redirect_stdout(new_target):
+            """Redirect stdout to the new target.
+
+            Args:
+                new_target: TextIOWrapper. The new target to which stdout is
+                redirected.
+
+            Yields:
+                TextIOWrapper. The new target.
+            """
+            old_target = sys.stdout
+            sys.stdout = new_target
+            try:
+                yield new_target
+            finally:
+                sys.stdout = old_target
+
+        target_stdout = python_utils.string_io()
+        with _redirect_stdout(target_stdout):
+            common.print_each_string_after_two_new_lines([
+                'These', 'are', 'sample', 'strings.'])
+
+        self.assertEqual(
+            target_stdout.getvalue(), 'These\n\nare\n\nsample\n\nstrings.\n\n')
+
+    def test_install_npm_library(self):
+
+        def _mock_subprocess_call(unused_command):
+            """Mocks subprocess.call() to create a temporary file instead of the
+            actual npm library.
+            """
+            temp_file = tempfile.NamedTemporaryFile()
+            temp_file.name = 'temp_file'
+            with python_utils.open_file('temp_file', 'w') as f:
+                f.write('content')
+
+            self.assertTrue(os.path.exists('temp_file'))
+            temp_file.close()
+
+        self.assertFalse(os.path.exists('temp_file'))
+
+        with self.swap(subprocess, 'call', _mock_subprocess_call):
+            common.install_npm_library('library_name', 'version', 'path')
