@@ -60,30 +60,30 @@ var ExplorationEditorImprovementsTab = function() {
     by.css('.protractor-test-improvements-card-state-name');
 
   var _buildCardStateNameMatcher = function(stateName) {
-    return (card) => {
+    return function(card) {
       return card.element(stateNameLocator).getText()
         .then(stateName => stateName === cardMatchOptions.state_name);
     };
   };
 
   var _buildCardTypeMatcher = function(cardType) {
-    return (card) => {
+    return function(card) {
       return card.getAttribute('class')
         .then(cssClass => cssClass.includes(cardMatchOptions.card_type));
     };
   };
 
   var _buildCardContentMatcher = function(content) {
-    return (card) => {
+    return function(card) {
       return card.element(cardBodyLocator).getText()
         .then(body => body.includes(cardMatchOptions.card_content));
     };
   };
 
   var _reduceCardMatchers = function(matchers) {
-    return (card) => {
-      return Promise.all(matchers.map(matcher => matcher(card)))
-        .then(results => results.every(Boolean));
+    return function(card) {
+      return Promise.all(matchers.map(isMatch => isMatch(card)))
+        .then(matchResults => matchResults.every(Boolean));
     };
   };
 
