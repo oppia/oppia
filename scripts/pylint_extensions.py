@@ -20,16 +20,26 @@ presubmit checks.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
 import re
+import sys
 
-import astroid
-from pylint import checkers
-from pylint import interfaces
-from pylint.checkers import typecheck
-from pylint.checkers import utils as checker_utils
+import python_utils
+from . import docstrings_checker
 
-import python_utils  # isort:skip
-from . import docstrings_checker  # isort:skip
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
+sys.path.insert(0, _PYLINT_PATH)
+
+# pylint: disable=wrong-import-order
+# pylint: disable=wrong-import-position
+import astroid  # isort:skip
+from pylint import checkers  # isort:skip
+from pylint import interfaces  # isort:skip
+from pylint.checkers import typecheck  # isort:skip
+from pylint.checkers import utils as checker_utils  # isort:skip
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
 
 
 def read_from_node(node):

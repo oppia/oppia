@@ -106,21 +106,21 @@ def _does_current_folder_contain_have_package_lock_file():
     return os.path.isfile('package-lock.json')
 
 
-def main():
+def main(args=None):
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_commit_hook to the .git/hooks dir')
-    args = parser.parse_args()
+    args = parser.parse_args(args=args)
     if args.install:
         _install_hook()
-        sys.exit(0)
+        return
 
     python_utils.PRINT('Running pre-commit check for package-lock.json ...')
     if _does_diff_include_package_lock_file() and (
-            not _does_current_folder_contain_have_package_lock_file()):
+            _does_current_folder_contain_have_package_lock_file()):
         # The following message is necessary since there git commit aborts
         # quietly when the status is non-zero.
         python_utils.PRINT('-----------COMMIT ABORTED-----------')
@@ -131,7 +131,7 @@ def main():
             'on how to use yarn, see https://yarnpkg.com/en/docs/usage.'
         )
         sys.exit(1)
-    sys.exit(0)
+    return
 
 
 if __name__ == '__main__':

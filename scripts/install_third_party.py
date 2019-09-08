@@ -16,6 +16,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
 import contextlib
 import json
 import os
@@ -68,6 +69,10 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
         'optional_key_pairs': []
     }
 }
+
+_PARSER = argparse.ArgumentParser(description="""
+Installation script for Oppia third-party libraries.
+""")
 
 
 def download_files(source_url_root, target_dir, source_filenames):
@@ -320,10 +325,11 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-def _install_third_party_libs():
+def main(args=None):
     """Installs all the third party libraries."""
+    unused_parsed_args = _PARSER.parse_args(args=args)
     download_manifest_files(MANIFEST_FILE_PATH)
 
 
 if __name__ == '__main__':
-    _install_third_party_libs()
+    main()

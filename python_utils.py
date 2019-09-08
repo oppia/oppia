@@ -23,13 +23,16 @@ import io
 import os
 import sys
 
-import yaml
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
+_FUTURE_PATH = os.path.join(os.getcwd(), 'third_party', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
+
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+sys.path.insert(0, _YAML_PATH)
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
+import yaml  # isort:skip
+
 import builtins  # isort:skip
 import future.utils  # isort:skip
 import past.builtins  # isort:skip

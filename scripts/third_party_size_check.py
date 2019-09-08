@@ -23,9 +23,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import sys
-import yaml
 
-import python_utils  # isort:skip
+import python_utils
+
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+sys.path.insert(0, _YAML_PATH)
+
+import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 7000
