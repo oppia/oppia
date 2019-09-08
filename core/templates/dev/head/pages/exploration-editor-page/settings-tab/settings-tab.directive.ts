@@ -181,10 +181,6 @@ angular.module('oppia').directive('settingsTab', [
 
             ctrl.hasPageLoaded = false;
             ExplorationDataService.getData().then(function() {
-              // Ensure that ExplorationStatesService has been initialized
-              // before getting the state names from it. (Otherwise,
-              // navigating to the settings tab directly (by entering a URL
-              //  that ends with /settings) results in a console error.
               if (ExplorationStatesService.isInitialized()) {
                 var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
                   function(categoryItem) {
