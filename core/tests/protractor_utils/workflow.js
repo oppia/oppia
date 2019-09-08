@@ -139,6 +139,18 @@ var createAndPublishExploration = function(
   publishExploration();
 };
 
+var createAddExpDetailsAndPublishExp = function(
+    title, category, objective, language, tags) {
+  createExploration();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.setContent(forms.toRichText('new exploration'));
+  explorationEditorMainTab.setInteraction('EndExploration');
+  explorationEditorPage.saveChanges('Save the changes');
+  explorationEditorPage.publishCardExploration(
+    title, objective, category, language, tags);
+};
+
 // Role management (state editor settings tab)
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
@@ -213,3 +225,4 @@ exports.getExplorationManagers = getExplorationManagers;
 exports.getExplorationCollaborators = getExplorationCollaborators;
 exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
+exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
