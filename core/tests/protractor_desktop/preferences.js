@@ -110,8 +110,8 @@ describe('Preferences', function() {
   });
 
   it('should set the subject interest', function() {
-    users.createUser('nipan@preferences.com', 'nipanPreferences');
-    users.login('nipan@preferences.com');
+    users.createUser('User@preferences.com', 'UserPreferences');
+    users.login('User@preferences.com');
     preferencesPage.get();
     preferencesPage.setSubInterest('maths, physics, biology');
     browser.refresh();
