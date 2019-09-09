@@ -21,8 +21,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import os
-import sys
 import tempfile
 import unittest
 
@@ -30,20 +28,9 @@ import python_utils
 
 from . import pylint_extensions
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
-sys.path.insert(0, _PYLINT_PATH)
-
-# Since these module needs to be imported after adding Pylint path,
-# we need to disable isort for the below lines to prevent import
-# order errors.
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
 import astroid  # isort:skip
 from pylint import testutils  # isort:skip
 from pylint import lint  # isort:skip
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
 
 
 class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
