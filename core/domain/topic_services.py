@@ -574,6 +574,7 @@ def publish_story(topic_id, story_id, committer_id):
     _save_topic(
         committer_id, topic, 'Published story with id %s' % story_id,
         change_list)
+    create_topic_summary(topic.id)
 
 
 def unpublish_story(topic_id, story_id, committer_id):
@@ -607,6 +608,7 @@ def unpublish_story(topic_id, story_id, committer_id):
     _save_topic(
         committer_id, topic, 'Unpublished story with id %s' % story_id,
         change_list)
+    create_topic_summary(topic.id)
 
 
 def delete_canonical_story(user_id, topic_id, story_id):
@@ -755,8 +757,16 @@ def compute_summary_of_topic(topic):
     Returns:
         TopicSummary. The computed summary for the given topic.
     """
-    topic_model_canonical_story_count = len(topic.canonical_story_references)
-    topic_model_additional_story_count = len(topic.additional_story_references)
+    canonical_story_count = 0
+    additional_story_count = 0
+    for reference in topic.canonical_story_references:
+        if reference.story_is_published:
+            canonical_story_count += 1
+    for reference in topic.additional_story_references:
+        if reference.story_is_published:
+            additional_story_count += 1
+    topic_model_canonical_story_count = canonical_story_count
+    topic_model_additional_story_count = additional_story_count
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 

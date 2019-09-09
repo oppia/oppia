@@ -519,6 +519,7 @@
     "I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2": "Explorations are meant to be continuously improved, and explorations that haven't been edited for a long time may be considered \"orphaned\". In this case, ownership may be handed to the Oppia community at large (at moderator discretion), so that the exploration can continue to be improved.",
     "I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "Participation Playbook",
     "I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Teach with Oppia",
+    "I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lesson} other{# lessons}}",
     "I18N_TOPIC_VIEWER_PLAY": "Play",
     "I18N_TOPIC_VIEWER_REVIEW": "Review",
     "I18N_TOPIC_VIEWER_TRAIN": "Train",
