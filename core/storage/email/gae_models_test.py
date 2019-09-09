@@ -189,14 +189,98 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP)
 
 
-class GeneralFeedbackEmailReplyToIdModelUnitTests(test_utils.GenericTestBase):
-    """Test the GeneralFeedbackEmailReplyToIdModel class."""
+class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
+    """Tests for the GeneralFeedbackEmailReplyToIdModel class."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             email_models.GeneralFeedbackEmailReplyToIdModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
+
+    def test_put_function(self):
+        email_reply_model = email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='user_id_1.exploration.exp_id.thread_id',
+            user_id='user_id_1',
+            thread_id='exploration.exp_id.thread_id',
+            reply_to_id='reply_id')
+
+        email_reply_model.put()
+
+        last_updated = email_reply_model.last_updated
+
+        # If we do not wish to update the last_updated time, we should set
+        # the update_last_updated_time argument to False in the put function.
+        email_reply_model.put(update_last_updated_time=False)
+        self.assertEqual(email_reply_model.last_updated, last_updated)
+
+        # If we do wish to change it however, we can simply use the put function
+        # as the default value of update_last_updated_time is True.
+        email_reply_model.put()
+        self.assertNotEqual(email_reply_model.last_updated, last_updated)
+
+    def test_create_new_object(self):
+        actual_model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'exploration.exp_id.thread_id')
+
+        self.assertEqual(
+            actual_model.id,
+            'user_id.exploration.exp_id.thread_id')
+        self.assertEqual(actual_model.user_id, 'user_id')
+        self.assertEqual(
+            actual_model.thread_id,
+            'exploration.exp_id.thread_id')
+
+    def test_get_object(self):
+        actual_model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'exploration.exp_id.thread_id')
+        actual_model.put()
+        expected_model = email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='user_id.exploration.exp_id.thread_id',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id')
+
+        actual_model = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.get(
+                'user_id', 'exploration.exp_id.thread_id'))
+
+        self.assertEqual(actual_model.id, expected_model.id)
+        self.assertEqual(actual_model.user_id, expected_model.user_id)
+        self.assertEqual(actual_model.thread_id, expected_model.thread_id)
+
+    def test_get_multi_by_user_ids(self):
+        actual_model1 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id_1', 'exploration.exp_id.thread_id')
+        actual_model1.put()
+        actual_model2 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id_2', 'exploration.exp_id.thread_id')
+        actual_model2.put()
+
+        expected_model_1 = email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='user_id_1.exploration.exp_id.thread_id',
+            user_id='user_id_1',
+            thread_id='exploration.exp_id.thread_id')
+        expected_model_2 = email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='user_id_2.exploration.exp_id.thread_id',
+            user_id='user_id_2',
+            thread_id='exploration.exp_id.thread_id')
+
+        actual_models = (
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .get_multi_by_user_ids(
+                ['user_id_1', 'user_id_2'],
+                'exploration.exp_id.thread_id'))
+
+        actual_model_1 = actual_models['user_id_1']
+        actual_model_2 = actual_models['user_id_2']
+
+        self.assertEqual(actual_model_1.id, expected_model_1.id)
+        self.assertEqual(actual_model_1.user_id, expected_model_1.user_id)
+        self.assertEqual(actual_model_1.thread_id, expected_model_1.thread_id)
+
+        self.assertEqual(actual_model_2.id, expected_model_2.id)
+        self.assertEqual(actual_model_2.user_id, expected_model_2.user_id)
+        self.assertEqual(actual_model_2.thread_id, expected_model_2.thread_id)
 
 
 class GenerateHashTests(test_utils.GenericTestBase):
