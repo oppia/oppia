@@ -28,7 +28,7 @@ IMPORTANT NOTES:
 1.  Before running this script, you must install third-party dependencies by
     running
 
-        bash scripts/start.sh
+        python -m scripts.install_third_party_libs
 
     at least once.
 
@@ -541,7 +541,8 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 if not os.path.exists(_PYLINT_PATH):
     python_utils.PRINT('')
-    python_utils.PRINT('ERROR    Please run start.sh first to install pylint ')
+    python_utils.PRINT(
+        'ERROR  Please run install_third_party_libs.py first to install pylint')
     python_utils.PRINT('         and its dependencies.')
     sys.exit(1)
 
@@ -1787,7 +1788,8 @@ class JsTsLintChecksManager(LintChecksManager):
         if not os.path.exists(eslint_path):
             python_utils.PRINT('')
             python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
+                'ERROR    Please run install_third_party_libs.py first to '
+                'install node-eslint ')
             python_utils.PRINT('         and its dependencies.')
             sys.exit(1)
 
@@ -2617,7 +2619,8 @@ class OtherLintChecksManager(LintChecksManager):
         if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
             python_utils.PRINT('')
             python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
+                'ERROR    Please run install_third_party_libs.py first to '
+                'install node-eslint ')
             python_utils.PRINT(
                 '         or node-stylelint and its dependencies.')
             sys.exit(1)
