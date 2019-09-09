@@ -17,7 +17,7 @@
 This should not be run directly. Instead, navigate to the oppia/ folder and
 execute:
 
-    bash scripts/run_backend_tests.sh
+    python -m scripts.run_backend_tests
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
