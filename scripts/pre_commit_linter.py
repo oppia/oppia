@@ -28,7 +28,7 @@ IMPORTANT NOTES:
 1.  Before running this script, you must install third-party dependencies by
     running
 
-        bash scripts/start.sh
+        python -m scripts.install_third_party_libs
 
     at least once.
 
@@ -95,9 +95,10 @@ EXCLUDED_PHRASES = [
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*')
+    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
+    'webpack_bundles/*')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
@@ -110,7 +111,10 @@ CONFIG_FILE_PATHS = (
     'core/tests/karma.conf.ts',
     'core/templates/dev/head/mathjaxConfig.ts',
     'assets/constants.ts',
-    'assets/rich_text_components_definitions.ts')
+    'assets/rich_text_components_definitions.ts',
+    'webpack.config.ts',
+    'webpack.dev.config.ts',
+    'webpack.prod.config.ts')
 
 BAD_PATTERNS = {
     '__author__': {
@@ -409,7 +413,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\Winput\('),
+        'regexp': re.compile(r'[^.|\w]input\('),
         'message': 'Please use python_utils.INPUT.',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -509,32 +513,6 @@ REQUIRED_STRINGS_CONSTANTS = {
 
 ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 
-EXCLUDED_PHRASES = [
-    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
-
-EXCLUDED_PATHS = (
-    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*')
-
-GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
-
-CONFIG_FILE_PATHS = (
-    'core/tests/.browserstack.env.example',
-    'core/tests/protractor.conf.js',
-    'core/tests/karma.conf.ts',
-    'core/templates/dev/head/mathjaxConfig.ts',
-    'assets/constants.ts',
-    'assets/rich_text_components_definitions.ts',
-    'webpack.config.ts',
-    'webpack.dev.config.ts',
-    'webpack.prod.config.ts')
-
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 
 # This list needs to be in sync with the important patterns in the CODEOWNERS
@@ -549,8 +527,9 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/core/storage/',
     '/export/',
     '/manifest.json',
-    '/package*.json',
-    '/scripts/install_third_party.sh',
+    '/package.json',
+    '/yarn.lock',
+    '/scripts/install_third_party_libs.py',
     '/.github/']
 
 if not os.getcwd().endswith('oppia'):
@@ -562,7 +541,8 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 if not os.path.exists(_PYLINT_PATH):
     python_utils.PRINT('')
-    python_utils.PRINT('ERROR    Please run start.sh first to install pylint ')
+    python_utils.PRINT(
+        'ERROR  Please run install_third_party_libs.py first to install pylint')
     python_utils.PRINT('         and its dependencies.')
     sys.exit(1)
 
@@ -585,7 +565,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.8.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.2.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.8'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-3.13.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
@@ -1143,6 +1123,180 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 self.indentation_level -= 1
 
 
+def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
+    """Checks that the most important patterns are at the bottom
+    of the CODEOWNERS file.
+
+    Arguments:
+        important_patterns: list(str). List of the important
+            patterns for CODEOWNERS file.
+
+    Returns:
+        bool. Whether the CODEOWNERS "important pattern" check fails.
+    """
+
+    failed = False
+
+    # Check that there are no duplicate elements in the lists.
+    important_patterns_set = set(important_patterns)
+    codeowner_important_paths_set = set(CODEOWNER_IMPORTANT_PATHS)
+    if len(important_patterns_set) != len(important_patterns):
+        python_utils.PRINT(
+            '%s --> Duplicate pattern(s) found in critical rules'
+            ' section.' % CODEOWNER_FILEPATH)
+        failed = True
+    if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
+        python_utils.PRINT(
+            'scripts/pre_commit_linter.py --> Duplicate pattern(s) found '
+            'in CODEOWNER_IMPORTANT_PATHS list.')
+        failed = True
+
+    # Check missing rules by set difference operation.
+    critical_rule_section_minus_list_set = (
+        important_patterns_set.difference(codeowner_important_paths_set))
+    list_minus_critical_rule_section_set = (
+        codeowner_important_paths_set.difference(important_patterns_set))
+    for rule in critical_rule_section_minus_list_set:
+        python_utils.PRINT(
+            '%s --> Rule %s is not present in the '
+            'CODEOWNER_IMPORTANT_PATHS list in '
+            'scripts/pre_commit_linter.py. Please add this rule in the '
+            'mentioned list or remove this rule from the \'Critical files'
+            '\' section.' % (CODEOWNER_FILEPATH, rule))
+        failed = True
+    for rule in list_minus_critical_rule_section_set:
+        python_utils.PRINT(
+            '%s --> Rule \'%s\' is not present in the \'Critical files\' '
+            'section. Please place it under the \'Critical files\' '
+            'section since it is an important rule. Alternatively please '
+            'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
+            'scripts/pre_commit_linter.py if it is no longer an '
+            'important rule.' % (CODEOWNER_FILEPATH, rule))
+        failed = True
+
+    return failed
+
+
+def _check_codeowner_file(verbose_mode_enabled):
+    """Checks the CODEOWNERS file for any uncovered dirs/files and also
+    checks that every pattern in the CODEOWNERS file matches at least one
+    file/dir. Note that this checks the CODEOWNERS file according to the
+    glob patterns supported by Python2.7 environment. For more information
+    please refer https://docs.python.org/2/library/glob.html.
+    This function also ensures that the most important rules are at the
+    bottom of the CODEOWNERS file.
+    """
+    if verbose_mode_enabled:
+        python_utils.PRINT('Starting CODEOWNERS file check')
+        python_utils.PRINT('----------------------------------------')
+
+    with _redirect_stdout(_TARGET_STDOUT):
+        failed = False
+        summary_messages = []
+        # Checks whether every pattern in the CODEOWNERS file matches at
+        # least one dir/file.
+        critical_file_section_found = False
+        important_rules_in_critical_section = []
+        file_patterns = []
+        dir_patterns = []
+        for line_num, line in enumerate(FileCache.readlines(
+                CODEOWNER_FILEPATH)):
+            stripped_line = line.strip()
+            if '# Critical files' in line:
+                critical_file_section_found = True
+            if stripped_line and stripped_line[0] != '#':
+                if '@' not in line:
+                    python_utils.PRINT(
+                        '%s --> Pattern on line %s doesn\'t have '
+                        'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))
+                    failed = True
+                else:
+                    # Extract the file pattern from the line.
+                    line_in_concern = line.split('@')[0].strip()
+                    # This is being populated for the important rules
+                    # check.
+                    if critical_file_section_found:
+                        important_rules_in_critical_section.append(
+                            line_in_concern)
+                    # Checks if the path is the full path relative to the
+                    # root oppia directory.
+                    if not line_in_concern.startswith('/'):
+                        python_utils.PRINT(
+                            '%s --> Pattern on line %s is invalid. Use '
+                            'full path relative to the root directory'
+                            % (CODEOWNER_FILEPATH, line_num + 1))
+                        failed = True
+
+                    # The double asterisks pattern is supported by the
+                    # CODEOWNERS syntax but not the glob in Python 2.
+                    # The following condition checks this.
+                    if '**' in line_in_concern:
+                        python_utils.PRINT(
+                            '%s --> Pattern on line %s is invalid. '
+                            '\'**\' wildcard not allowed' % (
+                                CODEOWNER_FILEPATH, line_num + 1))
+                        failed = True
+                    # Adjustments to the dir paths in CODEOWNERS syntax
+                    # for glob-style patterns to match correctly.
+                    if line_in_concern.endswith('/'):
+                        line_in_concern = line_in_concern[:-1]
+                    # The following condition checks whether the specified
+                    # path exists in the codebase or not. The CODEOWNERS
+                    # syntax has paths starting with '/' which refers to
+                    # full path relative to root, but python glob module
+                    # does not conform to this logic and literally matches
+                    # the '/' character. Therefore the leading '/' has to
+                    # be changed to './' for glob patterns to match
+                    # correctly.
+                    line_in_concern = line_in_concern.replace('/', './', 1)
+                    if not glob.glob(line_in_concern):
+                        python_utils.PRINT(
+                            '%s --> Pattern on line %s doesn\'t match '
+                            'any file or directory' % (
+                                CODEOWNER_FILEPATH, line_num + 1))
+                        failed = True
+                    # The following list is being populated with the
+                    # paths in the CODEOWNERS file with the removal of the
+                    # leading '/' to aid in the glob pattern matching in
+                    # the next part of the check wherein the valid patterns
+                    # are used to check if they cover the entire codebase.
+                    if os.path.isdir(line_in_concern):
+                        dir_patterns.append(line_in_concern)
+                    else:
+                        file_patterns.append(line_in_concern)
+
+        # Checks that every file (except those under the dir represented by
+        # the dir_patterns) is covered under CODEOWNERS.
+        for file_paths in _walk_with_gitignore('.', dir_patterns):
+            for file_path in file_paths:
+                match = False
+                for file_pattern in file_patterns:
+                    if file_path in glob.glob(file_pattern):
+                        match = True
+                        break
+                if not match:
+                    python_utils.PRINT(
+                        '%s is not covered under CODEOWNERS' % file_path)
+                    failed = True
+
+        failed = failed or (
+            check_for_important_patterns_at_bottom_of_codeowners(
+                important_rules_in_critical_section))
+
+        if failed:
+            summary_message = '%s   CODEOWNERS file check failed' % (
+                _MESSAGE_TYPE_FAILED)
+        else:
+            summary_message = '%s  CODEOWNERS file check passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+
+        summary_messages.append(summary_message)
+        python_utils.PRINT(summary_message)
+        python_utils.PRINT('')
+
+    return summary_messages
+
+
 def _lint_css_files(
         node_path, stylelint_path, config_path, files_to_lint, stdout, result,
         verbose_mode_enabled):
@@ -1179,7 +1333,9 @@ def _lint_css_files(
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        linter_stdout, linter_stderr = proc.communicate()
+        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
+        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
             python_utils.PRINT('LINTER FAILED')
             python_utils.PRINT(linter_stderr)
@@ -1237,7 +1393,9 @@ def _lint_js_and_ts_files(
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        linter_stdout, linter_stderr = proc.communicate()
+        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
+        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
             python_utils.PRINT('LINTER FAILED')
             python_utils.PRINT(linter_stderr)
@@ -1569,179 +1727,6 @@ class LintChecksManager( # pylint: disable=inherit-non-class
 
         return summary_messages
 
-    def check_for_important_patterns_at_bottom_of_codeowners(
-            self, important_patterns):
-        """Checks that the most important patterns are at the bottom
-        of the CODEOWNERS file.
-
-        Arguments:
-            important_patterns: list(str). List of the important
-                patterns for CODEOWNERS file.
-
-        Returns:
-            bool. Whether the CODEOWNERS "important pattern" check fails.
-        """
-
-        failed = False
-
-        # Check that there are no duplicate elements in the lists.
-        important_patterns_set = set(important_patterns)
-        codeowner_important_paths_set = set(CODEOWNER_IMPORTANT_PATHS)
-        if len(important_patterns_set) != len(important_patterns):
-            python_utils.PRINT(
-                '%s --> Duplicate pattern(s) found in critical rules'
-                ' section.' % CODEOWNER_FILEPATH)
-            failed = True
-        if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
-            python_utils.PRINT(
-                'scripts/pre_commit_linter.py --> Duplicate pattern(s) found '
-                'in CODEOWNER_IMPORTANT_PATHS list.')
-            failed = True
-
-        # Check missing rules by set difference operation.
-        critical_rule_section_minus_list_set = (
-            important_patterns_set.difference(codeowner_important_paths_set))
-        list_minus_critical_rule_section_set = (
-            codeowner_important_paths_set.difference(important_patterns_set))
-        for rule in critical_rule_section_minus_list_set:
-            python_utils.PRINT(
-                '%s --> Rule %s is not present in the '
-                'CODEOWNER_IMPORTANT_PATHS list in '
-                'scripts/pre_commit_linter.py. Please add this rule in the '
-                'mentioned list or remove this rule from the \'Critical files'
-                '\' section.' % (CODEOWNER_FILEPATH, rule))
-            failed = True
-        for rule in list_minus_critical_rule_section_set:
-            python_utils.PRINT(
-                '%s --> Rule \'%s\' is not present in the \'Critical files\' '
-                'section. Please place it under the \'Critical files\' '
-                'section since it is an important rule. Alternatively please '
-                'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
-                'scripts/pre_commit_linter.py if it is no longer an '
-                'important rule.' % (CODEOWNER_FILEPATH, rule))
-            failed = True
-
-        return failed
-
-    def _check_codeowner_file(self):
-        """Checks the CODEOWNERS file for any uncovered dirs/files and also
-        checks that every pattern in the CODEOWNERS file matches at least one
-        file/dir. Note that this checks the CODEOWNERS file according to the
-        glob patterns supported by Python2.7 environment. For more information
-        please refer https://docs.python.org/2/library/glob.html.
-        This function also ensures that the most important rules are at the
-        bottom of the CODEOWNERS file.
-        """
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting CODEOWNERS file check')
-            python_utils.PRINT('----------------------------------------')
-
-        with _redirect_stdout(_TARGET_STDOUT):
-            failed = False
-            summary_messages = []
-            # Checks whether every pattern in the CODEOWNERS file matches at
-            # least one dir/file.
-            critical_file_section_found = False
-            important_rules_in_critical_section = []
-            file_patterns = []
-            dir_patterns = []
-            for line_num, line in enumerate(FileCache.readlines(
-                    CODEOWNER_FILEPATH)):
-                stripped_line = line.strip()
-                if '# Critical files' in line:
-                    critical_file_section_found = True
-                if stripped_line and stripped_line[0] != '#':
-                    if '@' not in line:
-                        python_utils.PRINT(
-                            '%s --> Pattern on line %s doesn\'t have '
-                            'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))
-                        failed = True
-                    else:
-                        # Extract the file pattern from the line.
-                        line_in_concern = line.split('@')[0].strip()
-                        # This is being populated for the important rules
-                        # check.
-                        if critical_file_section_found:
-                            important_rules_in_critical_section.append(
-                                line_in_concern)
-                        # Checks if the path is the full path relative to the
-                        # root oppia directory.
-                        if not line_in_concern.startswith('/'):
-                            python_utils.PRINT(
-                                '%s --> Pattern on line %s is invalid. Use '
-                                'full path relative to the root directory'
-                                % (CODEOWNER_FILEPATH, line_num + 1))
-                            failed = True
-
-                        # The double asterisks pattern is supported by the
-                        # CODEOWNERS syntax but not the glob in Python 2.
-                        # The following condition checks this.
-                        if '**' in line_in_concern:
-                            python_utils.PRINT(
-                                '%s --> Pattern on line %s is invalid. '
-                                '\'**\' wildcard not allowed' % (
-                                    CODEOWNER_FILEPATH, line_num + 1))
-                            failed = True
-                        # Adjustments to the dir paths in CODEOWNERS syntax
-                        # for glob-style patterns to match correctly.
-                        if line_in_concern.endswith('/'):
-                            line_in_concern = line_in_concern[:-1]
-                        # The following condition checks whether the specified
-                        # path exists in the codebase or not. The CODEOWNERS
-                        # syntax has paths starting with '/' which refers to
-                        # full path relative to root, but python glob module
-                        # does not conform to this logic and literally matches
-                        # the '/' character. Therefore the leading '/' has to
-                        # be changed to './' for glob patterns to match
-                        # correctly.
-                        line_in_concern = line_in_concern.replace('/', './', 1)
-                        if not glob.glob(line_in_concern):
-                            python_utils.PRINT(
-                                '%s --> Pattern on line %s doesn\'t match '
-                                'any file or directory' % (
-                                    CODEOWNER_FILEPATH, line_num + 1))
-                            failed = True
-                        # The following list is being populated with the
-                        # paths in the CODEOWNERS file with the removal of the
-                        # leading '/' to aid in the glob pattern matching in
-                        # the next part of the check wherein the valid patterns
-                        # are used to check if they cover the entire codebase.
-                        if os.path.isdir(line_in_concern):
-                            dir_patterns.append(line_in_concern)
-                        else:
-                            file_patterns.append(line_in_concern)
-
-            # Checks that every file (except those under the dir represented by
-            # the dir_patterns) is covered under CODEOWNERS.
-            for file_paths in _walk_with_gitignore('.', dir_patterns):
-                for file_path in file_paths:
-                    match = False
-                    for file_pattern in file_patterns:
-                        if file_path in glob.glob(file_pattern):
-                            match = True
-                            break
-                    if not match:
-                        python_utils.PRINT(
-                            '%s is not covered under CODEOWNERS' % file_path)
-                        failed = True
-
-            failed = failed or (
-                self.check_for_important_patterns_at_bottom_of_codeowners(
-                    important_rules_in_critical_section))
-
-            if failed:
-                summary_message = '%s   CODEOWNERS file check failed' % (
-                    _MESSAGE_TYPE_FAILED)
-            else:
-                summary_message = '%s  CODEOWNERS file check passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
-
-            summary_messages.append(summary_message)
-            python_utils.PRINT(summary_message)
-            python_utils.PRINT('')
-
-        return summary_messages
-
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -1751,9 +1736,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         """
         mandatory_patterns_messages = self._check_mandatory_patterns()
         pattern_messages = self._check_bad_patterns()
-        codeowner_messages = self._check_codeowner_file()
-        return (
-            mandatory_patterns_messages + pattern_messages + codeowner_messages)
+        return mandatory_patterns_messages + pattern_messages
 
 
 class JsTsLintChecksManager(LintChecksManager):
@@ -1805,7 +1788,8 @@ class JsTsLintChecksManager(LintChecksManager):
         if not os.path.exists(eslint_path):
             python_utils.PRINT('')
             python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
+                'ERROR    Please run install_third_party_libs.py first to '
+                'install node-eslint ')
             python_utils.PRINT('         and its dependencies.')
             sys.exit(1)
 
@@ -1833,11 +1817,10 @@ class JsTsLintChecksManager(LintChecksManager):
             js_and_ts_messages.append(js_and_ts_stdout.get())
 
         python_utils.PRINT('')
-        # The output from the stdout are read as bytes, hence the b' prefix.
-        python_utils.PRINT(b'\n'.join(js_and_ts_messages))
+        python_utils.PRINT('\n'.join(js_and_ts_messages))
 
         with _redirect_stdout(_TARGET_STDOUT):
-            python_utils.PRINT(b'\n'.join(js_and_ts_messages))
+            python_utils.PRINT('\n'.join(js_and_ts_messages))
             python_utils.PRINT('')
 
         return js_and_ts_messages
@@ -2636,7 +2619,8 @@ class OtherLintChecksManager(LintChecksManager):
         if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
             python_utils.PRINT('')
             python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
+                'ERROR    Please run install_third_party_libs.py first to '
+                'install node-eslint ')
             python_utils.PRINT(
                 '         or node-stylelint and its dependencies.')
             sys.exit(1)
@@ -2706,7 +2690,7 @@ class OtherLintChecksManager(LintChecksManager):
                 summary_messages.append(result_queue.get())
 
         with _redirect_stdout(_TARGET_STDOUT):
-            python_utils.PRINT(b'\n'.join(summary_messages))
+            python_utils.PRINT('\n'.join(summary_messages))
             python_utils.PRINT('')
 
         return summary_messages
@@ -3096,7 +3080,8 @@ class OtherLintChecksManager(LintChecksManager):
                 proc = subprocess.Popen(
                     proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-                linter_stdout, _ = proc.communicate()
+                encoded_linter_stdout, _ = proc.communicate()
+                linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
                 # This line splits the output of the linter and extracts digits
                 # from it. The digits are stored in a list. The second last
                 # digit in the list represents the number of errors in the file.
@@ -3169,11 +3154,11 @@ def _print_complete_summary_of_errors():
         python_utils.PRINT(error_messages)
 
 
-def main():
+def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
     """
-    parsed_args = _PARSER.parse_args()
+    parsed_args = _PARSER.parse_args(args=args)
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
@@ -3183,10 +3168,10 @@ def main():
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('No files to check.')
         python_utils.PRINT('---------------------------')
-        sys.exit(1)
+        return
 
     all_filepaths_dict = {
-        '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], 'css': []
+        '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []
     }
     for f in all_filepaths:
         _, extension = os.path.splitext(f)
@@ -3194,13 +3179,15 @@ def main():
             all_filepaths_dict[extension].append(f)
         else:
             all_filepaths_dict['other'].append(f)
+    code_owner_check_message = _check_codeowner_file(verbose_mode_enabled)
     js_ts_lint_checks_manager = JsTsLintChecksManager(
         all_filepaths_dict['.js'], all_filepaths_dict['.ts'],
         verbose_mode_enabled)
     other_lint_checks_manager = OtherLintChecksManager( # pylint: disable=too-many-function-args
         all_filepaths_dict['.py'], all_filepaths_dict['.html'],
-        all_filepaths_dict['css'], all_filepaths_dict['other'])
-    all_messages = js_ts_lint_checks_manager.perform_all_lint_checks()
+        all_filepaths_dict['.css'], all_filepaths_dict['other'])
+    all_messages = code_owner_check_message
+    all_messages += js_ts_lint_checks_manager.perform_all_lint_checks()
     all_messages += other_lint_checks_manager.perform_all_lint_checks()
 
     _print_complete_summary_of_errors()

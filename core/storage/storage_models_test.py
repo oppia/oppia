@@ -17,15 +17,19 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
+import unittest
 
 from core.platform import models
 from core.tests import test_utils
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class StorageModelsTest(test_utils.GenericTestBase):
     """Tests for Oppia storage models."""
 
-    def test_all_model_module_names_unique(self):
+    def _get_model_module_names(self):
+        """Get all module names in storage."""
         all_model_module_names = []
 
         # As models.NAMES is an enum, it cannot be iterated. So we use the
@@ -33,10 +37,13 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for name in models.NAMES.__dict__:
             if '__' not in name:
                 all_model_module_names.append(name)
+        return all_model_module_names
 
-        names_of_ndb_model_subclasses = []
-        for module_name in all_model_module_names:
-            (module, ) = models.Registry.import_models([module_name])
+    def _get_model_classes(self):
+        """Get all model classes in storage."""
+        model_subclasses = []
+        for module_name in self._get_model_module_names():
+            (module,) = models.Registry.import_models([module_name])
             for member_name, member_obj in inspect.getmembers(module):
                 if inspect.isclass(member_obj):
                     clazz = getattr(module, member_name)
@@ -44,8 +51,35 @@ class StorageModelsTest(test_utils.GenericTestBase):
                         base_class.__name__ for base_class in inspect.getmro(
                             clazz)]
                     if 'Model' in all_base_classes:
-                        names_of_ndb_model_subclasses.append(clazz.__name__)
+                        model_subclasses.append(clazz)
+        return model_subclasses
+
+    def test_all_model_module_names_unique(self):
+        names_of_ndb_model_subclasses = [
+            clazz.__name__ for clazz in self._get_model_classes()]
 
         self.assertEqual(
             len(set(names_of_ndb_model_subclasses)),
             len(names_of_ndb_model_subclasses))
+
+    @unittest.skip('get_deletion_policy is not yet implemented on all models')
+    def test_all_models_have_get_deletion_policy(self):
+        model_subclasses = self._get_model_classes()
+
+        for clazz in model_subclasses:
+            base_classes = [base.__name__ for base in inspect.getmro(clazz)]
+            # BaseSnapshotMetadataModel adopts the policy of the associated
+            # VersionedModel.
+            if 'BaseSnapshotMetadataModel' in base_classes:
+                continue
+            # BaseSnapshotContentModel adopts the policy of the associated
+            # VersionedModel.
+            if 'BaseSnapshotContentModel' in base_classes:
+                continue
+            # BaseCommitLogEntryModel adopts the policy of the associated
+            # VersionedModel.
+            if 'BaseCommitLogEntryModel' in base_classes:
+                continue
+            self.assertIn(
+                clazz.get_deletion_policy(),
+                base_models.DELETION_POLICY.__dict__)

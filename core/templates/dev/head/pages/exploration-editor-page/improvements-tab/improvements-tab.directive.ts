@@ -56,6 +56,8 @@ angular.module('oppia').directive('improvementsTab', [
             fetchedCards = cards;
           });
 
+          $scope.onlyShowOpenTasks = true;
+
           $scope.getStatusCssClass =
             ImprovementsDisplayService.getStatusCssClass;
 
@@ -68,6 +70,10 @@ angular.module('oppia').directive('improvementsTab', [
 
           $scope.isCardOpen = function(card) {
             return ImprovementsDisplayService.isOpen(card.getStatus());
+          };
+
+          $scope.isCardShown = function(card) {
+            return $scope.isCardOpen(card) || !$scope.onlyShowOpenTasks;
           };
 
           $scope.getCardTitle = function(card) {

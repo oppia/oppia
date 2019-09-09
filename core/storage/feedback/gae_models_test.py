@@ -42,25 +42,6 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_put_function(self):
-        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION, entity_id='exp_id_1',
-            subject='dummy subject', message_count=0)
-
-        feedback_thread_model.put()
-
-        last_updated = feedback_thread_model.last_updated
-
-        # If we do not wish to update the last_updated time, we should set
-        # the update_last_updated_time argument to False in the put function.
-        feedback_thread_model.put(update_last_updated_time=False)
-        self.assertEqual(feedback_thread_model.last_updated, last_updated)
-
-        # If we do wish to change it however, we can simply use the put function
-        # as the default value of update_last_updated_time is True.
-        feedback_thread_model.put()
-        self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
-
     def test_raise_exception_by_mocking_collision(self):
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
         # Test create method.
@@ -270,6 +251,27 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     """Tests for the FeedbackThreadUserModel class."""
 
+    def test_put_function(self):
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadUserModel(
+            id='user_id.exploration.exp_id.thread_id',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id',
+            message_ids_read_by_user=[])
+
+        feedback_thread_model.put()
+
+        last_updated = feedback_thread_model.last_updated
+
+        # If we do not wish to update the last_updated time, we should set
+        # the update_last_updated_time argument to False in the put function.
+        feedback_thread_model.put(update_last_updated_time=False)
+        self.assertEqual(feedback_thread_model.last_updated, last_updated)
+
+        # If we do wish to change it however, we can simply use the put function
+        # as the default value of update_last_updated_time is True.
+        feedback_thread_model.put()
+        self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             feedback_models.GeneralFeedbackThreadUserModel
@@ -352,6 +354,15 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             actual_model_2.message_ids_read_by_user,
             expected_model_2.message_ids_read_by_user)
+
+
+class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
+    """Tests for the FeedbackAnalyticsModelTests class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            feedback_models.FeedbackAnalyticsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):

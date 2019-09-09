@@ -26,6 +26,7 @@ import os
 import random
 import re
 import string
+import sys
 import time
 import unicodedata
 
@@ -33,7 +34,10 @@ from constants import constants
 import feconf
 import python_utils
 
-import yaml
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+sys.path.insert(0, _YAML_PATH)
+
+import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 
 class InvalidInputException(Exception):
@@ -106,8 +110,8 @@ def get_exploration_components_from_dir(dir_path):
         dir_path_array = dir_path_array[:-1]
     dir_path_length = len(dir_path_array)
 
-    for root, dirs, files in os.walk(dir_path):
-        for directory in dirs:
+    for root, directories, files in os.walk(dir_path):
+        for directory in directories:
             if root == dir_path and directory != 'assets':
                 raise Exception(
                     'The only directory in %s should be assets/' % dir_path)
@@ -365,9 +369,11 @@ def convert_to_hash(input_string, max_length):
             (input_string, type(input_string)))
 
     # Encodes strings using the character set [A-Za-z0-9].
+    # Prefixing altchars with b' to ensure that all characters in encoded_string
+    # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
         hashlib.sha1(python_utils.convert_to_bytes(input_string)).digest(),
-        altchars='ab'
+        altchars=b'ab'
     ).replace('=', 'c')
 
     return encoded_string[:max_length]
