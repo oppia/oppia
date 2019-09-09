@@ -119,9 +119,9 @@ describe('Preferences', function() {
     preferencesPage.setSubInterest('Chemistry');
     browser.refresh();
     preferencesPage.expectSubToBe('Chemistry');
-    preferencesPage.editSubInterest(', Computer Science, Hindi');
+    preferencesPage.editSubInterest(', Hindi');
     preferencesPage.editSubInterest(', English');
-    preferencesPage.expectSubToBe('Chemistry, Computer Science, Hindi, English');
+    preferencesPage.expectSubToBe('Chemistry, Hindi, English');
   });
 
   afterEach(function() {

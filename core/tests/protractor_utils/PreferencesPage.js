@@ -150,7 +150,7 @@ var PreferencesPage = function() {
   };
 
   this.expectSubToBe = function(subject) {
-    expect(subInterest.getText().toMatch(subject);
+    expect(subInterest.getText()).toMatch(subject);
   };
 
   this.selectCreatorDashboard = function() {
