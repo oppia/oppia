@@ -32,6 +32,9 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import story_domain
+from core.domain import story_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -39,8 +42,8 @@ from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
-(exp_models, job_models,) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.job])
+(exp_models, job_models, opportunity_models,) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.job, models.NAMES.opportunity])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -215,6 +218,70 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             migration_bot_contributions_model.created_exploration_ids, [])
         self.assertEqual(
             migration_bot_contributions_model.edited_exploration_ids, [])
+
+    def test_regenerate_topic_related_opportunities_action(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        topic_id = 'topic'
+        story_id = 'story'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            '0', title='title')
+        exp_services.save_new_exploration(owner_id, exploration)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id=topic_id, name='topic')
+        topic_services.save_new_topic(owner_id, topic)
+
+        story = story_domain.Story.create_default_story(
+            story_id, title='A story',
+            corresponding_topic_id=topic_id)
+        story_services.save_new_story(owner_id, story)
+        topic_services.add_canonical_story(
+            owner_id, topic_id, story_id)
+        story_services.update_story(
+            owner_id, story_id, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+
+        self.assertEqual(len(all_opportunity_models), 1)
+
+        old_creation_time = all_opportunity_models[0].created_on
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        result = self.post_json(
+            '/adminhandler', {
+                'action': 'regenerate_topic_related_opportunities',
+                'topic_id': 'topic'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(
+            result, {
+                'opportunities_count': 1
+            })
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+
+        self.assertEqual(len(all_opportunity_models), 1)
+
+        new_creation_time = all_opportunity_models[0].created_on
+
+        self.assertLess(old_creation_time, new_creation_time)
 
     def test_admin_topics_csv_download_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
