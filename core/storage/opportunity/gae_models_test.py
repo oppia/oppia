@@ -138,6 +138,21 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             .get_by_topic('non_existing_topic_id'))
         self.assertEqual(len(model_list), 0)
 
+    def test_delete_all(self):
+        results, _, more = (
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_all_translation_opportunities(1, None, 'hi'))
+        self.assertEqual(len(results), 1)
+        self.assertTrue(more)
+
+        opportunity_models.ExplorationOpportunitySummaryModel.delete_all()
+
+        results, _, more = (
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_all_translation_opportunities(1, None, 'hi'))
+        self.assertEqual(len(results), 0)
+        self.assertFalse(more)
+
 
 class SkillOpportunityModelTest(test_utils.GenericTestBase):
     """Tests for the SkillOpportunityModel class."""

@@ -38,23 +38,75 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
+  var adminPage = null;
   var collectionEditorPage = null;
-  var explorationPlayerPage = null;
-  var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
-  var explorationEditorSettingsTab = null;
   var creatorDashboardPage = null;
+  var explorationEditorPage = null;
+  var explorationPlayerPage = null;
   var libraryPage = null;
 
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
+
   beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    libraryPage = new LibraryPage.LibraryPage();
+
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    libraryPage = new LibraryPage.LibraryPage();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+
+    users.createAndLoginAdminUser('superUser@stateEditor.com', 'superUser');
+    // TODO(#7569): Change this test to work with the improvements tab.
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean', (elem) => elem.setValue(false));
+    users.logout();
   });
+
+  it('should walk through the tutorial when user repeatedly clicks Next',
+    function() {
+      users.createUser(
+        'userTutorial@stateEditor.com', 'userTutorialStateEditor');
+      users.login('userTutorial@stateEditor.com');
+
+      workflow.createExplorationAndStartTutorial();
+      explorationEditorMainTab.startTutorial();
+      explorationEditorMainTab.playTutorial();
+      explorationEditorMainTab.finishTutorial();
+      users.logout();
+    }
+  );
+
+  it('should reflect skills and goal in exploration editor settings',
+    function() {
+      users.createUser('user@editorAndPlayer.com', 'userEditorAndPlayer');
+      users.login('user@editorAndPlayer.com');
+      const EXPLORATION_OBJECTIVE =
+      'Let us learn how to add fractions in an amazing way';
+      const EXPLORATION_TITLE = 'Fractions';
+      const EXPLORATION_CATEGORY = 'Mathematics';
+      const EXPLORATION_LANGUAGE = 'Deutsch';
+      const EXPLORATION_TAGS = ['maths', 'english', 'fractions', 'addition'];
+      workflow.createAddExpDetailsAndPublishExp(
+        EXPLORATION_TITLE,
+        EXPLORATION_CATEGORY,
+        EXPLORATION_OBJECTIVE,
+        EXPLORATION_LANGUAGE,
+        EXPLORATION_TAGS);
+      explorationEditorPage.navigateToSettingsTab();
+      explorationEditorPage.verifyExplorationSettingFields(
+        EXPLORATION_TITLE,
+        EXPLORATION_CATEGORY,
+        EXPLORATION_OBJECTIVE,
+        EXPLORATION_LANGUAGE,
+        EXPLORATION_TAGS
+      );
+      users.logout();
+    });
 
   it('should report an exploration to moderators', function() {
     var EXPLORATION_OBJECTIVE = 'Let us learn how to add fractions';

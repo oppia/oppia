@@ -16,19 +16,18 @@
  * @fileoverview Unit tests for multiple choice input rules.
  */
 
-require(
-  'interactions/MultipleChoiceInput/directives/' +
-  'multiple-choice-input-rules.service.ts');
+/* eslint-disable max-len */
+import { MultipleChoiceInputRulesService } from
+  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
+/* eslint-enable max-len */
 
-describe('Multiple choice input rules service', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Multiple choice input rules service', () => {
+  let mcirs: MultipleChoiceInputRulesService = null;
+  beforeEach(() => {
+    mcirs = new MultipleChoiceInputRulesService();
+  });
 
-  var mcirs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    mcirs = $injector.get('MultipleChoiceInputRulesService');
-  }));
-
-  it('should have a correct \'equals\' rule', function() {
+  it('should have a correct \'equals\' rule', () => {
     expect(mcirs.Equals(3, {
       x: 3
     })).toBe(true);
