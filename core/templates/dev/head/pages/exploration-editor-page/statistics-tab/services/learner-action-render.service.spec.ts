@@ -38,10 +38,6 @@ import { GroupedStartingIndicesObjectFactory } from
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
-/* eslint-disable max-len */
-import { LearnerActionRenderService } from
-  'pages/exploration-editor-page/statistics-tab/services/learner-action-render.service';
-/* eslint-enable max-len */
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
