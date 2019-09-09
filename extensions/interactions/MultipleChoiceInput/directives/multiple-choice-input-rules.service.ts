@@ -16,10 +16,18 @@
  * @fileoverview Rules service for the interaction.
  */
 
-angular.module('oppia').factory('MultipleChoiceInputRulesService', [function() {
-  return {
-    Equals: function(answer, inputs) {
-      return answer === inputs.x;
-    }
-  };
-}]);
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MultipleChoiceInputRulesService {
+  Equals(answer: number, inputs: {x: number}): boolean {
+    return answer === inputs.x;
+  }
+}
+
+angular.module('oppia').factory(
+  'MultipleChoiceInputRulesService',
+  downgradeInjectable(MultipleChoiceInputRulesService));
