@@ -31,14 +31,17 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'answer-submit-action.directive.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/issues/' +
+  'mis-issue.directive.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
-  '$sce', 'ExplorationStatesService', 'GroupedStartingIndicesObjectFactory',
+  'ExplorationStatesService', 'GroupedStartingIndicesObjectFactory',
   'HtmlEscaperService', 'ACTION_TYPE_ANSWER_SUBMIT',
   'ACTION_TYPE_EXPLORATION_QUIT', 'ACTION_TYPE_EXPLORATION_START',
   function(
-      $sce, ExplorationStatesService, GroupedStartingIndicesObjectFactory,
+      ExplorationStatesService, GroupedStartingIndicesObjectFactory,
       HtmlEscaperService, ACTION_TYPE_ANSWER_SUBMIT,
       ACTION_TYPE_EXPLORATION_QUIT, ACTION_TYPE_EXPLORATION_START) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
@@ -98,27 +101,9 @@ angular.module('oppia').factory('LearnerActionRenderService', [
      */
     var renderLearnerActionsTableForMultipleIncorrectIssue = function(
         finalBlock) {
-      var index = finalBlock.length - 1;
-      var stateName =
-        finalBlock[index].actionCustomizationArgs.state_name.value;
-
-      var tableHTML =
-        '<table class="oppia-issues-learner-action-table"><tr><th>Answer</th>' +
-        '<th>Feedback</th></tr>';
-      for (var i = 0; i < index; i++) {
-        if (finalBlock[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT) {
-          continue;
-        }
-        var answer =
-          finalBlock[i].actionCustomizationArgs.submitted_answer.value;
-        var feedback =
-          finalBlock[i].actionCustomizationArgs.feedback.value._html;
-        feedback = feedback.replace('{{answer}}', answer);
-        tableHTML +=
-          '<tr><td>' + answer + '</td><td>' + feedback + '</td></tr>';
-      }
-      tableHTML += '</table>';
-      return tableHTML;
+      var el = $('<mis-issue>');
+      el.attr('finalBlock', HtmlEscaperService.objToEscapedJson(finalBlock));
+      return ($('<span>').append(el)).html();
     };
 
     /**
@@ -164,22 +149,10 @@ angular.module('oppia').factory('LearnerActionRenderService', [
        */
       renderFinalDisplayBlockForMISIssueHTML: function(
           block, actionStartIndex) {
-        var index = block.length - 1;
-        var stateName = block[index].actionCustomizationArgs.state_name.value;
-        var htmlString = '';
-        for (
-          var i = 0; block[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT; i++) {
-          htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
-        }
-        htmlString +=
-          '<div class="oppia-issues-learner-action">' +
-          (actionStartIndex + i).toString() +
-          '. Submitted the following answers in card "' + stateName +
-          '"</div>';
-        htmlString += renderLearnerActionsTableForMultipleIncorrectIssue(block);
-        htmlString += renderLearnerActionHTML(
-          block[index], actionStartIndex + i + 1);
-        return $sce.trustAsHtml(htmlString);
+        var el = $('<mis-issue>');
+        el.attr('final-block', HtmlEscaperService.objToEscapedJson(block));
+        el.attr('action-start-index', actionStartIndex);
+        return ($('<span>').append(el)).html();
       },
       renderLearnerAction: function(learnerAction, actionIndex) {
         return renderLearnerActionHTML(learnerAction, actionIndex);

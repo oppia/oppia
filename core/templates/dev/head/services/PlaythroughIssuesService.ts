@@ -161,12 +161,16 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
                 if (playthrough.issueType === (
                   ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)) {
                   $scope.isIssueMIS = true;
+                }
+
+                $scope.renderIssueTable = function() {
                   var lars = LearnerActionRenderService;
-                  $scope.issueMisTableHtml =
+                  var tableHtml =
                     lars.renderFinalDisplayBlockForMISIssueHTML(
                       playthrough.actions.slice($scope.startingIndices[0]),
                       $scope.startingIndices[0] + 1);
-                }
+                  return tableHtml;
+                };
 
                 $scope.maxHidden = $scope.startingIndices.length - 1;
 

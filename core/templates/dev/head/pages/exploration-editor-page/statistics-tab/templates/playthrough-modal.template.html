@@ -17,7 +17,10 @@
         </angular-html-bind>
       </div>
     </div>
-    <div ng-if="isIssueMIS" ng-bind-html="issueMisTableHtml" class="oppia-issues-highlight"></div>
+    <div ng-if="isIssueMIS" class="oppia-issues-highlight">
+      <angular-html-bind html-data="renderIssueTable()">
+      </angular-html-bind>
+    </div>
   </div>
 </div>
 

@@ -110,8 +110,6 @@ describe('Learner Action Render Service', function() {
     $provide.value(
       'LearnerActionObjectFactory', new LearnerActionObjectFactory());
     $provide.value(
-      'LearnerActionRenderService', new LearnerActionRenderService());
-    $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
     $provide.value(
@@ -282,20 +280,8 @@ describe('Learner Action Render Service', function() {
             .renderFinalDisplayBlockForMISIssueHTML(
               learnerActions.slice(startingIndices[0]), 1);
 
-        expect(this.$sce.getTrustedHtml(finalBlockHTML)).toEqual(
-          '1. Started exploration at card "stateName1".' +
-          '<div class="oppia-issues-learner-action">2. Submitted the ' +
-          'following answers in card "stateName1"</div>' +
-          '<table class="oppia-issues-learner-action-table"><tr><th>Answer' +
-          '</th><th>Feedback</th></tr>' +
-          '<tr><td>Hello</td><td>Try again</td></tr>' +
-          '<tr><td>Hello</td><td>Try again</td></tr>' +
-          '<tr><td>Hello</td><td>Try again</td></tr>' +
-          '<tr><td>Hello</td><td>Try again</td></tr>' +
-          '<tr><td>Hello</td><td>Try again</td></tr></table>' +
-          '3. Left the exploration after spending a total of 120 seconds on ' +
-          'card "stateName1".'
-        );
+        expect(finalBlockHTML).toContain('<mis-issue');
+        expect(finalBlockHTML).toContain('final-block');
       });
   });
 });
