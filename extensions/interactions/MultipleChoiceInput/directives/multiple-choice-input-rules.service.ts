@@ -22,7 +22,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 @Injectable({
   providedIn: 'root'
 })
-
 export class MultipleChoiceInputRulesService {
   Equals(answer: number, inputs: {x: number}): boolean {
     return answer === inputs.x;
