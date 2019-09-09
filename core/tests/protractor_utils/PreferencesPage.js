@@ -51,7 +51,7 @@ var PreferencesPage = function() {
   };
 
   this.editSubInterest = function(subject) {
-    subInterest.sendkeys(subject);
+    subInterest.sendKeys(subject);
   };
 
   this.get = function() {
@@ -98,7 +98,7 @@ var PreferencesPage = function() {
 
   this.setSubInterest = function(subject) {
     subInterest.clear();
-    subInterest.sendkeys(subject);
+    subInterest.sendKeys(subject);
   };
 
   this.isFeedbackEmailsCheckboxSelected = function() {
