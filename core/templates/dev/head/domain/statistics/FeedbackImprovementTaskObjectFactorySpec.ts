@@ -154,16 +154,16 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
       _FeedbackImprovementTaskObjectFactory_;
     ImprovementModalService = _ImprovementModalService_;
     ThreadDataService = _ThreadDataService_;
-    FEEDBACK_IMPROVEMENT_TASK_TYPE = _FEEDBACK_IMPROVEMENT_CARD_TYPE_;
+    FEEDBACK_IMPROVEMENT_TASK_TYPE = _FEEDBACK_IMPROVEMENT_TASK_TYPE_;
   }));
 
   describe('.createNew', function() {
     it('retrieves data from passed thread', function() {
       var mockThread = {threadId: 1};
-      var card = FeedbackImprovementTaskObjectFactory.createNew(mockThread);
+      var task = FeedbackImprovementTaskObjectFactory.createNew(mockThread);
 
-      expect(card.getDirectiveData()).toBe(mockThread);
-      expect(card.getDirectiveType()).toEqual(FEEDBACK_IMPROVEMENT_TASK_TYPE);
+      expect(task.getDirectiveData()).toBe(mockThread);
+      expect(task.getDirectiveType()).toEqual(FEEDBACK_IMPROVEMENT_TASK_TYPE);
     });
   });
 
@@ -175,9 +175,9 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
         feedbackThreads: [{threadId: 'abc1'}, {threadId: 'def2'}]
       });
 
-      FeedbackImprovementTaskObjectFactory.fetchTasks().then(function(cards) {
-        expect(cards[0].getDirectiveData().threadId).toEqual('abc1');
-        expect(cards[1].getDirectiveData().threadId).toEqual('def2');
+      FeedbackImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
+        expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
+        expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);
 
       // $q Promises need to be forcibly resolved through a JavaScript digest,
@@ -197,45 +197,45 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
         summary: null,
         thread_id: 'abc1',
       };
-      this.card =
+      this.task =
         FeedbackImprovementTaskObjectFactory.createNew(this.mockThread);
     });
 
     describe('.getStatus', function() {
       it('returns the same status as the thread', function() {
         this.mockThread.status = 'a unique status';
-        expect(this.card.getStatus()).toEqual('a unique status');
+        expect(this.task.getStatus()).toEqual('a unique status');
       });
     });
 
     describe('.getTitle', function() {
       it('returns the subject of the thread', function() {
         this.mockThread.subject = 'Feedback from a learner';
-        expect(this.card.getTitle()).toEqual('Feedback from a learner');
+        expect(this.task.getTitle()).toEqual('Feedback from a learner');
       });
     });
 
     describe('.getDirectiveType', function() {
       it('returns feedback as directive type', function() {
-        expect(this.card.getDirectiveType())
+        expect(this.task.getDirectiveType())
           .toEqual(FEEDBACK_IMPROVEMENT_TASK_TYPE);
       });
     });
 
     describe('.getDirectiveData', function() {
       it('returns the thread', function() {
-        expect(this.card.getDirectiveData()).toBe(this.mockThread);
+        expect(this.task.getDirectiveData()).toBe(this.mockThread);
       });
     });
 
     describe('.getActionButtons', function() {
       it('contains one button', function() {
-        expect(this.card.getActionButtons().length).toEqual(1);
+        expect(this.task.getActionButtons().length).toEqual(1);
       });
 
       describe('first button', function() {
         beforeEach(function() {
-          this.button = this.card.getActionButtons()[0];
+          this.button = this.task.getActionButtons()[0];
         });
 
         it('opens a thread modal', function() {

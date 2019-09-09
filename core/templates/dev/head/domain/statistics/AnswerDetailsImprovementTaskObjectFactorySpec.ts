@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the SuggestionImprovementTaskObjectFactory.
+ * @fileoverview Unit tests for the FeedbackImprovementTaskObjectFactory.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// SuggestionImprovementTaskObjectFactory.ts is upgraded to Angular 8.
+// FeedbackImprovementTaskObjectFactory.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -43,11 +43,12 @@ import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 /* eslint-disable max-len */
@@ -56,9 +57,8 @@ import { StateEditorService } from
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+/* eslint-enable max-len */
 import { SuggestionModalService } from 'services/SuggestionModalService';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -73,18 +73,18 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/statistics/SuggestionImprovementTaskObjectFactory.ts');
+require('domain/statistics/AnswerDetailsImprovementTaskObjectFactory.ts');
 
-describe('SuggestionImprovementTaskObjectFactory', function() {
+describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
+  var AnswerDetailsImprovementTaskObjectFactory = null;
   var ImprovementModalService = null;
-  var SuggestionImprovementTaskObjectFactory = null;
-  var SuggestionModalForExplorationEditorService = null;
-  var SuggestionThreadObjectFactory = null;
-  var ThreadDataService = null;
-  var SUGGESTION_IMPROVEMENT_TASK_TYPE = null;
+  var LearnerAnswerDetailsDataService = null;
+  var ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE = null;
+  var STATUS_NOT_ACTIONABLE = null;
+  var STATUS_OPEN = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -112,10 +112,14 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
-    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value(
       'ParamChangesObjectFactory', new ParamChangesObjectFactory(
         new ParamChangeObjectFactory()));
+    $provide.value(
+      'StateEditorService', new StateEditorService(
+        new SolutionValidityService()));
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
@@ -123,16 +127,13 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
       'StateClassifierMappingService', new StateClassifierMappingService(
         new ClassifierObjectFactory()));
     $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-    $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value('SuggestionModalService', new SuggestionModalService());
     $provide.value(
       'ThreadStatusDisplayService', new ThreadStatusDisplayService());
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
@@ -145,46 +146,51 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
         new WrittenTranslationObjectFactory()));
   }));
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _$uibModal_, _ImprovementModalService_,
-      _SuggestionImprovementTaskObjectFactory_,
-      _SuggestionModalForExplorationEditorService_,
-      _SuggestionThreadObjectFactory_, _ThreadDataService_,
-      _SUGGESTION_IMPROVEMENT_TASK_TYPE_) {
+      _$q_, _$rootScope_, _$uibModal_,
+      _AnswerDetailsImprovementTaskObjectFactory_, _ImprovementModalService_,
+      _LearnerAnswerDetailsDataService_,
+      _ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE_,
+      _STATUS_NOT_ACTIONABLE_, _STATUS_OPEN_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
+    AnswerDetailsImprovementTaskObjectFactory =
+      _AnswerDetailsImprovementTaskObjectFactory_;
     ImprovementModalService = _ImprovementModalService_;
-    SuggestionImprovementTaskObjectFactory =
-      _SuggestionImprovementTaskObjectFactory_;
-    SuggestionModalForExplorationEditorService =
-      _SuggestionModalForExplorationEditorService_;
-    SuggestionThreadObjectFactory = _SuggestionThreadObjectFactory_;
-    ThreadDataService = _ThreadDataService_;
-    SUGGESTION_IMPROVEMENT_TASK_TYPE = _SUGGESTION_IMPROVEMENT_CARD_TYPE_;
+    LearnerAnswerDetailsDataService = _LearnerAnswerDetailsDataService_;
+    ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE =
+      _ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE_;
+    STATUS_NOT_ACTIONABLE = _STATUS_NOT_ACTIONABLE_;
+    STATUS_OPEN = _STATUS_OPEN_;
   }));
 
   describe('.createNew', function() {
     it('retrieves data from passed thread', function() {
-      var mockThread = {threadId: 1};
-      var card = SuggestionImprovementTaskObjectFactory.createNew(mockThread);
+      var mockLearnerAnswerDetails = {learnerAnswerInfoData: 'sample'};
+      var task = AnswerDetailsImprovementTaskObjectFactory.createNew(
+        mockLearnerAnswerDetails);
 
-      expect(card.getDirectiveData()).toBe(mockThread);
-      expect(card.getDirectiveType()).toEqual(SUGGESTION_IMPROVEMENT_TASK_TYPE);
+      expect(task.getDirectiveData()).toBe(mockLearnerAnswerDetails);
+      expect(task.getDirectiveType()).toEqual(
+        ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
     });
   });
 
   describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
-      spyOn(ThreadDataService, 'fetchThreads').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'fetchMessages').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'getData').and.returnValue({
-        suggestionThreads: [{threadId: 'abc1'}, {threadId: 'def2'}]
-      });
+      spyOn(
+        LearnerAnswerDetailsDataService,
+        'fetchLearnerAnswerInfoData').and.callFake($q.resolve);
+      spyOn(LearnerAnswerDetailsDataService, 'getData').and.returnValue(
+        [{learnerAnswerInfoData: 'abc1'}, {learnerAnswerInfoData: 'def2'}]);
 
-      SuggestionImprovementTaskObjectFactory.fetchTasks().then(function(cards) {
-        expect(cards[0].getDirectiveData().threadId).toEqual('abc1');
-        expect(cards[1].getDirectiveData().threadId).toEqual('def2');
-      }).then(done, done.fail);
+      AnswerDetailsImprovementTaskObjectFactory.fetchTasks().then(
+        function(tasks) {
+          expect(
+            tasks[0].getDirectiveData().learnerAnswerInfoData).toEqual('abc1');
+          expect(
+            tasks[1].getDirectiveData().learnerAnswerInfoData).toEqual('def2');
+        }).then(done, done.fail);
 
       // $q Promises need to be forcibly resolved through a JavaScript digest,
       // which is what $apply helps kick-start.
@@ -192,90 +198,83 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
     });
   });
 
-  describe('SuggestionImprovementTask', function() {
+  describe('AnswerDetailsImprovementTask', function() {
     beforeEach(function() {
-      var mockSuggestionThreadBackendDict = {
-        last_updated: 1000,
-        original_author_username: 'author',
-        status: 'accepted',
-        subject: 'sample subject',
-        summary: 'sample summary',
-        message_count: 10,
-        state_name: 'state 1',
-        thread_id: 'exploration.exp1.thread1'
+      this.mockLearnerAnswerDetails = {
+        expId: 12,
+        stateName: 'fakeStateName',
+        learnerAnswerInfoData: [{
+          id: 1,
+          answer: 'fakeAnswer',
+          answer_details: 'fakeAnswerDetails',
+          created_on: 1441870501230.642,
+        }]
       };
-      var mockSuggestionBackendDict = {
-        suggestion_id: 'exploration.exp1.thread1',
-        suggestion_type: 'edit_exploration_state_content',
-        target_type: 'exploration',
-        target_id: 'exp1',
-        target_version_at_submission: 1,
-        status: 'accepted',
-        author_name: 'author',
-        change: {
-          cmd: 'edit_state_property',
-          property_name: 'content',
-          state_name: 'state_1',
-          new_value: {
-            html: 'new suggestion content'
-          },
-          old_value: {
-            html: 'old suggestion content'
-          }
-        },
-        last_updated: 1000
-      };
-
-      this.mockThread = SuggestionThreadObjectFactory.createFromBackendDicts(
-        mockSuggestionThreadBackendDict, mockSuggestionBackendDict);
-      this.card =
-        SuggestionImprovementTaskObjectFactory.createNew(this.mockThread);
+      this.task =
+        AnswerDetailsImprovementTaskObjectFactory.createNew(
+          this.mockLearnerAnswerDetails);
     });
 
     describe('.getStatus', function() {
-      it('returns the same status as the thread', function() {
-        this.mockThread.status = 'a unique status';
-        expect(this.card.getStatus()).toEqual('a unique status');
+      it('returns open as status', function() {
+        expect(this.task.getStatus()).toEqual(STATUS_OPEN);
+      });
+
+      it('returns not actionable as status', function() {
+        this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
+        expect(this.task.getStatus()).toEqual(STATUS_NOT_ACTIONABLE);
       });
     });
 
     describe('.getTitle', function() {
-      it('returns the state associated with the suggestion', function() {
-        expect(this.card.getTitle())
-          .toEqual('Suggestion for the card "state_1"');
+      it('returns answer details as title', function() {
+        expect(this.task.getTitle()).toEqual(
+          'Answer details for the task "fakeStateName"');
+      });
+    });
+
+    describe('.isObsolete', function() {
+      it('returns is obsolete as false', function() {
+        expect(this.task.isObsolete()).toEqual(false);
+      });
+
+      it('returns is obsolete as true', function() {
+        this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
+        expect(this.task.isObsolete()).toEqual(true);
       });
     });
 
     describe('.getDirectiveType', function() {
-      it('returns suggestion as directive type', function() {
-        expect(this.card.getDirectiveType())
-          .toEqual(SUGGESTION_IMPROVEMENT_TASK_TYPE);
+      it('returns answer details as directive type', function() {
+        expect(this.task.getDirectiveType())
+          .toEqual(ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
       });
     });
 
     describe('.getDirectiveData', function() {
-      it('returns the thread', function() {
-        expect(this.card.getDirectiveData()).toBe(this.mockThread);
+      it('returns the learner answer details', function() {
+        expect(this.task.getDirectiveData()).toBe(
+          this.mockLearnerAnswerDetails);
       });
     });
 
     describe('.getActionButtons', function() {
       it('contains one button', function() {
-        expect(this.card.getActionButtons().length).toEqual(1);
+        expect(this.task.getActionButtons().length).toEqual(1);
+      });
+    });
+
+    describe('first button', function() {
+      beforeEach(function() {
+        this.button = this.task.getActionButtons()[0];
       });
 
-      describe('first button', function() {
-        beforeEach(function() {
-          this.button = this.card.getActionButtons()[0];
-        });
+      it('opens a learner answer details modal', function() {
+        var spy = spyOn(ImprovementModalService, 'openLearnerAnswerDetails');
 
-        it('opens a thread modal', function() {
-          var spy = spyOn(ImprovementModalService, 'openSuggestionThread');
+        this.button.execute();
 
-          this.button.execute();
-
-          expect(spy).toHaveBeenCalledWith(this.mockThread);
-        });
+        expect(spy).toHaveBeenCalledWith(this.mockLearnerAnswerDetails);
       });
     });
   });
