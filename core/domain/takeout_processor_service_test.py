@@ -136,11 +136,18 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             last_played_exp_version=self.EXP_VERSION,
             last_played_state_name=self.STATE_NAME).put()
 
-        # Setup for LearnerPlaylistModel
+        # Setup for LearnerPlaylistModel.
         user_models.LearnerPlaylistModel(
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS).put()
+
+        # Setup for CollectionProgressModel.
+        user_models.CollectionProgressModel(
+            id='%s.%s' % (self.USER_ID_1, self.COLLECTION_IDS[0]),
+            user_id=self.USER_ID_1,
+            collection_id=self.COLLECTION_IDS[0],
+            completed_explorations=self.EXPLORATION_IDS[0]).put()
 
     def test_export_data_nontrivial(self):
         takeout_processor_service.export_all_models(self.USER_ID_1)
@@ -214,11 +221,14 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                 'state_name': self.STATE_NAME_1
             }
         }
-
         learner_playlist_expected_data = {
             'playlist_exploration_ids': self.EXPLORATION_IDS,
             'playlist_collection_ids': self.COLLECTION_IDS
         }
+        collection_progress_expected_data = {
+            self.COLLECTION_IDS[0]: self.EXPLORATION_IDS[0]
+        }
+        
 
 
 
