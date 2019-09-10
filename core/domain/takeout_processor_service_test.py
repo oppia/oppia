@@ -1,6 +1,6 @@
 from core.tests import test_utils
 from core.platform import models
-from core.domain import takeout_processor_service
+from core.domain import takeout_processor_service, feedback_services
 import feconf
 import datetime
 
@@ -60,6 +60,8 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
     THREAD_HAS_SUGGESTION = True
     THREAD_SUMMARY = 'This is a great summary.'
     THREAD_MESSAGE_COUNT = 0
+    MESSAGE_TEXT = 'Export test text.'
+    MESSAGE_RECEIEVED_VIA_EMAIL = False
 
     def setUp(self):
         """Set up all models for use in testing"""
@@ -262,13 +264,45 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         
         expected_general_feedback_thread_data = {
             feedback_thread_model.id: {
-                'entity_type': test_export_entity_type,
-                'entity_id': test_export_entity_id,
-                'status': test_export_status,
-                'subject': test_export_subject,
-                'has_suggestion': test_export_has_suggestion,
-                'summary': test_export_summary,
-                'message_count': test_export_message_count,
+                'entity_type': self.THREAD_ENTITY_TYPE,
+                'entity_id': self.THREAD_ENTITY_ID,
+                'status': self.THREAD_STATUS,
+                'subject': self.THREAD_SUBJECT,
+                'has_suggestion': self.THREAD_HAS_SUBJECT,
+                'summary': self.THREAD_SUMMARY,
+                'message_count': self.THREAD_MESSAGE_COUNT,
                 'last_updated': feedback_thread_model.last_updated
+            }
+        }
+        thread_id = feedback_services.create_thread(
+            self.THREAD_ENTITY_TYPE,
+            self.THREAD_ENTITY_ID,
+            self.USER_ID_1,
+            self.THREAD_SUBJECT,
+            self.MESSAGE_TEXT
+        )
+        feedback_services.create_message(
+            thread_id,
+            self.USER_ID_1,
+            self.THREAD_STATUS,
+            self.THREAD_SUBJECT,
+            self.MESSAGE_TEXT
+        )
+        general_feedback_message_expected_data = {
+            thread_id + '.0': {
+                'thread_id': thread_id,
+                'message_id': 0,
+                'updated_status': self.THREAD_STATUS,
+                'updated_subject': self.THREAD_SUBJECT,
+                'text': self.MESSAGE_TEXT,
+                'received_via_email': self.MESSAGE_RECEIEVED_VIA_EMAIL
+            },
+            thread_id + '.1': {
+                'thread_id': thread_id,
+                'message_id': 1,
+                'updated_status': self.THREAD_STATUS,
+                'updated_subject': self.THREAD_SUBJECT,
+                'text': self.MESSAGE_TEXT,
+                'received_via_email': self.MESSAGE_RECEIEVED_VIA_EMAIL
             }
         }
