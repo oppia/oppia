@@ -51,6 +51,8 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
     DEGREE_OF_MASTERY = 0.5
     EXP_VERSION = 1
     STATE_NAME = 'state_name'
+    STORY_ID_1 = 'story_id_1'
+    COMPLETED_NODE_IDS_1 = ['node_id_1', 'node_id_2']
 
     def setUp(self):
         """Set up all models for use in testing"""
@@ -149,6 +151,13 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             collection_id=self.COLLECTION_IDS[0],
             completed_explorations=self.EXPLORATION_IDS[0]).put()
 
+        # Setup for StoryProgressModel.
+        user_models.StoryProgressModel(
+            id='%s.%s' % (self.USER_ID_1, self.STORY_ID_1),
+            user_id=self.USER_ID_1,
+            story_id=self.STORY_ID_1,
+            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
+
     def test_export_data_nontrivial(self):
         takeout_processor_service.export_all_models(self.USER_ID_1)
         stats_expected_user_data = {
@@ -228,8 +237,6 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         collection_progress_expected_data = {
             self.COLLECTION_IDS[0]: self.EXPLORATION_IDS[0]
         }
-        
-
-
-
-
+        story_progress_expected_data = {
+            self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
+        }
