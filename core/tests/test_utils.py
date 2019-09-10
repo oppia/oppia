@@ -32,8 +32,6 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import opportunity_domain
-from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
