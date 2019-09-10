@@ -44,6 +44,9 @@ angular.module('oppia').directive('adminMiscTab', [
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
+        ctrl.topicIdForRegeneratingOpportunities = null;
+        ctrl.regenerationMessage = null;
+
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
@@ -88,6 +91,27 @@ angular.module('oppia').directive('adminMiscTab', [
             ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
             AdminTaskManagerService.finishTask();
+          });
+        };
+
+        ctrl.regenerateOpportunitiesRelatedToTopic = function() {
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+          if (!$window.confirm(irreversibleActionMessage)) {
+            return;
+          }
+          ctrl.regenerationMessage = 'Regenerating opportunities...';
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'regenerate_topic_related_opportunities',
+            topic_id: ctrl.topicIdForRegeneratingOpportunities
+          }).then(function(response) {
+            ctrl.regenerationMessage = (
+              'No. of opportunities model created: ' +
+              response.data.opportunities_count);
+          }, function(errorResponse) {
+            ctrl.regenerationMessage = (
+              'Server error: ' + errorResponse.data.error);
           });
         };
 

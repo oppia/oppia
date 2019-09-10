@@ -1,10 +1,10 @@
 <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
   <h3>Topic Similarities</h3>
-  <div>
+  <div class="oppia-topic-similarities-container">
     Upload a csv file:<br>
     The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
     <input type="file" id="topicSimilaritiesFile">
-    <button ng-click="$ctrl.uploadTopicSimilaritiesFile()">Upload</button><br>
+    <button ng-click="$ctrl.uploadTopicSimilaritiesFile()">Upload</button>
     <button ng-click="$ctrl.downloadTopicSimilaritiesFile()">Download current topic similarities</button>
   </div>
 </md-card>
@@ -23,20 +23,41 @@
   <h3>Extract Data</h3>
   <div class="oppia-query-form">
     <form class="form" ng-submit="$ctrl.submitQuery()">
-      Exploration ID: <input type="text" ng-model="$ctrl.expId" required="true">
-      <br>
-      Exploration version: <input type="number" min="0" ng-model="$ctrl.expVersion" required="true">
-      <br>
-      State name: <input type="text" ng-model="$ctrl.stateName" required="true">
-      <br>
-      Number of answers: <input type="number" min="0" ng-model="$ctrl.numAnswers" required="true">
-      <br>
-      <input type="submit" value="submit query">
-      <input type="reset" value="reset">
+      <div class="form-group row">
+        <label>Exploration ID:</label> <input type="text" ng-model="$ctrl.expId" required="true">
+      </div>
+      <div class="form-group row">
+        <label>Exploration version:</label> <input type="number" min="0" ng-model="$ctrl.expVersion" required="true">
+      </div>
+      <div class="form-group row">
+        <label>State name:</label> <input type="text" ng-model="$ctrl.stateName" required="true">
+      </div>
+      <div class="form-group row">
+        <label>Number of answers:</label> <input type="number" min="0" ng-model="$ctrl.numAnswers" required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="submit query">
+        <input type="reset" value="reset">
+      </div>
     </form>
-    <br>
     <p> (To get all answers set number of answers to 0) </p>
     <p ng-if="$ctrl.showDataExtractionQueryStatus">Status: <[$ctrl.dataExtractionQueryStatusMessage]></p>
+  </div>
+</md-card>
+
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Regenerate contribution opportunities for a topic:</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.regenerateOpportunitiesRelatedToTopic()">
+      <div class="form-group row">
+        <label>Topic ID:</label> <input type="text" ng-model="$ctrl.topicIdForRegeneratingOpportunities" required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Regenerate">
+        <input type="reset" value="reset">
+      </div>
+    </form>
+    <p ng-if="$ctrl.regenerationMessage"><[$ctrl.regenerationMessage]></p>
   </div>
 </md-card>
 
@@ -44,7 +65,22 @@
   .oppia-admin-page-card {
     max-width: 700px
   }
-  .oppia-admin-page-card button {
+  .oppia-admin-page-card > button {
     max-width: 30%;
+  }
+  .oppia-admin-page-card.oppia-long-text p {
+    margin: 0;
+  }
+  .oppia-admin-page-card .oppia-query-form .form-group {
+    margin-left: 0;
+  }
+  .oppia-admin-page-card .oppia-query-form label {
+    font-weight: normal;
+    width: 30%;
+  }
+  .oppia-topic-similarities-container > input,
+  .oppia-topic-similarities-container > button {
+    margin: 5px 0 5px 0;
+    display: block;
   }
 </style>

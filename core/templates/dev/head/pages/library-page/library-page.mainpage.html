@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base_components/header.html', {"title": "Oppia"})
+    @require('../../base-components/header.template.html', {"title": "Oppia"})
     <base href="/search/">
     <style>
       html, body {
@@ -13,9 +13,9 @@
     <service-bootstrap></service-bootstrap>
     <div ng-controller="Base">
       <base-content>
-        <nav-options>
+        <navbar-breadcrumb>
           <search-bar></search-bar>
-        </nav-options>
+        </navbar-breadcrumb>
 
         <content>
           <library-page></library-page>

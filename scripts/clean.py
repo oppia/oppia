@@ -14,7 +14,9 @@
 
 """Deletes temporary and installed files."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
 import os
 import shutil
 
@@ -22,6 +24,10 @@ import python_utils
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+
+_PARSER = argparse.ArgumentParser(description="""
+Deletes temporary and installed files.
+""")
 
 
 def delete_directory_tree(directory_path):
@@ -47,8 +53,10 @@ def delete_file(filepath):
     os.remove(filepath)
 
 
-def main():
+def main(args=None):
     """Runs the script to clean temporary and installed files."""
+    unused_parsed_args = _PARSER.parse_args(args=args)
+
     delete_directory_tree(OPPIA_TOOLS_DIR)
     delete_directory_tree('node_modules/')
     delete_directory_tree('third_party/')

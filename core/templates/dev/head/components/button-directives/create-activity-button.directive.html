@@ -1,16 +1,16 @@
 <div class="oppia-navbar-button-container">
   <!-- User must complete the registration process. -->
-  <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
+  <button class="btn oppia-navbar-button nav-link oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
           ng-click="$ctrl.onRedirectToLogin('/creator_dashboard?mode=create')" ng-if="$ctrl.userIsLoggedIn === false">
           <!-- "userIsLoggedIn === false" is needed because we want to show the button when we know that user is not logged in
                 when userIsLoggedIn is undefined or null we don't want to show the button thus we can't use ""userIsLoggedIn"!-->
     <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_CREATE"></span>
   </button>
-  <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
+  <button class="btn nav-link oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
           ng-click="$ctrl.initCreationProcess()" ng-disabled="$ctrl.creationInProgress" ng-if="$ctrl.userIsLoggedIn">
     <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_CREATE"></span>
   </button>
-  <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200"
+  <button class="btn nav-link oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200"
           ng-click="$ctrl.showUploadExplorationModal()" ng-disabled="$ctrl.creationInProgress" ng-if="$ctrl.allowYamlFileUpload && $ctrl.userIsLoggedIn">
     <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_UPLOAD"></span>
   </button>

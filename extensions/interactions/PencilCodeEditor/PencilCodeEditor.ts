@@ -17,16 +17,17 @@
  */
 
 require(
-  'interactions/PencilCodeEditor/directives/PencilCodeEditorRulesService.ts');
+  'interactions/PencilCodeEditor/directives/' +
+  'pencil-code-editor-rules.service.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'PencilCodeEditorValidationService.ts');
+  'pencil-code-editor-validation.service.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'OppiaInteractivePencilCodeEditorDirective.ts');
+  'oppia-interactive-pencil-code-editor.directive.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'OppiaResponsePencilCodeEditorDirective.ts');
+  'oppia-response-pencil-code-editor.directive.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'OppiaShortResponsePencilCodeEditorDirective.ts');
+  'oppia-short-response-pencil-code-editor.directive.ts');

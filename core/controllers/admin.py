@@ -14,6 +14,7 @@
 
 """Controllers for the admin view."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 import random
@@ -29,6 +30,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import opportunity_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -135,6 +137,7 @@ class AdminHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         try:
+            result = {}
             if self.payload.get('action') == 'reload_exploration':
                 exploration_id = self.payload.get('exploration_id')
                 self._reload_exploration(exploration_id)
@@ -208,9 +211,19 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'upload_topic_similarities':
                 data = self.payload.get('data')
                 recommendations_services.update_topic_similarities(data)
-            self.render_json({})
+            elif self.payload.get('action') == (
+                    'regenerate_topic_related_opportunities'):
+                topic_id = self.payload.get('topic_id')
+                opportunities_count = (
+                    opportunity_services
+                    .regenerate_opportunities_related_to_topic(
+                        topic_id, delete_existing_opportunities=True))
+                result = {
+                    'opportunities_count': opportunities_count
+                }
+            self.render_json(result)
         except Exception as e:
-            self.render_json({'error': python_utils.STR(e)})
+            self.render_json({'error': python_utils.UNICODE(e)})
             raise
 
     def _reload_exploration(self, exploration_id):
