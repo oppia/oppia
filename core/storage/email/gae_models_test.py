@@ -29,6 +29,7 @@ import utils
 (base_models, email_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.email])
 
+
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
@@ -332,20 +333,6 @@ class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
         """Set up user models in datastore for use in testing."""
         super(GeneralFeedbackEmailReplyToIdTests, self).setUp()
 
-        # USER 1 has GeneralFeedbackEmailReplyToId models but no
-        # UserSubscriptionsModel.
-        email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            self.USER_ID_1, self.THREAD_ID_1).put()
-        email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            self.USER_ID_1, self.THREAD_ID_2).put()
-
-        # USER 2 has a UserSubscriptionsModel and corresponding
-        # GeneralFeedbackEmailReplyToId models for each thread ID.
-        user_models.UserSubscriptionsModel(
-            id=self.USER_ID_2,
-            general_feedback_thread_ids=(
-                [self.THREAD_ID_1, self.THREAD_ID_2])).put()
-
         # Since reply-to-id is generated using a random generator
         # that does not support seeding (SystemRandom) and whose
         # output is hashed by utils.convert_to_hash, we will
@@ -367,14 +354,7 @@ class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
             email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.USER_ID_2, self.THREAD_ID_2).put()
 
-    def test_export_data_no_subscriptions_model(self):
-        """Verify that None is returned if no UserSubscriptionsModel."""
-        user_data = (
-            email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
-                self.USER_ID_1))
-        self.assertEqual(None, user_data)
-
-    def test_export_data_on_normal_user(self):
+    def test_export_data_on_user_with_data(self):
         """Verify proper export data output on a normal user case."""
         user_data = (
             email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
@@ -383,4 +363,12 @@ class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
             self.THREAD_ID_1: self.USER_2_REPLY_TO_ID_1,
             self.THREAD_ID_2: self.USER_2_REPLY_TO_ID_2
         }
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_on_user_without_data(self):
+        """Verify proper export data output on user with no models."""
+        user_data = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
+                self.USER_ID_1))
+        expected_data = {}
         self.assertEqual(expected_data, user_data)

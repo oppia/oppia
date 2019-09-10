@@ -27,8 +27,7 @@ import utils
 
 from google.appengine.ext import ndb
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class SentEmailModel(base_models.BaseModel):
@@ -478,29 +477,12 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict or None. A dict whose keys are IDs of threads the user is
+            dict. A dict whose keys are IDs of threads the user is
             involved in. The corresponding value is the reply_to_id of that
-            thread. If the user_id does not have a corresponding
-            UserSubscriptionsModel, then this method returns None. If a thread
-            ID in UserSubscriptionsModel does not have a corresponding
-            GeneralFeedbackEmailReplyToIdModel, it is excluded from the
-            returned dict.
+            thread.
         """
-        # We use the UserSubscriptionsModel to retrieve thread_ids associated
-        # with the given user_id since GeneralFeedbackEmailReplyToIdModel
-        # does not store the user_id, so querying the datastore isn't feasible.
-        user_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            user_id, strict=False)
-        if not user_subscriptions_model:
-            return None
-
-        thread_ids = user_subscriptions_model.general_feedback_thread_ids
-        instance_ids = (
-            ['.'.join([user_id, thread_id]) for thread_id in thread_ids])
-        user_email_models = cls.get_multi(instance_ids)
-
         user_data = {}
-        for i, email_model in enumerate(user_email_models):
-            user_data[thread_ids[i]] = email_model.reply_to_id
-
+        email_reply_models = cls.get_all().filter(cls.user_id == user_id)
+        for model in email_reply_models:
+            user_data[model.thread_id] = model.reply_to_id
         return user_data
