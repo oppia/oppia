@@ -16,6 +16,7 @@
 
 """Models for Oppia users."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -535,6 +536,13 @@ class UserSubscribersModel(base_models.BaseModel):
 
     # IDs of the learners who have subscribed to this user.
     subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User subscribers can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):

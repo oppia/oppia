@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" lang="<[currentLang]>" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base_components/header.html', {"title": "Oppia"})
+    @require('../../base-components/header.template.html', {"title": "Oppia"})
 
     <!-- Updated previous version to current version of google charts
     https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
@@ -38,14 +38,15 @@
           <div class="oppia-content-container">
             <div id="wrapper">
               <div class="oppia-main-body">
-                <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="0" offset="0">
+                <nav class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection" role="navigation"
+                     headroom tolerance="0" offset="0">
                   <div class="navbar-container">
                     <top-navigation-bar></top-navigation-bar>
-                    <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
+                    <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak">
                       <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
 
+                      <exploration-save-and-publish-buttons class="ml-auto"></exploration-save-and-publish-buttons>
                       <editor-navigation></editor-navigation>
-                      <exploration-save-and-publish-buttons></exploration-save-and-publish-buttons>
                     </div>
                   </div>
                 </nav>

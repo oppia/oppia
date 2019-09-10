@@ -23,7 +23,7 @@
         </div>
         <div>
           <input class="form-control protractor-test-misconception-name-field" type="text" ng-model="misconceptionName" maxlength="50" autofocus>
-          <span ng-if="misconceptionName.length === 50" class="help-block" style="color: red; font-size: smaller">
+          <span ng-if="misconceptionName.length === 50" class="form-text" style="color: red; font-size: smaller">
             <em>Please use at most 50 characters.</em>
           </span>
         </div>
@@ -48,7 +48,7 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-add-misconception-button" ng-click="saveMisconception()" ng-disabled="!misconceptionName || misconceptionNotes.length === 0 || misconceptionFeedback.length === 0">Save</button>
   </div>
 </div>

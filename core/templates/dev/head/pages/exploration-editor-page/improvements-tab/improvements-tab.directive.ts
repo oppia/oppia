@@ -19,6 +19,10 @@
 
 require(
   'pages/exploration-editor-page/improvements-tab/' +
+  'answer-details-improvement-card/answer-details-improvement-card.directive.ts'
+);
+require(
+  'pages/exploration-editor-page/improvements-tab/' +
   'feedback-improvement-card/feedback-improvement-card.directive.ts'
 );
 require(
@@ -52,6 +56,8 @@ angular.module('oppia').directive('improvementsTab', [
             fetchedCards = cards;
           });
 
+          $scope.onlyShowOpenTasks = true;
+
           $scope.getStatusCssClass =
             ImprovementsDisplayService.getStatusCssClass;
 
@@ -64,6 +70,10 @@ angular.module('oppia').directive('improvementsTab', [
 
           $scope.isCardOpen = function(card) {
             return ImprovementsDisplayService.isOpen(card.getStatus());
+          };
+
+          $scope.isCardShown = function(card) {
+            return $scope.isCardOpen(card) || !$scope.onlyShowOpenTasks;
           };
 
           $scope.getCardTitle = function(card) {

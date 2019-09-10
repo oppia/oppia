@@ -16,6 +16,7 @@
 
 """Models for Oppia feedback threads and messages."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -76,34 +77,41 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         indexed=True, default=False, required=True)
     # The number of messages in the thread.
     message_count = ndb.IntegerProperty(indexed=True, default=0)
-    # When this thread was last updated. This overrides the field in
-    # BaseModel. We are overriding it because we do not want the last_updated
-    # field to be updated everytime the feedback thread is changed. For example,
-    # on running the job for calculating the number of messages in a thread
-    # and updating the message_count field we do not wish the last_updated field
-    # to be updated.
-    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy():
         """General feedback thread needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
-    def put(self, update_last_updated_time=True):
-        """Writes the given thread instance to the datastore.
+    @classmethod
+    def export_data(cls, user_id):
+        """Exports the data from GeneralFeedbackThreadModel
+        into dict format for Takeout.
 
         Args:
-            update_last_updated_time: bool. Whether to update the
-                last_updated_field of the thread.
+            user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            GeneralFeedbackThreadModel. The thread entity.
+            dict. Dictionary of the data from GeneralFeedbackThreadModel.
         """
-        if update_last_updated_time:
-            self.last_updated = datetime.datetime.utcnow()
 
-        return super(GeneralFeedbackThreadModel, self).put()
+        user_data = dict()
+        feedback_models = cls.get_all().filter(
+            cls.original_author_id == user_id).fetch()
 
+        for feedback_model in feedback_models:
+            user_data[feedback_model.id] = {
+                'entity_type': feedback_model.entity_type,
+                'entity_id': feedback_model.entity_id,
+                'status': feedback_model.status,
+                'subject': feedback_model.subject,
+                'has_suggestion': feedback_model.has_suggestion,
+                'summary': feedback_model.summary,
+                'message_count': feedback_model.message_count,
+                'last_updated': feedback_model.last_updated
+            }
+
+        return user_data
 
     @classmethod
     def generate_new_thread_id(cls, entity_type, entity_id):
@@ -203,6 +211,33 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
+    def export_data(cls, user_id):
+        """Exports the data from GeneralFeedbackMessageModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from GeneralFeedbackMessageModel.
+        """
+
+        user_data = dict()
+        feedback_models = cls.get_all().filter(cls.author_id == user_id).fetch()
+
+        for feedback_model in feedback_models:
+            user_data[feedback_model.id] = {
+                'thread_id': feedback_model.thread_id,
+                'message_id': feedback_model.message_id,
+                'updated_status': feedback_model.updated_status,
+                'updated_subject': feedback_model.updated_subject,
+                'text': feedback_model.text,
+                'received_via_email': feedback_model.received_via_email
+            }
+
+        return user_data
+
+    @classmethod
     def _generate_id(cls, thread_id, message_id):
         """Generates full message ID given the thread ID and message ID.
 
@@ -214,7 +249,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. Full message ID.
         """
-        return '.'.join([thread_id, python_utils.STR(message_id)])
+        return '.'.join([thread_id, python_utils.UNICODE(message_id)])
 
     @property
     def entity_id(self):
@@ -372,9 +407,12 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     user_id = ndb.StringProperty(required=False, indexed=True)
     thread_id = ndb.StringProperty(required=False, indexed=True)
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
-    # When this user thread was last updated. This overrides the field in
-    # BaseModel. We are overriding it because we do not want the last_updated
-    # field to be updated when running one off job.
+    # When this user thread was created and last updated. This overrides the
+    # fields in BaseModel. We are overriding them because we do not want the
+    # last_updated field to be updated when running one off job and whe the
+    # model is created we need to make sure that created_on is set before
+    # last updated.
+    created_on = ndb.DateTimeProperty(indexed=True, required=True)
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
     def put(self, update_last_updated_time=True):
@@ -385,7 +423,10 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         Returns:
             GeneralFeedbackThreadModel. The thread entity.
         """
-        if update_last_updated_time:
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
+
+        if update_last_updated_time or self.last_updated is None:
             self.last_updated = datetime.datetime.utcnow()
 
         return super(GeneralFeedbackThreadUserModel, self).put()
@@ -475,6 +516,13 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     num_open_threads = ndb.IntegerProperty(default=None, indexed=True)
     # Total number of feedback threads for this exploration.
     num_total_threads = ndb.IntegerProperty(default=None, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Feedback analytic model should be kept if the associated exploration
+        is public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def create(cls, model_id, num_open_threads, num_total_threads):

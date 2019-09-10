@@ -16,6 +16,7 @@
 
 """Services for exploration-related statistics."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
@@ -1142,7 +1143,6 @@ def create_learner_answer_details_model_instance(learner_answer_details):
         learner_answer_details.accumulated_answer_info_json_size_bytes)
 
 
-
 def save_learner_answer_details(
         entity_type, state_reference, learner_answer_details):
     """Saves the LearnerAnswerDetails domain object in the datatstore,
@@ -1198,10 +1198,9 @@ def record_learner_answer_info(
             value will be equal to 'exp_id:state_name' and for question
             this will be equal to 'question_id'.
         interaction_id: str. The ID of the interaction.
-        answer: dict or list or str or int or bool. The answer which is
-            submitted by the learner. Actually type of the answer is
-            interaction dependent, like TextInput interactions have
-            string type answer, NumericInput have int type answers etc.
+        answer: *(json-like). The answer which is submitted by the
+            learner. The actual type of answer depends on the
+            interaction.
         answer_details: str. The details the learner will submit when the
             learner will be asked questions like 'Hey how did you land on
             this answer', 'Why did you pick that answer' etc.
