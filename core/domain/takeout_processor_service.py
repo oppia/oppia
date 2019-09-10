@@ -40,3 +40,28 @@ def export_all_models(user_id):
 
     # Email models.
     general_feedback_email_reply_data = email_models.GeneralFeedbackEmailReplyToIdModel.export_data(user_id)
+
+    # Combine the data into a single dictionary.
+    return {
+        'stats_data': stats_data,
+        'user_settings_data': user_settings_data,
+        'user_subscriptions_data': user_subscriptions_data,
+        'user_skill_data': user_skill_data,
+        'user_contribution_data': user_contribution_data,
+        'user_skill_data': user_skill_data,
+        'user_contribution_data': user_contribution_data,
+        'user_exploration_data': user_exploration_data,
+        'completed_activities_data': completed_activities_data,
+        'incomplete_activities_data': incomplete_activities_data,
+        'last_playthrough_data': last_playthrough_data,
+        'learner_playlist_data': learner_playlist_data,
+        'collection_progress_data': collection_progress_data,
+        'story_progress_data': story_progress_data,
+        'general_feedback_thread_data': general_feedback_thread_data,
+        'general_feedback_message_data': general_feedback_message_data,
+        'collection_rights_data': collection_rights_data,
+        'general_suggestion_data': general_suggestion_data,
+        'exploration_rights_data': exploration_rights_data,
+        'story_rights_data': story_rights_data,
+        'general_feedback_email_reply_data': general_feedback_email_reply_data
+    }
