@@ -17,9 +17,9 @@
  */
 
 require('App.ts');
-require('expressions/ExpressionEvaluatorService.ts');
-require('expressions/ExpressionParserService.js');
-require('expressions/ExpressionSyntaxTreeService.ts');
+require('expressions/expression-evaluator.service.ts');
+require('expressions/expression-parser.service.js');
+require('expressions/expression-syntax-tree.service.ts');
 require('services/UtilsService.ts');
 
 describe('Expression evaluator service', function() {
