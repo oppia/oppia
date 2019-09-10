@@ -459,7 +459,18 @@ def create_skill_opportunity(skill_id, skill_description):
     Args:
         skill_id: str. The skill_id of the opportunity.
         skill_description: str. The skill_description of the opportunity.
+
+    Raises:
+        Exception: If a SkillOpportunityModel corresponding to the supplied
+            skill_id already exists.
     """
+    skill_opportunity_model = (
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
+    if skill_opportunity_model:
+        raise Exception(
+            'SkillOpportunity corresponding to skill ID %s already exists.' % (
+                skill_id))
+
     skill_opportunity = opportunity_domain.SkillOpportunity(
         skill_id=skill_id,
         skill_description=skill_description,

@@ -391,6 +391,17 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['id'], self.SKILL_ID)
         self.assertEqual(opportunity['skill_description'], 'skill_description')
 
+    def test_create_skill_opportunity_for_existing_opportunity_raises_exception(
+            self):
+        opportunity_services.create_skill_opportunity(
+            self.SKILL_ID, 'description')
+        with self.assertRaisesRegexp(
+                Exception,
+                ('SkillOpportunity corresponding to skill ID %s already exists.'
+                 % self.SKILL_ID)):
+            opportunity_services.create_skill_opportunity(
+                self.SKILL_ID, 'description')
+
     def test_update_skill_description_updates_skill_opportunity(self):
         self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
         changelist = [
