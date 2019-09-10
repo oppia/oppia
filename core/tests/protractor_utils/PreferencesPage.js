@@ -42,7 +42,7 @@ var PreferencesPage = function() {
   var learnerDashboardRadio = element(
     by.css('.protractor-test-learner-dashboard-radio'));
   var subInterest = element(
-    by.css('select2-search__field'));
+    by.css('.select2-search__field'));
 
   this.editUserBio = function(bio) {
     userBioElement.sendKeys(bio);
