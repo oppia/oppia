@@ -1,6 +1,7 @@
 from core.tests import test_utils
 from core.platform import models
 from core.domain import takeout_processor_service, feedback_services
+from constants import constants
 import feconf
 import datetime
 
@@ -165,7 +166,22 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             id='%s.%s' % (self.USER_ID_1, self.STORY_ID_1),
             user_id=self.USER_ID_1,
             story_id=self.STORY_ID_1,
-            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()        
+            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
+        
+        # Setup for CollectionRightsModel.
+        collection_models.CollectionRightsModel(
+            id=self.COLLECTION_IDS[0],
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_1],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            'cid', 'Created new collection right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_export_data_nontrivial(self):
         takeout_processor_service.export_all_models(self.USER_ID_1)
@@ -306,3 +322,13 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                 'received_via_email': self.MESSAGE_RECEIEVED_VIA_EMAIL
             }
         }
+        collection_rights_expected_data = {
+            'owned_collection_ids': (
+                [self.COLLECTION_IDS[0]]),
+            'editable_collection_ids': (
+                [self.COLLECTION_IDS[0]]),
+            'voiced_collection_ids': (
+                [self.COLLECTION_IDS[0]]),
+            'viewable_collection_ids': [self.COLLECTION_IDS[0]]
+        }
+
