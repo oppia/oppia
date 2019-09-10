@@ -19,7 +19,7 @@
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
-require('expressions/ExpressionInterpolationService.ts');
+require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/AlertsService.ts');
