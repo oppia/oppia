@@ -598,7 +598,7 @@ import html.parser  # isort:skip
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 _TARGET_STDOUT = python_utils.string_io()
-_STDOUTS = multiprocessing.Manager().list()
+_STDOUT_LIST = multiprocessing.Manager().list()
 _FILES = multiprocessing.Manager().dict()
 
 
@@ -607,8 +607,6 @@ class FileCache(python_utils.OBJECT):
 
     def __init__(self):
         self._CACHE_DATA_DICT = {}
-        # self._CACHE_LOCK_DICT = {}
-        # self._CACHE_LOCK_DICT_LOCK = threading.Lock()
 
     def read(self, filepath, mode='r'):
         """Returns the data read from the file in unicode form.
@@ -1790,6 +1788,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
             p = multiprocessing.Process(target=check)
             processes.append(p)
             p.start()
+
         for p in processes:
             p.join()
 
@@ -1869,7 +1868,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
 
         summary_messages.append(summary_message)
         self.process_manager['mandatory'] = summary_messages
-        _STDOUTS.append(stdout)
+        _STDOUT_LIST.append(stdout)
 
     def _check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
@@ -1939,7 +1938,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                     total_files_checked, total_error_count))
                 python_utils.PRINT(summary_message)
         self.process_manager['bad_pattern'] = summary_messages
-        _STDOUTS.append(stdout)
+        _STDOUT_LIST.append(stdout)
 
     def _check_patterns(self):
         """Run checks relate to bad patterns."""
@@ -2130,7 +2129,7 @@ class JsTsLintChecksManager(LintChecksManager):
             python_utils.PRINT(summary_message)
             python_utils.PRINT('')
         self.process_manager['extra'] = summary_messages
-        _STDOUTS.append(stdout)
+        _STDOUT_LIST.append(stdout)
 
     def _check_js_and_ts_component_name_and_count(self):
         """This function ensures that all JS/TS files have exactly
@@ -2186,7 +2185,7 @@ class JsTsLintChecksManager(LintChecksManager):
 
             python_utils.PRINT('')
             self.process_manager['component'] = summary_messages
-            _STDOUTS.append(stdout)
+            _STDOUT_LIST.append(stdout)
 
     def _check_directive_scope(self):
         """This function checks that all directives have an explicit
@@ -2319,7 +2318,7 @@ class JsTsLintChecksManager(LintChecksManager):
 
             python_utils.PRINT('')
             self.process_manager['directive'] = summary_messages
-            _STDOUTS.append(stdout)
+            _STDOUT_LIST.append(stdout)
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -2414,7 +2413,7 @@ class JsTsLintChecksManager(LintChecksManager):
         if self.verbose_mode_enabled:
             python_utils.PRINT('----------------------------------------')
         self.process_manager['sorted'] = summary_messages
-        _STDOUTS.append(stdout)
+        _STDOUT_LIST.append(stdout)
 
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
@@ -2477,7 +2476,7 @@ class JsTsLintChecksManager(LintChecksManager):
 
             python_utils.PRINT('')
         self.process_manager['line_breaks'] = summary_messages
-        _STDOUTS.append(stdout)
+        _STDOUT_LIST.append(stdout)
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
@@ -2843,7 +2842,7 @@ class OtherLintChecksManager(LintChecksManager):
 
             python_utils.PRINT('')
             self.process_manager['division'] = summary_messages
-            _STDOUTS.append(stdout)
+            _STDOUT_LIST.append(stdout)
 
 
     def _check_import_order(self):
@@ -2884,7 +2883,7 @@ class OtherLintChecksManager(LintChecksManager):
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
         self.process_manager['import'] = summary_messages
-        _STDOUTS.append(stdout)
+        _STDOUT_LIST.append(stdout)
 
 
     def _check_divide_and_import(self):
@@ -3052,7 +3051,7 @@ class OtherLintChecksManager(LintChecksManager):
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
         self.process_manager['docstrings'] = summary_messages
-        _STDOUTS.append(stdout)
+        _STDOUT_LIST.append(stdout)
 
     def _check_comments(self):
         """This function ensures that comments follow correct style."""
@@ -3131,7 +3130,7 @@ class OtherLintChecksManager(LintChecksManager):
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
         self.process_manager['comments'] = summary_messages
-        _STDOUTS.append(stdout)
+        _STDOUT_LIST.append(stdout)
 
 
     def _check_html_tags_and_attributes(self, debug=False):
@@ -3252,8 +3251,6 @@ class OtherLintChecksManager(LintChecksManager):
         # import_order_messages = self._check_import_order()
         self._check_divide_and_import()
         self._check_docstrings_and_comments()
-        # docstring_messages = self._check_docstrings()
-        # comment_messages = self._check_comments()
         docstring_messages = self.process_manager['docstrings']
         comment_messages = self.process_manager['comments']
         # The html tags and attributes check has an additional
@@ -3275,7 +3272,7 @@ class OtherLintChecksManager(LintChecksManager):
 def _print_complete_summary_of_errors():
     """Print complete summary of errors."""
     error_messages = _TARGET_STDOUT.getvalue()
-    piped_messages = ''.join([x.getvalue() for x in _STDOUTS])
+    piped_messages = ''.join([x.getvalue() for x in _STDOUT_LIST])
     error_messages += piped_messages
     if error_messages != '':
         python_utils.PRINT('Summary of Errors:')
