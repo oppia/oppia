@@ -107,13 +107,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_summaries = topic_services.get_multi_topic_summaries([
             self.TOPIC_ID, 'invalid_id'])
 
-        self.assertEqual(len(topic_summaries), 1)
+        self.assertEqual(len(topic_summaries), 2)
         self.assertEqual(topic_summaries[0].name, 'Name')
         self.assertEqual(topic_summaries[0].canonical_story_count, 2)
         self.assertEqual(topic_summaries[0].additional_story_count, 1)
         self.assertEqual(topic_summaries[0].total_skill_count, 2)
         self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
+        self.assertIsNone(topic_summaries[1])
+
+    def test_get_multi_rights(self):
+        topic_rights = topic_services.get_multi_topic_rights([
+            self.TOPIC_ID, 'invalid_id'])
+
+        self.assertEqual(len(topic_rights), 2)
+        self.assertEqual(topic_rights[0].id, self.TOPIC_ID)
+        self.assertEqual(topic_rights[0].manager_ids, [])
+        self.assertFalse(topic_rights[0].topic_is_published)
+        self.assertIsNone(topic_rights[1])
 
     def test_get_new_topic_id(self):
         new_topic_id = topic_services.get_new_topic_id()

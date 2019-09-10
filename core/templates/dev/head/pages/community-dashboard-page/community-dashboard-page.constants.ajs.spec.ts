@@ -38,11 +38,11 @@ describe('Community dashboard page constants', function() {
     for (var tabName in COMMUNITY_DASHBOARD_TABS_DETAILS) {
       var tabDetails = COMMUNITY_DASHBOARD_TABS_DETAILS[tabName];
       for (var infoKey in tabDetailsTemplate) {
-        expect(tabDetails.hasOwnProperty(infoKey)).toBeTruthy();
+        expect(tabDetails.hasOwnProperty(infoKey)).toBe(true);
         if (tabDetailsTemplate[infoKey] === 'string') {
           expect(typeof tabDetails[infoKey]).toEqual('string');
         } else if (tabDetailsTemplate[infoKey] === 'array') {
-          expect(Array.isArray(tabDetails[infoKey])).toBeTruthy();
+          expect(Array.isArray(tabDetails[infoKey])).toBe(true);
         }
       }
     }
