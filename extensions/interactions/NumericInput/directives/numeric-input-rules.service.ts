@@ -16,31 +16,41 @@
  * @fileoverview Rules service for the interaction.
  */
 
-angular.module('oppia').factory('NumericInputRulesService', [function() {
-  return {
-    Equals: function(answer, inputs) {
-      return answer === inputs.x;
-    },
-    IsLessThan: function(answer, inputs) {
-      return answer < inputs.x;
-    },
-    IsGreaterThan: function(answer, inputs) {
-      return answer > inputs.x;
-    },
-    IsLessThanOrEqualTo: function(answer, inputs) {
-      return answer <= inputs.x;
-    },
-    IsGreaterThanOrEqualTo: function(answer, inputs) {
-      return answer >= inputs.x;
-    },
-    IsInclusivelyBetween: function(answer, inputs) {
-      // TODO(wxy): have frontend validation at creation time to check that
-      // inputs.a <= inputs.b
-      return answer >= inputs.a && answer <= inputs.b;
-    },
-    IsWithinTolerance: function(answer, inputs) {
-      return answer >= inputs.x - inputs.tol &&
-        answer <= inputs.x + inputs.tol;
-    }
-  };
-}]);
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class NumericInputRulesService {
+  Equals(answer: number, inputs: {x: number}): boolean {
+    return answer === inputs.x;
+  }
+  IsLessThan(answer: number, inputs: {x: number}): boolean {
+    return answer < inputs.x;
+  }
+  IsGreaterThan(answer: number, inputs: {x: number}): boolean {
+    return answer > inputs.x;
+  }
+  IsLessThanOrEqualTo(answer: number, inputs: {x: number}): boolean {
+    return answer <= inputs.x;
+  }
+  IsGreaterThanOrEqualTo(answer: number, inputs: {x: number}): boolean {
+    return answer >= inputs.x;
+  }
+  IsInclusivelyBetween(
+      answer: number, inputs: {a: number, b: number}): boolean {
+    // TODO(wxy): have frontend validation at creation time to check that
+    // inputs.a <= inputs.b
+    return answer >= inputs.a && answer <= inputs.b;
+  }
+  IsWithinTolerance(
+      answer: number, inputs: {x: number, tol: number}): boolean {
+    return answer >= inputs.x - inputs.tol &&
+      answer <= inputs.x + inputs.tol;
+  }
+}
+
+angular.module('oppia').factory(
+  'NumericInputRulesService',
+  downgradeInjectable(NumericInputRulesService));
