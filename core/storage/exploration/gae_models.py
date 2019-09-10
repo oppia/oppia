@@ -601,6 +601,13 @@ class StateIdMappingModel(base_models.BaseModel):
     # from this value + 1.
     largest_state_id_used = ndb.IntegerProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """State id mapping is going to be deleted soon thus using
+        not applicable.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def create(
             cls, exp_id, exp_version, state_names_to_ids,

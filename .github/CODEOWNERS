@@ -47,8 +47,7 @@
 
 # Community contribution project
 /core/controllers/community_dashboard*.py @DubeySandeep
-/core/domain/opportunity_domain*.py @DubeySandeep
-/core/domain/opportunity_services*.py @DubeySandeep
+/core/domain/opportunity*.py @DubeySandeep
 /core/storage/opportunity/ @DubeySandeep
 /core/templates/dev/head/pages/community-dashboard-page/ @DubeySandeep
 
@@ -485,6 +484,7 @@
 /core/domain/user*.py @seanlip
 /export/ @seanlip
 /manifest.json @seanlip @vojtechjelinek
-/package*.json @seanlip @vojtechjelinek
-/scripts/install_third_party.sh @seanlip @vojtechjelinek
+/package.json @seanlip @vojtechjelinek
+/yarn.lock @seanlip @vojtechjelinek
+/scripts/install_third_party_libs.py @seanlip @vojtechjelinek
 /.github/ @DubeySandeep

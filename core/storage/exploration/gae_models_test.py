@@ -474,6 +474,11 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
 class StateIdMappingModelUnitTest(test_utils.GenericTestBase):
     """Tests for the StateIdMappingModel."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exploration_models.StateIdMappingModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_create_successfully_with_new_id(self):
         exploration_models.StateIdMappingModel.create(
             exp_id='id_0',

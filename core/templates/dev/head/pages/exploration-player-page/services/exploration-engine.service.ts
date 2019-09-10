@@ -23,7 +23,7 @@ require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('expressions/ExpressionInterpolationService.ts');
+require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('pages/exploration-player-page/services/audio-preloader.service.ts');
