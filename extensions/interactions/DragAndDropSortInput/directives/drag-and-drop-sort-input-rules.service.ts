@@ -24,7 +24,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 @Injectable({
   providedIn: 'root'
 })
-
 export class DragAndDropSortInputRulesService {
   static checkEquality(answer: string[][],
       inputs: {x: string[][]}): boolean {

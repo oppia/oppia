@@ -16,27 +16,24 @@
  * @fileoverview Unit tests for Interactive Map rules.
  */
 
-require(
-  'interactions/InteractiveMap/directives/' +
-  'interactive-map-rules.service.ts');
+import { InteractiveMapRulesService } from
+  'interactions/InteractiveMap/directives/interactive-map-rules.service';
 
-describe('Numeric Input service', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Numeric Input service', () => {
+  let imrs: InteractiveMapRulesService = null;
+  beforeEach(() => {
+    imrs = new InteractiveMapRulesService();
+  });
 
-  var imrs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    imrs = $injector.get('InteractiveMapRulesService');
-  }));
+  var RADIUS_OF_EARTH_KM: number = 6371.0;
+  var QUARTER_CIRCUMFERENCE_KM: number = 0.5 * Math.PI * RADIUS_OF_EARTH_KM;
+  var HALF_CIRCUMFERENCE_KM: number = 2 * QUARTER_CIRCUMFERENCE_KM;
+  var DELTA_KM: number = 5;
+  var NORTH_POLE: number[] = [90, 0];
+  var SOUTH_POLE: number[] = [-90, 0];
+  var EQUATOR_ORIGIN: number[] = [0, 0];
 
-  var RADIUS_OF_EARTH_KM = 6371.0;
-  var QUARTER_CIRCUMFERENCE_KM = 0.5 * Math.PI * RADIUS_OF_EARTH_KM;
-  var HALF_CIRCUMFERENCE_KM = 2 * QUARTER_CIRCUMFERENCE_KM;
-  var DELTA_KM = 5;
-  var NORTH_POLE = [90, 0];
-  var SOUTH_POLE = [-90, 0];
-  var EQUATOR_ORIGIN = [0, 0];
-
-  it('should have a correct \'within\' rule', function() {
+  it('should have a correct \'within\' rule', () => {
     expect(imrs.Within(EQUATOR_ORIGIN, {
       p: [0, 180],
       d: HALF_CIRCUMFERENCE_KM + DELTA_KM
@@ -103,7 +100,7 @@ describe('Numeric Input service', function() {
     })).toBe(false);
   });
 
-  it('should have a correct \'not within\' rule', function() {
+  it('should have a correct \'not within\' rule', () => {
     expect(imrs.NotWithin(EQUATOR_ORIGIN, {
       p: [0, 180],
       d: HALF_CIRCUMFERENCE_KM + DELTA_KM
