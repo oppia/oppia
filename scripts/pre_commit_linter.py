@@ -28,7 +28,7 @@ IMPORTANT NOTES:
 1.  Before running this script, you must install third-party dependencies by
     running
 
-        bash scripts/start.sh
+        python -m scripts.install_third_party_libs
 
     at least once.
 
@@ -413,7 +413,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\Winput\('),
+        'regexp': re.compile(r'[^.|\w]input\('),
         'message': 'Please use python_utils.INPUT.',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -527,8 +527,9 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/core/storage/',
     '/export/',
     '/manifest.json',
-    '/package*.json',
-    '/scripts/install_third_party.sh',
+    '/package.json',
+    '/yarn.lock',
+    '/scripts/install_third_party_libs.py',
     '/.github/']
 
 if not os.getcwd().endswith('oppia'):
@@ -540,7 +541,8 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 if not os.path.exists(_PYLINT_PATH):
     python_utils.PRINT('')
-    python_utils.PRINT('ERROR    Please run start.sh first to install pylint ')
+    python_utils.PRINT(
+        'ERROR  Please run install_third_party_libs.py first to install pylint')
     python_utils.PRINT('         and its dependencies.')
     sys.exit(1)
 
@@ -563,7 +565,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.8.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.2.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.8'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-3.13.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
@@ -3326,11 +3328,11 @@ def _join_linting_process(linting_processes, result_queues):
     return summary_messages
 
 
-def main():
+def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
     """
-    parsed_args = _PARSER.parse_args()
+    parsed_args = _PARSER.parse_args(args=args)
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
@@ -3340,7 +3342,7 @@ def main():
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('No files to check.')
         python_utils.PRINT('---------------------------')
-        sys.exit(1)
+        return
 
     read_files(all_filepaths)
     categorize_files(all_filepaths)

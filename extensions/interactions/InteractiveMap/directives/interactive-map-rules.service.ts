@@ -16,37 +16,49 @@
  * @fileoverview Rules service for the interaction.
  */
 
-angular.module('oppia').factory('InteractiveMapRulesService', [
-  function() {
-    var RADIUS_OF_EARTH_KM = 6371.0;
-    var degreesToRadians = function(angle) {
-      return angle / 180 * Math.PI;
-    };
-    var getDistanceInKm = function(point1, point2) {
-      var latitude1 = degreesToRadians(point1[0]);
-      var latitude2 = degreesToRadians(point2[0]);
-      var latitudeDifference = degreesToRadians(point2[0] - point1[0]);
-      var longitudeDifference = degreesToRadians(point2[1] - point1[1]);
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-      // Use the haversine formula
-      var haversineOfCentralAngle = (
-        Math.pow(Math.sin(latitudeDifference / 2), 2) +
-        Math.cos(latitude1) * Math.cos(latitude2) *
-        Math.pow(Math.sin(longitudeDifference / 2), 2));
+@Injectable({
+  providedIn: 'root'
+})
+export class InteractiveMapRulesService {
+  static RADIUS_OF_EARTH_KM = 6371.0;
+  static degreesToRadians(angle: number): number {
+    return angle / 180 * Math.PI;
+  }
+  static getDistanceInKm(point1: number[], point2: number[]): number {
+    var latitude1: number = InteractiveMapRulesService.degreesToRadians(
+      point1[0]);
+    var latitude2: number = InteractiveMapRulesService.degreesToRadians(
+      point2[0]);
+    var latitudeDifference: number = (
+      InteractiveMapRulesService.degreesToRadians(point2[0] - point1[0]));
+    var longitudeDifference: number = (
+      InteractiveMapRulesService.degreesToRadians(point2[1] - point1[1]));
 
-      return RADIUS_OF_EARTH_KM *
-        2 * Math.asin(Math.sqrt(haversineOfCentralAngle));
-    };
+    // Use the haversine formula
+    var haversineOfCentralAngle: number = (
+      Math.pow(Math.sin(latitudeDifference / 2), 2) +
+      Math.cos(latitude1) * Math.cos(latitude2) *
+      Math.pow(Math.sin(longitudeDifference / 2), 2));
 
-    return {
-      Within: function(answer, inputs) {
-        var actualDistance = getDistanceInKm(inputs.p, answer);
-        return actualDistance <= inputs.d;
-      },
-      NotWithin: function(answer, inputs) {
-        var actualDistance = getDistanceInKm(inputs.p, answer);
-        return actualDistance > inputs.d;
-      }
-    };
-  }]
-);
+    return InteractiveMapRulesService.RADIUS_OF_EARTH_KM *
+      2 * Math.asin(Math.sqrt(haversineOfCentralAngle));
+  }
+
+  Within(answer: number[], inputs: {p: number[], d: number}) {
+    var actualDistance = InteractiveMapRulesService.getDistanceInKm(
+      inputs.p, answer);
+    return actualDistance <= inputs.d;
+  }
+  NotWithin(answer: number[], inputs: {p: number[], d: number}) {
+    var actualDistance = InteractiveMapRulesService.getDistanceInKm(
+      inputs.p, answer);
+    return actualDistance > inputs.d;
+  }
+}
+
+angular.module('oppia').factory(
+  'InteractiveMapRulesService',
+  downgradeInjectable(InteractiveMapRulesService));

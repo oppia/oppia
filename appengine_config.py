@@ -110,6 +110,3 @@ for lib_path in THIRD_PARTY_LIBS:
     if not os.path.isdir(lib_path):
         raise Exception('Invalid path for third_party library: %s' % lib_path)
     sys.path.insert(0, lib_path)
-
-# Required, otherwise MapReduce third-party library will throw errors.
-os.environ['PYTHONPATH'] = ','.join(sys.path)
