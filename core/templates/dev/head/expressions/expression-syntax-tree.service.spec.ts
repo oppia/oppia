@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ExpressionSyntaxTreeService.ts
+ * @fileoverview Unit tests for expression-syntax-tree.service.ts
  */
 
 require('App.ts');
-require('expressions/ExpressionSyntaxTreeService.ts');
+require('expressions/expression-syntax-tree.service.ts');
 
 describe('Expression syntax tree service', () => {
   beforeEach(angular.mock.module('oppia'));

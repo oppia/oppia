@@ -297,10 +297,10 @@ class BuildTests(test_utils.GenericTestBase):
         service_js_filepath = os.path.join(
             'local_compiled_js', 'core', 'pages', 'AudioService.js')
         generated_parser_js_filepath = os.path.join(
-            'core', 'expressions', 'ExpressionParserService.js')
+            'core', 'expressions', 'expression-parser.service.js')
         compiled_generated_parser_js_filepath = os.path.join(
             'local_compiled_js', 'core', 'expressions',
-            'ExpressionParserService.js')
+            'expression-parser.service.js')
         service_ts_filepath = os.path.join('core', 'pages', 'AudioService.ts')
         spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
         protractor_filepath = os.path.join('extensions', 'protractor.js')
@@ -330,7 +330,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         with self.swap(
             build, 'JS_FILEPATHS_NOT_TO_BUILD', (
-                'core/expressions/ExpressionParserService.js',)):
+                'core/expressions/expression-parser.service.js',)):
             self.assertFalse(
                 build.should_file_be_built(generated_parser_js_filepath))
             self.assertTrue(
