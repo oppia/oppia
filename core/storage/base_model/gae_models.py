@@ -87,6 +87,16 @@ class BaseModel(ndb.Model):
         raise NotImplementedError
 
     @staticmethod
+    def has_reference_to_user_id(user_id):
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError
+
+    @staticmethod
     def export_data(user_id):
         """This method should be implemented by subclasses.
 

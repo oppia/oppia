@@ -32,6 +32,12 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            recommendations_models.ExplorationRecommendationsModel
+            .has_reference_to_user_id('any_id')
+        )
+
 
 class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSimilaritiesModel class."""
@@ -40,3 +46,9 @@ class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             recommendations_models.TopicSimilaritiesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            recommendations_models.TopicSimilaritiesModel
+            .has_reference_to_user_id('any_id')
+        )

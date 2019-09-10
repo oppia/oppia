@@ -44,6 +44,16 @@ class ExplorationRecommendationsModel(
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def has_reference_to_user_id(_):
+        """ExplorationRecommendationsModel doesn't reference any user_id
+        directly.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return False
+
 
 class TopicSimilaritiesModel(base_models.BaseModel):
     """This model stores the similarity between any two topics. The topic
@@ -63,3 +73,13 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     def get_deletion_policy():
         """Topic similarities is one instance only model."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def has_reference_to_user_id(_):
+        """TopicSimilaritiesModel doesn't reference any user_id
+        directly.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return False
