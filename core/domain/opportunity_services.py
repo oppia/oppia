@@ -458,7 +458,7 @@ def create_skill_opportunity(skill_id, skill_description):
 
     Args:
         skill_id: str. The skill_id of the opportunity.
-        new_description: str. The skill_description of the opportunity.
+        skill_description: str. The skill_description of the opportunity.
     """
     skill_opportunity = opportunity_domain.SkillOpportunity(
         skill_id=skill_id,
