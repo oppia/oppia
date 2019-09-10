@@ -2,6 +2,7 @@ from core.tests import test_utils
 from core.platform import models
 from core.domain import takeout_processor_service
 import feconf
+import datetime
 
 (user_models, collection_models, exploration_models, story_models,
  feedback_models, suggestion_models,
@@ -114,11 +115,17 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             draft_change_list_exp_version=3,
             draft_change_list_id=1).put()
         
+        # Setup for CompletedActivitiesModel.
         user_models.CompletedActivitiesModel(
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS).put()
 
+        # Setup for IncompleteACtivitiesModel.
+        user_models.IncompleteActivitiesModel(
+            id=self.USER_ID_1,
+            exploration_ids=self.EXPLORATION_IDS,
+            collection_ids=self.COLLECTION_IDS).put()
 
     def test_export_data_nontrivial(self):
         takeout_processor_service.export_all_models(self.USER_ID_1)
@@ -179,8 +186,13 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             }
         }
         completed_expected_data = {
-            'completed_exploration_ids': self.EXPLORATION_IDS_1,
-            'completed_collection_ids': self.COLLECTION_IDS_1
+            'completed_exploration_ids': self.EXPLORATION_IDS,
+            'completed_collection_ids': self.COLLECTION_IDS
         }
-        
+        incomplete_expected_data = {
+            'incomplete_exploration_ids': self.EXPLORATION_IDS,
+            'incomplete_collection_ids': self.COLLECTION_IDS
+        }
+
+
 
