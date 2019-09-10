@@ -388,7 +388,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
         opportunity = skill_opportunities[0]
-        self.assertEqual(opportunity['skill_id'], self.SKILL_ID)
+        self.assertEqual(opportunity['id'], self.SKILL_ID)
         self.assertEqual(opportunity['skill_description'], 'skill_description')
 
     def test_update_skill_description_updates_skill_opportunity(self):
@@ -414,7 +414,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
-        self.assertEqual(opportunity['skill_id'], self.SKILL_ID)
+        self.assertEqual(opportunity['id'], self.SKILL_ID)
         self.assertEqual(opportunity['skill_description'], 'new_description')
 
     def test_delete_skill_deletes_skill_opportunity(self):
@@ -446,7 +446,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.create_skill_opportunity(self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
 
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)

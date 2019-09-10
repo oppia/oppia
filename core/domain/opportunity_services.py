@@ -477,9 +477,10 @@ def update_skill_opportunity_skill_description(skill_id, new_description):
         new_description: str. The new skill_description.
     """
     skill_opportunity_model = (
-        opportunity_models.SkillOpportunityModel.get(skill_id))
-    skill_opportunity_model.skill_description = new_description
-    skill_opportunity_model.put()
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
+    if skill_opportunity_model:
+        skill_opportunity_model.skill_description = new_description
+        skill_opportunity_model.put()
 
 
 def delete_skill_opportunities(skill_id):
@@ -490,7 +491,7 @@ def delete_skill_opportunities(skill_id):
             SkillOpportunityModel.
     """
     skill_opportunity_model = (
-        opportunity_models.SkillOpportunityModel.get(skill_id))
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
     opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
 
 
@@ -541,7 +542,7 @@ def _update_skill_opportunity_question_count(skill_ids, delta):
     updated_models = []
     for skill_id in skill_ids:
         skill_opportunity_model = (
-            opportunity_models.SkillOpportunityModel.get(skill_id))
+            opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
         if skill_opportunity_model:
             skill_opportunity_model.question_count += delta
             updated_models.append(skill_opportunity_model)
