@@ -14,7 +14,7 @@
 
 /*******************************************************************************
  * NOTE TO DEVELOPERS
- * If you update this file you must run create_expression_parser.sh script to
+ * If you update this file you must run create_expression_parser.py script to
  * generate the parser JS file. See instructions in README.txt.
  ******************************************************************************/
 

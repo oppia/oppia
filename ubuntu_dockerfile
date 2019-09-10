@@ -18,10 +18,10 @@
 #
 # This Dockerfile allows for an easy installation of Oppia for Windows
 # users and a more reliable testing environment for running test scripts.
-# 
+#
 # Current known limitations:
 #   - no support for run_e2e_tests.sh
-#   - run_frontend_tests.sh might not run correctly every time
+#   - run_frontend_tests.py might not run correctly every time
 #
 # For more detailed instructions, go to the Windows page on here:
 # https://github.com/oppia/oppia/wiki/Installing-Oppia
@@ -99,10 +99,10 @@
 #   docker start {container_name}
 #
 # If this does not output names of containers, run:
-#   docker images 
+#   docker images
 # to get the name of a previously built image and follow step 4 from the
-# prerequisite instructions. 
-# 
+# prerequisite instructions.
+#
 # Then return to step 1 to ensure that the container is running.
 #
 ########## UPDATE THE FILES IN THE CONTAINER WITH YOUR LOCAL REPO
@@ -116,11 +116,11 @@
 #   docker cp {path\to\src} {container_name}:/home/oppia/{path/to/dest}
 #      where {path\to\src} can be the relative path to a file or folder
 #      and {path/to/dest} is the path within the /home/oppia directory
-#      in the container. 
+#      in the container.
 #   ex: docker cp .\core\domain\. oppia_container:/home/oppia/core/domain/
 #
 # If you do not remember what files you have edited, run:
-#   docker cp .\. {container_name}:/home/oppia/ 
+#   docker cp .\. {container_name}:/home/oppia/
 #      in the oppia root directory to copy over the entire oppia/ directory
 #      into the container.
 # Note: This will take ~10 minutes to copy over all of the files.
@@ -136,11 +136,11 @@
 # Now you should have a new terminal prompt "root@...". Run the start.sh
 # script:
 #
-#   bash scripts/start.sh
+#   python -m scripts.start
 #
 # Runtime: 10-20 minutes
 # The script opens a server at localhost:8181. After the terminal prints
-# "INFO ... http://0.0.0.0:8181" or "+ 27 hidden modules", open 
+# "INFO ... http://0.0.0.0:8181" or "+ 27 hidden modules", open
 # localhost:8181 in your local computer browser. If the Oppia server does
 # not load, restart this step.
 #
@@ -152,9 +152,9 @@
 # Start bash in the Docker image (follow steps 1-4 above).
 #
 # STEP 2
-# Run the run_frontend_tests.sh script:
+# Run the run_frontend_tests.py script:
 #
-#   bash scripts/run_frontend_tests.sh
+#   python -m scripts.run_frontend_tests
 #
 # Runtime: 3-7 minutes
 # If this outputs an error ("failed before timeout of 2000ms"), continue
