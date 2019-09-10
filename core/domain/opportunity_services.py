@@ -452,20 +452,39 @@ def get_skill_opportunities(cursor):
     return opportunities, cursor, more
 
 
-def create_skill_opportunity(skill_opportunity):
+def create_skill_opportunity(skill_id, skill_description):
     """Creates a skill opportunity domain object as a SkillOpportunityModel
     entity in the datastore.
 
     Args:
-        skill_opportunity: The skill opportunity domain object to be saved in
-            the datastore.
+        skill_id: str. The skill_id of the opportunity.
+        new_description: str. The skill_description of the opportunity.
     """
-    skill_opportunity_model = opportunity_models.SkillOpportunityModel(
-        id=skill_opportunity.id,
-        skill_description=skill_opportunity.skill_description,
-        question_count=skill_opportunity.question_count,
+    skill_opportunity = opportunity_domain.SkillOpportunity(
+        skill_id=skill_id,
+        skill_description=skill_description,
+        question_count=0
     )
-    skill_opportunity_model.put()
+    _save_skill_opportunities([skill_opportunity])
+
+
+def _save_skill_opportunities(skill_opportunities):
+    """Saves SkillOpportunity domain objects into datastore as
+    SkillOpportunityModel objects.
+
+    Args:
+        skill_opportunities: list(SkillOpportunity). A list of SkillOpportunity
+            domain objects.
+    """
+    skill_opportunity_models = []
+    for skill_opportunity in skill_opportunities:
+        model = opportunity_models.SkillOpportunityModel(
+            id=skill_opportunity.id,
+            skill_description=skill_opportunity.skill_description,
+            question_count=skill_opportunity.question_count,
+        )
+        skill_opportunity_models.append(model)
+    opportunity_models.SkillOpportunityModel.put_multi(skill_opportunity_models)
 
 
 def update_skill_opportunity_skill_description(skill_id, new_description):
@@ -476,14 +495,32 @@ def update_skill_opportunity_skill_description(skill_id, new_description):
         skill_id: str. The corresponding skill_id of the opportunity.
         new_description: str. The new skill_description.
     """
+    skill_opportunity = _get_skill_opportunity(skill_id)
+    if skill_opportunity:
+        skill_opportunity.skill_description = new_description
+        _save_skill_opportunities([skill_opportunity])
+
+
+def _get_skill_opportunity(skill_id):
+    """Returns the SkillOpportunity domain object representing a
+    SkillOpportunityModel with the supplied skill_id in the datastore.
+
+    Args:
+        skill_id: str. The corresponding skill_id of the opportunity.
+
+    Returns:
+        SkillOpportunity or None. The domain object representing a
+            SkillOpportunity with the supplied skill_id, or None if it does not
+            exist.
+    """
     skill_opportunity_model = (
         opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
     if skill_opportunity_model:
-        skill_opportunity_model.skill_description = new_description
-        skill_opportunity_model.put()
+        return get_skill_opportunity_from_model(skill_opportunity_model)
+    return None
 
 
-def delete_skill_opportunities(skill_id):
+def delete_skill_opportunity(skill_id):
     """Deletes the SkillOpportunityModel corresponding to the supplied skill_id.
 
     Args:
@@ -504,11 +541,12 @@ def update_skill_opportunity_question_counts(skill_ids, delta):
             SkillOpportunityModel(s).
         delta: int. The delta for which to update each question_count.
     """
-    updated_models = _update_skill_opportunity_question_count(skill_ids, delta)
-    opportunity_models.SkillOpportunityModel.put_multi(updated_models)
+    updated_skill_opportunities = _update_skill_opportunity_question_count(
+        skill_ids, delta)
+    _save_skill_opportunities(updated_skill_opportunities)
 
 
-def compute_question_linked_skill_ids_update(old_skill_ids, new_skill_ids):
+def update_question_skill_ids_question_count(old_skill_ids, new_skill_ids):
     """Updates question_count(s) of SkillOpportunityModel(s) by the set
     difference of new_skill_ids - old_skill_ids.
 
@@ -520,33 +558,35 @@ def compute_question_linked_skill_ids_update(old_skill_ids, new_skill_ids):
     new_skill_ids_set = set(new_skill_ids)
     added = new_skill_ids_set - old_skill_ids_set
     removed = old_skill_ids_set - new_skill_ids_set
-    updated_models = []
-    updated_models.extend(_update_skill_opportunity_question_count(added, 1))
-    updated_models.extend(_update_skill_opportunity_question_count(removed, -1))
-    opportunity_models.SkillOpportunityModel.put_multi(updated_models)
+    updated_skill_opportunities = []
+    updated_skill_opportunities.extend(
+        _update_skill_opportunity_question_count(added, 1))
+    updated_skill_opportunities.extend(
+        _update_skill_opportunity_question_count(removed, -1))
+    _save_skill_opportunities(updated_skill_opportunities)
 
 
 def _update_skill_opportunity_question_count(skill_ids, delta):
-    """Returns a list of SkillOpportunityModel(s) with corresponding skill_ids
+    """Returns a list of SkillOpportunities with corresponding skill_ids
     with question_count(s) updated by delta.
 
     Args:
-        skill_ids: iterable(str). The skill_ids of the SkillOpportunityModel(s).
+        skill_ids: iterable(str). The IDs of the matching SkillOpportunityModels
+            in the datastore.
         delta: int. The delta for which to update each question_count (can be
             negative).
 
     Returns:
-        updated_models. list(SkillOpportunityModel) The updated
-            SkillOpportunityModel(s).
+        updated_skill_opportunities. list(SkillOpportunity) The updated
+            SkillOpportunities.
     """
-    updated_models = []
+    updated_skill_opportunities = []
     for skill_id in skill_ids:
-        skill_opportunity_model = (
-            opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
-        if skill_opportunity_model:
-            skill_opportunity_model.question_count += delta
-            updated_models.append(skill_opportunity_model)
-    return updated_models
+        skill_opportunity = _get_skill_opportunity(skill_id)
+        if skill_opportunity:
+            skill_opportunity.question_count += delta
+            updated_skill_opportunities.append(skill_opportunity)
+    return updated_skill_opportunities
 
 
 def regenerate_opportunities_related_to_topic(

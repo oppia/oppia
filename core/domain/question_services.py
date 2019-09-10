@@ -176,7 +176,7 @@ def _update_linked_skill_ids_of_question(
     change_list = [question_domain.QuestionChange(change_dict)]
     update_question(
         user_id, question_id, change_list, 'updated linked skill ids')
-    opportunity_services.compute_question_linked_skill_ids_update(
+    opportunity_services.update_question_skill_ids_question_count(
         old_linked_skill_ids, new_linked_skill_ids)
 
 

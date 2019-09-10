@@ -429,11 +429,8 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
     skill.version += 1
     create_skill_summary(skill.id)
     opportunity_services.create_skill_opportunity(
-        opportunity_domain.SkillOpportunity(
-            skill_id=skill.id,
-            skill_description=skill.description,
-            question_count=0
-        )
+        skill_id=skill.id,
+        skill_description=skill.description
     )
 
 
@@ -706,7 +703,7 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
     # Delete the summary of the skill (regardless of whether
     # force_deletion is True or not).
     delete_skill_summary(skill_id)
-    opportunity_services.delete_skill_opportunities(skill_id)
+    opportunity_services.delete_skill_opportunity(skill_id)
 
 
 def delete_skill_summary(skill_id):
