@@ -433,6 +433,9 @@ angular.module('oppia').directive('conversationSkin', [
               FEEDBACK_POPOVER_PATH);
           };
 
+          var alwaysAskLearnerForAnswerDetails = (
+            ExplorationEngineService.getAlwaysAskLearnerForAnswerDetails);
+
           $scope.canAskLearnerForAnswerInfo = (
             LearnerAnswerInfoService.canAskLearnerForAnswerInfo);
 
@@ -855,11 +858,13 @@ angular.module('oppia').directive('conversationSkin', [
               }
             }
 
-            if (!$scope.isInPreviewMode &&
+            if (!ExplorationPlayerStateService.isInQuestionMode() &&
+              !$scope.isInPreviewMode &&
               ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
               initLearnerAnswerInfoService(
                 $scope.explorationId, ExplorationEngineService.getState(),
-                answer, interactionRulesService);
+                answer, interactionRulesService,
+                alwaysAskLearnerForAnswerDetails());
             }
 
             NumberAttemptsService.submitAttempt();

@@ -17,16 +17,22 @@
 """Feature detection utilities for Python 2 and Python 3."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import io
 import os
 import sys
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
+_FUTURE_PATH = os.path.join(os.getcwd(), 'third_party', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
+
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+sys.path.insert(0, _YAML_PATH)
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
+import yaml  # isort:skip
+
 import builtins  # isort:skip
 import future.utils  # isort:skip
 import past.builtins  # isort:skip
@@ -43,11 +49,11 @@ OBJECT = builtins.object
 PRINT = print
 RANGE = builtins.range
 ROUND = builtins.round
-STR = builtins.str
+UNICODE = builtins.str
 ZIP = builtins.zip
 
 
-def string_io(buffer_value=''):
+def string_io(buffer_value=b''):
     """Returns StringIO from StringIO module if run under Python 2 and from io
     module if run under Python 3.
 
@@ -374,6 +380,54 @@ def convert_to_bytes(string_to_convert):
     Returns:
         bytes. The encoded string.
     """
-    if isinstance(string_to_convert, STR):
+    if isinstance(string_to_convert, UNICODE):
         return string_to_convert.encode('utf-8')
     return bytes(string_to_convert)
+
+
+def _recursively_convert_to_str(value):
+    """Convert all builtins.bytes and builtins.str elements in a data structure
+    to bytes and unicode respectively. This is required for the
+    yaml.safe_dump() function to work as it only works for unicode and bytes and
+    not builtins.bytes nor builtins.str(UNICODE). See:
+    https://stackoverflow.com/a/1950399/11755830
+
+    Args:
+        value: list|dict|BASESTRING. The data structure to convert.
+
+    Returns:
+        list|dict|bytes|unicode. The data structure in bytes and unicode.
+    """
+    if isinstance(value, list):
+        return [_recursively_convert_to_str(e) for e in value]
+    elif isinstance(value, dict):
+        return {
+            _recursively_convert_to_str(k): _recursively_convert_to_str(
+                v) for k, v in value.items()}
+    # We are using 'type' here instead of 'isinstance' because we need to
+    # clearly distinguish the builtins.str and builtins.bytes strings.
+    elif type(value) == future.types.newstr:  # pylint: disable=unidiomatic-typecheck
+        temp = str(value.encode('utf-8'))
+        # Remove the b'' prefix from the string.
+        return temp[2:-1].decode('utf-8')
+    elif type(value) == future.types.newbytes:  # pylint: disable=unidiomatic-typecheck
+        temp = bytes(value)
+        # Remove the b'' prefix from the string.
+        return temp[2:-1]
+    else:
+        return value
+
+
+def yaml_from_dict(dictionary, width=80):
+    """Gets the YAML representation of a dict.
+
+    Args:
+        dictionary: dict. Dictionary for conversion into yaml.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
+
+    Returns:
+        str. Converted yaml of the passed dictionary.
+    """
+    dictionary = _recursively_convert_to_str(dictionary)
+    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)

@@ -16,6 +16,7 @@
 
 """Commands for feedback thread and message operations."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -932,10 +933,8 @@ def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
     # at most one user who does not have FeedbackEmailReplyToIdModel instance.
     for user_id in user_ids:
         if feedback_email_id_models[user_id] is None:
-            new_model = (
-                email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                    user_id, thread_id))
-            new_model.put()
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                user_id, thread_id)
 
 
 def _add_message_to_email_buffer(

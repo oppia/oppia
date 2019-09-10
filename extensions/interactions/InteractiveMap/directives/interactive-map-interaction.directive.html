@@ -1,0 +1,39 @@
+<style>
+  .oppia-interactive-map {
+    height: 400px;
+    margin: auto;
+    max-height: 400px;
+    max-width: 560px;
+    min-width: 560px;
+    width: 560px;
+  }
+
+  .interactive-map-container {
+    background: #fff;
+    padding: 8px;
+  }
+
+  @media screen and (max-width: 559px) {
+    .oppia-interactive-map {
+      max-width: 83vw;
+      min-width: 83vw;
+      width: 83vw;
+    }
+
+    .interactive-map-container {
+      padding: 8px 0;
+    }
+  }
+</style>
+
+<div class="$ctrl.interactive-map-container">
+  <div ng-style="$ctrl.overlayStyle">
+    <leaflet id="interactiveMap"
+             class="oppia-interactive-map"
+             defaults="$ctrl.mapOptions.defaults"
+             event-broadcast="$ctrl.mapOptions.events"
+             lf-center="$ctrl.mapOptions.center"
+             markers="$ctrl.mapMarkers">
+    </leaflet>
+  </div>
+</div>

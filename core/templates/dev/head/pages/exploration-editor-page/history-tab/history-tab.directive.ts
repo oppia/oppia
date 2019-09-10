@@ -59,6 +59,8 @@ angular.module('oppia').directive('historyTab', [
               '/createhandler/snapshots/' + ctrl.explorationId;
           ctrl.revertExplorationUrl =
             '/createhandler/revert/' + ctrl.explorationId;
+          ctrl.explorationDownloadUrl =
+            '/createhandler/download/' + ctrl.explorationId;
 
           /* Variable definitions:
           *

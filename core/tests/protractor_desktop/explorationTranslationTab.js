@@ -21,6 +21,8 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage = require(
   '../protractor_utils/CreatorDashboardPage.js');
 
@@ -29,6 +31,7 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
 describe('Exploration translation and voiceover tab', function() {
+  var adminPage = null;
   var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
@@ -39,6 +42,7 @@ describe('Exploration translation and voiceover tab', function() {
   var RED_STATE_PROGRESS_COLOR = 'rgb(209, 72, 54)';
 
   beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -47,6 +51,11 @@ describe('Exploration translation and voiceover tab', function() {
 
     users.createUser('voiceArtist@translationTab.com', 'userVoiceArtist');
     users.createUser('user@editorTab.com', 'userEditor');
+    users.createAndLoginAdminUser('superUser@translationTab.com', 'superUser');
+    // TODO(#7569): Change this test to work with the improvements tab.
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean', (elem) => elem.setValue(false));
     users.login('user@editorTab.com');
     workflow.createExploration();
 
@@ -84,7 +93,6 @@ describe('Exploration translation and voiceover tab', function() {
       'Run tests using same exploration.');
     explorationEditorPage.saveChanges('Done!');
     workflow.addExplorationVoiceArtist('userVoiceArtist');
-    users.logout();
   });
 
   it('should walkthrough translation tutorial when user clicks next',
