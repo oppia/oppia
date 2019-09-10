@@ -49,6 +49,8 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
     DEGREE_OF_MASTERY = 0.5
+    EXP_VERSION = 1
+    STATE_NAME = 'state_name'
 
     def setUp(self):
         """Set up all models for use in testing"""
@@ -126,6 +128,13 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS).put()
+        
+        # Setup for ExpUserLastPlaythroughModel.
+        user_models.ExpUserLastPlaythroughModel(
+            id='%s.%s' % (self.USER_ID_1, self.EXPLORATION_IDS[0]),
+            user_id=self.USER_ID_1, exploration_id=self.EXPLORATION_IDS[0],
+            last_played_exp_version=self.EXP_VERSION,
+            last_played_state_name=self.STATE_NAME).put()
 
     def test_export_data_nontrivial(self):
         takeout_processor_service.export_all_models(self.USER_ID_1)
@@ -192,6 +201,12 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         incomplete_expected_data = {
             'incomplete_exploration_ids': self.EXPLORATION_IDS,
             'incomplete_collection_ids': self.COLLECTION_IDS
+        }
+        last_playthrough_expected_data = {
+            self.EXPLORATION_IDS[0]: {
+                'exp_version': self.EXP_VERSION,
+                'state_name': self.STATE_NAME_1
+            }
         }
 
 
