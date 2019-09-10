@@ -40,6 +40,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             }
         }
     ]
+    EXPLORATION_IDS = ['exp_1']
     CREATOR_IDS = ['4', '8', '16']
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
@@ -47,7 +48,6 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
     DEGREE_OF_MASTERY = 0.5
-    EXP_ID_1 = 'exp_1'
 
     def setUp(self):
         """Set up all models for use in testing"""
@@ -95,10 +95,10 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         # Setup for UserContributionsModel.
         self.signup(self.USER_ID_1, self.GENERIC_USERNAME)
         self.save_new_valid_exploration(
-            self.EXP_ID_1, self.USER_ID_1, end_state_name='End')
+            self.EXPLORATION_IDS[0], self.USER_ID_1, end_state_name='End')
         
         exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+            self.user_a_id, self.EXPLORATION_IDS[0], [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
@@ -106,14 +106,18 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         
         # Setup for ExplorationUserDataModel.
         user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.USER_ID_1, self.EXP_ID_1), user_id=self.USER_ID_1,
-            exploration_id=self.EXP_ID_1, rating=2,
+            id='%s.%s' % (self.USER_ID_1, self.EXPLORATION_IDS[0]), user_id=self.USER_ID_1,
+            exploration_id=self.EXPLORATION_IDS[0], rating=2,
             rated_on=self.GENERIC_DATE,
             draft_change_list={'new_content': {}},
             draft_change_list_last_updated=self.GENERIC_DATE,
             draft_change_list_exp_version=3,
             draft_change_list_id=1).put()
         
+        user_models.CompletedActivitiesModel(
+            id=self.USER_ID_1,
+            exploration_ids=self.EXPLORATION_IDS,
+            collection_ids=self.COLLECTION_IDS).put()
 
 
     def test_export_data_nontrivial(self):
@@ -157,8 +161,8 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             self.SKILL_ID_2: self.DEGREE_OF_MASTERY
         }
         contributions_expected_data = {
-            'created_exploration_ids': [self.EXP_ID_1],
-            'edited_exploration_ids': [self.EXP_ID_1]
+            'created_exploration_ids': [self.EXPLORATION_IDS[0]],
+            'edited_exploration_ids': [self.EXPLORATION_IDS[0]]
         }
         exploration_expected_data = {
             self.EXP_ID_ONE: {
@@ -174,4 +178,9 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
             }
         }
+        completed_expected_data = {
+            'completed_exploration_ids': self.EXPLORATION_IDS_1,
+            'completed_collection_ids': self.COLLECTION_IDS_1
+        }
+        
 
