@@ -415,37 +415,37 @@
 
 
 # Simple pages.
-/core/controllers/pages*.py @vojtechjelinek
-/core/controllers/custom_landing_pages*.py @vojtechjelinek
-/core/templates/dev/head/pages/contact-page/ @vojtechjelinek
-/core/templates/dev/head/pages/donate-page/ @vojtechjelinek
-/core/templates/dev/head/pages/error-pages/ @vojtechjelinek
-/core/templates/dev/head/pages/get-started-page/ @vojtechjelinek
-/core/templates/dev/head/pages/landing-pages/ @vojtechjelinek
-/core/templates/dev/head/pages/maintenance-page/ @vojtechjelinek
-/core/templates/dev/head/pages/preferences-page/ @vojtechjelinek
-/core/templates/dev/head/pages/signup-page/ @vojtechjelinek
-/core/templates/dev/head/pages/splash-page/ @vojtechjelinek
-/core/templates/dev/head/pages/teach-page/ @vojtechjelinek
-/core/templates/dev/head/pages/thanks-page/ @vojtechjelinek
+/core/controllers/pages*.py @jamesjay4199 @vojtechjelinek
+/core/controllers/custom_landing_pages*.py @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/contact-page/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/donate-page/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/error-pages/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/get-started-page/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/landing-pages/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/maintenance-page/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/preferences-page/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/signup-page/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/splash-page/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/teach-page/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/thanks-page/ @jamesjay4199 @vojtechjelinek
 
 
 # Speed Improvement team.
-/app_dev.yaml @vojtechjelinek
-/core/templates/dev/head/google-analytics.initializer.ts @vojtechjelinek
+/app_dev.yaml @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/google-analytics.initializer.ts @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/base-components/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/Base.ts @vojtechjelinek
-/core/templates/dev/head/pages/oppia_footer_directive.html @vojtechjelinek
-/core/templates/dev/head/pages/OppiaFooterDirective.ts @vojtechjelinek
-/core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
-/core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
-/core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
+/core/templates/dev/head/pages/Base.ts @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/oppia_footer_directive.html @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/OppiaFooterDirective.ts @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/footer_js_libs.html @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/header_css_libs.html @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/header_js_libs.html @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/services/CsrfTokenService*.ts @jamesjay4199 @vojtechjelinek
-/gulpfile.js @vojtechjelinek
-/jinja_utils*.py @vojtechjelinek
-/webpack.common.config.ts @vojtechjelinek
-/webpack.dev.config.ts @vojtechjelinek
-/webpack.prod.config.ts @vojtechjelinek
+/gulpfile.js @jamesjay4199 @vojtechjelinek
+/jinja_utils*.py @jamesjay4199 @vojtechjelinek
+/webpack.common.config.ts @jamesjay4199 @vojtechjelinek
+/webpack.dev.config.ts @jamesjay4199 @vojtechjelinek
+/webpack.prod.config.ts @jamesjay4199 @vojtechjelinek
 
 
 # Typings.
