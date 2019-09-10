@@ -1,3 +1,6 @@
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.tests import test_utils
 from core.platform import models
 from core.domain import takeout_processor_service, feedback_services, rights_manager
@@ -72,14 +75,14 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         """Set up all models for use in testing"""
 
         # Setup for UserStatsModel.
-        user_model_1 = user_models.UserStatsModel(id=self.USER_ID_1)
-        user_model_1.impact_score = self.USER_1_IMPACT_SCORE
-        user_model_1.total_plays = self.USER_1_TOTAL_PLAYS
-        user_model_1.average_ratings = self.USER_1_AVERAGE_RATINGS
-        user_model_1.num_ratings = self.USER_1_NUM_RATINGS
-        user_model_1.weekly_creator_stats_list = (
-            self.USER_1_WEEKLY_CREATOR_STATS_LIST)
-        user_models.UserStatsModel.put(user_model_1)
+        user_models.UserStatsModel(
+            id=self.USER_ID_1,
+            impact_score=self.USER_1_IMPACT_SCORE,
+            total_plays=self.USER_1_TOTAL_PLAYS,
+            average_ratings=self.USER_1_AVERAGE_RATINGS,
+            num_ratings=self.USER_1_NUM_RATINGS,
+            weekly_creator_stats_list=self.USER_1_WEEKLY_CREATOR_STATS_LIST
+        ).put()
 
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
