@@ -53,6 +53,13 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
     STATE_NAME = 'state_name'
     STORY_ID_1 = 'story_id_1'
     COMPLETED_NODE_IDS_1 = ['node_id_1', 'node_id_2']
+    THREAD_ENTITY_TYPE = feconf.ENTITY_TYPE_EXPLORATION
+    THREAD_ENTITY_ID = 'exp_id_2'
+    THREAD_STATUS = 'open'
+    THREAD_SUBJECT = 'dummy subject'
+    THREAD_HAS_SUGGESTION = True
+    THREAD_SUMMARY = 'This is a great summary.'
+    THREAD_MESSAGE_COUNT = 0
 
     def setUp(self):
         """Set up all models for use in testing"""
@@ -156,7 +163,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             id='%s.%s' % (self.USER_ID_1, self.STORY_ID_1),
             user_id=self.USER_ID_1,
             story_id=self.STORY_ID_1,
-            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
+            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()        
 
     def test_export_data_nontrivial(self):
         takeout_processor_service.export_all_models(self.USER_ID_1)
@@ -239,4 +246,29 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         }
         story_progress_expected_data = {
             self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
+        }
+
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            entity_type=self.THREAD_ENTITY_TYPE,
+            entity_id=self.THREAD_ENTITY_ID,
+            original_author_id=self.USER_ID_1,
+            status=self.THREAD_STATUS,
+            subject=self.THREAD_SUBJECT,
+            has_suggestion=self.THREAD_HAS_SUGGESTION,
+            summary=self.THREAD_SUMMARY,
+            message_count=self.THREAD_MESSAGE_COUNT
+        )
+        feedback_thread_model.put()
+        
+        expected_general_feedback_thread_data = {
+            feedback_thread_model.id: {
+                'entity_type': test_export_entity_type,
+                'entity_id': test_export_entity_id,
+                'status': test_export_status,
+                'subject': test_export_subject,
+                'has_suggestion': test_export_has_suggestion,
+                'summary': test_export_summary,
+                'message_count': test_export_message_count,
+                'last_updated': feedback_thread_model.last_updated
+            }
         }
