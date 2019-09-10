@@ -25,6 +25,10 @@ import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
+import { NumericInputRulesService } from
+  'interactions/NumericInput/directives/numeric-input-rules.service';
+import { InteractiveMapRulesService } from
+  'interactions/InteractiveMap/directives/interactive-map-rules.service';
 /* eslint-disable max-len */
 import { DragAndDropSortInputRulesService } from
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
@@ -50,6 +54,9 @@ describe('Rule spec services', function() {
       new DragAndDropSortInputRulesService());
     $provide.value('MultipleChoiceInputRulesService',
       new MultipleChoiceInputRulesService());
+    $provide.value('NumericInputRulesService', new NumericInputRulesService());
+    $provide.value('InteractiveMapRulesService',
+      new InteractiveMapRulesService());
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The

@@ -191,6 +191,23 @@ def get_story_summary_by_id(story_id, strict=True):
         return None
 
 
+def get_stories_by_ids(story_ids):
+    """Returns a list of stories matching the IDs provided.
+
+    Args:
+        story_ids: list(str). List of IDs to get stories for.
+
+    Returns:
+        list(Story|None). The list of stories corresponding to given ids.  If a
+        Story does not exist, the corresponding returned list element is None.
+    """
+    all_story_models = story_models.StoryModel.get_multi(story_ids)
+    stories = [
+        get_story_from_model(story_model) if story_model is not None else None
+        for story_model in all_story_models]
+    return stories
+
+
 def get_story_summaries_by_ids(story_ids):
     """Returns the StorySummary objects corresponding the given story ids.
 
