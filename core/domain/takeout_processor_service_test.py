@@ -1,6 +1,6 @@
 from core.tests import test_utils
 from core.platform import models
-from core.domain import takeout_processor_service, feedback_services
+from core.domain import takeout_processor_service, feedback_services, rights_manager
 from constants import constants
 import feconf
 import datetime
@@ -195,6 +195,21 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
             'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
             'exploration.exp1.thread_1')
+        
+        # Setup for ExplorationRightsModel.
+        exploration_models.ExplorationRightsModel(
+            id=self.EXPLORATION_IDS[0],
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_1],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            'cid', 'Created new exploration right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_export_data_nontrivial(self):
         takeout_processor_service.export_all_models(self.USER_ID_1)
@@ -344,7 +359,6 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                 [self.COLLECTION_IDS[0]]),
             'viewable_collection_ids': [self.COLLECTION_IDS[0]]
         }
-
         general_suggestion_expected_data = {
             'exploration.exp1.thread_1': {
                 'suggestion_type': suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -355,4 +369,14 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                 'change_cmd': self.CHANGE_CMD
             }
         }
+        expected_exploration_ids = {
+            'owned_exploration_ids': (
+                [self.EXPLORATION_IDS[0]]),
+            'editable_exploration_ids': (
+                [self.EXPLORATION_IDS[0]]),
+            'voiced_exploration_ids': (
+                [self.EXPLORATION_IDS[0]]),
+            'viewable_exploration_ids': [self.EXPLORATION_IDS[0]]
+        }
+
 
