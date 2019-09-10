@@ -35,19 +35,17 @@ def export_all_models(user_id):
     # Exploration models.
     exploration_rights_data = exploration_models.ExplorationRightsModel.export_data(user_id)
 
-    # Story models.
-    story_rights_data = story_models.StoryRightsModel.export_data(user_id)
+    # TODO: What happened to the export for StoryRights.
+    # story_rights_data = story_models.StoryRightsModel.export_data(user_id)
 
-    # Email models.
-    general_feedback_email_reply_data = email_models.GeneralFeedbackEmailReplyToIdModel.export_data(user_id)
+    # TODO: Uncomment after Luis' PR.
+    # general_feedback_email_reply_data = email_models.GeneralFeedbackEmailReplyToIdModel.export_data(user_id)
 
     # Combine the data into a single dictionary.
     return {
         'stats_data': stats_data,
         'user_settings_data': user_settings_data,
         'user_subscriptions_data': user_subscriptions_data,
-        'user_skill_data': user_skill_data,
-        'user_contribution_data': user_contribution_data,
         'user_skill_data': user_skill_data,
         'user_contribution_data': user_contribution_data,
         'user_exploration_data': user_exploration_data,
@@ -62,6 +60,6 @@ def export_all_models(user_id):
         'collection_rights_data': collection_rights_data,
         'general_suggestion_data': general_suggestion_data,
         'exploration_rights_data': exploration_rights_data,
-        'story_rights_data': story_rights_data,
-        'general_feedback_email_reply_data': general_feedback_email_reply_data
+        # 'story_rights_data': story_rights_data,
+        # 'general_feedback_email_reply_data': general_feedback_email_reply_data
     }

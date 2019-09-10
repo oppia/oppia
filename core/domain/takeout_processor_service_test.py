@@ -213,14 +213,14 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
 
     def test_export_data_nontrivial(self):
         takeout_processor_service.export_all_models(self.USER_ID_1)
-        stats_expected_user_data = {
+        stats_data = {
             'impact_score': self.USER_1_IMPACT_SCORE,
             'total_plays': self.USER_1_TOTAL_PLAYS,
             'average_ratings': self.USER_1_AVERAGE_RATINGS,
             'num_ratings': self.USER_1_NUM_RATINGS,
             'weekly_creator_stats_list': self.USER_1_WEEKLY_CREATOR_STATS_LIST
         }
-        settings_expected_user_data = {
+        user_settings_data = {
             'email': self.USER_1_EMAIL,
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
@@ -240,22 +240,22 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0]
         }
-        user_subscriptions_expected_data = {
+        user_subscriptions_data = {
             'creator_ids': self.CREATOR_IDS,
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'last_checked': None
         }
-        skill_expected_data = {
+        user_skill_data = {
             self.SKILL_ID_1: self.DEGREE_OF_MASTERY,
             self.SKILL_ID_2: self.DEGREE_OF_MASTERY
         }
-        contributions_expected_data = {
+        user_contribution_data = {
             'created_exploration_ids': [self.EXPLORATION_IDS[0]],
             'edited_exploration_ids': [self.EXPLORATION_IDS[0]]
         }
-        exploration_expected_data = {
+        user_exploration_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
                 'rated_on': self.DATETIME_OBJECT,
@@ -269,28 +269,28 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
             }
         }
-        completed_expected_data = {
+        completed_activities_data = {
             'completed_exploration_ids': self.EXPLORATION_IDS,
             'completed_collection_ids': self.COLLECTION_IDS
         }
-        incomplete_expected_data = {
+        incomplete_activities_data = {
             'incomplete_exploration_ids': self.EXPLORATION_IDS,
             'incomplete_collection_ids': self.COLLECTION_IDS
         }
-        last_playthrough_expected_data = {
+        last_playthrough_data = {
             self.EXPLORATION_IDS[0]: {
                 'exp_version': self.EXP_VERSION,
                 'state_name': self.STATE_NAME_1
             }
         }
-        learner_playlist_expected_data = {
+        learner_playlist_data = {
             'playlist_exploration_ids': self.EXPLORATION_IDS,
             'playlist_collection_ids': self.COLLECTION_IDS
         }
-        collection_progress_expected_data = {
+        collection_progress_data = {
             self.COLLECTION_IDS[0]: self.EXPLORATION_IDS[0]
         }
-        story_progress_expected_data = {
+        story_progress_data = {
             self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
         }
 
@@ -306,7 +306,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.put()
         
-        expected_general_feedback_thread_data = {
+        general_feedback_thread_data = {
             feedback_thread_model.id: {
                 'entity_type': self.THREAD_ENTITY_TYPE,
                 'entity_id': self.THREAD_ENTITY_ID,
@@ -332,7 +332,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
-        general_feedback_message_expected_data = {
+        general_feedback_message_data = {
             thread_id + '.0': {
                 'thread_id': thread_id,
                 'message_id': 0,
@@ -350,7 +350,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                 'received_via_email': self.MESSAGE_RECEIEVED_VIA_EMAIL
             }
         }
-        collection_rights_expected_data = {
+        collection_rights_data = {
             'owned_collection_ids': (
                 [self.COLLECTION_IDS[0]]),
             'editable_collection_ids': (
@@ -359,7 +359,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                 [self.COLLECTION_IDS[0]]),
             'viewable_collection_ids': [self.COLLECTION_IDS[0]]
         }
-        general_suggestion_expected_data = {
+        general_suggestion_data = {
             'exploration.exp1.thread_1': {
                 'suggestion_type': suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -369,7 +369,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                 'change_cmd': self.CHANGE_CMD
             }
         }
-        expected_exploration_ids = {
+        exploration_rights_data = {
             'owned_exploration_ids': (
                 [self.EXPLORATION_IDS[0]]),
             'editable_exploration_ids': (
@@ -378,5 +378,25 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                 [self.EXPLORATION_IDS[0]]),
             'viewable_exploration_ids': [self.EXPLORATION_IDS[0]]
         }
-
-
+        expected_export = {
+            'stats_data': stats_data,
+            'user_settings_data': user_settings_data,
+            'user_subscriptions_data': user_subscriptions_data,
+            'user_skill_data': user_skill_data,
+            'user_contribution_data': user_contribution_data,
+            'user_exploration_data': user_exploration_data,
+            'completed_activities_data': completed_activities_data,
+            'incomplete_activities_data': incomplete_activities_data,
+            'last_playthrough_data': last_playthrough_data,
+            'learner_playlist_data': learner_playlist_data,
+            'collection_progress_data': collection_progress_data,
+            'story_progress_data': story_progress_data,
+            'general_feedback_thread_data': general_feedback_thread_data,
+            'general_feedback_message_data': general_feedback_message_data,
+            'collection_rights_data': collection_rights_data,
+            'general_suggestion_data': general_suggestion_data,
+            'exploration_rights_data': exploration_rights_data,
+        }
+        exported_data = takeout_processor_service.export_data(self.USER_ID_1)
+        self.assertEqual(exported_data, expected_export)
+        #TODO: Implement tests for StoryRights and GeneralFeedbackEmailReplyToId
