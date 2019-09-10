@@ -63,6 +63,10 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
     THREAD_MESSAGE_COUNT = 0
     MESSAGE_TEXT = 'Export test text.'
     MESSAGE_RECEIEVED_VIA_EMAIL = False
+    CHANGE_CMD = {}
+    SCORE_CATEGORY = (
+        suggestion_models.SCORE_TYPE_TRANSLATION +
+        suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
 
     def setUp(self):
         """Set up all models for use in testing"""
@@ -182,6 +186,15 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         ).save(
             'cid', 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
+
+        # Setup for GeneralSuggestionModel.
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.EXPLORATION_IDS[0], 1,
+            suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
+            'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
+            'exploration.exp1.thread_1')
 
     def test_export_data_nontrivial(self):
         takeout_processor_service.export_all_models(self.USER_ID_1)
@@ -330,5 +343,16 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             'voiced_collection_ids': (
                 [self.COLLECTION_IDS[0]]),
             'viewable_collection_ids': [self.COLLECTION_IDS[0]]
+        }
+
+        general_suggestion_expected_data = {
+            'exploration.exp1.thread_1': {
+                'suggestion_type': suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                'target_id': self.EXPLORATION_IDS[0],
+                'target_version_at_submission': 1,
+                'status': suggestion_models.STATUS_IN_REVIEW,
+                'change_cmd': self.CHANGE_CMD
+            }
         }
 
