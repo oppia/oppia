@@ -15,12 +15,15 @@
 # limitations under the License.
 
 """Domain objects for the pages for subtopics, and related models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
@@ -64,7 +67,7 @@ class SubtopicPageChange(change_domain.BaseChange):
     }]
 
 
-class SubtopicPageContents(object):
+class SubtopicPageContents(python_utils.OBJECT):
     """Domain object for the contents on a subtopic page."""
 
     def __init__(
@@ -141,7 +144,7 @@ class SubtopicPageContents(object):
                 'written_translations']))
 
 
-class SubtopicPage(object):
+class SubtopicPage(python_utils.OBJECT):
     """Domain object for a Subtopic page."""
 
     def __init__(
@@ -284,7 +287,7 @@ class SubtopicPage(object):
             ValidationError: One or more attributes of the subtopic page are
                 invalid.
         """
-        if not isinstance(self.topic_id, basestring):
+        if not isinstance(self.topic_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' %
                 self.topic_id)
@@ -308,7 +311,7 @@ class SubtopicPage(object):
                     self.page_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

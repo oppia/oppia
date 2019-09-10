@@ -15,10 +15,13 @@
 # limitations under the License.
 
 """Services for managing subscriptions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
 from core.platform import models
+import python_utils
 import utils
 
 (user_models,) = models.Registry.import_models([
@@ -283,5 +286,5 @@ def record_user_has_seen_notifications(user_id, last_seen_msecs):
         subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
 
     subscriptions_model.last_checked = datetime.datetime.utcfromtimestamp(
-        last_seen_msecs / 1000.0)
+        python_utils.divide(last_seen_msecs, 1000.0))
     subscriptions_model.put()

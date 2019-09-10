@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the practice session.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
@@ -84,22 +84,23 @@ angular.module('oppia').directive('practiceSessionPage', [
                 resultActionButtons: [
                   {
                     type: 'BOOST_SCORE',
-                    text: 'Boost My Score'
+                    i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
                   },
                   {
                     type: 'RETRY_SESSION',
-                    text: 'New Session',
+                    i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
                     url: practiceSessionsUrl
                   },
                   {
                     type: 'DASHBOARD',
-                    text: 'My Dashboard',
+                    i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
                     url: topicViewerUrl
                   }
                 ],
                 skillList: skillList,
                 skillDescriptions: skillDescriptions,
-                questionCount: TOTAL_QUESTIONS
+                questionCount: TOTAL_QUESTIONS,
+                questionsSortedByDifficulty: false
               };
               ctrl.questionPlayerConfig = questionPlayerConfig;
             });

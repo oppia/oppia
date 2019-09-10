@@ -21,7 +21,9 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
-import StringIO
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import collections
 import datetime
 import logging
@@ -40,6 +42,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import search_services
@@ -48,6 +51,7 @@ from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
@@ -138,7 +142,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
     returned_exploration_ids = []
     search_cursor = cursor
 
-    for _ in range(MAX_ITERATIONS):
+    for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
@@ -247,7 +251,7 @@ def export_to_zip_file(exploration_id, version=None):
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
-    memfile = StringIO.StringIO()
+    memfile = python_utils.string_io()
     with zipfile.ZipFile(
         memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
 
@@ -265,7 +269,7 @@ def export_to_zip_file(exploration_id, version=None):
             file_contents = fs.get(filepath, version=1)
 
             str_filepath = 'assets/%s' % filepath
-            assert isinstance(str_filepath, str)
+            assert isinstance(str_filepath, python_utils.UNICODE)
             unicode_filepath = str_filepath.decode('utf-8')
             zfile.writestr(unicode_filepath, file_contents)
 
@@ -293,7 +297,7 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
         exploration_id, version=version)
     exploration_dict = {}
     for state in exploration.states:
-        exploration_dict[state] = utils.yaml_from_dict(
+        exploration_dict[state] = python_utils.yaml_from_dict(
             exploration.states[state].to_dict(), width=width)
     return exploration_dict
 
@@ -333,7 +337,8 @@ def apply_change_list(exploration_id, change_list):
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     state.update_param_changes(
-                        map(to_param_domain, change.new_value))
+                        list(python_utils.MAP(
+                            to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     state.update_content(
                         state_domain.SubtitledHtml.from_dict(change.new_value))
@@ -421,7 +426,8 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     exploration.update_param_changes(
-                        map(to_param_domain, change.new_value))
+                        list(python_utils.MAP(
+                            to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -500,7 +506,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
         state_name: state.to_dict()
-        for (state_name, state) in exploration.states.iteritems()}
+        for (state_name, state) in exploration.states.items()}
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
@@ -518,9 +524,11 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
     # Trigger statistics model update.
-    stats_services.handle_stats_creation_for_new_exp_version(
+    new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
         exp_versions_diff=exp_versions_diff, revert_to_version=None)
+
+    stats_services.create_stats_model(new_exp_stats)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         trainable_states_dict = exploration.get_trainable_states_dict(
@@ -580,7 +588,7 @@ def _create_exploration(
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()
-            for (state_name, state) in exploration.states.iteritems()},
+            for (state_name, state) in exploration.states.items()},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
@@ -591,8 +599,9 @@ def _create_exploration(
     exploration.version += 1
 
     # Trigger statistics model creation.
-    stats_services.handle_stats_creation_for_new_exploration(
+    exploration_stats = stats_services.get_stats_for_new_exploration(
         exploration.id, exploration.version, exploration.states)
+    stats_services.create_stats_model(exploration_stats)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -723,7 +732,7 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     current_version = exploration.version
-    version_nums = range(1, current_version + 1)
+    version_nums = list(python_utils.RANGE(1, current_version + 1))
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
         exploration_id, version_nums, allow_deleted=allow_deleted)
@@ -833,19 +842,25 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    exploration = apply_change_list(exploration_id, change_list)
-    _save_exploration(committer_id, exploration, commit_message, change_list)
+    updated_exploration = apply_change_list(exploration_id, change_list)
+    _save_exploration(
+        committer_id, updated_exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
-    update_exploration_summary(exploration.id, committer_id)
+    update_exploration_summary(exploration_id, committer_id)
 
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
-        user_services.add_edited_exploration_id(committer_id, exploration.id)
+        user_services.add_edited_exploration_id(committer_id, exploration_id)
         user_services.record_user_edited_an_exploration(committer_id)
-        if not rights_manager.is_exploration_private(exploration.id):
+        if not rights_manager.is_exploration_private(exploration_id):
             user_services.update_first_contribution_msec_if_not_set(
                 committer_id, utils.get_current_time_in_millisecs())
+
+    if opportunity_services.is_exploration_available_for_contribution(
+            exploration_id):
+        opportunity_services.update_opportunity_with_updated_exploration(
+            exploration_id)
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):
@@ -937,7 +952,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
                 contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        get_last_updated_by_human_ms(exploration.id) / 1000.0)
+        python_utils.divide(
+            get_last_updated_by_human_ms(exploration.id), 1000.0))
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
@@ -1085,9 +1101,10 @@ def revert_exploration(
     # not add the committer of the revert to the list of contributors.
     update_exploration_summary(exploration_id, None)
 
-    stats_services.handle_stats_creation_for_new_exp_version(
+    exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
         exp_versions_diff=None, revert_to_version=revert_to_version)
+    stats_services.create_stats_model(exploration_stats)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
@@ -1308,7 +1325,7 @@ def get_image_filenames_from_exploration(exploration):
        list(str). List containing the name of the image files in exploration.
     """
     filenames = []
-    for state in exploration.states.itervalues():
+    for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
                 'imageAndRegions']['value']['imagePath'])
@@ -1321,8 +1338,7 @@ def get_image_filenames_from_exploration(exploration):
                 html_string))
 
     for rte_comp in rte_components_in_exp:
-        if 'id' in rte_comp and (
-                str(rte_comp['id']) == 'oppia-noninteractive-image'):
+        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.
@@ -1364,7 +1380,7 @@ def get_average_rating(ratings):
 
         for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
-        return rating_sum / (number_of_ratings * 1.0)
+        return python_utils.divide(rating_sum, (number_of_ratings * 1.0))
 
 
 def get_scaled_average_rating(ratings):
@@ -1384,12 +1400,15 @@ def get_scaled_average_rating(ratings):
         return 0
     average_rating = get_average_rating(ratings)
     z = 1.9599639715843482
-    x = (average_rating - 1) / 4
+    x = python_utils.divide((average_rating - 1), 4)
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
-    a = x + (z**2) / (2 * n)
-    b = z * math.sqrt((x * (1 - x)) / n + (z**2) / (4 * n**2))
-    wilson_score_lower_bound = (a - b) / (1 + z**2 / n)
+    a = x + python_utils.divide((z**2), (2 * n))
+    b = z * math.sqrt(
+        python_utils.divide((x * (1 - x)), n) + python_utils.divide(
+            (z**2), (4 * n**2)))
+    wilson_score_lower_bound = python_utils.divide(
+        (a - b), (1 + python_utils.divide(z**2, n)))
     return 1 + 4 * wilson_score_lower_bound
 
 

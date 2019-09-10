@@ -15,13 +15,16 @@
 # limitations under the License.
 
 """Base class for visualizations of summarized learner answers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import calculation_registry
+import python_utils
 import schema_utils
 import utils
 
 
-class BaseVisualization(object):
+class BaseVisualization(python_utils.OBJECT):
     """Base class for definitions of visualizations."""
 
     # Option specifications for the visualization, including their descriptions
@@ -50,7 +53,8 @@ class BaseVisualization(object):
 
         # Check that the options_dict is valid.
         expected_option_names = sorted([
-            spec['name'] for spec in self._OPTIONS_SPECS])
+            python_utils.convert_to_bytes(
+                spec['name']) for spec in self._OPTIONS_SPECS])
         actual_option_names = sorted(self.options.keys())
         if actual_option_names != expected_option_names:
             raise utils.ValidationError(

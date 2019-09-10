@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for story domain objects and methods defined on them."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -22,6 +24,7 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 
@@ -375,7 +378,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_corresponding_topic_id_validation(self):
         # Generating valid topic id of type str.
         valid_topic_id = utils.generate_random_string(12)
-        self.assertTrue(isinstance(valid_topic_id, basestring))
+        self.assertTrue(isinstance(valid_topic_id, python_utils.BASESTRING))
         self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 
@@ -522,6 +525,97 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(calculated_list[0].id, expected_list[0].id)
         self.assertEqual(calculated_list[1].id, expected_list[1].id)
         self.assertEqual(calculated_list[2].id, expected_list[2].id)
+
+    def test_get_all_linked_exp_ids(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'title': 'Title 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1'
+        }
+        node_2 = {
+            'id': 'node_2',
+            'title': 'Title 2',
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_2'
+        }
+        node_3 = {
+            'id': 'node_3',
+            'title': 'Title 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_3'
+        }
+        self.story.story_contents.initial_node_id = 'node_2'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+        ]
+        self.assertEqual(
+            self.story.story_contents.get_all_linked_exp_ids(),
+            ['exp_1', 'exp_2'])
+        self.story.story_contents.nodes.append(
+            story_domain.StoryNode.from_dict(node_3))
+        self.assertEqual(
+            self.story.story_contents.get_all_linked_exp_ids(),
+            ['exp_1', 'exp_2', 'exp_3'])
+
+    def test_get_node_with_corresponding_exp_id_with_valid_exp_id(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'title': 'Title 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1'
+        }
+        self.story.story_contents.initial_node_id = 'node_1'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1)
+        ]
+
+        node_with_exp_1 = (
+            self.story.story_contents.get_node_with_corresponding_exp_id(
+                'exp_1'))
+
+        self.assertEqual(node_with_exp_1.to_dict(), node_1)
+
+    def test_get_node_with_corresponding_exp_id_with_invalid_exp_id(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'title': 'Title 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1'
+        }
+        self.story.story_contents.initial_node_id = 'node_1'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1)
+        ]
+        with self.assertRaisesRegexp(
+            Exception,
+            'Unable to find the exploration id in any node: invalid_id'):
+            self.story.story_contents.get_node_with_corresponding_exp_id(
+                'invalid_id')
 
     def test_all_nodes_visited(self):
         self.story.story_contents.next_node_id = 'node_4'

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for custom landing pages."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
 import feconf

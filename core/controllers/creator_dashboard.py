@@ -15,6 +15,8 @@
 """Controllers for the creator dashboard, notifications, and creating new
 activities.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -23,12 +25,10 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import dependency_registry
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import interaction_registry
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
@@ -38,9 +38,8 @@ from core.domain import user_jobs_continuous
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
-
-import jinja2
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
@@ -56,7 +55,7 @@ class NotificationsDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_creator_dashboard
     def get(self):
         self.render_template(
-            'dist/notifications-dashboard-page.mainpage.html')
+            'notifications-dashboard-page.mainpage.html')
 
 
 class NotificationsDashboardHandler(base.BaseHandler):
@@ -112,21 +111,8 @@ class CreatorDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
-        interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
-                interaction_dependency_ids + self.ADDITIONAL_DEPENDENCY_IDS))
 
-        self.values.update({
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'additional_angular_modules': additional_angular_modules,
-            'dependencies_html': jinja2.utils.Markup(dependencies_html)
-        })
-        self.render_template('dist/creator-dashboard-page.mainpage.html')
+        self.render_template('creator-dashboard-page.mainpage.html')
 
 
 class CreatorDashboardHandler(base.BaseHandler):
@@ -148,7 +134,8 @@ class CreatorDashboardHandler(base.BaseHandler):
             Returns:
                 float. The rounded average value of rating.
             """
-            return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
+            return python_utils.ROUND(
+                rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         # We need to do the filtering because some activities that were
         # originally subscribed to may have been deleted since.
@@ -230,7 +217,7 @@ class CreatorDashboardHandler(base.BaseHandler):
         last_week_stats = (
             user_services.get_last_week_dashboard_stats(self.user_id))
 
-        if last_week_stats and len(last_week_stats.keys()) != 1:
+        if last_week_stats and len(list(last_week_stats.keys())) != 1:
             logging.error(
                 '\'last_week_stats\' should contain only one key-value pair'
                 ' denoting last week dashboard stats of the user keyed by a'
@@ -240,9 +227,9 @@ class CreatorDashboardHandler(base.BaseHandler):
         if last_week_stats:
             # 'last_week_stats' is a dict with only one key-value pair denoting
             # last week dashboard stats of the user keyed by a datetime string.
-            datetime_of_stats = last_week_stats.keys()[0]
+            datetime_of_stats = list(last_week_stats.keys())[0]
             last_week_stats_average_ratings = (
-                last_week_stats.values()[0].get('average_ratings'))
+                list(last_week_stats.values())[0].get('average_ratings'))
             if last_week_stats_average_ratings:
                 last_week_stats[datetime_of_stats]['average_ratings'] = (
                     _round_average_ratings(last_week_stats_average_ratings))

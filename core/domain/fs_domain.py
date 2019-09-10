@@ -15,12 +15,15 @@
 # limitations under the License.
 
 """Domain objects representing a file system and a file stream."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
 from core.domain import change_domain
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 import cloudstorage
@@ -48,7 +51,7 @@ class FileChange(change_domain.BaseChange):
     pass
 
 
-class FileMetadata(object):
+class FileMetadata(python_utils.OBJECT):
     """A class representing the metadata of a file.
 
     Attributes:
@@ -73,7 +76,7 @@ class FileMetadata(object):
         return self._size
 
 
-class FileStreamWithMetadata(object):
+class FileStreamWithMetadata(python_utils.OBJECT):
     """A class that wraps a file stream, but adds extra attributes to it.
 
     Attributes:
@@ -123,7 +126,7 @@ class FileStreamWithMetadata(object):
         return self._version
 
 
-class GeneralFileSystem(object):
+class GeneralFileSystem(python_utils.OBJECT):
     """The parent class which is inherited by both DatastoreBackedFileSystem
     and GcsFileSystem as the member variables in both classes are the same.
 
@@ -157,7 +160,7 @@ class GeneralFileSystem(object):
         if entity_name not in ALLOWED_ENTITY_NAMES:
             raise utils.ValidationError(
                 'Invalid entity_name received: %s.' % entity_name)
-        if not isinstance(entity_id, basestring):
+        if not isinstance(entity_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid entity_id received: %s' % entity_id)
         if entity_id == '':
@@ -510,7 +513,7 @@ class GcsFileSystem(GeneralFileSystem):
         return files_in_dir
 
 
-class AbstractFileSystem(object):
+class AbstractFileSystem(python_utils.OBJECT):
     """Interface for a file system."""
 
     def __init__(self, impl):
@@ -609,7 +612,7 @@ class AbstractFileSystem(object):
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the file.
         """
-        raw_bytes = str(raw_bytes)
+        raw_bytes = python_utils.convert_to_bytes(raw_bytes)
         self._check_filepath(filepath)
         self._impl.commit(user_id, filepath, raw_bytes, mimetype)
 

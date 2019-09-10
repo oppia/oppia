@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Common classes and methods for managing long running jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
@@ -24,6 +26,7 @@ import logging
 import traceback
 
 from core.platform import models
+import python_utils
 import utils
 
 from google.appengine.api import app_identity
@@ -72,7 +75,7 @@ DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
 NUM_JOBS_IN_DASHBOARD_LIMIT = 100
 
 
-class BaseJobManager(object):
+class BaseJobManager(python_utils.OBJECT):
     """Base class for managing long-running jobs.
 
     These jobs are not transaction-safe, and multiple jobs of the same kind
@@ -212,7 +215,8 @@ class BaseJobManager(object):
             cls, output_list, test_only_max_output_len_chars=None):
         """Returns compressed list of strings within a max length of chars.
 
-        Ensures that the payload (i.e., [str(output) for output in output_list])
+        Ensures that the payload (i.e.,
+        [python_utils.UNICODE(output) for output in output_list])
         makes up at most max_output_chars of the final output data.
 
         Args:
@@ -235,10 +239,11 @@ class BaseJobManager(object):
             pass
 
         # Consolidate the lines of output since repeating them isn't useful.
-        counter = _OrderedCounter(str(output) for output in output_list)
+        counter = _OrderedCounter(
+            python_utils.UNICODE(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
-            for (output_str, count) in counter.iteritems()
+            for (output_str, count) in counter.items()
         ]
 
         # Truncate outputs to fit within given max length.
@@ -611,9 +616,11 @@ class BaseDeferredJobManager(BaseJobManager):
                 'Job %s failed at %s' %
                 (job_id, utils.get_current_time_in_millisecs()))
             cls.register_failure(
-                job_id, '%s\n%s' % (unicode(e), traceback.format_exc()))
+                job_id, '%s\n%s'
+                % (python_utils.UNICODE(e), traceback.format_exc()))
             raise taskqueue_services.PermanentTaskFailure(
-                'Task failed: %s\n%s' % (unicode(e), traceback.format_exc()))
+                'Task failed: %s\n%s'
+                % (python_utils.UNICODE(e), traceback.format_exc()))
 
         # Note that the job may have been canceled after it started and before
         # it reached this stage. This will result in an exception when the
@@ -704,7 +711,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                 (job_id, utils.get_current_time_in_millisecs()))
             job_class.register_failure(
                 job_id,
-                '%s\n%s' % (unicode(e), traceback.format_exc()))
+                '%s\n%s' % (python_utils.UNICODE(e), traceback.format_exc()))
 
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
@@ -722,7 +729,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
             data: *. Data to be serialized in JSON format.
         """
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
-            '%s\n' % json.dumps(data))
+            python_utils.convert_to_bytes('%s\n' % json.dumps(data)))
 
 
 class BaseMapReduceJobManager(BaseJobManager):
@@ -840,7 +847,7 @@ class BaseMapReduceJobManager(BaseJobManager):
                 # strings. Also note that the value for this key is determined
                 # just before enqueue time, so it will be roughly equal to the
                 # actual enqueue time.
-                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: str(
+                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: python_utils.UNICODE(
                     utils.get_current_time_in_millisecs()),
             },
             'reducer_params': {
@@ -1189,7 +1196,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             realtime_layer. The realtime layer entity.
         """
         if (self.realtime_layer is None or
-                str(self.realtime_layer) != self.id[0]):
+                python_utils.UNICODE(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
                 (self.realtime_layer, self.id))
@@ -1198,7 +1205,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             BaseRealtimeDatastoreClassForContinuousComputations, self).put()
 
 
-class BaseContinuousComputationManager(object):
+class BaseContinuousComputationManager(python_utils.OBJECT):
     """This class represents a manager for a continuously-running computation.
 
     Such computations consist of two parts: a batch job to compute summary

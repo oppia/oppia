@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for core.domain.acl_decorators."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -2947,3 +2949,120 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_edit_entity/%s/%s' % (
                 'invalid_entity_type', 'q_id'), expected_status_int=404)
+
+
+class SaveExplorationTests(test_utils.GenericTestBase):
+    """Tests for can_save_exploration decorator."""
+    role = rights_manager.ROLE_VOICE_ARTIST
+    username = 'user'
+    user_email = 'user@example.com'
+    banned_username = 'banneduser'
+    banned_user_email = 'banneduser@example.com'
+    published_exp_id_1 = 'exp_1'
+    published_exp_id_2 = 'exp_2'
+    private_exp_id_1 = 'exp_3'
+    private_exp_id_2 = 'exp_4'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_save_exploration
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(SaveExplorationTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.signup(self.banned_user_email, self.banned_username)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_banned_users([self.banned_username])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.published_exp_id_2, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_2, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
+
+        rights_manager.assign_role_for_exploration(
+            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.role)
+        rights_manager.assign_role_for_exploration(
+            self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
+
+    def test_unautheticated_user_cannot_save_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+
+    def test_can_not_save_exploration_with_invalid_exp_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/invalid_exp_id', expected_status_int=404)
+        self.logout()
+
+    def test_banned_user_cannot_save_exploration(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+        self.logout()
+
+    def test_owner_can_save_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
+        self.logout()
+
+    def test_moderator_can_save_public_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.published_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.published_exp_id_1)
+        self.logout()
+
+    def test_moderator_cannot_save_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+        self.logout()
+
+    def test_admin_can_save_private_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
+        self.logout()
+
+    def test_voice_artist_can_only_save_assigned_exploration(self):
+        self.login(self.VOICE_ARTIST_EMAIL)
+        # Checking voice artist can only save assigned public exploration.
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.published_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.published_exp_id_1)
+
+        # Checking voice artist cannot save public exploration which he/she
+        # is not assigned for.
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
+        self.logout()

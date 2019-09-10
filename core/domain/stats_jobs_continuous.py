@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Jobs for statistics views."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
@@ -151,11 +153,11 @@ class InteractionAnswerSummariesMRJobManager(
         # Convert the interaction IDs to a list so they may be easily indexed.
         versioned_interaction_ids = {
             v: list(interaction_ids)
-            for v, interaction_ids in versioned_interaction_ids.iteritems()
+            for v, interaction_ids in versioned_interaction_ids.items()
         }
 
         # Verify all interaction ID and item ID containers are well-structured.
-        for version, interaction_ids in versioned_interaction_ids.iteritems():
+        for version, interaction_ids in versioned_interaction_ids.items():
             if len(interaction_ids) != 1:
                 yield (
                     'ERROR: Expected exactly one interaction ID for '

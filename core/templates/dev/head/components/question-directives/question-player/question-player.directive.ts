@@ -17,7 +17,6 @@
  */
 
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
@@ -543,6 +542,10 @@ angular.module('oppia').directive('questionPlayer', [
 
                   $scope.closeModal = function() {
                     $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.openConceptCardModal = function(skillId) {
+                    openConceptCardModal([skillId]);
                   };
                 }
               ]

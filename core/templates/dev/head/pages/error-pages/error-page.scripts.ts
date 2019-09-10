@@ -21,5 +21,5 @@
 require('pages/error-pages/error-page.module.ts');
 require('App.ts');
 
-require('pages/OppiaFooterDirective.ts');
+require('base-components/base-content.directive.ts');
 require('pages/error-pages/error-page.controller.ts');

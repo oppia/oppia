@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for collection domain objects and methods defined on them."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -22,6 +24,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 # Dictionary-like data structures within sample YAML must be formatted
@@ -670,7 +673,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
-        for version_num in range(1, current_collection_schema_version):
+        for version_num in python_utils.RANGE(
+                1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
                 '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
@@ -687,7 +691,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-        for version_num in range(1, current_collection_schema_version):
+        for version_num in python_utils.RANGE(
+                1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
                 '_convert_v%s_dict_to_v%s_dict' % (

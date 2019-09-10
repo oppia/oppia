@@ -15,16 +15,24 @@
 # limitations under the License.
 
 """Tests for core.storage.activity.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
 from core.tests import test_utils
 
-(activity_models,) = models.Registry.import_models([models.NAMES.activity])
+(base_models, activity_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.activity])
 
 
 class ActivityListModelTest(test_utils.GenericTestBase):
     """Tests the ActivityListModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            activity_models.ActivityReferencesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_featured_activity_list_always_exists(self):
         featured_model_instance = (

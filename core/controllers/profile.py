@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the profile page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
@@ -42,7 +44,7 @@ class ProfilePage(base.BaseHandler):
         if not user_settings:
             raise self.PageNotFoundException
 
-        self.render_template('dist/profile-page.mainpage.html')
+        self.render_template('profile-page.mainpage.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -102,7 +104,7 @@ class PreferencesPage(base.BaseHandler):
     @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/preferences-page.mainpage.html')
+        self.render_template('preferences-page.mainpage.html')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -243,7 +245,7 @@ class SignupPage(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
-        return_url = str(self.request.get('return_url', self.request.uri))
+        return_url = self.request.get('return_url', self.request.uri)
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
@@ -251,7 +253,7 @@ class SignupPage(base.BaseHandler):
             self.redirect(return_url)
             return
 
-        self.render_template('dist/signup-page.mainpage.html')
+        self.render_template('signup-page.mainpage.html')
 
 
 class SignupHandler(base.BaseHandler):

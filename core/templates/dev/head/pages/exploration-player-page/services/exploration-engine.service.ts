@@ -23,7 +23,7 @@ require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('expressions/ExpressionInterpolationService.ts');
+require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('pages/exploration-player-page/services/audio-preloader.service.ts');
@@ -39,6 +39,7 @@ require(
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
+require('services/ExplorationFeaturesBackendApiService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
@@ -56,22 +57,24 @@ require('pages/interaction-specs.constants.ajs.ts');
 angular.module('oppia').factory('ExplorationEngineService', [
   '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
-  'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
-  'ExpressionInterpolationService', 'FocusManagerService',
-  'ImagePreloaderService', 'LearnerParamsService', 'PlayerTranscriptService',
-  'ReadOnlyExplorationBackendApiService', 'StateCardObjectFactory',
-  'StatsReportingService', 'UrlService',
+  'ExplorationFeaturesBackendApiService', 'ExplorationHtmlFormatterService',
+  'ExplorationObjectFactory', 'ExpressionInterpolationService',
+  'FocusManagerService', 'ImagePreloaderService', 'LearnerParamsService',
+  'PlayerTranscriptService', 'ReadOnlyExplorationBackendApiService',
+  'StateCardObjectFactory', 'StatsReportingService', 'UrlService',
   function(
       $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
-      ExplorationHtmlFormatterService, ExplorationObjectFactory,
-      ExpressionInterpolationService, FocusManagerService,
-      ImagePreloaderService, LearnerParamsService, PlayerTranscriptService,
-      ReadOnlyExplorationBackendApiService, StateCardObjectFactory,
-      StatsReportingService, UrlService) {
+      ExplorationFeaturesBackendApiService, ExplorationHtmlFormatterService,
+      ExplorationObjectFactory, ExpressionInterpolationService,
+      FocusManagerService, ImagePreloaderService, LearnerParamsService,
+      PlayerTranscriptService, ReadOnlyExplorationBackendApiService,
+      StateCardObjectFactory, StatsReportingService, UrlService) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
+    var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var answerIsBeingProcessed = false;
+    var alwaysAskLearnersForAnswerDetails = false;
 
     var exploration = null;
 
@@ -85,11 +88,13 @@ angular.module('oppia').factory('ExplorationEngineService', [
     var manualParamChanges = null;
     var initStateName = null;
     var version = UrlService.getExplorationVersionFromUrl();
-    ReadOnlyExplorationBackendApiService
-      .loadExploration(_explorationId, version)
-      .then(function(exploration) {
-        version = exploration.version;
-      });
+    if (!_questionPlayerMode) {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(_explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    }
 
     var randomFromArray = function(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
@@ -225,6 +230,14 @@ angular.module('oppia').factory('ExplorationEngineService', [
         labelForFocusTarget);
     };
 
+    var checkAlwaysAskLearnersForAnswerDetails = function() {
+      ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+        _explorationId).then(function(featuresData) {
+        alwaysAskLearnersForAnswerDetails = (
+          featuresData.always_ask_learners_for_answer_details);
+      });
+    };
+
     return {
       // This should only be used in editor preview mode. It sets the
       // exploration data from what's currently specified in the editor, and
@@ -287,6 +300,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
           ImagePreloaderService.init(exploration);
           ImagePreloaderService.kickOffImagePreloader(
             exploration.getInitialState().name);
+          checkAlwaysAskLearnersForAnswerDetails();
           _loadInitialState(successCallback);
         }
       },
@@ -298,6 +312,10 @@ angular.module('oppia').factory('ExplorationEngineService', [
       },
       recordNewCardAdded: function() {
         currentStateName = nextStateName;
+      },
+      getState: function() {
+        var stateName = PlayerTranscriptService.getLastStateName();
+        return exploration.getState(stateName);
       },
       getExplorationId: function() {
         return _explorationId;
@@ -321,7 +339,6 @@ angular.module('oppia').factory('ExplorationEngineService', [
         if (answerIsBeingProcessed) {
           return;
         }
-
         answerIsBeingProcessed = true;
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
@@ -378,7 +395,6 @@ angular.module('oppia').factory('ExplorationEngineService', [
           AlertsService.addWarning('Expression parsing error.');
           return;
         }
-
         var newParams = (
           newState ? makeParams(
             oldParams, newState.paramChanges, [oldParams]) : oldParams);
@@ -437,6 +453,9 @@ angular.module('oppia').factory('ExplorationEngineService', [
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;
+      },
+      getAlwaysAskLearnerForAnswerDetails: function() {
+        return alwaysAskLearnersForAnswerDetails;
       }
     };
   }

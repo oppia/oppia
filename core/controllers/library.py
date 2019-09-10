@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the library page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
@@ -27,6 +29,7 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (base_models, exp_models,) = models.Registry.import_models([
@@ -74,8 +77,7 @@ class LibraryPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-
-        self.render_template('dist/library-page.mainpage.html')
+        self.render_template('library-page.mainpage.html')
 
 
 class LibraryIndexHandler(base.BaseHandler):
@@ -148,7 +150,7 @@ class LibraryGroupPage(base.BaseHandler):
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
         })
-        self.render_template('dist/library-page.mainpage.html')
+        self.render_template('library-page.mainpage.html')
 
 
 class LibraryGroupIndexHandler(base.BaseHandler):
@@ -267,7 +269,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
             include_private_exps = False
 
         if (not isinstance(exp_ids, list) or not all([
-                isinstance(exp_id, basestring) for exp_id in exp_ids])):
+                isinstance(
+                    exp_id, python_utils.BASESTRING) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
         if include_private_exps:

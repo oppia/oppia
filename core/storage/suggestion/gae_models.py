@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Models for Oppia suggestions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -133,6 +135,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """General suggestion needs to be pseudonymized for the user."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def create(
@@ -258,18 +265,18 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        suggestion_models = (cls.get_all()
-                             .filter(cls.author_id == user_id).fetch())
+        suggestion_models = (
+            cls.get_all()
+            .filter(cls.author_id == user_id).fetch())
 
         for suggestion_model in suggestion_models:
-            suggestion_model_id = str(suggestion_model.id)
-            user_data[suggestion_model_id] = {
+            user_data[suggestion_model.id] = {
                 'suggestion_type': suggestion_model.suggestion_type,
                 'target_type': suggestion_model.target_type,
                 'target_id': suggestion_model.target_id,
-                'target_version_at_submission': (suggestion_model
-                                                 .target_version_at_submission
-                                                ),
+                'target_version_at_submission': (
+                    suggestion_model
+                    .target_version_at_submission),
                 'status': suggestion_model.status,
                 'change_cmd': suggestion_model.change_cmd,
             }

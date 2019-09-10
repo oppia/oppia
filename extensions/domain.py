@@ -15,9 +15,13 @@
 # limitations under the License.
 
 """Domain objects used within multiple extensions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import python_utils
 
 
-class CustomizationArgSpec(object):
+class CustomizationArgSpec(python_utils.OBJECT):
     """Value object for a customization arg specification."""
 
     def __init__(self, name, description, schema, default_value):

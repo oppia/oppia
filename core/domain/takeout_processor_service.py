@@ -1,0 +1,42 @@
+from core.platform import models
+
+(user_models, collection_models, exploration_models, story_models,
+ feedback_models, suggestion_models,
+ email_models) = models.Registry.import_models([
+    models.NAMES.user, models.NAMES.collection, models.NAMES.exploration,
+    models.NAMES.story, models.NAMES.feedback, models.NAMES.suggestion,
+    models.NAMES.email])
+
+def export_all_models(user_id):
+    # User models.
+    stats_data = user_models.UserStatsModel.export_data(user_id)
+    user_settings_data = user_models.UserSettingsModel.export_data(user_id)
+    user_subscriptions_data = user_models.UserSubscriptionsModel.export_data(user_id)
+    user_skill_data = user_models.UserSkillMasteryModel.export_data(user_id)
+    user_contribution_data = user_models.UserContributionsModel.export_data(user_id)
+    user_exploration_data = user_models.ExplorationUserDataModel.export_data(user_id)
+    completed_activities_data = user_models.CompletedActivitiesModel.export_data(user_id)
+    incomplete_activities_data = user_models.IncompleteActivitiesModel.export_data(user_id)
+    last_playthrough_data = user_models.ExpUserLastPlaythroughModel.export_data(user_id)
+    learner_playlist_data = user_models.LearnerPlaylistModel.export_data(user_id)
+    collection_progress_data = user_models.CollectionProgressModel.export_data(user_id)
+    story_progress_data = user_models.StoryProgressModel.export_data(user_id)
+
+    # Feedback models.
+    general_feedback_thread_data = feedback_models.GeneralFeedbackThreadModel.export_data(user_id)
+    general_feedback_message_data = feedback_models.GeneralFeedbackMessageModel.export_data(user_id)
+
+    # Collection models.
+    collection_rights_data = collection_models.CollectionRightsModel.export_data(user_id)
+
+    # Suggestion models.
+    general_suggestion_data = suggestion_models.GeneralSuggestionModel.export_data(user_id)
+
+    # Exploration models.
+    exploration_rights_data = exploration_models.ExplorationRightsModel.export_data(user_id)
+
+    # Story models.
+    story_rights_data = story_models.StoryRightsModel.export_data(user_id)
+
+    # Email models.
+    general_feedback_email_reply_data = email_models.GeneralFeedbackEmailReplyToIdModel.export_data(user_id)

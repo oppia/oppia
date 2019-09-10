@@ -15,10 +15,13 @@
 # limitations under the License.
 
 """Domain objects for configuration properties."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import change_domain
 from core.platform import models
 import feconf
+import python_utils
 import schema_utils
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
@@ -34,6 +37,30 @@ SET_OF_STRINGS_SCHEMA = {
     'validators': [{
         'id': 'is_uniquified',
     }],
+}
+
+SET_OF_CLASSROOM_DICTS_SCHEMA = {
+    'type': 'list',
+    'items': {
+        'type': 'dict',
+        'properties': [{
+            'name': 'name',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'topic_ids',
+            'schema': {
+                'type': 'list',
+                'items': {
+                    'type': 'unicode',
+                },
+                'validators': [{
+                    'id': 'is_uniquified',
+                }]
+            }
+        }]
+    }
 }
 
 VMID_SHARED_SECRET_KEY_SCHEMA = {
@@ -81,7 +108,7 @@ class ConfigPropertyChange(change_domain.BaseChange):
     }]
 
 
-class ConfigProperty(object):
+class ConfigProperty(python_utils.OBJECT):
     """A property with a name and a default value.
 
     NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
@@ -210,7 +237,7 @@ class ConfigProperty(object):
         return schema_utils.normalize_against_schema(value, self._schema)
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all configuration properties."""
 
     # The keys of _config_registry are the property names, and the values are
@@ -250,7 +277,7 @@ class Registry(object):
         """
         schemas_dict = {}
 
-        for (property_name, instance) in cls._config_registry.iteritems():
+        for (property_name, instance) in cls._config_registry.items():
             schemas_dict[property_name] = {
                 'schema': instance.schema,
                 'description': instance.description,
@@ -283,6 +310,14 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
         '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
         'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
 
+TOPIC_IDS_FOR_CLASSROOM_PAGES = ConfigProperty(
+    'topic_ids_for_classroom_pages', SET_OF_CLASSROOM_DICTS_SCHEMA,
+    'The set of topic IDs for each classroom page.', [{
+        'name': 'Math',
+        'topic_ids': []
+    }]
+)
+
 RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
@@ -290,4 +325,9 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
 IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
     'is_improvements_tab_enabled', BOOL_SCHEMA,
     'Exposes the Improvements Tab for creators in the exploration editor.',
+    True)
+
+ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
+    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
+    'Always ask learners for answer details. For testing -- do not use',
     False)

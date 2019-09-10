@@ -13,9 +13,10 @@
 # limitations under the License.
 
 """Controllers for Oppia resources (templates, images)."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
-import urllib
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -25,6 +26,7 @@ from core.domain import fs_domain
 from core.domain import topic_fetchers
 from core.domain import value_generators_domain
 import feconf
+import python_utils
 
 
 class ValueGeneratorHandler(base.BaseHandler):
@@ -76,13 +78,14 @@ class AssetDevHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         try:
-            filename = urllib.unquote(encoded_filename)
+            filename = python_utils.urllib_unquote(encoded_filename)
             file_format = filename[(filename.rfind('.') + 1):]
 
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            self.response.headers['Content-Type'] = str(
-                '%s/%s' % (asset_type, file_format))
+            self.response.headers[
+                b'Content-Type'] = python_utils.convert_to_bytes(
+                    '%s/%s' % (asset_type, file_format))
 
             if page_context == feconf.ENTITY_TYPE_SUBTOPIC:
                 entity_type = feconf.ENTITY_TYPE_TOPIC

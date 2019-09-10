@@ -15,10 +15,14 @@
 # limitations under the License.
 
 """Commands that can be used to upgrade draft to newer Exploration versions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import logging
 
 from core.domain import exp_domain
 from core.platform import models
+import python_utils
 import utils
 
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
@@ -55,7 +59,8 @@ def try_upgrading_draft_to_exp_version(
     if current_draft_version == to_exp_version:
         return
 
-    exp_versions = range(current_draft_version + 1, to_exp_version + 1)
+    exp_versions = list(
+        python_utils.RANGE(current_draft_version + 1, to_exp_version + 1))
     commits_list = (
         exp_models.ExplorationCommitLogEntryModel.get_multi(
             exp_id, exp_versions))
@@ -79,7 +84,7 @@ def try_upgrading_draft_to_exp_version(
     return draft_change_list
 
 
-class DraftUpgradeUtil(object):
+class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod

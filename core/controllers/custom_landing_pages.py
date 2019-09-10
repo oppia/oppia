@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Controllers for custom landing pages."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -38,7 +40,7 @@ class TopicLandingPage(base.BaseHandler):
         """Handles GET requests."""
         if subject in feconf.AVAILABLE_LANDING_PAGES:
             if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
-                self.render_template('dist/topic-landing-page.mainpage.html')
+                self.render_template('topic-landing-page.mainpage.html')
             else:
                 raise self.PageNotFoundException
         else:
@@ -54,4 +56,4 @@ class StewardsLandingPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.render_template(
-            'dist/stewards-landing-page.mainpage.html')
+            'stewards-landing-page.mainpage.html')

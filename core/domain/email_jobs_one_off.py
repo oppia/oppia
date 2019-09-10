@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Jobs for Sent Email Model."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
 from core.platform import models
@@ -36,6 +38,32 @@ class EmailHashRegenerationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(email_model):
         email_model.put()
         yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class GeneralFeedbackEmailReplyToIdOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for setting user_id and thread_id for all
+    GeneralFeedbackEmailReplyToIdOneOffJob.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [email_models.GeneralFeedbackEmailReplyToIdModel]
+
+    @staticmethod
+    def map(model_instance):
+        """Implements the map function for this job."""
+        user_id, thread_id = model_instance.id.split('.', 1)
+        if model_instance.user_id is None:
+            model_instance.user_id = user_id
+        if model_instance.thread_id is None:
+            model_instance.thread_id = thread_id
+        model_instance.put(update_last_updated_time=False)
+        yield ('SUCCESS', model_instance.id)
 
     @staticmethod
     def reduce(key, values):

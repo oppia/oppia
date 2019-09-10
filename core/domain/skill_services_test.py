@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests the methods defined in skill services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -24,6 +26,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -68,7 +71,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_contents)
 
     def test_apply_change_list_with_invalid_property_name(self):
-        class MockSkillChange(object):
+        class MockSkillChange(python_utils.OBJECT):
             def __init__(self, cmd, property_name):
                 self.cmd = cmd
                 self.property_name = property_name
@@ -727,9 +730,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'commit message')
 
         self.assertEqual(len(observed_log_messages), 1)
-        self.assertEqual(
-            observed_log_messages[0], 'AttributeError \'str\' object has no '
-            'attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
+        self.assertRegexpMatches(
+            observed_log_messages[0], 'object has no'
+            ' attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
 
     def test_cannot_update_misconception_name_with_invalid_id(self):
         changelist = [skill_domain.SkillChange({

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Services for classifier data models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -21,6 +23,7 @@ import re
 from core.domain import classifier_domain
 from core.platform import models
 import feconf
+import python_utils
 
 (classifier_models, exp_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.exploration])
@@ -197,7 +200,8 @@ def convert_strings_to_float_numbers_in_classifier_data(
             classifier_data.append(
                 convert_strings_to_float_numbers_in_classifier_data(item))
         return classifier_data
-    elif isinstance(classifier_data_with_floats_stringified, basestring):
+    elif isinstance(
+            classifier_data_with_floats_stringified, python_utils.BASESTRING):
         if re.match(
                 feconf.FLOAT_VERIFIER_REGEX,
                 classifier_data_with_floats_stringified):
@@ -274,7 +278,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
     classifier_training_job_models = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
-    for index in range(len(job_ids)):
+    for index in python_utils.RANGE(len(job_ids)):
         if classifier_training_job_models[index] is None:
             raise Exception(
                 'The ClassifierTrainingJobModel corresponding to the job_id '
@@ -459,9 +463,9 @@ def create_classifier_training_job_for_reverted_exploration(
     """
     classifier_training_jobs_for_old_version = get_classifier_training_jobs(
         exploration.id, exploration_to_revert_to.version,
-        exploration_to_revert_to.states.keys())
+        list(exploration_to_revert_to.states.keys()))
     job_exploration_mappings = []
-    state_names = exploration_to_revert_to.states.keys()
+    state_names = list(exploration_to_revert_to.states.keys())
     for index, classifier_training_job in enumerate(
             classifier_training_jobs_for_old_version):
         if classifier_training_job is not None:

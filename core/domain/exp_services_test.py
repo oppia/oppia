@@ -15,8 +15,9 @@
 # limitations under the License.
 
 """Unit tests for core.domain.exp_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import StringIO
 import datetime
 import logging
 import os
@@ -39,6 +40,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (exp_models, user_models) = models.Registry.import_models([
@@ -620,7 +622,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(retrieved_exploration.states), 1)
         self.assertEqual(len(retrieved_exploration.param_specs), 1)
         self.assertEqual(
-            retrieved_exploration.param_specs.keys()[0], 'theParameter')
+            list(retrieved_exploration.param_specs.keys())[0], 'theParameter')
 
     def test_save_and_retrieve_exploration_summary(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -771,7 +773,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_get_state_classifier_mapping(self):
         yaml_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        with open(yaml_path, 'r') as yaml_file:
+        with python_utils.open_file(
+            yaml_path, 'rb', encoding=None) as yaml_file:
             yaml_content = yaml_file.read()
 
         exploration = exp_fetchers.get_exploration_by_id('exp_id', strict=False)
@@ -849,7 +852,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 0)
 
-        demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
+        demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
         self.assertGreaterEqual(
             len(demo_exploration_ids), 1,
             msg='There must be at least one demo exploration.')
@@ -862,10 +865,11 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
             exploration.validate(strict=True)
 
             duration = datetime.datetime.utcnow() - start_time
-            processing_time = duration.seconds + duration.microseconds / 1E6
+            processing_time = duration.seconds + python_utils.divide(
+                duration.microseconds, 1E6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)' %
-                (exploration.title.encode('utf-8'), processing_time))
+                (exploration.title, processing_time))
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(),
@@ -1665,7 +1669,8 @@ title: A title
                 })], 'Add state name')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
-        zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
+        zf = zipfile.ZipFile(python_utils.string_io(
+            buffer_value=zip_file_output))
 
         self.assertEqual(zf.namelist(), ['A title.yaml'])
         self.assertEqual(
@@ -1698,7 +1703,9 @@ title: A title
                     'new_value': 'TextInput'
                 })], 'Add state name')
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
@@ -1706,7 +1713,8 @@ title: A title
         fs.commit(self.owner_id, 'abc.png', raw_image)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
-        zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
+        zf = zipfile.ZipFile(python_utils.string_io(
+            buffer_value=zip_file_output))
 
         self.assertEqual(zf.namelist(), ['A title.yaml', 'assets/abc.png'])
         self.assertEqual(
@@ -1737,7 +1745,9 @@ title: A title
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
         })]
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
@@ -1761,14 +1771,16 @@ title: A title
         # Download version 2.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_ID, version=2)
-        zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
+        zf = zipfile.ZipFile(python_utils.string_io(
+            buffer_value=zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
         # Download version 3.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_ID, version=3)
-        zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
+        zf = zipfile.ZipFile(python_utils.string_io(
+            buffer_value=zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)
 
@@ -1948,7 +1960,9 @@ written_translations:
             'new_value': 'TextInput'
         })]
         exploration.objective = 'The objective'
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
@@ -2696,7 +2710,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in range(len(snapshots_metadata) - 1):
+        for ind in python_utils.RANGE(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -2726,7 +2740,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
         self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in range(len(snapshots_metadata) - 1):
+        for ind in python_utils.RANGE(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -3001,7 +3015,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             'add_documents_to_index',
             add_docs_counter)
 
-        for i in xrange(5):
+        for i in python_utils.RANGE(5):
             self.save_new_valid_exploration(
                 all_exp_ids[i],
                 self.owner_id,
@@ -3010,7 +3024,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         # We're only publishing the first 4 explorations, so we're not
         # expecting the last exploration to be indexed.
-        for i in xrange(4):
+        for i in python_utils.RANGE(4):
             rights_manager.publish_exploration(
                 self.owner, expected_exp_ids[i])
 
@@ -3328,8 +3342,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 )}
 
         # Check actual summaries equal expected summaries.
-        self.assertEqual(actual_summaries.keys(),
-                         expected_summaries.keys())
+        self.assertEqual(list(actual_summaries.keys()),
+                         list(expected_summaries.keys()))
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings',
                         'scaled_average_rating', 'status',
@@ -3372,8 +3386,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         }
 
         # Check actual summaries equal expected summaries.
-        self.assertEqual(actual_summaries.keys(),
-                         expected_summaries.keys())
+        self.assertEqual(list(actual_summaries.keys()),
+                         list(expected_summaries.keys()))
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
@@ -3464,9 +3478,9 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """) % (
-    feconf.DEFAULT_INIT_STATE_NAME,
+    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
+    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'

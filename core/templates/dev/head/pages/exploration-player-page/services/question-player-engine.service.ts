@@ -19,7 +19,7 @@
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
-require('expressions/ExpressionInterpolationService.ts');
+require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/AlertsService.ts');
@@ -47,13 +47,16 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       StateCardObjectFactory, UrlService, INTERACTION_DISPLAY_MODE_INLINE,
       INTERACTION_SPECS) {
     var _explorationId = ContextService.getExplorationId();
+    var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var version = UrlService.getExplorationVersionFromUrl();
 
-    ReadOnlyExplorationBackendApiService
-      .loadExploration(_explorationId, version)
-      .then(function(exploration) {
-        version = exploration.version;
-      });
+    if (!_questionPlayerMode) {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(_explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    }
 
     var answerIsBeingProcessed = false;
 

@@ -15,13 +15,16 @@
 # limitations under the License.
 
 """Classes for interpreting typed objects in Oppia."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+import python_utils
 import schema_utils
 
 
-class BaseObject(object):
+class BaseObject(python_utils.OBJECT):
     """Base object class.
 
     This is the superclass for typed object specifications in Oppia, such as
@@ -446,15 +449,15 @@ class CheckedProof(BaseObject):
         Returns:
             dict. The normalized object containing the following key-value
                 pairs:
-                    assumptions_string: basestring. The string containing the
+                    assumptions_string: str. The string containing the
                         assumptions.
-                    target_string: basestring. The target string of the proof.
-                    proof_string: basestring. The proof string.
+                    target_string: str. The target string of the proof.
+                    proof_string: str. The proof string.
                     correct: bool. Whether the proof is correct.
-                    error_category: basestring. The category of the error.
-                    error_code: basestring. The error code.
-                    error_message: basestring. The error message.
-                    error_line_number: basestring. The line number at which the
+                    error_category: str. The category of the error.
+                    error_code: str. The error code.
+                    error_message: str. The error message.
+                    error_line_number: str. The line number at which the
                         error has occurred.
 
         Raises:
@@ -462,14 +465,17 @@ class CheckedProof(BaseObject):
         """
         try:
             assert isinstance(raw, dict)
-            assert isinstance(raw['assumptions_string'], basestring)
-            assert isinstance(raw['target_string'], basestring)
-            assert isinstance(raw['proof_string'], basestring)
+            assert isinstance(
+                raw['assumptions_string'], python_utils.BASESTRING)
+            assert isinstance(raw['target_string'], python_utils.BASESTRING)
+            assert isinstance(raw['proof_string'], python_utils.BASESTRING)
             assert raw['correct'] in [True, False]
             if not raw['correct']:
-                assert isinstance(raw['error_category'], basestring)
-                assert isinstance(raw['error_code'], basestring)
-                assert isinstance(raw['error_message'], basestring)
+                assert isinstance(
+                    raw['error_category'], python_utils.BASESTRING)
+                assert isinstance(raw['error_code'], python_utils.BASESTRING)
+                assert isinstance(
+                    raw['error_message'], python_utils.BASESTRING)
                 assert isinstance(raw['error_line_number'], int)
             return copy.deepcopy(raw)
         except Exception:
@@ -495,22 +501,22 @@ class LogicQuestion(BaseObject):
                     assumptions: list(dict(str, *)). The list containing all the
                         assumptions in the dict format containing following
                         key-value pairs:
-                            top_kind_name: basestring. The top kind name in the
+                            top_kind_name: str. The top kind name in the
                                 expression.
-                            top_operator_name: basestring. The top operator name
+                            top_operator_name: str. The top operator name
                                 in the expression.
                             arguments: list. A list of arguments.
                             dummies: list. A list of dummy values.
                     results: list(dict(str, *)). The list containing the final
                         results of the required proof in the dict format
                         containing following key-value pairs:
-                            top_kind_name: basestring. The top kind name in the
+                            top_kind_name: str. The top kind name in the
                                 expression.
-                            top_operator_name: basestring. The top operator name
+                            top_operator_name: str. The top operator name
                                 in the expression.
                             arguments: list. A list of arguments.
                             dummies: list. A list of dummy values.
-                    default_proof_string: basestring. The default proof string.
+                    default_proof_string: str. The default proof string.
 
         Raises:
             TypeError: Cannot convert to LogicQuestion schema.
@@ -528,8 +534,10 @@ class LogicQuestion(BaseObject):
                     format.
             """
             assert isinstance(expression, dict)
-            assert isinstance(expression['top_kind_name'], basestring)
-            assert isinstance(expression['top_operator_name'], basestring)
+            assert isinstance(
+                expression['top_kind_name'], python_utils.BASESTRING)
+            assert isinstance(
+                expression['top_operator_name'], python_utils.BASESTRING)
             _validate_expression_array(expression['arguments'])
             _validate_expression_array(expression['dummies'])
 
@@ -551,7 +559,8 @@ class LogicQuestion(BaseObject):
             assert isinstance(raw, dict)
             _validate_expression_array(raw['assumptions'])
             _validate_expression_array(raw['results'])
-            assert isinstance(raw['default_proof_string'], basestring)
+            assert isinstance(
+                raw['default_proof_string'], python_utils.BASESTRING)
 
             return copy.deepcopy(raw)
         except Exception:

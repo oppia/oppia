@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for generic controller behavior."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import importlib
@@ -36,6 +38,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import main
+import python_utils
 import utils
 
 from mapreduce import main as mapreduce_main
@@ -391,7 +394,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             import main  # pylint: disable-all
 
         headers_dict = {
-            'X-AppEngine-TaskName': 'taskname'
+            'X-AppEngine-TaskName': b'taskname'
         }
         self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
         self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
@@ -525,10 +528,6 @@ class EscapingTests(test_utils.GenericTestBase):
     class FakePage(base.BaseHandler):
         """Fake page for testing autoescaping."""
 
-        def get(self):
-            """Handles GET requests."""
-            self.render_template('tests/jinja_escaping.html')
-
         def post(self):
             """Handles POST requests."""
             self.render_json({'big_value': u'\n<script>马={{'})
@@ -545,17 +544,6 @@ class EscapingTests(test_utils.GenericTestBase):
             [webapp2.Route('/fake', self.FakePage, name='FakePage')],
             debug=feconf.DEBUG,
         ))
-
-    def test_jinja_autoescaping(self):
-        dangerous_field_contents = '<[angular_tag]> x{{51 * 3}}y'
-        with self.swap(constants, 'DEV_MODE', dangerous_field_contents):
-            response = self.get_html_response('/fake')
-
-            self.assertIn('&lt;[angular_tag]&gt;', response.body)
-            self.assertNotIn('<[angular_tag]>', response.body)
-
-            self.assertIn('x{{51 * 3}}y', response.body)
-            self.assertNotIn('x153y', response.body)
 
     def test_special_char_escaping(self):
         response = self.testapp.post('/fake', params={})
@@ -720,8 +708,9 @@ class I18nDictsTests(test_utils.GenericTestBase):
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
         for filename in filenames:
-            with open(os.path.join(os.getcwd(), 'assets', 'i18n', filename),
-                      mode='r') as f:
+            with python_utils.open_file(
+                os.path.join(os.getcwd(), 'assets', 'i18n', filename),
+                mode='r') as f:
                 lines = f.readlines()
                 self.assertEqual(lines[0], '{\n')
                 self.assertEqual(lines[-1], '}\n')
@@ -778,7 +767,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         # HTML tags and Angular variable interpolations.
         master_tags_dict = {
             key: self._get_tags(value, key, 'en.json')
-            for key, value in master_translation_dict.iteritems()
+            for key, value in master_translation_dict.items()
         }
 
         mismatches = []
@@ -790,7 +779,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 continue
             translation_dict = json.loads(utils.get_file_contents(
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename)))
-            for key, value in translation_dict.iteritems():
+            for key, value in translation_dict.items():
                 tags = self._get_tags(value, key, filename)
                 if tags != master_tags_dict[key]:
                     mismatches.append('%s (%s): %s != %s' % (
@@ -886,7 +875,7 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
 
         def get(self):
-            self.values.update(self.request.GET.items())
+            self.values.update(list(self.request.GET.items()))
             self.render_json(self.values)
 
     def test_get_items(self):
@@ -985,7 +974,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
             self.render_template(
-                'pages/about-page/about-page.mainpage.html',
+                'about-page.mainpage.html',
                 iframe_restriction=iframe_restriction)
 
     def setUp(self):

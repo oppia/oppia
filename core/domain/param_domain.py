@@ -15,16 +15,19 @@
 # limitations under the License.
 
 """Domain objects relating to parameters."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
 from core.domain import obj_services
 from core.domain import value_generators_domain
 import feconf
+import python_utils
 import utils
 
 
-class ParamSpec(object):
+class ParamSpec(python_utils.OBJECT):
     """Value object for an exploration parameter specification."""
 
     SUPPORTED_OBJ_TYPES = {
@@ -83,7 +86,7 @@ class ParamSpec(object):
                 (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
 
 
-class ParamChange(object):
+class ParamChange(python_utils.OBJECT):
     """Value object for a parameter change."""
 
     def __init__(self, name, generator_id, customization_args):
@@ -195,7 +198,7 @@ class ParamChange(object):
 
     def validate(self):
         """Checks that the properties of this ParamChange object are valid."""
-        if not isinstance(self.name, basestring):
+        if not isinstance(self.name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected param_change name to be a string, received %s'
                 % self.name)
@@ -219,7 +222,7 @@ class ParamChange(object):
                 'Expected a dict of customization_args, received %s'
                 % self.customization_args)
         for arg_name in self.customization_args:
-            if not isinstance(arg_name, basestring):
+            if not isinstance(arg_name, python_utils.BASESTRING):
                 raise Exception(
                     'Invalid parameter change customization_arg name: %s'
                     % arg_name)

@@ -15,11 +15,14 @@
 # limitations under the License.
 
 """Domain object for a reference to an activity."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+import python_utils
 
 
-class ActivityReference(object):
+class ActivityReference(python_utils.OBJECT):
     """Domain object for an activity reference.
 
     An activity is a piece of learning material that can be created in Oppia.
@@ -55,7 +58,7 @@ class ActivityReference(object):
         if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
                 self.type != constants.ACTIVITY_TYPE_COLLECTION):
             raise Exception('Invalid activity type: %s' % self.type)
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.id, python_utils.BASESTRING):
             raise Exception(
                 'Expected id to be a string but found %s' % self.id)
 
@@ -72,7 +75,7 @@ class ActivityReference(object):
         }
 
 
-class ActivityReferences(object):
+class ActivityReferences(python_utils.OBJECT):
     """Domain object for a list of activity references.
 
     Attributes:

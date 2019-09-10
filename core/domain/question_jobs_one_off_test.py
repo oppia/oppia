@@ -15,6 +15,9 @@
 # limitations under the License.
 
 """Tests for Question-related one-off jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import ast
 
 from core.domain import question_jobs_one_off

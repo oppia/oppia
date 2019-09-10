@@ -16,10 +16,14 @@
 
 Do not use this module anywhere else in the code base!
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 import inspect
 import threading
+
+import python_utils
 
 
 def memoize(func):
@@ -80,7 +84,8 @@ def memoize(func):
     # values and use them to build the kwargs that func will actually see.
     arg_names, _, _, defaults = inspect.getargspec(func)
     defaults = defaults if defaults is not None else ()
-    default_func_kwargs = dict(zip(arg_names[-len(defaults):], defaults))
+    default_func_kwargs = dict(
+        python_utils.ZIP(arg_names[-len(defaults):], defaults))
 
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):
@@ -92,7 +97,7 @@ def memoize(func):
         """
         func_kwargs = default_func_kwargs.copy()
         func_kwargs.update(kwargs)
-        key = (tuple(args), tuple(sorted(func_kwargs.iteritems())))
+        key = (tuple(args), tuple(sorted(func_kwargs.items())))
         return get_from_cache(key, factory=lambda: func(*args, **kwargs))
 
     return memoized_func

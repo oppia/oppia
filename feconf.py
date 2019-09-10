@@ -15,12 +15,14 @@
 # limitations under the License.
 
 """Stores various configuration options and constants for Oppia."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import datetime
 import os
 
-from constants import constants  # pylint: disable=relative-import
+from constants import constants
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -33,6 +35,10 @@ POST_COMMIT_STATUS_PRIVATE = 'private'
 
 # Whether to unconditionally log info messages.
 DEBUG = False
+
+# The path for generating release_summary.md file for the current release.
+RELEASE_SUMMARY_FILEPATH = os.path.join(
+    os.getcwd(), os.pardir, 'release_summary.md')
 
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
@@ -61,15 +67,14 @@ INTERACTIONS_DIR = (
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
-    os.path.join('assets', 'rich_text_components_definitions.js'))
+    os.path.join('assets', 'rich_text_components_definitions.ts'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
-    os.path.join(
-        'core', 'templates', 'dev', 'head') if constants.DEV_MODE else
-    os.path.join('backend_prod_files', 'templates', 'head'))
+    os.path.join('webpack_bundles') if constants.DEV_MODE else
+    os.path.join('backend_prod_files', 'webpack_bundles'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -219,6 +224,9 @@ COMMIT_LIST_PAGE_SIZE = 50
 # The default number of items to show on a page in the exploration feedback
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
+
+# The default number of opportunities to show on community dashboard page.
+OPPORTUNITIES_PAGE_SIZE = 20
 
 # The maximum number of top unresolved answers which should be aggregated
 # from all of the submitted answers.
@@ -403,6 +411,9 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
+# Whether community dashboard is ready to use for contributors.
+COMMUNITY_DASHBOARD_ENABLED = False
+
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
@@ -485,6 +496,13 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # The minimum score required for a user to review suggestions of a particular
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
+
+# The number of medium question skill difficulty.
+MEDIUM_SKILL_DIFFICULTY = 0.6
+
+# The maximum number of skills to be requested at one time when fetching
+# questions.
+MAX_NUMBER_OF_SKILL_IDS = 20
 
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
@@ -597,6 +615,8 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+CLASSROOM_URL_PREFIX = '/classroom'
+CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
@@ -605,6 +625,8 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
+COMMUNITY_DASHBOARD_URL = '/community_dashboard'
+COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
@@ -711,8 +733,8 @@ TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
+USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
-VOICEOVER_DATA_PREFIX = '/createhandler/voiceover'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

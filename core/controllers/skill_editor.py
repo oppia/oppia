@@ -13,19 +13,17 @@
 # limitations under the License.
 
 """Controllers for the skill editor."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import dependency_registry
-from core.domain import interaction_registry
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import user_services
 import feconf
 import utils
-
-import jinja2
 
 
 def _require_valid_version(version_from_payload, skill_version):
@@ -55,8 +53,6 @@ def _require_valid_version(version_from_payload, skill_version):
 class SkillEditorPage(base.BaseHandler):
     """The editor page for a single skill."""
 
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
-
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
         """Handles GET requests."""
@@ -68,22 +64,7 @@ class SkillEditorPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
-        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
-
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
-                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
-
-        self.values.update({
-            'additional_angular_modules': additional_angular_modules,
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'dependencies_html': jinja2.utils.Markup(dependencies_html)
-        })
-
-        self.render_template('dist/skill-editor-page.mainpage.html')
+        self.render_template('skill-editor-page.mainpage.html')
 
 
 def check_can_edit_skill_description(user):
@@ -208,11 +189,11 @@ class SkillDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException('Invalid skill id.')
         try:
             skills = skill_services.get_multi_skills(skill_ids)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
         skill_dicts = [skill.to_dict() for skill in skills]

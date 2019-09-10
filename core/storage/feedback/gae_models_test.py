@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for core.storage.feedback.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import types
 
@@ -23,7 +25,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(base_models, feedback_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.feedback])
 
 CREATED_ON_FIELD = 'created_on'
 LAST_UPDATED_FIELD = 'last_updated'
@@ -34,24 +37,10 @@ FIELDS_NOT_REQUIRED = [CREATED_ON_FIELD, LAST_UPDATED_FIELD, DELETED_FIELD]
 class FeedbackThreadModelTest(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackThreadModel class."""
 
-    def test_put_function(self):
-        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION, entity_id='exp_id_1',
-            subject='dummy subject', message_count=0)
-
-        feedback_thread_model.put()
-
-        last_updated = feedback_thread_model.last_updated
-
-        # If we do not wish to update the last_updated time, we should set
-        # the update_last_updated_time argument to False in the put function.
-        feedback_thread_model.put(update_last_updated_time=False)
-        self.assertEqual(feedback_thread_model.last_updated, last_updated)
-
-        # If we do wish to change it however, we can simply use the put function
-        # as the default value of update_last_updated_time is True.
-        feedback_thread_model.put()
-        self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            feedback_models.GeneralFeedbackThreadModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_raise_exception_by_mocking_collision(self):
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
@@ -82,12 +71,13 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
     def test_export_data_trivial(self):
         user_data = feedback_models.GeneralFeedbackThreadModel.export_data(
-            'fake_user')
+            'fake_user'
+        )
         test_data = {}
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
-        # Set up testing varibles.
+        # Set up testing variables.
         test_export_entity_type = feconf.ENTITY_TYPE_EXPLORATION
         test_export_entity_id = 'exp_id_2'
         test_export_author_id = 'user_1'
@@ -110,10 +100,11 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
         feedback_thread_model.put()
 
-        user_data = (feedback_models
-                     .GeneralFeedbackThreadModel.export_data('user_1'))
+        user_data = (
+            feedback_models
+            .GeneralFeedbackThreadModel.export_data('user_1'))
         test_data = {
-            str(feedback_thread_model.id): {
+            feedback_thread_model.id: {
                 'entity_type': test_export_entity_type,
                 'entity_id': test_export_entity_id,
                 'status': test_export_status,
@@ -129,6 +120,11 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
 class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackMessageModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            feedback_models.GeneralFeedbackMessageModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_raise_exception_by_mocking_collision(self):
         with self.assertRaisesRegexp(
@@ -194,9 +190,9 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(message.updated_subject, 'subject 2')
 
     def test_export_data_trivial(self):
-        user_data = (feedback_models
-                     .GeneralFeedbackMessageModel
-                     .export_data('non_existent_user'))
+        user_data = (
+            feedback_models.GeneralFeedbackMessageModel
+            .export_data('non_existent_user'))
         test_data = {}
         self.assertEqual(user_data, test_data)
 
@@ -226,9 +222,9 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             test_export_text
         )
 
-        user_data = (feedback_models
-                     .GeneralFeedbackMessageModel
-                     .export_data(test_export_author_id))
+        user_data = (
+            feedback_models.GeneralFeedbackMessageModel
+            .export_data(test_export_author_id))
 
         test_data = {
             thread_id + '.0': {
@@ -255,6 +251,33 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     """Tests for the FeedbackThreadUserModel class."""
 
+    def test_put_function(self):
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadUserModel(
+            id='user_id.exploration.exp_id.thread_id',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id',
+            message_ids_read_by_user=[])
+
+        feedback_thread_model.put()
+
+        last_updated = feedback_thread_model.last_updated
+
+        # If we do not wish to update the last_updated time, we should set
+        # the update_last_updated_time argument to False in the put function.
+        feedback_thread_model.put(update_last_updated_time=False)
+        self.assertEqual(feedback_thread_model.last_updated, last_updated)
+
+        # If we do wish to change it however, we can simply use the put function
+        # as the default value of update_last_updated_time is True.
+        feedback_thread_model.put()
+        self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            feedback_models.GeneralFeedbackThreadUserModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
     def test_create_new_object(self):
         feedback_models.GeneralFeedbackThreadUserModel.create(
             'user_id', 'exploration.exp_id.thread_id')
@@ -265,6 +288,10 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_thread_user_model.id,
             'user_id.exploration.exp_id.thread_id')
+        self.assertEqual(feedback_thread_user_model.user_id, 'user_id')
+        self.assertEqual(
+            feedback_thread_user_model.thread_id,
+            'exploration.exp_id.thread_id')
         self.assertEqual(
             feedback_thread_user_model.message_ids_read_by_user, [])
 
@@ -273,6 +300,8 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             'user_id', 'exploration.exp_id.thread_id')
         expected_model = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id',
             message_ids_read_by_user=[])
 
         actual_model = (
@@ -280,6 +309,8 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
                 'user_id', 'exploration.exp_id.thread_id'))
 
         self.assertEqual(actual_model.id, expected_model.id)
+        self.assertEqual(actual_model.user_id, expected_model.user_id)
+        self.assertEqual(actual_model.thread_id, expected_model.thread_id)
         self.assertEqual(
             actual_model.message_ids_read_by_user,
             expected_model.message_ids_read_by_user)
@@ -292,9 +323,13 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
 
         expected_model_1 = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id_1',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id_1',
             message_ids_read_by_user=[])
         expected_model_2 = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id_2',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id_2',
             message_ids_read_by_user=[])
 
         actual_models = (
@@ -307,18 +342,36 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         actual_model_2 = actual_models[1]
 
         self.assertEqual(actual_model_1.id, expected_model_1.id)
+        self.assertEqual(actual_model_1.user_id, expected_model_1.user_id)
+        self.assertEqual(actual_model_1.thread_id, expected_model_1.thread_id)
         self.assertEqual(
             actual_model_1.message_ids_read_by_user,
             expected_model_1.message_ids_read_by_user)
 
         self.assertEqual(actual_model_2.id, expected_model_2.id)
+        self.assertEqual(actual_model_2.user_id, expected_model_2.user_id)
+        self.assertEqual(actual_model_2.thread_id, expected_model_2.thread_id)
         self.assertEqual(
             actual_model_2.message_ids_read_by_user,
             expected_model_2.message_ids_read_by_user)
 
 
+class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
+    """Tests for the FeedbackAnalyticsModelTests class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            feedback_models.FeedbackAnalyticsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
     """Tests for FeedbackMessageEmailDataModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            feedback_models.UnsentFeedbackEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
 
     def test_new_instances_stores_correct_data(self):
         user_id = 'A'

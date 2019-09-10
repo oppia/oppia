@@ -15,6 +15,8 @@
 """Controllers for the topics and skills dashboard, from where topics and skills
 are created.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -34,7 +36,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
         self.render_template(
-            'dist/topics-and-skills-dashboard-page.mainpage.html')
+            'topics-and-skills-dashboard-page.mainpage.html')
 
 
 class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
@@ -147,6 +149,11 @@ class NewSkillHandler(base.BaseHandler):
     def post(self):
         description = self.payload.get('description')
         linked_topic_ids = self.payload.get('linked_topic_ids')
+        rubrics = self.payload.get('rubrics')
+        if not isinstance(rubrics, list):
+            raise self.InvalidInputException('Rubrics should be a list.')
+
+        rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
             topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
@@ -159,7 +166,7 @@ class NewSkillHandler(base.BaseHandler):
         skill_domain.Skill.require_valid_description(description)
 
         skill = skill_domain.Skill.create_default_skill(
-            new_skill_id, description)
+            new_skill_id, description, rubrics)
         skill_services.save_new_skill(self.user_id, skill)
 
         self.render_json({

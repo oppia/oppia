@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Classes for Rich Text Components in Oppia."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
@@ -22,16 +24,18 @@ import bs4
 import constants
 from extensions.objects.models import objects
 import feconf
+import python_utils
 
 
-class BaseRteComponent(object):
+class BaseRteComponent(python_utils.OBJECT):
     """Base Rte Component class.
 
     This is the superclass for rich text components in Oppia, such as
     Image and Video.
     """
 
-    with open(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
+    with python_utils.open_file(
+        feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
         rich_text_component_specs = constants.parse_json_from_js(f)
 
     obj_types_to_obj_classes = {
@@ -65,15 +69,16 @@ class BaseRteComponent(object):
             obj_class = cls.obj_types_to_obj_classes[obj_type]
             arg_names_to_obj_classes[arg_name] = obj_class
 
-        required_attr_names = arg_names_to_obj_classes.keys()
-        attr_names = value_dict.keys()
+        required_attr_names = list(arg_names_to_obj_classes.keys())
+        attr_names = list(value_dict.keys())
 
         if set(attr_names) != set(required_attr_names):
             missing_attr_names = list(
                 set(required_attr_names) - set(attr_names))
             extra_attr_names = list(set(attr_names) - set(required_attr_names))
             raise Exception('Missing attributes: %s, Extra attributes: %s' % (
-                str(missing_attr_names), str(extra_attr_names)))
+                ', '.join(missing_attr_names),
+                ', '.join(extra_attr_names)))
 
         for arg_name in required_attr_names:
             arg_obj_class = arg_names_to_obj_classes[arg_name]

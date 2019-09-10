@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for methods relating to sending emails."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import types
@@ -26,6 +28,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
@@ -2316,7 +2319,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         usernames = ('username1', 'username2')
         emails = ('user1@example.com', 'user2@example.com')
 
-        for user_id, username, user_email in zip(user_ids, usernames, emails):
+        for user_id, username, user_email in python_utils.ZIP(
+                user_ids, usernames, emails):
             user_services.create_new_user(user_id, user_email)
             user_services.set_username(user_id, username)
 

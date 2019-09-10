@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the skill mastery."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -72,7 +74,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
                 'Expected payload to contain mastery_change_per_skill '
                 'as a dict.')
 
-        skill_ids = mastery_change_per_skill.keys()
+        skill_ids = list(mastery_change_per_skill.keys())
 
         current_degrees_of_mastery = (
             skill_services.get_multi_user_skill_mastery(self.user_id, skill_ids)

@@ -62,6 +62,9 @@ require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require(
   'pages/exploration-editor-page/services/user-email-preferences.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesService.ts');
@@ -84,9 +87,9 @@ angular.module('oppia').directive('settingsTab', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$scope', '$uibModal', '$window',
-        'AlertsService',
-        'ChangeListService', 'EditableExplorationBackendApiService',
-        'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
+        'AlertsService', 'ChangeListService',
+        'EditabilityService', 'EditableExplorationBackendApiService',
+        'ExplorationAutomaticTextToSpeechService',
         'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
         'ExplorationDataService', 'ExplorationFeaturesService',
         'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
@@ -95,12 +98,14 @@ angular.module('oppia').directive('settingsTab', [
         'ExplorationStatesService', 'ExplorationTagsService',
         'ExplorationTitleService', 'ExplorationWarningsService',
         'UrlInterpolationService', 'UserEmailPreferencesService',
-        'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+        'UserExplorationPermissionsService', 'ALL_CATEGORIES',
+        'CATEGORIES_TO_COLORS', 'DEFAULT_CATEGORY_ICON', 'DEFAULT_COLOR',
+        'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
         function(
             $http, $rootScope, $scope, $uibModal, $window,
-            AlertsService,
-            ChangeListService, EditableExplorationBackendApiService,
-            EditabilityService, ExplorationAutomaticTextToSpeechService,
+            AlertsService, ChangeListService,
+            EditabilityService, EditableExplorationBackendApiService,
+            ExplorationAutomaticTextToSpeechService,
             ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
             ExplorationDataService, ExplorationFeaturesService,
             ExplorationInitStateNameService, ExplorationLanguageCodeService,
@@ -109,7 +114,9 @@ angular.module('oppia').directive('settingsTab', [
             ExplorationStatesService, ExplorationTagsService,
             ExplorationTitleService, ExplorationWarningsService,
             UrlInterpolationService, UserEmailPreferencesService,
-            ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
+            UserExplorationPermissionsService, ALL_CATEGORIES,
+            CATEGORIES_TO_COLORS, DEFAULT_CATEGORY_ICON, DEFAULT_COLOR,
+            EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
           var ctrl = this;
           ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
             EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
@@ -124,12 +131,20 @@ angular.module('oppia').directive('settingsTab', [
 
           ctrl.isRolesFormOpen = false;
 
-          ctrl.TAG_REGEX = constants.TAG_REGEX;
-          ctrl.canDelete = GLOBALS.canDelete;
-          ctrl.canModifyRoles = GLOBALS.canModifyRoles;
-          ctrl.canReleaseOwnership = GLOBALS.canReleaseOwnership;
-          ctrl.canUnpublish = GLOBALS.canUnpublish;
+          ctrl.TAG_REGEX = TAG_REGEX;
+          ctrl.canDelete = false;
+          ctrl.canModifyRoles = false;
+          ctrl.canReleaseOwnership = false;
+          ctrl.canUnpublish = false;
           ctrl.explorationId = ExplorationDataService.explorationId;
+
+          UserExplorationPermissionsService.getPermissionsAsync()
+            .then(function(permissions) {
+              ctrl.canDelete = permissions.can_delete;
+              ctrl.canModifyRoles = permissions.can_modify_roles;
+              ctrl.canReleaseOwnership = permissions.can_release_ownership;
+              ctrl.canUnpublish = permissions.can_unpublish;
+            });
 
           var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
           var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -144,49 +159,50 @@ angular.module('oppia').directive('settingsTab', [
             ctrl.explorationTitleService = ExplorationTitleService;
             ctrl.explorationCategoryService = ExplorationCategoryService;
             ctrl.explorationObjectiveService = ExplorationObjectiveService;
-            ctrl.explorationLanguageCodeService =
-              ExplorationLanguageCodeService;
+            ctrl.explorationLanguageCodeService = (
+              ExplorationLanguageCodeService);
             ctrl.explorationTagsService = ExplorationTagsService;
             ctrl.ExplorationRightsService = ExplorationRightsService;
             ctrl.explorationInitStateNameService = (
               ExplorationInitStateNameService);
             ctrl.explorationParamSpecsService = ExplorationParamSpecsService;
-            ctrl.explorationParamChangesService =
-              ExplorationParamChangesService;
+            ctrl.explorationParamChangesService = (
+              ExplorationParamChangesService);
             ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
 
-            ExplorationDataService.getData().then(function() {
-              ctrl.refreshSettingsTab();
-              ctrl.hasPageLoaded = true;
-            });
+            ctrl.refreshSettingsTab();
           };
 
           ctrl.refreshSettingsTab = function() {
             // Ensure that ExplorationStatesService has been initialized before
-            // getting the state names from it. (Otherwise, navigating to the
+            // getting the state names from it. Otherwise, navigating to the
             // settings tab directly (by entering a URL that ends with
             // /settings) results in a console error.
-            if (ExplorationStatesService.isInitialized()) {
-              var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
-                function(categoryItem) {
-                  return (
-                    categoryItem.id === (
-                      ExplorationCategoryService.savedMemento));
+
+            ctrl.hasPageLoaded = false;
+            ExplorationDataService.getData().then(function() {
+              if (ExplorationStatesService.isInitialized()) {
+                var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
+                  function(categoryItem) {
+                    return (
+                      categoryItem.id ===
+                          ExplorationCategoryService.savedMemento);
+                  }
+                );
+                // If the current category is not in the dropdown, add it
+                // as the first option.
+                if (!categoryIsInSelect2 &&
+                    ExplorationCategoryService.savedMemento) {
+                  ctrl.CATEGORY_LIST_FOR_SELECT2.unshift({
+                    id: ExplorationCategoryService.savedMemento,
+                    text: ExplorationCategoryService.savedMemento
+                  });
                 }
-              );
 
-              // If the current category is not in the dropdown, add it
-              // as the first option.
-              if (!categoryIsInSelect2 &&
-                  ExplorationCategoryService.savedMemento) {
-                ctrl.CATEGORY_LIST_FOR_SELECT2.unshift({
-                  id: ExplorationCategoryService.savedMemento,
-                  text: ExplorationCategoryService.savedMemento
-                });
+                ctrl.stateNames = ExplorationStatesService.getStateNames();
               }
-
-              ctrl.stateNames = ExplorationStatesService.getStateNames();
-            }
+              ctrl.hasPageLoaded = true;
+            });
           };
 
           $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
@@ -261,8 +277,8 @@ angular.module('oppia').directive('settingsTab', [
             ExplorationAutomaticTextToSpeechService
               .isAutomaticTextToSpeechEnabled);
           ctrl.toggleAutomaticTextToSpeech = (
-            ExplorationAutomaticTextToSpeechService
-              .toggleAutomaticTextToSpeech);
+            ExplorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech
+          );
 
           ctrl.isCorrectnessFeedbackEnabled = (
             ExplorationCorrectnessFeedbackService.isEnabled);
@@ -300,12 +316,14 @@ angular.module('oppia').directive('settingsTab', [
           };
           ctrl.muteSuggestionNotifications = function() {
             UserEmailPreferencesService.setSuggestionNotificationPreferences(
-              true);
+              true
+            );
           };
 
           ctrl.unmuteFeedbackNotifications = function() {
             UserEmailPreferencesService.setFeedbackNotificationPreferences(
-              false);
+              false
+            );
           };
           ctrl.unmuteSuggestionNotifications = function() {
             UserEmailPreferencesService.setSuggestionNotificationPreferences(
@@ -334,19 +352,18 @@ angular.module('oppia').directive('settingsTab', [
                   };
                   $scope.getThumbnailIconUrl = function() {
                     var category = ExplorationCategoryService.displayed;
-                    if (constants.ALL_CATEGORIES.indexOf(category) === -1) {
-                      category = constants.DEFAULT_CATEGORY_ICON;
+                    if (ALL_CATEGORIES.indexOf(category) === -1) {
+                      category = DEFAULT_CATEGORY_ICON;
                     }
                     return '/subjects/' + category + '.svg';
                   };
                   $scope.getThumbnailBgColor = function() {
                     var category = ExplorationCategoryService.displayed;
                     var color = null;
-                    if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(
-                      category)) {
-                      color = constants.DEFAULT_COLOR;
+                    if (!CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
+                      color = DEFAULT_COLOR;
                     } else {
-                      color = constants.CATEGORIES_TO_COLORS[category];
+                      color = CATEGORIES_TO_COLORS[category];
                     }
                     return color;
                   };

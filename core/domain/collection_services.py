@@ -21,6 +21,8 @@ stored in the database. In particular, the various query methods should
 delegate to the Collection model class. This will enable the collection
 storage model to be changed without affecting this module and others above it.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
@@ -37,6 +39,7 @@ from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (collection_models, user_models) = models.Registry.import_models([
@@ -255,7 +258,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     memcache_keys = [_get_collection_memcache_key(i) for i in collection_ids]
     cache_result = memcache_services.get_multi(memcache_keys)
 
-    for collection_obj in cache_result.itervalues():
+    for collection_obj in cache_result.values():
         result[collection_obj.id] = collection_obj
 
     for _id in collection_ids:
@@ -282,7 +285,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             % '\n'.join(not_found))
 
     cache_update = {
-        cid: db_results_dict[cid] for cid in db_results_dict.iterkeys()
+        cid: db_results_dict[cid] for cid in db_results_dict
         if db_results_dict[cid] is not None
     }
 
@@ -549,7 +552,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
     returned_collection_ids = []
     search_cursor = cursor
 
-    for _ in range(MAX_ITERATIONS):
+    for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
@@ -847,7 +850,7 @@ def get_collection_snapshots_metadata(collection_id):
     """
     collection = get_collection_by_id(collection_id)
     current_version = collection.version
-    version_nums = range(1, current_version + 1)
+    version_nums = list(python_utils.RANGE(1, current_version + 1))
 
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)

@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Common utilities for test classes."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import copy
@@ -46,6 +48,7 @@ import feconf
 import main
 import main_mail
 import main_taskqueue
+import python_utils
 import utils
 
 from google.appengine.api import apiproxy_stub
@@ -60,7 +63,8 @@ import webtest
 current_user_services = models.Registry.import_current_user_services()
 
 # Prefix to append to all lines printed by tests to the console.
-LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
+# We are using the b' prefix as all the stdouts are in bytes.
+LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 
 
 def empty_environ():
@@ -494,7 +498,9 @@ tags: []
         """Print the line with a prefix that can be identified by the
         script that calls the test.
         """
-        print '%s%s' % (LOG_LINE_PREFIX, line)
+        # We are using the b' prefix as all the stdouts are in bytes.
+        python_utils.PRINT(
+            b'%s%s' % (LOG_LINE_PREFIX, python_utils.convert_to_bytes(line)))
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -741,8 +747,14 @@ tags: []
         Returns:
             webtest.TestResponse: The response of the POST request.
         """
+        # Convert the files to bytes.
+        if upload_files is not None:
+            upload_files = tuple(
+                tuple(python_utils.convert_to_bytes(
+                    j) for j in i) for i in upload_files)
+
         json_response = app.post(
-            str(url), data, expect_errors=expect_errors,
+            url, data, expect_errors=expect_errors,
             upload_files=upload_files, headers=headers,
             status=expected_status_int)
         return json_response
@@ -792,7 +804,7 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
         json_response = self.testapp.put(
-            str(url), data, expect_errors=expect_errors)
+            python_utils.UNICODE(url), data, expect_errors=expect_errors)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -1020,9 +1032,9 @@ tags: []
 
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
-                zip(state_names[:-1], state_names[1:])):
+                python_utils.ZIP(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
-            from_state.update_interaction_id(next(interaction_ids))
+            from_state.update_interaction_id(python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
         end_state.update_interaction_id('EndExploration')
@@ -1511,7 +1523,8 @@ tags: []
         Returns:
             Skill. A newly-created skill.
         """
-        skill = skill_domain.Skill.create_default_skill(skill_id, description)
+        skill = skill_domain.Skill.create_default_skill(
+            skill_id, description, [])
         if misconceptions is not None:
             skill.misconceptions = misconceptions
             skill.next_misconception_id = len(misconceptions) + 1
@@ -1519,6 +1532,14 @@ tags: []
             skill.skill_contents = skill_contents
         if rubrics is not None:
             skill.rubrics = rubrics
+        else:
+            skill.rubrics = [
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
@@ -1810,16 +1831,19 @@ class AppEngineTestBase(TestBase):
                 # All other tasks are expected to be mapreduce ones, or
                 # Oppia-taskqueue-related ones.
                 headers = {
-                    key: str(val) for key, val in task.headers.iteritems()
+                    key: python_utils.convert_to_bytes(
+                        val) for key, val in task.headers.items()
                 }
-                headers['Content-Length'] = str(len(task.payload or ''))
+                headers['Content-Length'] = python_utils.convert_to_bytes(
+                    len(task.payload or ''))
 
                 app = (
                     webtest.TestApp(main_taskqueue.app)
                     if task.url.startswith('/task')
                     else self.testapp)
                 response = app.post(
-                    url=str(task.url), params=(task.payload or ''),
+                    url=python_utils.UNICODE(
+                        task.url), params=(task.payload or ''),
                     headers=headers, expect_errors=True)
                 if response.status_code != 200:
                     raise RuntimeError(
@@ -1898,7 +1922,7 @@ class AppEngineTestBase(TestBase):
 GenericTestBase = AppEngineTestBase
 
 
-class FunctionWrapper(object):
+class FunctionWrapper(python_utils.OBJECT):
     """A utility for making function wrappers. Create a subclass and override
     any or both of the pre_call_hook and post_call_hook methods. See these
     methods for more info.

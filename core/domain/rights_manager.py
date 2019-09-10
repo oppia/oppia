@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Domain objects and functions that manage rights for various user actions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import logging
@@ -27,6 +29,7 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -90,7 +93,7 @@ COMMON_ALLOWED_COMMANDS = [{
 }]
 
 
-class ActivityRights(object):
+class ActivityRights(python_utils.OBJECT):
     """Domain object for the rights/publication status of an activity (an
     exploration or a collection).
     """
@@ -777,6 +780,23 @@ def check_can_voiceover_activity(user, activity_rights):
         return True
 
     return False
+
+
+def check_can_save_activity(user, activity_rights):
+    """Checks whether the user can save given activity.
+
+    Args:
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
+            activity.
+
+    Returns:
+        bool. Whether the user can save given activity.
+    """
+
+    return (check_can_edit_activity(user, activity_rights) or (
+        check_can_voiceover_activity(user, activity_rights)))
 
 
 def check_can_delete_activity(user, activity_rights):

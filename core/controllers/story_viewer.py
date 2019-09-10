@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the story viewer page"""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -32,7 +34,7 @@ class StoryPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        self.render_template('dist/story-viewer-page.mainpage.html')
+        self.render_template('story-viewer-page.mainpage.html')
 
 
 class StoryPageDataHandler(base.BaseHandler):
@@ -94,7 +96,7 @@ class StoryNodeCompletionHandler(base.BaseHandler):
         try:
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 story_id, node_id)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
         story_services.record_completed_node_in_story_context(

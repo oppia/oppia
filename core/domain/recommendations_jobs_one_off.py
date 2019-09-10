@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """One-off jobs for recommendations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
@@ -58,8 +60,7 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         reference_exp_summary = exp_summaries_dict[exp_summary_id]
-        exp_summaries_items = exp_summaries_dict.iteritems()
-        for compared_exp_id, compared_exp_summary in exp_summaries_items:
+        for compared_exp_id, compared_exp_summary in exp_summaries_dict.items():
             if compared_exp_id != exp_summary_id:
                 similarity_score = (
                     recommendations_services.get_item_similarity(

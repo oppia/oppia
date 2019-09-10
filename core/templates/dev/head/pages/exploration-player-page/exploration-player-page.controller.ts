@@ -16,75 +16,15 @@
  * @fileoverview Dependencies for the explaration player page.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
-// introduce webpack for /extensions
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-require('directives/angular-html-bind.directive.ts');
-require('directives/mathjax-bind.directive.ts');
-require('components/forms/validators/is-at-least.filter.ts');
-require('components/forms/validators/is-at-most.filter.ts');
-require('components/forms/validators/is-float.filter.ts');
-require('components/forms/validators/is-integer.filter.ts');
-require('components/forms/validators/is-nonempty.filter.ts');
-require(
-  'components/forms/custom-forms-directives/apply-validation.directive.ts');
-require(
-  'components/forms/custom-forms-directives/require-is-float.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-bool-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-choices-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-custom-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-dict-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-expression-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-float-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-html-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-list-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-unicode-editor.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
-// ^^^ this block of requires should be removed ^^^
-
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');

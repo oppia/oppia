@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the admin view."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 import random
@@ -28,6 +30,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import opportunity_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -38,6 +41,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -49,7 +53,7 @@ class AdminPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
-        self.render_template('dist/admin-page.mainpage.html')
+        self.render_template('admin-page.mainpage.html')
 
 
 class AdminHandler(base.BaseHandler):
@@ -60,7 +64,7 @@ class AdminHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
-        demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
+        demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
 
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
@@ -107,8 +111,8 @@ class AdminHandler(base.BaseHandler):
             'config_properties': (
                 config_domain.Registry.get_config_property_schemas()),
             'continuous_computations_data': continuous_computations_data,
-            'demo_collections': sorted(feconf.DEMO_COLLECTIONS.iteritems()),
-            'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.iteritems()),
+            'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
+            'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
@@ -133,6 +137,7 @@ class AdminHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         try:
+            result = {}
             if self.payload.get('action') == 'reload_exploration':
                 exploration_id = self.payload.get('exploration_id')
                 self._reload_exploration(exploration_id)
@@ -167,7 +172,7 @@ class AdminHandler(base.BaseHandler):
                     'new_config_property_values')
                 logging.info('[ADMIN] %s saved config property values: %s' %
                              (self.user_id, new_config_property_values))
-                for (name, value) in new_config_property_values.iteritems():
+                for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
@@ -206,9 +211,19 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'upload_topic_similarities':
                 data = self.payload.get('data')
                 recommendations_services.update_topic_similarities(data)
-            self.render_json({})
+            elif self.payload.get('action') == (
+                    'regenerate_topic_related_opportunities'):
+                topic_id = self.payload.get('topic_id')
+                opportunities_count = (
+                    opportunity_services
+                    .regenerate_opportunities_related_to_topic(
+                        topic_id, delete_existing_opportunities=True))
+                result = {
+                    'opportunities_count': opportunities_count
+                }
+            self.render_json(result)
         except Exception as e:
-            self.render_json({'error': unicode(e)})
+            self.render_json({'error': python_utils.UNICODE(e)})
             raise
 
     def _reload_exploration(self, exploration_id):
@@ -225,9 +240,11 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(unicode(exploration_id))
+            exp_services.load_demo(python_utils.convert_to_bytes(
+                exploration_id))
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(), unicode(exploration_id))
+                user_services.get_system_user(), python_utils.convert_to_bytes(
+                    exploration_id))
         else:
             raise Exception('Cannot reload an exploration in production.')
 
@@ -245,9 +262,11 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
-            collection_services.load_demo(unicode(collection_id))
+            collection_services.load_demo(
+                python_utils.convert_to_bytes(collection_id))
             rights_manager.release_ownership_of_collection(
-                user_services.get_system_user(), unicode(collection_id))
+                user_services.get_system_user(), python_utils.convert_to_bytes(
+                    collection_id))
         else:
             raise Exception('Cannot reload a collection in production.')
 
@@ -274,7 +293,7 @@ class AdminHandler(base.BaseHandler):
                                'Elvish, language of "Lord of the Rings',
                                'The Science of Superheroes']
             exploration_ids_to_publish = []
-            for i in range(num_dummy_exps_to_generate):
+            for i in python_utils.RANGE(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_fetchers.get_new_exploration_id()

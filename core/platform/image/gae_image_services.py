@@ -15,11 +15,15 @@
 # limitations under the License.
 
 """Provides app identity services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import io
 
 from PIL import Image
 from constants import constants
 from core.platform import models
+import python_utils
 
 from google.appengine.api import images
 
@@ -70,7 +74,8 @@ def compress_image(image_content, scaling_factor):
             # Recompute the scaling factor such that the larger dimension does
             # not exceed 4000 when scaled.
             new_scaling_factor = (
-                MAX_RESIZE_DIMENSION_PX / float(max(width, height)))
+                python_utils.divide(
+                    MAX_RESIZE_DIMENSION_PX, float(max(width, height))))
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)
         return images.resize(

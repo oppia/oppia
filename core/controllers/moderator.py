@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the moderator page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -29,7 +31,7 @@ class ModeratorPage(base.BaseHandler):
     @acl_decorators.can_access_moderator_page
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/moderator-page.mainpage.html')
+        self.render_template('moderator-page.mainpage.html')
 
 
 class FeaturedActivitiesHandler(base.BaseHandler):

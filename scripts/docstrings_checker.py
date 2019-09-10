@@ -15,21 +15,27 @@
 # limitations under the License.
 
 """Utility methods for docstring checking."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import os
 import re
 import sys
 
+import python_utils
+
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 sys.path.insert(0, _PYLINT_PATH)
 
+# pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 import astroid # isort:skip
 from pylint.checkers import utils # isort:skip
 from pylint.extensions import _check_docs_utils # isort:skip
 # pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
 
 
 def space_indentation(s):
@@ -201,7 +207,7 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     re_yields_line = re_returns_line
 
 
-class ASTDocStringChecker(object):
+class ASTDocStringChecker(python_utils.OBJECT):
     """Checks that docstrings meet the code style."""
 
     def __init__(self):
@@ -221,8 +227,7 @@ class ASTDocStringChecker(object):
         """
         # Ignore self and cls args.
         args_to_ignore = ['self', 'cls']
-        return [a.id for a in function_node.args.args if a.id not in
-                args_to_ignore]
+        return python_utils.get_args_of_function(function_node, args_to_ignore)
 
     @classmethod
     def build_regex_from_args(cls, function_args):

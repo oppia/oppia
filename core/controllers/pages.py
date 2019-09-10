@@ -13,10 +13,13 @@
 # limitations under the License.
 
 """Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
 import feconf
+import python_utils
 
 
 class ForumRedirectPage(base.BaseHandler):
@@ -24,7 +27,7 @@ class ForumRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.GOOGLE_GROUP_URL)
+        self.redirect(python_utils.convert_to_bytes(feconf.GOOGLE_GROUP_URL))
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -33,7 +36,7 @@ class AboutRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/about')
+        self.redirect(python_utils.convert_to_bytes('/about'))
 
 
 class FoundationRedirectPage(base.BaseHandler):
@@ -41,7 +44,7 @@ class FoundationRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.FOUNDATION_SITE_URL)
+        self.redirect(python_utils.convert_to_bytes(feconf.FOUNDATION_SITE_URL))
         return
 
 
@@ -51,7 +54,7 @@ class TeachRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/teach')
+        self.redirect(python_utils.convert_to_bytes('/teach'))
 
 
 class ConsoleErrorPage(base.BaseHandler):
@@ -60,7 +63,7 @@ class ConsoleErrorPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/console_errors.html')
+        self.render_template('console_errors.html')
 
 
 class MaintenancePage(base.BaseHandler):
@@ -69,4 +72,4 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        self.render_template('dist/maintenance-page.mainpage.html')
+        self.render_template('maintenance-page.mainpage.html')

@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Unit tests for core.domain.stats_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import operator
 import os
@@ -33,6 +35,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
@@ -119,15 +122,15 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
     def test_calls_to_stats_methods(self):
         """Test that calls are being made to the
-        handle_stats_creation_for_new_exp_version and
-        handle_stats_creation_for_new_exploration methods when an exploration is
+        get_stats_for_new_exp_version and
+        get_stats_for_new_exploration methods when an exploration is
         created or updated.
         """
         # Initialize call counters.
         stats_for_new_exploration_log = test_utils.CallCounter(
-            stats_services.handle_stats_creation_for_new_exploration)
+            stats_services.get_stats_for_new_exploration)
         stats_for_new_exp_version_log = test_utils.CallCounter(
-            stats_services.handle_stats_creation_for_new_exp_version)
+            stats_services.get_stats_for_new_exp_version)
 
         # Create exploration object in datastore.
         exp_id = 'exp_id'
@@ -136,7 +139,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
         with self.swap(
-            stats_services, 'handle_stats_creation_for_new_exploration',
+            stats_services, 'get_stats_for_new_exploration',
             stats_for_new_exploration_log):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
@@ -153,7 +156,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'state_name': 'New state'
         })]
         with self.swap(
-            stats_services, 'handle_stats_creation_for_new_exp_version',
+            stats_services, 'get_stats_for_new_exp_version',
             stats_for_new_exp_version_log):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
@@ -278,8 +281,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'is_valid': True
         })
 
-    def test_handle_stats_creation_for_new_exploration(self):
-        """Test the handle_stats_creation_for_new_exploration method."""
+    def test_get_stats_for_new_exploration(self):
+        """Test the get_stats_for_new_exploration method."""
         # Create exploration object in datastore.
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
@@ -291,8 +294,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             assets_list)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
-        stats_services.handle_stats_creation_for_new_exploration(
+        exploration_stats = stats_services.get_stats_for_new_exploration(
             exploration.id, exploration.version, exploration.states)
+        stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -305,7 +309,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), ['Home', 'End'])
+            list(exploration_stats.state_stats_mapping.keys()), ['Home', 'End'])
 
     def test_revert_exploration_creates_stats(self):
         """Test that the revert_exploration method creates stats
@@ -351,8 +355,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 2)
         self.assertEqual(exploration_stats.num_completions_v2, 1)
 
-    def test_handle_stats_creation_for_new_exp_version(self):
-        """Test the handle_stats_creation_for_new_exp_version method."""
+    def test_get_stats_for_new_exp_version(self):
+        """Test the get_stats_for_new_exp_version method."""
         # Create exploration object in datastore.
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
@@ -375,9 +379,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'state_name': 'New state 2'
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.handle_stats_creation_for_new_exp_version(
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
             exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -404,9 +409,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'new_state_name': 'Renamed state'
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.handle_stats_creation_for_new_exp_version(
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
             exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -423,9 +429,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'state_name': 'New state'
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.handle_stats_creation_for_new_exp_version(
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
             exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -451,9 +458,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'state_name': 'Renamed state 2'
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.handle_stats_creation_for_new_exp_version(
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
             exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -480,9 +488,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'new_state_name': 'New state 4'
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.handle_stats_creation_for_new_exp_version(
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
             exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -524,9 +533,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'new_state_name': 'New state 4'
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.handle_stats_creation_for_new_exp_version(
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
             exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -555,9 +565,11 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         # Test reverts.
         exploration.version += 1
-        stats_services.handle_stats_creation_for_new_exp_version(
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
             exp_versions_diff=None, revert_to_version=5)
+        stats_services.create_stats_model(exploration_stats)
+
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 8)
@@ -1716,7 +1728,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         # submitted, there must therefore be fewer than 100 answers in the
         # index shard.
         model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-            self.exploration.id, str(self.exploration.version),
+            self.exploration.id, python_utils.UNICODE(self.exploration.version),
             self.exploration.init_state_name, '0'))
         self.assertEqual(model.shard_count, 1)
 
@@ -2286,7 +2298,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
-        self.assertEqual(exploration.states.keys(), ['Introduction'])
+        self.assertEqual(list(exploration.states.keys()), ['Introduction'])
         with self.assertRaisesRegexp(
             utils.InvalidInputException,
             'No state with the given state name was found'):
@@ -2299,7 +2311,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
-        self.assertEqual(exploration.states.keys(), ['Introduction'])
+        self.assertEqual(list(exploration.states.keys()), ['Introduction'])
         state_reference = (
             stats_services.get_state_reference_for_exploration(
                 self.exp_id, 'Introduction'))

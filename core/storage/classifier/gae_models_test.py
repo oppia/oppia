@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for core.storage.classifier.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import types
@@ -24,12 +26,17 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(classifier_models,) = models.Registry.import_models(
-    [models.NAMES.classifier])
+(base_models, classifier_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.classifier])
 
 
 class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     """Test the ClassifierTrainingJobModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            classifier_models.ClassifierTrainingJobModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_new_training_job_runs_successfully(self):
         next_scheduled_check_time = datetime.datetime.utcnow()
@@ -202,6 +209,12 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
 class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
     """Tests for the TrainingJobExplorationMappingModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            classifier_models.TrainingJobExplorationMappingModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_create_and_get_new_mapping_runs_successfully(self):
         mapping_id = (
             classifier_models.TrainingJobExplorationMappingModel.create(
@@ -231,7 +244,7 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
-        self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name1.encode(
+        self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name1.encode(
             encoding='utf-8')))
 
         state_name2 = u'टेक्स्ट'
@@ -242,7 +255,7 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
-        self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name2.encode(
+        self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name2.encode(
             encoding='utf-8')))
 
     def test_get_model_from_exploration_attributes(self):

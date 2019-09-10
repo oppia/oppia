@@ -21,6 +21,16 @@
   vertical-align: top;
 }
 
+.multiple-choice-outer-radio-button {
+  border: 2px solid #0D48A1;
+  border-radius: 50%;
+  display: inline-block;
+  height: 16px;
+  margin-bottom: -1px;
+  margin-right: 12px;
+  width: 16px;
+}
+
 .multiple-choice-option:hover {
   color: #115FD4;
 }
@@ -38,14 +48,4 @@
 .multiple-choice-option:hover .multiple-choice-outer-radio-button,
 .multiple-choice-option:focus .multiple-choice-outer-radio-button {
   border-color: #115FD4;
-}
-
-.multiple-choice-outer-radio-button {
-  border: 2px solid #0D48A1;
-  border-radius: 50%;
-  display: inline-block;
-  height: 16px;
-  margin-bottom: -7px;
-  margin-right: 12px;
-  width: 16px;
 }

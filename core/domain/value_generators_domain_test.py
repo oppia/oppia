@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Unit tests for core.domain.value_generators_domain."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import importlib
 import inspect

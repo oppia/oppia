@@ -15,11 +15,14 @@
 # limitations under the License.
 
 """Tests for the suggestion gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(base_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.suggestion])
 
 
 class SuggestionModelUnitTests(test_utils.GenericTestBase):
@@ -32,6 +35,11 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     target_id = 'exp1'
     target_version_at_submission = 1
     change_cmd = {}
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            suggestion_models.GeneralSuggestionModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
@@ -133,7 +141,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         queries = [('suggestion_type', 'invalid_suggestion_type')]
 
         with self.assertRaisesRegexp(
-            Exception, 'Value \'invalid_suggestion_type\' for property'
+            Exception, 'Value u\'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 
@@ -359,15 +367,15 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertIn('category2', score_categories)
 
     def test_export_data_trivial(self):
-        user_data = (suggestion_models
-                     .GeneralSuggestionModel
-                     .export_data('non_existent_user'))
+        user_data = (
+            suggestion_models.GeneralSuggestionModel
+            .export_data('non_existent_user'))
         test_data = {}
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
-        test_export_suggestion_type = (suggestion_models
-                                       .SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+        test_export_suggestion_type = (
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
         test_export_target_type = suggestion_models.TARGET_TYPE_EXPLORATION
         test_export_target_id = self.target_id
         test_export_target_version = self.target_version_at_submission
@@ -391,9 +399,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             test_export_thread_id
         )
 
-        user_data = (suggestion_models
-                     .GeneralSuggestionModel
-                     .export_data('test_export_author'))
+        user_data = (
+            suggestion_models.GeneralSuggestionModel
+            .export_data('test_export_author'))
+
         test_data = {
             test_export_thread_id: {
                 'suggestion_type': test_export_suggestion_type,

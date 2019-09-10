@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Performance tests for the exploration editor."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests.performance_tests import base
 from core.tests.performance_tests import test_config

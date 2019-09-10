@@ -13,11 +13,14 @@
 # limitations under the License.
 
 """Models for storing the classification data models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -66,6 +69,11 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The schema version for the data that is being classified.
     data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Classifier training job is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the training job of the form
@@ -82,11 +90,12 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             producing too many collisions.
         """
 
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    python_utils.UNICODE(
+                        utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -211,6 +220,11 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     # The ID of the training job corresponding to the exploration attributes.
     job_id = ndb.StringProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Training job exploration mapping is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
         """Generates a unique ID for the Classifier Exploration Mapping of the
@@ -227,7 +241,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
             str. ID of the new Classifier Exploration Mapping instance.
         """
         new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
-        return utils.convert_to_str(new_id)
+        return python_utils.convert_to_bytes(new_id)
 
     @classmethod
     def get_models(cls, exp_id, exp_version, state_names):

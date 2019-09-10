@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Service functions relating to email models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import email_domain
 from core.platform import models

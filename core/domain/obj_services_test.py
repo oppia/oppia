@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for services relating to typed objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import interaction_registry
 from core.domain import obj_services
@@ -76,7 +78,7 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
         """
         object_default_vals = obj_services.get_default_object_values()
         all_object_classes = obj_services.Registry.get_all_object_classes()
-        for (obj_type, default_value) in object_default_vals.iteritems():
+        for (obj_type, default_value) in object_default_vals.items():
             self.assertIn(obj_type, all_object_classes)
             self.assertEqual(
                 default_value, all_object_classes[obj_type].default_value)

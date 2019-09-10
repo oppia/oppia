@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Commands that can be used to operate on skills."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import logging
@@ -23,6 +25,7 @@ from core.domain import skill_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 (skill_models, user_models, question_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
@@ -250,7 +253,8 @@ def get_multi_skills(skill_ids):
         list(Skill). The list of skills matching the provided IDs.
     """
     local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
-    for skill_id, skill_model in zip(skill_ids, local_skill_models):
+    for skill_id, skill_model in python_utils.ZIP(
+            skill_ids, local_skill_models):
         if skill_model is None:
             raise Exception('No skill exists for ID %s' % skill_id)
     skills = [
@@ -909,7 +913,7 @@ def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
     """
     user_skill_mastery_models = []
 
-    for skill_id, degree_of_mastery in degrees_of_mastery.iteritems():
+    for skill_id, degree_of_mastery in degrees_of_mastery.items():
         user_skill_mastery_models.append(user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
                 user_id, skill_id),
@@ -965,7 +969,8 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
 
-    for skill_id, skill_mastery_model in zip(skill_ids, skill_mastery_models):
+    for skill_id, skill_mastery_model in python_utils.ZIP(
+            skill_ids, skill_mastery_models):
         if skill_mastery_model is None:
             degrees_of_mastery[skill_id] = None
         else:

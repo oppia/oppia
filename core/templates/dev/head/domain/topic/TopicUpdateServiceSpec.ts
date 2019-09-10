@@ -28,6 +28,8 @@ import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
+import { StoryReferenceObjectFactory } from
+  'domain/topic/StoryReferenceObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
@@ -72,6 +74,8 @@ describe('Topic update service', function() {
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value(
       'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+    $provide.value(
+      'StoryReferenceObjectFactory', new StoryReferenceObjectFactory());
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value(

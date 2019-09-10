@@ -15,8 +15,12 @@
 # limitations under the License.
 
 """Tests for Skill-related one-off jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import ast
 
+from constants import constants
 from core.domain import skill_domain
 from core.domain import skill_jobs_one_off
 from core.domain import skill_services
@@ -38,6 +42,13 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         super(SkillMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test skills.
+        self.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.process_and_flush_pending_tasks()
@@ -49,7 +60,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new skill that should not be affected by the
         # job.
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, description='A description')
+            self.SKILL_ID, description='A description', rubrics=self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
         self.assertEqual(
             skill.skill_contents_schema_version,
@@ -90,7 +101,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, description='A description')
+            self.SKILL_ID, description='A description', rubrics=self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
 
         # Delete the skill before migration occurs.
@@ -182,7 +193,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             return 'invalid_skill'
 
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, description='A description')
+            self.SKILL_ID, description='A description', rubrics=self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
 
         get_skill_by_id_swap = self.swap(
@@ -201,7 +212,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         # 'successfully migrated' message. Its absence means that the skill
         # could not be processed.
         expected = [[u'validation_error',
-                     [u'Skill %s failed validation: \'str\' object has '
+                     [u'Skill %s failed validation: \'unicode\' object has '
                       'no attribute \'validate\'' % (self.SKILL_ID)]]]
         self.assertEqual(
             expected, [ast.literal_eval(x) for x in output])
