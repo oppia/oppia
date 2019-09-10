@@ -1056,6 +1056,9 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getsubmittedsuggestions/exploration/translate_content')
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_ids_to_opportunity_dicts']), 1)
+        response = self.get_json(
+            '/getsubmittedsuggestions/topic/translate_content')
+        self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):
         self.login(self.AUTHOR_EMAIL)
@@ -1180,6 +1183,9 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getreviewablesuggestions/exploration/translate_content')
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_ids_to_opportunity_dicts']), 1)
+        response = self.get_json(
+            '/getreviewablesuggestions/topic/translate_content')
+        self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
