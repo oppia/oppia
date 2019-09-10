@@ -16,17 +16,16 @@
  * @fileoverview Unit tests for Numeric Input rules.
  */
 
-require('interactions/NumericInput/directives/numeric-input-rules.service.ts');
+import { NumericInputRulesService } from
+  'interactions/NumericInput/directives/numeric-input-rules.service';
 
-describe('Numeric Input service', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Numeric Input service', () => {
+  let nirs: NumericInputRulesService = null;
+  beforeEach(() => {
+    nirs = new NumericInputRulesService();
+  });
 
-  var nirs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    nirs = $injector.get('NumericInputRulesService');
-  }));
-
-  it('should have a correct equals rule', function() {
+  it('should have a correct equals rule', () => {
     expect(nirs.Equals(3, {
       x: 3
     })).toBe(true);
@@ -38,7 +37,7 @@ describe('Numeric Input service', function() {
     })).toBe(false);
   });
 
-  it('should have a correct is less than rule', function() {
+  it('should have a correct is less than rule', () => {
     expect(nirs.IsLessThan(3.0, {
       x: 4.0
     })).toBe(true);
@@ -62,7 +61,7 @@ describe('Numeric Input service', function() {
     })).toBe(false);
   });
 
-  it('should have a correct is greater than rule', function() {
+  it('should have a correct is greater than rule', () => {
     expect(nirs.IsGreaterThan(3.0, {
       x: 4.0
     })).toBe(false);
@@ -86,7 +85,7 @@ describe('Numeric Input service', function() {
     })).toBe(false);
   });
 
-  it('should have a correct less than or equal to rule', function() {
+  it('should have a correct less than or equal to rule', () => {
     expect(nirs.IsLessThanOrEqualTo(3.0, {
       x: 4.0
     })).toBe(true);
@@ -110,7 +109,7 @@ describe('Numeric Input service', function() {
     })).toBe(false);
   });
 
-  it('should have a correct greater than or equal to rule', function() {
+  it('should have a correct greater than or equal to rule', () => {
     expect(nirs.IsGreaterThanOrEqualTo(3.0, {
       x: 4.0
     })).toBe(false);
@@ -134,7 +133,7 @@ describe('Numeric Input service', function() {
     })).toBe(true);
   });
 
-  it('should have a correct inclusively between rule', function() {
+  it('should have a correct inclusively between rule', () => {
     expect(nirs.IsInclusivelyBetween(1, {
       a: 0,
       b: 2
@@ -157,7 +156,7 @@ describe('Numeric Input service', function() {
     })).toBe(false);
   });
 
-  it('should have a correct within tolerence rule', function() {
+  it('should have a correct within tolerence rule', () => {
     expect(nirs.IsWithinTolerance(0, {
       x: 0,
       tol: 1

@@ -4600,16 +4600,16 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance.last_updated = (
-            datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.put(update_last_updated_time=False)
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'GeneralFeedbackThreadModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(

@@ -16,7 +16,7 @@
  * @fileoverview A service that lists all the exploration warnings.
  */
 
-require('expressions/ExpressionInterpolationService.ts');
+require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-param-changes.service.ts');

@@ -28,7 +28,6 @@ class EmailServicesTest(test_utils.GenericTestBase):
     def test_reply_info_email_objects_are_created_and_queried_correctly(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user1', 'exploration.exp1.1')
-        model.put()
         reply_to_id = model.reply_to_id
         queried_object = (
             email_services.get_feedback_thread_reply_info_by_reply_to_id(

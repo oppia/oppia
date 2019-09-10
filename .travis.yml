@@ -81,16 +81,13 @@ before_install:
 - source /opt/jdk_switcher/jdk_switcher.sh
 - jdk_switcher use oraclejdk8
 - pip install codecov
-- pip install pyyaml
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start
 
 install:
 - pushd $TRAVIS_BUILD_DIR
-- source scripts/setup.sh || exit 1
-- source scripts/setup_gae.sh || exit 1
-- bash scripts/install_third_party.sh
+- python -m scripts.install_third_party_libs
 
 script:
 # These lines are commented out because these checks are being run on CircleCI
