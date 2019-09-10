@@ -749,11 +749,14 @@ def _lint_all_files(
         process.start()
 
     result_queues = [
-        js_and_ts_stdout, css_in_html_result, css_result, py_result,
+        js_and_ts_result, css_in_html_result, css_result, py_result,
         py_result_for_python3_compatibility
     ]
 
-    return linting_processes, result_queues
+    stdout_queus = [
+        js_and_ts_stdout, css_in_html_stdout, css_stdout
+    ]
+    return linting_processes, result_queues, stdout_queus
 
 
 def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
@@ -3291,6 +3294,7 @@ def read_files(file_paths):
         thread = threading.Thread(target=FILE_CACHE.read, args=(file_path,))
         thread.start()
         threads.append(thread)
+
     for thread in threads:
         thread.join()
 
@@ -3309,7 +3313,7 @@ def categorize_files(file_paths):
     _FILES.update(all_filepaths_dict)
 
 
-def _join_linting_process(linting_processes, result_queues):
+def _join_linting_process(linting_processes, result_queues, result_stdouts):
     """Join process spawn off by _lint_all_files and capture the outputs."""
     for process in linting_processes:
         process.join()
@@ -3319,6 +3323,10 @@ def _join_linting_process(linting_processes, result_queues):
     for result_queue in result_queues:
         while not result_queue.empty():
             summary_messages.append(result_queue.get())
+
+    for result_stdout in result_stdouts:
+        while not result_stdout.empty():
+            summary_messages.append(result_stdout.get())
 
     with _redirect_stdout(_TARGET_STDOUT):
         python_utils.PRINT(b'\n'.join(summary_messages))
@@ -3346,7 +3354,7 @@ def main(args=None):
 
     read_files(all_filepaths)
     categorize_files(all_filepaths)
-    linting_processes, result_queues = _lint_all_files(
+    linting_processes, result_queues, result_stdout = _lint_all_files(
         _FILES['.js'], _FILES['.ts'], _FILES['.py'], _FILES['.html'],
         _FILES['.css'], verbose_mode_enabled)
     code_owner_message = _check_codeowner_file(verbose_mode_enabled)
@@ -3361,7 +3369,8 @@ def main(args=None):
     other_messages = other_lint_checks_manager.perform_all_lint_checks()
     all_messages += js_message + other_messages
 
-    all_messages += _join_linting_process(linting_processes, result_queues)
+    all_messages += _join_linting_process(
+        linting_processes, result_queues, result_stdout)
 
     _print_complete_summary_of_errors()
 
