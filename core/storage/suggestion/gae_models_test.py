@@ -423,7 +423,8 @@ class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_models.ReviewerRotationTrackingModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
 
     def test_create_and_update_model(self):
         suggestion_models.ReviewerRotationTrackingModel.create(
