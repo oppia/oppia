@@ -187,7 +187,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question skill link should be deleted only if all associated skills
+        """Question-skill link should be deleted only if all associated skills
         or questions are deleted.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC

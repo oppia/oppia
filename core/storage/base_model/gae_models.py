@@ -90,6 +90,9 @@ class BaseModel(ndb.Model):
     def has_reference_to_user_id(user_id):
         """This method should be implemented by subclasses.
 
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
         Raises:
             NotImplementedError: The method is not overwritten in a derived
                 class.

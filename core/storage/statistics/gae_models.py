@@ -1138,7 +1138,7 @@ class PlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Playthrough is not related to users."""
+        """Playthroughs are not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod

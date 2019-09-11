@@ -112,7 +112,7 @@ class UserSettingsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            bool. Whether the model for user_id exists.
+            bool. Whether any models refer to the given user ID.
         """
         return cls.get(user_id, strict=False) is not None
 
