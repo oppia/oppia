@@ -15,6 +15,9 @@ workflows:
       - backend_tests:
           requires:
             - setup
+      - e2e_tests:
+          requires:
+            - setup
 
 var_for_docker_image: &docker_image circleci/python:2.7.14-jessie-browsers
 
