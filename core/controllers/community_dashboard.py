@@ -20,6 +20,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
+from core.domain import topic_fetchers
 import feconf
 import utils
 
@@ -48,7 +49,12 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             raise self.PageNotFoundException
         search_cursor = self.request.get('cursor', None)
 
-        if opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
+        if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
+            opportunities, next_cursor, more = (
+                opportunity_services.get_skill_opportunities_with_topic(
+                    search_cursor))
+
+        elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
             language_code = self.request.get('language_code')
             if language_code is None or not (
                     utils.is_supported_audio_language_code(language_code)):

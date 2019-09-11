@@ -224,3 +224,19 @@ def get_topic_by_name(topic_name):
 
     topic = get_topic_from_model(topic_model)
     return topic
+
+
+def get_all_topics_with_skills():
+    """Returns a list of topics with linked skills.
+
+    Returns:
+        list(Topic|None). A list of topics with skills.
+    """
+    all_topic_models = topic_models.TopicModel.get_all()
+    topics_with_skills = []
+    for topic_model in all_topic_models:
+        if topic_model:
+            topic = get_topic_from_model(topic_model)
+            if topic.get_all_skill_ids():
+                topics_with_skills.append(topic)
+    return topics_with_skills
