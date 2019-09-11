@@ -35,6 +35,7 @@ import feconf
     models.NAMES.story, models.NAMES.feedback, models.NAMES.suggestion,
     models.NAMES.email])
 
+
 class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
     """Tests for the takeout processor service."""
 
@@ -137,14 +138,14 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         # Setup for UserContributionsModel.
         self.save_new_valid_exploration(
             self.EXPLORATION_IDS[0], self.USER_ID_1, end_state_name='End')
-        
+
         exp_services.update_exploration(
             self.USER_ID_1, self.EXPLORATION_IDS[0], [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
             })], 'Test edit')
-        
+
         # Setup for ExplorationUserDataModel.
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_ID_1, self.EXPLORATION_IDS[0]), user_id=self.USER_ID_1,
@@ -154,7 +155,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             draft_change_list_last_updated=self.GENERIC_DATE,
             draft_change_list_exp_version=3,
             draft_change_list_id=1).put()
-        
+
         # Setup for CompletedActivitiesModel.
         user_models.CompletedActivitiesModel(
             id=self.USER_ID_1,
@@ -166,7 +167,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS).put()
-        
+
         # Setup for ExpUserLastPlaythroughModel.
         user_models.ExpUserLastPlaythroughModel(
             id='%s.%s' % (self.USER_ID_1, self.EXPLORATION_IDS[0]),
@@ -193,7 +194,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             user_id=self.USER_ID_1,
             story_id=self.STORY_ID_1,
             completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
-        
+
         # Setup for CollectionRightsModel.
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_IDS[0],
@@ -217,7 +218,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
             'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
             'exploration.exp1.thread_1')
-        
+
         # Setup for ExplorationRightsModel.
         exploration_models.ExplorationRightsModel(
             id=self.EXPLORATION_IDS[0],
@@ -327,7 +328,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             message_count=self.THREAD_MESSAGE_COUNT
         )
         feedback_thread_model.put()
-        
+
         general_feedback_thread_data = {
             feedback_thread_model.id: {
                 'entity_type': self.THREAD_ENTITY_TYPE,
@@ -423,4 +424,4 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         exported_data_json = json.dumps(exported_data, default=str)
         expected_export_json = json.dumps(exported_data, default=str)
         self.assertEqual(expected_export_json, exported_data_json)
-        #TODO(ulloaluis): Implement tests for StoryRights and GeneralFeedbackEmailReplyToId.
+        # TODO(ulloaluis): Implement tests for StoryRights and GeneralFeedbackEmailReplyToId.
