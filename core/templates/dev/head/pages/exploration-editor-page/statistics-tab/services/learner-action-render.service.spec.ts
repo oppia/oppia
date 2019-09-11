@@ -247,6 +247,33 @@ describe('Learner Action Render Service', function() {
         expect(startingIndices).toEqual([0]);
       });
 
+    it('should render correct learner actions.',
+      function() {
+        this.PlaythroughService.recordExplorationStartAction('stateName1');
+        this.PlaythroughService.recordAnswerSubmitAction(
+          'stateName1', 'stateName2', 'Continue', '', 'Welcome', 30);
+        this.PlaythroughService.recordAnswerSubmitAction(
+          'stateName2', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+        this.PlaythroughService.recordExplorationQuitAction('stateName2', 120);
+
+        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+        var renderedStatements = [];
+        for (var i = 0; i < learnerActions.length; i++) {
+          renderedStatements.push(
+            this.LearnerActionRenderService.renderLearnerAction(
+              learnerActions[i], i + 1));
+        }
+
+        expect(renderedStatements[0]).toEqual(
+          '1. Started exploration at card "stateName1".');
+        expect(renderedStatements[1]).toEqual(
+          '2. Pressed "Continue" to move to card "stateName2" after 30 seconds.'
+        );
+        expect(renderedStatements[3]).toEqual(
+          '4. Left the exploration after spending a total of 120 seconds on ' +
+          'card "stateName2".');
+      });
+
     it('should render tables for MultipleIncorrectSubmissions issue block.',
       function() {
         var feedback = {
