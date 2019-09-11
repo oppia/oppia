@@ -170,6 +170,12 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(topics[1])
         self.assertEqual(len(topics), 2)
 
+    def test_get_all_topics_with_skills(self):
+        expected_topic = self.topic.to_dict()
+        topics = topic_fetchers.get_all_topics_with_skills()
+        self.assertEqual(topics[0].to_dict(), expected_topic)
+        self.assertEqual(len(topics), 1)
+
     def test_commit_log_entry(self):
         topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 1)

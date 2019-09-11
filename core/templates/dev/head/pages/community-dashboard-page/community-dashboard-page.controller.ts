@@ -21,6 +21,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require(
+  'pages/community-dashboard-page/skill-opportunities/' +
+  'skill-opportunities.directive.ts');
+require(
   'pages/community-dashboard-page/translation-opportunities/' +
   'translation-opportunities.directive.ts');
 require(
