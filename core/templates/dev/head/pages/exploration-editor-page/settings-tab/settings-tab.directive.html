@@ -274,7 +274,7 @@
               <form ng-submit="$ctrl.editRole($ctrl.newMemberUsername, $ctrl.newMemberRole.value)">
                 <label for="$ctrl.newMemberUsername">Username of invited user</label>
                 <div>
-                  <input type="text" id="$ctrl.newMemberUsername" class="form-control protractor-test-role-username" ng-model="$ctrl.newMemberUsername" placeholder="username">
+                  <input type="text" id="$ctrl.newMemberUsername" class="form-control protractor-test-role-username" ng-model="$ctrl.newMemberUsername" placeholder="{{username}}">
                 </div>
                 <br>
                 <label for="$ctrl.newMemberRole">Role of invited user</label>

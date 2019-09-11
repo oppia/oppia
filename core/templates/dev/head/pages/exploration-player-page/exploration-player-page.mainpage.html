@@ -36,7 +36,7 @@
     <div ng-controller="Base">
       <base-content>
         <navbar-breadcrumb>
-          <learner-view-info></learner-view-info>
+          <learner-view-info exploration-title="{{exploration_title}}"></learner-view-info>
         </navbar-breadcrumb>
 
         <nav-options>
@@ -48,7 +48,7 @@
         </content>
 
         <page-footer>
-          <exploration-footer></exploration-footer>
+          <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
         </page-footer>
       </base-content>
     </div>
