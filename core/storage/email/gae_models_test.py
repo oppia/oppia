@@ -24,6 +24,7 @@ import types
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 (base_models, email_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.email])
@@ -317,3 +318,57 @@ class GenerateHashTests(test_utils.GenericTestBase):
             'recipient_id2', 'email_subject2', 'email_html_body2')
         self.assertNotEqual(email_hash1, email_hash2)
         # pylint: enable=protected-access
+
+
+class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
+    """Tests for the GeneralFeedbackEmailReplyToId model."""
+    USER_ID_1 = 'user_id_1'
+    USER_ID_2 = 'user_id_2'
+    THREAD_ID_1 = 'thread_id_1'
+    THREAD_ID_2 = 'thread_id_2'
+    USER_2_REPLY_TO_ID_1 = 'user_2_reply_to_id_thread_1'
+    USER_2_REPLY_TO_ID_2 = 'user_2_reply_to_id_thread_2'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(GeneralFeedbackEmailReplyToIdTests, self).setUp()
+
+        # Since reply-to-id is generated using a random generator
+        # that does not support seeding (SystemRandom) and whose
+        # output is hashed by utils.convert_to_hash, we will
+        # (for testing purposes) instead replace convert_to_hash
+        # with a lambda that returns a predetermined value.
+        user_two_fake_hash_lambda_one = (
+            lambda rand_int, reply_to_id_length: self.USER_2_REPLY_TO_ID_1)
+        user_two_fake_hash_one = self.swap(
+            utils, 'convert_to_hash', user_two_fake_hash_lambda_one)
+        with user_two_fake_hash_one:
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.USER_ID_2, self.THREAD_ID_1).put()
+
+        user_two_fake_hash_lambda_two = (
+            lambda rand_int, reply_to_id_length: self.USER_2_REPLY_TO_ID_2)
+        user_two_fake_hash_two = self.swap(
+            utils, 'convert_to_hash', user_two_fake_hash_lambda_two)
+        with user_two_fake_hash_two:
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.USER_ID_2, self.THREAD_ID_2).put()
+
+    def test_export_data_on_user_with_data(self):
+        """Verify proper export data output on a normal user case."""
+        user_data = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
+                self.USER_ID_2))
+        expected_data = {
+            self.THREAD_ID_1: self.USER_2_REPLY_TO_ID_1,
+            self.THREAD_ID_2: self.USER_2_REPLY_TO_ID_2
+        }
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_on_user_without_data(self):
+        """Verify proper export data output on user with no models."""
+        user_data = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
+                self.USER_ID_1))
+        expected_data = {}
+        self.assertEqual(expected_data, user_data)
