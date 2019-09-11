@@ -271,10 +271,11 @@ describe('Search service', function() {
         }
       };
       // In the two cases below, language_code param is not wrapped in
-      // parantheses.  However, the category param is defined correctly.
+      // parentheses. However, the category param is defined correctly.
       // updateSearchFieldsBasedOnUrlQuery is expected to clean language_code.
       var urlComponent = (
-        '?q=protractor%20test&category=("Mathematics")&language_code="en" OR "ar")'); // eslint-disable-line max-len
+        '?q=protractor%20test&category=("Mathematics")&' +
+        'language_code="en" OR "ar")');
       SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({
@@ -282,18 +283,20 @@ describe('Search service', function() {
       });
 
       var urlComponent = (
-        '?q=protractor%20test&category=("Mathematics")&language_code="en" OR "ar"'); // eslint-disable-line max-len
+        '?q=protractor%20test&category=("Mathematics")&' +
+        'language_code="en" OR "ar"');
       SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({
         Mathematics: true
       });
 
-      // In this case, neither of the params are wrapped in parantheses.
+      // In this case, neither of the params are wrapped in parentheses.
       // updateSearchFieldsBasedOnUrlQuery is expected to clean category and
       // language_code.
       var urlComponent = (
-        '?q=protractor%20test&category="Mathematics"&language_code="en" OR "ar"'); // eslint-disable-line max-len
+        '?q=protractor%20test&category="Mathematics"&' +
+        'language_code="en" OR "ar"');
       SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({});
