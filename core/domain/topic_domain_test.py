@@ -342,23 +342,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.add_uncategorized_skill_id('skill_id_3')
         self.assertEqual(self.topic.uncategorized_skill_ids, ['skill_id_3'])
 
-    def test_fail_to_add_unpublished_skill_id(self):
-        self.save_new_skill(
-            'skill_a', self.user_id_a, 'Description A', misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml(
-                    '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
-                state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-        with self.assertRaisesRegexp(
-            Exception,
-            'Cannot assign unpublished skills to a topic'):
-            self.topic.add_uncategorized_skill_id('skill_a')
-
-
     def test_remove_uncategorized_skill_id(self):
         self.topic.uncategorized_skill_ids = ['skill_id_5']
         with self.assertRaisesRegexp(
