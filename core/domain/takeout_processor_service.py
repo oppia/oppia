@@ -16,6 +16,8 @@
 user_id.
 """
 from __future__ import absolute_import
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.platform import models
 
 (user_models, collection_models, exploration_models, story_models,
