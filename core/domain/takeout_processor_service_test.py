@@ -1,13 +1,18 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.tests import test_utils
-from core.platform import models
-from core.domain import takeout_processor_service, feedback_services, rights_manager, exp_services, exp_domain
-from constants import constants
-import feconf
 import datetime
 import json
+from constants import constants
+from core.domain import exp_domain
+from core.domain import exp_services
+from core.domain import feedback_services
+from core.domain import rights_manager
+from core.domain import takeout_processor_service
+from core.platform import models
+from core.tests import test_utils
+import feconf
+
 
 (user_models, collection_models, exploration_models, story_models,
  feedback_models, suggestion_models,
@@ -404,4 +409,4 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         exported_data_json = json.dumps(exported_data, default=str)
         expected_export_json = json.dumps(exported_data, default=str)
         self.assertEqual(expected_export_json, exported_data_json)
-        #TODO: Implement tests for StoryRights and GeneralFeedbackEmailReplyToId
+        #TODO(ulloaluis): Implement tests for StoryRights and GeneralFeedbackEmailReplyToId

@@ -1,3 +1,21 @@
+# Copyright 2018 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Functions to export the data of all user related models from a given
+user_id.
+"""
+from __future__ import absolute_import
 from core.platform import models
 
 (user_models, collection_models, exploration_models, story_models,
@@ -35,10 +53,10 @@ def export_all_models(user_id):
     # Exploration models.
     exploration_rights_data = exploration_models.ExplorationRightsModel.export_data(user_id)
 
-    # TODO: What happened to the export for StoryRights.
+    # TODO(seanlip): What happened to the export for StoryRights.
     # story_rights_data = story_models.StoryRightsModel.export_data(user_id)
 
-    # TODO: Uncomment after Luis' PR.
+    # TODO(luisulloa): Uncomment after Luis' PR.
     # general_feedback_email_reply_data = email_models.GeneralFeedbackEmailReplyToIdModel.export_data(user_id)
 
     # Combine the data into a single dictionary.
@@ -60,6 +78,4 @@ def export_all_models(user_id):
         'collection_rights_data': collection_rights_data,
         'general_suggestion_data': general_suggestion_data,
         'exploration_rights_data': exploration_rights_data,
-        # 'story_rights_data': story_rights_data,
-        # 'general_feedback_email_reply_data': general_feedback_email_reply_data
     }
