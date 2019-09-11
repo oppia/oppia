@@ -21,8 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from constants import constants
-from core.domain import skill_domain
-from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
