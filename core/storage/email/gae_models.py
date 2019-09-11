@@ -464,7 +464,25 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """
         instance_ids = [cls._generate_id(user_id, thread_id)
                         for user_id in user_ids]
-        user_models = cls.get_multi(instance_ids)
+        retrieved_models = cls.get_multi(instance_ids)
         return {
             user_id: model for user_id, model in python_utils.ZIP(
-                user_ids, user_models)}
+                user_ids, retrieved_models)}
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export GeneralFeedbackEmailReplyToIdModel's user data.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict whose keys are IDs of threads the user is
+            involved in. The corresponding value is the reply_to_id of that
+            thread.
+        """
+        user_data = {}
+        email_reply_models = cls.get_all().filter(cls.user_id == user_id)
+        for model in email_reply_models:
+            user_data[model.thread_id] = model.reply_to_id
+        return user_data
