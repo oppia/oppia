@@ -79,6 +79,17 @@ jobs:
             python -m scripts.third_party_size_check
             python -m scripts.pre_commit_linter --path=. --verbose
 
+  e2e_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run:
+          <<: *install_dependencies
+      - run:
+          name: Run e2e tests
+          command: |
+            python -m scripts.run_e2e_tests --prod_env
+
   typescript_tests:
     <<: *job_defaults
     steps:

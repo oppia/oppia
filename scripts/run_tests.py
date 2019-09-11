@@ -31,6 +31,7 @@ import subprocess
 import python_utils
 
 from . import run_backend_tests
+from . import run_e2e_tests
 from . import run_frontend_tests
 from . import setup
 from . import setup_gae
@@ -64,7 +65,7 @@ def main(args=None):
 
     # Run end-to-end tests.
     python_utils.PRINT('Running end-to-end tests')
-    subprocess.Popen('bash scripts/run_e2e_tests.sh', shell=True)
+    run_e2e_tests.main(args=[])
 
     python_utils.PRINT(
         'SUCCESS    All frontend, backend and end-to-end tests passed!')
