@@ -1813,8 +1813,8 @@ class JsTsLintChecksManager(LintChecksManager):
             process.join()
 
         js_and_ts_messages = []
-        while not js_and_ts_stdout.empty():
-            js_and_ts_messages.append(js_and_ts_stdout.get())
+        while not js_and_ts_result.empty():
+            js_and_ts_messages.append(js_and_ts_result.get())
 
         python_utils.PRINT('')
         python_utils.PRINT('\n'.join(js_and_ts_messages))
