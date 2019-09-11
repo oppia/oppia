@@ -17,7 +17,7 @@
  */
 
 require('domain/exploration/ParamMetadataObjectFactory.ts');
-require('expressions/ExpressionInterpolationService.ts');
+require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-param-changes.service.ts');
