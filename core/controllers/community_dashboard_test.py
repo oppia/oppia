@@ -183,7 +183,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
-                '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,params={})
+                '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL, params={})
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
                 response['opportunities'],
