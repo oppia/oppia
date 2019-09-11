@@ -238,34 +238,6 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return user_data
 
     @classmethod
-    def export_data(cls, user_id):
-        """Exports the data from GeneralFeedbackMessageModel
-        into dict format for Takeout.
-
-        Args:
-            user_id: str. The ID of the user whose data should be exported.
-
-        Returns:
-            dict. Dictionary of the data from GeneralFeedbackMessageModel.
-        """
-
-        user_data = dict()
-        feedback_models = cls.get_all().filter(cls.author_id == user_id).fetch()
-
-        for feedback_model in feedback_models:
-            feedback_model_id = str(feedback_model.id)
-            user_data[feedback_model_id] = {
-                'thread_id': feedback_model.thread_id,
-                'message_id': feedback_model.message_id,
-                'updated_status': feedback_model.updated_status,
-                'updated_subject': feedback_model.updated_subject,
-                'text': feedback_model.text,
-                'received_via_email': feedback_model.received_via_email
-            }
-
-        return user_data
-
-    @classmethod
     def _generate_id(cls, thread_id, message_id):
         """Generates full message ID given the thread ID and message ID.
 
