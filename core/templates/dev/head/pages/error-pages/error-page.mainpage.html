@@ -2,18 +2,13 @@
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base-components/header.template.html', {"title": "Error - Oppia"})
-    <script>
-      var GLOBALS = {
-        status_code: JSON.parse('{{status_code}}'),
-      };
-    </script>
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
     <div ng-controller="Base">
       <base-content>
         <content>
-          <error-page></error-page>
+          <error-page status_code="<%=htmlWebpackPlugin.options.statusCode%>"></error-page>
         </content>
       </base-content>
     </div>
