@@ -278,7 +278,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error-page-' + 400 + '.mainpage.html',
+      filename: 'error-page-400.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -287,7 +287,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error-page-' + 401 + '.mainpage.html',
+      filename: 'error-page-401.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -296,7 +296,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error-page-' + 404 + '.mainpage.html',
+      filename: 'error-page-404.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -305,7 +305,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error-page-' + 500 + '.mainpage.html',
+      filename: 'error-page-500.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
