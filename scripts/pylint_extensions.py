@@ -904,31 +904,35 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
 
 
 class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
-  """Checks if only one space is used after a yield statement."""
-  __implements__ = interfaces.IRawChecker
+    """Checks if only one space is used after a yield statement."""
+    __implements__ = interfaces.IRawChecker
 
-  name = 'single-space-after-yield'
-  priority = -1
-  msgs = {
-      'C0010': (
-          'Not using a single space after yield statement.',
-          'single-space-after-yield',
-          'Ensure a single space is used after yield statement.',
-      ),
-  }
+    name = 'single-space-after-yield'
+    priority = -1
+    msgs = {
+        'C0010': (
+            'Not using a single space after yield statement.',
+            'single-space-after-yield',
+            'Ensure a single space is used after yield statement.',
+        ),
+    }
 
-  def process_module(self, node):
-    """Process a module to ensure that yield keywords are followed by exactly
-    one space, so matching 'yield *' where * is not a whitespace character.
+    def process_module(self, node):
+        """Process a module to ensure that yield keywords are followed by
+        exactly one space, so matching 'yield *' where * is not a whitespace
+        character.
 
-      Args:
-          node: astroid.scoped_nodes.Function. Node to access module content.
-    """
-    file_content = read_from_node(node)
-    for (line_num, line) in enumerate(file_content):
-      source_line = line.lstrip()
-      if source_line.startswith('yield') and not re.search(r'^(yield) \S', source_line):
-        self.add_message('single-space-after-yield', line=line_num + 1)
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        file_content = read_from_node(node)
+        for (line_num, line) in enumerate(file_content):
+            source_line = line.lstrip()
+            # The source files are read as bytes, hence the b' prefix.
+            if source_line.startswith(b'yield') and not re.search(
+                    br'^(yield) \S', source_line):
+                self.add_message('single-space-after-yield', line=line_num + 1)
+
 
 def register(linter):
     """Registers the checker with pylint.
