@@ -20,7 +20,6 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
-from core.domain import topic_fetchers
 import feconf
 import utils
 
