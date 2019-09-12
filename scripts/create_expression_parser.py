@@ -43,7 +43,7 @@ def main(args=None):
         'core', 'templates', 'dev', 'head', 'expressions', 'parser.pegjs')
     expression_parser_js = os.path.join(
         'core', 'templates', 'dev', 'head', 'expressions',
-        'ExpressionParserService.js')
+        'expression-parser.service.js')
 
     common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
 
