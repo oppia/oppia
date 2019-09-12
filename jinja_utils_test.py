@@ -73,6 +73,9 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
             for dirname in dirnames:
                 subdirs.append(
                     os.path.join(os.path.dirname(__file__), root, dirname))
+        subdirs.append(os.path.join(
+            os.path.dirname(__file__), 'core', 'templates', 'dev',
+            'head', 'tests'))
         self.assertEqual(sorted(env.loader.searchpath), sorted(subdirs))
 
         for jinja_filter in jinja_utils.JINJA_FILTERS:

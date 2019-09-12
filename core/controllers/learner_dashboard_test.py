@@ -284,7 +284,8 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
         self.assertIn(
-            '<title itemprop="name">Learner Dashboard - Oppia</title>',
+            '@require(\'../../base-components/header.template.html\', '
+            '{"title": "Learner Dashboard - Oppia"})',
             response.body)
 
         self.logout()

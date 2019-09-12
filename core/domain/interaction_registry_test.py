@@ -55,10 +55,11 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
 
         exp_services.load_demo(exp_id)
 
-        # Skulpt is one of the dependencies and should be loaded in
-        # the exploration reader page.
+        # Ensure that dependencies are added in the exploration reader page.
         response = self.get_html_response('/explore/%s' % exp_id)
-        response.mustcontain('skulpt')
+        response.mustcontain(
+            '@require(\'../../../../../../extensions/interactions/'
+            'dependency_html.html\')')
 
     def test_no_dependencies_in_non_exploration_pages(self):
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
@@ -71,10 +72,11 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
 
-        # Skulpt is one of the dependencies and should be loaded in
-        # the exploration editor page.
+        # Ensure that dependencies are added in the exploration editor page.
         response = self.get_html_response('/create/0')
-        response.mustcontain('skulpt')
+        response.mustcontain(
+            '@require(\'../../../../../../extensions/interactions/'
+            'dependency_html.html\')')
 
         self.logout()
 

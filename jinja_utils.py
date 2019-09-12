@@ -93,6 +93,10 @@ def get_jinja_env_for_backend_tests(template_root_dir):
             subdirs.append(
                 os.path.join(os.path.dirname(__file__), root, dirname))
 
+    # This is required for the console_errors.html template.
+    subdirs.append(os.path.join(
+        os.path.dirname(__file__), 'core', 'templates', 'dev', 'head', 'tests'))
+
     loader = jinja2.FileSystemLoader(subdirs)
     env = jinja2.Environment(
         autoescape=True, loader=loader)

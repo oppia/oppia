@@ -604,7 +604,8 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
         self.assertIn(
-            '<title itemprop="name">Preferences - Oppia</title>',
+            '@require(\'../../base-components/header.template.html\', '
+            '{"title": "Preferences - Oppia"})',
             response.body)
 
         self.logout()
