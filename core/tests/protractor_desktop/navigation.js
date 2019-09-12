@@ -213,12 +213,4 @@ describe('Static Pages Tour', function() {
     expect(element(
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
-
-  it('redirects to the test server', function() {
-    browser.driver.get('https://oppiatestserver.appspot.com/splash');
-    waitFor.pageToFullyLoad();
-    browser.getCurrentUrl().then(function(url) {
-      expect(url).toBe('https://oppiatestserver.appspot.com/splash');
-    });
-  });
 });
