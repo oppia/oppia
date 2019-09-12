@@ -215,7 +215,7 @@ describe('Static Pages Tour', function() {
   });
 
   it('redirects to the test server', function() {
-    browser.driver.get('https://oppiaserver.appspot.com/splash');
+    browser.driver.get('https://oppiatestserver.appspot.com/splash');
     waitFor.pageToFullyLoad();
     browser.getCurrentUrl().then(function(url) {
       expect(url).toBe('https://oppiatestserver.appspot.com/splash');
