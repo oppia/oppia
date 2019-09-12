@@ -3,18 +3,18 @@ workflows:
   circleci_tests:
     jobs:
       - setup
-      - lint_tests:
-          requires:
-            - setup
-      - typescript_tests:
-          requires:
-            - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - backend_tests:
-          requires:
-            - setup
+      # - lint_tests:
+      #     requires:
+      #       - setup
+      # - typescript_tests:
+      #     requires:
+      #       - setup
+      # - frontend_tests:
+      #     requires:
+      #       - setup
+      # - backend_tests:
+      #     requires:
+      #       - setup
       - e2e_tests:
           requires:
             - setup
@@ -30,7 +30,6 @@ anchor_for_job_defaults: &job_defaults
   # information: https://github.com/oppia/oppia/pull/7067#issuecomment-508822501
   environment:
     CC_TEST_REPORTER_ID: 561968e2f03d3bb4f1aed69dc94174c2e3b9dc82cf1f8ad31fc799f8c67afc6e
-    CHROME_BIN: /usr/bin/google-chrome-stable
   docker:
     - image: *docker_image
 
@@ -92,6 +91,7 @@ jobs:
       - run:
           name: Install Chromedriver latest version
           command: |
+            export CHROME_BIN=/usr/bin/google-chrome
             sudo apt-get install libappindicator3-1 libindicator3-7
             curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
             sudo dpkg -i google-chrome.deb
