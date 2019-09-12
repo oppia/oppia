@@ -221,4 +221,11 @@ describe('Static Pages Tour', function() {
       expect(url).toBe('https://oppiatestserver.appspot.com/splash');
     });
   });
+
+  it('shows the error page when an incorrect url is given', function() {
+    browser.get('/splashes');
+    waitsFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-error-page')).isPresent()).toBe(true);
+  });
 });
