@@ -66,15 +66,15 @@ describe('Logic Proof rules service', () => {
   };
 
   it('should have a correct \'correct\' rule', () => {
-    expect(lprs.Correct(CORRECT_EXAMPLE, null)).toBe(true);
-    expect(lprs.Correct(INCORRECT_EXAMPLE_PARSING, null)).toBe(false);
-    expect(lprs.Correct(INCORRECT_EXAMPLE_TYPING, null)).toBe(false);
+    expect(lprs.Correct(CORRECT_EXAMPLE)).toBe(true);
+    expect(lprs.Correct(INCORRECT_EXAMPLE_PARSING)).toBe(false);
+    expect(lprs.Correct(INCORRECT_EXAMPLE_TYPING)).toBe(false);
   });
 
   it('should have a correct \'not correct\' rule', () => {
-    expect(lprs.NotCorrect(CORRECT_EXAMPLE, null)).toBe(false);
-    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_PARSING, null)).toBe(true);
-    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_TYPING, null)).toBe(true);
+    expect(lprs.NotCorrect(CORRECT_EXAMPLE)).toBe(false);
+    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_PARSING)).toBe(true);
+    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_TYPING)).toBe(true);
   });
 
   it('should have a correct \'not correct by category\' rule', () => {
