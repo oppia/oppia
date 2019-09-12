@@ -308,19 +308,19 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     return result
 
 
-def update_constants(constants_env_variable):
-    """Updates constants file to set RUN_BACKEND_TESTS to true.
+def update_feconf(feconf_env_variable):
+    """Updates feconf file to set RUN_BACKEND_TESTS to True.
 
     Args:
-        constants_env_variable: str. String to replace RUN_BACKEND_TESTS with.
+        feconf_env_variable: str. String to replace RUN_BACKEND_TESTS with.
     """
     for line in fileinput.input(
-            files=[os.path.join('assets', 'constants.ts')], inplace=True):
+            files=[os.path.join('feconf.py')], inplace=True):
         # Inside this loop the STDOUT will be redirected to the file,
-        # constants.ts. The end='' is needed to avoid double line breaks.
+        # feconf.py. The end='' is needed to avoid double line breaks.
         python_utils.PRINT(
             re.sub(
-                r'"RUN_BACKEND_TESTS": .*', constants_env_variable, line),
+                r'RUN_BACKEND_TESTS = .*', feconf_env_variable, line),
             end='')
 
 
@@ -358,9 +358,9 @@ def main(args=None):
     if parsed_args.test_target and '/' in parsed_args.test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    update_constants('"RUN_BACKEND_TESTS": true')
+    update_feconf('RUN_BACKEND_TESTS = True')
     # This complete block is put in try...finally to enusre that update made
-    # to constants file is reverted even in case of an exception.
+    # to feconf file is reverted even in case of an exception.
     try:
         if parsed_args.test_target:
             if '_test' in parsed_args.test_target:
@@ -505,7 +505,7 @@ def main(args=None):
         python_utils.PRINT('')
         python_utils.PRINT('Done!')
     finally:
-        update_constants('"RUN_BACKEND_TESTS": false')
+        update_feconf('RUN_BACKEND_TESTS = False')
 
 
 if __name__ == '__main__':

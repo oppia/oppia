@@ -612,8 +612,5 @@ export = {
   // in prod mode when the resource bucket name is not allowed to be null.
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",
 
-  "DEV_MODE": true,
-
-  // Whether backend tests are running.
-  "RUN_BACKEND_TESTS": false
+  "DEV_MODE": true
 };
