@@ -50,7 +50,8 @@ class ExplorationRecommendationsModel(
         directly.
 
         Args:
-            unused_user_id: str. The models doesn't reference user at all.
+            unused_user_id: str. The (unused) ID of the user whose data
+            should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -74,7 +75,9 @@ class TopicSimilaritiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Topic similarities is one instance only model."""
+        """There is only a single TopicSimilaritiesModel in the entire
+        codebase.
+        """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -83,7 +86,8 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         directly.
 
         Args:
-            unused_user_id: str. The models doesn't reference user at all.
+            unused_user_id: str. The (unused) ID of the user whose data
+            should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.

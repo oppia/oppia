@@ -603,7 +603,7 @@ class StateIdMappingModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State id mapping is going to be deleted soon thus using
+        """State id mapping is going to be deleted soon. Thus, using
         not applicable.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE

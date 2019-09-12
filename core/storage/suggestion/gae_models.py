@@ -295,8 +295,8 @@ class ReviewerRotationTrackingModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Reviewer rotation tracking is going to be reworked soon thus using
-        not applicable for now.
+        """Reviewer rotation tracking is going to be reworked oon.
+        Thus, using using not applicable for now.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 

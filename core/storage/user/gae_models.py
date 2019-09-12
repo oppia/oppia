@@ -106,7 +106,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserSettingsModel exists for user.
+        """Check whether UserSettingsModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -212,7 +212,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that CompletedActivitiesModel exists for user.
+        """Check whether CompletedActivitiesModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -266,7 +266,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that IncompleteActivitiesModel exists for user.
+        """Check whether IncompleteActivitiesModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -326,7 +326,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that ExpUserLastPlaythroughModel exists for user.
+        """Check whether ExpUserLastPlaythroughModels exist for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -334,7 +334,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).count() > 0
+        return cls.get_all().filter(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -430,7 +430,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that LearnerPlaylistModel exist for user.
+        """Check whether LearnerPlaylistModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -488,7 +488,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserContributionsModel exist for user.
+        """Check whether UserContributionsModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -550,7 +550,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserEmailPreferencesModel exist for user.
+        """Check whether UserEmailPreferencesModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -590,7 +590,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserSubscriptionsModel exist for user.
+        """Check whether UserSubscriptionsModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -645,7 +645,7 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserSubscribersModel exist for user.
+        """Check whether UserSubscribersModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -677,7 +677,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserRecentChangesBatchModel exist for user.
+        """Check whether UserRecentChangesBatchModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -747,7 +747,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserStatsModel exist for user.
+        """Check whether UserStatsModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -857,7 +857,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that ExplorationUserDataModels exist for user.
+        """Check whether ExplorationUserDataModels exist for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -865,7 +865,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).count() > 0
+        return cls.get_all().filter(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -999,7 +999,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that CollectionProgressModel exist for user.
+        """Check whether CollectionProgressModels exist for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -1007,7 +1007,7 @@ class CollectionProgressModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).count() > 0
+        return cls.get_all().filter(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
@@ -1148,7 +1148,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that StoryProgressModel exist for user.
+        """Check whether StoryProgressModels exist for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -1156,7 +1156,7 @@ class StoryProgressModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).count() > 0
+        return cls.get_all().filter(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -1323,7 +1323,7 @@ class UserQueryModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserQueryModel exist for user.
+        """Check whether UserQueryModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -1331,7 +1331,7 @@ class UserQueryModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get_all().filter(cls.submitter_id == user_id).count() > 0
+        return cls.get_all().filter(cls.submitter_id == user_id).get() is not None
 
     @classmethod
     def fetch_page(cls, page_size, cursor):
@@ -1381,7 +1381,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserBulkEmailsModel exist for user.
+        """Check whether UserBulkEmailsModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -1416,7 +1416,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserSkillMasteryModel exist for user.
+        """Check whether UserSkillMasteryModels exist for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -1424,7 +1424,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).count() > 0
+        return cls.get_all().filter(cls.user_id == user_id).get() is not None
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):
@@ -1487,7 +1487,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check that UserContributionScoringModel exist for user.
+        """Check whether UserContributionScoringModels exist for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -1495,7 +1495,7 @@ class UserContributionScoringModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).count() > 0
+        return cls.get_all().filter(cls.user_id == user_id).get() is not None
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):

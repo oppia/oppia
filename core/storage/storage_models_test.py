@@ -27,7 +27,7 @@ from core.tests import test_utils
 class StorageModelsTest(test_utils.GenericTestBase):
     """Tests for Oppia storage models."""
 
-    def _get_model_module_names(self, skip_base_models):
+    def _get_model_module_names(self):
         """Get all module names in storage."""
         all_model_module_names = []
 
@@ -36,15 +36,13 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for name in models.NAMES.__dict__:
             if '__' in name:
                 continue
-            if skip_base_models and name == 'base_model':
-                continue
             all_model_module_names.append(name)
         return all_model_module_names
 
-    def _get_model_classes(self, skip_base_models=False):
+    def _get_model_classes(self):
         """Get all model classes in storage."""
         model_subclasses = []
-        for module_name in self._get_model_module_names(skip_base_models):
+        for module_name in self._get_model_module_names():
             (module,) = models.Registry.import_models([module_name])
             for member_name, member_obj in inspect.getmembers(module):
                 if inspect.isclass(member_obj):
@@ -64,23 +62,38 @@ class StorageModelsTest(test_utils.GenericTestBase):
             len(set(names_of_ndb_model_subclasses)),
             len(names_of_ndb_model_subclasses))
 
-    def test_all_models_have_get_deletion_policy(self):
-        model_subclasses = self._get_model_classes(skip_base_models=True)
+    # List of model classes that can't have Wipeout related class methods
+    # defined because they're not used directly but only as a base classes for
+    # the other models.
+    BASE_CLASSES = (
+        'BaseCommitLogEntryModel',
+        'BaseMapReduceBatchResultsModel',
+        'BaseModel',
+        'BaseSnapshotContentModel',
+        'BaseSnapshotMetadataModel',
+        'VersionedModel',
+    )
+
+    def test_all_child_models_have_get_deletion_policy(self):
+        model_subclasses = self._get_model_classes()
 
         for clazz in model_subclasses:
+            if clazz.__name__ in self.BASE_CLASSES:
+                continue
             base_classes = [base.__name__ for base in inspect.getmro(clazz)]
-            # BaseSnapshotMetadataModel adopts the policy of the associated
-            # VersionedModel.
+            # BaseSnapshotMetadataModel and models that inherit from it
+            # adopt the policy of the associated VersionedModel.
             if 'BaseSnapshotMetadataModel' in base_classes:
                 continue
-            # BaseSnapshotContentModel adopts the policy of the associated
-            # VersionedModel.
+            # BaseSnapshotContentModel and models that inherit from it
+            # adopt the policy of the associated VersionedModel.
             if 'BaseSnapshotContentModel' in base_classes:
                 continue
-            # BaseCommitLogEntryModel adopts the policy of the associated
-            # VersionedModel.
+            # BaseCommitLogEntryModel and models that inherit from it
+            # adopt the policy of the associated VersionedModel.
             if 'BaseCommitLogEntryModel' in base_classes:
                 continue
+
             try:
                 self.assertIn(
                     clazz.get_deletion_policy(),
@@ -88,3 +101,11 @@ class StorageModelsTest(test_utils.GenericTestBase):
             except NotImplementedError:
                 self.fail(msg='get_deletion_policy is not defined for %s' % (
                     clazz.__name__))
+
+    def test_all_base_models_do_not_have_get_deletion_policy(self):
+        model_subclasses = self._get_model_classes()
+
+        for clazz in model_subclasses:
+            if clazz.__name__ in self.BASE_CLASSES:
+                with self.assertRaises(NotImplementedError):
+                    clazz.get_deletion_policy()
