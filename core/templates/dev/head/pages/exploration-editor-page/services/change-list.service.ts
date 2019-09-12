@@ -35,48 +35,48 @@ angular.module('oppia').factory('ChangeListService', [
       // well as the list of changes in the undo stack.
 
       // Temporary buffer for changes made to the exploration.
-      this.explorationChangeList = [];
+      this._explorationChangeList = [];
       // Stack for storing undone changes. The last element is the most recently
       // undone change.
-      this.undoneChangeStack = [];
+      this._undoneChangeStack = [];
 
       // All these constants should correspond to those in exp_domain.py.
       // TODO(sll): Enforce this in code.
-      this.CMD_ADD_STATE = 'add_state';
-      this.CMD_RENAME_STATE = 'rename_state';
-      this.CMD_DELETE_STATE = 'delete_state';
-      this.CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
-      this.CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
+    };
+    var CMD_ADD_STATE = 'add_state';
+    var CMD_RENAME_STATE = 'rename_state';
+    var CMD_DELETE_STATE = 'delete_state';
+    var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
+    var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
 
-      this.ALLOWED_EXPLORATION_BACKEND_NAMES = {
-        category: true,
-        init_state_name: true,
-        language_code: true,
-        objective: true,
-        param_changes: true,
-        param_specs: true,
-        tags: true,
-        title: true,
-        auto_tts_enabled: true,
-        correctness_feedback_enabled: true
-      };
+    var ALLOWED_EXPLORATION_BACKEND_NAMES = {
+      category: true,
+      init_state_name: true,
+      language_code: true,
+      objective: true,
+      param_changes: true,
+      param_specs: true,
+      tags: true,
+      title: true,
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true
+    };
 
-      this.ALLOWED_STATE_BACKEND_NAMES = {
-        answer_groups: true,
-        confirmed_unclassified_answers: true,
-        content: true,
-        recorded_voiceovers: true,
-        default_outcome: true,
-        hints: true,
-        param_changes: true,
-        param_specs: true,
-        solicit_answer_details: true,
-        solution: true,
-        state_name: true,
-        widget_customization_args: true,
-        widget_id: true,
-        written_translations: true
-      };
+    var ALLOWED_STATE_BACKEND_NAMES = {
+      answer_groups: true,
+      confirmed_unclassified_answers: true,
+      content: true,
+      recorded_voiceovers: true,
+      default_outcome: true,
+      hints: true,
+      param_changes: true,
+      param_specs: true,
+      solicit_answer_details: true,
+      solution: true,
+      state_name: true,
+      widget_customization_args: true,
+      widget_id: true,
+      written_translations: true
     };
     ChangeListService.prototype.autosaveChangeListOnChange = function(
         explorationChangeList) {
@@ -112,9 +112,9 @@ angular.module('oppia').factory('ChangeListService', [
       if ($rootScope.loadingMessage) {
         return;
       }
-      this.explorationChangeList.push(changeDict);
-      this.undoneChangeStack = [];
-      this.autosaveChangeListOnChange(this.explorationChangeList);
+      this._explorationChangeList.push(changeDict);
+      this._undoneChangeStack = [];
+      this.autosaveChangeListOnChange(this._explorationChangeList);
     };
     /**
      * Saves a change dict that represents adding a new state. It is the
@@ -124,7 +124,7 @@ angular.module('oppia').factory('ChangeListService', [
      */
     ChangeListService.prototype.addState = function(stateName) {
       this.addChange({
-        cmd: this.CMD_ADD_STATE,
+        cmd: CMD_ADD_STATE,
         state_name: stateName
       });
     };
@@ -137,13 +137,13 @@ angular.module('oppia').factory('ChangeListService', [
      */
     ChangeListService.prototype.deleteState = function(stateName) {
       this.addChange({
-        cmd: this.CMD_DELETE_STATE,
+        cmd: CMD_DELETE_STATE,
         state_name: stateName
       });
     };
     ChangeListService.prototype.discardAllChanges = function() {
-      this.explorationChangeList = [];
-      this.undoneChangeStack = [];
+      this._explorationChangeList = [];
+      this._undoneChangeStack = [];
       ExplorationDataService.discardDraft();
     };
     /**
@@ -158,13 +158,13 @@ angular.module('oppia').factory('ChangeListService', [
      */
     ChangeListService.prototype.editExplorationProperty = function(
         backendName, newValue, oldValue) {
-      if (!this.ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
+      if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
         AlertsService.addWarning(
           'Invalid exploration property: ' + backendName);
         return;
       }
       this.addChange({
-        cmd: this.CMD_EDIT_EXPLORATION_PROPERTY,
+        cmd: CMD_EDIT_EXPLORATION_PROPERTY,
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue),
         property_name: backendName
@@ -182,12 +182,12 @@ angular.module('oppia').factory('ChangeListService', [
      */
     ChangeListService.prototype.editStateProperty = function(
         stateName, backendName, newValue, oldValue) {
-      if (!this.ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
+      if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
         AlertsService.addWarning('Invalid state property: ' + backendName);
         return;
       }
       this.addChange({
-        cmd: this.CMD_EDIT_STATE_PROPERTY,
+        cmd: CMD_EDIT_STATE_PROPERTY,
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue),
         property_name: backendName,
@@ -195,10 +195,10 @@ angular.module('oppia').factory('ChangeListService', [
       });
     };
     ChangeListService.prototype.getChangeList = function() {
-      return angular.copy(this.explorationChangeList);
+      return angular.copy(this._explorationChangeList);
     };
     ChangeListService.prototype.isExplorationLockedForEditing = function() {
-      return this.explorationChangeList.length > 0;
+      return this._explorationChangeList.length > 0;
     };
     /**
      * Initializes the current changeList with the one received from backend.
@@ -207,7 +207,7 @@ angular.module('oppia').factory('ChangeListService', [
      * @param {object} changeList - Autosaved changeList data
      */
     ChangeListService.prototype.loadAutosavedChangeList = function(changeList) {
-      this.explorationChangeList = changeList;
+      this._explorationChangeList = changeList;
     };
     /**
      * Saves a change dict that represents the renaming of a state. This
@@ -222,19 +222,19 @@ angular.module('oppia').factory('ChangeListService', [
     ChangeListService.prototype.renameState = function(
         newStateName, oldStateName) {
       this.addChange({
-        cmd: this.CMD_RENAME_STATE,
+        cmd: CMD_RENAME_STATE,
         new_state_name: newStateName,
         old_state_name: oldStateName
       });
     };
     ChangeListService.prototype.undoLastChange = function() {
-      if (this.explorationChangeList.length === 0) {
+      if (this._explorationChangeList.length === 0) {
         AlertsService.addWarning('There are no changes to undo.');
         return;
       }
-      var lastChange = this.explorationChangeList.pop();
-      this.undoneChangeStack.push(lastChange);
-      this.autosaveChangeListOnChange(this.explorationChangeList);
+      var lastChange = this._explorationChangeList.pop();
+      this._undoneChangeStack.push(lastChange);
+      this.autosaveChangeListOnChange(this._explorationChangeList);
     };
     return new ChangeListService;
   }
