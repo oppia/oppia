@@ -957,7 +957,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
             # is used at the start of a variable name.
             source_line = line.lstrip()
             if (source_line.startswith(b'yield') and
-                    not re.search(r'^(yield)( \S|$|\w)', source_line)):
+                    not re.search(br'^(yield)( \S|$|\w)', source_line)):
                 self.add_message('single-space-after-yield', line=line_num + 1)
 
 
