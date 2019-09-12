@@ -107,7 +107,7 @@ GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 JS_FILEPATHS_NOT_TO_BUILD = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
     'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
+    'core/templates/dev/head/expressions/expression-parser.service.js')
 
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).

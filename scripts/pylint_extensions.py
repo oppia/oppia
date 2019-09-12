@@ -903,6 +903,33 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             self.add_message('newline-at-eof', line=file_length)
 
 
+class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
+  """Checks if only one space is used after a yield statement."""
+  __implements__ = interfaces.IRawChecker
+
+  name = 'single-space-after-yield'
+  priority = -1
+  msgs = {
+      'C0010': (
+          'Not using a single space after yield statement.',
+          'single-space-after-yield',
+          'Ensure a single space is used after yield statement.',
+      ),
+  }
+
+  def process_module(self, node):
+    """Process a module to ensure that yield keywords are followed by exactly
+    one space, so matching 'yield *' where * is not a whitespace character.
+
+      Args:
+          node: astroid.scoped_nodes.Function. Node to access module content.
+    """
+    file_content = read_from_node(node)
+    for (line_num, line) in enumerate(file_content):
+      source_line = line.lstrip()
+      if source_line.startswith('yield') and not re.search(r'^(yield) \S', source_line):
+        self.add_message('single-space-after-yield', line=line_num + 1)
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -917,3 +944,4 @@ def register(linter):
     linter.register_checker(FunctionArgsOrderChecker(linter))
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
+    linter.register_checker(SingleSpaceAfterYieldChecker(linter))
