@@ -110,6 +110,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             pass
         init_swap = self.swap(base.BaseHandler, '__init__', mock_init)
         with init_swap, self.swap(feconf, 'RUN_BACKEND_TESTS', False):
+            # jinja2_env is a @webapp2.cached_property.
             env = base.BaseHandler('req', 'res').jinja2_env
             self.assertTrue(env.autoescape)
 
