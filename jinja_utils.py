@@ -86,6 +86,20 @@ def get_jinja_env(dir_path):
     return env
 
 
+def get_jinja_env_for_backend_tests(template_root_dir):
+    subdirs = []
+    for root, dirnames, _  in os.walk(template_root_dir):
+        for dirname in dirnames:
+            subdirs.append(
+                os.path.join(os.path.dirname(__file__), root, dirname))
+
+    loader = jinja2.FileSystemLoader(subdirs)
+    env = jinja2.Environment(
+        autoescape=True, loader=loader)
+    env.filters.update(JINJA_FILTERS)
+    return env
+
+
 def parse_string(string, params, autoescape=True):
     """Parses a string using Jinja templating.
 

@@ -129,6 +129,9 @@ class BaseHandler(webapp2.RequestHandler):
         Returns:
             Environment. A Jinja2 environment object used to load templates.
         """
+        if constants.RUN_BACKEND_TESTS:
+            return jinja_utils.get_jinja_env_for_backend_tests(
+                feconf.FRONTEND_TEMPLATES_DIR_FOR_BACKEND_TESTS)
         return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
