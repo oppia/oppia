@@ -91,10 +91,10 @@ jobs:
       - run:
           name: Install Chromedriver latest version
           command: |
-            export CHROME_BIN=/usr/bin/google-chrome
-            sudo apt-get install libappindicator3-1 libindicator3-7
-            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
+            sudo apt-get install lsb-release libappindicator3-1
+            curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
             sudo dpkg -i google-chrome.deb
+            sudo sed -i 's|HERE/chrome"|HERE/chrome" --no-sandbox|g' /opt/google/chrome/google-chrome
             rm google-chrome.deb
       - run:
           name: Run e2e tests

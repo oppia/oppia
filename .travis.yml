@@ -101,31 +101,31 @@ script:
 # - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
 # - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 # Run the e2e tests in the production environment (using --prod_env).
-- if [ "$RUN_E2E_TESTS_ACCESSIBILITY" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="accessibility" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalPlayerFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_COLLECTIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="collections" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_CREATOR_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="embedding" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationFeedbackTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationHistoryTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_IMPROVEMENTS_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationImprovementsTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationStatisticsTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationTranslationTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="extensions" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_LEARNER_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="learnerDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="learner" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_LIBRARY" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="library" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_NAVIGATION" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="navigation" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_PREFERENCES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="preferences" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_PROFILE_MENU" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="profileMenu" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_PUBLICATION" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="publication" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_SUBSCRIPTIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="subscriptions" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="topicsAndSkillsDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="topicAndStoryEditor" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_USERS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="users" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_ACCESSIBILITY" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite accessibility --prod_env; fi
+- if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite additionalEditorFeatures --prod_env; fi
+- if [ "$RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite additionalPlayerFeatures --prod_env; fi
+- if [ "$RUN_E2E_TESTS_COLLECTIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite collections --prod_env; fi
+- if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite coreEditorAndPlayerFeatures --prod_env; fi
+- if [ "$RUN_E2E_TESTS_CREATOR_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite creatorDashboard --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite embedding --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite explorationFeedbackTab --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite explorationHistoryTab --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_IMPROVEMENTS_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite explorationImprovementsTab --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite explorationStatisticsTab --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite explorationTranslationTab --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite extensions --prod_env; fi
+- if [ "$RUN_E2E_TESTS_LEARNER_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite learnerDashboard --prod_env; fi
+- if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite learner --prod_env; fi
+- if [ "$RUN_E2E_TESTS_LIBRARY" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite library --prod_env; fi
+- if [ "$RUN_E2E_TESTS_NAVIGATION" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite navigation --prod_env; fi
+- if [ "$RUN_E2E_TESTS_PREFERENCES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite preferences --prod_env; fi
+- if [ "$RUN_E2E_TESTS_PROFILE_MENU" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite profileMenu --prod_env; fi
+- if [ "$RUN_E2E_TESTS_PUBLICATION" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite publication --prod_env; fi
+- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite skillEditor --prod_env; fi
+- if [ "$RUN_E2E_TESTS_SUBSCRIPTIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite subscriptions --prod_env; fi
+- if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite topicsAndSkillsDashboard --prod_env; fi
+- if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite topicAndStoryEditor --prod_env; fi
+- if [ "$RUN_E2E_TESTS_USERS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite users --prod_env; fi
 # These lines are commented out because these checks are being run on CircleCI
 # here: https://circleci.com/gh/oppia/oppia
 # after_success:
