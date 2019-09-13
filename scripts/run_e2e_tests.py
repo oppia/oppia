@@ -24,6 +24,7 @@ import re
 import shutil
 import signal
 import subprocess
+import time
 
 import python_utils
 
@@ -188,6 +189,7 @@ def main(args=None):
             common.GOOGLE_APP_ENGINE_HOME,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             app_yaml_filepath), shell=True)
+    time.sleep(10)
 
     # Forces the cleanup function to run on exit.
     # Developers: note that at the end of this script, the cleanup() function at
