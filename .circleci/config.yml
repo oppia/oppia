@@ -88,6 +88,9 @@ jobs:
       - checkout
       - run:
           <<: *install_dependencies
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
       - run:
           name: Install Chromedriver latest version
           command: |
