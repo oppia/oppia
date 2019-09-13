@@ -215,14 +215,14 @@ def main(args=None):
                 os.path.join(
                     common.NODE_MODULES_PATH, 'protractor', 'bin',
                     'protractor'),
-                os.path.join('core', 'tests', 'protractor.conf.js'), '--suite',
+                os.path.join('core', 'tests', 'protractor-ci.conf.js'), '--suite',
                 parsed_args.suite, '--params.devMode="%s"' % dev_mode])
         else:
             subprocess.call([
                 os.path.join(
                     common.NODE_MODULES_PATH, 'protractor', 'bin',
                     'protractor'),
-                os.path.join('core', 'tests', 'protractor.conf.js'),
+                os.path.join('core', 'tests', 'protractor-ci.conf.js'),
                 '--capabilities.shardTestFiles=%s' % parsed_args.sharding,
                 '--capabilities.maxInstances=%s'
                 % parsed_args.sharding_instances, '--suite', parsed_args.suite,

@@ -115,6 +115,10 @@ module.exports = function(config) {
           '--disable-web-security'
         ] : ['--no-sandbox']
       }
+      ChromeHeadlessCI: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--disable-gpu']
+      }
     },
 
     plugins: [
