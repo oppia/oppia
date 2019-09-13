@@ -87,8 +87,17 @@ def get_jinja_env(dir_path):
 
 
 def get_jinja_env_for_backend_tests(template_root_dir):
+    """Loads the correct jinja2 template environment for backend tests.
+
+    Args:
+        template_root_dir: str. The directory path for which all subdirectories
+            are the search path for the loader.
+
+    Returns:
+        Environment. The template environment.
+    """
     subdirs = []
-    for root, dirnames, _  in os.walk(template_root_dir):
+    for root, dirnames, _ in os.walk(template_root_dir):
         for dirname in dirnames:
             subdirs.append(
                 os.path.join(os.path.dirname(__file__), root, dirname))

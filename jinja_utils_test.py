@@ -25,8 +25,6 @@ import feconf
 import jinja_utils
 import python_utils
 
-import jinja2
-
 
 class JinjaUtilsUnitTests(test_utils.GenericTestBase):
 
@@ -68,8 +66,8 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         self.assertTrue(env.autoescape)
 
         subdirs = []
-        for root, dirnames, _  in os.walk(
-            feconf.FRONTEND_TEMPLATES_DIR_FOR_BACKEND_TESTS):
+        for root, dirnames, _ in os.walk(
+                feconf.FRONTEND_TEMPLATES_DIR_FOR_BACKEND_TESTS):
             for dirname in dirnames:
                 subdirs.append(
                     os.path.join(os.path.dirname(__file__), root, dirname))
