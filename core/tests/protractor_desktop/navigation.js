@@ -213,4 +213,11 @@ describe('Static Pages Tour', function() {
     expect(element(
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
+
+  it('shows the error page when an incorrect url is given', function() {
+    browser.get('/splashes');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-error-page')).isPresent()).toBe(true);
+  });
 });
