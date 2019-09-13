@@ -207,6 +207,8 @@ angular.module('oppia').factory('$exceptionHandler', [
 
     return function(exception, cause) {
       var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
+      // Suppress tpload errors which occur with p1 of -1 in the error URL
+      // because -1 is the status code for aborted requests.
       if (tploadStatusCode !== null && tploadStatusCode[1] === '-1') {
         return;
       }
