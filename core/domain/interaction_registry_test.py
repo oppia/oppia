@@ -57,15 +57,11 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
 
         # Ensure that dependencies are added in the exploration reader page.
         response = self.get_html_response('/explore/%s' % exp_id)
-        response.mustcontain(
-            '@require(\'../../../../../../extensions/interactions/'
-            'dependency_html.html\')')
+        response.mustcontain('dependency_html.html')
 
     def test_no_dependencies_in_non_exploration_pages(self):
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        response.mustcontain(no=[(
-            '@require(\'../../../../../../extensions/interactions/'
-            'dependency_html.html\')')])
+        response.mustcontain(no=['dependency_html.html'])
 
     def test_dependencies_loaded_in_exploration_editor(self):
         exp_services.load_demo('0')
@@ -76,9 +72,7 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
 
         # Ensure that dependencies are added in the exploration editor page.
         response = self.get_html_response('/create/0')
-        response.mustcontain(
-            '@require(\'../../../../../../extensions/interactions/'
-            'dependency_html.html\')')
+        response.mustcontain('dependency_html.html')
 
         self.logout()
 

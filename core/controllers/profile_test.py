@@ -603,10 +603,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn(
-            '@require(\'../../base-components/header.template.html\', '
-            '{"title": "Preferences - Oppia"})',
-            response.body)
+        self.assertIn('{"title": "Preferences - Oppia"})', response.body)
 
         self.logout()
 

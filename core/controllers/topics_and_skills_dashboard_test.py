@@ -145,9 +145,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         response = self.get_html_response(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
         self.assertIn(
-            '@require(\'../../base-components/header.template.html\', '
-            '{"title": "Topics and Skills Dashboard - Oppia"})',
-            response.body)
+            '{"title": "Topics and Skills Dashboard - Oppia"})', response.body)
 
         self.logout()
 
