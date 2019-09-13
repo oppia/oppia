@@ -417,13 +417,11 @@ def main(args=None):
                 failures = int(tests_failed_regex_match.group(3))
                 total_errors += errors
                 total_failures += failures
-                python_utils.PRINT(
-                    'FAILED    %s: %s errors, %s failures' % (
-                        spec.test_target, errors, failures))
+                python_utils.PRINT('FAILED    %s: %s errors, %s failures' % (
+                    spec.test_target, errors, failures))
             except AttributeError:
-                # There was an internal error, and the tests did not run
-                # (The error message did not match
-                # `tests_failed_regex_match`).
+                # There was an internal error, and the tests did not run (The
+                # error message did not match `tests_failed_regex_match`).
                 test_count = 0
                 total_errors += 1
                 python_utils.PRINT('')
