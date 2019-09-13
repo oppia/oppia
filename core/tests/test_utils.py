@@ -117,11 +117,10 @@ def mock_get_template(unused_self, filename):
         jinja2.environment.Template. The template for the given file.
     """
     filepath = get_filepath_from_filename(
-        filename, os.path.join(
-            'core', 'templates', 'dev', 'head', 'pages'))
+        filename, os.path.join('core', 'templates', 'dev', 'head', 'pages'))
     if not filepath:
         filepath = get_filepath_from_filename(
-            filename, os.path.join('core', 'tests'))
+            filename, os.path.join('core', 'templates', 'dev', 'head', 'tests'))
     with python_utils.open_file(filepath, 'r') as f:
         file_content = f.read()
     return jinja2.environment.Template(file_content)
@@ -593,9 +592,11 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
 
-        response = self.testapp.get(
-            url, params, expect_errors=expect_errors,
-            status=expected_status_int)
+        with self.swap(
+            jinja2.environment.Environment, 'get_template', mock_get_template):
+            response = self.testapp.get(
+                url, params, expect_errors=expect_errors,
+                status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -627,11 +628,9 @@ tags: []
         Returns:
             webtest.TestResponse. The test response.
         """
-        with self.swap(
-            jinja2.environment.Environment, 'get_template', mock_get_template):
-            response = self._get_response(
-                url, 'text/html', params=params,
-                expected_status_int=expected_status_int)
+        response = self._get_response(
+            url, 'text/html', params=params,
+            expected_status_int=expected_status_int)
 
         return response
 
@@ -679,7 +678,9 @@ tags: []
                 isinstance(params, dict),
                 msg='Expected params to be a dict, received %s' % params)
 
-        response = self.testapp.get(url, params, expect_errors=True)
+        with self.swap(
+            jinja2.environment.Environment, 'get_template', mock_get_template):
+            response = self.testapp.get(url, params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)
 
@@ -707,9 +708,12 @@ tags: []
         expect_errors = False
         if expected_status_int >= 400:
             expect_errors = True
-        json_response = self.testapp.get(
-            url, params, expect_errors=expect_errors,
-            status=expected_status_int)
+
+        with self.swap(
+            jinja2.environment.Environment, 'get_template', mock_get_template):
+            json_response = self.testapp.get(
+                url, params, expect_errors=expect_errors,
+                status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
