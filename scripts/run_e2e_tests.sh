@@ -124,11 +124,13 @@ for arg in "$@"; do
   fi
 done
 
-if [[ "DEV_MODE" == "true" ]]; then
+if [[ "$DEV_MODE" == "true" ]]; then
   constants_env_variable="\"DEV_MODE\": true"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
   python -m scripts.build
   APP_YAML_FILEPATH="app_dev.yaml"
+
+  node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts
 else
   constants_env_variable="\"DEV_MODE\": false"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
