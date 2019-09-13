@@ -370,7 +370,8 @@ class BaseHandler(webapp2.RequestHandler):
                     'error-iframed.mainpage.html',
                     iframe_restriction=None)
             else:
-                self.render_template('error-page.mainpage.html')
+                self.render_template(
+                    'error-page-%s.mainpage.html' % values['status_code'])
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
@@ -386,6 +387,8 @@ class BaseHandler(webapp2.RequestHandler):
                 400, 401, 404 or 500).
             values: dict. The key-value pairs to include in the response.
         """
+        # The error codes here should be in sync with the error pages
+        # generated via webpack.common.config.ts.
         assert error_code in [400, 401, 404, 500]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
