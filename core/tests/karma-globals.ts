@@ -17,8 +17,7 @@
  */
 
 var GLOBALS = {
-  status_code: '',
-  TRANSLATOR_PROVIDER_FOR_TESTS: null,
+  TRANSLATOR_PROVIDER_FOR_TESTS: null
 };
 
 /* This function overwrites the translationProvider for a dummy function

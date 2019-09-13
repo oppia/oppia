@@ -25,7 +25,9 @@ angular.module('oppia').directive('errorPage', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        statusCode: '@'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/error-pages/error-page.directive.html'),
       controllerAs: '$ctrl',
@@ -37,7 +39,9 @@ angular.module('oppia').directive('errorPage', [
           ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/oops_mint.png');
 
-          ctrl.statusCode = GLOBALS.status_code;
+          ctrl.getStatusCode = function() {
+            return Number(ctrl.statusCode);
+          };
 
           PageTitleService.setPageTitle(
             'Error ' + ctrl.statusCode + ' - Oppia');
