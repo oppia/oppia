@@ -54,6 +54,7 @@ import utils
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
+import jinja2
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -78,6 +79,52 @@ def empty_environ():
     os.environ['USER_IS_ADMIN'] = '0'
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
+
+
+def get_filepath_from_filename(filename, rootdir):
+    """Returns filepath using the filename.
+
+    Args:
+        filename: str. The name of the file.
+        rootdir: str. The directory to search the file in.
+
+    Returns:
+        str. The path of the file if file is found otherwise
+            an empty string.
+    """
+    # This is required since error files are served according to error status
+    # code. The file served is error-page.mainpage.html but it is compiled
+    # and stored as error-page-{status_code}.mainpage.html.
+    # So, we need to swap the name here to obtain the correct filepath.
+    if filename.startswith('error-page'):
+        filename = 'error-page.mainpage.html'
+    for root, _, files in os.walk(rootdir):
+        for name in files:
+            if name == filename:
+                return os.path.join(root, filename)
+    return ''
+
+
+def mock_get_template(unused_self, filename):
+    """Mock for get_template function of jinja2 Environment.
+
+    Args:
+        unused_self: jinja2.environment.Environment. The Environment instance.
+        filename: str. The name of the file for which template is
+            to be returned.
+
+    Returns:
+        jinja2.environment.Template. The template for the given file.
+    """
+    filepath = get_filepath_from_filename(
+        filename, os.path.join(
+            'core', 'templates', 'dev', 'head', 'pages'))
+    if not filepath:
+        filepath = get_filepath_from_filename(
+            filename, os.path.join('core', 'tests'))
+    with python_utils.open_file(filepath, 'r') as f:
+        file_content = f.read()
+    return jinja2.environment.Template(file_content)
 
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
@@ -580,9 +627,11 @@ tags: []
         Returns:
             webtest.TestResponse. The test response.
         """
-        response = self._get_response(
-            url, 'text/html', params=params,
-            expected_status_int=expected_status_int)
+        with self.swap(
+            jinja2.environment.Environment, 'get_template', mock_get_template):
+            response = self._get_response(
+                url, 'text/html', params=params,
+                expected_status_int=expected_status_int)
 
         return response
 
