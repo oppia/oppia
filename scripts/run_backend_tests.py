@@ -353,8 +353,7 @@ def main(args=None):
                 '---------------------------------------------------------')
             python_utils.PRINT('')
             time.sleep(3)
-            python_utils.PRINT(
-                'Redirecting to its corresponding test file...')
+            python_utils.PRINT('Redirecting to its corresponding test file...')
             all_test_targets = [parsed_args.test_target + '_test']
     else:
         include_load_tests = not parsed_args.exclude_load_tests
@@ -405,8 +404,7 @@ def main(args=None):
             test_count = 0
         elif task.exception:
             exc_str = python_utils.convert_to_bytes(task.exception)
-            python_utils.PRINT(
-                exc_str[exc_str.find('='): exc_str.rfind('-')])
+            python_utils.PRINT(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
@@ -430,16 +428,14 @@ def main(args=None):
                 total_errors += 1
                 python_utils.PRINT('')
                 python_utils.PRINT(
-                    '-----------------------------------'
-                    '-------------------')
+                    '------------------------------------------------------')
                 python_utils.PRINT(
                     '    WARNING: FAILED TO RUN %s' % spec.test_target)
                 python_utils.PRINT('')
                 python_utils.PRINT(
                     '    This is most likely due to an import error.')
                 python_utils.PRINT(
-                    '------------------------------------'
-                    '------------------')
+                    '------------------------------------------------------')
         else:
             try:
                 tests_run_regex_match = re.search(

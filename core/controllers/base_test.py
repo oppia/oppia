@@ -37,7 +37,6 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import jinja_utils
 import main
 import python_utils
 import utils
