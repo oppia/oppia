@@ -82,15 +82,26 @@ def empty_environ():
 
 
 def get_filepath_from_filename(filename, rootdir):
-    """Returns filepath using the filename.
+    """Returns filepath using the filename. Different files are present
+    in different subdirectories in the rootdir. So, we walk through the
+    rootdir and match the all the filenames with the given filename.
+    When a match is found the function returns the complete path of the
+    filename by using os.path.join(root, filename).
+
+    For example signup-page.mainpage.html is present in
+    core/templates/dev/head/pages/signup-page and error-pgae.mainpage.html is
+    present in core/templates/dev/head/pages/error-pages. So we walk through
+    core/templates/dev/head/pages and a match for signup-page.directive.html
+    is found in signup-page subdirectory and a match for
+    error-page.directive.html is found in error-pages subdirectory.
 
     Args:
         filename: str. The name of the file.
         rootdir: str. The directory to search the file in.
 
     Returns:
-        str. The path of the file if file is found otherwise
-            an empty string.
+        str | None. The path of the file if file is found otherwise
+            None.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled
@@ -102,11 +113,17 @@ def get_filepath_from_filename(filename, rootdir):
         for name in files:
             if name == filename:
                 return os.path.join(root, filename)
-    return ''
+    return None
 
 
 def mock_get_template(unused_self, filename):
-    """Mock for get_template function of jinja2 Environment.
+    """Mock for get_template function of jinja2 Environment. This mock is
+    required for backend tests since we do not have webpack compilation
+    before backend tests. The folder to search templates is webpack_bundles
+    which is generated after webpack compilation. Since this folder will be
+    missing, get_template function will return a TemplateNotFound error. So,
+    we use a mock for get_template which returns the html file from the source
+    directory instead.
 
     Args:
         unused_self: jinja2.environment.Environment. The Environment instance.
@@ -592,6 +609,10 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
 
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles
+        # is only produced after webpack compilation which is not performed
+        # during backend tests.
         with self.swap(
             jinja2.environment.Environment, 'get_template', mock_get_template):
             response = self.testapp.get(
@@ -678,6 +699,10 @@ tags: []
                 isinstance(params, dict),
                 msg='Expected params to be a dict, received %s' % params)
 
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles
+        # is only produced after webpack compilation which is not performed
+        # during backend tests.
         with self.swap(
             jinja2.environment.Environment, 'get_template', mock_get_template):
             response = self.testapp.get(url, params, expect_errors=True)
@@ -709,6 +734,10 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
 
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles
+        # is only produced after webpack compilation which is not performed
+        # during backend tests.
         with self.swap(
             jinja2.environment.Environment, 'get_template', mock_get_template):
             json_response = self.testapp.get(

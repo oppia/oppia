@@ -63,7 +63,9 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
 
     def test_no_dependencies_in_non_exploration_pages(self):
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        response.mustcontain(no=['skulpt'])
+        response.mustcontain(no=[(
+            '@require(\'../../../../../../extensions/interactions/'
+            'dependency_html.html\')')])
 
     def test_dependencies_loaded_in_exploration_editor(self):
         exp_services.load_demo('0')
