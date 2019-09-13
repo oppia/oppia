@@ -430,7 +430,7 @@ class ExplorationContentValidationJobForCKEditor(
             yield (key, output_values)
         else:
             output_values.append(key[exp_id_index:])
-            yield(key[:exp_id_index - 1], output_values)
+            yield (key[:exp_id_index - 1], output_values)
 
 
 class InteractionCustomizationArgsValidationJob(
@@ -475,7 +475,7 @@ class InteractionCustomizationArgsValidationJob(
             yield (key, output_values)
         else:
             output_values.append(key[exp_id_index:])
-            yield(key[:exp_id_index - 1], output_values)
+            yield (key[:exp_id_index - 1], output_values)
 
 
 class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):

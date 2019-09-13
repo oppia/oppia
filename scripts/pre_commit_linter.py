@@ -699,12 +699,11 @@ def _lint_all_files(
     linting_processes = []
 
     js_and_ts_result = multiprocessing.Queue()
-    js_and_ts_stdout = multiprocessing.Queue()
 
     linting_processes.append(multiprocessing.Process(
         target=_lint_js_and_ts_files, args=(
             node_path, eslint_path, js_and_ts_files_to_lint,
-            js_and_ts_stdout, js_and_ts_result, verbose_mode_enabled)))
+            js_and_ts_result, verbose_mode_enabled)))
 
     css_in_html_result = multiprocessing.Queue()
     css_in_html_stdout = multiprocessing.Queue()
@@ -754,7 +753,7 @@ def _lint_all_files(
     ]
 
     stdout_queus = [
-        js_and_ts_stdout, css_in_html_stdout, css_stdout
+        css_in_html_stdout, css_stdout
     ]
     return linting_processes, result_queues, stdout_queus
 
@@ -1441,15 +1440,13 @@ def _lint_css_files(
 
 
 def _lint_js_and_ts_files(
-        node_path, eslint_path, files_to_lint, stdout, result,
-        verbose_mode_enabled):
+        node_path, eslint_path, files_to_lint, result, verbose_mode_enabled):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
         node_path: str. Path to the node binary.
         eslint_path: str. Path to the ESLint binary.
         files_to_lint: list(str). A list of filepaths to lint.
-        stdout:  multiprocessing.Queue. A queue to store ESLint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
@@ -1485,7 +1482,6 @@ def _lint_js_and_ts_files(
         if linter_stdout:
             num_files_with_errors += 1
             result_list.append(linter_stdout)
-            stdout.put(linter_stdout)
 
     if num_files_with_errors:
         for error in result_list:

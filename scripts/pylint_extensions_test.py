@@ -937,6 +937,64 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_yield_nothing(self):
+        yield_nothing_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    yield
+                """)
+        yield_nothing_file.file = filename
+        yield_nothing_file.path = filename
+
+        self.checker_test_object.checker.process_module(
+            yield_nothing_file)
+
+        # No errors on yield statements that do nothing.
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_yield_in_multi_line_comment(self):
+        yield_in_multiline_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    \"\"\"
+                        yield(\"invalid yield format\")
+                    \"\"\"
+                    extract_node(\"\"\"
+                        yield   (invalid)
+                    \"\"\")
+                    extract_node(
+                    b\"\"\"
+                        yield(1, 2)
+                    \"\"\")
+                    extract_node(
+                    u\"\"\"
+                        yield(3, 4)
+                    \"\"\")
+                    )
+                """)
+        yield_in_multiline_file.file = filename
+        yield_in_multiline_file.path = filename
+
+        self.checker_test_object.checker.process_module(
+            yield_in_multiline_file)
+
+        # No errors on yield statements in multi-line comments.
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
     def test_too_many_spaces_after_yield_statement(self):
         node_too_many_spaces_after_yield_file = astroid.scoped_nodes.Module(
             name='test',
