@@ -16,81 +16,108 @@
  * @fileoverview Rules service for the interaction.
  */
 
-// The below file is imported just for its constant.
-require(
-  'interactions/MusicNotesInput/directives/' +
-  'oppia-interactive-music-notes-input.directive.ts');
 
-require('interactions/interactions-extension.constants.ajs.ts');
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('MusicNotesInputRulesService', [
-  'NOTE_NAMES_TO_MIDI_VALUES', function(NOTE_NAMES_TO_MIDI_VALUES) {
-    var _getMidiNoteValue = function(note) {
-      if (NOTE_NAMES_TO_MIDI_VALUES.hasOwnProperty(note.readableNoteName)) {
-        return NOTE_NAMES_TO_MIDI_VALUES[note.readableNoteName];
-      } else {
-        throw new Error('Invalid music note ' + note);
+
+interface Note {
+  readableNoteName: string,
+  noteDuration: {
+    num: number,
+    den: number
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MusicNotesInputRulesService {
+  static _getMidiNoteValue(note: Note): number {
+    if (
+      InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES.hasOwnProperty(
+        note.readableNoteName)) {
+      return InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES[
+        note.readableNoteName];
+    } else {
+      throw new Error('Invalid music note ' + note);
+    }
+  }
+
+  static _convertSequenceToMidi(sequence): number[] {
+    return sequence.map((note) => {
+      return MusicNotesInputRulesService._getMidiNoteValue(note);
+    });
+  }
+
+  Equals(answer: Note[], inputs: {x: Note[]}): boolean {
+    return angular.equals(
+      MusicNotesInputRulesService._convertSequenceToMidi(answer),
+      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
+  }
+  IsLongerThan(answer: Note[], inputs: {x: Note[], k: number}): boolean {
+    return MusicNotesInputRulesService._convertSequenceToMidi(
+      answer).length > inputs.k;
+  }
+  // TODO(wxy): validate that inputs.a <= inputs.b
+  HasLengthInclusivelyBetween(
+      answer: Note[], inputs: {x: Note[], a: number, b: number}): boolean {
+    var answerLength:number = (
+      MusicNotesInputRulesService._convertSequenceToMidi(answer).length);
+    return answerLength >= inputs.a && answerLength <= inputs.b;
+  }
+  IsEqualToExceptFor(answer: Note[], inputs: {x: Note[], k: number}): boolean {
+    var targetSequence: number[] = (
+      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
+    var userSequence: number[] = (
+      MusicNotesInputRulesService._convertSequenceToMidi(answer));
+    if (userSequence.length !== targetSequence.length) {
+      return false;
+    }
+
+    var numWrongNotes: number = 0;
+    userSequence.map(function(noteValue, index) {
+      if (noteValue !== targetSequence[index]) {
+        numWrongNotes++;
       }
-    };
+    });
+    return numWrongNotes <= inputs.k;
+  }
+  IsTranspositionOf(answer: Note[], inputs: {x: Note[], y: number}): boolean {
+    var targetSequence: number[] = (
+      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
+    var userSequence: number[] = (
+      MusicNotesInputRulesService._convertSequenceToMidi(answer));
+    if (userSequence.length !== targetSequence.length) {
+      return false;
+    }
+    return userSequence.every((noteValue, index) => {
+      return targetSequence[index] + inputs.y === noteValue;
+    });
+  }
+  IsTranspositionOfExceptFor(
+      answer: Note[], inputs: {x: Note[], y: number, k: number}): boolean {
+    var targetSequence: number[] = (
+      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
+    var userSequence: number[] = (
+      MusicNotesInputRulesService._convertSequenceToMidi(answer));
+    if (userSequence.length !== targetSequence.length) {
+      return false;
+    }
 
-    var _convertSequenceToMidi = function(sequence) {
-      return sequence.map(function(note) {
-        return _getMidiNoteValue(note);
-      });
-    };
-
-    return {
-      Equals: function(answer, inputs) {
-        return angular.equals(_convertSequenceToMidi(answer),
-          _convertSequenceToMidi(inputs.x));
-      },
-      IsLongerThan: function(answer, inputs) {
-        return _convertSequenceToMidi(answer).length > inputs.k;
-      },
-      // TODO(wxy): validate that inputs.a <= inputs.b
-      HasLengthInclusivelyBetween: function(answer, inputs) {
-        var answerLength = _convertSequenceToMidi(answer).length;
-        return answerLength >= inputs.a && answerLength <= inputs.b;
-      },
-      IsEqualToExceptFor: function(answer, inputs) {
-        var targetSequence = _convertSequenceToMidi(inputs.x);
-        var userSequence = _convertSequenceToMidi(answer);
-        if (userSequence.length !== targetSequence.length) {
-          return false;
-        }
-
-        var numWrongNotes = 0;
-        userSequence.map(function(noteValue, index) {
-          if (noteValue !== targetSequence[index]) {
-            numWrongNotes++;
-          }
-        });
-        return numWrongNotes <= inputs.k;
-      },
-      IsTranspositionOf: function(answer, inputs) {
-        var targetSequence = _convertSequenceToMidi(inputs.x);
-        var userSequence = _convertSequenceToMidi(answer);
-        if (userSequence.length !== targetSequence.length) {
-          return false;
-        }
-        return userSequence.every(function(noteValue, index) {
-          return targetSequence[index] + inputs.y === noteValue;
-        });
-      },
-      IsTranspositionOfExceptFor: function(answer, inputs) {
-        var targetSequence = _convertSequenceToMidi(inputs.x);
-        var userSequence = _convertSequenceToMidi(answer);
-        if (userSequence.length !== targetSequence.length) {
-          return false;
-        }
-
-        var numWrongNotes = 0;
-        userSequence.map(function(noteValue, index) {
-          if (targetSequence[index] + inputs.y !== noteValue) {
-            numWrongNotes++;
-          }
-        });
-        return numWrongNotes <= inputs.k;
+    var numWrongNotes: number = 0;
+    userSequence.map((noteValue, index) => {
+      if (targetSequence[index] + inputs.y !== noteValue) {
+        numWrongNotes++;
       }
-    };
-  }]);
+    });
+    return numWrongNotes <= inputs.k;
+  }
+}
+
+angular.module('oppia').factory(
+  'MusicNotesInputRulesService',
+  downgradeInjectable(MusicNotesInputRulesService));
+
