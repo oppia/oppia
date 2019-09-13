@@ -86,33 +86,6 @@ def get_jinja_env(dir_path):
     return env
 
 
-def get_jinja_env_for_backend_tests(template_root_dir):
-    """Loads the correct jinja2 template environment for backend tests.
-
-    Args:
-        template_root_dir: str. The directory path for which all subdirectories
-            are the search path for the loader.
-
-    Returns:
-        Environment. The template environment.
-    """
-    subdirs = []
-    for root, dirnames, _ in os.walk(template_root_dir):
-        for dirname in dirnames:
-            subdirs.append(
-                os.path.join(os.path.dirname(__file__), root, dirname))
-
-    # This is required for the console_errors.html template.
-    subdirs.append(os.path.join(
-        os.path.dirname(__file__), 'core', 'templates', 'dev', 'head', 'tests'))
-
-    loader = jinja2.FileSystemLoader(subdirs)
-    env = jinja2.Environment(
-        autoescape=True, loader=loader)
-    env.filters.update(JINJA_FILTERS)
-    return env
-
-
 def parse_string(string, params, autoescape=True):
     """Parses a string using Jinja templating.
 

@@ -60,25 +60,6 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         for jinja_filter in jinja_utils.JINJA_FILTERS:
             self.assertTrue(jinja_filter in env.filters)
 
-    def test_get_jinja_env_for_backend_tests(self):
-        env = jinja_utils.get_jinja_env_for_backend_tests(
-            feconf.FRONTEND_TEMPLATES_DIR_FOR_BACKEND_TESTS)
-        self.assertTrue(env.autoescape)
-
-        subdirs = []
-        for root, dirnames, _ in os.walk(
-                feconf.FRONTEND_TEMPLATES_DIR_FOR_BACKEND_TESTS):
-            for dirname in dirnames:
-                subdirs.append(
-                    os.path.join(os.path.dirname(__file__), root, dirname))
-        subdirs.append(os.path.join(
-            os.path.dirname(__file__), 'core', 'templates', 'dev',
-            'head', 'tests'))
-        self.assertEqual(sorted(env.loader.searchpath), sorted(subdirs))
-
-        for jinja_filter in jinja_utils.JINJA_FILTERS:
-            self.assertTrue(jinja_filter in env.filters)
-
     def test_parse_string(self):
         parsed_str = jinja_utils.parse_string('{{test}}', {'test': 'hi'})
         self.assertEqual(parsed_str, 'hi')

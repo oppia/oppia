@@ -105,22 +105,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.signup(self.TEST_CREATOR_EMAIL, self.TEST_CREATOR_USERNAME)
         self.signup(self.TEST_EDITOR_EMAIL, self.TEST_EDITOR_USERNAME)
 
-    def test_jinja2_env_in_non_test_mode(self):
-        def mock_init(unused_self, unused_request, unused_response):
-            pass
-        init_swap = self.swap(base.BaseHandler, '__init__', mock_init)
-        with init_swap, self.swap(feconf, 'RUN_BACKEND_TESTS', False):
-            # jinja2_env is a @webapp2.cached_property.
-            env = base.BaseHandler('req', 'res').jinja2_env
-            self.assertTrue(env.autoescape)
-
-            self.assertEqual(
-                env.loader.searchpath,
-                [os.path.join(os.getcwd(), feconf.FRONTEND_TEMPLATES_DIR)])
-
-            for jinja_filter in jinja_utils.JINJA_FILTERS:
-                self.assertTrue(jinja_filter in env.filters)
-
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 
