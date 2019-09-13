@@ -89,7 +89,7 @@ def get_filepath_from_filename(filename, rootdir):
     filename by using os.path.join(root, filename).
 
     For example signup-page.mainpage.html is present in
-    core/templates/dev/head/pages/signup-page and error-pgae.mainpage.html is
+    core/templates/dev/head/pages/signup-page and error-page.mainpage.html is
     present in core/templates/dev/head/pages/error-pages. So we walk through
     core/templates/dev/head/pages and a match for signup-page.directive.html
     is found in signup-page subdirectory and a match for
