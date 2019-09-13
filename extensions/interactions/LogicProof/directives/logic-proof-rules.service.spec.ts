@@ -16,23 +16,35 @@
  * @fileoverview Unit tests for Logic Proof rules.
  */
 
-require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
+import { LogicProofRulesService } from
+  'interactions/LogicProof/directives/logic-proof-rules.service';
 
-describe('Logic Proof rules service', function() {
-  beforeEach(angular.mock.module('oppia'));
+/* eslint-disable camelcase */
+interface Answer {
+  assumptions_string: string,
+  target_string: string,
+  proof_string: string,
+  correct: boolean,
+  error_category?: string,
+  error_code?: string,
+  error_message?: string,
+  error_line_number?: number
+}
+/* eslint-enable camelcase */
 
-  var lprs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    lprs = $injector.get('LogicProofRulesService');
-  }));
+describe('Logic Proof rules service', () => {
+  let lprs: LogicProofRulesService = null;
+  beforeEach(() => {
+    lprs = new LogicProofRulesService();
+  });
 
-  var CORRECT_EXAMPLE = {
+  var CORRECT_EXAMPLE: Answer = {
     assumptions_string: 'p',
     target_string: 'q',
     proof_string: 'a proof',
     correct: true
   };
-  var INCORRECT_EXAMPLE_PARSING = {
+  var INCORRECT_EXAMPLE_PARSING: Answer = {
     assumptions_string: 'p',
     target_string: 'q',
     proof_string: 'a proof',
@@ -42,7 +54,7 @@ describe('Logic Proof rules service', function() {
     error_message: 'a message',
     error_line_number: 3
   };
-  var INCORRECT_EXAMPLE_TYPING = {
+  var INCORRECT_EXAMPLE_TYPING: Answer = {
     assumptions_string: 'p',
     target_string: 'q',
     proof_string: 'a proof',
@@ -53,20 +65,20 @@ describe('Logic Proof rules service', function() {
     error_line_number: 4
   };
 
-  it('should have a correct \'correct\' rule', function() {
-    expect(lprs.Correct(CORRECT_EXAMPLE, null)).toBe(true);
-    expect(lprs.Correct(INCORRECT_EXAMPLE_PARSING, null)).toBe(false);
-    expect(lprs.Correct(INCORRECT_EXAMPLE_TYPING, null)).toBe(false);
+  it('should have a correct \'correct\' rule', () => {
+    expect(lprs.Correct(CORRECT_EXAMPLE)).toBe(true);
+    expect(lprs.Correct(INCORRECT_EXAMPLE_PARSING)).toBe(false);
+    expect(lprs.Correct(INCORRECT_EXAMPLE_TYPING)).toBe(false);
   });
 
-  it('should have a correct \'not correct\' rule', function() {
-    expect(lprs.NotCorrect(CORRECT_EXAMPLE, null)).toBe(false);
-    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_PARSING, null)).toBe(true);
-    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_TYPING, null)).toBe(true);
+  it('should have a correct \'not correct\' rule', () => {
+    expect(lprs.NotCorrect(CORRECT_EXAMPLE)).toBe(false);
+    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_PARSING)).toBe(true);
+    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_TYPING)).toBe(true);
   });
 
-  it('should have a correct \'not correct by category\' rule', function() {
-    var RULE_INPUT = {
+  it('should have a correct \'not correct by category\' rule', () => {
+    var RULE_INPUT: {c: string} = {
       c: 'typing'
     };
     expect(lprs.NotCorrectByCategory(CORRECT_EXAMPLE, RULE_INPUT)).toBe(false);
