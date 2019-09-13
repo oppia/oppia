@@ -79,8 +79,8 @@ CMD_ADD_STATE = 'add_state'
 CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
-# This takes addition 'state_name', 'content_id', 'language_code' and 'html'
-# parameters.
+# This takes addition 'state_name', 'content_id', 'language_code' and
+# 'content_html' and 'translation_html' parameters.
 CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
@@ -1252,7 +1252,6 @@ class Exploration(python_utils.OBJECT):
                     outcome.dest = other_state_name
 
         del self.states[state_name]
-
 
     def get_translatable_text(self, language_code):
         """Returns all the contents which needs translation in the given

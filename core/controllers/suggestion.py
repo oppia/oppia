@@ -214,7 +214,7 @@ class ReviewableSuggestionsHandler(base.BaseHandler):
 
 
 class UserSubmittedSuggestionsHandler(base.BaseHandler):
-    """Provides all suggestions which can be reviewed by the user for a given
+    """Provides all suggestions which are submitted by the user for a given
     suggestion type.
     """
 
