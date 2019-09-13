@@ -734,15 +734,9 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
 
-        # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles
-        # is only produced after webpack compilation which is not performed
-        # during backend tests.
-        with self.swap(
-            jinja2.environment.Environment, 'get_template', mock_get_template):
-            json_response = self.testapp.get(
-                url, params, expect_errors=expect_errors,
-                status=expected_status_int)
+        json_response = self.testapp.get(
+            url, params, expect_errors=expect_errors,
+            status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
