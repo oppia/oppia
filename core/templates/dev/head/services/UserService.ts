@@ -33,7 +33,7 @@ angular.module('oppia').factory('UserService', [
         return $q.resolve(UserInfoObjectFactory.createDefault());
       }
       if (userInfoPromise) {
-        return $q.resolve(userInfoPromise);
+        return userInfoPromise;
       }
       userInfoPromise = $http.get('/userinfohandler')
         .then(function(response) {
