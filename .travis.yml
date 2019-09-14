@@ -1,9 +1,11 @@
 sudo: required
-# In order to install Chrome stable we need xenial distribution.
 dist: xenial
 language: python
 python:
-- 2.7
+  - 2.7
+
+services:
+  - xvfb
 
 branches:
   only:
@@ -81,7 +83,6 @@ before_install:
 - pip install codecov
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
-- bash -e /etc/init.d/xvfb start
 
 install:
 - pushd $TRAVIS_BUILD_DIR
