@@ -22,4 +22,4 @@ require('tests/console_errors.module.ts');
 
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');

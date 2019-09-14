@@ -28,7 +28,7 @@ IMPORTANT NOTES:
 1.  Before running this script, you must install third-party dependencies by
     running
 
-        bash scripts/start.sh
+        python -m scripts.install_third_party_libs
 
     at least once.
 
@@ -103,7 +103,7 @@ EXCLUDED_PATHS = (
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
     'extensions/interactions/LogicProof/static/js/generatedParser.ts',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
+    'core/templates/dev/head/expressions/expression-parser.service.js')
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
@@ -413,7 +413,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\Winput\('),
+        'regexp': re.compile(r'[^.|\w]input\('),
         'message': 'Please use python_utils.INPUT.',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -527,8 +527,9 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/core/storage/',
     '/export/',
     '/manifest.json',
-    '/package*.json',
-    '/scripts/install_third_party.sh',
+    '/package.json',
+    '/yarn.lock',
+    '/scripts/install_third_party_libs.py',
     '/.github/']
 
 if not os.getcwd().endswith('oppia'):
@@ -540,7 +541,8 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 if not os.path.exists(_PYLINT_PATH):
     python_utils.PRINT('')
-    python_utils.PRINT('ERROR    Please run start.sh first to install pylint ')
+    python_utils.PRINT(
+        'ERROR  Please run install_third_party_libs.py first to install pylint')
     python_utils.PRINT('         and its dependencies.')
     sys.exit(1)
 
@@ -563,7 +565,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.8.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.2.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.8'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-3.13.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
@@ -1358,15 +1360,13 @@ def _lint_css_files(
 
 
 def _lint_js_and_ts_files(
-        node_path, eslint_path, files_to_lint, stdout, result,
-        verbose_mode_enabled):
+        node_path, eslint_path, files_to_lint, result, verbose_mode_enabled):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
         node_path: str. Path to the node binary.
         eslint_path: str. Path to the ESLint binary.
         files_to_lint: list(str). A list of filepaths to lint.
-        stdout:  multiprocessing.Queue. A queue to store ESLint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
@@ -1402,7 +1402,6 @@ def _lint_js_and_ts_files(
         if linter_stdout:
             num_files_with_errors += 1
             result_list.append(linter_stdout)
-            stdout.put(linter_stdout)
 
     if num_files_with_errors:
         for error in result_list:
@@ -1786,7 +1785,8 @@ class JsTsLintChecksManager(LintChecksManager):
         if not os.path.exists(eslint_path):
             python_utils.PRINT('')
             python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
+                'ERROR    Please run install_third_party_libs.py first to '
+                'install node-eslint ')
             python_utils.PRINT('         and its dependencies.')
             sys.exit(1)
 
@@ -1795,12 +1795,11 @@ class JsTsLintChecksManager(LintChecksManager):
         linting_processes = []
 
         js_and_ts_result = multiprocessing.Queue()
-        js_and_ts_stdout = multiprocessing.Queue()
 
         linting_processes.append(multiprocessing.Process(
             target=_lint_js_and_ts_files, args=(
                 node_path, eslint_path, js_and_ts_files_to_lint,
-                js_and_ts_stdout, js_and_ts_result, self.verbose_mode_enabled)))
+                js_and_ts_result, self.verbose_mode_enabled)))
 
         for process in linting_processes:
             process.daemon = False
@@ -1810,8 +1809,8 @@ class JsTsLintChecksManager(LintChecksManager):
             process.join()
 
         js_and_ts_messages = []
-        while not js_and_ts_stdout.empty():
-            js_and_ts_messages.append(js_and_ts_stdout.get())
+        while not js_and_ts_result.empty():
+            js_and_ts_messages.append(js_and_ts_result.get())
 
         python_utils.PRINT('')
         python_utils.PRINT('\n'.join(js_and_ts_messages))
@@ -2616,7 +2615,8 @@ class OtherLintChecksManager(LintChecksManager):
         if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
             python_utils.PRINT('')
             python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
+                'ERROR    Please run install_third_party_libs.py first to '
+                'install node-eslint ')
             python_utils.PRINT(
                 '         or node-stylelint and its dependencies.')
             sys.exit(1)
@@ -3150,11 +3150,11 @@ def _print_complete_summary_of_errors():
         python_utils.PRINT(error_messages)
 
 
-def main():
+def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
     """
-    parsed_args = _PARSER.parse_args()
+    parsed_args = _PARSER.parse_args(args=args)
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
@@ -3164,7 +3164,7 @@ def main():
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('No files to check.')
         python_utils.PRINT('---------------------------')
-        sys.exit(1)
+        return
 
     all_filepaths_dict = {
         '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []

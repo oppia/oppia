@@ -171,39 +171,39 @@ angular.module('oppia').directive('settingsTab', [
                 ExplorationParamChangesService);
               ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
 
-              ExplorationDataService.getData().then(function() {
-                ctrl.refreshSettingsTab();
-                ctrl.hasPageLoaded = true;
-              });
+              ctrl.refreshSettingsTab();
             };
 
             ctrl.refreshSettingsTab = function() {
-              // Ensure that ExplorationStatesService has been initialized
-              // before getting the state names from it. Otherwise, navigating
-              // to the settings tab directly (by entering a URL that ends with
+              // Ensure that ExplorationStatesService has been initialized before
+              // getting the state names from it. Otherwise, navigating to the
+              // settings tab directly (by entering a URL that ends with
               // /settings) results in a console error.
-              if (ExplorationStatesService.isInitialized()) {
-                var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
-                  function(categoryItem) {
-                    return (
-                      categoryItem.id ===
-                      ExplorationCategoryService.savedMemento
-                    );
+
+              ctrl.hasPageLoaded = false;
+              ExplorationDataService.getData().then(function() {
+                if (ExplorationStatesService.isInitialized()) {
+                  var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
+                    function(categoryItem) {
+                      return (
+                        categoryItem.id ===
+                            ExplorationCategoryService.savedMemento);
+                    }
+                  );
+                  // If the current category is not in the dropdown, add it
+                  // as the first option.
+                  if (!categoryIsInSelect2 &&
+                      ExplorationCategoryService.savedMemento) {
+                    ctrl.CATEGORY_LIST_FOR_SELECT2.unshift({
+                      id: ExplorationCategoryService.savedMemento,
+                      text: ExplorationCategoryService.savedMemento
+                    });
                   }
-                );
 
-                // If the current category is not in the dropdown, add it
-                // as the first option.
-                if (!categoryIsInSelect2 &&
-                    ExplorationCategoryService.savedMemento) {
-                  ctrl.CATEGORY_LIST_FOR_SELECT2.unshift({
-                    id: ExplorationCategoryService.savedMemento,
-                    text: ExplorationCategoryService.savedMemento
-                  });
+                  ctrl.stateNames = ExplorationStatesService.getStateNames();
                 }
-
-                ctrl.stateNames = ExplorationStatesService.getStateNames();
-              }
+                ctrl.hasPageLoaded = true;
+              });
             };
 
             $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
@@ -224,11 +224,11 @@ angular.module('oppia').directive('settingsTab', [
               value: 'viewer'
             }];
 
-            ctrl.formStyle = JSON.stringify({
+            ctrl.formStyle = {
               display: 'table-cell',
               width: '16.66666667%',
               'vertical-align': 'top'
-            });
+            };
 
             ctrl.saveExplorationTitle = function() {
               ExplorationTitleService.saveDisplayedValue();
@@ -278,8 +278,7 @@ angular.module('oppia').directive('settingsTab', [
               ExplorationAutomaticTextToSpeechService
                 .isAutomaticTextToSpeechEnabled);
             ctrl.toggleAutomaticTextToSpeech = (
-              ExplorationAutomaticTextToSpeechService
-                .toggleAutomaticTextToSpeech
+              ExplorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech
             );
 
             ctrl.isCorrectnessFeedbackEnabled = (
@@ -376,9 +375,9 @@ angular.module('oppia').directive('settingsTab', [
                     };
                   }
                 ]
-              }).result.then(function() {}, function() {
-                // This callback is triggered when the Cancel button is
-                // clicked. No further action is needed.
+              }).result.then(function() {
+                // Promise is returned by getCurrentUrl which is handled here.
+                // No further action is needed.
               });
             };
 
@@ -402,9 +401,6 @@ angular.module('oppia').directive('settingsTab', [
                 ]
               }).result.then(function() {
                 ExplorationRightsService.makeCommunityOwned();
-              }, function() {
-                // This callback is triggered when the Cancel button is
-                // clicked. No further action is needed.
               });
             };
 
@@ -432,8 +428,6 @@ angular.module('oppia').directive('settingsTab', [
                   ctrl.explorationId).then(function() {
                   $window.location = CREATOR_DASHBOARD_PAGE_URL;
                 });
-              }, function() {
-
               });
             };
 
@@ -443,8 +437,8 @@ angular.module('oppia').directive('settingsTab', [
               var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
 
               $http.get(moderatorEmailDraftUrl).then(function(response) {
-                // If the draft email body is empty, email functionality will
-                // not be exposed to the mdoerator.
+                // If the draft email body is empty, email functionality will not
+                // be exposed to the mdoerator.
                 var draftEmailBody = response.data.draft_email_body;
 
                 $uibModal.open({
@@ -463,38 +457,33 @@ angular.module('oppia').directive('settingsTab', [
                     '$uibModalInstance', 'draftEmailBody',
                     function($uibModalInstance, draftEmailBody) {
                       var ctrl = this;
-                      this.$onInit = function() {
-                        ctrl.willEmailBeSent = Boolean(draftEmailBody);
-                        ctrl.emailBody = draftEmailBody;
+                      ctrl.willEmailBeSent = Boolean(draftEmailBody);
+                      ctrl.emailBody = draftEmailBody;
 
-                        if (ctrl.willEmailBeSent) {
-                          ctrl.EMAIL_BODY_SCHEMA = {
-                            type: 'unicode',
-                            ui_config: {
-                              rows: 20
-                            }
-                          };
-                        }
-
-                        ctrl.reallyTakeAction = function() {
-                          $uibModalInstance.close({
-                            emailBody: ctrl.emailBody
-                          });
+                      if (ctrl.willEmailBeSent) {
+                        ctrl.EMAIL_BODY_SCHEMA = {
+                          type: 'unicode',
+                          ui_config: {
+                            rows: 20
+                          }
                         };
+                      }
 
-                        ctrl.cancel = function() {
-                          $uibModalInstance.dismiss('cancel');
-                          AlertsService.clearWarnings();
-                        };
+                      ctrl.reallyTakeAction = function() {
+                        $uibModalInstance.close({
+                          emailBody: ctrl.emailBody
+                        });
+                      };
+
+                      ctrl.cancel = function() {
+                        $uibModalInstance.dismiss('cancel');
+                        AlertsService.clearWarnings();
                       };
                     }
                   ]
                 }).result.then(function(result) {
                   ExplorationRightsService.saveModeratorChangeToBackend(
                     result.emailBody);
-                }, function() {
-                  // This callback is triggered when the Cancel button is
-                  // clicked. No further action is needed.
                 });
               });
             };
@@ -511,6 +500,6 @@ angular.module('oppia').directive('settingsTab', [
               return ExplorationTitleService.savedMemento.length > 0;
             };
           };
-        }]
-    };
+        }
+      ]};
   }]);

@@ -53,13 +53,12 @@ GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 LINTER_MODULE = 'scripts.pre_commit_linter'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
-SCRIPTS_DIR = os.path.join(OPPIA_DIR, 'scripts')
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 NPM_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'npm')
-FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
+FRONTEND_TEST_SCRIPT = 'run_frontend_tests'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -269,9 +268,11 @@ def _start_linter(files):
     return task.returncode
 
 
-def _start_sh_script(scriptname):
-    """Runs the 'start.sh' script and returns the returncode of the task."""
-    cmd = ['bash', os.path.join(SCRIPTS_DIR, scriptname)]
+def _start_python_script(scriptname):
+    """Runs the 'start.py' script and returns the returncode of the task."""
+    cmd = [
+        'python', '-m',
+        os.path.join('scripts', scriptname).replace('/', '.')]
     task = subprocess.Popen(cmd)
     task.communicate()
     return task.returncode
@@ -356,7 +357,7 @@ def _does_diff_include_package_json(files_to_lint):
     return False
 
 
-def main():
+def main(args=None):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
     """
@@ -365,10 +366,10 @@ def main():
     parser.add_argument('url', nargs='?', help='provided by git before push')
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_push_hook to the .git/hooks dir')
-    args = parser.parse_args()
+    args = parser.parse_args(args=args)
     if args.install:
         _install_hook()
-        sys.exit(0)
+        return
 
     remote = _get_remote_name()
     remote = remote if remote else args.remote
@@ -399,12 +400,12 @@ def main():
                     sys.exit(1)
             frontend_status = 0
             if _does_diff_include_js_or_ts_files(files_to_lint):
-                frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
+                frontend_status = _start_python_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
-    sys.exit(0)
+    return
 
 
 if __name__ == '__main__':

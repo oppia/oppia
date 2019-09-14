@@ -69,6 +69,11 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The schema version for the data that is being classified.
     data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Classifier training job is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the training job of the form
@@ -214,6 +219,11 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     state_name = ndb.StringProperty(required=True, indexed=True)
     # The ID of the training job corresponding to the exploration attributes.
     job_id = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Training job exploration mapping is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):

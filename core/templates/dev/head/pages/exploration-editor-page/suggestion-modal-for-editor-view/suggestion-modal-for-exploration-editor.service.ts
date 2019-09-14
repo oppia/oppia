@@ -40,8 +40,8 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
     );
 
     var _showEditStateContentSuggestionModal = function(
-        activeThread, setActiveThread, isSuggestionHandled,
-        hasUnsavedChanges, isSuggestionValid) {
+        activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
+        setActiveThread = (threadId) => {}) {
       $uibModal.open({
         templateUrl: _templateUrl,
         backdrop: true,
@@ -183,10 +183,10 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
             extraParams.activeThread,
-            extraParams.setActiveThread,
             extraParams.isSuggestionHandled,
             extraParams.hasUnsavedChanges,
-            extraParams.isSuggestionValid
+            extraParams.isSuggestionValid,
+            extraParams.setActiveThread
           );
         }
       }

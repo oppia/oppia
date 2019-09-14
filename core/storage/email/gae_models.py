@@ -75,6 +75,11 @@ class SentEmailModel(base_models.BaseModel):
     # The hash of the recipient id, email subject and message body.
     email_hash = ndb.StringProperty(indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Sent email should be kept for audit purposes."""
+        return base_models.DELETION_POLICY.KEEP
+
     @classmethod
     def _generate_id(cls, intent):
         """Generates an ID for a new SentEmailModel instance.
@@ -265,6 +270,11 @@ class BulkEmailModel(base_models.BaseModel):
     # The datetime the email was sent, in UTC.
     sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Sent email should be kept for audit purposes."""
+        return base_models.DELETION_POLICY.KEEP
+
     @classmethod
     def create(
             cls, instance_id, recipient_ids, sender_id, sender_email,
@@ -300,8 +310,41 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     suggestion emails. The id/key of instances of this model has form of
     [USER_ID].[THREAD_ID]
     """
+
+    user_id = ndb.StringProperty(required=False, indexed=True)
+    thread_id = ndb.StringProperty(required=False, indexed=True)
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
+    # When this user thread was created and last updated. This overrides the
+    # fields in BaseModel. We are overriding them because we do not want the
+    # last_updated field to be updated when running one off job and whe the
+    # model is created we need to make sure that created_on is set before
+    # last updated.
+    created_on = ndb.DateTimeProperty(indexed=True, required=True)
+    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
+
+    def put(self, update_last_updated_time=True):
+        """Writes the given thread instance to the datastore.
+
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated_field of the thread.
+
+        Returns:
+            GeneralFeedbackEmailReplyToIdModel. The thread entity.
+        """
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
+
+        if update_last_updated_time or self.last_updated is None:
+            self.last_updated = datetime.datetime.utcnow()
+
+        return super(GeneralFeedbackEmailReplyToIdModel, self).put()
+
+    @staticmethod
+    def get_deletion_policy():
+        """Feedback email reply to id should be deleted."""
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):
@@ -359,7 +402,14 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                             ' already exists.')
 
         reply_to_id = cls._generate_unique_reply_to_id()
-        return cls(id=instance_id, reply_to_id=reply_to_id)
+        feedback_email_reply_model_instance = cls(
+            id=instance_id,
+            user_id=user_id,
+            thread_id=thread_id,
+            reply_to_id=reply_to_id)
+
+        feedback_email_reply_model_instance.put()
+        return feedback_email_reply_model_instance
 
     @classmethod
     def get_by_reply_to_id(cls, reply_to_id):
@@ -414,7 +464,25 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """
         instance_ids = [cls._generate_id(user_id, thread_id)
                         for user_id in user_ids]
-        user_models = cls.get_multi(instance_ids)
+        retrieved_models = cls.get_multi(instance_ids)
         return {
             user_id: model for user_id, model in python_utils.ZIP(
-                user_ids, user_models)}
+                user_ids, retrieved_models)}
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export GeneralFeedbackEmailReplyToIdModel's user data.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict whose keys are IDs of threads the user is
+            involved in. The corresponding value is the reply_to_id of that
+            thread.
+        """
+        user_data = {}
+        email_reply_models = cls.get_all().filter(cls.user_id == user_id)
+        for model in email_reply_models:
+            user_data[model.thread_id] = model.reply_to_id
+        return user_data

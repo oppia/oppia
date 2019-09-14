@@ -45,6 +45,13 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     need_voice_artist_in_language_codes = ndb.StringProperty(
         repeated=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration opporturnity summary is deleted only if the corresponding
+        exploration is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def get_all_translation_opportunities(
             cls, page_size, urlsafe_start_cursor, language_code):
@@ -131,3 +138,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             ExplorationOpportunitySummaryModel having given topic_id.
         """
         return cls.query(cls.topic_id == topic_id).fetch()
+
+    @classmethod
+    def delete_all(cls):
+        """Deletes all entities of this class."""
+        keys = cls.query().fetch(keys_only=True)
+        ndb.delete_multi(keys)

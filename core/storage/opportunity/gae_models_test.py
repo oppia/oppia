@@ -22,12 +22,18 @@ from core.platform import models
 from core.tests import test_utils
 import python_utils
 
-(opportunity_models,) = models.Registry.import_models(
-    [models.NAMES.opportunity])
+(base_models, opportunity_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.opportunity])
 
 
 class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationOpportunitySummaryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def setUp(self):
         super(ExplorationOpportunitySummaryModelUnitTest, self).setUp()
@@ -131,3 +137,18 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_by_topic('non_existing_topic_id'))
         self.assertEqual(len(model_list), 0)
+
+    def test_delete_all(self):
+        results, _, more = (
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_all_translation_opportunities(1, None, 'hi'))
+        self.assertEqual(len(results), 1)
+        self.assertTrue(more)
+
+        opportunity_models.ExplorationOpportunitySummaryModel.delete_all()
+
+        results, _, more = (
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_all_translation_opportunities(1, None, 'hi'))
+        self.assertEqual(len(results), 0)
+        self.assertFalse(more)

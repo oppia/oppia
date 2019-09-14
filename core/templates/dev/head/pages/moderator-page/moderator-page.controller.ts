@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia moderator page.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-editor.directive.ts');

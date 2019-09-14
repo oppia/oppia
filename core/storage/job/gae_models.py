@@ -91,6 +91,11 @@ class JobModel(base_models.BaseModel):
     # Store additional params passed with job.
     additional_job_params = ndb.JsonProperty(default=None)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Job is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
     @property
     def is_cancelable(self):
         """Checks if the job is cancelable.
@@ -196,3 +201,8 @@ class ContinuousComputationModel(base_models.BaseModel):
     # The time at which a halt signal was last sent to this batch job, in
     # milliseconds since the epoch.
     last_stopped_msec = ndb.FloatProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Continuous computation is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE

@@ -52,9 +52,9 @@ describe('ImprovementsDisplayService', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(true);
     });
 
-    it('uses info label', function() {
+    it('uses info badge', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
-        .toEqual('label label-info');
+        .toEqual('badge badge-info');
     });
 
     it('has a nice name', function() {
@@ -72,9 +72,9 @@ describe('ImprovementsDisplayService', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
     });
 
-    it('uses default label', function() {
+    it('uses default badge', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
-        .toEqual('label label-default');
+        .toEqual('badge badge-default');
     });
 
     it('has a nice name', function() {
@@ -92,9 +92,9 @@ describe('ImprovementsDisplayService', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
     });
 
-    it('uses default label', function() {
+    it('uses default badge', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
-        .toEqual('label label-default');
+        .toEqual('badge badge-default');
     });
 
     it('has a nice name', function() {
@@ -112,9 +112,9 @@ describe('ImprovementsDisplayService', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
     });
 
-    it('uses success label', function() {
+    it('uses success badge', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
-        .toEqual('label label-success');
+        .toEqual('badge badge-success');
     });
 
     it('has a nice name', function() {
@@ -132,9 +132,9 @@ describe('ImprovementsDisplayService', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
     });
 
-    it('uses default label', function() {
+    it('uses default badge', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
-        .toEqual('label label-default');
+        .toEqual('badge badge-default');
     });
 
     it('has a nice name', function() {
@@ -152,9 +152,9 @@ describe('ImprovementsDisplayService', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
     });
 
-    it('uses default label', function() {
+    it('uses default badge', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
-        .toEqual('label label-default');
+        .toEqual('badge badge-default');
     });
 
     it('has an empty name', function() {

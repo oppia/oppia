@@ -75,7 +75,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopics[0].to_dict(),
                          updated_topic.subtopics[0].to_dict())
 
-        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'topic_migrated',
                      [u'1 topics successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
