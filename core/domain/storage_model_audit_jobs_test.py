@@ -23,7 +23,7 @@ from core.platform import models
 from core.tests import test_utils
 
 
-# This list includes statistics models and deprecated StateIdMappingModel.
+# This list includes statistics models.
 # The statistics models are included here because the audit jobs for
 # statistics models are defined in core/domain/stats_jobs_one_off.py
 # These jobs should be updated and moved to
@@ -49,7 +49,6 @@ MODEL_CLASS_NAMES_TO_EXCLUDE = {
     'ExplorationAnnotationsModel',
     'StateAnswersModel',
     'StateAnswersCalcOutputModel',
-    'StateIdMappingModel'
 }
 
 
