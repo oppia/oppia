@@ -31,11 +31,18 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_services
+from core.domain import question_domain
+from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import search_services
+from core.domain import skill_domain
+from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import stats_services
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -164,6 +171,10 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
+            elif (
+                    self.payload.get('action') ==
+                    'generate_dummy_new_structures_data'):
+                self._load_dummy_topics_stories_and_skills()
             elif self.payload.get('action') == (
                     'flush_migration_bot_contribution_data'):
                 user_services.flush_migration_bot_contributions_model()
@@ -247,6 +258,162 @@ class AdminHandler(base.BaseHandler):
                     exploration_id))
         else:
             raise Exception('Cannot reload an exploration in production.')
+
+    def _create_dummy_question(self, question_id, linked_skill_ids):
+        """Creates a dummy question object with the given question ID.
+
+        Args:
+            question_id: str. The ID of the question to be created.
+            linked_skill_ids: list(str). The IDs of the skills to which the
+                question is linekd to.
+
+        Returns:
+            Question. The dummy question with given values.
+        """
+        state = state_domain.State.create_default_state(
+            'ABC', is_initial_state=True)
+        state.interaction.id = 'TextInput'
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is a solution.</p>'
+            }
+        }
+        hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>This is a hint.</p>'
+            }
+        }]
+        state.update_interaction_solution(solution_dict)
+        state.update_interaction_hints(hints_list)
+        state.interaction.customization_args = {
+            'placeholder': 'Enter text here',
+            'rows': 1
+        }
+        state.interaction.default_outcome.labelled_as_correct = True
+        state.interaction.default_outcome.dest = None
+        question = question_domain.Question(
+            question_id, state,
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
+            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids)
+        return question
+
+    def _create_dummy_skill(self, skill_id, skill_description, explanation):
+        """Creates a dummy skill object with the given values.
+
+        Args:
+            skill_id: str. The ID of the skill to be created.
+            skill_description: str. The description of the skill.
+            explanation: str. The review material for the skill.
+
+        Returns:
+            Skill. The dummy skill with given values.
+        """
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skill = skill_domain.Skill.create_default_skill(
+            skill_id, skill_description, rubrics)
+        skill.skill_contents = skill_domain.SkillContents(
+            state_domain.SubtitledHtml('1', explanation), [],
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}}}),
+            state_domain.WrittenTranslations.from_dict(
+                {'translations_mapping': {'1': {}}}))
+        return skill
+
+    def _load_dummy_topics_stories_and_skills(self):
+        """Loads the database with a topic, a story and three skills in the
+        topic (two of them in a subtopic) and a question attached to each skill.
+
+        Raises:
+            Exception: Cannot load new structures data in production mode.
+        """
+        if constants.DEV_MODE:
+            topic_id = topic_services.get_new_topic_id()
+            story_id = story_services.get_new_story_id()
+            skill_id_1 = skill_services.get_new_skill_id()
+            skill_id_2 = skill_services.get_new_skill_id()
+            skill_id_3 = skill_services.get_new_skill_id()
+            question_id_1 = question_services.get_new_question_id()
+            question_id_2 = question_services.get_new_question_id()
+            question_id_3 = question_services.get_new_question_id()
+
+            skill_1 = self._create_dummy_skill(
+                skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
+            skill_2 = self._create_dummy_skill(
+                skill_id_2, 'Dummy Skill 2', '<p>Dummy Explanation 2</p>')
+            skill_3 = self._create_dummy_skill(
+                skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>')
+
+            question_1 = self._create_dummy_question(
+                question_id_1, [skill_id_1])
+            question_2 = self._create_dummy_question(
+                question_id_2, [skill_id_2])
+            question_3 = self._create_dummy_question(
+                question_id_3, [skill_id_3])
+            question_services.add_question(self.user_id, question_1)
+            question_services.add_question(self.user_id, question_2)
+            question_services.add_question(self.user_id, question_3)
+
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_1, skill_id_1, 0.3)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_2, skill_id_2, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_3, skill_id_3, 0.7)
+
+            topic = topic_domain.Topic.create_default_topic(
+                topic_id, 'Dummy Topic 1')
+            topic.canonical_story_references = [
+                topic_domain.StoryReference.create_default_story_reference(
+                    story_id)
+            ]
+            topic.uncategorized_skill_ids = [skill_id_1]
+            topic.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Dummy Subtopic Title', [skill_id_2, skill_id_3])
+            ]
+            topic.next_subtopic_id = 2
+
+            self._reload_exploration('0')
+            self._reload_exploration('16')
+            story = story_domain.Story.create_default_story(
+                story_id, 'Dummy Story 1', topic_id)
+            story.add_node(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), 'Dummy Chapter 1')
+            story.update_node_destination_node_ids(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), [
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, 2)])
+            story.update_node_exploration_id(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '0')
+
+            story.add_node(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), 'Dummy Chapter 2')
+            story.update_node_exploration_id(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), '16')
+
+            skill_services.save_new_skill(self.user_id, skill_1)
+            skill_services.save_new_skill(self.user_id, skill_2)
+            skill_services.save_new_skill(self.user_id, skill_3)
+            story_services.save_new_story(self.user_id, story)
+            topic_services.save_new_topic(self.user_id, topic)
+
+            topic_services.publish_story(topic_id, story_id, self.user_id)
+            topic_services.publish_topic(topic_id, self.user_id)
+            skill_services.publish_skill(skill_id_1, self.user_id)
+            skill_services.publish_skill(skill_id_2, self.user_id)
+            skill_services.publish_skill(skill_id_3, self.user_id)
+        else:
+            raise Exception('Cannot load new structures data in production.')
+
 
     def _reload_collection(self, collection_id):
         """Reloads the collection in dev_mode corresponding to the given
