@@ -44,11 +44,12 @@ def main(args=None):
         home_directory, '.cache/TravisChrome/',
         os.path.basename(chrome_source_url))
 
+    # Caching Chrome's Debian package after download to prevent connection
+    # problem.
+    if not os.path.isdir(os.path.join(home_directory, '.cache/TravisChrome/')):
+        os.makedirs(os.path.join(home_directory, '.cache/TravisChrome/'))
+
     if not os.path.isfile(travis_chrome_path):
-        # Caching Chrome's Debian package after download to prevent connection
-        # problem.
-        os.makedirs(
-            os.path.join(home_directory, '.cache/TravisChrome/'), exist_ok=True)
         os.chdir(os.path.join(home_directory, '.cache/TravisChrome/'))
         python_utils.url_retrieve(
             chrome_source_url, filename=os.path.basename(chrome_source_url))
