@@ -31,7 +31,6 @@
   "include": ["core", "extensions", "typings"],
   "exclude": [
     "core/tests",
-    "core/templates/dev/head/dist",
     "core/templates/dev/head/google-analytics.initializer.ts"
   ]
 }
