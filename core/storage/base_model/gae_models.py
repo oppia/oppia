@@ -35,7 +35,13 @@ _VERSION_DELIMITER = '-'
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
-    'KEEP', 'DELETE', 'ANONYMIZE', 'LOCALLY_PSEUDONYMIZE', 'KEEP_IF_PUBLIC')
+    'KEEP',
+    'DELETE',
+    'ANONYMIZE',
+    'LOCALLY_PSEUDONYMIZE',
+    'KEEP_IF_PUBLIC',
+    'NOT_APPLICABLE'
+)
 
 # Constants used for generating ids.
 MAX_RETRIES = 10

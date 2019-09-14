@@ -23,7 +23,7 @@ IMPORTANT NOTES:
 1.  Before running this script, you must install third-party dependencies by
     running
 
-        bash scripts/start.sh
+        python -m scripts.install_third_party_libs
 
     at least once.
 
@@ -165,11 +165,11 @@ def preprocess_release():
 
 
 def install_required_dev_dependencies():
-    """Runs start.sh to ensure that dev dependencies are up-to-date
+    """Runs start.py to ensure that dev dependencies are up-to-date
     and installs required dependencies.
     """
 
-    cmd = ['bash', 'scripts/start.sh']
+    cmd = ['python', '-m', 'scripts.start']
     if os.path.exists('dev_output.txt'):
         os.remove('dev_output.txt')
 
@@ -260,8 +260,9 @@ def _execute_deployment():
                     'The mailgun API key must be added before deployment.')
     if not os.path.exists(THIRD_PARTY_DIR):
         raise Exception(
-            'Could not find third_party directory at %s. Please run start.sh '
-            'prior to running this script.' % THIRD_PARTY_DIR)
+            'Could not find third_party directory at %s. Please run '
+            'install_third_party_libs.py prior to running this script.'
+            % THIRD_PARTY_DIR)
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()

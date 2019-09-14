@@ -1,13 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base_components/header.html', {"title": "Exploration Not Found - Oppia"})
-    <script>
-      var GLOBALS = {
-        status_code: JSON.parse('{{status_code}}'),
-      };
-    </script>
-
+    @require('../../base-components/header.template.html', {"title": "Exploration Not Found - Oppia"})
     <style>
       html, body {
         background: #afd2eb no-repeat center center fixed;

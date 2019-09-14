@@ -28,23 +28,23 @@ angular.module('oppia').factory('ImprovementsDisplayService', [
     var STATUS_CHOICES = {
       [STATUS_COMPLIMENT]: {
         text: 'Compliment',
-        cssClass: 'label label-success',
+        cssClass: 'badge badge-success',
       },
       [STATUS_FIXED]: {
         text: 'Fixed',
-        cssClass: 'label label-default',
+        cssClass: 'badge badge-default',
       },
       [STATUS_IGNORED]: {
         text: 'Ignored',
-        cssClass: 'label label-default',
+        cssClass: 'badge badge-default',
       },
       [STATUS_NOT_ACTIONABLE]: {
         text: 'Not Actionable',
-        cssClass: 'label label-default',
+        cssClass: 'badge badge-default',
       },
       [STATUS_OPEN]: {
         text: 'Open',
-        cssClass: 'label label-info',
+        cssClass: 'badge badge-info',
       },
     };
 
@@ -54,7 +54,7 @@ angular.module('oppia').factory('ImprovementsDisplayService', [
       },
       getStatusCssClass: function(status) {
         return STATUS_CHOICES.hasOwnProperty(status) ?
-          STATUS_CHOICES[status].cssClass : 'label label-default';
+          STATUS_CHOICES[status].cssClass : 'badge badge-default';
       },
       getHumanReadableStatus: function(status) {
         return STATUS_CHOICES.hasOwnProperty(status) ?

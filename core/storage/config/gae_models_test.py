@@ -22,11 +22,17 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(config_models,) = models.Registry.import_models([models.NAMES.config])
+(base_models, config_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.config])
 
 
 class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
     """Test ConfigPropertyModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            config_models.ConfigPropertyModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_model(self):
         config_model = config_models.ConfigPropertyModel(

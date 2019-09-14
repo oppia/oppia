@@ -15,21 +15,19 @@
 /**
  * @fileoverview Unit tests for Drag and Drop Sorting rules.
  */
+/* eslint-disable max-len */
+import { DragAndDropSortInputRulesService } from
+  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
+/* eslint-enable max-len */
 
-require(
-  'interactions/DragAndDropSortInput/directives/' +
-  'drag-and-drop-sort-input-rules.service.ts');
+describe('Drag and Drop Sort Input rules service', () => {
+  let ddsrs: DragAndDropSortInputRulesService = null;
+  beforeEach(() => {
+    ddsrs = new DragAndDropSortInputRulesService();
+  });
 
-describe('Drag and Drop Sort Input rules service', function() {
-  beforeEach(angular.mock.module('oppia'));
-
-  var ddsrs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    ddsrs = $injector.get('DragAndDropSortInputRulesService');
-  }));
-
-  it('should have a correct \'is equal to ordering\' rule', function() {
-    var RULE_INPUT = {
+  it('should have a correct \'is equal to ordering\' rule', () => {
+    var RULE_INPUT: {x: string[][]} = {
       x: [['a', 'b'], ['c'], ['de', 'f']]
     };
     expect(ddsrs.IsEqualToOrdering(
@@ -49,8 +47,8 @@ describe('Drag and Drop Sort Input rules service', function() {
   });
 
   it('should have a correct \'is equal to ordering with one item at incorrect' +
-    ' position\' rule', function() {
-    var RULE_INPUT = {
+    ' position\' rule', () => {
+    var RULE_INPUT: {x: string[][]} = {
       x: [['a', 'b'], ['c'], ['de', 'f']]
     };
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
@@ -69,8 +67,8 @@ describe('Drag and Drop Sort Input rules service', function() {
       [['a', 'b'], ['c', 'de', 'f']], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'has element X at position Y\' rule', function() {
-    var RULE_INPUT = {
+  it('should have a correct \'has element X at position Y\' rule', () => {
+    var RULE_INPUT: {x:string, y:number} = {
       x: 'b',
       y: 2
     };
@@ -85,8 +83,8 @@ describe('Drag and Drop Sort Input rules service', function() {
   });
 
   it('should have a correct \'has element X before element Y\' rule',
-    function() {
-      var RULE_INPUT = {
+    () => {
+      var RULE_INPUT: {x:string, y:string} = {
         x: 'b',
         y: 'd'
       };
