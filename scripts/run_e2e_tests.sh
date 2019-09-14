@@ -45,6 +45,11 @@
 # single test or test suite.
 
 function cleanup {
+  # Send a kill signal to the dev server and Selenium server. The awk command
+  # gets just the process ID from the grepped line.
+  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'` || true
+  kill `ps aux | grep node_modules/webdriver-manager/selenium | awk '{print $2}'` || true
+
   if [ -d "../protractor-screenshots" ]; then
     echo ""
     echo "  Note: If ADD_SCREENSHOT_REPORTER is set to true in"
