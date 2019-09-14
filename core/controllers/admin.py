@@ -43,6 +43,8 @@ from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -174,7 +176,7 @@ class AdminHandler(base.BaseHandler):
             elif (
                     self.payload.get('action') ==
                     'generate_dummy_new_structures_data'):
-                self._load_dummy_topics_stories_and_skills()
+                self._load_dummy_new_structures_data()
             elif self.payload.get('action') == (
                     'flush_migration_bot_contribution_data'):
                 user_services.flush_migration_bot_contributions_model()
@@ -259,11 +261,13 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot reload an exploration in production.')
 
-    def _create_dummy_question(self, question_id, linked_skill_ids):
+    def _create_dummy_question(
+            self, question_id, question_content, linked_skill_ids):
         """Creates a dummy question object with the given question ID.
 
         Args:
             question_id: str. The ID of the question to be created.
+            question_content: str. The question content.
             linked_skill_ids: list(str). The IDs of the skills to which the
                 question is linekd to.
 
@@ -273,6 +277,11 @@ class AdminHandler(base.BaseHandler):
         state = state_domain.State.create_default_state(
             'ABC', is_initial_state=True)
         state.interaction.id = 'TextInput'
+        state.content = state_domain.SubtitledHtml('1', question_content)
+        state.recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            {'voiceovers_mapping': {'1': {}, 'default_outcome': {}}})
+        state.written_translations = state_domain.WrittenTranslations.from_dict(
+            {'translations_mapping': {'1': {}, 'default_outcome': {}}})
         solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
@@ -329,14 +338,18 @@ class AdminHandler(base.BaseHandler):
                 {'translations_mapping': {'1': {}}}))
         return skill
 
-    def _load_dummy_topics_stories_and_skills(self):
+    def _load_dummy_new_structures_data(self):
         """Loads the database with a topic, a story and three skills in the
         topic (two of them in a subtopic) and a question attached to each skill.
 
         Raises:
             Exception: Cannot load new structures data in production mode.
+            Exception: User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
+            if self.user.role != feconf.ROLE_ID_ADMIN:
+                raise Exception(
+                    'User does not have enough rights to generate data.')
             topic_id = topic_services.get_new_topic_id()
             story_id = story_services.get_new_story_id()
             skill_id_1 = skill_services.get_new_skill_id()
@@ -354,11 +367,11 @@ class AdminHandler(base.BaseHandler):
                 skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>')
 
             question_1 = self._create_dummy_question(
-                question_id_1, [skill_id_1])
+                question_id_1, 'Question 1', [skill_id_1])
             question_2 = self._create_dummy_question(
-                question_id_2, [skill_id_2])
+                question_id_2, 'Question 2', [skill_id_2])
             question_3 = self._create_dummy_question(
-                question_id_3, [skill_id_3])
+                question_id_3, 'Question 3', [skill_id_3])
             question_services.add_question(self.user_id, question_1)
             question_services.add_question(self.user_id, question_2)
             question_services.add_question(self.user_id, question_3)
@@ -383,6 +396,9 @@ class AdminHandler(base.BaseHandler):
             ]
             topic.next_subtopic_id = 2
 
+            subtopic_page = (
+                subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                    1, topic_id))
             self._reload_exploration('0')
             self._reload_exploration('16')
             story = story_domain.Story.create_default_story(
@@ -405,6 +421,14 @@ class AdminHandler(base.BaseHandler):
             skill_services.save_new_skill(self.user_id, skill_3)
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic)
+            subtopic_page_services.save_subtopic_page(
+                self.user_id, subtopic_page, 'Added subtopic',
+                [topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Dummy Subtopic Title'
+                })]
+            )
 
             topic_services.publish_story(topic_id, story_id, self.user_id)
             topic_services.publish_topic(topic_id, self.user_id)

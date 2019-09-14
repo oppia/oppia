@@ -156,6 +156,22 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
         self.logout()
 
+    def test_load_new_structures_data(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_new_structures_data'
+            }, csrf_token=csrf_token)
+        assert_raises_regexp = self.assertRaisesRegexp(
+            Exception, 'User does not have enough rights to generate data.')
+        with assert_raises_regexp_context_manager:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_new_structures_data'
+                }, csrf_token=csrf_token)
+        self.logout()
+
     def test_cannot_reload_collection_in_production_mode(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()

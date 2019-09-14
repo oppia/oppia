@@ -150,6 +150,21 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
           AdminTaskManagerService.finishTask();
         };
 
+        ctrl.loadNewStructuresData = function() {
+          AdminTaskManagerService.startTask();
+          ctrl.setStatusMessage('Processing...');
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'generate_dummy_new_structures_data'
+          }).then(function() {
+            ctrl.setStatusMessage(
+              'Dummy new structures data generated successfully.');
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+          AdminTaskManagerService.finishTask();
+        };
+
         ctrl.reloadCollection = function(collectionId) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
