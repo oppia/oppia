@@ -1,6 +1,6 @@
 sudo: required
-# In order to install Chrome stable we need trusty distribution.
-dist: trusty
+# In order to install Chrome stable we need xenial distribution.
+dist: xenial
 language: python
 python:
 - 2.7
