@@ -34,11 +34,11 @@ How to update the parser:
 2. Add tests in test.js for the new or modified grammar.
 3. Run
 
-      bash scripts/create_expression_parser.sh
+      python -m scripts.create_expression_parser
 
    which updates expression-parser.service.js. Then run the frontend unit tests using
 
-      bash scripts/run_frontend_tests.sh
+      python -m scripts.run_frontend_tests
 
    to ensure that the new grammar passes the tests in ExpressionParserServiceSpec.js and
    ExpressionEvaluatorServiceSpec.js.

@@ -28,13 +28,13 @@ Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for fu
 
   ```
     git checkout develop
-    bash scripts/start.sh
+    python -m scripts.start
   ```
 
 3. To run tests:
 
   ```
-    bash scripts/run_tests.sh
+    python -m scripts.run_tests
   ```
 
 
