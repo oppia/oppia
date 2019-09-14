@@ -27,13 +27,16 @@ import re
 import subprocess
 import time
 
-import python_utils
-
-from . import build
-from . import common
+# Install third party libraries before importing other files.
 from . import install_third_party_libs
-from . import setup
-from . import setup_gae
+install_third_party_libs.main(args=[])
+
+# pylint: disable=wrong-import-position
+import python_utils  # isort:skip
+
+from . import build  # isort:skip
+from . import common  # isort:skip
+# pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser(description="""
 Run the script from the oppia root folder:
@@ -73,10 +76,6 @@ def cleanup():
 def main(args=None):
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
-
-    setup.main(args=[])
-    setup_gae.main(args=[])
-    install_third_party_libs.main(args=[])
 
     # Runs cleanup function on exit.
     atexit.register(cleanup)
