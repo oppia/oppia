@@ -46,208 +46,194 @@ angular.module('oppia').directive('signupPage', [
             UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
             DASHBOARD_TYPE_LEARNER, SITE_NAME) {
           var ctrl = this;
-          this.$onInit = function() {
-            var _SIGNUP_DATA_URL = '/signuphandler/data';
-            $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
-            ctrl.warningI18nCode = '';
-            ctrl.siteName = SITE_NAME;
-            ctrl.submissionInProcess = false;
+          var _SIGNUP_DATA_URL = '/signuphandler/data';
+          $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
+          ctrl.warningI18nCode = '';
+          ctrl.siteName = SITE_NAME;
+          ctrl.submissionInProcess = false;
 
-            $http.get(_SIGNUP_DATA_URL).then(function(response) {
-              var data = response.data;
-              $rootScope.loadingMessage = '';
-              ctrl.username = data.username;
-              ctrl.hasEverRegistered = data.has_ever_registered;
-              ctrl.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
-              ctrl.showEmailPreferencesForm = data.can_send_emails;
-              ctrl.hasUsername = Boolean(ctrl.username);
-              FocusManagerService.setFocus('usernameInputField');
-            });
+          $http.get(_SIGNUP_DATA_URL).then(function(response) {
+            var data = response.data;
+            $rootScope.loadingMessage = '';
+            ctrl.username = data.username;
+            ctrl.hasEverRegistered = data.has_ever_registered;
+            ctrl.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
+            ctrl.showEmailPreferencesForm = data.can_send_emails;
+            ctrl.hasUsername = Boolean(ctrl.username);
+            FocusManagerService.setFocus('usernameInputField');
+          });
 
-            ctrl.blurredAtLeastOnce = false;
-            ctrl.canReceiveEmailUpdates = null;
+          ctrl.blurredAtLeastOnce = false;
+          ctrl.canReceiveEmailUpdates = null;
 
-            ctrl.isFormValid = function() {
-              return (
-                ctrl.hasAgreedToLatestTerms &&
-                (ctrl.hasUsername || !ctrl.getWarningText(ctrl.username))
-              );
-            };
-
-            ctrl.showLicenseExplanationModal = function() {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/signup-page/modal-templates/' +
-                  'licence-explanation-modal.template.directive.html'),
-                backdrop: true,
-                resolve: {},
-                controller: [
-                  '$scope', '$uibModalInstance', 'SITE_NAME',
-                  function($scope, $uibModalInstance, SITE_NAME) {
-                    $scope.siteName = SITE_NAME;
-                    $scope.close = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
-              }).result.then(function() {}, function() {
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
-              });
-            };
-
-            ctrl.onUsernameInputFormBlur = function(username) {
-              if (ctrl.hasUsername) {
-                return;
-              }
-              AlertsService.clearWarnings();
-              ctrl.blurredAtLeastOnce = true;
-              ctrl.updateWarningText(username);
-              if (!ctrl.warningI18nCode) {
-                $http.post('usernamehandler/data', {
-                  username: ctrl.username
-                }).then(function(response) {
-                  if (response.data.username_is_taken) {
-                    ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
-                  }
-                });
-              }
-            };
-
-            // Returns the warning text corresponding to the validation error
-            // for the given username, or an empty string if the username is
-            // valid.
-            ctrl.updateWarningText = function(username) {
-              var alphanumeric = /^[A-Za-z0-9]+$/;
-              var admin = /admin/i;
-              var oppia = /oppia/i;
-
-              if (!username) {
-                ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
-              } else if (username.indexOf(' ') !== -1) {
-                ctrl.warningI18nCode =
-                'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
-              } else if (username.length > 50) {
-                ctrl.warningI18nCode =
-                'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
-              } else if (!alphanumeric.test(username)) {
-                ctrl.warningI18nCode =
-                'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
-              } else if (admin.test(username)) {
-                ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
-              } else if (oppia.test(username)) {
-                ctrl.warningI18nCode =
-                'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
-              } else {
-                ctrl.warningI18nCode = '';
-              }
-            };
-
-            ctrl.onSelectEmailPreference = function() {
-              ctrl.emailPreferencesWarningText = '';
-            };
-
-            ctrl.submitPrerequisitesForm = function(
-                agreedToTerms, username, canReceiveEmailUpdates) {
-              if (!agreedToTerms) {
-                AlertsService.addWarning(
-                  'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
-                return;
-              }
-
-              if (!ctrl.hasUsername && ctrl.warningI18nCode) {
-                return;
-              }
-
-              var defaultDashboard = DASHBOARD_TYPE_LEARNER;
-              var returnUrl = window.decodeURIComponent(
-                UrlService.getUrlParams().return_url);
-
-              if (returnUrl.indexOf('creator_dashboard') !== -1) {
-                defaultDashboard = DASHBOARD_TYPE_CREATOR;
-              } else {
-                defaultDashboard = DASHBOARD_TYPE_LEARNER;
-              }
-
-              var requestParams = {
-                agreed_to_terms: agreedToTerms,
-                can_receive_email_updates: null,
-                default_dashboard: defaultDashboard,
-                username: null
-              };
-
-              if (!ctrl.hasUsername) {
-                requestParams.username = username;
-              }
-
-              if (ctrl.showEmailPreferencesForm && !ctrl.hasUsername) {
-                if (canReceiveEmailUpdates === null) {
-                  ctrl.emailPreferencesWarningText =
-                  'I18N_SIGNUP_FIELD_REQUIRED';
-                  return;
-                }
-
-                if (canReceiveEmailUpdates === 'yes') {
-                  requestParams.can_receive_email_updates = true;
-                } else if (canReceiveEmailUpdates === 'no') {
-                  requestParams.can_receive_email_updates = false;
-                } else {
-                  throw Error(
-                    'Invalid value for email preferences: ' +
-                    canReceiveEmailUpdates);
-                }
-              }
-
-              SiteAnalyticsService.registerNewSignupEvent();
-
-              ctrl.submissionInProcess = true;
-              $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
-                window.location = window.decodeURIComponent(
-                  UrlService.getUrlParams().return_url);
-              }, function(rejection) {
-                if (
-                  rejection.data && rejection.data.status_code === 401) {
-                  ctrl.showRegistrationSessionExpiredModal();
-                }
-                ctrl.submissionInProcess = false;
-              });
-            };
-
-            ctrl.showRegistrationSessionExpiredModal = function() {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/signup-page/modal-templates/' +
-                  'registration-session-expired-modal.template.html'),
-                backdrop: 'static',
-                keyboard: false,
-                resolve: {},
-                controller: [
-                  '$scope', '$uibModalInstance', 'SiteAnalyticsService',
-                  'UserService', '$timeout', '$window',
-                  function($scope, $uibModalInstance, SiteAnalyticsService,
-                      UserService, $timeout, $window) {
-                    $scope.continueRegistration = function() {
-                      UserService.getLoginUrlAsync().then(
-                        function(loginUrl) {
-                          if (loginUrl) {
-                            $timeout(function() {
-                              $window.location = loginUrl;
-                            }, 150);
-                          } else {
-                            throw Error('Login url not found.');
-                          }
-                        }
-                      );
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
-              }).result.then(function() {}, function() {
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
-              });
-            };
+          ctrl.isFormValid = function() {
+            return (
+              ctrl.hasAgreedToLatestTerms &&
+              (ctrl.hasUsername || !ctrl.getWarningText(ctrl.username))
+            );
           };
-        }]
+
+          ctrl.showLicenseExplanationModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/signup-page/modal-templates/' +
+                'licence-explanation-modal.template.directive.html'),
+              backdrop: true,
+              resolve: {},
+              controller: [
+                '$scope', '$uibModalInstance', 'SITE_NAME',
+                function($scope, $uibModalInstance, SITE_NAME) {
+                  $scope.siteName = SITE_NAME;
+                  $scope.close = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+          };
+
+          ctrl.onUsernameInputFormBlur = function(username) {
+            if (ctrl.hasUsername) {
+              return;
+            }
+            AlertsService.clearWarnings();
+            ctrl.blurredAtLeastOnce = true;
+            ctrl.updateWarningText(username);
+            if (!ctrl.warningI18nCode) {
+              $http.post('usernamehandler/data', {
+                username: ctrl.username
+              }).then(function(response) {
+                if (response.data.username_is_taken) {
+                  ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
+                }
+              });
+            }
+          };
+
+          // Returns the warning text corresponding to the validation error for
+          // the given username, or an empty string if the username is valid.
+          ctrl.updateWarningText = function(username) {
+            var alphanumeric = /^[A-Za-z0-9]+$/;
+            var admin = /admin/i;
+            var oppia = /oppia/i;
+
+            if (!username) {
+              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
+            } else if (username.indexOf(' ') !== -1) {
+              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
+            } else if (username.length > 50) {
+              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
+            } else if (!alphanumeric.test(username)) {
+              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
+            } else if (admin.test(username)) {
+              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
+            } else if (oppia.test(username)) {
+              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
+            } else {
+              ctrl.warningI18nCode = '';
+            }
+          };
+
+          ctrl.onSelectEmailPreference = function() {
+            ctrl.emailPreferencesWarningText = '';
+          };
+
+          ctrl.submitPrerequisitesForm = function(
+              agreedToTerms, username, canReceiveEmailUpdates) {
+            if (!agreedToTerms) {
+              AlertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
+              return;
+            }
+
+            if (!ctrl.hasUsername && ctrl.warningI18nCode) {
+              return;
+            }
+
+            var defaultDashboard = DASHBOARD_TYPE_LEARNER;
+            var returnUrl = window.decodeURIComponent(
+              UrlService.getUrlParams().return_url);
+
+            if (returnUrl.indexOf('creator_dashboard') !== -1) {
+              defaultDashboard = DASHBOARD_TYPE_CREATOR;
+            } else {
+              defaultDashboard = DASHBOARD_TYPE_LEARNER;
+            }
+
+            var requestParams = {
+              agreed_to_terms: agreedToTerms,
+              can_receive_email_updates: null,
+              default_dashboard: defaultDashboard,
+              username: null
+            };
+
+            if (!ctrl.hasUsername) {
+              requestParams.username = username;
+            }
+
+            if (ctrl.showEmailPreferencesForm && !ctrl.hasUsername) {
+              if (canReceiveEmailUpdates === null) {
+                ctrl.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
+                return;
+              }
+
+              if (canReceiveEmailUpdates === 'yes') {
+                requestParams.can_receive_email_updates = true;
+              } else if (canReceiveEmailUpdates === 'no') {
+                requestParams.can_receive_email_updates = false;
+              } else {
+                throw Error(
+                  'Invalid value for email preferences: ' +
+                  canReceiveEmailUpdates);
+              }
+            }
+
+            SiteAnalyticsService.registerNewSignupEvent();
+
+            ctrl.submissionInProcess = true;
+            $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
+              window.location = window.decodeURIComponent(
+                UrlService.getUrlParams().return_url);
+            }, function(rejection) {
+              if (
+                rejection.data && rejection.data.status_code === 401) {
+                ctrl.showRegistrationSessionExpiredModal();
+              }
+              ctrl.submissionInProcess = false;
+            });
+          };
+
+          ctrl.showRegistrationSessionExpiredModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/signup-page/modal-templates/' +
+                'registration-session-expired-modal.template.html'),
+              backdrop: 'static',
+              keyboard: false,
+              resolve: {},
+              controller: [
+                '$scope', '$uibModalInstance', 'SiteAnalyticsService',
+                'UserService', '$timeout', '$window',
+                function($scope, $uibModalInstance, SiteAnalyticsService,
+                    UserService, $timeout, $window) {
+                  $scope.continueRegistration = function() {
+                    UserService.getLoginUrlAsync().then(
+                      function(loginUrl) {
+                        if (loginUrl) {
+                          $timeout(function() {
+                            $window.location = loginUrl;
+                          }, 150);
+                        } else {
+                          throw Error('Login url not found.');
+                        }
+                      }
+                    );
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+          };
+        }
+      ]
     };
   }]);

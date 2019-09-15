@@ -88,7 +88,6 @@ angular.module('oppia').directive('creatorDashboardPage', [
             HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS,
             SUBSCRIPTION_SORT_BY_KEYS) {
           var ctrl = this;
-          this.$onInit = function() {
             var EXP_PUBLISH_TEXTS = {
               defaultText: (
                 'This exploration is private. Publish it to receive ' +
@@ -392,7 +391,6 @@ angular.module('oppia').directive('creatorDashboardPage', [
             ctrl.getCompleteThumbnailIconUrl = function(iconUrl) {
               return UrlInterpolationService.getStaticImageUrl(iconUrl);
             };
-          };
         }]
     };
   }]);

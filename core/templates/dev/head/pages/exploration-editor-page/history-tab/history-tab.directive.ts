@@ -53,7 +53,6 @@ angular.module('oppia').directive('historyTab', [
             DateTimeFormatService, EditabilityService, ExplorationDataService,
             UrlInterpolationService, VersionTreeService) {
           var ctrl = this;
-          this.$onInit = function() {
             ctrl.EditabilityService = EditabilityService;
             ctrl.explorationId = ExplorationDataService.explorationId;
             ctrl.explorationAllSnapshotsUrl =
@@ -329,7 +328,6 @@ angular.module('oppia').directive('historyTab', [
                   ctrl.versionCheckboxArray[i].vnum);
               }
             };
-          };
         }
       ]};
   }]);
