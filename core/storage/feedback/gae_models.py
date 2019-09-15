@@ -84,6 +84,20 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralFeedbackThreadModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_all().filter(
+            cls.original_author_id == user_id
+        ).get() is not None
+
+    @classmethod
     def export_data(cls, user_id):
         """Exports the data from GeneralFeedbackThreadModel
         into dict format for Takeout.
@@ -209,6 +223,18 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     def get_deletion_policy():
         """General feedback message needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralFeedbackMessageModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_all().filter(cls.author_id == user_id).get() is not None
 
     @classmethod
     def export_data(cls, user_id):
@@ -415,6 +441,25 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     created_on = ndb.DateTimeProperty(indexed=True, required=True)
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """General feedback thread user can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralFeedbackThreadUserModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_all().filter(cls.user_id == user_id).get() is not None
+
     def put(self, update_last_updated_time=True):
         """Writes the given thread instance to the datastore.
         Args:
@@ -430,13 +475,6 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             self.last_updated = datetime.datetime.utcnow()
 
         return super(GeneralFeedbackThreadUserModel, self).put()
-
-    @staticmethod
-    def get_deletion_policy():
-        """General feedback thread user can be deleted since it only contains
-        information relevant to the one user.
-        """
-        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def generate_full_id(cls, user_id, thread_id):
@@ -524,6 +562,19 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def has_reference_to_user_id(unused_user_id):
+        """FeedbackAnalyticsModel doesn't reference any user_id directly.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data
+            should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
     @classmethod
     def create(cls, model_id, num_open_threads, num_total_threads):
         """Creates a new FeedbackAnalyticsModel entry.
@@ -568,3 +619,15 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Unsent feedback email is kept until sent."""
         return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UnsentFeedbackEmailModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get(user_id, strict=False) is not None
