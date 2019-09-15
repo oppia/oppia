@@ -177,9 +177,10 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'\b(browser.sleep)\('),
         'message': 'In tests, please do not use browser.sleep().',
         'excluded_files': (
-            # TODO(#7622): Remove the file from the excluded list.
-            # The following was placed due to a necessary sleep as a temporary
-            # measure to keep the embedding tests from failing.
+            # TODO(#7622): Remove the file from the excluded list. Remove the
+            # TODO in core/tests/protractor_desktop/embedding.js pointing to the
+            # same issue. The following was placed due to a necessary sleep as
+            # a temporary measure to keep the embedding tests from failing.
             'core/tests/protractor_desktop/embedding.js'
         ),
         'excluded_dirs': ()

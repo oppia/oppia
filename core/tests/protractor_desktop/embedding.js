@@ -258,9 +258,10 @@ describe('Embedding', function() {
         by.css('.protractor-test-embedded-exploration > iframe')));
       waitFor.pageToFullyLoad();
 
-      // TODO(#7622): Remove this sleep. This sleep was placed here as a
-      // temporary measure because the wait in the line above does not wait for
-      // the iframe to load fully.
+      // TODO(#7622): Remove this sleep. Remove the TODO in
+      // scripts/pre_commit_linter.py pointing to the same issue This sleep was
+      // placed here as a temporary measure because the wait in the line above
+      // does not wait for the iframe to load fully.
       browser.sleep(6000);
 
       expect(driver.findElement(by.css('.protractor-test-float-form-input'))
