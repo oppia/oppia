@@ -1331,7 +1331,8 @@ class UserQueryModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get_all().filter(cls.submitter_id == user_id).get() is not None
+        return (
+            cls.get_all().filter(cls.submitter_id == user_id).get() is not None)
 
     @classmethod
     def fetch_page(cls, page_size, cursor):

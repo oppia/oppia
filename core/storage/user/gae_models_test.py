@@ -1394,7 +1394,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             id='%s.%s' % (self.SCORE_CATEGORY, self.USER_ID),
             user_id=self.USER_ID,
             score_category=self.SCORE_CATEGORY,
-            score = 1.5,
+            score=1.5,
             has_email_been_sent=False
         ).put()
 
