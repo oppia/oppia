@@ -257,6 +257,10 @@ describe('Embedding', function() {
       browser.switchTo().frame(driver.findElement(
         by.css('.protractor-test-embedded-exploration > iframe')));
       waitFor.pageToFullyLoad();
+
+      // TODO(kevinlee12): Remove this sleep.
+      browser.sleep(6000);
+
       expect(driver.findElement(by.css('.protractor-test-float-form-input'))
         .getAttribute('placeholder')).toBe(expectedPlaceholder);
       browser.switchTo().defaultContent();

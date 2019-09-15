@@ -1386,7 +1386,7 @@ def main(args=None):
         generate_app_yaml()
         if not options.minify_third_party_libs_only:
             generate_build_directory(hashes)
-    
+
     save_hashes_to_file(dict())
 
 
