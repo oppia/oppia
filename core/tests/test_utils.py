@@ -136,6 +136,8 @@ def mock_get_template(unused_self, filename):
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'dev', 'head', 'pages'))
     if not filepath:
+        # This is required since we have the 'console_errors.html' template
+        # in the core/templates/dev/head/tests directory.
         filepath = get_filepath_from_filename(
             filename, os.path.join('core', 'templates', 'dev', 'head', 'tests'))
     with python_utils.open_file(filepath, 'r') as f:
