@@ -201,9 +201,17 @@ angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
 angular.module('oppia').factory('$exceptionHandler', [
   '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
+    var TPLOAD_STATUS_CODE_REGEX = (
+      new RegExp(/\[\$compile:tpload\].*p1=(.*?)&p2=/));
     var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
     return function(exception, cause) {
+      var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
+      // Suppress tpload errors which occur with p1 of -1 in the error URL
+      // because -1 is the status code for aborted requests.
+      if (tploadStatusCode !== null && tploadStatusCode[1] === '-1') {
+        return;
+      }
       sourceMappedStackTrace.mapStackTrace(
         exception.stack, function(mappedStack) {
           var messageAndSourceAndStackTrace = [
