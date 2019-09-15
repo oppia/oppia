@@ -376,7 +376,7 @@ angular.module('oppia').directive('settingsTab', [
                     };
                   }
                 ]
-              }).result.then(function() {
+              }).result.then(function() {}, function() {
                 // Promise is returned by getCurrentUrl which is handled here.
                 // No further action is needed.
               });
@@ -429,6 +429,9 @@ angular.module('oppia').directive('settingsTab', [
                   ctrl.explorationId).then(function() {
                   $window.location = CREATOR_DASHBOARD_PAGE_URL;
                 });
+              }, function() {
+                // Promise is returned by uimodal which is handled here.
+                // No further action is needed.
               });
             };
 
