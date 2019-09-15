@@ -278,11 +278,39 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error-page.mainpage.html',
+      filename: 'error-page-400.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
-      inject: false
+      inject: false,
+      statusCode: 400
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-page-401.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      statusCode: 401
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-page-404.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      statusCode: 404
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-page-500.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      statusCode: 500
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
