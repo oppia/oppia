@@ -523,14 +523,3 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
-
-
-class DeleteStateIdMappingModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for wiping out state ID mapping models."""
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.StateIdMappingModel]
-
-    @staticmethod
-    def map(item):
-        item.delete()

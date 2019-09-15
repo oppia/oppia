@@ -23,10 +23,9 @@ from core.platform import models
 from core.tests import test_utils
 
 
-# This list includes statistics models and deprecated StateIdMappingModel.
-# The statistics models are included here because the audit jobs for
-# statistics models are defined in core/domain/stats_jobs_one_off.py
-# These jobs should be updated and moved to
+# This list includes statistics models. The statistics models are included here
+# because the audit jobs for statistics models are defined in
+# core/domain/stats_jobs_one_off.py. These jobs should be updated and moved to
 # core/domain/prod_validation_jobs_one_off.py and the statistics model
 # class names can then be removed from this list.
 # The corresponding issue is #7100.
@@ -49,7 +48,6 @@ MODEL_CLASS_NAMES_TO_EXCLUDE = {
     'ExplorationAnnotationsModel',
     'StateAnswersModel',
     'StateAnswersCalcOutputModel',
-    'StateIdMappingModel'
 }
 
 
