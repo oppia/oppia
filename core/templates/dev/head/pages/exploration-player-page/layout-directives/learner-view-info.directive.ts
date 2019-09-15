@@ -101,8 +101,8 @@ angular.module('oppia').directive('learnerViewInfo', [
                   'expInfo', 'UrlInterpolationService',
                   function(
                       $scope, $uibModalInstance,
-                      DateTimeFormatService, RatingComputationService, expInfo,
-                      UrlInterpolationService) {
+                      DateTimeFormatService, RatingComputationService,
+                      expInfo, UrlInterpolationService) {
                     var getExplorationTagsSummary = function(arrayOfTags) {
                       var tagsToShow = [];
                       var tagsInTooltip = [];
