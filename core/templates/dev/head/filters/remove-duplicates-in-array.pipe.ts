@@ -16,14 +16,17 @@
  * @fileoverview RemoveDuplicatesInArray filter for Oppia.
  */
 
-angular.module('oppia').filter('removeDuplicatesInArray', [function() {
-  return function(input) {
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({name: 'removeDuplicatesInArray'})
+export class RemoveDuplicatesInArrayPipe implements PipeTransform {
+  transform(input: any[]): any[] {
     if (!input.filter) {
       throw Error(
         'Bad input for removeDuplicatesInArray: ' + JSON.stringify(input));
     }
-    return input.filter(function(val, pos) {
+    return input.filter((val: any, pos: number) => {
       return input.indexOf(val) === pos;
     });
-  };
-}]);
+  }
+}

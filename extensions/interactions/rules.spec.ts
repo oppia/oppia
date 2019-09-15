@@ -38,6 +38,8 @@ import { DragAndDropSortInputRulesService } from
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
+import { ItemSelectionInputRulesService } from
+  'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
@@ -65,6 +67,8 @@ describe('Rule spec services', function() {
     $provide.value('LogicProofRulesService', new LogicProofRulesService());
     $provide.value(
       'MusicNotesInputRulesService', new MusicNotesInputRulesService());
+    $provide.value(
+      'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The
