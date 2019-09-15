@@ -70,7 +70,7 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
           $rootScope.$broadcast('enterTranslationForTheFirstTime');
           EditorFirstTimeEventsService.initRegisterEvents(expId);
           $http.post(STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId)
-            .catch(function() {
+            .then(null, function() {
               console.error(
                 'Warning: could not record translation tutorial start event.'
               );

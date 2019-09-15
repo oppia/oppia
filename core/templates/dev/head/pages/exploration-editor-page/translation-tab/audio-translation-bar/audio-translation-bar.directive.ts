@@ -625,7 +625,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               $scope.initAudioBar();
             }, function() {
               // uib-modal promise is handled here.
-              });
+            });
           };
           $scope.initAudioBar();
         }]

@@ -79,7 +79,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
                     };
                   }
                 ]
-              }).result.catch(function() {
+              }).result.then(null, function() {
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
               });

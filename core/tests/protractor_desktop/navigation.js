@@ -219,8 +219,8 @@ describe('Static Pages Tour', function() {
     waitFor.pageToFullyLoad();
 
     browser.getCurrentUrl().then(function(url) {
-    expect(element(
-      by.css('.protractor-test-error-page')).isPresent()).toBe(true);
+      expect(element(
+        by.css('.protractor-test-error-page')).isPresent()).toBe(true);
     });
   }, function() {
     // Promise is returned by getCurrentUrl which is handled here.

@@ -72,6 +72,15 @@ angular.module('oppia').directive('preferencesPage', [
               ctrl.email = userInfo.getEmail();
             });
 
+            ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
+              function(languageItem) {
+                return {
+                  id: languageItem.id,
+                  text: languageItem.description
+                };
+              }
+            );
+
             ctrl.hasPageLoaded = false;
             var preferencesPromise = $http.get(_PREFERENCES_DATA_URL);
             preferencesPromise.then(function(response) {
@@ -95,6 +104,7 @@ angular.module('oppia').directive('preferencesPage', [
               ctrl.subscriptionList = data.subscription_list;
               ctrl.hasPageLoaded = true;
               _forceSelect2Refresh();
+            }).then(null, function onError(response) {
             });
 
             $q.all([userInfoPromise, preferencesPromise]).then(function() {
@@ -281,14 +291,6 @@ angular.module('oppia').directive('preferencesPage', [
             ctrl.LANGUAGE_CHOICES =
             LanguageUtilService.getLanguageIdsAndTexts();
             ctrl.SITE_LANGUAGE_CHOICES = SUPPORTED_SITE_LANGUAGES;
-            ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
-              function(languageItem) {
-                return {
-                  id: languageItem.id,
-                  text: languageItem.description
-                };
-              }
-            );
           };
         }]
     };

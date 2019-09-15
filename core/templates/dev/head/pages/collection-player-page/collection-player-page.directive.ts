@@ -148,7 +148,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                   .getNextRecommendedCollectionNodeCount(
                   ) + ctrl.collectionPlaythrough
                   .getCompletedExplorationNodeCount(
-              ));
+                  ));
             };
 
             ctrl.updateExplorationPreview = function(explorationId) {

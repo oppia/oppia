@@ -155,7 +155,7 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                       }
                     }).then(function(response) {
                       $scope.showUnresolvedAnswers(response.unresolved_answers);
-                    }).catch(function(response) {
+                    }).then(null, function(response) {
                       $log.error(
                         'Error occurred while fetching unresolved answers ' +
                         'for exploration ' + _explorationId + 'state ' +
@@ -259,7 +259,7 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
               // No further action is needed.
             });
           };
-          
+
           $scope.getUnresolvedStateStats = function() {
             return StateTopAnswersStatsService.getUnresolvedStateStats(
               StateEditorService.getActiveStateName());

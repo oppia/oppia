@@ -175,9 +175,9 @@ angular.module('oppia').directive('settingsTab', [
             };
 
             ctrl.refreshSettingsTab = function() {
-              // Ensure that ExplorationStatesService has been initialized before
-              // getting the state names from it. Otherwise, navigating to the
-              // settings tab directly (by entering a URL that ends with
+              // Ensure that ExplorationStatesService has been initialized
+              // before getting the state names from it. Otherwise, navigating
+              // to the settings tab directly (by entering a URL that ends with
               // /settings) results in a console error.
 
               ctrl.hasPageLoaded = false;
@@ -224,11 +224,11 @@ angular.module('oppia').directive('settingsTab', [
               value: 'viewer'
             }];
 
-            ctrl.formStyle = {
+            ctrl.formStyle = JSON.stringify({
               display: 'table-cell',
               width: '16.66666667%',
               'vertical-align': 'top'
-            };
+            });
 
             ctrl.saveExplorationTitle = function() {
               ExplorationTitleService.saveDisplayedValue();
@@ -278,7 +278,8 @@ angular.module('oppia').directive('settingsTab', [
               ExplorationAutomaticTextToSpeechService
                 .isAutomaticTextToSpeechEnabled);
             ctrl.toggleAutomaticTextToSpeech = (
-              ExplorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech
+              ExplorationAutomaticTextToSpeechService
+                .toggleAutomaticTextToSpeech
             );
 
             ctrl.isCorrectnessFeedbackEnabled = (
@@ -437,8 +438,8 @@ angular.module('oppia').directive('settingsTab', [
               var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
 
               $http.get(moderatorEmailDraftUrl).then(function(response) {
-                // If the draft email body is empty, email functionality will not
-                // be exposed to the mdoerator.
+                // If the draft email body is empty, email functionality will
+                // not be exposed to the mdoerator.
                 var draftEmailBody = response.data.draft_email_body;
 
                 $uibModal.open({

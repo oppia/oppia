@@ -25,7 +25,7 @@ describe('Rating display directive', function() {
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(
     angular.mock.inject(function(
-      $compile, $rootScope, $rootElement, $document, $templateCache) {
+        $compile, $rootScope, $rootElement, $document, $templateCache) {
       var templateHtml = $templateCache.get(
         '/components/ratings/rating-display/rating-display.directive.html');
       $compile(templateHtml)($rootScope);
