@@ -221,9 +221,9 @@ describe('Static Pages Tour', function() {
     browser.getCurrentUrl().then(function(url) {
       expect(element(
         by.css('.protractor-test-error-page')).isPresent()).toBe(true);
+    }, function() {
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
-  }, function() {
-    // Promise is returned by getCurrentUrl which is handled here.
-    // No further action is needed.
   });
 });
