@@ -50,7 +50,7 @@ describe('Cache Slugs', function() {
     browser.get('/console_errors');
     var expectedErrors = [
       // Temporary change for AngularJS Migration.
-      'Cannot read property split of undefined',
+      "Cannot read property 'split' of undefined",
       'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
     ];
     general.checkConsoleErrorsExist(expectedErrors);

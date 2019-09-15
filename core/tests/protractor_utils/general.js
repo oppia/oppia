@@ -44,7 +44,7 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 
     // Temporary change for AngularJS Migration.
     browserLogs = browserLogs.filter(function(browserLog) {
-      return !(browserLog.message.includes('Cannot read property split of undefined'));
+      return !(browserLog.message.includes("Cannot read property 'split' of undefined"));
     });
 
     for (var i = 0; i < browserLogs.length; i++) {
