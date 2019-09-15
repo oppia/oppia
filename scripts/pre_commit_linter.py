@@ -176,7 +176,9 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': re.compile(r'\b(browser.sleep)\('),
         'message': 'In tests, please do not use browser.sleep().',
-        'excluded_files': (),
+        'excluded_files': (
+            'core/tests/protractor_desktop/embedding.js'
+        ),
         'excluded_dirs': ()
     },
     {
