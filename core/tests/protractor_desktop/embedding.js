@@ -106,135 +106,135 @@ describe('Embedding', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  // it('should display and play embedded explorations', function() {
-  //   var TEST_PAGES = [{
-  //     filename: 'embedding_tests_dev_0.0.1.min.html',
-  //     isVersion1: true
-  //   }, {
-  //     filename: 'embedding_tests_dev_0.0.2.min.html',
-  //     isVersion1: false
-  //   }];
+  it('should display and play embedded explorations', function() {
+    var TEST_PAGES = [{
+      filename: 'embedding_tests_dev_0.0.1.min.html',
+      isVersion1: true
+    }, {
+      filename: 'embedding_tests_dev_0.0.2.min.html',
+      isVersion1: false
+    }];
 
-  //   var playCountingExploration = function(version) {
-  //     waitFor.pageToFullyLoad();
-  //     explorationPlayerPage.expectContentToMatch(
-  //       forms.toRichText((version === 2) ?
-  //         'Given three balls of different colors. How many ways are there ' +
-  //         'to arrange them in a straight line?' : 'Version 3'));
-  //     explorationPlayerPage.submitAnswer('NumericInput', 6);
-  //     explorationPlayerPage.expectContentToMatch(
-  //       forms.toRichText('Right! Why do you think it is 6?'));
-  //     explorationPlayerPage.expectExplorationToNotBeOver();
-  //     explorationPlayerPage.submitAnswer('TextInput', 'factorial');
-  //     explorationPlayerPage.clickThroughToNextCard();
-  //     explorationPlayerPage.expectExplorationToBeOver();
-  //   };
+    var playCountingExploration = function(version) {
+      waitFor.pageToFullyLoad();
+      explorationPlayerPage.expectContentToMatch(
+        forms.toRichText((version === 2) ?
+          'Given three balls of different colors. How many ways are there ' +
+          'to arrange them in a straight line?' : 'Version 3'));
+      explorationPlayerPage.submitAnswer('NumericInput', 6);
+      explorationPlayerPage.expectContentToMatch(
+        forms.toRichText('Right! Why do you think it is 6?'));
+      explorationPlayerPage.expectExplorationToNotBeOver();
+      explorationPlayerPage.submitAnswer('TextInput', 'factorial');
+      explorationPlayerPage.clickThroughToNextCard();
+      explorationPlayerPage.expectExplorationToBeOver();
+    };
 
-  //   var PLAYTHROUGH_LOGS = [
-  //     'Exploration loaded',
-  //     'Transitioned from state Intro via answer 6 to state correct but why',
-  //     'Transitioned from state correct but why via answer \\"factorial\\" ' +
-  //       'to state END',
-  //     'Exploration completed'
-  //   ];
+    var PLAYTHROUGH_LOGS = [
+      'Exploration loaded',
+      'Transitioned from state Intro via answer 6 to state correct but why',
+      'Transitioned from state correct but why via answer \\"factorial\\" ' +
+        'to state END',
+      'Exploration completed'
+    ];
 
-  //   users.createUser('user1@embedding.com', 'user1Embedding');
-  //   users.login('user1@embedding.com', true);
+    users.createUser('user1@embedding.com', 'user1Embedding');
+    users.login('user1@embedding.com', true);
 
-  //   // Create exploration.
-  //   // Version 1 is creation of the exploration.
-  //   workflow.createExploration();
-  //   general.getExplorationIdFromEditor().then(function(expId) {
-  //     var explorationId = expId;
-  //     // Create Version 2 of the exploration.
-  //     createCountingExploration();
+    // Create exploration.
+    // Version 1 is creation of the exploration.
+    workflow.createExploration();
+    general.getExplorationIdFromEditor().then(function(expId) {
+      var explorationId = expId;
+      // Create Version 2 of the exploration.
+      createCountingExploration();
 
-  //     general.openEditor(explorationId);
-  //     explorationEditorMainTab.setContent(forms.toRichText('Version 3'));
-  //     explorationEditorPage.saveChanges('demonstration edit');
+      general.openEditor(explorationId);
+      explorationEditorMainTab.setContent(forms.toRichText('Version 3'));
+      explorationEditorPage.saveChanges('demonstration edit');
 
-  //     for (var i = 0; i < TEST_PAGES.length; i++) {
-  //       // This is necessary as the pages are non-angular.
-  //       var driver = browser.driver;
-  //       driver.get(
-  //         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
-  //         TEST_PAGES[i].filename);
+      for (var i = 0; i < TEST_PAGES.length; i++) {
+        // This is necessary as the pages are non-angular.
+        var driver = browser.driver;
+        driver.get(
+          general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
+          TEST_PAGES[i].filename);
 
-  //       driver.findElement(by.css(
-  //         '.protractor-test-exploration-id-input-field')
-  //       ).sendKeys(explorationId);
+        driver.findElement(by.css(
+          '.protractor-test-exploration-id-input-field')
+        ).sendKeys(explorationId);
 
-  //       driver.findElement(by.css(
-  //         '.protractor-test-exploration-id-submit-button')
-  //       ).click();
+        driver.findElement(by.css(
+          '.protractor-test-exploration-id-submit-button')
+        ).click();
 
-  //       // Test of standard loading (new and old versions).
-  //       browser.switchTo().frame(
-  //         driver.findElement(
-  //           by.css('.protractor-test-standard > iframe')));
-  //       playCountingExploration(3);
-  //       browser.switchTo().defaultContent();
+        // Test of standard loading (new and old versions).
+        browser.switchTo().frame(
+          driver.findElement(
+            by.css('.protractor-test-standard > iframe')));
+        playCountingExploration(3);
+        browser.switchTo().defaultContent();
 
-  //       if (TEST_PAGES[i].isVersion1) {
-  //         // Test of deferred loading (old version).
-  //         driver.findElement(
-  //           by.css('.protractor-test-old-version > oppia > div > button')
-  //         ).click();
-  //       }
+        if (TEST_PAGES[i].isVersion1) {
+          // Test of deferred loading (old version).
+          driver.findElement(
+            by.css('.protractor-test-old-version > oppia > div > button')
+          ).click();
+        }
 
-  //       browser.switchTo().frame(
-  //         driver.findElement(
-  //           by.css('.protractor-test-old-version > iframe')));
-  //       playCountingExploration(2);
-  //       browser.switchTo().defaultContent();
-  //     }
+        browser.switchTo().frame(
+          driver.findElement(
+            by.css('.protractor-test-old-version > iframe')));
+        playCountingExploration(2);
+        browser.switchTo().defaultContent();
+      }
 
-  //     // Certain events in the exploration playthroughs should trigger hook
-  //     // functions in the outer page; these send logs to the console which we
-  //     // now check to ensure that the hooks work correctly.
-  //     browser.manage().logs().get('browser').then(function(browserLogs) {
-  //       var embeddingLogs = [];
-  //       for (var i = 0; i < browserLogs.length; i++) {
-  //         // We ignore all logs that are not of the desired form.
-  //         try {
-  //           var message = browserLogs[i].message;
-  //           var EMBEDDING_PREFIX = 'Embedding test: ';
-  //           if (message.indexOf(EMBEDDING_PREFIX) !== -1) {
-  //             var index = message.indexOf(EMBEDDING_PREFIX);
-  //             // The "-1" in substring() removes the trailing quotation mark.
-  //             embeddingLogs.push(message.substring(
-  //               index + EMBEDDING_PREFIX.length, message.length - 1));
-  //           }
-  //         } catch (err) {}
-  //       }
+      // Certain events in the exploration playthroughs should trigger hook
+      // functions in the outer page; these send logs to the console which we
+      // now check to ensure that the hooks work correctly.
+      browser.manage().logs().get('browser').then(function(browserLogs) {
+        var embeddingLogs = [];
+        for (var i = 0; i < browserLogs.length; i++) {
+          // We ignore all logs that are not of the desired form.
+          try {
+            var message = browserLogs[i].message;
+            var EMBEDDING_PREFIX = 'Embedding test: ';
+            if (message.indexOf(EMBEDDING_PREFIX) !== -1) {
+              var index = message.indexOf(EMBEDDING_PREFIX);
+              // The "-1" in substring() removes the trailing quotation mark.
+              embeddingLogs.push(message.substring(
+                index + EMBEDDING_PREFIX.length, message.length - 1));
+            }
+          } catch (err) {}
+        }
 
-  //       // We played the exploration twice for each test page.
-  //       var expectedLogs = [];
-  //       for (var i = 0; i < TEST_PAGES.length; i++) {
-  //         if (TEST_PAGES[i].isVersion1) {
-  //           expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
-  //           expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
-  //         } else {
-  //           // The two loading events are fired first ...
-  //           expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[0]);
-  //           expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[0]);
-  //           // ... followed by the rest of the events, as each playthrough
-  //           // occurs.
-  //           expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[1]);
-  //           expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[2]);
-  //           expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[3]);
-  //           expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[1]);
-  //           expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[2]);
-  //           expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[3]);
-  //         }
-  //       }
-  //       expect(embeddingLogs).toEqual(expectedLogs);
-  //     });
+        // We played the exploration twice for each test page.
+        var expectedLogs = [];
+        for (var i = 0; i < TEST_PAGES.length; i++) {
+          if (TEST_PAGES[i].isVersion1) {
+            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
+            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
+          } else {
+            // The two loading events are fired first ...
+            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[0]);
+            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[0]);
+            // ... followed by the rest of the events, as each playthrough
+            // occurs.
+            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[1]);
+            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[2]);
+            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[3]);
+            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[1]);
+            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[2]);
+            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[3]);
+          }
+        }
+        expect(embeddingLogs).toEqual(expectedLogs);
+      });
 
-  //     users.logout();
-  //     general.checkForConsoleErrors([]);
-  //   });
-  // });
+      users.logout();
+      general.checkForConsoleErrors([]);
+    });
+  });
 
   it('should use the exploration language as site language.', function() {
     // Opens the test file and checks the placeholder in the exploration is
