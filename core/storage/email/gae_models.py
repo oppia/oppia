@@ -46,7 +46,7 @@ class SentEmailModel(base_models.BaseModel):
     recipient_email = ndb.StringProperty(required=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
-    sender_id = ndb.StringProperty(required=True)
+    sender_id = ndb.StringProperty(required=True, indexed=True)
     # The email address used to send the notification.
     sender_email = ndb.StringProperty(required=True)
     # The intent of the email.
@@ -79,6 +79,24 @@ class SentEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SentEmailModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        references_recipient_id = cls.get_all().filter(
+            cls.recipient_id == user_id
+        ).get() is not None
+        references_sender_id = cls.get_all().filter(
+            cls.sender_id == user_id
+        ).get() is not None
+        return references_recipient_id or references_sender_id
 
     @classmethod
     def _generate_id(cls, intent):
@@ -252,7 +270,7 @@ class BulkEmailModel(base_models.BaseModel):
     recipient_ids = ndb.JsonProperty(default=[], compressed=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
-    sender_id = ndb.StringProperty(required=True)
+    sender_id = ndb.StringProperty(required=True, indexed=True)
     # The email address used to send the notification.
     sender_email = ndb.StringProperty(required=True)
     # The intent of the email.
@@ -274,6 +292,19 @@ class BulkEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether BulkEmailModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        # TODO(vojtechjelinek): Add check for recipient_ids too.
+        return cls.get_all().filter(cls.sender_id == user_id).get() is not None
 
     @classmethod
     def create(
@@ -323,6 +354,23 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     created_on = ndb.DateTimeProperty(indexed=True, required=True)
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Feedback email reply to id should be deleted."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralFeedbackEmailReplyToIdModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_all().filter(cls.user_id == user_id).get() is not None
+
     def put(self, update_last_updated_time=True):
         """Writes the given thread instance to the datastore.
 
@@ -340,11 +388,6 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             self.last_updated = datetime.datetime.utcnow()
 
         return super(GeneralFeedbackEmailReplyToIdModel, self).put()
-
-    @staticmethod
-    def get_deletion_policy():
-        """Feedback email reply to id should be deleted."""
-        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):
