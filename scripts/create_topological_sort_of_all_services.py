@@ -44,6 +44,7 @@ TOPO_SORT_STACK = []
 ADJ_LIST = collections.defaultdict(list)
 DIRECTORY_NAMES = ['core/templates/dev/head', 'extensions']
 
+
 def dfs(node):
     """Depth First Search starting with node.
 
