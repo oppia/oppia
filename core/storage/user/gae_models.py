@@ -33,7 +33,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
-    # User id used to identify user by GAE
+    # User id used to identify user by GAE.
     gae_user_id = ndb.StringProperty(required=False, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)

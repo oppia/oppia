@@ -1192,12 +1192,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'No user id specified.'):
             self.user_settings.validate()
 
-    def test_validate_non_str_user_id(self):
-        self.user_settings.user_id = 0
-        with self.assertRaisesRegexp(
-            Exception, 'Expected user_id to be a string'):
-            self.user_settings.validate()
-
     def test_validate_non_str_role(self):
         self.user_settings.role = 0
         with self.assertRaisesRegexp(Exception, 'Expected role to be a string'):
