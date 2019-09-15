@@ -76,174 +76,174 @@ angular.module('oppia').directive('explorationEditorTab', [
             ExplorationWarningsService, GraphDataService, RouterService,
             StateEditorService, UrlInterpolationService) {
           var ctrl = this;
-            ctrl.areParametersEnabled =
-              ExplorationFeaturesService.areParametersEnabled;
+          ctrl.areParametersEnabled =
+            ExplorationFeaturesService.areParametersEnabled;
 
-            ctrl.interactionIsShown = false;
+          ctrl.interactionIsShown = false;
 
-            $scope.$on('refreshStateEditor', function() {
-              ctrl.initStateEditor();
-            });
+          $scope.$on('refreshStateEditor', function() {
+            ctrl.initStateEditor();
+          });
 
-            $scope.$watch(ExplorationStatesService.getStates, function() {
-              if (ExplorationStatesService.getStates()) {
-                StateEditorService.setStateNames(
-                  ExplorationStatesService.getStateNames());
-              }
-            }, true);
-
-            ctrl.getStateContentPlaceholder = function() {
-              if (
-                StateEditorService.getActiveStateName() ===
-                ExplorationInitStateNameService.savedMemento) {
-                return (
-                  'This is the first card of your exploration. Use this' +
-                  'space to introduce your topic and engage the learner,' +
-                  'then ask them a question.');
-              } else {
-                return (
-                  'You can speak to the learner here, ' +
-                  'then ask them a question.');
-              }
-            };
-
-            ctrl.addState = function(newStateName) {
-              ExplorationStatesService.addState(newStateName, null);
-            };
-
-            ctrl.refreshWarnings = function() {
-              ExplorationWarningsService.updateWarnings();
-            };
-
-            ctrl.initStateEditor = function() {
-              ctrl.stateName = StateEditorService.getActiveStateName();
+          $scope.$watch(ExplorationStatesService.getStates, function() {
+            if (ExplorationStatesService.getStates()) {
               StateEditorService.setStateNames(
                 ExplorationStatesService.getStateNames());
-              StateEditorService.setCorrectnessFeedbackEnabled(
-                ExplorationCorrectnessFeedbackService.isEnabled());
-              StateEditorService.setInQuestionMode(false);
-              var stateData = ExplorationStatesService.getState(ctrl.stateName);
-              if (ctrl.stateName && stateData) {
-                $rootScope.$broadcast('stateEditorInitialized', stateData);
+            }
+          }, true);
 
-                var content = ExplorationStatesService.getStateContentMemento(
-                  ctrl.stateName);
-                if (content.getHtml() || stateData.interaction.id) {
-                  ctrl.interactionIsShown = true;
+          ctrl.getStateContentPlaceholder = function() {
+            if (
+              StateEditorService.getActiveStateName() ===
+              ExplorationInitStateNameService.savedMemento) {
+              return (
+                'This is the first card of your exploration. Use this' +
+                'space to introduce your topic and engage the learner,' +
+                'then ask them a question.');
+            } else {
+              return (
+                'You can speak to the learner here, ' +
+                'then ask them a question.');
+            }
+          };
+
+          ctrl.addState = function(newStateName) {
+            ExplorationStatesService.addState(newStateName, null);
+          };
+
+          ctrl.refreshWarnings = function() {
+            ExplorationWarningsService.updateWarnings();
+          };
+
+          ctrl.initStateEditor = function() {
+            ctrl.stateName = StateEditorService.getActiveStateName();
+            StateEditorService.setStateNames(
+              ExplorationStatesService.getStateNames());
+            StateEditorService.setCorrectnessFeedbackEnabled(
+              ExplorationCorrectnessFeedbackService.isEnabled());
+            StateEditorService.setInQuestionMode(false);
+            var stateData = ExplorationStatesService.getState(ctrl.stateName);
+            if (ctrl.stateName && stateData) {
+              $rootScope.$broadcast('stateEditorInitialized', stateData);
+
+              var content = ExplorationStatesService.getStateContentMemento(
+                ctrl.stateName);
+              if (content.getHtml() || stateData.interaction.id) {
+                ctrl.interactionIsShown = true;
+              }
+
+              $rootScope.loadingMessage = '';
+            }
+          };
+
+          ctrl.recomputeGraph = function() {
+            GraphDataService.recompute();
+          };
+
+          ctrl.saveStateContent = function(displayedValue) {
+            ExplorationStatesService.saveStateContent(
+              ctrl.stateName, angular.copy(displayedValue));
+            // Show the interaction when the text content is saved, even if no
+            // content is entered.
+            ctrl.interactionIsShown = true;
+          };
+
+          ctrl.saveInteractionId = function(displayedValue) {
+            ExplorationStatesService.saveInteractionId(
+              ctrl.stateName, angular.copy(displayedValue));
+            StateEditorService.setInteractionId(angular.copy(displayedValue));
+          };
+
+          ctrl.saveInteractionAnswerGroups = function(newAnswerGroups) {
+            ExplorationStatesService.saveInteractionAnswerGroups(
+              ctrl.stateName, angular.copy(newAnswerGroups));
+
+            StateEditorService.setInteractionAnswerGroups(
+              angular.copy(newAnswerGroups));
+            ctrl.recomputeGraph();
+          };
+
+          ctrl.saveInteractionDefaultOutcome = function(newOutcome) {
+            ExplorationStatesService.saveInteractionDefaultOutcome(
+              ctrl.stateName, angular.copy(newOutcome));
+
+            StateEditorService.setInteractionDefaultOutcome(
+              angular.copy(newOutcome));
+            ctrl.recomputeGraph();
+          };
+
+          ctrl.saveInteractionCustomizationArgs = function(displayedValue) {
+            ExplorationStatesService.saveInteractionCustomizationArgs(
+              ctrl.stateName, angular.copy(displayedValue));
+
+            StateEditorService.setInteractionCustomizationArgs(
+              angular.copy(displayedValue));
+          };
+
+          ctrl.saveSolution = function(displayedValue) {
+            ExplorationStatesService.saveSolution(
+              ctrl.stateName, angular.copy(displayedValue));
+
+            StateEditorService.setInteractionSolution(
+              angular.copy(displayedValue));
+          };
+
+          ctrl.saveHints = function(displayedValue) {
+            ExplorationStatesService.saveHints(
+              ctrl.stateName, angular.copy(displayedValue));
+
+            StateEditorService.setInteractionHints(
+              angular.copy(displayedValue));
+          };
+
+          ctrl.saveSolicitAnswerDetails = function(displayedValue) {
+            ExplorationStatesService.saveSolicitAnswerDetails(
+              ctrl.stateName, angular.copy(displayedValue));
+
+            StateEditorService.setSolicitAnswerDetails(
+              angular.copy(displayedValue));
+          };
+
+          ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
+              contentId) {
+            var stateName = StateEditorService.getActiveStateName();
+            var state = ExplorationStatesService.getState(stateName);
+            var recordedVoiceovers = state.recordedVoiceovers;
+            var writtenTranslations = state.writtenTranslations;
+            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
+                writtenTranslations.hasUnflaggedWrittenTranslations(
+                  contentId)) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/components/forms/forms-templates/mark-all-audio-and-' +
+                  'translations-as-needing-update-modal.directive.html'),
+                backdrop: true,
+                controller: (
+                  'MarkAllAudioAndTranslationsAsNeedingUpdateController')
+              }).result.then(function() {
+                if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+                  recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+                    contentId);
+                  ExplorationStatesService.saveRecordedVoiceovers(
+                    stateName, recordedVoiceovers);
                 }
+                if (writtenTranslations.hasUnflaggedWrittenTranslations(
+                  contentId)) {
+                  writtenTranslations.markAllTranslationsAsNeedingUpdate(
+                    contentId);
+                  ExplorationStatesService.saveWrittenTranslations(
+                    stateName, writtenTranslations);
+                }
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
+              });
+            }
+          };
 
-                $rootScope.loadingMessage = '';
-              }
-            };
-
-            ctrl.recomputeGraph = function() {
-              GraphDataService.recompute();
-            };
-
-            ctrl.saveStateContent = function(displayedValue) {
-              ExplorationStatesService.saveStateContent(
-                ctrl.stateName, angular.copy(displayedValue));
-              // Show the interaction when the text content is saved, even if no
-              // content is entered.
-              ctrl.interactionIsShown = true;
-            };
-
-            ctrl.saveInteractionId = function(displayedValue) {
-              ExplorationStatesService.saveInteractionId(
-                ctrl.stateName, angular.copy(displayedValue));
-              StateEditorService.setInteractionId(angular.copy(displayedValue));
-            };
-
-            ctrl.saveInteractionAnswerGroups = function(newAnswerGroups) {
-              ExplorationStatesService.saveInteractionAnswerGroups(
-                ctrl.stateName, angular.copy(newAnswerGroups));
-
-              StateEditorService.setInteractionAnswerGroups(
-                angular.copy(newAnswerGroups));
-              ctrl.recomputeGraph();
-            };
-
-            ctrl.saveInteractionDefaultOutcome = function(newOutcome) {
-              ExplorationStatesService.saveInteractionDefaultOutcome(
-                ctrl.stateName, angular.copy(newOutcome));
-
-              StateEditorService.setInteractionDefaultOutcome(
-                angular.copy(newOutcome));
-              ctrl.recomputeGraph();
-            };
-
-            ctrl.saveInteractionCustomizationArgs = function(displayedValue) {
-              ExplorationStatesService.saveInteractionCustomizationArgs(
-                ctrl.stateName, angular.copy(displayedValue));
-
-              StateEditorService.setInteractionCustomizationArgs(
-                angular.copy(displayedValue));
-            };
-
-            ctrl.saveSolution = function(displayedValue) {
-              ExplorationStatesService.saveSolution(
-                ctrl.stateName, angular.copy(displayedValue));
-
-              StateEditorService.setInteractionSolution(
-                angular.copy(displayedValue));
-            };
-
-            ctrl.saveHints = function(displayedValue) {
-              ExplorationStatesService.saveHints(
-                ctrl.stateName, angular.copy(displayedValue));
-
-              StateEditorService.setInteractionHints(
-                angular.copy(displayedValue));
-            };
-
-            ctrl.saveSolicitAnswerDetails = function(displayedValue) {
-              ExplorationStatesService.saveSolicitAnswerDetails(
-                ctrl.stateName, angular.copy(displayedValue));
-
-              StateEditorService.setSolicitAnswerDetails(
-                angular.copy(displayedValue));
-            };
-
-            ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
-                contentId) {
-              var stateName = StateEditorService.getActiveStateName();
-              var state = ExplorationStatesService.getState(stateName);
-              var recordedVoiceovers = state.recordedVoiceovers;
-              var writtenTranslations = state.writtenTranslations;
-              if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
-                  writtenTranslations.hasUnflaggedWrittenTranslations(
-                    contentId)) {
-                $uibModal.open({
-                  templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                    '/components/forms/forms-templates/mark-all-audio-and-' +
-                    'translations-as-needing-update-modal.directive.html'),
-                  backdrop: true,
-                  controller: (
-                    'MarkAllAudioAndTranslationsAsNeedingUpdateController')
-                }).result.then(function() {
-                  if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-                    recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                      contentId);
-                    ExplorationStatesService.saveRecordedVoiceovers(
-                      stateName, recordedVoiceovers);
-                  }
-                  if (writtenTranslations.hasUnflaggedWrittenTranslations(
-                    contentId)) {
-                    writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                      contentId);
-                    ExplorationStatesService.saveWrittenTranslations(
-                      stateName, writtenTranslations);
-                  }
-                }, function() {
-                  // This callback is triggered when the Cancel button is
-                  // clicked. No further action is needed.
-                });
-              }
-            };
-
-            ctrl.navigateToState = function(stateName) {
-              RouterService.navigateToMainTab(stateName);
-            };
+          ctrl.navigateToState = function(stateName) {
+            RouterService.navigateToMainTab(stateName);
+          };
         }]
     };
   }]);
