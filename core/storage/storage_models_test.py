@@ -29,19 +29,15 @@ class StorageModelsTest(test_utils.GenericTestBase):
 
     def _get_model_module_names(self):
         """Get all module names in storage."""
-        all_model_module_names = []
-
         # As models.NAMES is an enum, it cannot be iterated. So we use the
         # __dict__ property which can be iterated.
         for name in models.NAMES.__dict__:
             if '__' in name:
                 continue
-            all_model_module_names.append(name)
-        return all_model_module_names
+            yield name
 
     def _get_model_classes(self):
         """Get all model classes in storage."""
-        model_subclasses = []
         for module_name in self._get_model_module_names():
             (module,) = models.Registry.import_models([module_name])
             for member_name, member_obj in inspect.getmembers(module):
@@ -51,16 +47,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
                         base_class.__name__ for base_class in inspect.getmro(
                             clazz)]
                     if 'Model' in all_base_classes:
-                        model_subclasses.append(clazz)
-        return model_subclasses
-
-    def test_all_model_module_names_unique(self):
-        names_of_ndb_model_subclasses = [
-            clazz.__name__ for clazz in self._get_model_classes()]
-
-        self.assertEqual(
-            len(set(names_of_ndb_model_subclasses)),
-            len(names_of_ndb_model_subclasses))
+                        yield clazz
 
     # List of model classes that can't have Wipeout related class methods
     # defined because they're not used directly but only as a base classes for
@@ -74,10 +61,12 @@ class StorageModelsTest(test_utils.GenericTestBase):
         'VersionedModel',
     )
 
-    def test_all_child_models_have_get_deletion_policy(self):
-        model_subclasses = self._get_model_classes()
+    def _get_child_model_classes(self):
+        """Get all child model classes, these are classes that are used directly
+        for saving data and not just inherited from.
+        """
 
-        for clazz in model_subclasses:
+        for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
                 continue
             base_classes = [base.__name__ for base in inspect.getmro(clazz)]
@@ -93,7 +82,18 @@ class StorageModelsTest(test_utils.GenericTestBase):
             # adopt the policy of the associated VersionedModel.
             if 'BaseCommitLogEntryModel' in base_classes:
                 continue
+            yield clazz
 
+    def test_all_model_module_names_unique(self):
+        names_of_ndb_model_subclasses = [
+            clazz.__name__ for clazz in self._get_model_classes()]
+
+        self.assertEqual(
+            len(set(names_of_ndb_model_subclasses)),
+            len(names_of_ndb_model_subclasses))
+
+    def test_all_child_models_have_get_deletion_policy(self):
+        for clazz in self._get_child_model_classes():
             try:
                 self.assertIn(
                     clazz.get_deletion_policy(),
@@ -103,9 +103,22 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     clazz.__name__))
 
     def test_all_base_models_do_not_have_get_deletion_policy(self):
-        model_subclasses = self._get_model_classes()
-
-        for clazz in model_subclasses:
+        for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
                 with self.assertRaises(NotImplementedError):
                     clazz.get_deletion_policy()
+
+    def test_all_child_models_have_has_reference_to_user_id(self):
+        for clazz in self._get_child_model_classes():
+            try:
+                self.assertIsNotNone(clazz.has_reference_to_user_id())
+            except NotImplementedError:
+                self.fail(
+                    msg='has_reference_to_user_id is not defined for %s' % (
+                        clazz.__name__))
+
+    def test_all_base_models_do_not_have_has_reference_to_user_id(self):
+        for clazz in self._get_model_classes():
+            if clazz.__name__ in self.BASE_CLASSES:
+                with self.assertRaises(NotImplementedError):
+                    clazz.has_reference_to_user_id()
