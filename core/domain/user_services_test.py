@@ -1176,6 +1176,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
+    def test_gae_user_id_is_user_id(self):
+        self.assertEqual(
+            self.user_settings.user_id, self.user_settings.gae_user_id
+        )
+
     def test_validate_non_str_user_id(self):
         self.user_settings.user_id = 0
         with self.assertRaisesRegexp(
@@ -1185,6 +1190,12 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_validate_empty_user_id(self):
         self.user_settings.user_id = ''
         with self.assertRaisesRegexp(Exception, 'No user id specified.'):
+            self.user_settings.validate()
+
+    def test_validate_non_str_user_id(self):
+        self.user_settings.user_id = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected user_id to be a string'):
             self.user_settings.validate()
 
     def test_validate_non_str_role(self):
