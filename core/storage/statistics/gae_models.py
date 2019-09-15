@@ -92,8 +92,8 @@ class StateCounterModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State counter data is aggregated and anonymized,
-        and cannot be tied back to an individual user.
+        """State counter data is aggregated and anonymized, and cannot be tied
+        back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -134,8 +134,8 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Answer submitted event logs are anonymized,
-        and cannot be tied back to an individual user.
+        """Answer submitted event logs are anonymized, and cannot be tied back
+        to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -188,8 +188,8 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration actual start event logs are anonymized,
-        and cannot be tied back to an individual user.
+        """Exploration actual start event logs are anonymized, and cannot be
+        tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -237,8 +237,8 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Solution hit event logs are anonymized,
-        and cannot be tied back to an individual user.
+        """Solution hit event logs are anonymized, and cannot be tied back to
+        an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -314,8 +314,8 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Start exploration event logs are anonymized,
-        and cannot be tied back to an individual user.
+        """Start exploration event logs are anonymized, and cannot be tied back
+        to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -435,8 +435,8 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Maybe leave exploration event logs are anonymized,
-        and cannot be tied back to an individual user.
+        """Maybe leave exploration event logs are anonymized, and cannot be tied
+        back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -547,8 +547,8 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Complete exploration event logs are anonymized,
-        and cannot be tied back to an individual user.
+        """Complete exploration event logs are anonymized, and cannot be tied
+        back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -631,8 +631,8 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Rate exploration event logs are anonymized,
-        and cannot be tied back to an individual user.
+        """Rate exploration event logs are anonymized, and cannot be tied back
+        to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -719,8 +719,8 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State hit event logs are anonymized,
-        and cannot be tied back to an individual user.
+        """State hit event logs are anonymized, and cannot be tied back to an
+        individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -796,8 +796,8 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State complete event logs are anonymized,
-        and cannot be tied back to an individual user.
+        """State complete event logs are anonymized, and cannot be tied back to
+        an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -850,8 +850,8 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Leave for refresher exploration event logs are anonymized,
-        and cannot be tied back to an individual user.
+        """Leave for refresher exploration event logs are anonymized, and cannot
+        be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -926,8 +926,8 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration stats are aggregated and anonymized,
-        and cannot be tied back to an individual user.
+        """Exploration stats are aggregated and anonymized, and cannot be tied
+        back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -1084,8 +1084,8 @@ class ExplorationIssuesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration issues are aggregated and anonymized,
-        and cannot be tied back to an individual user.
+        """Exploration issues are aggregated and anonymized, and cannot be tied
+        back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -1164,8 +1164,8 @@ class PlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Playthroughs are anonymized,
-        and cannot be tied back to an individual user.
+        """Playthroughs are anonymized, and cannot be tied back to an individual
+        user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -1276,8 +1276,8 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Learner answer details are aggregated and anonymized,
-        and cannot be tied back to an individual user.
+        """Learner answer details are aggregated and anonymized, and cannot be
+        tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -1412,8 +1412,8 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration annotations are aggregated and anonymized,
-        and cannot be tied back to an individual user.
+        """Exploration annotations are aggregated and anonymized, and cannot be
+        tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -1531,8 +1531,8 @@ class StateAnswersModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State answers are aggregated and anonymized,
-        and cannot be tied back to an individual user.
+        """State answers are aggregated and anonymized, and cannot be tied back
+        to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -1843,8 +1843,8 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State answer calc outputs are aggregated and anonymized,
-        and cannot be tied back to an individual user.
+        """State answer calc outputs are aggregated and anonymized, and cannot
+        be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
