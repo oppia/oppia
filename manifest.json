@@ -261,7 +261,7 @@
         "targetDirPrefix": "bootstrap-",
         "bundle": {
           "css": ["css/bootstrap.css"],
-          "fontsPath": "fonts",
+          "fontsPath": "webfonts",
           "js": ["js/bootstrap.js"]
         }
       },
