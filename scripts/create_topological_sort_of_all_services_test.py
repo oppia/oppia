@@ -18,10 +18,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import os
-from core.tests import test_utils
 
-from . import create_topological_sort_of_all_services
+from core.tests import test_utils
 import python_utils
+from . import create_topological_sort_of_all_services
 
 MOCK_DIRECTORY_NAMES = [os.path.join('core', 'tests', 'services_sources')]
 
@@ -31,53 +31,52 @@ class TopologicalSortTests(test_utils.GenericTestBase):
     on dependencies.
     """
     def test_dfs_with_connected_graph(self):
-    	topo_sort_stack = []
-    	visit_stack = []
-    	adj_list = collections.defaultdict(list)
-    	adj_list['A'] = ['B', 'C']
-    	adj_list['C'] = ['D']
-    	create_topological_sort_of_all_services.dfs(
-    		'A', topo_sort_stack, adj_list, visit_stack)
-    	self.assertEqual(topo_sort_stack, ['B', 'D', 'C', 'A'])
-    	self.assertEqual(visit_stack, ['A', 'B', 'C', 'D'])
+        topo_sort_stack = []
+        visit_stack = []
+        adj_list = collections.defaultdict(list)
+        adj_list['A'] = ['B', 'C']
+        adj_list['C'] = ['D']
+        create_topological_sort_of_all_services.dfs(
+            'A', topo_sort_stack, adj_list, visit_stack)
+        self.assertEqual(topo_sort_stack, ['B', 'D', 'C', 'A'])
+        self.assertEqual(visit_stack, ['A', 'B', 'C', 'D'])
 
     def test_make_graph(self):
-    	with self.swap(
-    		create_topological_sort_of_all_services, 'DIRECTORY_NAMES',
-    		MOCK_DIRECTORY_NAMES):
-    		adj_list, node_set = (
-    			create_topological_sort_of_all_services.make_graph())
+        with self.swap(
+            create_topological_sort_of_all_services, 'DIRECTORY_NAMES',
+            MOCK_DIRECTORY_NAMES):
+            adj_list, node_set = (
+                create_topological_sort_of_all_services.make_graph())
 
-    		expected_adj_list = {
-    			'DTest.service.ts': [
-    				'CTest.service.ts', 'ETestFactory.ts', 'ATestFactory.ts',
-    				'BTestService.ts'],
-    			'BTestService.ts': ['CTest.service.ts'],
-    			'ATestFactory.ts': ['CTest.service.ts'],
-    			'CTest.service.ts': ['ETestFactory.ts']}
+            expected_adj_list = {
+                'DTest.service.ts': [
+                    'CTest.service.ts', 'ETestFactory.ts', 'ATestFactory.ts',
+                    'BTestService.ts'],
+                'BTestService.ts': ['CTest.service.ts'],
+                'ATestFactory.ts': ['CTest.service.ts'],
+                'CTest.service.ts': ['ETestFactory.ts']}
 
-    		expected_node_set = set([
-    			'DTest.service.ts', 'ETestFactory.ts', 'BTestService.ts',
-    			'CTest.service.ts', 'ATestFactory.ts'])
+            expected_node_set = set([
+                'DTest.service.ts', 'ETestFactory.ts', 'BTestService.ts',
+                'CTest.service.ts', 'ATestFactory.ts'])
 
-    		self.assertEqual(adj_list, expected_adj_list)
-    		self.assertEqual(node_set, expected_node_set)
+            self.assertEqual(adj_list, expected_adj_list)
+            self.assertEqual(node_set, expected_node_set)
 
     def test_complete_process(self):
-    	actual_output = []
+        actual_output = []
 
-    	def mock_print(val):
-    		actual_output.append(val)
+        def mock_print(val):
+            actual_output.append(val)
 
-    	print_swap = self.swap(python_utils, 'PRINT', mock_print)
-    	dir_names_swap = self.swap(
-    		create_topological_sort_of_all_services, 'DIRECTORY_NAMES',
-    		MOCK_DIRECTORY_NAMES)
-    	with print_swap, dir_names_swap:
-    		create_topological_sort_of_all_services.main()
+        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        dir_names_swap = self.swap(
+            create_topological_sort_of_all_services, 'DIRECTORY_NAMES',
+            MOCK_DIRECTORY_NAMES)
+        with print_swap, dir_names_swap:
+            create_topological_sort_of_all_services.main()
 
-    	expected_output = [
-    		'DTest.service.ts', 'BTestService.ts', 'ATestFactory.ts',
-    		'CTest.service.ts', 'ETestFactory.ts']
-    	self.assertEqual(actual_output, expected_output)
-
+        expected_output = [
+            'DTest.service.ts', 'BTestService.ts', 'ATestFactory.ts',
+            'CTest.service.ts', 'ETestFactory.ts']
+        self.assertEqual(actual_output, expected_output)
