@@ -37,7 +37,8 @@ angular.module('oppia').directive('promoBar', [
           var ctrl = this;
           var isPromoDismissed = function() {
             try {
-              return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
+              return (
+                !!angular.fromJson($window.sessionStorage.promoIsDismissed));
             } catch (exception) {
               displayCookiesDisabledModal();
               return true;
@@ -48,7 +49,7 @@ angular.module('oppia').directive('promoBar', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/common-layout-directives/common-elements/' +
-                'disabled-cookies-modal.template.html'),
+                'disabled-cookies-modal.directive.html'),
               backdrop: 'static',
               resolve: {},
               controller: [
@@ -58,7 +59,7 @@ angular.module('oppia').directive('promoBar', [
                     $uibModalInstance.close('okay');
                   };
                 }]
-            }); 
+            });
           };
 
           var setPromoDismissed = function(promoIsDismissed) {
