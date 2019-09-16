@@ -29,11 +29,17 @@ import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { InteractiveMapRulesService } from
   'interactions/InteractiveMap/directives/interactive-map-rules.service';
+import { LogicProofRulesService } from
+  'interactions/LogicProof/directives/logic-proof-rules.service';
+import { MusicNotesInputRulesService } from
+  'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 /* eslint-disable max-len */
 import { DragAndDropSortInputRulesService } from
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
+import { ItemSelectionInputRulesService } from
+  'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
@@ -50,13 +56,19 @@ describe('Rule spec services', function() {
     $provide.value('GraphUtilsService', new GraphUtilsService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('SetInputRulesService', new SetInputRulesService());
-    $provide.value('DragAndDropSortInputRulesService',
+    $provide.value(
+      'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());
-    $provide.value('MultipleChoiceInputRulesService',
-      new MultipleChoiceInputRulesService());
+    $provide.value(
+      'MultipleChoiceInputRulesService', new MultipleChoiceInputRulesService());
     $provide.value('NumericInputRulesService', new NumericInputRulesService());
-    $provide.value('InteractiveMapRulesService',
-      new InteractiveMapRulesService());
+    $provide.value(
+      'InteractiveMapRulesService', new InteractiveMapRulesService());
+    $provide.value('LogicProofRulesService', new LogicProofRulesService());
+    $provide.value(
+      'MusicNotesInputRulesService', new MusicNotesInputRulesService());
+    $provide.value(
+      'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The

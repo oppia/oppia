@@ -5922,12 +5922,12 @@ class UserNormalizedNameAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model_instance):
         if not model_instance.deleted:
-            yield(model_instance.normalized_username, model_instance.id)
+            yield (model_instance.normalized_username, model_instance.id)
 
     @staticmethod
     def reduce(key, values):
         if len(values) > 1:
-            yield(
+            yield (
                 'failed validation check for normalized username check of '
                 'UserSettingsModel',
                 'Users with ids %s have the same normalized username %s' % (
