@@ -38,36 +38,43 @@ for path in _PATHS_TO_INSERT:
 import esprima # isort:skip
 # pylint: enable=wrong-import-position
 
-NODES = set()
-VISIT_STACK = []
-TOPO_SORT_STACK = []
-ADJ_LIST = collections.defaultdict(list)
 DIRECTORY_NAMES = ['core/templates/dev/head', 'extensions']
+SERVICE_FILES_SUFFICES = ('.service.ts', 'Service.ts', 'Factory.ts')
 
 
-def dfs(node):
+def dfs(node, topo_sort_stack, adj_list, visit_stack):
     """Depth First Search starting with node.
 
     Args:
         node: str. The service name from which dfs will begin.
+        topo_sort_stack: list(str). Stores topological sort of services
+            in reveresed way.
+        adj_list: dict. Adjacency list of the graph formed with services
+            as nodes and dependencies as edges.
+        visit_stack: list(str). Keeps track of visited and unvisited nodes.
     """
-    VISIT_STACK.append(node)
-    for pt in ADJ_LIST[node]:
-        if pt not in VISIT_STACK:
-            dfs(pt)
-    TOPO_SORT_STACK.append(node)
+    visit_stack.append(node)
+    for pt in adj_list[node]:
+        if pt not in visit_stack:
+            dfs(pt, topo_sort_stack, adj_list, visit_stack)
+    topo_sort_stack.append(node)
 
 
 def make_graph():
     """Creates an adjaceny list considering services as node and dependencies
     as edges.
+
+    Returns:
+        tuple(dict, set(str)). Adjancency list of the graph formed with
+        services as nodes and dependencies as edges, set of all the services.
     """
+    adj_list = collections.defaultdict(list)
+    nodes_set = set()
     for dirname in DIRECTORY_NAMES:
         for root, _, filenames in os.walk(dirname):
             for filename in filenames:
-                if filename.endswith((
-                        '.service.ts', 'Service.ts', 'Factory.ts')):
-                    NODES.add(filename)
+                if filename.endswith(SERVICE_FILES_SUFFICES):
+                    nodes_set.add(filename)
                     filepath = os.path.join(root, filename)
                     with python_utils.open_file(filepath, 'r') as f:
                         file_lines = f.readlines()
@@ -115,19 +122,30 @@ def make_graph():
                                         argument.right.value)
                                 if not dep_path.endswith('.ts'):
                                     dep_path = dep_path + '.ts'
-                                if dep_path.endswith((
-                                        '.service.ts', 'Service.ts',
-                                        'Factory.ts')):
+                                if dep_path.endswith(SERVICE_FILES_SUFFICES):
                                     dep_name = os.path.basename(dep_path)
-                                    ADJ_LIST[dep_name].append(filename)
+                                    adj_list[dep_name].append(filename)
+
+    return (adj_list, nodes_set)
 
 
-if __name__ == '__main__':
-    make_graph()
+def main():
+    """ Prints the topological order of the services based on the dependencies.
+    """
+    adj_list, nodes_set = make_graph()
+    visit_stack = []
+    topo_sort_stack = []
 
-    for unchecked_node in NODES:
-        if unchecked_node not in VISIT_STACK:
-            dfs(unchecked_node)
-    TOPO_SORT_STACK.reverse()
-    for service in TOPO_SORT_STACK:
+    for unchecked_node in nodes_set:
+        if unchecked_node not in visit_stack:
+            dfs(unchecked_node, topo_sort_stack, adj_list, visit_stack)
+
+    topo_sort_stack.reverse()
+    for service in topo_sort_stack:
         python_utils.PRINT(service)
+
+
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when build.py is used as a script.
+if __name__ == '__main__':  # pragma: no cover
+    main()
