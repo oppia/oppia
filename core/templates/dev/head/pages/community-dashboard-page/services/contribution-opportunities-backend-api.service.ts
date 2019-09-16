@@ -20,49 +20,18 @@
 angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
   '$http', 'UrlInterpolationService', 'OPPORTUNITY_TYPE_SKILL',
   'OPPORTUNITY_TYPE_TRANSLATION', 'OPPORTUNITY_TYPE_VOICEOVER', function(
-      $http, UrlInterpolationService, OPPORTUNITY_TYPE_SKILL,
-      OPPORTUNITY_TYPE_TRANSLATION, OPPORTUNITY_TYPE_VOICEOVER) {
+      $http, UrlInterpolationService) {
     var urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
     return {
-      fetchSkillOpportunities: function(cursor, successCallback) {
+      fetchOpportunities: function(opportunityType, params, successCallback) {
         return $http.get(
           UrlInterpolationService.interpolateUrl(
-            urlTemplate, {opportunityType: OPPORTUNITY_TYPE_SKILL}
+            urlTemplate, {opportunityType: opportunityType}
           ), {
-            params: {
-              cursor: cursor
-            }
+            params: params
           }).then(function(response) {
           successCallback(response.data);
         });
-      },
-      fetchTranslationOpportunities: function(
-          languageCode, cursor, successCallback) {
-        return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            urlTemplate, {opportunityType: OPPORTUNITY_TYPE_TRANSLATION}
-          ), {
-            params: {
-              language_code: languageCode,
-              cursor: cursor
-            }
-          }).then(function(response) {
-          successCallback(response.data);
-        });
-      },
-      fetchVoiceoverOpportunities: function(
-          languageCode, cursor, successCallback) {
-        return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            urlTemplate, {opportunityType: OPPORTUNITY_TYPE_VOICEOVER}
-          ), {
-            params: {
-              language_code: languageCode,
-              cursor: cursor
-            }
-          }).then(function(response) {
-          successCallback(response.data);
-        });
-      },
+      }
     };
   }]);
