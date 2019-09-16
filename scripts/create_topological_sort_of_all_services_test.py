@@ -60,7 +60,12 @@ class TopologicalSortTests(test_utils.GenericTestBase):
                 'DTest.service.ts', 'ETestFactory.ts', 'BTestService.ts',
                 'CTest.service.ts', 'ATestFactory.ts'])
 
-            self.assertEqual(adj_list, expected_adj_list)
+            self.assertEqual(adj_list.keys(), expected_adj_list.keys())
+
+            for key in adj_list:
+                self.assertEqual(
+                    sorted(adj_list[key]), sorted(expected_adj_list[key]))
+
             self.assertEqual(node_set, expected_node_set)
 
     def test_complete_process(self):
