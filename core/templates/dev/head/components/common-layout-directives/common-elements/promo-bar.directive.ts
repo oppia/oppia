@@ -22,8 +22,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/PromoBarService.ts');
 
 angular.module('oppia').directive('promoBar', [
-  '$window', 'PromoBarService', 'UrlInterpolationService',
-  function($window, PromoBarService, UrlInterpolationService) {
+  '$uibModal', '$window', 'PromoBarService', 'UrlInterpolationService',
+  function($uibModal, $window, PromoBarService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -36,17 +36,39 @@ angular.module('oppia').directive('promoBar', [
         function() {
           var ctrl = this;
           var isPromoDismissed = function() {
-            if (!$window.hasOwnProperty('sessionStorage')) {
-              return false;
+            try {
+              return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
+            } catch (exception) {
+              displayCookiesDisabledModal();
+              return true;
             }
-            return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
           };
+
+          var displayCookiesDisabledModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/common-layout-directives/common-elements/' +
+                'disabled-cookies-modal.template.html'),
+              backdrop: 'static',
+              resolve: {},
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.okay = function() {
+                    $uibModalInstance.close('okay');
+                  };
+                }]
+            }); 
+          };
+
           var setPromoDismissed = function(promoIsDismissed) {
-            if (!$window.hasOwnProperty('sessionStorage')) {
-              return;
+            try {
+              $window.sessionStorage.promoIsDismissed = angular.toJson(
+                promoIsDismissed);
+            } catch (exception) {
+              displayCookiesDisabledModal();
+              return true;
             }
-            $window.sessionStorage.promoIsDismissed = angular.toJson(
-              promoIsDismissed);
           };
 
           PromoBarService.getPromoBarData().then(function(promoBarObject) {
