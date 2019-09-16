@@ -130,7 +130,8 @@ def make_graph():
 
 
 def main():
-    """ Prints the topological order of the services based on the dependencies.
+    """Prints the topological order of the services based on the
+    dependencies.
     """
     adj_list, nodes_set = make_graph()
     visit_stack = []
