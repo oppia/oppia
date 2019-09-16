@@ -162,6 +162,7 @@
 /core/templates/dev/head/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/background-banner.directive.ts @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/background-banner.directive.html @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/disabled-cookies-modal.directive.html @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/lazy-loading.directive.html @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/lazy-loading.directive.ts @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
