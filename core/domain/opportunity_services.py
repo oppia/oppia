@@ -453,8 +453,7 @@ def get_skill_opportunities(cursor):
 
 
 def create_skill_opportunity(skill_id, skill_description):
-    """Creates a skill opportunity domain object as a SkillOpportunityModel
-    entity in the datastore.
+    """Creates a SkillOpportunityModel entity in the datastore.
 
     Args:
         skill_id: str. The skill_id of the opportunity.
@@ -489,6 +488,7 @@ def _save_skill_opportunities(skill_opportunities):
     """
     skill_opportunity_models = []
     for skill_opportunity in skill_opportunities:
+        skill_opportunity.validate()
         model = opportunity_models.SkillOpportunityModel(
             id=skill_opportunity.id,
             skill_description=skill_opportunity.skill_description,
@@ -557,7 +557,7 @@ def update_skill_opportunity_question_counts(skill_ids, delta):
     _save_skill_opportunities(updated_skill_opportunities)
 
 
-def update_question_skill_ids_question_count(old_skill_ids, new_skill_ids):
+def update_question_count_by_skill_ids(old_skill_ids, new_skill_ids):
     """Updates question_count(s) of SkillOpportunityModel(s) by the set
     difference of new_skill_ids - old_skill_ids.
 

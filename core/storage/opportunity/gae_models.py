@@ -149,8 +149,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 class SkillOpportunityModel(base_models.BaseModel):
     """Model for opportunities to add questions to skills.
 
-    A new instance of this model is created and saved every time a commit to
-    SkillModel occurs.
+    A new instance of this model is created each time a SkillModel is created.
+    When a SkillModel's skill description changes, the corresponding instance
+    of this model is also updated.
     """
     # The description of the opportunity's skill.
     skill_description = ndb.StringProperty(required=True, indexed=True)

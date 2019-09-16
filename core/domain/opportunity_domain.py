@@ -258,9 +258,6 @@ class SkillOpportunity(python_utils.OBJECT):
         """Returns a copy of the object as a dictionary. It includes all
         necessary information to represent an opportunity.
 
-        NOTE: The returned dict has only those data which are required to
-        represent the opportunity to a contributor.
-
         Returns:
             dict. A dict mapping the fields of SkillOpportunity
             instance which are required to represent the opportunity to a
