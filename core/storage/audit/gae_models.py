@@ -63,4 +63,3 @@ class RoleQueryAuditModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.get_all().filter(cls.user_id == user_id).get() is not None
-
