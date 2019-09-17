@@ -60,7 +60,8 @@ class TopologicalSortTests(test_utils.GenericTestBase):
                 'DTest.service.ts', 'ETestFactory.ts', 'BTestService.ts',
                 'CTest.service.ts', 'ATestFactory.ts'])
 
-            self.assertEqual(adj_list.keys(), expected_adj_list.keys()) # pylint: disable=dict-keys-not-iterating
+            self.assertEqual(
+                sorted(adj_list.keys()), sorted(expected_adj_list.keys())) # pylint: disable=dict-keys-not-iterating
 
             for key in adj_list:
                 self.assertEqual(
