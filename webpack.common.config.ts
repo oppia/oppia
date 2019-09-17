@@ -653,10 +653,9 @@ module.exports = {
     }]
   },
   optimization: {
+    runtimeChunk: 'single',
     splitChunks: {
-      chunks: 'all',
-      minSize: 1024 * 10,
-      maxInitialRequests: 9,
-    }
+      chunks: 'all'
+    },
   }
 };
