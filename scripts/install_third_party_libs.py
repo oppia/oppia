@@ -245,19 +245,35 @@ def main(args=None):
     # Do a little surgery on configparser in pylint-1.9.4 to remove dependency
     # on ConverterMapping, which is not implemented in some Python
     # distributions.
-    configparser_filepath = os.path.join(
+    pylint_configparser_filepath = os.path.join(
         common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
-    newlines = []
-    with python_utils.open_file(configparser_filepath, 'r') as f:
+    pylint_newlines = []
+    with python_utils.open_file(pylint_configparser_filepath, 'r') as f:
         for line in f.readlines():
             if line.strip() == 'ConverterMapping,':
                 continue
             if line.strip().endswith('"ConverterMapping",'):
-                newlines.append(line[:line.find('"ConverterMapping"')] + '\n')
+                pylint_newlines.append(
+                    line[:line.find('"ConverterMapping"')] + '\n')
             else:
-                newlines.append(line)
-    with python_utils.open_file(configparser_filepath, 'w+') as f:
-        f.writelines(newlines)
+                pylint_newlines.append(line)
+    with python_utils.open_file(pylint_configparser_filepath, 'w+') as f:
+        f.writelines(pylint_newlines)
+
+    # Do similar surgery on configparser in pylint-quotes-0.1.8 to remove
+    # dependency on ConverterMapping.
+    pq_configparser_filepath = os.path.join(
+        common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
+    pq_newlines = []
+    with python_utils.open_file(pq_configparser_filepath, 'r') as f:
+        for line in f.readlines():
+            if line.strip() == 'ConverterMapping,':
+                continue
+            if line.strip == '"ConverterMapping",':
+                continue
+            pq_newlines.append(line)
+    with python_utils.open_file(pq_configparser_filepath, 'w+') as f:
+        f.writelines(pq_newlines)
 
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
