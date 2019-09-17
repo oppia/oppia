@@ -242,6 +242,23 @@ def main(args=None):
     for package, version, path in pip_dependencies:
         ensure_pip_library_is_installed(package, version, path)
 
+    # Do a little surgery on configparser in pylint-1.9.4 to remove dependency
+    # on ConverterMapping, which is not implemented in some Python
+    # distributions.
+    configparser_filepath = os.path.join(
+        common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
+    newlines = []
+    with python_utils.open_file(configparser_filepath, 'r') as f:
+        for line in f.readlines():
+            if line.strip() == 'ConverterMapping,':
+                continue
+            if line.strip().endswith('"ConverterMapping",'):
+                newlines.append(line[:line.find('"ConverterMapping"')] + '\n')
+            else:
+                newlines.append(line)
+    with python_utils.open_file(configparser_filepath, 'w+') as f:
+        f.writelines(newlines)
+
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
