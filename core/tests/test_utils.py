@@ -109,11 +109,17 @@ def get_filepath_from_filename(filename, rootdir):
     # So, we need to swap the name here to obtain the correct filepath.
     if filename.startswith('error-page'):
         filename = 'error-page.mainpage.html'
-    for root, _, files in os.walk(rootdir):
-        for name in files:
+
+    filepath = None
+    for root, _, filenames in os.walk(rootdir):
+        for name in filenames:
             if name == filename:
-                return os.path.join(root, filename)
-    return None
+                if filepath is None:
+                    filepath = os.path.join(root, filename)
+                else:
+                    raise Exception(
+                        'Multiple files found with name: %s' % filename)
+    return filepath
 
 
 def mock_get_template(unused_self, filename):
