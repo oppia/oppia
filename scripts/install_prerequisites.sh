@@ -34,4 +34,9 @@ sudo apt-get install python-dev
 sudo apt-get install python-pip
 sudo apt-get install unzip
 sudo apt-get install python-yaml
+# This is only done to address an
+#     "ImportError: No module named functools_lru_cache"
+# error. See the Troubleshooting page for details:
+#    https://github.com/oppia/oppia/wiki/Troubleshooting
+sudo apt-get install python-matplotlib
 sudo pip install --upgrade pip
