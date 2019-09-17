@@ -59,7 +59,7 @@ angular.module('oppia').directive('promoBar', [
             } catch (e) {
               return false;
             }
-          }
+          };
 
           PromoBarService.getPromoBarData().then(function(promoBarObject) {
             ctrl.promoBarIsEnabled = promoBarObject.promoBarEnabled;
