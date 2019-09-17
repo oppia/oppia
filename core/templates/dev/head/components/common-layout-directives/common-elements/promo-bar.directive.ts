@@ -22,8 +22,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/PromoBarService.ts');
 
 angular.module('oppia').directive('promoBar', [
-  '$uibModal', '$window', 'PromoBarService', 'UrlInterpolationService',
-  function($uibModal, $window, PromoBarService, UrlInterpolationService) {
+  '$window', 'PromoBarService', 'UrlInterpolationService',
+  function($window, PromoBarService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -36,41 +36,30 @@ angular.module('oppia').directive('promoBar', [
         function() {
           var ctrl = this;
           var isPromoDismissed = function() {
-            try {
-              return (
-                !!angular.fromJson($window.sessionStorage.promoIsDismissed));
-            } catch (exception) {
-              displayCookiesDisabledModal();
-              return true;
+            if (!isSessionStorageAvailable()) {
+              return false;
             }
+            return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
           };
-
-          var displayCookiesDisabledModal = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/common-layout-directives/common-elements/' +
-                'disabled-cookies-modal.directive.html'),
-              backdrop: 'static',
-              resolve: {},
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.okay = function() {
-                    $uibModalInstance.close('okay');
-                  };
-                }]
-            });
-          };
-
           var setPromoDismissed = function(promoIsDismissed) {
-            try {
-              $window.sessionStorage.promoIsDismissed = angular.toJson(
-                promoIsDismissed);
-            } catch (exception) {
-              displayCookiesDisabledModal();
-              return true;
+            if (!isSessionStorageAvailable()) {
+              return false;
             }
+            $window.sessionStorage.promoIsDismissed = angular.toJson(
+              promoIsDismissed);
           };
+
+          var isSessionStorageAvailable = function() {
+            // This is to ensure sessionStorage is accessible.
+            var testKey = 'Oppia';
+            try {
+              $window.sessionStorage.setItem(testKey, testKey);
+              $window.sessionStorage.removeItem(testKey);
+              return true;
+            } catch (e) {
+              return false;
+            }
+          }
 
           PromoBarService.getPromoBarData().then(function(promoBarObject) {
             ctrl.promoBarIsEnabled = promoBarObject.promoBarEnabled;
