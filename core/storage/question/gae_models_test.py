@@ -35,7 +35,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             question_models.QuestionModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_create_question_empty_skill_id_list(self):
         state = state_domain.State.create_default_state('ABC')
@@ -125,7 +125,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             question_models.QuestionSkillLinkModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.KEEP)
 
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
@@ -477,7 +477,7 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             question_models.QuestionSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_get_by_creator_id(self):
         question_summary_model_1 = question_models.QuestionSummaryModel(
@@ -510,4 +510,4 @@ class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             question_models.QuestionRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
