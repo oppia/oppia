@@ -81,7 +81,12 @@ class TopologicalSortTests(test_utils.GenericTestBase):
         with print_swap, dir_names_swap:
             create_topological_sort_of_all_services.main()
 
-        expected_output = [
+        expected_output_1 = [
             'DTest.service.ts', 'BTestService.ts', 'ATestFactory.ts',
             'CTest.service.ts', 'ETestFactory.ts']
-        self.assertEqual(actual_output, expected_output)
+        expected_output_2 = [
+            'DTest.service.ts', 'ATestFactory.ts', 'BTestService.ts',
+            'CTest.service.ts', 'ETestFactory.ts']
+        self.assertTrue((
+            actual_output == expected_output_1) or (
+                actual_output == expected_output_2))
