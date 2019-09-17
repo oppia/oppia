@@ -98,7 +98,7 @@ def pip_install(package, version, install_path):
                 'Windows%29')
         raise Exception
 
-    subprocess.call([
+    subprocess.check_call([
         'pip', 'install', '%s==%s' % (package, version), '--target',
         install_path])
 
@@ -229,7 +229,7 @@ def main(args=None):
     pip_dependencies = [
         ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
         ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', '0.2.1', common.OPPIA_TOOLS_DIR),
+        ('pylint-quotes', '0.1.8', common.OPPIA_TOOLS_DIR),
         ('webtest', '2.0.33', common.OPPIA_TOOLS_DIR),
         ('isort', '4.3.20', common.OPPIA_TOOLS_DIR),
         ('pycodestyle', '2.5.0', common.OPPIA_TOOLS_DIR),
