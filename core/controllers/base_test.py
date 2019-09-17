@@ -57,7 +57,7 @@ class UniqueTemplateNamesTests(test_utils.GenericTestBase):
     core/templates/dev/head/pages have unique filenames. This is required
     for the backend tests to work correctly since they fetch templates
     from this directory based on name of the template. For details, refer
-    get_filepath_from_filename function in test_utils.py
+    get_filepath_from_filename function in test_utils.py.
     """
 
     def test_template_filenames_are_unique(self):
