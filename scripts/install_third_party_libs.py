@@ -269,7 +269,7 @@ def main(args=None):
         for line in f.readlines():
             if line.strip() == 'ConverterMapping,':
                 continue
-            if line.strip == '"ConverterMapping",':
+            if line.strip() == '"ConverterMapping",':
                 continue
             pq_newlines.append(line)
     with python_utils.open_file(pq_configparser_filepath, 'w+') as f:
