@@ -51,6 +51,7 @@ import python_utils
 
 from . import common
 from . import gcloud_adapter
+from . import install_third_party_libs
 # pylint: enable=wrong-import-order
 
 _PARSER = argparse.ArgumentParser()
@@ -108,8 +109,8 @@ def preprocess_release():
     does the following:
 
     (1) Substitutes files from the per-app deployment data.
-    (2) Change the DEV_MODE constant in assets/constants.js.
-    (3) Change GCS_RESOURCE_BUCKET in assets/constants.js.
+    (2) Change the DEV_MODE constant in assets/constants.ts.
+    (3) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
     (4) Removes the "version" field from app.yaml, since gcloud does not like
         it (when deploying).
     """
@@ -147,43 +148,21 @@ def preprocess_release():
             dst = os.path.join(dst_dir, filename)
             shutil.copyfile(src, dst)
 
-    # Changes the DEV_MODE constant in assets/constants.js.
+    # Changes the DEV_MODE constant in assets/constants.ts.
     with python_utils.open_file(
-        os.path.join('assets', 'constants.js'), 'r') as assets_file:
+        os.path.join('assets', 'constants.ts'), 'r') as assets_file:
         content = assets_file.read()
     bucket_name = APP_NAME + BUCKET_NAME_SUFFIX
     assert '"DEV_MODE": true' in content
     assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
-    os.remove(os.path.join('assets', 'constants.js'))
+    os.remove(os.path.join('assets', 'constants.ts'))
     content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
     content = content.replace(
         '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
     with python_utils.open_file(
-        os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
+        os.path.join('assets', 'constants.ts'), 'w+') as new_assets_file:
         new_assets_file.write(content)
-
-
-def install_required_dev_dependencies():
-    """Runs start.py to ensure that dev dependencies are up-to-date
-    and installs required dependencies.
-    """
-
-    cmd = ['python', '-m', 'scripts.start']
-    if os.path.exists('dev_output.txt'):
-        os.remove('dev_output.txt')
-
-    with python_utils.open_file('dev_output.txt', 'w') as out:
-        process = subprocess.Popen(cmd, stdout=out)
-
-        while True:
-            with python_utils.open_file('dev_output.txt', 'r') as f:
-                lines = f.readlines()
-                for line in lines:
-                    if 'Oppia setup complete!' in line:
-                        process.kill()
-                        os.remove('dev_output.txt')
-                        return
 
 
 def check_errors_in_a_page(url_to_check, msg_to_confirm):
@@ -214,7 +193,7 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
 def _execute_deployment():
     """Executes the deployment process after doing the prerequisite checks."""
 
-    install_required_dev_dependencies()
+    install_third_party_libs.main(args=[])
 
     if not common.is_current_branch_a_release_branch():
         raise Exception(
@@ -230,8 +209,8 @@ def _execute_deployment():
         'https://console.cloud.google.com/datastore/indexes'
         '?project=%s') % APP_NAME
     release_version_library_url = (
-        'https://%s-dot-%s.appspot.com/library' %
-        current_release_version, APP_NAME)
+        'https://%s-dot-%s.appspot.com/library' % (
+            current_release_version, APP_NAME))
     memcache_url = (
         'https://pantheon.corp.google.com/appengine/memcache?'
         'project=%s') % APP_NAME
