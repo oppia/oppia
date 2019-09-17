@@ -116,6 +116,16 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 url = route.template
             url = re.sub('<([^/^:]+)>', 'abc123', url)
 
+            # This url is ignored since it is only needed for a protractor test.
+            # The backend tests fetch templates from
+            # core/templates/dev/head/pages instead of webpack_bundles since we
+            # skip webpack compilation for backend tests.
+            # The console_errors.html template is present in
+            # core/templates/dev/head/tests and we want one canonical
+            # directory for retrieving templates so we ignore this url.
+            if url == 'console_errors.html':
+                continue
+
             # Some of these will 404 or 302. This is expected.
             self.get_response_without_checking_for_errors(
                 url, [200, 302, 400, 401, 404])
