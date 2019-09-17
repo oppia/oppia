@@ -58,6 +58,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
+        self.save_new_skill(
+            'skill_1', self.admin_id, 'Skill Description 1')
+        self.save_new_skill(
+            'skill_2', self.admin_id, 'Skill Description 2')
+        self.save_new_skill(
+            'skill_3', self.admin_id, 'Skill Description 3')
+
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
@@ -72,13 +79,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question_2 = self.save_new_question(
             self.question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_2'])
-
-        self.save_new_skill(
-            'skill_1', self.admin_id, 'Skill Description 1')
-        self.save_new_skill(
-            'skill_2', self.admin_id, 'Skill Description 2')
-        self.save_new_skill(
-            'skill_3', self.admin_id, 'Skill Description 3')
 
     def test_get_question_by_id(self):
         question = question_services.get_question_by_id(self.question_id)
