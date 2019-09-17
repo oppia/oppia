@@ -283,7 +283,7 @@ def _execute_deployment():
         # Do a build, while outputting to the terminal.
         python_utils.PRINT('Building and minifying scripts...')
         build_process = subprocess.Popen(
-            ['python', 'scripts/build.py', '--prod_env'],
+            ['python', '-m', 'scripts.build', '--prod_env'],
             stdout=subprocess.PIPE)
         while True:
             line = build_process.stdout.readline().strip()
