@@ -162,7 +162,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegexp(
             Exception,
-            'The given content_html does not matches the content of the '
+            'The given content_html does not match the content of the '
             'exploration.'):
             suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
