@@ -1422,11 +1422,15 @@ class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
         user_id = 'user'
         email = 'user@domain.com'
         user_models.UserSettingsModel(
-            id=user_id, email=email, gae_user_id=None).put()
+            id=user_id, email=email, gae_user_id=None
+        ).put()
 
         output = self._run_one_off_job()
 
-        self.assertEqual(output, [(u'SUCCESS', 1)])
+        # The reason why SUCCESS is returned twice and not once is that one
+        # additional UserSettingsModel is created by the TestBase and the
+        # migration is also performed on that user.
+        self.assertEqual(output, [(u'SUCCESS', 2)])
 
         self._check_model_validity(user_id, email)
 
@@ -1442,7 +1446,10 @@ class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
 
-        self.assertEqual(output, [(u'SUCCESS', 2)])
+        # The reason why SUCCESS is returned thrice and not twice is that one
+        # additional UserSettingsModel is created by the TestBase and the
+        # migration is also performed on that user.
+        self.assertEqual(output, [(u'SUCCESS', 3)])
 
         self._check_model_validity(user_1_id, user_1_email)
         self._check_model_validity(user_2_id, user_2_email)
