@@ -47,13 +47,8 @@
 function cleanup {
   # Send a kill signal to the dev server and Selenium server. The awk command
   # gets just the process ID from the grepped line.
-  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
-  kill `ps aux | grep node_modules/webdriver-manager/selenium | awk '{print $2}'`
-
-  # Wait for the servers to go down; suppress "connection refused" error output
-  # from nc since that is exactly what we are expecting to happen.
-  while ( nc -vz localhost 4444 >/dev/null 2>&1 ); do sleep 1; done
-  while ( nc -vz localhost 9001 >/dev/null 2>&1 ); do sleep 1; done
+  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'` || true
+  kill `ps aux | grep node_modules/webdriver-manager/selenium | awk '{print $2}'` || true
 
   if [ -d "../protractor-screenshots" ]; then
     echo ""
