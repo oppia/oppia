@@ -111,7 +111,6 @@ angular.module('oppia').factory('TranslateTextService', [
           }
         };
         $http.post(url, data).then(successCallback);
-      },
-
+      }
     };
   }]);
