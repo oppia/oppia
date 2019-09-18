@@ -79,7 +79,7 @@ def create_suggestion(
                 change['state_name'], change['content_id']))
         if content_html != change['content_html']:
             raise Exception(
-                'The given content_html does not matches the content of the '
+                'The given content_html does not match the content of the '
                 'exploration.')
     elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
