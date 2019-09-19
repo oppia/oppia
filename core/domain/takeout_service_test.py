@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.takeout_service."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import json
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -26,19 +26,25 @@ from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
+import json
 
 (user_models, collection_models, exploration_models, story_models,
  feedback_models, suggestion_models,
  email_models) = models.Registry.import_models([
-    models.NAMES.user, models.NAMES.collection, models.NAMES.exploration,
-    models.NAMES.story, models.NAMES.feedback, models.NAMES.suggestion,
-    models.NAMES.email])
+     models.NAMES.user, models.NAMES.collection, models.NAMES.exploration,
+     models.NAMES.story, models.NAMES.feedback, models.NAMES.suggestion,
+     models.NAMES.email])
 
 
 class TakeoutServiceTests(test_utils.GenericTestBase):
     """Tests for the takeout service."""
 
     USER_ID_1 = 'user_1'
+    THREAD_ID_1 = 'thread_id_1'
+    THREAD_ID_2 = 'thread_id_2'
+    USER_1_REPLY_TO_ID_1 = 'user_1_reply_to_id_thread_1'
+    USER_1_REPLY_TO_ID_2 = 'user_1_reply_to_id_thread_2'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
     USER_1_EMAIL = 'user1@example.com'
     GENERIC_USERNAME = 'user'
@@ -131,7 +137,8 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
             self.EXPLORATION_IDS[0], self.USER_ID_1, end_state_name='End')
 
         exp_services.update_exploration(
-            self.USER_ID_1, self.EXPLORATION_IDS[0], [exp_domain.ExplorationChange({
+            self.USER_ID_1, self.EXPLORATION_IDS[0],
+            [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
@@ -139,7 +146,8 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
 
         # Setup for ExplorationUserDataModel.
         user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.USER_ID_1, self.EXPLORATION_IDS[0]), user_id=self.USER_ID_1,
+            id='%s.%s' % (self.USER_ID_1, self.EXPLORATION_IDS[0]), 
+            user_id=self.USER_ID_1,
             exploration_id=self.EXPLORATION_IDS[0], rating=2,
             rated_on=self.GENERIC_DATE,
             draft_change_list={'new_content': {}},
@@ -224,7 +232,7 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
         ).save(
             'cid', 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        
+
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
@@ -247,6 +255,23 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
             preferred_site_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
             preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0])
         ).put()
+
+        # Setup for GeneralFeedbackReplyToId.
+        user_two_fake_hash_lambda_one = (
+            lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_1)
+        user_two_fake_hash_one = self.swap(
+            utils, 'convert_to_hash', user_two_fake_hash_lambda_one)
+        with user_two_fake_hash_one:
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.USER_ID_1, self.THREAD_ID_1).put()
+
+        user_two_fake_hash_lambda_two = (
+            lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_2)
+        user_two_fake_hash_two = self.swap(
+            utils, 'convert_to_hash', user_two_fake_hash_lambda_two)
+        with user_two_fake_hash_two:
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.USER_ID_1, self.THREAD_ID_2).put()
 
     def test_export_data_nontrivial(self):
         stats_data = {
@@ -348,7 +373,9 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
                 'has_suggestion': False,
                 'summary': None,
                 'message_count': 2,
-                'last_updated': feedback_models.GeneralFeedbackThreadModel.get(thread_id).last_updated
+                'last_updated': (feedback_models.
+                                 GeneralFeedbackThreadModel.
+                                 get(thread_id).last_updated)
             }
         }
         general_feedback_message_data = {
@@ -380,7 +407,8 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
         }
         general_suggestion_data = {
             'exploration.exp1.thread_1': {
-                'suggestion_type': suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                'suggestion_type': (suggestion_models.
+                                    SUGGESTION_TYPE_EDIT_STATE_CONTENT),
                 'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
@@ -418,6 +446,11 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0]
         }
 
+        expected_reply_to_id_data = {
+            self.THREAD_ID_1: self.USER_1_REPLY_TO_ID_1,
+            self.THREAD_ID_2: self.USER_1_REPLY_TO_ID_2
+        }
+
         thread_and_message_ids = self.GENERAL_FEEDBACK_THREAD_IDS
         thread_and_message_ids.append(thread_id)
 
@@ -450,8 +483,9 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
             'collection_rights_data': collection_rights_data,
             'general_suggestion_data': general_suggestion_data,
             'exploration_rights_data': exploration_rights_data,
+            'general_feedback_email_reply_data': expected_reply_to_id_data
         }
 
         exported_data = takeout_service.export_all_models(self.USER_ID_1)
-        
+
         self.assertEqual(exported_data, expected_export)

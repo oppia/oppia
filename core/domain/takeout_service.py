@@ -77,4 +77,5 @@ def export_all_models(user_id):
         'collection_rights_data': collection_rights_data,
         'general_suggestion_data': general_suggestion_data,
         'exploration_rights_data': exploration_rights_data,
+        'general_feedback_email_reply_data': general_feedback_email_reply_data
     }
