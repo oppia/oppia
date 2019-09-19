@@ -26,29 +26,16 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
-
-
-class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
-    """Test the AnswerSubmittedEventLogEntryModel class."""
-
-    def test_create_and_get_event_models(self):
-        event_id = (
-            stats_models.AnswerSubmittedEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True))
-
-        event_model = stats_models.AnswerSubmittedEventLogEntryModel.get(
-            event_id)
-
-        self.assertEqual(event_model.exp_id, 'exp_id1')
-        self.assertEqual(event_model.exp_version, 1)
-        self.assertEqual(event_model.state_name, 'state_name1')
-        self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
-        self.assertEqual(event_model.is_feedback_useful, True)
+(base_models, stats_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.statistics])
 
 
 class StateCounterModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StateCounterModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_state_counter_model_gets_created(self):
         # This tests whether get_or_create() can create the model.
@@ -76,144 +63,40 @@ class StateCounterModelTests(test_utils.GenericTestBase):
         self.assertEqual(model_instance.active_answer_count, 0)
 
 
-class ExplorationAnnotationsModelTests(test_utils.GenericTestBase):
+class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Test the AnswerSubmittedEventLogEntryModel class."""
 
-    def test_create_and_get_models(self):
-        stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', '1', 5, 4, {})
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.AnswerSubmittedEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-        model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stats_models.AnswerSubmittedEventLogEntryModel.create(
+                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True))
 
-        self.assertEqual(model1.exploration_id, 'exp_id1')
-        self.assertEqual(model1.version, '1')
-        self.assertEqual(model1.num_starts, 5)
-        self.assertEqual(model1.num_completions, 4)
-        self.assertEqual(model1.state_hit_counts, {})
+        event_model = stats_models.AnswerSubmittedEventLogEntryModel.get(
+            event_id)
 
-    def test_get_versions(self):
-        stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', '1', 5, 4, {})
-        stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', '2', 5, 4, {})
-
-        versions = stats_models.ExplorationAnnotationsModel.get_versions(
-            'exp_id1')
-
-        self.assertEqual(sorted(versions), ['1', '2'])
-
-    def test_get_version_for_invalid_exploration_id(self):
-        versions = stats_models.ExplorationAnnotationsModel.get_versions(
-            'invalid_exp_id')
-
-        self.assertEqual(versions, [])
-
-
-class StateAnswersModelTests(test_utils.GenericTestBase):
-
-    def test_shard_count_is_updated_when_data_overflows(self):
-
-        submitted_answer_list = [{'answer': 'value'}]
-
-        stats_models.StateAnswersModel.insert_submitted_answers(
-            'exp_id', 1, 'state_name', 'interaction_id',
-            submitted_answer_list)
-
-        model1 = stats_models.StateAnswersModel.get_master_model(
-            'exp_id', 1, 'state_name')
-
-        # Ensure we got the correct model.
-        self.assertEqual(model1.exploration_id, 'exp_id')
-        self.assertEqual(model1.exploration_version, 1)
-        self.assertEqual(model1.state_name, 'state_name')
-        self.assertEqual(model1.submitted_answer_list, submitted_answer_list)
-        self.assertEqual(model1.shard_count, 0)
-
-        # Use a smaller max answer list size so fewer answers are needed to
-        # exceed a shard. This will increase the 'shard_count'.
-        with self.swap(
-            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
-            stats_models.StateAnswersModel.insert_submitted_answers(
-                'exp_id', 1, 'state_name', 'interaction_id',
-                submitted_answer_list)
-
-            model1 = stats_models.StateAnswersModel.get_master_model(
-                'exp_id', 1, 'state_name')
-
-            self.assertEqual(model1.shard_count, 1)
-
-            stats_models.StateAnswersModel.insert_submitted_answers(
-                'exp_id', 1, 'state_name', 'interaction_id',
-                submitted_answer_list)
-
-            model1 = stats_models.StateAnswersModel.get_master_model(
-                'exp_id', 1, 'state_name')
-
-            self.assertEqual(model1.shard_count, 2)
-
-        # 'shard_count' will not increase as number of answers are less than
-        # the max answer list size.
-        stats_models.StateAnswersModel.insert_submitted_answers(
-            'exp_id', 1, 'state_name', 'interaction_id',
-            submitted_answer_list)
-
-        model1 = stats_models.StateAnswersModel.get_master_model(
-            'exp_id', 1, 'state_name')
-
-        self.assertEqual(model1.shard_count, 2)
-
-
-class StateAnswersCalcOutputModelTests(test_utils.GenericTestBase):
-
-    def test_get_model_returns_created_properties(self):
-
-        stats_models.StateAnswersCalcOutputModel.create_or_update(
-            'exp_id', '1', 'state_name', '', 'calculation_id', '', {})
-
-        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
-            'exp_id', '1', 'state_name', 'calculation_id')
-
-        self.assertEqual(model1.exploration_id, 'exp_id')
-        self.assertEqual(model1.exploration_version, '1')
-        self.assertEqual(model1.state_name, 'state_name')
-        self.assertEqual(model1.calculation_id, 'calculation_id')
-
-        # Model with 'invalid_exp_id' does not exist.
-        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
-            'invalid_exp_id', '1', 'state_name', 'calculation_id')
-
-        self.assertIsNone(model1)
-
-    def test_raise_exception_with_large_calculation_output(self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.exception."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
-
-        large_calculation_output = {'key': 'a' * 1200000}
-
-        with logging_swap:
-            stats_models.StateAnswersCalcOutputModel.create_or_update(
-                'exp_id', '1', 'state_name', '', 'calculation_id', '',
-                large_calculation_output)
-
-            self.assertEqual(len(observed_log_messages), 1)
-            self.assertEqual(
-                observed_log_messages[0],
-                (
-                    'Failed to add calculation output for exploration ID '
-                    'exp_id, version 1, state name state_name, and '
-                    'calculation ID calculation_id'
-                )
-            )
+        self.assertEqual(event_model.exp_id, 'exp_id1')
+        self.assertEqual(event_model.exp_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+        self.assertEqual(event_model.is_feedback_useful, True)
 
 
 class ExplorationActualStartEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the ExplorationActualStartEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.ExplorationActualStartEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -232,6 +115,11 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
 class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the SolutionHitEventLogEntryModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.SolutionHitEventLogEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_create_and_get_event_models(self):
         event_id = (
             stats_models.SolutionHitEventLogEntryModel.create(
@@ -247,8 +135,89 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
 
 
+class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Test the StartExplorationEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StartExplorationEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stats_models.StartExplorationEventLogEntryModel.create(
+                'exp_id1', 1, 'state_name1', 'session_id1', {},
+                feconf.PLAY_TYPE_NORMAL))
+
+        event_model = stats_models.StartExplorationEventLogEntryModel.get(
+            event_id)
+
+        self.assertEqual(event_model.exploration_id, 'exp_id1')
+        self.assertEqual(event_model.exploration_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.params, {})
+        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+
+class MaybeLeaveExplorationEventLogEntryModelUnitTests(
+        test_utils.GenericTestBase):
+    """Test the MaybeLeaveExplorationEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
+class CompleteExplorationEventLogEntryModelUnitTests(
+        test_utils.GenericTestBase):
+    """Test the CompleteExplorationEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.CompleteExplorationEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stats_models.CompleteExplorationEventLogEntryModel.create(
+                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, {},
+                feconf.PLAY_TYPE_NORMAL))
+
+        event_model = stats_models.CompleteExplorationEventLogEntryModel.get(
+            event_id)
+
+        self.assertEqual(event_model.exploration_id, 'exp_id1')
+        self.assertEqual(event_model.exploration_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
+        self.assertEqual(event_model.params, {})
+        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+
+class RateExplorationEventLogEntryModelUnitTests(
+        test_utils.GenericTestBase):
+    """Test the RateExplorationEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.RateExplorationEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateHitEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StateHitEventLogEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -269,6 +238,11 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateCompleteEventLogEntryModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StateCompleteEventLogEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_create_and_get_event_models(self):
         event_id = (
             stats_models.StateCompleteEventLogEntryModel.create(
@@ -287,6 +261,12 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the LeaveForRefresherExplorationEventLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.LeaveForRefresherExplorationEventLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -308,50 +288,13 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
             feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
 
-class CompleteExplorationEventLogEntryModelUnitTests(
-        test_utils.GenericTestBase):
-    """Test the CompleteExplorationEventLogEntryModel class."""
-
-    def test_create_and_get_event_models(self):
-        event_id = (
-            stats_models.CompleteExplorationEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, {},
-                feconf.PLAY_TYPE_NORMAL))
-
-        event_model = stats_models.CompleteExplorationEventLogEntryModel.get(
-            event_id)
-
-        self.assertEqual(event_model.exploration_id, 'exp_id1')
-        self.assertEqual(event_model.exploration_version, 1)
-        self.assertEqual(event_model.state_name, 'state_name1')
-        self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
-        self.assertEqual(event_model.params, {})
-        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
-
-
-class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
-    """Test the StartExplorationEventLogEntryModel class."""
-
-    def test_create_and_get_event_models(self):
-        event_id = (
-            stats_models.StartExplorationEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', {},
-                feconf.PLAY_TYPE_NORMAL))
-
-        event_model = stats_models.StartExplorationEventLogEntryModel.get(
-            event_id)
-
-        self.assertEqual(event_model.exploration_id, 'exp_id1')
-        self.assertEqual(event_model.exploration_version, 1)
-        self.assertEqual(event_model.state_name, 'state_name1')
-        self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.params, {})
-        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
-
-
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationStatsModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.ExplorationStatsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_analytics_model(self):
         model_id = (
@@ -400,6 +343,11 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
 class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationIssuesModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.ExplorationIssuesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_create_and_get_exp_issues_model(self):
         model_id = (
             stats_models.ExplorationIssuesModel.create(
@@ -415,6 +363,11 @@ class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
 
 class PlaythroughModelUnitTests(test_utils.GenericTestBase):
     """Test the PlaythroughModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.PlaythroughModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_get_playthrough_model(self):
         model_id = (
@@ -462,6 +415,11 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
     """Tests the LearnerAnswerDetailsModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.LearnerAnswerDetailsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_get_state_reference_for_exploration(self):
         exp_id_1 = 'expid1'
         state_name_1 = 'intro'
@@ -491,7 +449,6 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_5, state_name_5)) #pylint: disable=line-too-long
         self.assertEqual(
             state_reference_5, '1234:%s' % (state_name_5))
-
 
     def test_get_state_reference_for_question(self):
         question_id_1 = 'first question'
@@ -582,3 +539,156 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual(model_instance, None)
         self.assertEqual(
             model_instance.state_reference, '123:%s' % (state_name))
+
+
+class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the ExplorationAnnotationsModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.ExplorationAnnotationsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_create_and_get_models(self):
+        stats_models.ExplorationAnnotationsModel.create(
+            'exp_id1', '1', 5, 4, {})
+
+        model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
+
+        self.assertEqual(model1.exploration_id, 'exp_id1')
+        self.assertEqual(model1.version, '1')
+        self.assertEqual(model1.num_starts, 5)
+        self.assertEqual(model1.num_completions, 4)
+        self.assertEqual(model1.state_hit_counts, {})
+
+    def test_get_versions(self):
+        stats_models.ExplorationAnnotationsModel.create(
+            'exp_id1', '1', 5, 4, {})
+        stats_models.ExplorationAnnotationsModel.create(
+            'exp_id1', '2', 5, 4, {})
+
+        versions = stats_models.ExplorationAnnotationsModel.get_versions(
+            'exp_id1')
+
+        self.assertEqual(sorted(versions), ['1', '2'])
+
+    def test_get_version_for_invalid_exploration_id(self):
+        versions = stats_models.ExplorationAnnotationsModel.get_versions(
+            'invalid_exp_id')
+
+        self.assertEqual(versions, [])
+
+
+class StateAnswersModelUnitTests(test_utils.GenericTestBase):
+    """Tests the StateAnswersModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StateAnswersModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_shard_count_is_updated_when_data_overflows(self):
+
+        submitted_answer_list = [{'answer': 'value'}]
+
+        stats_models.StateAnswersModel.insert_submitted_answers(
+            'exp_id', 1, 'state_name', 'interaction_id',
+            submitted_answer_list)
+
+        model1 = stats_models.StateAnswersModel.get_master_model(
+            'exp_id', 1, 'state_name')
+
+        # Ensure we got the correct model.
+        self.assertEqual(model1.exploration_id, 'exp_id')
+        self.assertEqual(model1.exploration_version, 1)
+        self.assertEqual(model1.state_name, 'state_name')
+        self.assertEqual(model1.submitted_answer_list, submitted_answer_list)
+        self.assertEqual(model1.shard_count, 0)
+
+        # Use a smaller max answer list size so fewer answers are needed to
+        # exceed a shard. This will increase the 'shard_count'.
+        with self.swap(
+            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
+            stats_models.StateAnswersModel.insert_submitted_answers(
+                'exp_id', 1, 'state_name', 'interaction_id',
+                submitted_answer_list)
+
+            model1 = stats_models.StateAnswersModel.get_master_model(
+                'exp_id', 1, 'state_name')
+
+            self.assertEqual(model1.shard_count, 1)
+
+            stats_models.StateAnswersModel.insert_submitted_answers(
+                'exp_id', 1, 'state_name', 'interaction_id',
+                submitted_answer_list)
+
+            model1 = stats_models.StateAnswersModel.get_master_model(
+                'exp_id', 1, 'state_name')
+
+            self.assertEqual(model1.shard_count, 2)
+
+        # 'shard_count' will not increase as number of answers are less than
+        # the max answer list size.
+        stats_models.StateAnswersModel.insert_submitted_answers(
+            'exp_id', 1, 'state_name', 'interaction_id',
+            submitted_answer_list)
+
+        model1 = stats_models.StateAnswersModel.get_master_model(
+            'exp_id', 1, 'state_name')
+
+        self.assertEqual(model1.shard_count, 2)
+
+
+class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
+    """Tests the StateAnswersCalcOutputModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            stats_models.StateAnswersCalcOutputModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_returns_created_properties(self):
+
+        stats_models.StateAnswersCalcOutputModel.create_or_update(
+            'exp_id', '1', 'state_name', '', 'calculation_id', '', {})
+
+        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
+            'exp_id', '1', 'state_name', 'calculation_id')
+
+        self.assertEqual(model1.exploration_id, 'exp_id')
+        self.assertEqual(model1.exploration_version, '1')
+        self.assertEqual(model1.state_name, 'state_name')
+        self.assertEqual(model1.calculation_id, 'calculation_id')
+
+        # Model with 'invalid_exp_id' does not exist.
+        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
+            'invalid_exp_id', '1', 'state_name', 'calculation_id')
+
+        self.assertIsNone(model1)
+
+    def test_raise_exception_with_large_calculation_output(self):
+
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+
+        large_calculation_output = {'key': 'a' * 1200000}
+
+        with logging_swap:
+            stats_models.StateAnswersCalcOutputModel.create_or_update(
+                'exp_id', '1', 'state_name', '', 'calculation_id', '',
+                large_calculation_output)
+
+            self.assertEqual(len(observed_log_messages), 1)
+            self.assertEqual(
+                observed_log_messages[0],
+                (
+                    'Failed to add calculation output for exploration ID '
+                    'exp_id, version 1, state name state_name, and '
+                    'calculation ID calculation_id'
+                )
+            )

@@ -419,6 +419,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
 class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            suggestion_models.ReviewerRotationTrackingModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
+
     def test_create_and_update_model(self):
         suggestion_models.ReviewerRotationTrackingModel.create(
             'category1', 'user1')

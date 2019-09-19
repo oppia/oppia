@@ -17,7 +17,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import unittest
 
 from core.platform import models
 from core.tests import test_utils
@@ -62,24 +61,50 @@ class StorageModelsTest(test_utils.GenericTestBase):
             len(set(names_of_ndb_model_subclasses)),
             len(names_of_ndb_model_subclasses))
 
-    @unittest.skip('get_deletion_policy is not yet implemented on all models')
-    def test_all_models_have_get_deletion_policy(self):
+    # List of model classes that can't have Wipeout related class methods
+    # defined because they're not used directly but only as a base classes for
+    # the other models.
+    BASE_CLASSES = (
+        'BaseCommitLogEntryModel',
+        'BaseMapReduceBatchResultsModel',
+        'BaseModel',
+        'BaseSnapshotContentModel',
+        'BaseSnapshotMetadataModel',
+        'VersionedModel',
+    )
+
+    def test_all_child_models_have_get_deletion_policy(self):
         model_subclasses = self._get_model_classes()
 
         for clazz in model_subclasses:
+            if clazz.__name__ in self.BASE_CLASSES:
+                continue
             base_classes = [base.__name__ for base in inspect.getmro(clazz)]
-            # BaseSnapshotMetadataModel adopts the policy of the associated
-            # VersionedModel.
+            # BaseSnapshotMetadataModel and models that inherit from it
+            # adopt the policy of the associated VersionedModel.
             if 'BaseSnapshotMetadataModel' in base_classes:
                 continue
-            # BaseSnapshotContentModel adopts the policy of the associated
-            # VersionedModel.
+            # BaseSnapshotContentModel and models that inherit from it
+            # adopt the policy of the associated VersionedModel.
             if 'BaseSnapshotContentModel' in base_classes:
                 continue
-            # BaseCommitLogEntryModel adopts the policy of the associated
-            # VersionedModel.
+            # BaseCommitLogEntryModel and models that inherit from it
+            # adopt the policy of the associated VersionedModel.
             if 'BaseCommitLogEntryModel' in base_classes:
                 continue
-            self.assertIn(
-                clazz.get_deletion_policy(),
-                base_models.DELETION_POLICY.__dict__)
+
+            try:
+                self.assertIn(
+                    clazz.get_deletion_policy(),
+                    base_models.DELETION_POLICY.__dict__)
+            except NotImplementedError:
+                self.fail(msg='get_deletion_policy is not defined for %s' % (
+                    clazz.__name__))
+
+    def test_all_base_models_do_not_have_get_deletion_policy(self):
+        model_subclasses = self._get_model_classes()
+
+        for clazz in model_subclasses:
+            if clazz.__name__ in self.BASE_CLASSES:
+                with self.assertRaises(NotImplementedError):
+                    clazz.get_deletion_policy()
