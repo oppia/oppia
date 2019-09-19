@@ -516,7 +516,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         Returns:
             dict. A dict containing the user-relevant properties of
             GeneralFeedbackThreadUserModel, i.e., which messages have been
-            read from the user (as a list of ids) in each thread.
+            read by the user (as a list of ids) in each thread.
         """
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}
