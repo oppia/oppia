@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2015 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * @fileoverview RemoveDuplicatesInArray filter for Oppia.
- */
+require('core/tests/services-sources/DTest.service.ts');
 
-angular.module('oppia').filter('removeDuplicatesInArray', [function() {
-  return function(input) {
-    if (!input.filter) {
-      throw Error(
-        'Bad input for removeDuplicatesInArray: ' + JSON.stringify(input));
-    }
-    return input.filter(function(val, pos) {
-      return input.indexOf(val) === pos;
-    });
-  };
-}]);
+angular.module('oppia').factory('BTestFactory', [
+  'BTestFactory',
+  function(BTestFactory) {
+    var States = function(states) {
+      this._states = states;
+    };
+  }
+]);

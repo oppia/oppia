@@ -16,16 +16,37 @@
  * @fileoverview Rules service for the interaction.
  */
 
-angular.module('oppia').factory('LogicProofRulesService', [function() {
-  return {
-    Correct: function(answer) {
-      return answer.correct;
-    },
-    NotCorrect: function(answer) {
-      return !answer.correct;
-    },
-    NotCorrectByCategory: function(answer, inputs) {
-      return !answer.correct && answer.error_category === inputs.c;
-    }
-  };
-}]);
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+/* eslint-disable camelcase */
+interface Answer {
+  assumptions_string: string,
+  target_string: string,
+  proof_string: string,
+  correct: boolean,
+  error_category?: string,
+  error_code?: string,
+  error_message?: string,
+  error_line_number?: number
+}
+/* eslint-enable camelcase */
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LogicProofRulesService {
+  Correct(answer: Answer): boolean {
+    return answer.correct;
+  }
+  NotCorrect(answer: Answer): boolean {
+    return !answer.correct;
+  }
+  NotCorrectByCategory(answer: Answer, inputs: {c: string}): boolean {
+    return !answer.correct && answer.error_category === inputs.c;
+  }
+}
+
+angular.module('oppia').factory(
+  'LogicProofRulesService',
+  downgradeInjectable(LogicProofRulesService));
