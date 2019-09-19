@@ -451,6 +451,9 @@
 # Typings.
 /typings @ankita240796
 
+# Takeout.
+/core/domain/takeout_service*.py
+
 
 # User’s profile page.
 /core/controllers/profile*.py @kevinlee12
