@@ -62,8 +62,8 @@
  * @fileoverview Service for expression evaluation.
  */
 
-require('expressions/ExpressionParserService.js');
-require('expressions/ExpressionSyntaxTreeService.ts');
+require('expressions/expression-parser.service.js');
+require('expressions/expression-syntax-tree.service.ts');
 
 // Service for expression evaluation.
 angular.module('oppia').factory('ExpressionEvaluatorService', [

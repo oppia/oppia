@@ -107,7 +107,7 @@ GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 JS_FILEPATHS_NOT_TO_BUILD = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
     'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
+    'core/templates/dev/head/expressions/expression-parser.service.js')
 
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -1308,7 +1308,6 @@ def generate_build_directory(hashes):
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
     _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
 
-    save_hashes_to_file(dict())
     python_utils.PRINT('Build completed.')
 
 
@@ -1387,8 +1386,8 @@ def main(args=None):
         generate_app_yaml()
         if not options.minify_third_party_libs_only:
             generate_build_directory(hashes)
-    else:
-        save_hashes_to_file(dict())
+
+    save_hashes_to_file(dict())
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

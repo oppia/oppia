@@ -63,6 +63,7 @@
       <div class="col-lg-10 col-md-10 col-sm-10">
         <div ng-if="$ctrl.hasPageLoaded && $ctrl.select2DropdownIsShown">
           <select2-dropdown item="$ctrl.subjectInterests"
+                            class="protractor-test-interests-dropdown"
                             choices="$ctrl.subjectInterests"
                             allow-multiple-choices="true"
                             new-choice-regex="<[::$ctrl.TAG_REGEX_STRING]>"
