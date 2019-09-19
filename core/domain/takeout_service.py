@@ -56,8 +56,7 @@ def export_all_models(user_id):
     # Exploration models.
     exploration_rights_data = exploration_models.ExplorationRightsModel.export_data(user_id)
 
-    # TODO(luisulloa): Uncomment after Luis' PR.
-    # general_feedback_email_reply_data = email_models.GeneralFeedbackEmailReplyToIdModel.export_data(user_id)
+    general_feedback_email_reply_data = email_models.GeneralFeedbackEmailReplyToIdModel.export_data(user_id)
 
     # Combine the data into a single dictionary.
     return {

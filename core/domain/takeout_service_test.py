@@ -22,11 +22,10 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
-from core.domain import takeout_processor_service
+from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
 import feconf
-
 
 (user_models, collection_models, exploration_models, story_models,
  feedback_models, suggestion_models,
@@ -36,8 +35,8 @@ import feconf
     models.NAMES.email])
 
 
-class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
-    """Tests for the takeout processor service."""
+class TakeoutServiceTests(test_utils.GenericTestBase):
+    """Tests for the takeout service."""
 
     USER_ID_1 = 'user_1'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
@@ -94,7 +93,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Set up all models for use in testing."""
-        super(TakeoutProcessorServiceTests, self).setUp()
+        super(TakeoutServiceTests, self).setUp()
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -119,29 +118,6 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             user_id=self.USER_ID_1,
             skill_id=self.SKILL_ID_2,
             degree_of_mastery=self.DEGREE_OF_MASTERY).put()
-
-        # Setup for UserSettingsModel.
-        user_models.UserSettingsModel(
-            id=self.USER_ID_1,
-            email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE,
-            username=self.GENERIC_USERNAME,
-            normalized_username=self.GENERIC_USERNAME,
-            last_agreed_to_terms=self.GENERIC_DATE,
-            last_started_state_editor_tutorial=self.GENERIC_DATE,
-            last_started_state_translation_tutorial=self.GENERIC_DATE,
-            last_logged_in=self.GENERIC_DATE,
-            last_created_an_exploration=self.GENERIC_DATE,
-            last_edited_an_exploration=self.GENERIC_DATE,
-            profile_picture_data_url=self.GENERIC_IMAGE_URL,
-            default_dashboard='learner', creator_dashboard_display_pref='card',
-            user_bio=self.GENERIC_USER_BIO,
-            subject_interests=self.GENERIC_SUBJECT_INTERESTS,
-            first_contribution_msec=1,
-            preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
-            preferred_site_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
-            preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0])
-        ).put()
 
         # Setup for UserSubscriptionsModel.
         user_models.UserSubscriptionsModel(
@@ -248,42 +224,37 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         ).save(
             'cid', 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        
+        # Setup for UserSettingsModel.
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            email=self.USER_1_EMAIL,
+            role=self.USER_1_ROLE,
+            username=self.GENERIC_USERNAME,
+            normalized_username=self.GENERIC_USERNAME,
+            last_agreed_to_terms=self.GENERIC_DATE,
+            last_started_state_editor_tutorial=self.GENERIC_DATE,
+            last_started_state_translation_tutorial=self.GENERIC_DATE,
+            last_logged_in=self.GENERIC_DATE,
+            last_created_an_exploration=self.GENERIC_DATE,
+            last_edited_an_exploration=self.GENERIC_DATE,
+            profile_picture_data_url=self.GENERIC_IMAGE_URL,
+            default_dashboard='learner', creator_dashboard_display_pref='card',
+            user_bio=self.GENERIC_USER_BIO,
+            subject_interests=self.GENERIC_SUBJECT_INTERESTS,
+            first_contribution_msec=1,
+            preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
+            preferred_site_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
+            preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0])
+        ).put()
 
     def test_export_data_nontrivial(self):
-        takeout_processor_service.export_all_models(self.USER_ID_1)
         stats_data = {
             'impact_score': self.USER_1_IMPACT_SCORE,
             'total_plays': self.USER_1_TOTAL_PLAYS,
             'average_ratings': self.USER_1_AVERAGE_RATINGS,
             'num_ratings': self.USER_1_NUM_RATINGS,
             'weekly_creator_stats_list': self.USER_1_WEEKLY_CREATOR_STATS_LIST
-        }
-        user_settings_data = {
-            'email': self.USER_1_EMAIL,
-            'role': feconf.ROLE_ID_ADMIN,
-            'username': self.GENERIC_USERNAME,
-            'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_DATE,
-            'last_started_state_editor_tutorial': self.GENERIC_DATE,
-            'last_started_state_translation_tutorial': self.GENERIC_DATE,
-            'last_logged_in': self.GENERIC_DATE,
-            'last_edited_an_exploration': self.GENERIC_DATE,
-            'profile_picture_data_url': self.GENERIC_IMAGE_URL,
-            'default_dashboard': 'learner',
-            'creator_dashboard_display_pref': 'card',
-            'user_bio': self.GENERIC_USER_BIO,
-            'subject_interests': self.GENERIC_SUBJECT_INTERESTS,
-            'first_contribution_msec': 1,
-            'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
-            'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0]
-        }
-        user_subscriptions_data = {
-            'creator_ids': self.CREATOR_IDS,
-            'collection_ids': self.COLLECTION_IDS,
-            'activity_ids': self.ACTIVITY_IDS,
-            'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
-            'last_checked': None
         }
         user_skill_data = {
             self.SKILL_ID_1: self.DEGREE_OF_MASTERY,
@@ -344,18 +315,6 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.put()
 
-        general_feedback_thread_data = {
-            feedback_thread_model.id: {
-                'entity_type': self.THREAD_ENTITY_TYPE,
-                'entity_id': self.THREAD_ENTITY_ID,
-                'status': self.THREAD_STATUS,
-                'subject': self.THREAD_SUBJECT,
-                'has_suggestion': self.THREAD_HAS_SUGGESTION,
-                'summary': self.THREAD_SUMMARY,
-                'message_count': self.THREAD_MESSAGE_COUNT,
-                'last_updated': feedback_thread_model.last_updated
-            }
-        }
         thread_id = feedback_services.create_thread(
             self.THREAD_ENTITY_TYPE,
             self.THREAD_ENTITY_ID,
@@ -370,6 +329,28 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
+        general_feedback_thread_data = {
+            feedback_thread_model.id: {
+                'entity_type': self.THREAD_ENTITY_TYPE,
+                'entity_id': self.THREAD_ENTITY_ID,
+                'status': self.THREAD_STATUS,
+                'subject': self.THREAD_SUBJECT,
+                'has_suggestion': self.THREAD_HAS_SUGGESTION,
+                'summary': self.THREAD_SUMMARY,
+                'message_count': self.THREAD_MESSAGE_COUNT,
+                'last_updated': feedback_thread_model.last_updated
+            },
+            thread_id: {
+                'entity_type': self.THREAD_ENTITY_TYPE,
+                'entity_id': self.THREAD_ENTITY_ID,
+                'status': self.THREAD_STATUS,
+                'subject': self.THREAD_SUBJECT,
+                'has_suggestion': False,
+                'summary': None,
+                'message_count': 2,
+                'last_updated': feedback_models.GeneralFeedbackThreadModel.get(thread_id).last_updated
+            }
+        }
         general_feedback_message_data = {
             thread_id + '.0': {
                 'thread_id': thread_id,
@@ -416,6 +397,41 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
                 [self.EXPLORATION_IDS[0]]),
             'viewable_exploration_ids': [self.EXPLORATION_IDS[0]]
         }
+        user_settings_data = {
+            'email': self.USER_1_EMAIL,
+            'role': feconf.ROLE_ID_ADMIN,
+            'username': self.GENERIC_USERNAME,
+            'normalized_username': self.GENERIC_USERNAME,
+            'last_agreed_to_terms': self.GENERIC_DATE,
+            'last_started_state_editor_tutorial': self.GENERIC_DATE,
+            'last_started_state_translation_tutorial': self.GENERIC_DATE,
+            'last_logged_in': self.GENERIC_DATE,
+            'last_edited_an_exploration': self.GENERIC_DATE,
+            'profile_picture_data_url': self.GENERIC_IMAGE_URL,
+            'default_dashboard': 'learner',
+            'creator_dashboard_display_pref': 'card',
+            'user_bio': self.GENERIC_USER_BIO,
+            'subject_interests': self.GENERIC_SUBJECT_INTERESTS,
+            'first_contribution_msec': 1,
+            'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
+            'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0]
+        }
+
+        thread_and_message_ids = self.GENERAL_FEEDBACK_THREAD_IDS
+        thread_and_message_ids.append(thread_id)
+
+        activities = self.ACTIVITY_IDS
+        activities.extend(self.EXPLORATION_IDS)
+
+        user_subscriptions_data = {
+            'creator_ids': self.CREATOR_IDS,
+            'collection_ids': self.COLLECTION_IDS,
+            'activity_ids': self.ACTIVITY_IDS,
+            'general_feedback_thread_ids': thread_and_message_ids,
+            'last_checked': None
+        }
+
         expected_export = {
             'stats_data': stats_data,
             'user_settings_data': user_settings_data,
@@ -435,7 +451,7 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             'general_suggestion_data': general_suggestion_data,
             'exploration_rights_data': exploration_rights_data,
         }
-        exported_data = takeout_processor_service.export_all_models(self.USER_ID_1)
-        exported_data_json = json.dumps(exported_data, default=str)
-        expected_export_json = json.dumps(expected_export, default=str)
-        self.assertEqual(expected_export_json, exported_data_json)
+
+        exported_data = takeout_service.export_all_models(self.USER_ID_1)
+        
+        self.assertEqual(exported_data, expected_export)
