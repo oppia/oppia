@@ -21,9 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 
 (
- user_models, collection_models, exploration_models, story_models,
- feedback_models, suggestion_models,
- email_models) = models.Registry.import_models([
+    user_models, collection_models, exploration_models, story_models,
+    feedback_models, suggestion_models,
+    email_models) = models.Registry.import_models([
      models.NAMES.user, models.NAMES.collection, models.NAMES.exploration,
      models.NAMES.story, models.NAMES.feedback, models.NAMES.suggestion,
      models.NAMES.email])
@@ -43,7 +43,8 @@ def export_all_models(user_id):
     completed_activities_data = (user_models.
                                  CompletedActivitiesModel.export_data(user_id))
     incomplete_activities_data = (user_models.
-                                  IncompleteActivitiesModel.export_data(user_id))
+                                  IncompleteActivitiesModel.
+                                  export_data(user_id))
     last_playthrough_data = (user_models.
                              ExpUserLastPlaythroughModel.export_data(user_id))
     learner_playlist_data = (user_models.

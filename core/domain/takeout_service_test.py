@@ -28,7 +28,8 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(user_models, collection_models, exploration_models, story_models,
+(
+ user_models, collection_models, exploration_models, story_models,
  feedback_models, suggestion_models,
  email_models) = models.Registry.import_models([
      models.NAMES.user, models.NAMES.collection, models.NAMES.exploration,
