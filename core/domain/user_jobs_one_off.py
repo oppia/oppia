@@ -410,6 +410,7 @@ class UserGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function for this job."""
         if model_instance.gae_user_id is None:
             model_instance.gae_user_id = model_instance.id
+        model_instance.put(update_last_updated_time=False)
         yield ('SUCCESS', model_instance.id)
 
     @staticmethod
