@@ -24,12 +24,13 @@ from core.platform import models
     user_models, collection_models, exploration_models, story_models,
     feedback_models, suggestion_models,
     email_models) = models.Registry.import_models([
-     models.NAMES.user, models.NAMES.collection, models.NAMES.exploration,
-     models.NAMES.story, models.NAMES.feedback, models.NAMES.suggestion,
-     models.NAMES.email])
+        models.NAMES.user, models.NAMES.collection, models.NAMES.exploration,
+        models.NAMES.story, models.NAMES.feedback, models.NAMES.suggestion,
+        models.NAMES.email])
 
 
 def export_all_models(user_id):
+    """Exports all models according to model defined export_data functions."""
     # User models.
     stats_data = user_models.UserStatsModel.export_data(user_id)
     user_settings_data = user_models.UserSettingsModel.export_data(user_id)
