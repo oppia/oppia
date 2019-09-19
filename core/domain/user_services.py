@@ -183,7 +183,9 @@ class UserSettings(python_utils.OBJECT):
 
         if not isinstance(self.gae_user_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected user_id to be a string, received %s' % self.user_id)
+                'Expected gae_user_id to be a string, received %s' %
+                self.user_id
+            )
 
         if not isinstance(self.email, python_utils.BASESTRING):
             raise utils.ValidationError(
