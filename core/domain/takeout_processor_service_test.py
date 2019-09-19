@@ -105,6 +105,21 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
             weekly_creator_stats_list=self.USER_1_WEEKLY_CREATOR_STATS_LIST
         ).put()
 
+        # Setup for UserSkillModel.
+        user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                self.USER_ID_1, self.SKILL_ID_1),
+            user_id=self.USER_ID_1,
+            skill_id=self.SKILL_ID_1,
+            degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+
+        user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                self.USER_ID_1, self.SKILL_ID_2),
+            user_id=self.USER_ID_1,
+            skill_id=self.SKILL_ID_2,
+            degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
@@ -422,6 +437,5 @@ class TakeoutProcessorServiceTests(test_utils.GenericTestBase):
         }
         exported_data = takeout_processor_service.export_all_models(self.USER_ID_1)
         exported_data_json = json.dumps(exported_data, default=str)
-        expected_export_json = json.dumps(exported_data, default=str)
+        expected_export_json = json.dumps(expected_export, default=str)
         self.assertEqual(expected_export_json, exported_data_json)
-        # TODO(ulloaluis): Implement tests for StoryRights and GeneralFeedbackEmailReplyToId.
