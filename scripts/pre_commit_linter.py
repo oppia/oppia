@@ -571,7 +571,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.8.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.2.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.8'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-3.13.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
