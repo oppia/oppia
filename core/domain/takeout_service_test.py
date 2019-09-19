@@ -27,7 +27,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
-import json
 
 (user_models, collection_models, exploration_models, story_models,
  feedback_models, suggestion_models,
@@ -146,7 +145,7 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
 
         # Setup for ExplorationUserDataModel.
         user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.USER_ID_1, self.EXPLORATION_IDS[0]), 
+            id='%s.%s' % (self.USER_ID_1, self.EXPLORATION_IDS[0]),
             user_id=self.USER_ID_1,
             exploration_id=self.EXPLORATION_IDS[0], rating=2,
             rated_on=self.GENERIC_DATE,
