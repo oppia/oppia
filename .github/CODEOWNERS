@@ -452,7 +452,7 @@
 /typings @ankita240796
 
 # Takeout.
-/core/domain/takeout_service*.py
+/core/domain/takeout_service*.py @varun-tandon
 
 
 # User’s profile page.
