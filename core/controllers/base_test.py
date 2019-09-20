@@ -52,6 +52,26 @@ FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
 
 
+class UniqueTemplateNamesTests(test_utils.GenericTestBase):
+    """Tests to ensure that all template filenames in
+    core/templates/dev/head/pages have unique filenames. This is required
+    for the backend tests to work correctly since they fetch templates
+    from this directory based on name of the template. For details, refer
+    get_filepath_from_filename function in test_utils.py.
+    """
+
+    def test_template_filenames_are_unique(self):
+        templates_dir = os.path.join(
+            'core', 'templates', 'dev', 'head', 'pages')
+        all_template_names = []
+        for root, _, filenames in os.walk(templates_dir):
+            template_filenames = [
+                filename for filename in filenames if filename.endswith(
+                    '.html')]
+            all_template_names = all_template_names + template_filenames
+        self.assertEqual(len(all_template_names), len(set(all_template_names)))
+
+
 class BaseHandlerTests(test_utils.GenericTestBase):
 
     TEST_LEARNER_EMAIL = 'test.learner@example.com'
@@ -115,6 +135,16 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             else:
                 url = route.template
             url = re.sub('<([^/^:]+)>', 'abc123', url)
+
+            # This url is ignored since it is only needed for a protractor test.
+            # The backend tests fetch templates from
+            # core/templates/dev/head/pages instead of webpack_bundles since we
+            # skip webpack compilation for backend tests.
+            # The console_errors.html template is present in
+            # core/templates/dev/head/tests and we want one canonical
+            # directory for retrieving templates so we ignore this url.
+            if url == '/console_errors':
+                continue
 
             # Some of these will 404 or 302. This is expected.
             self.get_response_without_checking_for_errors(

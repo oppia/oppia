@@ -42,7 +42,8 @@ angular.module('oppia').directive('questionsTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-editor-page/questions-tab/questions-tab.directive.html'),
+        '/pages/topic-editor-page/questions-tab/' +
+        'topic-questions-tab.directive.html'),
       controller: [
         '$scope', '$q', '$uibModal', '$window',
         'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',

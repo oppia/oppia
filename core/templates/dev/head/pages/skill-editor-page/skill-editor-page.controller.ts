@@ -27,7 +27,8 @@ require(
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
 require(
   'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
-require('pages/skill-editor-page/questions-tab/questions-tab.directive.ts');
+require(
+  'pages/skill-editor-page/questions-tab/skill-questions-tab.directive.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');

@@ -18,7 +18,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from core.tests import test_utils
+import feconf
 import jinja_utils
 import python_utils
 
@@ -44,6 +47,18 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         for tup in expected_values:
             self.assertEqual(jinja_utils.JINJA_FILTERS['js_string'](
                 tup[0]), tup[1])
+
+    def test_get_jinja_env(self):
+        env = jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
+        self.assertTrue(env.autoescape)
+
+        self.assertEqual(
+            env.loader.searchpath,
+            [os.path.join(
+                os.path.dirname(__file__), feconf.FRONTEND_TEMPLATES_DIR)])
+
+        for jinja_filter in jinja_utils.JINJA_FILTERS:
+            self.assertTrue(jinja_filter in env.filters)
 
     def test_parse_string(self):
         parsed_str = jinja_utils.parse_string('{{test}}', {'test': 'hi'})

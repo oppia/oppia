@@ -41,7 +41,8 @@ angular.module('oppia').directive('questionsTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor-page/questions-tab/questions-tab.directive.html'),
+        '/pages/skill-editor-page/questions-tab/' +
+        'skill-questions-tab.directive.html'),
       controller: [
         '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
         'SkillEditorStateService', 'QuestionCreationService', 'UrlService',

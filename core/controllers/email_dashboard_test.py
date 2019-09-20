@@ -155,9 +155,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         response = self.get_html_response('/emaildashboard')
-        self.assertIn(
-            '<title itemprop="name">Email Dashboard - Oppia</title>',
-            response.body)
+        self.assertIn('{"title": "Email Dashboard - Oppia"})', response.body)
 
         self.logout()
 
@@ -216,8 +214,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         response = self.get_html_response('/emaildashboardresult/%s' % query_id)
 
         self.assertIn(
-            '<title itemprop="name">Email Dashboard Result - Oppia</title>',
-            response.body)
+            '{"title": "Email Dashboard Result - Oppia"})', response.body)
 
         self.logout()
 

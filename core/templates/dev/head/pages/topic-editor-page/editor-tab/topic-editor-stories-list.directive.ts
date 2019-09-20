@@ -32,7 +32,8 @@ angular.module('oppia').directive('storiesList', [
         getTopic: '&topic'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-editor-page/editor-tab/stories-list.directive.html'),
+        '/pages/topic-editor-page/editor-tab/' +
+        'topic-editor-stories-list.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$window',
         'EditableTopicBackendApiService', 'UrlService', 'UndoRedoService',
@@ -52,7 +53,7 @@ angular.module('oppia').directive('storiesList', [
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/topic-editor-page/modal-templates/' +
-                  'save-pending-changes-modal.template.html'),
+                  'topic-save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',

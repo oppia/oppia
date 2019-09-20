@@ -35,7 +35,6 @@ import time
 
 import python_utils
 
-from . import build
 from . import common
 from . import install_third_party_libs
 from . import setup
@@ -332,13 +331,6 @@ def main(args=None):
             install_third_party_libs.pip_install(
                 'coverage', '4.5.4',
                 os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'))
-
-    build.main(args=[])
-
-    python_utils.PRINT('Compiling webpack...')
-    subprocess.call([
-        os.path.join(common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
-        '--config', 'webpack.dev.config.ts'])
 
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
