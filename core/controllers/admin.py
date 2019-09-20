@@ -269,41 +269,46 @@ class AdminHandler(base.BaseHandler):
             question_id: str. The ID of the question to be created.
             question_content: str. The question content.
             linked_skill_ids: list(str). The IDs of the skills to which the
-                question is linekd to.
+                question is linked to.
 
         Returns:
             Question. The dummy question with given values.
         """
         state = state_domain.State.create_default_state(
             'ABC', is_initial_state=True)
-        state.interaction.id = 'TextInput'
-        state.content = state_domain.SubtitledHtml('1', question_content)
-        state.recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            {'voiceovers_mapping': {'1': {}, 'default_outcome': {}}})
-        state.written_translations = state_domain.WrittenTranslations.from_dict(
-            {'translations_mapping': {'1': {}, 'default_outcome': {}}})
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'Solution',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>This is a solution.</p>'
-            }
-        }
-        hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>This is a hint.</p>'
-            }
-        }]
+        state.update_interaction_id('TextInput')
+        state.update_content(state_domain.SubtitledHtml('1', question_content))
+        recorded_voiceovers = state_domain.RecordedVoiceovers({})
+        written_translations = state_domain.WrittenTranslations({})
+        recorded_voiceovers.add_content_id_for_voiceover('1')
+        recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
+        written_translations.add_content_id_for_translation('1')
+        written_translations.add_content_id_for_translation('default_outcome')
+
+        state.update_recorded_voiceovers(recorded_voiceovers)
+        state.update_written_translations(written_translations)
+        solution_dict = (
+            state_domain.Solution(
+                'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+                    'solution', '<p>This is a solution.</p>')).to_dict())
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>This is a hint.</p>')).to_dict()
+        ]
+
         state.update_interaction_solution(solution_dict)
         state.update_interaction_hints(hints_list)
-        state.interaction.customization_args = {
+        state.update_interaction_customization_args({
             'placeholder': 'Enter text here',
             'rows': 1
-        }
-        state.interaction.default_outcome.labelled_as_correct = True
-        state.interaction.default_outcome.dest = None
+        })
+        state.update_interaction_default_outcome(
+            state_domain.Outcome(
+                None, state_domain.SubtitledHtml(
+                    'feedback_id', '<p>Dummy Feedback</p>'),
+                True, [], None, None).to_dict()
+        )
         question = question_domain.Question(
             question_id, state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
@@ -330,17 +335,14 @@ class AdminHandler(base.BaseHandler):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill = skill_domain.Skill.create_default_skill(
             skill_id, skill_description, rubrics)
-        skill.skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', explanation), [],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}}}))
+        skill.update_explanation(
+            state_domain.SubtitledHtml('1', explanation).to_dict())
         return skill
 
     def _load_dummy_new_structures_data(self):
-        """Loads the database with a topic, a story and three skills in the
-        topic (two of them in a subtopic) and a question attached to each skill.
+        """Loads the database with two topics (one of which is empty), a story
+        and three skills in the topic (two of them in a subtopic) and a question
+        attached to each skill.
 
         Raises:
             Exception: Cannot load new structures data in production mode.
@@ -350,7 +352,8 @@ class AdminHandler(base.BaseHandler):
             if self.user.role != feconf.ROLE_ID_ADMIN:
                 raise Exception(
                     'User does not have enough rights to generate data.')
-            topic_id = topic_services.get_new_topic_id()
+            topic_id_1 = topic_services.get_new_topic_id()
+            topic_id_2 = topic_services.get_new_topic_id()
             story_id = story_services.get_new_story_id()
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
@@ -383,26 +386,26 @@ class AdminHandler(base.BaseHandler):
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
-            topic = topic_domain.Topic.create_default_topic(
-                topic_id, 'Dummy Topic 1')
-            topic.canonical_story_references = [
-                topic_domain.StoryReference.create_default_story_reference(
-                    story_id)
-            ]
-            topic.uncategorized_skill_ids = [skill_id_1]
-            topic.subtopics = [
-                topic_domain.Subtopic(
-                    1, 'Dummy Subtopic Title', [skill_id_2, skill_id_3])
-            ]
-            topic.next_subtopic_id = 2
+            topic_1 = topic_domain.Topic.create_default_topic(
+                topic_id_1, 'Dummy Topic 1')
+            topic_2 = topic_domain.Topic.create_default_topic(
+                topic_id_2, 'Empty Topic')
+
+            topic_1.add_canonical_story(story_id)
+            topic_1.add_uncategorized_skill_id(skill_id_1)
+            topic_1.add_uncategorized_skill_id(skill_id_2)
+            topic_1.add_uncategorized_skill_id(skill_id_3)
+            topic_1.add_subtopic(1, 'Dummy Subtopic Title')
+            topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
+            topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
 
             subtopic_page = (
                 subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                    1, topic_id))
+                    1, topic_id_1))
             self._reload_exploration('0')
             self._reload_exploration('16')
             story = story_domain.Story.create_default_story(
-                story_id, 'Dummy Story 1', topic_id)
+                story_id, 'Dummy Story 1', topic_id_1)
             story.add_node(
                 '%s%d' % (story_domain.NODE_ID_PREFIX, 1), 'Dummy Chapter 1')
             story.update_node_destination_node_ids(
@@ -420,7 +423,8 @@ class AdminHandler(base.BaseHandler):
             skill_services.save_new_skill(self.user_id, skill_2)
             skill_services.save_new_skill(self.user_id, skill_3)
             story_services.save_new_story(self.user_id, story)
-            topic_services.save_new_topic(self.user_id, topic)
+            topic_services.save_new_topic(self.user_id, topic_1)
+            topic_services.save_new_topic(self.user_id, topic_2)
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page, 'Added subtopic',
                 [topic_domain.TopicChange({
@@ -430,8 +434,8 @@ class AdminHandler(base.BaseHandler):
                 })]
             )
 
-            topic_services.publish_story(topic_id, story_id, self.user_id)
-            topic_services.publish_topic(topic_id, self.user_id)
+            topic_services.publish_story(topic_id_1, story_id, self.user_id)
+            topic_services.publish_topic(topic_id_1, self.user_id)
             skill_services.publish_skill(skill_id_1, self.user_id)
             skill_services.publish_skill(skill_id_2, self.user_id)
             skill_services.publish_skill(skill_id_3, self.user_id)
