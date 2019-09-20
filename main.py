@@ -115,6 +115,14 @@ def get_redirect_route(regex_route, handler, defaults=None):
 
     Warning: this method strips off parameters after the trailing slash. URLs
     with parameters should be formulated without the trailing slash.
+
+    Args:
+        regex_route: string. The route to be redirected.
+        handler: callable or string. Custom handler method to be called.
+        defaults: dict or default. Default or extra keywords to be returned by this route.
+
+    Returns:
+        string. Returns a route that redirects /foo/ to /foo.
     """
     if defaults is None:
         defaults = {}
