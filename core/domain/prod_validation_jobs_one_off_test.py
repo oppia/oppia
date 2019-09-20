@@ -11934,6 +11934,10 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 2))
             topic_services.save_new_topic(self.owner_id, topic)
+            topic_services.publish_story(
+                topic.id, '%s' % (index * 2 + 1), self.admin_id)
+            topic_services.publish_story(
+                topic.id, '%s' % (index * 2), self.admin_id)
             topic_services.update_topic_and_subtopic_pages(
                 self.owner_id, '%s' % index, [topic_domain.TopicChange({
                     'cmd': 'add_subtopic',

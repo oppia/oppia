@@ -109,8 +109,8 @@ def preprocess_release():
     does the following:
 
     (1) Substitutes files from the per-app deployment data.
-    (2) Change the DEV_MODE constant in assets/constants.js.
-    (3) Change GCS_RESOURCE_BUCKET in assets/constants.js.
+    (2) Change the DEV_MODE constant in assets/constants.ts.
+    (3) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
     (4) Removes the "version" field from app.yaml, since gcloud does not like
         it (when deploying).
     """
@@ -148,20 +148,20 @@ def preprocess_release():
             dst = os.path.join(dst_dir, filename)
             shutil.copyfile(src, dst)
 
-    # Changes the DEV_MODE constant in assets/constants.js.
+    # Changes the DEV_MODE constant in assets/constants.ts.
     with python_utils.open_file(
-        os.path.join('assets', 'constants.js'), 'r') as assets_file:
+        os.path.join('assets', 'constants.ts'), 'r') as assets_file:
         content = assets_file.read()
     bucket_name = APP_NAME + BUCKET_NAME_SUFFIX
     assert '"DEV_MODE": true' in content
     assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
-    os.remove(os.path.join('assets', 'constants.js'))
+    os.remove(os.path.join('assets', 'constants.ts'))
     content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
     content = content.replace(
         '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
     with python_utils.open_file(
-        os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
+        os.path.join('assets', 'constants.ts'), 'w+') as new_assets_file:
         new_assets_file.write(content)
 
 
@@ -283,7 +283,7 @@ def _execute_deployment():
         # Do a build, while outputting to the terminal.
         python_utils.PRINT('Building and minifying scripts...')
         build_process = subprocess.Popen(
-            ['python', 'scripts/build.py', '--prod_env'],
+            ['python', '-m', 'scripts.build', '--prod_env'],
             stdout=subprocess.PIPE)
         while True:
             line = build_process.stdout.readline().strip()
