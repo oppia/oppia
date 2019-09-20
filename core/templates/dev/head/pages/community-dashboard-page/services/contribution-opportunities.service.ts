@@ -25,7 +25,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
   'ContributionOpportunitiesBackendApiService', 'OPPORTUNITY_TYPE_SKILL',
   'OPPORTUNITY_TYPE_TRANSLATION', 'OPPORTUNITY_TYPE_VOICEOVER',
   function(ContributionOpportunitiesBackendApiService, OPPORTUNITY_TYPE_SKILL,
-    OPPORTUNITY_TYPE_TRANSLATION, OPPORTUNITY_TYPE_VOICEOVER) {
+      OPPORTUNITY_TYPE_TRANSLATION, OPPORTUNITY_TYPE_VOICEOVER) {
     var skillOpportunitiesCursor = null;
     var translationOpportunitiesCursor = null;
     var voiceoverOpportunitiesCursor = null;
@@ -36,7 +36,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     var _getSkillOpportunities = function(cursor, successCallback) {
       var params = {
         cursor: cursor
-      }
+      };
       ContributionOpportunitiesBackendApiService.fetchOpportunities(
         OPPORTUNITY_TYPE_SKILL, params, function(data) {
           moreSkillOpportunitiesAvailable = data.more;
@@ -49,7 +49,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
       var params = {
         language_code: languageCode,
         cursor: cursor
-      }
+      };
       ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
         OPPORTUNITY_TYPE_TRANSLATION, params, function(data) {
           moreTranslationOpportunitiesAvailable = data.more;
@@ -62,7 +62,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
       var params = {
         language_code: languageCode,
         cursor: cursor
-      }
+      };
       ContributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
         OPPORTUNITY_TYPE_VOICEOVER, params, function(data) {
           moreVoiceoverOpportunitiesAvailable = data.more;

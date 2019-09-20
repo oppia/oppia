@@ -18,9 +18,7 @@
  */
 
 angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
-  '$http', 'UrlInterpolationService', 'OPPORTUNITY_TYPE_SKILL',
-  'OPPORTUNITY_TYPE_TRANSLATION', 'OPPORTUNITY_TYPE_VOICEOVER', function(
-      $http, UrlInterpolationService) {
+  '$http', 'UrlInterpolationService', function($http, UrlInterpolationService) {
     var urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
     return {
       fetchOpportunities: function(opportunityType, params, successCallback) {
