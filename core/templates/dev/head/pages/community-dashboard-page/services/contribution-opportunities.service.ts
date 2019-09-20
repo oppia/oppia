@@ -22,15 +22,10 @@ require(
   'contribution-opportunities-backend-api.service.ts');
 
 angular.module('oppia').factory('ContributionOpportunitiesService', [
-<<<<<<< HEAD
   'ContributionOpportunitiesBackendApiService', 'OPPORTUNITY_TYPE_SKILL',
   'OPPORTUNITY_TYPE_TRANSLATION', 'OPPORTUNITY_TYPE_VOICEOVER',
   function(ContributionOpportunitiesBackendApiService, OPPORTUNITY_TYPE_SKILL,
     OPPORTUNITY_TYPE_TRANSLATION, OPPORTUNITY_TYPE_VOICEOVER) {
-=======
-  'ContributionOpportunitiesBackendApiService',
-  function(ContributionOpportunitiesBackendApiService) {
->>>>>>> 545d0050edc9c6e63a4e199901c7867ca0f3f8b9
     var skillOpportunitiesCursor = null;
     var translationOpportunitiesCursor = null;
     var voiceoverOpportunitiesCursor = null;
@@ -39,16 +34,11 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     var moreVoiceoverOpportunitiesAvailable = true;
 
     var _getSkillOpportunities = function(cursor, successCallback) {
-<<<<<<< HEAD
       var params = {
         cursor: cursor
       }
       ContributionOpportunitiesBackendApiService.fetchOpportunities(
         OPPORTUNITY_TYPE_SKILL, params, function(data) {
-=======
-      ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
-        cursor, function(data) {
->>>>>>> 545d0050edc9c6e63a4e199901c7867ca0f3f8b9
           moreSkillOpportunitiesAvailable = data.more;
           skillOpportunitiesCursor = data.next_cursor;
           successCallback(data.opportunities, data.more);
