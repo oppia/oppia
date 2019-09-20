@@ -6,8 +6,10 @@
     <div class="oppia-topic-name">
       <[::$ctrl.getTopicSummary().getName()]>
     </div>
-    <[::$ctrl.getTopicSummary().getCanonicalStoryCount()]>
-    lesson<span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() !== 1">s</span>
+    <span translate="I18N_TOPIC_SUMMARY_TILE_LESSONS"
+          translate-values="{lessonCount: $ctrl.getTopicSummary().getCanonicalStoryCount()}"
+          translate-interpolation="messageformat">
+    </span>
   </div>
 </a>
 <style>
