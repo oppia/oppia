@@ -29,7 +29,8 @@ angular.module('oppia').directive('storiesList', [
         getCanonicalStories: '&canonicalStoriesList',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-viewer-page/stories-list/stories-list.directive.html'),
+        '/pages/topic-viewer-page/stories-list/' +
+        'topic-viewer-stories-list.directive.html'),
       controller: ['WindowDimensionsService', '$scope', '$timeout',
         function(WindowDimensionsService, $scope, $timeout) {
           var STORY_TILE_WIDTH_PX = 360;
