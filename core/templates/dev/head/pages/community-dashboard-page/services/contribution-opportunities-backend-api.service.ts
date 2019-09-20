@@ -20,10 +20,31 @@
 angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
   '$http', 'UrlInterpolationService', 'OPPORTUNITY_TYPE_SKILL',
   'OPPORTUNITY_TYPE_TRANSLATION', 'OPPORTUNITY_TYPE_VOICEOVER', function(
+<<<<<<< HEAD
       $http, UrlInterpolationService) {
     var urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
     return {
       fetchOpportunities: function(opportunityType, params, successCallback) {
+=======
+      $http, UrlInterpolationService, OPPORTUNITY_TYPE_SKILL,
+      OPPORTUNITY_TYPE_TRANSLATION, OPPORTUNITY_TYPE_VOICEOVER) {
+    var urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
+    return {
+      fetchSkillOpportunities: function(cursor, successCallback) {
+        return $http.get(
+          UrlInterpolationService.interpolateUrl(
+            urlTemplate, {opportunityType: OPPORTUNITY_TYPE_SKILL}
+          ), {
+            params: {
+              cursor: cursor
+            }
+          }).then(function(response) {
+          successCallback(response.data);
+        });
+      },
+      fetchTranslationOpportunities: function(
+          languageCode, cursor, successCallback) {
+>>>>>>> 545d0050edc9c6e63a4e199901c7867ca0f3f8b9
         return $http.get(
           UrlInterpolationService.interpolateUrl(
             urlTemplate, {opportunityType: opportunityType}
