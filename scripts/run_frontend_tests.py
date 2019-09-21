@@ -54,8 +54,9 @@ def main(args=None):
     setup.main(args=[])
     setup_gae.main(args=[])
 
-    install_third_party_libs.maybe_install_dependencies(
-        parsed_args.skip_install, parsed_args.run_minified_tests)
+    if not parsed_args.skip_install:
+        install_third_party_libs.main()
+
     common.print_each_string_after_two_new_lines([
         'View interactive frontend test coverage reports by navigating to',
         '../karma_coverage_reports',

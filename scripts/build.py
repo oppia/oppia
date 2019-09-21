@@ -1381,10 +1381,10 @@ def main(args=None):
             'minify_third_party_libs_only should not be set in non-prod mode.')
     if options.prod_mode:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-        hashes = generate_hashes()
-        build_using_webpack()
-        generate_app_yaml()
         if not options.minify_third_party_libs_only:
+            hashes = generate_hashes()
+            build_using_webpack()
+            generate_app_yaml()
             generate_build_directory(hashes)
 
     save_hashes_to_file(dict())

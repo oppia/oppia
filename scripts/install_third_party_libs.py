@@ -40,7 +40,6 @@ if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
 # pylint: disable=wrong-import-order
 import python_utils  # isort:skip
 
-from . import build  # isort:skip
 from . import common  # isort:skip
 from . import install_third_party  # isort:skip
 from . import pre_commit_hook  # isort:skip
@@ -184,23 +183,6 @@ def install_skulpt(parsed_args):
             os.path.join(
                 common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/dist/'),
             os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
-
-
-def maybe_install_dependencies(
-        skip_installing_third_party_libs, run_minified_tests):
-    """Parse additional command line arguments."""
-    if skip_installing_third_party_libs is False:
-        # Install third party dependencies.
-        main(args=[])
-        # Ensure that generated JS and CSS files are in place before running the
-        # tests.
-        python_utils.PRINT('Running build task with concatenation only')
-        build.main(args=[])
-
-    if run_minified_tests is True:
-        python_utils.PRINT(
-            'Running build task with concatenation and minification')
-        build.main(args=['--prod_env'])
 
 
 def ensure_pip_library_is_installed(package, version, path):
