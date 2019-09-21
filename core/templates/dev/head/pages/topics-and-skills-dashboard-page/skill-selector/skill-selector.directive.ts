@@ -35,7 +35,7 @@ angular.module('oppia').directive('selectSkill', [
             $scope, $uibModal, $rootScope) {
           $scope.skillSummaries = $scope.getSkillSummaries();
           $scope.selectSkill = function(skillId) {
-              $scope.selectedSkillId = skillId;
+            $scope.selectedSkillId = skillId;
           };
         }
       ]

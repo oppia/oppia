@@ -129,7 +129,7 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
           question_id: questionId,
           skill_id: skillId
         });
-      $http.delete(deleteQuestionSkillLinkUrl).then(function(response) {
+      $http['delete'](deleteQuestionSkillLinkUrl).then(function(response) {
         if (successCallback) {
           successCallback();
         }

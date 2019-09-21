@@ -81,19 +81,19 @@ angular.module('oppia').directive('storyEditorNavbar', [
             var explorationIds = [];
             for (var i = 0; i < nodes.length; i++) {
               if (
-                  nodes[i].getExplorationId() !== null &&
-                  nodes[i].getExplorationId() !== '') {
+                nodes[i].getExplorationId() !== null &&
+                nodes[i].getExplorationId() !== '') {
                 explorationIds.push(nodes[i].getExplorationId());
               }
             }
 
             ExplorationSummaryBackendApiService.loadPublicExplorationSummaries(
               explorationIds).then(function(summaries) {
-                if (summaries.length !== explorationIds.length) {
-                  $scope.validationIssues.push(
-                    'Some explorations in story are not published.');
-                }
-              });
+              if (summaries.length !== explorationIds.length) {
+                $scope.validationIssues.push(
+                  'Some explorations in story are not published.');
+              }
+            });
           };
 
           $scope.saveChanges = function() {

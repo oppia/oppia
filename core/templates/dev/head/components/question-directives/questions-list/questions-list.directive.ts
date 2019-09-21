@@ -335,21 +335,21 @@ angular.module('oppia').directive('questionsList', [
                 if (summary.getDescription() === skillDescriptions[0]) {
                   EditableQuestionBackendApiService.deleteQuestionFromSkill(
                     questionId, summary.getId()).then(function() {
-                      ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
-                        0, ctrl.skillIds, true, true
-                      );
-                      ctrl.currentPage = 0;
-                      AlertsService.addSuccessMessage('Deleted Question');
-                    });
+                    ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
+                      0, ctrl.skillIds, true, true
+                    );
+                    ctrl.currentPage = 0;
+                    AlertsService.addSuccessMessage('Deleted Question');
+                  });
                 }
               });
             } else {
               var allSkillSummaries = ctrl.getAllSkillSummaries().filter(
                 function(summary) {
-                    summary.isSelected = false;
-                    return (
-                      skillDescriptions.indexOf(
-                        summary.getDescription()) !== -1);
+                  summary.isSelected = false;
+                  return (
+                    skillDescriptions.indexOf(
+                      summary.getDescription()) !== -1);
                 });
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -361,9 +361,9 @@ angular.module('oppia').directive('questionsList', [
                   function($scope, $uibModalInstance) {
                     var init = function() {
                       $scope.instructionMessage = (
-                          'Select the skill(s) from which to unlink ' +
-                          'question. (If all skills are selected, the ' +
-                          ' question would be deleted)');
+                        'Select the skill(s) from which to unlink ' +
+                        'question. (If all skills are selected, the ' +
+                        ' question would be deleted)');
                       $scope.currentMode = MODE_SELECT_SKILL;
                       $scope.skillSummaries = allSkillSummaries;
                     };
@@ -400,10 +400,10 @@ angular.module('oppia').directive('questionsList', [
                 selectedSkillIds.forEach(function(skillId) {
                   EditableQuestionBackendApiService.deleteQuestionFromSkill(
                     questionId, skillId).then(function() {
-                      deletedQuestionSkillLinksCount++;
-                      if (
-                          deletedQuestionSkillLinksCount ===
-                          selectedSkillIds.length) {
+                    deletedQuestionSkillLinksCount++;
+                    if (
+                      deletedQuestionSkillLinksCount ===
+                      selectedSkillIds.length) {
                       /*
                         Had to resort to a timeout here, since it seems when
                         deleting multiple question skill links, even though the
@@ -413,18 +413,17 @@ angular.module('oppia').directive('questionsList', [
                         skill link remained at the moment this next block
                         called.
                       */
-                            setTimeout(function(){
-                              ctrl.questionSummaries =
-                                ctrl.getQuestionSummariesAsync(
-                                  0, ctrl.skillIds, true, true
-                                );
-                              ctrl.currentPage = 0;
-                              AlertsService.addSuccessMessage('Deleted Links');
-                            }, 100 * selectedSkillIds.length);
-                        }
-                    });
+                      setTimeout(function() {
+                        ctrl.questionSummaries =
+                          ctrl.getQuestionSummariesAsync(
+                            0, ctrl.skillIds, true, true
+                          );
+                        ctrl.currentPage = 0;
+                        AlertsService.addSuccessMessage('Deleted Links');
+                      }, 100 * selectedSkillIds.length);
+                    }
+                  });
                 });
-
               });
             }
           };
