@@ -168,6 +168,7 @@ class BaseModel(ndb.Model):
         Args:
             update_last_updated_time: bool. Whether to update the
                 last_updated_field of the model.
+
         Returns:
             Model. The entity that was stored.
         """
