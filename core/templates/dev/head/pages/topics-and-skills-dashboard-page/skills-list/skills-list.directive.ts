@@ -17,6 +17,9 @@
  */
 
 require(
+  'pages/topics-and-skills-dashboard-page/skill-selector/' +
+  'skill-selector.directive.ts');
+require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
 
@@ -38,9 +41,7 @@ angular.module('oppia').directive('skillsList', [
       scope: {
         getSkillSummaries: '&skillSummaries',
         getEditableTopicSummaries: '&editableTopicSummaries',
-        isInModal: '&inModal',
         getMergeableSkillSummaries: '&mergeableSkillSummaries',
-        selectedSkill: '=',
         canDeleteSkill: '&userCanDeleteSkill',
         canCreateSkill: '&userCanCreateSkill',
         isUnpublishedSkill: '&unpublishedSkill'
@@ -157,10 +158,6 @@ angular.module('oppia').directive('skillsList', [
             });
           };
 
-          $scope.selectSkill = function(skill) {
-            $scope.selectedSkill = skill;
-          };
-
           $scope.mergeSkill = function(skill) {
             var skillSummaries = $scope.getMergeableSkillSummaries();
             var modalInstance = $uibModal.open({
@@ -172,11 +169,11 @@ angular.module('oppia').directive('skillsList', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
-                  $scope.selectedSkill = {};
+                  $scope.selectedSkillId = '';
                   $scope.done = function() {
                     $uibModalInstance.close(
                       {skill: skill,
-                        supersedingSkillId: $scope.selectedSkill.id
+                        supersedingSkillId: $scope.selectedSkillId
                       });
                   };
                   $scope.cancel = function() {
