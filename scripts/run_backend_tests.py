@@ -399,7 +399,7 @@ def main(args=None):
             test_count = 0
         elif (task.exception and
               'No tests were run' in python_utils.convert_to_bytes(
-                task.exception.args[0])):
+                  task.exception.args[0])):
             python_utils.PRINT(
                 'ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
