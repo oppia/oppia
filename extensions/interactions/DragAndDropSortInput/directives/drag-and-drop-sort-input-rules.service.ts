@@ -17,71 +17,93 @@
  */
 
 // Rules Service for DragAndDropSortInput interaction.
-angular.module('oppia').factory('DragAndDropSortInputRulesService', [
-  function() {
-    var checkEquality = function(answer, inputs) {
-      for (var i = 0; i < answer.length; i++) {
-        if (answer[i].length === inputs.x[i].length) {
-          for (var j = 0; j < answer[i].length; j++) {
-            if (inputs.x[i].indexOf(answer[i][j]) === -1) {
-              return false;
-            }
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DragAndDropSortInputRulesService {
+  static checkEquality(answer: string[][],
+      inputs: {x: string[][]}): boolean {
+    for (var i:number = 0; i < answer.length; i++) {
+      if (answer[i].length === inputs.x[i].length) {
+        for (var j:number = 0; j < answer[i].length; j++) {
+          if (inputs.x[i].indexOf(answer[i][j]) === -1) {
+            return false;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static checkEqualityWithIncorrectPositions(answer: string[][],
+      inputs: {x: string[][]}): boolean {
+    var noOfMismatches: number = 0;
+    for (var i:number = 0; i < Math.min(inputs.x.length, answer.length); i++) {
+      for (
+        var j:number = 0; j < Math.max(answer[i].length,
+          inputs.x[i].length); j++) {
+        if (inputs.x[i].length > answer[i].length) {
+          if (answer[i].indexOf(inputs.x[i][j]) === -1) {
+            noOfMismatches += 1;
           }
         } else {
-          return false;
-        }
-      }
-      return true;
-    };
-    var checkEqualityWithIncorrectPositions = function(answer, inputs) {
-      var noOfMismatches = 0;
-      for (var i = 0; i < math.min(inputs.x.length, answer.length); i++) {
-        for (
-          var j = 0; j < math.max(answer[i].length, inputs.x[i].length); j++) {
-          if (inputs.x[i].length > answer[i].length) {
-            if (answer[i].indexOf(inputs.x[i][j]) === -1) {
-              noOfMismatches += 1;
-            }
-          } else {
-            if (inputs.x[i].indexOf(answer[i][j]) === -1) {
-              noOfMismatches += 1;
-            }
+          if (inputs.x[i].indexOf(answer[i][j]) === -1) {
+            noOfMismatches += 1;
           }
         }
       }
-      return noOfMismatches === 1;
-    };
-    return {
-      IsEqualToOrdering: function(answer, inputs) {
-        return answer.length === inputs.x.length && checkEquality(
-          answer, inputs);
-      },
-      IsEqualToOrderingWithOneItemAtIncorrectPosition: function(
-          answer, inputs) {
-        return checkEqualityWithIncorrectPositions(answer, inputs);
-      },
-      HasElementXAtPositionY: function(answer, inputs) {
-        for (var i = 0; i < answer.length; i++) {
-          var index = answer[i].indexOf(inputs.x);
-          if (index !== -1) {
-            return ((i + 1) === inputs.y);
-          }
-        }
-      },
-      HasElementXBeforeElementY: function(answer, inputs) {
-        var indX = -1;
-        var indY = -1;
-        for (var i = 0; i < answer.length; i++) {
-          var index = answer[i].indexOf(inputs.x);
-          if (index !== -1) {
-            indX = i;
-          }
-          index = answer[i].indexOf(inputs.y);
-          if (index !== -1) {
-            indY = i;
-          }
-        }
-        return indX < indY;
+    }
+    return noOfMismatches === 1;
+  }
+
+  IsEqualToOrdering(answer: string[][],
+      inputs: {x: string[][]}):boolean {
+    return answer.length === inputs.x.length && (
+      DragAndDropSortInputRulesService.checkEquality(
+        answer, inputs));
+  }
+
+  IsEqualToOrderingWithOneItemAtIncorrectPosition(
+      answer: string[][], inputs: {x: string[][]}): boolean {
+    return DragAndDropSortInputRulesService.checkEqualityWithIncorrectPositions(
+      answer, inputs);
+  }
+
+  HasElementXAtPositionY(answer: string[][],
+      inputs: {x:string, y:number}): boolean {
+    for (var i:number = 0; i < answer.length; i++) {
+      var index = answer[i].indexOf(inputs.x);
+      if (index !== -1) {
+        return ((i + 1) === inputs.y);
       }
-    };
-  }]);
+    }
+  }
+
+  HasElementXBeforeElementY(answer: string[][],
+      inputs: {x:string, y:string}): boolean {
+    var indX = -1;
+    var indY = -1;
+    for (var i:number = 0; i < answer.length; i++) {
+      var index = answer[i].indexOf(inputs.x);
+      if (index !== -1) {
+        indX = i;
+      }
+      index = answer[i].indexOf(inputs.y);
+      if (index !== -1) {
+        indY = i;
+      }
+    }
+    return indX < indY;
+  }
+}
+
+
+angular.module('oppia').factory(
+  'DragAndDropSortInputRulesService',
+  downgradeInjectable(DragAndDropSortInputRulesService));

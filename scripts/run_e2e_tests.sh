@@ -47,13 +47,8 @@
 function cleanup {
   # Send a kill signal to the dev server and Selenium server. The awk command
   # gets just the process ID from the grepped line.
-  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
-  kill `ps aux | grep node_modules/webdriver-manager/selenium | awk '{print $2}'`
-
-  # Wait for the servers to go down; suppress "connection refused" error output
-  # from nc since that is exactly what we are expecting to happen.
-  while ( nc -vz localhost 4444 >/dev/null 2>&1 ); do sleep 1; done
-  while ( nc -vz localhost 9001 >/dev/null 2>&1 ); do sleep 1; done
+  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'` || true
+  kill `ps aux | grep node_modules/webdriver-manager/selenium | awk '{print $2}'` || true
 
   if [ -d "../protractor-screenshots" ]; then
     echo ""
@@ -77,15 +72,11 @@ then
 fi
 
 set -e
-source $(dirname $0)/setup.sh || exit 1
-source $(dirname $0)/setup_gae.sh || exit 1
+python -m scripts.setup
+python -m scripts.setup_gae
 if [ "$TRAVIS" == 'true' ]; then
-  source $(dirname $0)/install_chrome_on_travis.sh || exit 1
+  python -m scripts.install_chrome_on_travis
 fi
-
-export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
-export DEFAULT_RUN_MINIFIED_TESTS=false
-maybeInstallDependencies "$@"
 
 if ( nc -vz localhost 8181 ); then
   echo ""
@@ -128,15 +119,17 @@ for arg in "$@"; do
   fi
 done
 
-if [[ "DEV_MODE" == "true" ]]; then
+if [[ "$DEV_MODE" == "true" ]]; then
   constants_env_variable="\"DEV_MODE\": true"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
-  $PYTHON_CMD scripts/build.py
+  python -m scripts.build
   APP_YAML_FILEPATH="app_dev.yaml"
+
+  node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts
 else
   constants_env_variable="\"DEV_MODE\": false"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
-  $PYTHON_CMD scripts/build.py --prod_env
+  python -m scripts.build --prod_env
   APP_YAML_FILEPATH="app.yaml"
 fi
 
@@ -147,15 +140,15 @@ rm assets/constants.ts.bak
 # The 'detach' option continues the flow once the server is up and runnning.
 # The 'quiet' option prints only the necessary information about the server start-up
 # process.
-$NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.41
-$NODE_MODULE_DIR/.bin/webdriver-manager start --versions.chrome 2.41 --detach --quiet
+node_modules/.bin/webdriver-manager update --versions.chrome 2.41
+node_modules/.bin/webdriver-manager start --versions.chrome 2.41 --detach --quiet
 
 # Start a selenium process. The program sends thousands of lines of useless
 # info logs to stderr so we discard them.
 # TODO(jacob): Find a webdriver or selenium argument that controls log level.
-($NODE_MODULE_DIR/.bin/webdriver-manager start 2>/dev/null)&
+(node_modules/.bin/webdriver-manager start 2>/dev/null)&
 # Start a demo server.
-($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=9001 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true $APP_YAML_FILEPATH)&
+(python ../oppia_tools/google_appengine_1.9.67/google_appengine/dev_appserver.py --host=0.0.0.0 --port=9001 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true $APP_YAML_FILEPATH)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done
@@ -218,14 +211,14 @@ done
 # TODO(bhenning): Figure out if this is a bug with protractor.
 if [ "$RUN_ON_BROWSERSTACK" == "False" ]; then
   if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor.conf.js --suite "$SUITE" --params.devMode="$DEV_MODE"
+    node_modules/protractor/bin/protractor core/tests/protractor.conf.js --suite "$SUITE" --params.devMode="$DEV_MODE"
   else
-    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
+    node_modules/protractor/bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
   fi
 else
   if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --suite "$SUITE" --params.devMode="$DEV_MODE"
+    node_modules/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --suite "$SUITE" --params.devMode="$DEV_MODE"
   else
-    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
+    node_modules/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
   fi
 fi

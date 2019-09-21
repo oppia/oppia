@@ -138,3 +138,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             ExplorationOpportunitySummaryModel having given topic_id.
         """
         return cls.query(cls.topic_id == topic_id).fetch()
+
+    @classmethod
+    def delete_all(cls):
+        """Deletes all entities of this class."""
+        keys = cls.query().fetch(keys_only=True)
+        ndb.delete_multi(keys)

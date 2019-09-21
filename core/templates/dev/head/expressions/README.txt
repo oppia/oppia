@@ -16,9 +16,9 @@ See ExpressionEvaluatorService.js for the operator contracts.
 
 Files:
 parser.pegjs
-  This is the parser definition which is used to generate the ExpressionParserService.js file
+  This is the parser definition which is used to generate the expression-parser.service.js file
   that will be used at runtime to parse user-entered expressions.
-ExpressionParserService.js
+expression-parser.service.js
   This is the JavaScript parser file produced by PEGJS and the input file
   parser.pegjs.
 ExpressionEvaluatorService.js
@@ -34,14 +34,14 @@ How to update the parser:
 2. Add tests in test.js for the new or modified grammar.
 3. Run
 
-      bash scripts/create_expression_parser.sh
+      python -m scripts.create_expression_parser
 
-   which updates ExpressionParserService.js. Then run the frontend unit tests using
+   which updates expression-parser.service.js. Then run the frontend unit tests using
 
-      bash scripts/run_frontend_tests.sh
+      python -m scripts.run_frontend_tests
 
    to ensure that the new grammar passes the tests in ExpressionParserServiceSpec.js and
    ExpressionEvaluatorServiceSpec.js.
 4. Repeat 1-3 until the desired grammar is written and tested.
-5. Check the changes. You need to check in parser.pegjs as well as ExpressionParserService.js
+5. Check the changes. You need to check in parser.pegjs as well as expression-parser.service.js
   (and probably ExpressionParserServiceSpec.js and ExpressionEvaluatorServiceSpec.js).

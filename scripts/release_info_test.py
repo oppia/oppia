@@ -271,26 +271,26 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
 
     def test_check_setup_scripts_to_get_changed_scripts_status(self):
         def mock_run_cmd(unused_cmd):
-            return 'scripts/setup.sh\nscripts/setup_gae.sh'
+            return 'scripts/setup.py\nscripts/setup_gae.py'
         with self.swap(common, 'run_cmd', mock_run_cmd):
             actual_scripts = release_info.check_setup_scripts(
                 'release_tag')
         expected_scripts = {
-            'scripts/setup.sh': True,
-            'scripts/setup_gae.sh': True
+            'scripts/setup.py': True,
+            'scripts/setup_gae.py': True
         }
         self.assertEqual(actual_scripts, expected_scripts)
 
     def test_check_setup_scripts_to_get_all_scripts_status(self):
         def mock_run_cmd(unused_cmd):
-            return 'scripts/setup.sh\nscripts/setup_gae.sh'
+            return 'scripts/setup.py\nscripts/setup_gae.py'
         with self.swap(common, 'run_cmd', mock_run_cmd):
             actual_scripts = release_info.check_setup_scripts(
                 'release_tag', changed_only=False)
         expected_scripts = {
-            'scripts/setup.sh': True,
-            'scripts/setup_gae.sh': True,
-            'scripts/install_third_party.sh': False,
+            'scripts/setup.py': True,
+            'scripts/setup_gae.py': True,
+            'scripts/install_third_party_libs.py': False,
             'scripts/install_third_party.py': False
         }
         self.assertEqual(actual_scripts, expected_scripts)
@@ -298,7 +298,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
     def test_check_storage_models(self):
         def mock_run_cmd(unused_cmd):
             return (
-                'scripts/setup.sh\nextensions/test.ts\n'
+                'scripts/setup.py\nextensions/test.ts\n'
                 'core/storage/activity/gae_models.py\n'
                 'core/storage/user/gae_models.py')
         with self.swap(common, 'run_cmd', mock_run_cmd):

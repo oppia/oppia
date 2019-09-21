@@ -24,6 +24,7 @@ from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_jobs_one_off
+from core.domain import opportunity_jobs_one_off
 from core.domain import prod_validation_jobs_one_off
 from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
@@ -42,6 +43,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    email_jobs_one_off.GeneralFeedbackEmailReplyToIdOneOffJob,
     exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
@@ -54,7 +56,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
-    exp_jobs_one_off.DeleteStateIdMappingModelsOneOffJob,
+    opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,

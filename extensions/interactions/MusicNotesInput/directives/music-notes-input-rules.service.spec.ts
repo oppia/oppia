@@ -16,18 +16,16 @@
  * @fileoverview Unit tests for Music Notes rules.
  */
 
-require(
-  'interactions/MusicNotesInput/directives/music-notes-input-rules.service.ts');
+import { MusicNotesInputRulesService } from
+  'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 
-describe('Music Notes Input rules service', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Music Notes Input rules service', () => {
+  let mnirs: MusicNotesInputRulesService = null;
+  beforeEach(() => {
+    mnirs = new MusicNotesInputRulesService();
+  });
 
-  var mnirs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    mnirs = $injector.get('MusicNotesInputRulesService');
-  }));
-
-  it('should have a correct \'equals\' rule', function() {
+  it('should have a correct \'equals\' rule', () => {
     expect(mnirs.Equals([{
       readableNoteName: 'A4',
       noteDuration: {
@@ -141,7 +139,7 @@ describe('Music Notes Input rules service', function() {
     })).toBe(false);
   });
 
-  it('should have a correct \'equal except for\' rule', function() {
+  it('should have a correct \'equal except for\' rule', () => {
     expect(mnirs.IsEqualToExceptFor([{
       readableNoteName: 'C4',
       noteDuration: {
@@ -349,7 +347,7 @@ describe('Music Notes Input rules service', function() {
     })).toBe(false);
   });
 
-  it('should have a correct \'is transposition of\' rule', function() {
+  it('should have a correct \'is transposition of\' rule', () => {
     expect(mnirs.IsTranspositionOf([{
       readableNoteName: 'G4',
       noteDuration: {
@@ -463,7 +461,7 @@ describe('Music Notes Input rules service', function() {
   });
 
   it('should have a correct \'is transposition of except for\' rule',
-    function() {
+    () => {
       expect(mnirs.IsTranspositionOfExceptFor([{
         readableNoteName: 'G4',
         noteDuration: {
@@ -615,7 +613,7 @@ describe('Music Notes Input rules service', function() {
       })).toBe(false);
     }
   );
-  it('should have a correct \'is longer than\' rule', function() {
+  it('should have a correct \'is longer than\' rule', () => {
     expect(mnirs.IsLongerThan([{
       readableNoteName: 'A4',
       noteDuration: {
@@ -681,7 +679,7 @@ describe('Music Notes Input rules service', function() {
     })).toBe(false);
   });
   it('should have a correct \'has length inclusively between\' rule',
-    function() {
+    () => {
       expect(mnirs.HasLengthInclusivelyBetween([{
         readableNoteName: 'A4',
         noteDuration: {
