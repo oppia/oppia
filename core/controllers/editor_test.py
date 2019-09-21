@@ -114,7 +114,9 @@ class EditorTests(BaseEditorControllerTests):
 
         # Check that non-editors can access, but not edit, the editor page.
         response = self.get_html_response('/create/0')
-        self.assertIn('Help others learn new things.', response.body)
+        self.assertIn(
+            '<exploration-editor-page></exploration-editor-page>',
+            response.body)
         self.assert_cannot_edit('0')
 
         # Log in as an editor.
@@ -122,7 +124,9 @@ class EditorTests(BaseEditorControllerTests):
 
         # Check that it is now possible to access and edit the editor page.
         response = self.get_html_response('/create/0')
-        self.assertIn('Help others learn new things.', response.body)
+        self.assertIn(
+            '<exploration-editor-page></exploration-editor-page>',
+            response.body)
         self.assert_can_edit('0')
 
         self.logout()
