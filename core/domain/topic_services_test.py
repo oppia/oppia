@@ -86,8 +86,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
-        self.assertEqual(topic_summary.canonical_story_count, 2)
-        self.assertEqual(topic_summary.additional_story_count, 1)
+        self.assertEqual(topic_summary.canonical_story_count, 0)
+        self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
         self.assertEqual(topic_summary.total_skill_count, 2)
@@ -97,8 +97,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic_summaries), 1)
         self.assertEqual(topic_summaries[0].name, 'Name')
-        self.assertEqual(topic_summaries[0].canonical_story_count, 2)
-        self.assertEqual(topic_summaries[0].additional_story_count, 1)
+        self.assertEqual(topic_summaries[0].canonical_story_count, 0)
+        self.assertEqual(topic_summaries[0].additional_story_count, 0)
         self.assertEqual(topic_summaries[0].total_skill_count, 2)
         self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
@@ -109,8 +109,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic_summaries), 2)
         self.assertEqual(topic_summaries[0].name, 'Name')
-        self.assertEqual(topic_summaries[0].canonical_story_count, 2)
-        self.assertEqual(topic_summaries[0].additional_story_count, 1)
+        self.assertEqual(topic_summaries[0].canonical_story_count, 0)
+        self.assertEqual(topic_summaries[0].additional_story_count, 0)
         self.assertEqual(topic_summaries[0].total_skill_count, 2)
         self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
@@ -196,8 +196,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
-        self.assertEqual(topic_summary.canonical_story_count, 2)
-        self.assertEqual(topic_summary.additional_story_count, 1)
+        self.assertEqual(topic_summary.canonical_story_count, 0)
+        self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.total_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
@@ -207,8 +207,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
-        self.assertEqual(topic_summary.canonical_story_count, 2)
-        self.assertEqual(topic_summary.additional_story_count, 1)
+        self.assertEqual(topic_summary.canonical_story_count, 0)
+        self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
 
@@ -308,20 +308,26 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.canonical_story_references[0].story_is_published, True)
         self.assertEqual(
             topic.additional_story_references[0].story_is_published, True)
+        self.assertEqual(topic_summary.canonical_story_count, 1)
+        self.assertEqual(topic_summary.additional_story_count, 1)
 
         topic_services.unpublish_story(
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
         topic_services.unpublish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.canonical_story_references[0].story_is_published, False)
         self.assertEqual(
             topic.additional_story_references[0].story_is_published, False)
+        self.assertEqual(topic_summary.canonical_story_count, 0)
+        self.assertEqual(topic_summary.additional_story_count, 0)
 
     def test_invalid_publish_and_unpublish_story(self):
         with self.assertRaisesRegexp(
