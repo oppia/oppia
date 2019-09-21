@@ -158,6 +158,11 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   $scope.rubrics = rubrics;
                   $scope.allRubricsAdded = false;
 
+                  $scope.$watch('newSkillDescription', function() {
+                    $scope.rubrics[1].setExplanation(
+                      $scope.newSkillDescription);
+                  });
+
                   var areAllRubricsPresent = function() {
                     for (var idx in $scope.rubrics) {
                       if ($scope.rubrics[idx].getExplanation() === '') {
