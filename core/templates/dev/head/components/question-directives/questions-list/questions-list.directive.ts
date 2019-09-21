@@ -61,7 +61,7 @@ angular.module('oppia').directive('questionsList', [
         'questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$http', '$q', '$uibModal', '$window',
+        '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
         'AlertsService', 'QuestionCreationService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
         'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
@@ -70,7 +70,7 @@ angular.module('oppia').directive('questionsList', [
         'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL',
         'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
         function(
-            $scope, $filter, $http, $q, $uibModal, $window,
+            $scope, $filter, $http, $q, $timeout, $uibModal, $window,
             AlertsService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
             EditableSkillBackendApiService, MisconceptionObjectFactory,
@@ -237,7 +237,7 @@ angular.module('oppia').directive('questionsList', [
                     $scope.currentMode = MODE_SELECT_SKILL;
                   };
 
-                  $scope.nextStep = function() {
+                  $scope.goToNextStep = function() {
                     $scope.currentMode = MODE_SELECT_DIFFICULTY;
                   };
 
@@ -380,7 +380,7 @@ angular.module('oppia').directive('questionsList', [
                       $uibModalInstance.dismiss('cancel');
                     };
 
-                    $scope.nextStep = function() {
+                    $scope.goToNextStep = function() {
                       var selectedSkillIds = [];
                       $scope.skillSummaries.forEach(function(summary) {
                         if (summary.isSelected) {
@@ -413,7 +413,7 @@ angular.module('oppia').directive('questionsList', [
                         skill link remained at the moment this next block
                         called.
                       */
-                      setTimeout(function() {
+                      $timeout(function() {
                         ctrl.questionSummaries =
                           ctrl.getQuestionSummariesAsync(
                             0, ctrl.skillIds, true, true
