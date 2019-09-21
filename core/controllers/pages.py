@@ -63,7 +63,11 @@ class ConsoleErrorPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('console_errors.html')
+        # Note that this line is not meant to be covered by backend tests
+        # because this handler is only meant to be used in e2e tests. In the
+        # backend test environment, the HTML template file is not generated at
+        # all.
+        self.render_template('console_errors.html')  # pragma: no cover
 
 
 class MaintenancePage(base.BaseHandler):
