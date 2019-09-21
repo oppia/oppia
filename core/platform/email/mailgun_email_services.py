@@ -85,9 +85,9 @@ def send_mail(
     data = {
         'from': sender_email,
         'to': recipient_email,
-        'subject': subject.encode('utf-8'),
-        'text': plaintext_body.encode('utf-8'),
-        'html': html_body.encode('utf-8')
+        'subject': subject.encode(encoding='utf-8'),
+        'text': plaintext_body.encode(encoding='utf-8'),
+        'html': html_body.encode(encoding='utf-8')
     }
 
     if bcc_admin:
@@ -144,9 +144,9 @@ def send_bulk_mail(
         data = {
             'from': sender_email,
             'to': email_set,
-            'subject': subject.encode('utf-8'),
-            'text': plaintext_body.encode('utf-8'),
-            'html': html_body.encode('utf-8'),
+            'subject': subject.encode(encoding='utf-8'),
+            'text': plaintext_body.encode(encoding='utf-8'),
+            'html': html_body.encode(encoding='utf-8'),
             'recipient-variables': '{}'}
 
         post_to_mailgun(data)

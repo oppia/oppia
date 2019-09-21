@@ -41,10 +41,10 @@ class EmailTests(test_utils.GenericTestBase):
             result = mailgun_email_services.post_to_mailgun({
                 'from': 'a@a.com',
                 'to': 'b@b.com',
-                'subject': (
-                    'Hola 😂 - invitation to collaborate'.encode('utf-8')),
-                'text': 'plaintext_body 😂'.encode('utf-8'),
-                'html': 'Hi abc,<br> 😂'.encode('utf-8')
+                'subject': 'Hola 😂 - invitation to collaborate'.encode(
+                    encoding='utf-8'),
+                'text': 'plaintext_body 😂'.encode(encoding='utf-8'),
+                'html': 'Hi abc,<br> 😂'.encode(encoding='utf-8')
             })
             expected = (
                 'https://api.mailgun.net/v3/domain/messages',
