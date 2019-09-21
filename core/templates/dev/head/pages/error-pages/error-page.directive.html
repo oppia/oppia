@@ -4,19 +4,19 @@
   <div class="oppia-wide-panel oppia-error-wide-container">
     <div class="oppia-wide-panel-content protractor-test-error-container">
       <h1 class="oppia-error-h1">
-        <div ng-if="$ctrl.statusCode === 400">
+        <div ng-if="$ctrl.getStatusCode() === 400">
           <span translate="I18N_ERROR_HEADER_400"></span>
           - Bad Request
         </div>
-        <div ng-if="$ctrl.statusCode === 401">
+        <div ng-if="$ctrl.getStatusCode() === 401">
           <span translate="I18N_ERROR_HEADER_401"></span>
           - Unauthorized
         </div>
-        <div ng-if="$ctrl.statusCode === 404">
+        <div ng-if="$ctrl.getStatusCode() === 404" class="protractor-test-error-page">
           <span translate="I18N_ERROR_HEADER_404"></span>
           - Page Not Found
         </div>
-        <div ng-if="$ctrl.statusCode === 500">
+        <div ng-if="$ctrl.getStatusCode() === 500">
           <span translate="I18N_ERROR_HEADER_500"></span>
           - System Error
         </div>

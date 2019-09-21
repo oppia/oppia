@@ -17,7 +17,7 @@
 In general, this script should not be run directly. Instead, invoke
 it from the command line by running
 
-    bash scripts/run_backend_tests.sh
+    python -m scripts.run_backend_tests
 
 from the oppia/ root folder.
 """
@@ -81,8 +81,10 @@ def create_test_suites(test_target=None):
             top_level_dir=CURR_DIR)])
 
 
-def main():
+def main(args=None):
     """Runs the tests."""
+    parsed_args = _PARSER.parse_args(args=args)
+
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
@@ -91,7 +93,6 @@ def main():
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    parsed_args = _PARSER.parse_args()
     suites = create_test_suites(test_target=parsed_args.test_target)
 
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
