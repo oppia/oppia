@@ -33,6 +33,10 @@ class UserSettingsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+    # User id used to identify user by GAE. Is not required for now because we
+    # need to perform migration to fill this for existing users.
+    # TODO(#7659): Set required to True.
+    gae_user_id = ndb.StringProperty(required=False, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
     # User role. Required for authorization. User gets a default role of
@@ -114,7 +118,7 @@ class UserSettingsModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -220,7 +224,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -274,7 +278,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -334,7 +338,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -438,7 +442,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -496,7 +500,7 @@ class UserContributionsModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -558,7 +562,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
 
 class UserSubscriptionsModel(base_models.BaseModel):
@@ -598,7 +602,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -653,7 +657,7 @@ class UserSubscribersModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
@@ -685,7 +689,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -755,7 +759,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
     @classmethod
     def get_or_create(cls, user_id):
@@ -865,7 +869,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -1007,7 +1011,7 @@ class CollectionProgressModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
@@ -1156,7 +1160,7 @@ class StoryProgressModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -1331,8 +1335,7 @@ class UserQueryModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return (
-            cls.get_all().filter(cls.submitter_id == user_id).get() is not None)
+        return cls.query(cls.submitter_id == user_id).get() is not None
 
     @classmethod
     def fetch_page(cls, page_size, cursor):
@@ -1390,7 +1393,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.get_by_id(user_id) is not None
 
 
 class UserSkillMasteryModel(base_models.BaseModel):
@@ -1425,7 +1428,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):
@@ -1496,7 +1499,7 @@ class UserContributionScoringModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.get_all().filter(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):

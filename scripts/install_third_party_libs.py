@@ -40,7 +40,6 @@ if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
 # pylint: disable=wrong-import-order
 import python_utils  # isort:skip
 
-from . import build  # isort:skip
 from . import common  # isort:skip
 from . import install_third_party  # isort:skip
 from . import pre_commit_hook  # isort:skip
@@ -98,7 +97,7 @@ def pip_install(package, version, install_path):
                 'Windows%29')
         raise Exception
 
-    subprocess.call([
+    subprocess.check_call([
         'pip', 'install', '%s==%s' % (package, version), '--target',
         install_path])
 
@@ -186,23 +185,6 @@ def install_skulpt(parsed_args):
             os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
 
 
-def maybe_install_dependencies(
-        skip_installing_third_party_libs, run_minified_tests):
-    """Parse additional command line arguments."""
-    if skip_installing_third_party_libs is False:
-        # Install third party dependencies.
-        main(args=[])
-        # Ensure that generated JS and CSS files are in place before running the
-        # tests.
-        python_utils.PRINT('Running build task with concatenation only')
-        build.main(args=[])
-
-    if run_minified_tests is True:
-        python_utils.PRINT(
-            'Running build task with concatenation and minification')
-        build.main(args=['--prod_env'])
-
-
 def ensure_pip_library_is_installed(package, version, path):
     """Installs the pip library after ensuring its not already installed.
 
@@ -241,6 +223,39 @@ def main(args=None):
 
     for package, version, path in pip_dependencies:
         ensure_pip_library_is_installed(package, version, path)
+
+    # Do a little surgery on configparser in pylint-1.9.4 to remove dependency
+    # on ConverterMapping, which is not implemented in some Python
+    # distributions.
+    pylint_configparser_filepath = os.path.join(
+        common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
+    pylint_newlines = []
+    with python_utils.open_file(pylint_configparser_filepath, 'r') as f:
+        for line in f.readlines():
+            if line.strip() == 'ConverterMapping,':
+                continue
+            if line.strip().endswith('"ConverterMapping",'):
+                pylint_newlines.append(
+                    line[:line.find('"ConverterMapping"')] + '\n')
+            else:
+                pylint_newlines.append(line)
+    with python_utils.open_file(pylint_configparser_filepath, 'w+') as f:
+        f.writelines(pylint_newlines)
+
+    # Do similar surgery on configparser in pylint-quotes-0.1.8 to remove
+    # dependency on ConverterMapping.
+    pq_configparser_filepath = os.path.join(
+        common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
+    pq_newlines = []
+    with python_utils.open_file(pq_configparser_filepath, 'r') as f:
+        for line in f.readlines():
+            if line.strip() == 'ConverterMapping,':
+                continue
+            if line.strip() == '"ConverterMapping",':
+                continue
+            pq_newlines.append(line)
+    with python_utils.open_file(pq_configparser_filepath, 'w+') as f:
+        f.writelines(pq_newlines)
 
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')

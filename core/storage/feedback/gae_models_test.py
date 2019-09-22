@@ -282,6 +282,28 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
 class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     """Tests for the FeedbackThreadUserModel class."""
+    USER_ID_A = 'user.id.a'
+    USER_ID_B = 'user_id_b'
+    THREAD_ID_A = 'exploration.exp_id.thread_id_a'
+    THREAD_ID_B = 'exploration.exp_id.thread_id_b'
+    THREAD_ID_C = 'exploration.exp_id.thread_id_c'
+    MESSAGE_IDS_READ_IN_THREAD_A = [0, 1, 2]
+    MESSAGE_IDS_READ_IN_THREAD_B = [3, 4]
+    MESSAGE_IDS_READ_IN_THREAD_C = [5, 6, 7, 8, 9]
+
+    def setUp(self):
+        super(FeedbackThreadUserModelTest, self).setUp()
+        model = feedback_models.GeneralFeedbackThreadUserModel.create(
+            self.USER_ID_A, self.THREAD_ID_A)
+        model.message_ids_read_by_user = self.MESSAGE_IDS_READ_IN_THREAD_A
+
+        model = feedback_models.GeneralFeedbackThreadUserModel.create(
+            self.USER_ID_A, self.THREAD_ID_B)
+        model.message_ids_read_by_user = self.MESSAGE_IDS_READ_IN_THREAD_B
+
+        model = feedback_models.GeneralFeedbackThreadUserModel.create(
+            self.USER_ID_A, self.THREAD_ID_C)
+        model.message_ids_read_by_user = self.MESSAGE_IDS_READ_IN_THREAD_C
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -401,6 +423,23 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             actual_model_2.message_ids_read_by_user,
             expected_model_2.message_ids_read_by_user)
+
+    def test_export_data_general_case(self):
+        """Ensure export_data returns well-formed data in general case."""
+        user_data = feedback_models.GeneralFeedbackThreadUserModel.export_data(
+            self.USER_ID_A)
+        expected_data = {
+            self.THREAD_ID_A: self.MESSAGE_IDS_READ_IN_THREAD_A,
+            self.THREAD_ID_B: self.MESSAGE_IDS_READ_IN_THREAD_B,
+            self.THREAD_ID_C: self.MESSAGE_IDS_READ_IN_THREAD_C
+        }
+        self.assertDictEqual(expected_data, user_data)
+
+    def test_export_data_nonexistent_case(self):
+        """Ensure export data returns empty dict when data is not found."""
+        user_data = feedback_models.GeneralFeedbackThreadUserModel.export_data(
+            self.USER_ID_B)
+        self.assertEqual({}, user_data)
 
 
 class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):

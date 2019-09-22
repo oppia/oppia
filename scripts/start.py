@@ -80,8 +80,6 @@ def main(args=None):
     # Runs cleanup function on exit.
     atexit.register(cleanup)
 
-    python_utils.PRINT('Oppia setup complete!')
-
     # Check that there isn't a server already running.
     if common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         common.print_each_string_after_two_new_lines([

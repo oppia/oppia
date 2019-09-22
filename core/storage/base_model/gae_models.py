@@ -16,6 +16,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from constants import constants
 from core.platform import models
 import python_utils
@@ -54,9 +56,9 @@ class BaseModel(ndb.Model):
 
     # When this entity was first created. This can be overwritten and
     # set explicitly.
-    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
+    created_on = ndb.DateTimeProperty(indexed=True, required=True)
     # When this entity was last updated. This cannot be set directly.
-    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
+    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
     # Whether the current version of the model instance is deleted.
     deleted = ndb.BooleanProperty(indexed=True, default=False)
 
@@ -173,13 +175,40 @@ class BaseModel(ndb.Model):
                     entities[i] = None
         return entities
 
+    def put(self, update_last_updated_time=True):
+        """Stores the given ndb.Model instance to the datastore.
+
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated_field of the model.
+
+        Returns:
+            Model. The entity that was stored.
+        """
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
+
+        if update_last_updated_time or self.last_updated is None:
+            self.last_updated = datetime.datetime.utcnow()
+
+        return super(BaseModel, self).put()
+
     @classmethod
-    def put_multi(cls, entities):
+    def put_multi(cls, entities, update_last_updated_time=True):
         """Stores the given ndb.Model instances.
 
         Args:
             entities: list(ndb.Model).
+            update_last_updated_time: bool. Whether to update the
+                last_updated_field of the entities.
         """
+        for entity in entities:
+            if entity.created_on is None:
+                entity.created_on = datetime.datetime.utcnow()
+
+            if update_last_updated_time or entity.last_updated is None:
+                entity.last_updated = datetime.datetime.utcnow()
+
         ndb.put_multi(entities)
 
     @classmethod
@@ -575,7 +604,7 @@ class VersionedModel(BaseModel):
             id=snapshot_id, content=snapshot)
 
         transaction_services.run_in_transaction(
-            ndb.put_multi,
+            BaseModel.put_multi,
             [snapshot_metadata_instance, snapshot_content_instance, self])
 
     def delete(self, committer_id, commit_message, force_deletion=False):

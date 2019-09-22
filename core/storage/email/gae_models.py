@@ -90,10 +90,10 @@ class SentEmailModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        references_recipient_id = cls.get_all().filter(
+        references_recipient_id = cls.query(
             cls.recipient_id == user_id
         ).get() is not None
-        references_sender_id = cls.get_all().filter(
+        references_sender_id = cls.query(
             cls.sender_id == user_id
         ).get() is not None
         return references_recipient_id or references_sender_id
@@ -304,7 +304,7 @@ class BulkEmailModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         # TODO(vojtechjelinek): Add check for recipient_ids too.
-        return cls.get_all().filter(cls.sender_id == user_id).get() is not None
+        return cls.query(cls.sender_id == user_id).get() is not None
 
     @classmethod
     def create(
@@ -346,13 +346,6 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     thread_id = ndb.StringProperty(required=False, indexed=True)
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
-    # When this user thread was created and last updated. This overrides the
-    # fields in BaseModel. We are overriding them because we do not want the
-    # last_updated field to be updated when running one off job and whe the
-    # model is created we need to make sure that created_on is set before
-    # last updated.
-    created_on = ndb.DateTimeProperty(indexed=True, required=True)
-    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -369,25 +362,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.get_all().filter(cls.user_id == user_id).get() is not None
-
-    def put(self, update_last_updated_time=True):
-        """Writes the given thread instance to the datastore.
-
-        Args:
-            update_last_updated_time: bool. Whether to update the
-                last_updated_field of the thread.
-
-        Returns:
-            GeneralFeedbackEmailReplyToIdModel. The thread entity.
-        """
-        if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
-
-        if update_last_updated_time or self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
-
-        return super(GeneralFeedbackEmailReplyToIdModel, self).put()
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):

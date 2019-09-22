@@ -18,8 +18,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
 from core.platform import models
 import feconf
 import python_utils
@@ -93,9 +91,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.get_all().filter(
-            cls.original_author_id == user_id
-        ).get() is not None
+        return cls.query(cls.original_author_id == user_id).get() is not None
 
     @classmethod
     def export_data(cls, user_id):
@@ -234,7 +230,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.get_all().filter(cls.author_id == user_id).get() is not None
+        return cls.query(cls.author_id == user_id).get() is not None
 
     @classmethod
     def export_data(cls, user_id):
@@ -458,23 +454,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.get_all().filter(cls.user_id == user_id).get() is not None
-
-    def put(self, update_last_updated_time=True):
-        """Writes the given thread instance to the datastore.
-        Args:
-            update_last_updated_time: bool. Whether to update the
-                last_updated_field of the thread.
-        Returns:
-            GeneralFeedbackThreadModel. The thread entity.
-        """
-        if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
-
-        if update_last_updated_time or self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
-
-        return super(GeneralFeedbackThreadUserModel, self).put()
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def generate_full_id(cls, user_id, thread_id):
@@ -543,6 +523,25 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
         return super(GeneralFeedbackThreadUserModel, cls).get_multi(
             instance_ids)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export GeneralFeedbackThreadUserModel user-based properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict containing the user-relevant properties of
+            GeneralFeedbackThreadUserModel, i.e., which messages have been
+            read by the user (as a list of ids) in each thread.
+        """
+        found_models = cls.get_all().filter(cls.user_id == user_id)
+        user_data = {}
+        for user_model in found_models:
+            user_data[user_model.thread_id] = (
+                user_model.message_ids_read_by_user)
+        return user_data
 
 
 class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -630,4 +629,4 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get(user_id, strict=False) is not None
+        return cls.query(cls.id == user_id).get() is not None

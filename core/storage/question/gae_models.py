@@ -66,10 +66,8 @@ class QuestionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question should be kept if it belongs to at least one
-        published skill.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        """Question should be kept but the creator should be anonymized."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def _get_new_id(cls):
@@ -187,10 +185,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question-skill link should be deleted only if all associated skills
-        or questions are deleted.
+        """Question-skill link should be kept since questions are only
+        anonymized and are not deleted whe user is deleted.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.KEEP
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -555,10 +553,10 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question summary should be kept if associated question belongs to at
-        least one published skill.
+        """Question summary should be kept but the creator should be
+        anonymized.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def get_by_creator_id(cls, creator_id):
@@ -600,7 +598,7 @@ class QuestionRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question rights should be kept if associated question belongs to at
-        least one published skill.
+        """Question rights should be kept but the creator should be
+        anonymized.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE

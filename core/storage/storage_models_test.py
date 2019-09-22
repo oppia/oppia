@@ -33,9 +33,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
         # As models.NAMES is an enum, it cannot be iterated. So we use the
         # __dict__ property which can be iterated.
         for name in models.NAMES.__dict__:
-            if '__' in name:
-                continue
-            yield name
+            if '__' not in name:
+                yield name
 
     def _get_model_classes(self):
         """Get all model classes in storage."""
