@@ -1,6 +1,6 @@
 <div class="oppia-skill-mastery-viewer" ng-if="!$ctrl.loadingMessage">
   <div class="skill-mastery-degree">
-    <b> Mastery Degree: </b>
+    <b translate="I18N_SKILL_MASTERY_MASTERY_DEGREE"></b>
     <div style="margin-bottom: 10px">
       <[$ctrl.getSkillMasteryPercentage()]>%
       <span style="color: green" ng-if="$ctrl.masteryChange >= 0"> (<[$ctrl.getMasteryChangePercentage()]>%) </span>
@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="learning-tips">
-    <b> Learning Tips: </b>
+    <b translate="I18N_SKILL_MASTERY_LEARNING_TIPS"></b>
     <div> <[$ctrl.getLearningTips()]> </div>
   </div>
 </div>

@@ -1,20 +1,16 @@
 <div class="oppia-skills-list-container">
   <md-card class="oppia-page-card oppia-long-text">
     <div class="oppia-skills-mastery">
-      <h3 class="form-heading"> Skills included in this topic </h3>
-      <h4 class="not-logged-in-warning" ng-if="!$ctrl.userIsLoggedIn"> Please login to view your skill mastery. </h4>
+      <h3 class="form-heading" translate="I18N_SKILL_MASTERY_LIST_HEADING"></h3>
+      <h4 class="not-logged-in-warning" ng-if="!$ctrl.userIsLoggedIn" translate="I18N_SKILL_MASTERY_LIST_USER_LOGGED_OUT"></h4>
       <table class="skill-mastery-table" ng-if="$ctrl.skillIdsAndMastery.length > 0">
         <colgroup>
           <col style="width: 40%;">
           <col style="width: 60%">
         </colgroup>
         <tr>
-          <th class="skill-mastery-table-headings">
-            Skill Descriptions
-          </th>
-          <th class="skill-mastery-table-headings">
-            Skill Mastery
-          </th>
+          <th class="skill-mastery-table-headings" translate="I18N_SKILL_MASTERY_TABLE_HEADING_1"></th>
+          <th class="skill-mastery-table-headings" translate="I18N_SKILL_MASTERY_TABLE_HEADING_2"></th>
         </tr>
         <tr ng-repeat="item in $ctrl.skillIdsAndMastery | orderBy: '-mastery'"
             class="list-item"
@@ -28,9 +24,7 @@
           </td>
         </tr>
       </table>
-      <h4 class="no-skill-warning" ng-if="$ctrl.skillIdsAndMastery.length === 0">
-        No skill is assigned to this topic.
-      </h4>
+      <h4 class="no-skill-warning" ng-if="$ctrl.skillIdsAndMastery.length === 0" translate="I18N_SKILL_MASTERY_TABLE_NO_SKILL"></h4>
     </div>
   </md-card>
 </div>

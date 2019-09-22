@@ -8,17 +8,17 @@
 
 <div class="modal-footer">
   <button class="btn btn-default"
-          ng-click="closeModal()">
-    Close
+          ng-click="closeModal()"
+          translate="I18N_CONCEPT_CARD_MODAL_CLOSE">
   </button>
   <button class="btn btn-success"
           ng-if="isInTestMode && !isLastConceptCard()"
-          ng-click="goToNextConceptCard()">
-    Next
+          ng-click="goToNextConceptCard()"
+          translate="I18N_CONCEPT_CARD_MODAL_NEXT">
   </button>
   <button class="btn btn-success"
           ng-if="isInTestMode && isLastConceptCard()"
-          ng-click="retryTest()">
-    Retry Test
+          ng-click="retryTest()"
+          translate="I18N_CONCEPT_CARD_MODAL_RETRY">
   </button>
 </div>
