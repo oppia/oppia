@@ -64,7 +64,7 @@ angular.module('oppia').directive('storyEditorPage', [
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/story-editor-page/modal-templates/' +
-                  'save-pending-changes-modal.template.html'),
+                  'story-save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',
