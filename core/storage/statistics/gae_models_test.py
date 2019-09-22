@@ -37,6 +37,11 @@ class StateCounterModelTests(test_utils.GenericTestBase):
             stats_models.StateCounterModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.StateCounterModel.has_reference_to_user_id('any_id')
+        )
+
     def test_state_counter_model_gets_created(self):
         # This tests whether get_or_create() can create the model.
         model_instance = stats_models.StateCounterModel.get_or_create(
@@ -72,6 +77,12 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.AnswerSubmittedEventLogEntryModel
+            .has_reference_to_user_id('any_id')
+        )
+
     def test_create_and_get_event_models(self):
         event_id = (
             stats_models.AnswerSubmittedEventLogEntryModel.create(
@@ -98,6 +109,12 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.ExplorationActualStartEventLogEntryModel
+            .has_reference_to_user_id('any_id')
+        )
+
     def test_create_and_get_event_models(self):
         event_id = (
             stats_models.ExplorationActualStartEventLogEntryModel.create(
@@ -119,6 +136,12 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_models.SolutionHitEventLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.SolutionHitEventLogEntryModel
+            .has_reference_to_user_id('any_id')
+        )
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -143,6 +166,12 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             stats_models.StartExplorationEventLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.StartExplorationEventLogEntryModel
+            .has_reference_to_user_id('any_id')
+        )
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -171,6 +200,12 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel
+            .has_reference_to_user_id('any_id')
+        )
+
 
 class CompleteExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
@@ -181,6 +216,12 @@ class CompleteExplorationEventLogEntryModelUnitTests(
             stats_models.CompleteExplorationEventLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.CompleteExplorationEventLogEntryModel
+            .has_reference_to_user_id('any_id')
+        )
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -210,6 +251,12 @@ class RateExplorationEventLogEntryModelUnitTests(
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.RateExplorationEventLogEntryModel
+            .has_reference_to_user_id('any_id')
+        )
+
 
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateHitEventLogEntryModel class."""
@@ -218,6 +265,12 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_models.StateHitEventLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.StateHitEventLogEntryModel
+            .has_reference_to_user_id('any_id')
+        )
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -243,6 +296,12 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             stats_models.StateCompleteEventLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.StateCompleteEventLogEntryModel
+            .has_reference_to_user_id('any_id')
+        )
+
     def test_create_and_get_event_models(self):
         event_id = (
             stats_models.StateCompleteEventLogEntryModel.create(
@@ -267,6 +326,12 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
             stats_models.LeaveForRefresherExplorationEventLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.LeaveForRefresherExplorationEventLogEntryModel
+            .has_reference_to_user_id('any_id')
+        )
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -295,6 +360,11 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_models.ExplorationStatsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.ExplorationStatsModel.has_reference_to_user_id('id')
+        )
 
     def test_create_and_get_analytics_model(self):
         model_id = (
@@ -348,6 +418,11 @@ class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
             stats_models.ExplorationIssuesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.ExplorationIssuesModel.has_reference_to_user_id('id')
+        )
+
     def test_create_and_get_exp_issues_model(self):
         model_id = (
             stats_models.ExplorationIssuesModel.create(
@@ -368,6 +443,11 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_models.PlaythroughModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.PlaythroughModel.has_reference_to_user_id('any_id')
+        )
 
     def test_create_and_get_playthrough_model(self):
         model_id = (
@@ -419,6 +499,12 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_models.LearnerAnswerDetailsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.LearnerAnswerDetailsModel
+            .has_reference_to_user_id('any_id')
+        )
 
     def test_get_state_reference_for_exploration(self):
         exp_id_1 = 'expid1'
@@ -549,6 +635,12 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
             stats_models.ExplorationAnnotationsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.ExplorationAnnotationsModel
+            .has_reference_to_user_id('any_id')
+        )
+
     def test_create_and_get_models(self):
         stats_models.ExplorationAnnotationsModel.create(
             'exp_id1', '1', 5, 4, {})
@@ -586,6 +678,11 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_models.StateAnswersModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.StateAnswersModel.has_reference_to_user_id('any_id')
+        )
 
     def test_shard_count_is_updated_when_data_overflows(self):
 
@@ -646,6 +743,12 @@ class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_models.StateAnswersCalcOutputModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            stats_models.StateAnswersCalcOutputModel
+            .has_reference_to_user_id('any_id')
+        )
 
     def test_get_model_returns_created_properties(self):
 
