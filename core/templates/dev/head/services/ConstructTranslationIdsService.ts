@@ -16,8 +16,8 @@
  * @fileoverview Service to dynamically construct translation ids for i18n.
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -33,5 +33,4 @@ export class ConstructTranslationIdsService {
 }
 
 angular.module('oppia').factory(
-  'ConstructTranslationIdsService',
-  downgradeInjectable(ConstructTranslationIdsService));
+  'ConstructTranslationIdsService', downgradeInjectable(ConstructTranslationIdsService));
