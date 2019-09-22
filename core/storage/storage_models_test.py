@@ -114,7 +114,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
     def test_all_child_models_have_has_reference_to_user_id(self):
         for clazz in self._get_child_model_classes():
             try:
-                self.assertIsNotNone(clazz.has_reference_to_user_id())
+                self.assertIsNotNone(clazz.has_reference_to_user_id('any_id'))
             except NotImplementedError:
                 self.fail(
                     msg='has_reference_to_user_id is not defined for %s' % (
@@ -124,4 +124,4 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
                 with self.assertRaises(NotImplementedError):
-                    clazz.has_reference_to_user_id()
+                    clazz.has_reference_to_user_id('any_id')
