@@ -80,8 +80,6 @@ def main(args=None):
     # Runs cleanup function on exit.
     atexit.register(cleanup)
 
-    python_utils.PRINT('Oppia setup complete!')
-
     # Check that there isn't a server already running.
     if common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         common.print_each_string_after_two_new_lines([
@@ -170,8 +168,7 @@ def main(args=None):
                 'INFORMATION',
                 'Setting up a local development server at localhost:%s. '
                 % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-                'Opening a',
-                'default browser window pointing to this server'])
+                'Opening a default browser window pointing to this server'])
             time.sleep(5)
             background_processes.append(
                 subprocess.Popen([
@@ -182,8 +179,7 @@ def main(args=None):
             'INFORMATION',
             'Setting up a local development server at localhost:%s. '
             % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            'Opening a',
-            'default browser window pointing to this server.'])
+            'Opening a default browser window pointing to this server.'])
         time.sleep(5)
         background_processes.append(
             subprocess.Popen([

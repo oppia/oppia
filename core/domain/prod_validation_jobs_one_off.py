@@ -3616,16 +3616,17 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             # function.
             if topic_model is None or topic_model.deleted:
                 continue
-            canonical_story_ids = [
+            pubished_canonical_story_ids = [
                 reference['story_id']
-                for reference in topic_model.canonical_story_references]
-            if item.canonical_story_count != len(canonical_story_ids):
+                for reference in topic_model.canonical_story_references
+                if reference['story_is_published']]
+            if item.canonical_story_count != len(pubished_canonical_story_ids):
                 cls.errors['canonical story count check'].append((
                     'Entity id %s: Canonical story count: %s does not '
                     'match the number of story ids in canonical_story_ids in '
                     'topic model: %s') % (
                         item.id, item.canonical_story_count,
-                        canonical_story_ids))
+                        pubished_canonical_story_ids))
 
     @classmethod
     def _validate_additional_story_count(cls, item):
@@ -3645,16 +3646,19 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             # function.
             if topic_model is None or topic_model.deleted:
                 continue
-            additional_story_ids = [
+            published_additional_story_ids = [
                 reference['story_id']
-                for reference in topic_model.additional_story_references]
-            if item.additional_story_count != len(additional_story_ids):
+                for reference in topic_model.additional_story_references
+                if reference['story_is_published']]
+            if (
+                    item.additional_story_count !=
+                    len(published_additional_story_ids)):
                 cls.errors['additional story count check'].append((
                     'Entity id %s: Additional story count: %s does not '
                     'match the number of story ids in additional_story_ids in '
                     'topic model: %s') % (
                         item.id, item.additional_story_count,
-                        additional_story_ids))
+                        published_additional_story_ids))
 
     @classmethod
     def _validate_uncategorized_skill_count(cls, item):

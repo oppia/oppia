@@ -123,7 +123,6 @@ jobs:
       - restore_cache:
           <<: *restore_cache
       - run: sudo pip install webtest
-      - run: sudo pip install configparser
       - run: sudo pip install coverage
       - run:
           name: Run backend tests
