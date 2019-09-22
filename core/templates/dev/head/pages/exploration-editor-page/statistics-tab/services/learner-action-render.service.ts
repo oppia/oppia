@@ -26,7 +26,8 @@
  * learner actions and then returns a giant HTML string.
  */
 
-require('domain/statistics/GroupedStartingIndicesObjectFactory.ts');
+require(
+  'domain/statistics/PlaythroughActionsStartingIndicesBuilderObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
@@ -37,13 +38,15 @@ require(
 require('services/ExplorationHtmlFormatterService.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
-  'ExplorationStatesService', 'GroupedStartingIndicesObjectFactory',
-  'HtmlEscaperService', 'ACTION_TYPE_ANSWER_SUBMIT',
-  'ACTION_TYPE_EXPLORATION_QUIT', 'ACTION_TYPE_EXPLORATION_START',
+  'ExplorationStatesService',
+  'PlaythroughActionsStartingIndicesBuilderObjectFactory', 'HtmlEscaperService',
+  'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
+  'ACTION_TYPE_EXPLORATION_START',
   function(
-      ExplorationStatesService, GroupedStartingIndicesObjectFactory,
-      HtmlEscaperService, ACTION_TYPE_ANSWER_SUBMIT,
-      ACTION_TYPE_EXPLORATION_QUIT, ACTION_TYPE_EXPLORATION_START) {
+      ExplorationStatesService,
+      PlaythroughActionsStartingIndicesBuilderObjectFactory, HtmlEscaperService,
+      ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
+      ACTION_TYPE_EXPLORATION_START) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
       var statement =
         actionIndex + '. Started exploration at card "' + stateName + '".';
@@ -167,7 +170,7 @@ angular.module('oppia').factory('LearnerActionRenderService', [
         var lastIndex = learnerActions.length - 1;
 
         var groupedStartingIndices =
-          GroupedStartingIndicesObjectFactory.createNew(
+          PlaythroughActionsStartingIndicesBuilderObjectFactory.createNew(
             lastIndex,
             learnerActions[lastIndex].actionCustomizationArgs.state_name.value);
 
@@ -178,7 +181,7 @@ angular.module('oppia').factory('LearnerActionRenderService', [
           if (currentStateName !== groupedStartingIndices.latestStateName) {
             groupedStartingIndices.handleChangeInState(action);
           } else {
-            groupedStartingIndices.handleSameState(action);
+            groupedStartingIndices.handleSameState();
           }
         }
 

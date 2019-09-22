@@ -20,16 +20,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export class GroupedStartingIndices {
+export class PlaythroughActionsStartingIndicesBuilder {
   startingIndices: number[];
   localIndex: number;
   lastIndex: number;
   latestStateName: string;
   /**
    * @constructor
-   * @param {number} lastIndex - Last Learner action index.
-   * @param {latestStateName} latestStateName - The latest state name being
-   * handled by the instance of the object.
    */
   constructor(lastIndex: number, latestStateName: string) {
     this.startingIndices = [];
@@ -41,7 +38,6 @@ export class GroupedStartingIndices {
   /**
    * Updates the local starting index or finalises the current index and
    * start calculating the next stop.
-   * @param {LearnerAction} action.
    */
   handleChangeInState(action) {
     this.latestStateName = action.actionCustomizationArgs.state_name.value;
@@ -65,9 +61,9 @@ export class GroupedStartingIndices {
   }
 
   /**
-   * @param {LearnerAction} action.
+   * Updates the local starting index.
    */
-  handleSameState(action) {
+  handleSameState() {
     this.localIndex -= 1;
   }
 }
@@ -75,19 +71,15 @@ export class GroupedStartingIndices {
 @Injectable({
   providedIn: 'root'
 })
-export class GroupedStartingIndicesObjectFactory {
-  /**
-   * @property {number} lastIndex - Last Learner action index.
-   * @property {string} latestStateName - The latest state name being
-   * handled by the instance of the object.
-   * @returns {GroupedStartingIndices}.
-   */
+export class PlaythroughActionsStartingIndicesBuilderObjectFactory {
   createNew(
-      lastIndex: number, latestStateName: string): GroupedStartingIndices {
-    return new GroupedStartingIndices(lastIndex, latestStateName);
+      lastIndex: number,
+      latestStateName: string): PlaythroughActionsStartingIndicesBuilder {
+    return new PlaythroughActionsStartingIndicesBuilder(
+      lastIndex, latestStateName);
   }
 }
 
 angular.module('oppia').factory(
-  'GroupedStartingIndicesObjectFactory',
-  downgradeInjectable(GroupedStartingIndicesObjectFactory));
+  'PlaythroughActionsStartingIndicesBuilderObjectFactory',
+  downgradeInjectable(PlaythroughActionsStartingIndicesBuilderObjectFactory));
