@@ -66,7 +66,8 @@ import time
 from . import install_third_party_libs
 install_third_party_libs.main(args=[])
 
-import python_utils
+# pylint: disable=wrong-import-position
+import python_utils  # isort:skip
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
