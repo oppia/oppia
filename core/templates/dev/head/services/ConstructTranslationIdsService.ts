@@ -33,4 +33,5 @@ export class ConstructTranslationIdsService {
 }
 
 angular.module('oppia').factory(
-  'ConstructTranslationIdsService', downgradeInjectable(ConstructTranslationIdsService));
+  'ConstructTranslationIdsService',
+  downgradeInjectable(ConstructTranslationIdsService));
