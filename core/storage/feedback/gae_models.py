@@ -629,4 +629,4 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.query(cls.id == user_id).get() is not None
+        return cls.get_by_id(user_id) is not None
