@@ -168,8 +168,7 @@ def main(args=None):
                 'INFORMATION',
                 'Setting up a local development server at localhost:%s. '
                 % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-                'Opening a',
-                'default browser window pointing to this server'])
+                'Opening a default browser window pointing to this server'])
             time.sleep(5)
             background_processes.append(
                 subprocess.Popen([
@@ -180,8 +179,7 @@ def main(args=None):
             'INFORMATION',
             'Setting up a local development server at localhost:%s. '
             % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            'Opening a',
-            'default browser window pointing to this server.'])
+            'Opening a default browser window pointing to this server.'])
         time.sleep(5)
         background_processes.append(
             subprocess.Popen([
