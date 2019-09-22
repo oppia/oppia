@@ -142,6 +142,24 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralSuggestionModel exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        references_author_id = cls.query(
+            cls.author_id == user_id
+        ).get() is not None
+        references_final_reviewer_id = cls.query(
+            cls.final_reviewer_id == user_id
+        ).get() is not None
+        return references_author_id or references_final_reviewer_id
+
+    @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
             target_version_at_submission, status, author_id,
@@ -295,10 +313,24 @@ class ReviewerRotationTrackingModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Reviewer rotation tracking is going to be reworked oon.
-        Thus, using using not applicable for now.
+        """Reviewer rotation tracking is going to be reworked. Thus, using
+        not applicable for now.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def has_reference_to_user_id(unused_user_id):
+        """ReviewerRotationTrackingModel is going to be reworked. Thus, return
+        False for now.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data
+            should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
 
     @classmethod
     def create(cls, score_category, user_id):
