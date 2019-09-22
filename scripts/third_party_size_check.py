@@ -19,12 +19,17 @@ size limit is exceeded. The aim of this is to prevent us accidentally
 breaching the 10k file limit on App Engine.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import sys
-import yaml
 
-import python_utils  # isort:skip
+import python_utils
+
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+sys.path.insert(0, _YAML_PATH)
+
+import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 7000

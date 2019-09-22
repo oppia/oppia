@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the story viewer page.
+ * @fileoverview Module for the topic viewer page.
  */
 
 import 'core-js/es7/reflect';

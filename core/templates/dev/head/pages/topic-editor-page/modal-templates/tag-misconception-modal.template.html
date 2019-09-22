@@ -7,7 +7,7 @@
   Selected Misconception: <[selectedMisconception.getName()]>
   <div ng-repeat="(skillId, misconceptions) in misconceptionsBySkill">
     <div ng-repeat="misconception in misconceptions">
-      <button class="btn btn-default" style="width: 100%" ng-click="selectMisconception(misconception, skillId)">
+      <button class="btn btn-secondary" style="width: 100%" ng-click="selectMisconception(misconception, skillId)">
         <[misconception.getName()]>
       </button>
       <div ng-if="selectedMisconceptionSkillId === skillId && selectedMisconception.getId() === misconception.getId()">
@@ -27,7 +27,7 @@
   </span>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
+  <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
   <button class="btn btn-success" ng-disabled="selectedMisconception === null" ng-click="done()"> Done </button>
 </div>
 

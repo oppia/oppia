@@ -16,6 +16,7 @@
 
 """Unit tests for core.domain.exp_fetchers."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
@@ -228,9 +229,9 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """) % (
-    feconf.DEFAULT_INIT_STATE_NAME,
+    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
+    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -392,7 +393,7 @@ title: Old Title
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': '0',
-                'to_version': python_utils.STR(
+                'to_version': python_utils.UNICODE(
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             }],
             'version_number': 4,

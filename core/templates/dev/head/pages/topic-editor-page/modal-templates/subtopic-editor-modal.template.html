@@ -12,10 +12,10 @@
       <form class="form-horizontal" role="form">
         <input class="form-control protractor-test-subtopic-title-field" type="text" ng-blur="updateSubtopicTitle(editableTitle)" ng-model="editableTitle" maxlength="80" ng-change="resetErrorMsg()">
       </form>
-      <span class="help-block" style="font-size: smaller; color: red;" ng-if="errorMsg">
+      <span class="form-text" style="font-size: smaller; color: red;" ng-if="errorMsg">
         <em><[errorMsg]></em>
       </span>
-      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 80">
+      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 80">
         <em>The maximum length of subtopic title is 80 characters.</em>
       </span>
     </div>
@@ -32,7 +32,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
+    <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
     <button class="btn btn-success protractor-test-save-subtopic-button" ng-disabled="editableTitle === ''" ng-click="save()"> Save & Exit </button>
   </div>
 </div>

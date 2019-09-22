@@ -17,7 +17,7 @@
              ng-model="$ctrl.displayedCollectionObjective"
              ng-blur="$ctrl.updateCollectionObjective()"
              placeholder="Learn how to ...">
-      <span class="help-block" style="font-size: smaller">
+      <span class="form-text" style="font-size: smaller">
         What does this collection help people to do?
       </span>
     </div>
@@ -45,7 +45,7 @@
     <div class="col-lg-10 col-md-10 col-sm-10">
       <select id="$ctrl.collectionLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="$ctrl.displayedCollectionLanguage" ng-change="$ctrl.updateCollectionLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.languageListForSelect">
       </select>
-      <span class="help-block" style="font-size: smaller">
+      <span class="form-text" style="font-size: smaller">
         <em>
           Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank" rel="noopener">Tell us.</a>
         </em>
@@ -67,7 +67,7 @@
                           on-selection-change="$ctrl.updateCollectionTags()">
         </select2-dropdown>
       </div>
-      <span class="help-block" style="font-size: smaller">
+      <span class="form-text" style="font-size: smaller">
         <em>Tags help learners discover your collection when searching.</em>
       </span>
     </div>

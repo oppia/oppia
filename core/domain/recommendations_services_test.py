@@ -16,6 +16,7 @@
 
 """Unit tests for recommendations_services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_services
 from core.domain import recommendations_services

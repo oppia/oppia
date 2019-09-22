@@ -137,6 +137,21 @@ describe('Url Service', function() {
     }).toThrowError('Invalid URL for topic');
   });
 
+  it('should correctly retrieve classroom name from url', function() {
+    mockLocation.pathname = '/classroom/abcdefgijklm';
+    expect(
+      UrlService.getClassroomNameFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/classroom/class%20name';
+    expect(
+      UrlService.getClassroomNameFromUrl()
+    ).toBe('class name');
+    mockLocation.pathname = '/invalid/abcdefgijklm';
+    expect(function() {
+      UrlService.getClassroomNameFromUrl();
+    }).toThrowError('Invalid URL for classroom');
+  });
+
   it('should correctly retrieve subtopic id from url', function() {
     mockLocation.pathname = '/subtopic/abcdefgijklm/1';
     expect(

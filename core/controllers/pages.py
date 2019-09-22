@@ -14,10 +14,12 @@
 
 """Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
 import feconf
+import python_utils
 
 
 class ForumRedirectPage(base.BaseHandler):
@@ -25,7 +27,7 @@ class ForumRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.GOOGLE_GROUP_URL)
+        self.redirect(python_utils.convert_to_bytes(feconf.GOOGLE_GROUP_URL))
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -34,7 +36,7 @@ class AboutRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/about')
+        self.redirect(python_utils.convert_to_bytes('/about'))
 
 
 class FoundationRedirectPage(base.BaseHandler):
@@ -42,7 +44,7 @@ class FoundationRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.FOUNDATION_SITE_URL)
+        self.redirect(python_utils.convert_to_bytes(feconf.FOUNDATION_SITE_URL))
         return
 
 
@@ -52,7 +54,7 @@ class TeachRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/teach')
+        self.redirect(python_utils.convert_to_bytes('/teach'))
 
 
 class ConsoleErrorPage(base.BaseHandler):
@@ -61,7 +63,11 @@ class ConsoleErrorPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('console_errors.html')
+        # Note that this line is not meant to be covered by backend tests
+        # because this handler is only meant to be used in e2e tests. In the
+        # backend test environment, the HTML template file is not generated at
+        # all.
+        self.render_template('console_errors.html')  # pragma: no cover
 
 
 class MaintenancePage(base.BaseHandler):

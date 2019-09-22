@@ -16,6 +16,7 @@
 
 """HTML validation service."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
@@ -348,7 +349,7 @@ def convert_to_textangular(html_data):
     # html strings they are stored as <br>. Since both of these
     # should match and <br> and <br/> have same working,
     # so the tag has to be replaced in this way.
-    return python_utils.STR(soup).replace('<br/>', '<br>')
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
 def convert_to_ckeditor(html_data):
@@ -519,7 +520,7 @@ def convert_to_ckeditor(html_data):
             else:
                 content.wrap(soup.new_tag('p'))
 
-    return python_utils.STR(soup).replace('<br/>', '<br>')
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
 def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
@@ -561,7 +562,7 @@ def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
         tabs['tab_contents-with-value'] = escape_html(
             json.dumps(tab_content_list))
 
-    return python_utils.STR(soup)
+    return python_utils.UNICODE(soup)
 
 
 def validate_rte_format(html_list, rte_format, run_migration=False):
@@ -707,7 +708,7 @@ def add_caption_attr_to_image(html_string):
         if 'caption-with-value' not in attrs:
             image['caption-with-value'] = escape_html(json.dumps(''))
 
-    return python_utils.STR(soup)
+    return python_utils.UNICODE(soup)
 
 
 def validate_customization_args(html_list):
@@ -795,7 +796,7 @@ def _validate_customization_args_in_tag(tag):
                                 component_tag):
                             yield err_msg
     except Exception as e:
-        yield python_utils.STR(e)
+        yield python_utils.UNICODE(e)
 
 
 def regenerate_image_filename_using_dimensions(filename, height, width):
@@ -812,7 +813,7 @@ def regenerate_image_filename_using_dimensions(filename, height, width):
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
     dimensions_suffix = '_height_%s_width_%s' % (
-        python_utils.STR(height), python_utils.STR(width))
+        python_utils.UNICODE(height), python_utils.UNICODE(width))
     new_filename = '%s%s.%s' % (
         filename_wo_filetype, dimensions_suffix, filetype)
     return new_filename
@@ -846,7 +847,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
                 'Exploration %s failed to load image: %s' %
                 (exp_id, image['filepath-with-value'].encode('utf-8')))
             raise e
-    return python_utils.convert_to_bytes(soup).replace('<br/>', '<br>')
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
 def get_filename_with_dimensions(old_filename, exp_id):

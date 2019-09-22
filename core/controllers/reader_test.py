@@ -14,6 +14,7 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -40,7 +41,6 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
-import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
@@ -1394,23 +1394,23 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Remove one exploration.
-        self.delete_json(python_utils.STR(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
-                self.EXP_ID_0)))
+                self.EXP_ID_0))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_1])
 
         # Remove another exploration.
-        self.delete_json(python_utils.STR(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
-                self.EXP_ID_1)))
+                self.EXP_ID_1))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
@@ -1430,23 +1430,23 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Remove one collection.
-        self.delete_json(python_utils.STR(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
-                self.COL_ID_0)))
+                self.COL_ID_0))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
 
         # Remove another collection.
-        self.delete_json(python_utils.STR(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
-                self.COL_ID_1)))
+                self.COL_ID_1))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])
@@ -1852,7 +1852,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'issue_schema_version': 1
             }, csrf_token=self.csrf_token, expected_status_int=400)
 
-        self.assertEqual(response['error'], u'\'playthrough_id\'')
+        self.assertEqual(response['error'], 'u\'playthrough_id\'')
 
     def test_move_playthrough_to_correct_issue(self):
         playthrough_id = stats_models.PlaythroughModel.create(

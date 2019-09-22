@@ -14,6 +14,7 @@
 
 """Base constants and handlers."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
 import datetime
@@ -57,14 +58,14 @@ def _clear_login_cookies(response_headers):
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below.
     cookie = http.cookies.SimpleCookie()
-    for cookie_name in ['ACSID', 'SACSID']:
+    for cookie_name in [b'ACSID', b'SACSID']:
         cookie = http.cookies.SimpleCookie()
         cookie[cookie_name] = ''
         cookie[cookie_name]['expires'] = (
             datetime.datetime.utcnow() +
             datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
         ).strftime('%a, %d %b %Y %H:%M:%S GMT')
-        response_headers.add_header(*cookie.output().split(': ', 1))
+        response_headers.add_header(*cookie.output().split(b': ', 1))
 
 
 class LogoutPage(webapp2.RequestHandler):
@@ -200,7 +201,8 @@ class BaseHandler(webapp2.RequestHandler):
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
-            self.redirect('https://oppiatestserver.appspot.com', permanent=True)
+            self.redirect(
+                b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
         # In DEV_MODE, clearing cookies does not log out the user, so we
@@ -263,22 +265,23 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = 'application/json; charset=utf-8'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename="oppia-attachment.txt"')
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains')
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
+        self.response.content_type = b'application/json; charset=utf-8'
+        self.response.headers[b'Content-Disposition'] = (
+            b'attachment; filename="oppia-attachment.txt"')
+        self.response.headers[b'Strict-Transport-Security'] = (
+            b'max-age=31536000; includeSubDomains')
+        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
+        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client."""
-        self.response.headers['Content-Type'] = content_type
+        self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
+            content_type)
         self.response.headers[
-            'Content-Disposition'] = python_utils.convert_to_bytes(
+            b'Content-Disposition'] = python_utils.convert_to_bytes(
                 'attachment; filename=%s' % filename)
         self.response.write(values)
 
@@ -326,15 +329,15 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains')
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
+        self.response.headers[b'Strict-Transport-Security'] = (
+            b'max-age=31536000; includeSubDomains')
+        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
+        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
                 self.response.headers[
-                    'X-Frame-Options'] = python_utils.convert_to_bytes(
+                    b'X-Frame-Options'] = python_utils.convert_to_bytes(
                         iframe_restriction)
             else:
                 raise Exception(
@@ -364,7 +367,8 @@ class BaseHandler(webapp2.RequestHandler):
                     'error-iframed.mainpage.html',
                     iframe_restriction=None)
             else:
-                self.render_template('error-page.mainpage.html')
+                self.render_template(
+                    'error-page-%s.mainpage.html' % values['status_code'])
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
@@ -380,6 +384,8 @@ class BaseHandler(webapp2.RequestHandler):
                 400, 401, 404 or 500).
             values: dict. The key-value pairs to include in the response.
         """
+        # The error codes here should be in sync with the error pages
+        # generated via webpack.common.config.ts.
         assert error_code in [400, 401, 404, 500]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
@@ -427,7 +433,7 @@ class BaseHandler(webapp2.RequestHandler):
                     current_user_services.create_login_url(self.request.uri))
             return
 
-        logging.info(''.join(traceback.format_exception(*sys.exc_info())))
+        logging.info(b''.join(traceback.format_exception(*sys.exc_info())))
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)

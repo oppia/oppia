@@ -16,6 +16,7 @@
 
 """Tests for core.storage.base_model.gae_models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import types
 
@@ -42,6 +43,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         super(BaseModelUnitTests, self).tearDown()
 
+    def test_has_reference_to_user_id(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.has_reference_to_user_id('user_id')
+
     def test_error_cases_for_get_method(self):
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
             base_models.BaseModel.get('Invalid id')
@@ -57,7 +62,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
     def test_export_data(self):
         with self.assertRaises(NotImplementedError):
-            base_models.BaseModel.export_data('model_id')
+            base_models.BaseModel.export_data('user_id')
 
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()

@@ -21,5 +21,5 @@
 require('pages/review-test-page/review-test-page.module.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require('pages/review-test-page/review-test-page.directive.ts');

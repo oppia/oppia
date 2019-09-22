@@ -14,6 +14,7 @@
 
 """Models for Oppia suggestions."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -291,6 +292,13 @@ class ReviewerRotationTrackingModel(base_models.BaseModel):
     # The ID of the user whose turn is just completed in the rotation.
     current_position_in_rotation = ndb.StringProperty(
         required=True, indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Reviewer rotation tracking is going to be reworked oon.
+        Thus, using using not applicable for now.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create(cls, score_category, user_id):

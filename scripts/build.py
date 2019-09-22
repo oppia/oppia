@@ -14,13 +14,14 @@
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # pylint: disable=invalid-name
+import argparse
 import collections
 import fnmatch
 import hashlib
 import json
-import optparse
 import os
 import re
 import shutil
@@ -96,7 +97,7 @@ FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
 # /extensions.)
 JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
-GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
+GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
 # These files are present in both extensions and local_compiled_js/extensions.
 # They are required in local_compiled_js since they contain code used in
@@ -106,7 +107,7 @@ GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 JS_FILEPATHS_NOT_TO_BUILD = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
     'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
+    'core/templates/dev/head/expressions/expression-parser.service.js')
 
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -141,6 +142,20 @@ HASH_BLOCK_SIZE = 2**20
 
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
+
+_PARSER = argparse.ArgumentParser(description="""
+Creates a third-party directory where all the JS and CSS dependencies are
+built and stored. Depending on the options passed to the script, might also
+minify third-party libraries and/or generate a build directory.
+""")
+
+_PARSER.add_argument(
+    '--prod_env', action='store_true', default=False, dest='prod_mode')
+_PARSER.add_argument(
+    '--minify_third_party_libs_only', action='store_true', default=False,
+    dest='minify_third_party_libs_only')
+_PARSER.add_argument(
+    '--enable_watcher', action='store_true', default=False)
 
 
 def generate_app_yaml():
@@ -205,7 +220,7 @@ def write_to_file_stream(file_stream, content):
         file_stream: file. A stream handling object to do write operation on.
         content: str. String content to write to file object.
     """
-    file_stream.write(python_utils.STR(content))
+    file_stream.write(python_utils.UNICODE(content))
 
 
 def _join_files(source_paths, target_file_stream):
@@ -825,7 +840,8 @@ def save_hashes_to_file(file_hashes):
     ensure_directory_exists(HASHES_JSON_FILEPATH)
     with python_utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
         hashes_json_file.write(
-            python_utils.STR(json.dumps(filtered_hashes, ensure_ascii=False)))
+            python_utils.UNICODE(
+                json.dumps(filtered_hashes, ensure_ascii=False)))
         hashes_json_file.write(u'\n')
 
 
@@ -1062,7 +1078,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         file_extensions_to_always_rebuild = ('.html', '.py',)
         python_utils.PRINT(
             'Staging dir exists, re-building all %s files'
-            % python_utils.STR(file_extensions_to_always_rebuild))
+            % ', '.join(file_extensions_to_always_rebuild))
 
         filenames_to_always_rebuild = get_filepaths_by_extensions(
             source_dir, file_extensions_to_always_rebuild)
@@ -1292,7 +1308,6 @@ def generate_build_directory(hashes):
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
     _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
 
-    save_hashes_to_file(dict())
     python_utils.PRINT('Build completed.')
 
 
@@ -1347,22 +1362,9 @@ def compile_typescript_files_continuously(project_dir):
                     return
 
 
-def build():
-    """The main method of this script.
-
-    Creates a third-party directory where all the JS and CSS dependencies are
-    built and stored. Depending on the options passed to the script, might also
-    minify third-party libraries and/or generate a build directory.
-    """
-    parser = optparse.OptionParser()
-    parser.add_option(
-        '--prod_env', action='store_true', default=False, dest='prod_mode')
-    parser.add_option(
-        '--minify_third_party_libs_only', action='store_true', default=False,
-        dest='minify_third_party_libs_only')
-    parser.add_option(
-        '--enable_watcher', action='store_true', default=False)
-    options = parser.parse_args()[0]
+def main(args=None):
+    """The main method of this script."""
+    options = _PARSER.parse_args(args=args)
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
@@ -1379,16 +1381,16 @@ def build():
             'minify_third_party_libs_only should not be set in non-prod mode.')
     if options.prod_mode:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-        hashes = generate_hashes()
-        build_using_webpack()
-        generate_app_yaml()
         if not options.minify_third_party_libs_only:
+            hashes = generate_hashes()
+            build_using_webpack()
+            generate_app_yaml()
             generate_build_directory(hashes)
-    else:
-        save_hashes_to_file(dict())
+
+    save_hashes_to_file(dict())
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when build.py is used as a script.
 if __name__ == '__main__':  # pragma: no cover
-    build()
+    main()

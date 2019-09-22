@@ -16,10 +16,12 @@
 
 """Test functions relating to roles and actions."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import role_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class RoleDomainUnitTests(test_utils.GenericTestBase):
@@ -47,16 +49,17 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
         and ROLE_ACTIONS are string.
         """
         for role_name in self.PARENT_ROLES:
-            self.assertTrue(isinstance(role_name, str))
+            self.assertTrue(isinstance(role_name, python_utils.UNICODE))
 
             for role in self.PARENT_ROLES[role_name]:
-                self.assertTrue(isinstance(role, str))
+                self.assertTrue(isinstance(role, python_utils.UNICODE))
 
         for role_name in self.ACTIONS:
-            self.assertTrue(isinstance(role_name, str))
+            self.assertTrue(isinstance(role_name, python_utils.UNICODE))
 
             for action_name in self.ACTIONS[role_name]:
-                self.assertTrue(isinstance(action_name, str))
+                self.assertTrue(
+                    isinstance(action_name, python_utils.UNICODE))
 
     def test_valid_parents(self):
         """Test that all the roles present in value list for any key in

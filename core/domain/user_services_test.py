@@ -16,6 +16,7 @@
 
 """Unit tests for core.domain.user_services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -1175,40 +1176,61 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
+    def test_gae_user_id_is_user_id(self):
+        self.assertEqual(
+            self.user_settings.user_id, self.user_settings.gae_user_id
+        )
+
     def test_validate_non_str_user_id(self):
         self.user_settings.user_id = 0
         with self.assertRaisesRegexp(
-            Exception, 'Expected user_id to be a string'):
+            utils.ValidationError, 'Expected user_id to be a string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_non_str_gae_user_id(self):
+        self.user_settings.gae_user_id = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected gae_user_id to be a string'
+        ):
             self.user_settings.validate()
 
     def test_validate_empty_user_id(self):
         self.user_settings.user_id = ''
-        with self.assertRaisesRegexp(Exception, 'No user id specified.'):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'No user id specified.'
+        ):
             self.user_settings.validate()
 
     def test_validate_non_str_role(self):
         self.user_settings.role = 0
-        with self.assertRaisesRegexp(Exception, 'Expected role to be a string'):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected role to be a string'
+        ):
             self.user_settings.validate()
 
     def test_validate_role(self):
         self.user_settings.role = 'invalid_role'
         with self.assertRaisesRegexp(
-            Exception, 'Role invalid_role does not exist.'):
+            utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
 
     def test_validate_non_str_creator_dashboard_display_pref(self):
         self.user_settings.creator_dashboard_display_pref = 0
         with self.assertRaisesRegexp(
-            Exception, 'Expected dashboard display preference to be a string'):
+            utils.ValidationError,
+            'Expected dashboard display preference to be a string'
+        ):
             self.user_settings.validate()
 
     def test_validate_creator_dashboard_display_pref(self):
         self.user_settings.creator_dashboard_display_pref = (
             'invalid_creator_dashboard_display_pref')
         with self.assertRaisesRegexp(
-            Exception, 'invalid_creator_dashboard_display_pref is not a valid '
-            'value for the dashboard display preferences.'):
+            utils.ValidationError,
+            'invalid_creator_dashboard_display_pref is not a valid '
+            'value for the dashboard display preferences.'
+        ):
             self.user_settings.validate()
 
     def test_guest_has_not_fully_registered(self):
@@ -1216,19 +1238,22 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_cannot_create_new_user_with_existing_user_id(self):
         with self.assertRaisesRegexp(
-            Exception, 'User %s already exists.' % self.owner_id):
+            Exception, 'User %s already exists.' % self.owner_id
+        ):
             user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
 
     def test_cannot_set_existing_username(self):
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Sorry, the username \"%s\" is already taken! Please pick '
-            'a different one.' % self.OWNER_USERNAME):
+            'a different one.' % self.OWNER_USERNAME
+        ):
             user_services.set_username(self.owner_id, self.OWNER_USERNAME)
 
     def test_cannot_update_user_role_with_invalid_role(self):
         with self.assertRaisesRegexp(
-            Exception, 'Role invalid_role does not exist.'):
+            Exception, 'Role invalid_role does not exist.'
+        ):
             user_services.update_user_role(self.owner_id, 'invalid_role')
 
     def test_cannot_get_human_readable_user_ids_with_invalid_user_ids(self):
@@ -1249,7 +1274,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'User id invalid_user_id not known in list of user_ids '
-                '[\'invalid_user_id\']'
+                '[u\'invalid_user_id\']'
             ])
 
     def test_get_human_readable_user_ids(self):

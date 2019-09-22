@@ -4,7 +4,7 @@
     <input id="storyNodeTitle" type="text" class="form-control"
            ng-model="editableTitle" ng-blur="updateTitle(editableTitle)"
            placeholder="Enter a title for the chapter." maxlength="20" ng-trim="false">
-    <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
+    <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
       <em>Please use at most 20 characters for the story title.</em>
     </span>
   </div>

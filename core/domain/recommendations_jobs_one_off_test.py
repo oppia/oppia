@@ -16,6 +16,7 @@
 
 """Tests for recommendations_jobs_one_off."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs_registry
 from core.domain import exp_services

@@ -37,6 +37,14 @@ var PreferencesPage = function() {
   var systemLanguageSelector = element.all(
     by.css('.protractor-test-system-language-selector')).first();
   var userBioElement = element(by.css('.protractor-test-user-bio'));
+  var userInterestsElement = element(
+    by.css('.protractor-test-interests-dropdown'));
+  var userInterestsInput = userInterestsElement.element(
+    by.css('.select2-search__field'));
+  var createrDashboardRadio = element(
+    by.css('.protractor-test-creator-dashboard-radio'));
+  var learnerDashboardRadio = element(
+    by.css('.protractor-test-learner-dashboard-radio'));
 
   this.editUserBio = function(bio) {
     userBioElement.sendKeys(bio);
@@ -86,6 +94,14 @@ var PreferencesPage = function() {
     preferencesLink.click();
   };
 
+  this.setUserInterests = function(interests) {
+    userInterestsInput.click();
+    interests.forEach(function(interest) {
+      userInterestsInput.sendKeys(interest);
+      userInterestsInput.sendKeys(protractor.Key.RETURN);
+    });
+  };
+
   this.isFeedbackEmailsCheckboxSelected = function() {
     return feedbackMessageEmailsCheckbox.isSelected();
   };
@@ -132,6 +148,14 @@ var PreferencesPage = function() {
 
   this.expectUserBioToBe = function(bio) {
     expect(userBioElement.getAttribute('value')).toMatch(bio);
+  };
+
+  this.selectCreatorDashboard = function() {
+    createrDashboardRadio.click();
+  };
+
+  this.selectLearnerDashboard = function() {
+    learnerDashboardRadio.click();
   };
 };
 

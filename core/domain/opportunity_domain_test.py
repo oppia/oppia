@@ -16,6 +16,7 @@
 
 """Tests for opportunity domain objects."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import opportunity_domain
@@ -207,7 +208,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 self.valid_exp_opp_summary,
                 'Expected voice_artist "needed" and "assigned" list of '
                 'languages to be disjoint, received: '
-                r'\[\'hi\'\], \[\'hi\', \'en\'\]')
+                r'\[u\'hi\'\], \[u\'hi\', u\'en\'\]')
 
     def test_translation_counts_with_invalid_language_code_fails_validation(
             self):
@@ -335,14 +336,14 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_all_languages_in_summary_equals_supported_languages(self):
         self.valid_exp_opp_summary.assigned_voice_artist_in_language_codes = [
-            'hi-en']
+            b'hi-en']
         self.valid_exp_opp_summary.need_voice_artist_in_language_codes = ['hi']
         self.valid_exp_opp_summary.incomplete_translation_language_codes = [
-            'en']
+            b'en']
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary.validate()
             self.valid_exp_opp_summary.need_voice_artist_in_language_codes = [
-                'en']
+                b'en']
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Expected set of all languages available in '

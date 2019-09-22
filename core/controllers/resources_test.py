@@ -14,6 +14,7 @@
 
 """Tests for Oppia resource handling (e.g. templates, images)."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
@@ -39,9 +40,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def _get_image_url(self, entity_type, entity_id, filename):
         """Gets the image URL."""
-        return python_utils.STR(
-            '%s/%s/%s/assets/image/%s' %
-            (self.ASSET_HANDLER_URL_PREFIX, entity_type, entity_id, filename))
+        return '%s/%s/%s/assets/image/%s' % (
+            self.ASSET_HANDLER_URL_PREFIX, entity_type, entity_id, filename)
 
     def setUp(self):
         """Load a demo exploration and register self.EDITOR_EMAIL."""

@@ -14,6 +14,7 @@
 
 """Module with GCloud-related functions."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import os
@@ -40,8 +41,8 @@ def require_gcloud_to_be_available():
         subprocess.check_output([GCLOUD_PATH, '--version'])
     except Exception:
         raise Exception(
-            'gcloud required, but could not be found. Please run '
-            'scripts/start.sh to install gcloud.')
+            'gcloud required, but could not be found. Please run python -m '
+            'scripts.start to install gcloud.')
 
 
 def update_indexes(index_yaml_path, app_name):

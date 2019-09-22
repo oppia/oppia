@@ -16,6 +16,7 @@
 
 """One-off jobs for explorations."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import itertools
@@ -254,8 +255,9 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             # as str to conform with legacy data.
             commit_cmds = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': python_utils.STR(item.states_schema_version),
-                'to_version': python_utils.STR(
+                'from_version': python_utils.UNICODE(
+                    item.states_schema_version),
+                'to_version': python_utils.UNICODE(
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             })]
             exp_services.update_exploration(
@@ -378,7 +380,7 @@ class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if hints_length > 0:
                 exp_and_state_key = '%s %s' % (
                     item.id, state_name.encode('utf-8'))
-                yield (python_utils.STR(hints_length), exp_and_state_key)
+                yield (python_utils.UNICODE(hints_length), exp_and_state_key)
 
     @staticmethod
     def reduce(key, values):
@@ -428,7 +430,7 @@ class ExplorationContentValidationJobForCKEditor(
             yield (key, output_values)
         else:
             output_values.append(key[exp_id_index:])
-            yield(key[:exp_id_index - 1], output_values)
+            yield (key[:exp_id_index - 1], output_values)
 
 
 class InteractionCustomizationArgsValidationJob(
@@ -451,7 +453,7 @@ class InteractionCustomizationArgsValidationJob(
         except Exception as e:
             yield (
                 'Error %s when loading exploration'
-                % python_utils.STR(e), [item.id])
+                % python_utils.UNICODE(e), [item.id])
             return
 
         html_list = exploration.get_all_html_content_strings()
@@ -473,7 +475,7 @@ class InteractionCustomizationArgsValidationJob(
             yield (key, output_values)
         else:
             output_values.append(key[exp_id_index:])
-            yield(key[:exp_id_index - 1], output_values)
+            yield (key[:exp_id_index - 1], output_values)
 
 
 class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -521,14 +523,3 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
-
-
-class DeleteStateIdMappingModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for wiping out state ID mapping models."""
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.StateIdMappingModel]
-
-    @staticmethod
-    def map(item):
-        item.delete()

@@ -16,6 +16,7 @@
 
 """Tests for exploration domain objects and methods defined on them."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import os
@@ -480,7 +481,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            r'There is no state in \[\'ABC\'\] corresponding to '
+            r'There is no state in \[u\'ABC\'\] corresponding to '
             'the exploration\'s initial state name initname.')
 
         # Test whether a default outcome to a non-existing state is invalid.

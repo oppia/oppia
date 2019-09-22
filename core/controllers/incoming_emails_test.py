@@ -17,12 +17,12 @@
 
 """Tests for the incoming email handler."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
 
 (feedback_models, email_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.email])
@@ -78,8 +78,8 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
                 model.reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
             # Send email to Oppia.
             self.post_email(
-                python_utils.STR(recipient_email), self.USER_A_EMAIL,
-                'feedback email reply', 'New reply')
+                recipient_email, self.USER_A_EMAIL, 'feedback email reply',
+                'New reply')
 
             # Check that new message is added.
             messages = feedback_services.get_messages(thread_id)

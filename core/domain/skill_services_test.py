@@ -14,6 +14,7 @@
 
 """Tests the methods defined in skill services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -729,9 +730,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'commit message')
 
         self.assertEqual(len(observed_log_messages), 1)
-        self.assertEqual(
-            observed_log_messages[0], 'AttributeError \'str\' object has no '
-            'attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
+        self.assertRegexpMatches(
+            observed_log_messages[0], 'object has no'
+            ' attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
 
     def test_cannot_update_misconception_name_with_invalid_id(self):
         changelist = [skill_domain.SkillChange({

@@ -16,6 +16,7 @@
 
 """Common classes and methods for managing long running jobs."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
@@ -215,7 +216,7 @@ class BaseJobManager(python_utils.OBJECT):
         """Returns compressed list of strings within a max length of chars.
 
         Ensures that the payload (i.e.,
-        [python_utils.STR(output) for output in output_list])
+        [python_utils.UNICODE(output) for output in output_list])
         makes up at most max_output_chars of the final output data.
 
         Args:
@@ -239,7 +240,7 @@ class BaseJobManager(python_utils.OBJECT):
 
         # Consolidate the lines of output since repeating them isn't useful.
         counter = _OrderedCounter(
-            python_utils.STR(output) for output in output_list)
+            python_utils.UNICODE(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
             for (output_str, count) in counter.items()
@@ -616,10 +617,10 @@ class BaseDeferredJobManager(BaseJobManager):
                 (job_id, utils.get_current_time_in_millisecs()))
             cls.register_failure(
                 job_id, '%s\n%s'
-                % (python_utils.STR(e), traceback.format_exc()))
+                % (python_utils.UNICODE(e), traceback.format_exc()))
             raise taskqueue_services.PermanentTaskFailure(
                 'Task failed: %s\n%s'
-                % (python_utils.STR(e), traceback.format_exc()))
+                % (python_utils.UNICODE(e), traceback.format_exc()))
 
         # Note that the job may have been canceled after it started and before
         # it reached this stage. This will result in an exception when the
@@ -710,7 +711,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                 (job_id, utils.get_current_time_in_millisecs()))
             job_class.register_failure(
                 job_id,
-                '%s\n%s' % (python_utils.STR(e), traceback.format_exc()))
+                '%s\n%s' % (python_utils.UNICODE(e), traceback.format_exc()))
 
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
@@ -728,7 +729,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
             data: *. Data to be serialized in JSON format.
         """
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
-            '%s\n' % json.dumps(data))
+            python_utils.convert_to_bytes('%s\n' % json.dumps(data)))
 
 
 class BaseMapReduceJobManager(BaseJobManager):
@@ -846,7 +847,7 @@ class BaseMapReduceJobManager(BaseJobManager):
                 # strings. Also note that the value for this key is determined
                 # just before enqueue time, so it will be roughly equal to the
                 # actual enqueue time.
-                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: python_utils.STR(
+                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: python_utils.UNICODE(
                     utils.get_current_time_in_millisecs()),
             },
             'reducer_params': {
@@ -1195,7 +1196,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             realtime_layer. The realtime layer entity.
         """
         if (self.realtime_layer is None or
-                python_utils.STR(self.realtime_layer) != self.id[0]):
+                python_utils.UNICODE(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
                 (self.realtime_layer, self.id))

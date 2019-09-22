@@ -6,7 +6,7 @@
     <md-card layout="row">
       <div class="average-ratings stats-card">
         <p class="stat-description" translate="I18N_DASHBOARD_STATS_AVERAGE_RATING"></p>
-        <h1 class="stat-value-with-rating" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.average_ratings || 'N/A']></h1>
+        <h1 class="stat-value-with-rating protractor-test-oppia-average-rating" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.average_ratings || 'N/A']></h1>
         <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.average_ratings || 'N/A']></h1>
         <p ng-hide="!$ctrl.dashboardStats.num_ratings">
           <p ng-if="$ctrl.dashboardStats.num_ratings === 1">
@@ -19,7 +19,7 @@
       </div>
       <div class="total-plays stats-card">
         <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_PLAYS"></p>
-        <h1 class="stat-value-with-rating" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.total_plays]></h1>
+        <h1 class="stat-value-with-rating protractor-test-oppia-total-plays" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.total_plays]></h1>
         <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.total_plays]></h1>
         <p ng-hide="!$ctrl.relativeChangeInTotalPlays">
           (+<[$ctrl.relativeChangeInTotalPlays]> from last week)
@@ -27,18 +27,18 @@
       </div>
       <div class="total-open-feedback stats-card">
         <p class="stat-description" translate="I18N_DASHBOARD_STATS_OPEN_FEEDBACK"></p>
-        <h1 class="stat-value-with-rating" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.total_open_feedback]></h1>
+        <h1 class="stat-value-with-rating protractor-test-oppia-open-feedback" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.total_open_feedback]></h1>
         <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.total_open_feedback]></h1>
       </div>
       <div class="total-open-feedback stats-card">
         <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS"></p>
-        <h1 class="stat-value-with-rating" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.subscribersList.length]></h1>
-        <h1 class="stat-value-without-rating" ng-hide="$ctrl.$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.subscribersList.length]></h1>
+        <h1 class="stat-value-with-rating protractor-test-oppia-total-subscribers" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.subscribersList.length]></h1>
+        <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.subscribersList.length]></h1>
       </div>
     </md-card>
   </div>
   <div class="row" ng-if="$ctrl.enableQuestionSuggestions">
-    <div class="oppia-create-question pull-right" ng-if="$ctrl.explorationsList.length > 0 || $ctrl.collectionsList.length > 0">
+    <div class="oppia-create-question float-right" ng-if="$ctrl.explorationsList.length > 0 || $ctrl.collectionsList.length > 0">
       <button class="btn oppia-creator-dashboard-create-question-button" ng-click="$ctrl.showCreateQuestionModal()" ng-if="$ctrl.topicSummaries.length > 0">
         <b>CREATE QUESTION</b>
       </button>
@@ -85,7 +85,7 @@
                 aria-label="Card View">
           <span class="fa fa-th-large"></span>
         </button>
-        <button class="list-view-btn"
+        <button class="list-view-btn protractor-test-oppia-list-view-btn"
                 ng-class="{'dashboard-active-view': $ctrl.myExplorationsView === 'list'}"
                 ng-click="$ctrl.setMyExplorationsView('list')"
                 aria-label="List View">
@@ -172,7 +172,7 @@
           <tr ng-repeat="exploration in $ctrl.explorationsList | orderBy:$ctrl.sortByFunction:$ctrl.isCurrentSortDescending track by exploration.id"
               class="exploration-list-item">
             <td>
-              <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+              <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-title">
                 <[exploration.title || $ctrl.DEFAULT_EMPTY_TITLE]>
               </a>
             </td>
@@ -184,23 +184,23 @@
               </a>
             </td>
             <td ng-if="exploration.status !== 'private'">
-              <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+              <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-rating">
                 <[($ctrl.getAverageRating(exploration.ratings) | number:1) || 'N/A']>
               </a>
             </td>
             <td ng-if="exploration.status !== 'private'">
-              <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+              <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-num-views">
                 <[exploration.num_views]>
               </a>
             </td>
             <td ng-if="exploration.status !== 'private'">
               <a ng-href="/create/<[exploration.id]>#/feedback"
-                 class="oppia-dashboard-list-summary">
+                 class="oppia-dashboard-list-summary protractor-test-exp-summary-row-open-feedback">
                 <[exploration.num_open_threads]>
               </a>
             </td>
             <td>
-              <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+              <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-last-updated">
                 <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
               </a>
             </td>
@@ -239,8 +239,8 @@
               layout-wrap
               class="metrics"
               layout-align="space-between center">
-            <li flex="50">
-              <span class="protractor-test-exp-summary-tile-rating">
+            <li flex="50" class="protractor-test-exp-summary-tile-rating">
+              <span>
                 <span class="fa fa-star oppia-dashboard-card-statistic-icon"
                       uib-tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
                       tooltip-placement="top">
@@ -251,7 +251,7 @@
               </span>
             </li>
 
-            <li flex="50" class="protractor-test-exploration-feedback-count">
+            <li flex="50" class="protractor-test-exp-summary-tile-open-feedback">
               <span class="fa fa-comments oppia-dashboard-card-statistic-icon"
                     uib-tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                     tooltip-placement="top">
@@ -266,7 +266,7 @@
               </span>
             </li>
 
-            <li flex="50">
+            <li flex="50" class="protractor-test-exp-summary-tile-num-views">
               <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
                     uib-tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
                     tooltip-placement="top">
@@ -276,7 +276,7 @@
               </span>
             </li>
 
-            <li flex="50">
+            <li flex="50" class="protractor-test-exp-summary-tile-last-updated">
               <span class="far fa-clock oppia-dashboard-card-statistic-icon"
                     uib-tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
                     tooltip-placement="top">
@@ -335,7 +335,7 @@
     <md-card class="oppia-subscription-card protractor-test-subscription-card"
              ng-repeat="subscriber in $ctrl.subscribersList | orderBy:sortSubscriptionFunction:$ctrl.isCurrentSubscriptionSortDescending">
       <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank" rel="noopener">
-        <img ng-src="<[subscriber.subscriber_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
+        <img ng-src="<[subscriber.subscriber_picture_data_url]>" class="oppia-subscription-card-profile-picture rounded-circle">
         <span class="oppia-subscription-card-summary">
           <div style="margin-bottom: 5px; font-size: 17.5px;">
             <strong class="protractor-test-subscription-name"
@@ -400,7 +400,7 @@
         <div class="row">
           <div class="col-lg-7 col-md-7 col-sm-7">
             <span class="oppia-back-arrow">
-              <button type="button" class="btn btn-default btn-xs" ng-click="$ctrl.clearActiveThread()">
+              <button type="button" class="btn btn-secondary btn-sm" ng-click="$ctrl.clearActiveThread()">
                 <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
               </button>
             </span>
@@ -540,7 +540,7 @@
     color: #01645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 3em;
-    margin-top: 0px;
+    margin-top: 0;
     margin-bottom: 25px;
     padding-top: 78.5px;
     text-align: center;

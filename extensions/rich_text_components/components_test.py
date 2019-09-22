@@ -16,6 +16,7 @@
 
 """Tests for rich text components."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 import os

@@ -16,6 +16,7 @@
 
 """One-off jobs for collections."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
@@ -75,7 +76,7 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmds = [{
                 'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
                 'from_version': item.schema_version,
-                'to_version': python_utils.STR(
+                'to_version': python_utils.UNICODE(
                     feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
             }]
             collection_services.update_collection(

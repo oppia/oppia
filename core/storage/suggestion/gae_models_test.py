@@ -16,6 +16,7 @@
 
 """Tests for the suggestion gae_models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
@@ -140,7 +141,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         queries = [('suggestion_type', 'invalid_suggestion_type')]
 
         with self.assertRaisesRegexp(
-            Exception, 'Value \'invalid_suggestion_type\' for property'
+            Exception, 'Value u\'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 
@@ -417,6 +418,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
 
 class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            suggestion_models.ReviewerRotationTrackingModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
 
     def test_create_and_update_model(self):
         suggestion_models.ReviewerRotationTrackingModel.create(

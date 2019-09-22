@@ -14,6 +14,7 @@
 
 """Tests for the profile page."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
@@ -602,9 +603,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn(
-            '<title itemprop="name">Preferences - Oppia</title>',
-            response.body)
+        self.assertIn('{"title": "Preferences - Oppia"})', response.body)
 
         self.logout()
 

@@ -14,6 +14,7 @@
 
 """Tests for core.domain.question_services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -495,9 +496,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'updated question language code')
 
         self.assertEqual(len(observed_log_messages), 1)
-        self.assertEqual(
+        self.assertRegexpMatches(
             observed_log_messages[0],
-            'AttributeError \'str\' object has no attribute \'cmd\' %s '
+            'object has no attribute \'cmd\' %s '
             'invalid_change_list' % self.question_id)
 
     def test_replace_skill_id_for_all_questions(self):

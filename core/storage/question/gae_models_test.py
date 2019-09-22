@@ -14,6 +14,7 @@
 
 """Tests for core.storage.question.gae_models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import types
@@ -24,11 +25,17 @@ from core.platform import models
 from core.tests import test_utils
 import python_utils
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(base_models, question_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.question])
 
 
 class QuestionModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            question_models.QuestionModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_create_question_empty_skill_id_list(self):
         state = state_domain.State.create_default_state('ABC')
@@ -112,36 +119,13 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
                     question_state_data, language_code, version, set([]))
 
 
-class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
-    """Tests the QuestionSummaryModel class."""
-
-    def test_get_by_creator_id(self):
-        question_summary_model_1 = question_models.QuestionSummaryModel(
-            id='question_1',
-            creator_id='user',
-            question_content='Question 1',
-            question_model_created_on=datetime.datetime.utcnow(),
-            question_model_last_updated=datetime.datetime.utcnow()
-        )
-        question_summary_model_2 = question_models.QuestionSummaryModel(
-            id='question_2',
-            creator_id='user',
-            question_content='Question 2',
-            question_model_created_on=datetime.datetime.utcnow(),
-            question_model_last_updated=datetime.datetime.utcnow()
-        )
-        question_summary_model_1.put()
-        question_summary_model_2.put()
-
-        question_summaries = (
-            question_models.QuestionSummaryModel.get_by_creator_id('user'))
-        self.assertEqual(len(question_summaries), 2)
-        self.assertEqual(question_summaries[0].id, 'question_1')
-        self.assertEqual(question_summaries[1].id, 'question_2')
-
-
 class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionSkillLinkModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
 
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
@@ -485,3 +469,45 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             (question_models.QuestionSkillLinkModel.
              get_question_skill_links_equidistributed_by_skill(
                  3, skill_ids))
+
+
+class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
+    """Tests the QuestionSummaryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            question_models.QuestionSummaryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_get_by_creator_id(self):
+        question_summary_model_1 = question_models.QuestionSummaryModel(
+            id='question_1',
+            creator_id='user',
+            question_content='Question 1',
+            question_model_created_on=datetime.datetime.utcnow(),
+            question_model_last_updated=datetime.datetime.utcnow()
+        )
+        question_summary_model_2 = question_models.QuestionSummaryModel(
+            id='question_2',
+            creator_id='user',
+            question_content='Question 2',
+            question_model_created_on=datetime.datetime.utcnow(),
+            question_model_last_updated=datetime.datetime.utcnow()
+        )
+        question_summary_model_1.put()
+        question_summary_model_2.put()
+
+        question_summaries = (
+            question_models.QuestionSummaryModel.get_by_creator_id('user'))
+        self.assertEqual(len(question_summaries), 2)
+        self.assertEqual(question_summaries[0].id, 'question_1')
+        self.assertEqual(question_summaries[1].id, 'question_2')
+
+
+class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
+    """Test the QuestionRightsModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            question_models.QuestionRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)

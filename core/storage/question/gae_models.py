@@ -14,6 +14,7 @@
 
 """Models for storing the question data models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import math
 
@@ -63,6 +64,11 @@ class QuestionModel(base_models.VersionedModel):
     linked_skill_ids = ndb.StringProperty(
         indexed=True, repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question should be kept but the creator should be anonymized."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     @classmethod
     def _get_new_id(cls):
         """Generates a unique ID for the question of the form
@@ -78,7 +84,8 @@ class QuestionModel(base_models.VersionedModel):
 
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
-                python_utils.STR(utils.get_random_int(base_models.RAND_RANGE)),
+                python_utils.UNICODE(
+                    utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             if not cls.get_by_id(new_id):
                 return new_id
@@ -175,6 +182,13 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     skill_id = ndb.StringProperty(required=True, indexed=True)
     # The difficulty of the skill.
     skill_difficulty = ndb.FloatProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Question-skill link should be kept since questions are only
+        anonymized and are not deleted whe user is deleted.
+        """
+        return base_models.DELETION_POLICY.KEEP
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -537,6 +551,13 @@ class QuestionSummaryModel(base_models.BaseModel):
     # The html content for the question.
     question_content = ndb.TextProperty(indexed=False, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question summary should be kept but the creator should be
+        anonymized.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     @classmethod
     def get_by_creator_id(cls, creator_id):
         """Gets QuestionSummaryModel by creator_id.
@@ -574,3 +595,10 @@ class QuestionRightsModel(base_models.VersionedModel):
 
     # The user ID of the creator of the question.
     creator_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Question rights should be kept but the creator should be
+        anonymized.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE

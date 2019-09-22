@@ -14,6 +14,7 @@
 
 """Tests for the library page and associated handlers."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging

@@ -1494,7 +1494,7 @@ blockquote .small:before {
   content: '\2014 \00A0';
 }
 .blockquote-reverse,
-blockquote.pull-right {
+blockquote.float-right {
   padding-right: 15px;
   padding-left: 0;
   text-align: right;
@@ -1502,19 +1502,19 @@ blockquote.pull-right {
   border-left: 0;
 }
 .blockquote-reverse footer:before,
-blockquote.pull-right footer:before,
+blockquote.float-right footer:before,
 .blockquote-reverse small:before,
-blockquote.pull-right small:before,
+blockquote.float-right small:before,
 .blockquote-reverse .small:before,
-blockquote.pull-right .small:before {
+blockquote.float-right .small:before {
   content: '';
 }
 .blockquote-reverse footer:after,
-blockquote.pull-right footer:after,
+blockquote.float-right footer:after,
 .blockquote-reverse small:after,
-blockquote.pull-right small:after,
+blockquote.float-right small:after,
 .blockquote-reverse .small:after,
-blockquote.pull-right .small:after {
+blockquote.float-right .small:after {
   content: '\00A0 \2014';
 }
 address {
@@ -2798,7 +2798,7 @@ select[multiple].form-group-lg .form-control {
   height: 30px;
   line-height: 30px;
 }
-.has-success .help-block,
+.has-success .form-text,
 .has-success .control-label,
 .has-success .radio,
 .has-success .checkbox,
@@ -2828,7 +2828,7 @@ select[multiple].form-group-lg .form-control {
 .has-success .form-control-feedback {
   color: #3c763d;
 }
-.has-warning .help-block,
+.has-warning .form-text,
 .has-warning .control-label,
 .has-warning .radio,
 .has-warning .checkbox,
@@ -2858,7 +2858,7 @@ select[multiple].form-group-lg .form-control {
 .has-warning .form-control-feedback {
   color: #8a6d3b;
 }
-.has-error .help-block,
+.has-error .form-text,
 .has-error .control-label,
 .has-error .radio,
 .has-error .checkbox,
@@ -2894,7 +2894,7 @@ select[multiple].form-group-lg .form-control {
 .has-feedback label.sr-only ~ .form-control-feedback {
   top: 0;
 }
-.help-block {
+.form-text {
   display: block;
   margin-top: 5px;
   margin-bottom: 10px;
@@ -3040,48 +3040,48 @@ fieldset[disabled] .btn {
           box-shadow: none;
   opacity: .65;
 }
-.btn-default {
+.btn-secondary {
   color: #333;
   background-color: #fff;
   border-color: #ccc;
 }
-.btn-default:hover,
-.btn-default:focus,
-.btn-default.focus,
-.btn-default:active,
-.btn-default.active,
-.open > .dropdown-toggle.btn-default {
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary.focus,
+.btn-secondary:active,
+.btn-secondary.active,
+.open > .dropdown-toggle.btn-secondary {
   color: #333;
   background-color: #e6e6e6;
   border-color: #adadad;
 }
-.btn-default:active,
-.btn-default.active,
-.open > .dropdown-toggle.btn-default {
+.btn-secondary:active,
+.btn-secondary.active,
+.open > .dropdown-toggle.btn-secondary {
   background-image: none;
 }
-.btn-default.disabled,
-.btn-default[disabled],
-fieldset[disabled] .btn-default,
-.btn-default.disabled:hover,
-.btn-default[disabled]:hover,
-fieldset[disabled] .btn-default:hover,
-.btn-default.disabled:focus,
-.btn-default[disabled]:focus,
-fieldset[disabled] .btn-default:focus,
-.btn-default.disabled.focus,
-.btn-default[disabled].focus,
-fieldset[disabled] .btn-default.focus,
-.btn-default.disabled:active,
-.btn-default[disabled]:active,
-fieldset[disabled] .btn-default:active,
-.btn-default.disabled.active,
-.btn-default[disabled].active,
-fieldset[disabled] .btn-default.active {
+.btn-secondary.disabled,
+.btn-secondary[disabled],
+fieldset[disabled] .btn-secondary,
+.btn-secondary.disabled:hover,
+.btn-secondary[disabled]:hover,
+fieldset[disabled] .btn-secondary:hover,
+.btn-secondary.disabled:focus,
+.btn-secondary[disabled]:focus,
+fieldset[disabled] .btn-secondary:focus,
+.btn-secondary.disabled.focus,
+.btn-secondary[disabled].focus,
+fieldset[disabled] .btn-secondary.focus,
+.btn-secondary.disabled:active,
+.btn-secondary[disabled]:active,
+fieldset[disabled] .btn-secondary:active,
+.btn-secondary.disabled.active,
+.btn-secondary[disabled].active,
+fieldset[disabled] .btn-secondary.active {
   background-color: #fff;
   border-color: #ccc;
 }
-.btn-default .badge {
+.btn-secondary .badge {
   color: #fff;
   background-color: #333;
 }
@@ -3357,7 +3357,7 @@ fieldset[disabled] .btn-link:focus {
   line-height: 1.5;
   border-radius: 3px;
 }
-.btn-xs,
+.btn-sm,
 .btn-group-xs > .btn {
   padding: 1px 5px;
   font-size: 12px;
@@ -3450,7 +3450,7 @@ tbody.collapse.in {
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
           box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
-.dropdown-menu.pull-right {
+.dropdown-menu.float-right {
   right: 0;
   left: auto;
 }
@@ -3526,7 +3526,7 @@ tbody.collapse.in {
   left: 0;
   z-index: 990;
 }
-.pull-right > .dropdown-menu {
+.float-right > .dropdown-menu {
   right: 0;
   left: auto;
 }
@@ -3543,11 +3543,11 @@ tbody.collapse.in {
   margin-bottom: 2px;
 }
 @media (min-width: 768px) {
-  .navbar-right .dropdown-menu {
+  .float-right .dropdown-menu {
     right: 0;
     left: auto;
   }
-  .navbar-right .dropdown-menu-left {
+  .float-right .dropdown-menu-left {
     right: auto;
     left: 0;
   }
@@ -4368,7 +4368,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   margin-top: 10px;
   margin-bottom: 10px;
 }
-.navbar-btn.btn-xs {
+.navbar-btn.btn-sm {
   margin-top: 14px;
   margin-bottom: 14px;
 }
@@ -4384,14 +4384,14 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 @media (min-width: 768px) {
-  .navbar-left {
+  .float-left {
     float: left !important;
   }
-  .navbar-right {
+  .float-right {
     float: right !important;
     margin-right: -15px;
   }
-  .navbar-right ~ .navbar-right {
+  .float-right ~ .float-right {
     margin-right: 0;
   }
 }
@@ -4830,7 +4830,7 @@ a.label:focus {
   position: relative;
   top: -1px;
 }
-.btn-xs .badge,
+.btn-sm .badge,
 .btn-group-xs > .btn .badge {
   top: 0;
   padding: 1px 5px;
@@ -5107,11 +5107,11 @@ a.thumbnail.active {
   display: block;
 }
 .media-right,
-.media > .pull-right {
+.media > .float-right {
   padding-left: 10px;
 }
 .media-left,
-.media > .pull-left {
+.media > .float-left {
   padding-right: 10px;
 }
 .media-left,
@@ -5304,7 +5304,7 @@ a.list-group-item-danger.active:focus {
   margin-bottom: 0;
   line-height: 1.3;
 }
-.panel {
+.card {
   margin-bottom: 20px;
   background-color: #fff;
   border: 1px solid transparent;
@@ -5312,335 +5312,335 @@ a.list-group-item-danger.active:focus {
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
           box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 }
-.panel-body {
+.card-body {
   padding: 15px;
 }
-.panel-heading {
+.card-heading {
   padding: 10px 15px;
   border-bottom: 1px solid transparent;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
-.panel-heading > .dropdown .dropdown-toggle {
+.card-heading > .dropdown .dropdown-toggle {
   color: inherit;
 }
-.panel-title {
+.card-title {
   margin-top: 0;
   margin-bottom: 0;
   font-size: 16px;
   color: inherit;
 }
-.panel-title > a,
-.panel-title > small,
-.panel-title > .small,
-.panel-title > small > a,
-.panel-title > .small > a {
+.card-title > a,
+.card-title > small,
+.card-title > .small,
+.card-title > small > a,
+.card-title > .small > a {
   color: inherit;
 }
-.panel-footer {
+.card-footer {
   padding: 10px 15px;
   background-color: #f5f5f5;
   border-top: 1px solid #ddd;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
 }
-.panel > .list-group,
-.panel > .panel-collapse > .list-group {
+.card > .list-group,
+.card > .card-collapse > .list-group {
   margin-bottom: 0;
 }
-.panel > .list-group .list-group-item,
-.panel > .panel-collapse > .list-group .list-group-item {
+.card > .list-group .list-group-item,
+.card > .card-collapse > .list-group .list-group-item {
   border-width: 1px 0;
   border-radius: 0;
 }
-.panel > .list-group:first-child .list-group-item:first-child,
-.panel > .panel-collapse > .list-group:first-child .list-group-item:first-child {
+.card > .list-group:first-child .list-group-item:first-child,
+.card > .card-collapse > .list-group:first-child .list-group-item:first-child {
   border-top: 0;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
-.panel > .list-group:last-child .list-group-item:last-child,
-.panel > .panel-collapse > .list-group:last-child .list-group-item:last-child {
+.card > .list-group:last-child .list-group-item:last-child,
+.card > .card-collapse > .list-group:last-child .list-group-item:last-child {
   border-bottom: 0;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
 }
-.panel-heading + .list-group .list-group-item:first-child {
+.card-heading + .list-group .list-group-item:first-child {
   border-top-width: 0;
 }
-.list-group + .panel-footer {
+.list-group + .card-footer {
   border-top-width: 0;
 }
-.panel > .table,
-.panel > .table-responsive > .table,
-.panel > .panel-collapse > .table {
+.card > .table,
+.card > .table-responsive > .table,
+.card > .card-collapse > .table {
   margin-bottom: 0;
 }
-.panel > .table caption,
-.panel > .table-responsive > .table caption,
-.panel > .panel-collapse > .table caption {
+.card > .table caption,
+.card > .table-responsive > .table caption,
+.card > .card-collapse > .table caption {
   padding-right: 15px;
   padding-left: 15px;
 }
-.panel > .table:first-child,
-.panel > .table-responsive:first-child > .table:first-child {
+.card > .table:first-child,
+.card > .table-responsive:first-child > .table:first-child {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
-.panel > .table:first-child > thead:first-child > tr:first-child,
-.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child,
-.panel > .table:first-child > tbody:first-child > tr:first-child,
-.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child {
+.card > .table:first-child > thead:first-child > tr:first-child,
+.card > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child,
+.card > .table:first-child > tbody:first-child > tr:first-child,
+.card > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
-.panel > .table:first-child > thead:first-child > tr:first-child td:first-child,
-.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:first-child,
-.panel > .table:first-child > tbody:first-child > tr:first-child td:first-child,
-.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:first-child,
-.panel > .table:first-child > thead:first-child > tr:first-child th:first-child,
-.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:first-child,
-.panel > .table:first-child > tbody:first-child > tr:first-child th:first-child,
-.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:first-child {
+.card > .table:first-child > thead:first-child > tr:first-child td:first-child,
+.card > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:first-child,
+.card > .table:first-child > tbody:first-child > tr:first-child td:first-child,
+.card > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:first-child,
+.card > .table:first-child > thead:first-child > tr:first-child th:first-child,
+.card > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:first-child,
+.card > .table:first-child > tbody:first-child > tr:first-child th:first-child,
+.card > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:first-child {
   border-top-left-radius: 3px;
 }
-.panel > .table:first-child > thead:first-child > tr:first-child td:last-child,
-.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:last-child,
-.panel > .table:first-child > tbody:first-child > tr:first-child td:last-child,
-.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:last-child,
-.panel > .table:first-child > thead:first-child > tr:first-child th:last-child,
-.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:last-child,
-.panel > .table:first-child > tbody:first-child > tr:first-child th:last-child,
-.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:last-child {
+.card > .table:first-child > thead:first-child > tr:first-child td:last-child,
+.card > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:last-child,
+.card > .table:first-child > tbody:first-child > tr:first-child td:last-child,
+.card > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:last-child,
+.card > .table:first-child > thead:first-child > tr:first-child th:last-child,
+.card > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:last-child,
+.card > .table:first-child > tbody:first-child > tr:first-child th:last-child,
+.card > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:last-child {
   border-top-right-radius: 3px;
 }
-.panel > .table:last-child,
-.panel > .table-responsive:last-child > .table:last-child {
+.card > .table:last-child,
+.card > .table-responsive:last-child > .table:last-child {
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
 }
-.panel > .table:last-child > tbody:last-child > tr:last-child,
-.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child,
-.panel > .table:last-child > tfoot:last-child > tr:last-child,
-.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child {
+.card > .table:last-child > tbody:last-child > tr:last-child,
+.card > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child,
+.card > .table:last-child > tfoot:last-child > tr:last-child,
+.card > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child {
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
 }
-.panel > .table:last-child > tbody:last-child > tr:last-child td:first-child,
-.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:first-child,
-.panel > .table:last-child > tfoot:last-child > tr:last-child td:first-child,
-.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:first-child,
-.panel > .table:last-child > tbody:last-child > tr:last-child th:first-child,
-.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:first-child,
-.panel > .table:last-child > tfoot:last-child > tr:last-child th:first-child,
-.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:first-child {
+.card > .table:last-child > tbody:last-child > tr:last-child td:first-child,
+.card > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:first-child,
+.card > .table:last-child > tfoot:last-child > tr:last-child td:first-child,
+.card > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:first-child,
+.card > .table:last-child > tbody:last-child > tr:last-child th:first-child,
+.card > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:first-child,
+.card > .table:last-child > tfoot:last-child > tr:last-child th:first-child,
+.card > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:first-child {
   border-bottom-left-radius: 3px;
 }
-.panel > .table:last-child > tbody:last-child > tr:last-child td:last-child,
-.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:last-child,
-.panel > .table:last-child > tfoot:last-child > tr:last-child td:last-child,
-.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:last-child,
-.panel > .table:last-child > tbody:last-child > tr:last-child th:last-child,
-.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:last-child,
-.panel > .table:last-child > tfoot:last-child > tr:last-child th:last-child,
-.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:last-child {
+.card > .table:last-child > tbody:last-child > tr:last-child td:last-child,
+.card > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:last-child,
+.card > .table:last-child > tfoot:last-child > tr:last-child td:last-child,
+.card > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:last-child,
+.card > .table:last-child > tbody:last-child > tr:last-child th:last-child,
+.card > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:last-child,
+.card > .table:last-child > tfoot:last-child > tr:last-child th:last-child,
+.card > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:last-child {
   border-bottom-right-radius: 3px;
 }
-.panel > .panel-body + .table,
-.panel > .panel-body + .table-responsive,
-.panel > .table + .panel-body,
-.panel > .table-responsive + .panel-body {
+.card > .card-body + .table,
+.card > .card-body + .table-responsive,
+.card > .table + .card-body,
+.card > .table-responsive + .card-body {
   border-top: 1px solid #ddd;
 }
-.panel > .table > tbody:first-child > tr:first-child th,
-.panel > .table > tbody:first-child > tr:first-child td {
+.card > .table > tbody:first-child > tr:first-child th,
+.card > .table > tbody:first-child > tr:first-child td {
   border-top: 0;
 }
-.panel > .table-bordered,
-.panel > .table-responsive > .table-bordered {
+.card > .table-bordered,
+.card > .table-responsive > .table-bordered {
   border: 0;
 }
-.panel > .table-bordered > thead > tr > th:first-child,
-.panel > .table-responsive > .table-bordered > thead > tr > th:first-child,
-.panel > .table-bordered > tbody > tr > th:first-child,
-.panel > .table-responsive > .table-bordered > tbody > tr > th:first-child,
-.panel > .table-bordered > tfoot > tr > th:first-child,
-.panel > .table-responsive > .table-bordered > tfoot > tr > th:first-child,
-.panel > .table-bordered > thead > tr > td:first-child,
-.panel > .table-responsive > .table-bordered > thead > tr > td:first-child,
-.panel > .table-bordered > tbody > tr > td:first-child,
-.panel > .table-responsive > .table-bordered > tbody > tr > td:first-child,
-.panel > .table-bordered > tfoot > tr > td:first-child,
-.panel > .table-responsive > .table-bordered > tfoot > tr > td:first-child {
+.card > .table-bordered > thead > tr > th:first-child,
+.card > .table-responsive > .table-bordered > thead > tr > th:first-child,
+.card > .table-bordered > tbody > tr > th:first-child,
+.card > .table-responsive > .table-bordered > tbody > tr > th:first-child,
+.card > .table-bordered > tfoot > tr > th:first-child,
+.card > .table-responsive > .table-bordered > tfoot > tr > th:first-child,
+.card > .table-bordered > thead > tr > td:first-child,
+.card > .table-responsive > .table-bordered > thead > tr > td:first-child,
+.card > .table-bordered > tbody > tr > td:first-child,
+.card > .table-responsive > .table-bordered > tbody > tr > td:first-child,
+.card > .table-bordered > tfoot > tr > td:first-child,
+.card > .table-responsive > .table-bordered > tfoot > tr > td:first-child {
   border-left: 0;
 }
-.panel > .table-bordered > thead > tr > th:last-child,
-.panel > .table-responsive > .table-bordered > thead > tr > th:last-child,
-.panel > .table-bordered > tbody > tr > th:last-child,
-.panel > .table-responsive > .table-bordered > tbody > tr > th:last-child,
-.panel > .table-bordered > tfoot > tr > th:last-child,
-.panel > .table-responsive > .table-bordered > tfoot > tr > th:last-child,
-.panel > .table-bordered > thead > tr > td:last-child,
-.panel > .table-responsive > .table-bordered > thead > tr > td:last-child,
-.panel > .table-bordered > tbody > tr > td:last-child,
-.panel > .table-responsive > .table-bordered > tbody > tr > td:last-child,
-.panel > .table-bordered > tfoot > tr > td:last-child,
-.panel > .table-responsive > .table-bordered > tfoot > tr > td:last-child {
+.card > .table-bordered > thead > tr > th:last-child,
+.card > .table-responsive > .table-bordered > thead > tr > th:last-child,
+.card > .table-bordered > tbody > tr > th:last-child,
+.card > .table-responsive > .table-bordered > tbody > tr > th:last-child,
+.card > .table-bordered > tfoot > tr > th:last-child,
+.card > .table-responsive > .table-bordered > tfoot > tr > th:last-child,
+.card > .table-bordered > thead > tr > td:last-child,
+.card > .table-responsive > .table-bordered > thead > tr > td:last-child,
+.card > .table-bordered > tbody > tr > td:last-child,
+.card > .table-responsive > .table-bordered > tbody > tr > td:last-child,
+.card > .table-bordered > tfoot > tr > td:last-child,
+.card > .table-responsive > .table-bordered > tfoot > tr > td:last-child {
   border-right: 0;
 }
-.panel > .table-bordered > thead > tr:first-child > td,
-.panel > .table-responsive > .table-bordered > thead > tr:first-child > td,
-.panel > .table-bordered > tbody > tr:first-child > td,
-.panel > .table-responsive > .table-bordered > tbody > tr:first-child > td,
-.panel > .table-bordered > thead > tr:first-child > th,
-.panel > .table-responsive > .table-bordered > thead > tr:first-child > th,
-.panel > .table-bordered > tbody > tr:first-child > th,
-.panel > .table-responsive > .table-bordered > tbody > tr:first-child > th {
+.card > .table-bordered > thead > tr:first-child > td,
+.card > .table-responsive > .table-bordered > thead > tr:first-child > td,
+.card > .table-bordered > tbody > tr:first-child > td,
+.card > .table-responsive > .table-bordered > tbody > tr:first-child > td,
+.card > .table-bordered > thead > tr:first-child > th,
+.card > .table-responsive > .table-bordered > thead > tr:first-child > th,
+.card > .table-bordered > tbody > tr:first-child > th,
+.card > .table-responsive > .table-bordered > tbody > tr:first-child > th {
   border-bottom: 0;
 }
-.panel > .table-bordered > tbody > tr:last-child > td,
-.panel > .table-responsive > .table-bordered > tbody > tr:last-child > td,
-.panel > .table-bordered > tfoot > tr:last-child > td,
-.panel > .table-responsive > .table-bordered > tfoot > tr:last-child > td,
-.panel > .table-bordered > tbody > tr:last-child > th,
-.panel > .table-responsive > .table-bordered > tbody > tr:last-child > th,
-.panel > .table-bordered > tfoot > tr:last-child > th,
-.panel > .table-responsive > .table-bordered > tfoot > tr:last-child > th {
+.card > .table-bordered > tbody > tr:last-child > td,
+.card > .table-responsive > .table-bordered > tbody > tr:last-child > td,
+.card > .table-bordered > tfoot > tr:last-child > td,
+.card > .table-responsive > .table-bordered > tfoot > tr:last-child > td,
+.card > .table-bordered > tbody > tr:last-child > th,
+.card > .table-responsive > .table-bordered > tbody > tr:last-child > th,
+.card > .table-bordered > tfoot > tr:last-child > th,
+.card > .table-responsive > .table-bordered > tfoot > tr:last-child > th {
   border-bottom: 0;
 }
-.panel > .table-responsive {
+.card > .table-responsive {
   margin-bottom: 0;
   border: 0;
 }
-.panel-group {
+.card-group {
   margin-bottom: 20px;
 }
-.panel-group .panel {
+.card-group .card {
   margin-bottom: 0;
   border-radius: 4px;
 }
-.panel-group .panel + .panel {
+.card-group .card + .card {
   margin-top: 5px;
 }
-.panel-group .panel-heading {
+.card-group .card-heading {
   border-bottom: 0;
 }
-.panel-group .panel-heading + .panel-collapse > .panel-body,
-.panel-group .panel-heading + .panel-collapse > .list-group {
+.card-group .card-heading + .card-collapse > .card-body,
+.card-group .card-heading + .card-collapse > .list-group {
   border-top: 1px solid #ddd;
 }
-.panel-group .panel-footer {
+.card-group .card-footer {
   border-top: 0;
 }
-.panel-group .panel-footer + .panel-collapse .panel-body {
+.card-group .card-footer + .card-collapse .card-body {
   border-bottom: 1px solid #ddd;
 }
-.panel-default {
+.card-default {
   border-color: #ddd;
 }
-.panel-default > .panel-heading {
+.card-default > .card-heading {
   color: #333;
   background-color: #f5f5f5;
   border-color: #ddd;
 }
-.panel-default > .panel-heading + .panel-collapse > .panel-body {
+.card-default > .card-heading + .card-collapse > .card-body {
   border-top-color: #ddd;
 }
-.panel-default > .panel-heading .badge {
+.card-default > .card-heading .badge {
   color: #f5f5f5;
   background-color: #333;
 }
-.panel-default > .panel-footer + .panel-collapse > .panel-body {
+.card-default > .card-footer + .card-collapse > .card-body {
   border-bottom-color: #ddd;
 }
-.panel-primary {
+.card-primary {
   border-color: #337ab7;
 }
-.panel-primary > .panel-heading {
+.card-primary > .card-heading {
   color: #fff;
   background-color: #337ab7;
   border-color: #337ab7;
 }
-.panel-primary > .panel-heading + .panel-collapse > .panel-body {
+.card-primary > .card-heading + .card-collapse > .card-body {
   border-top-color: #337ab7;
 }
-.panel-primary > .panel-heading .badge {
+.card-primary > .card-heading .badge {
   color: #337ab7;
   background-color: #fff;
 }
-.panel-primary > .panel-footer + .panel-collapse > .panel-body {
+.card-primary > .card-footer + .card-collapse > .card-body {
   border-bottom-color: #337ab7;
 }
-.panel-success {
+.card-success {
   border-color: #d6e9c6;
 }
-.panel-success > .panel-heading {
+.card-success > .card-heading {
   color: #3c763d;
   background-color: #dff0d8;
   border-color: #d6e9c6;
 }
-.panel-success > .panel-heading + .panel-collapse > .panel-body {
+.card-success > .card-heading + .card-collapse > .card-body {
   border-top-color: #d6e9c6;
 }
-.panel-success > .panel-heading .badge {
+.card-success > .card-heading .badge {
   color: #dff0d8;
   background-color: #3c763d;
 }
-.panel-success > .panel-footer + .panel-collapse > .panel-body {
+.card-success > .card-footer + .card-collapse > .card-body {
   border-bottom-color: #d6e9c6;
 }
-.panel-info {
+.card-info {
   border-color: #bce8f1;
 }
-.panel-info > .panel-heading {
+.card-info > .card-heading {
   color: #31708f;
   background-color: #d9edf7;
   border-color: #bce8f1;
 }
-.panel-info > .panel-heading + .panel-collapse > .panel-body {
+.card-info > .card-heading + .card-collapse > .card-body {
   border-top-color: #bce8f1;
 }
-.panel-info > .panel-heading .badge {
+.card-info > .card-heading .badge {
   color: #d9edf7;
   background-color: #31708f;
 }
-.panel-info > .panel-footer + .panel-collapse > .panel-body {
+.card-info > .card-footer + .card-collapse > .card-body {
   border-bottom-color: #bce8f1;
 }
-.panel-warning {
+.card-warning {
   border-color: #faebcc;
 }
-.panel-warning > .panel-heading {
+.card-warning > .card-heading {
   color: #8a6d3b;
   background-color: #fcf8e3;
   border-color: #faebcc;
 }
-.panel-warning > .panel-heading + .panel-collapse > .panel-body {
+.card-warning > .card-heading + .card-collapse > .card-body {
   border-top-color: #faebcc;
 }
-.panel-warning > .panel-heading .badge {
+.card-warning > .card-heading .badge {
   color: #fcf8e3;
   background-color: #8a6d3b;
 }
-.panel-warning > .panel-footer + .panel-collapse > .panel-body {
+.card-warning > .card-footer + .card-collapse > .card-body {
   border-bottom-color: #faebcc;
 }
-.panel-danger {
+.card-danger {
   border-color: #ebccd1;
 }
-.panel-danger > .panel-heading {
+.card-danger > .card-heading {
   color: #a94442;
   background-color: #f2dede;
   border-color: #ebccd1;
 }
-.panel-danger > .panel-heading + .panel-collapse > .panel-body {
+.card-danger > .card-heading + .card-collapse > .card-body {
   border-top-color: #ebccd1;
 }
-.panel-danger > .panel-heading .badge {
+.card-danger > .card-heading .badge {
   color: #f2dede;
   background-color: #a94442;
 }
-.panel-danger > .panel-footer + .panel-collapse > .panel-body {
+.card-danger > .card-footer + .card-collapse > .card-body {
   border-bottom-color: #ebccd1;
 }
 .embed-responsive {
@@ -6314,8 +6314,8 @@ button.close {
 .navbar-collapse:after,
 .pager:before,
 .pager:after,
-.panel-body:before,
-.panel-body:after,
+.card-body:before,
+.card-body:after,
 .modal-footer:before,
 .modal-footer:after {
   display: table;
@@ -6334,7 +6334,7 @@ button.close {
 .navbar-header:after,
 .navbar-collapse:after,
 .pager:after,
-.panel-body:after,
+.card-body:after,
 .modal-footer:after {
   clear: both;
 }
@@ -6343,10 +6343,10 @@ button.close {
   margin-right: auto;
   margin-left: auto;
 }
-.pull-right {
+.float-right {
   float: right !important;
 }
-.pull-left {
+.float-left {
   float: left !important;
 }
 .hide {
@@ -7419,7 +7419,7 @@ button.md-button.md-fab md-icon {
       border-radius: 2px 0px 0px 2px; }
     .md-button-group > .md-button:last-child {
       border-right-width: 1px;
-      border-radius: 0px 2px 2px 0px; }
+      border-radius: 0px 2px 2px 0; }
 
 @media screen and (-ms-high-contrast: active) {
   .md-button.md-raised,
@@ -8897,7 +8897,7 @@ md-input-container {
 
 md-list {
   display: block;
-  padding: 8px 0px 8px 0px; }
+  padding: 8px 0px 8px 0; }
   md-list .md-subheader {
     font-size: 14px;
     font-weight: 500;
@@ -9455,7 +9455,7 @@ md-menu-content.md-menu-bar-menu.md-dense {
       width: 100%;
       text-transform: none;
       font-weight: normal;
-      border-radius: 0px;
+      border-radius: 0;
       padding-left: 16px; }
       [dir=rtl] md-menu-content.md-menu-bar-menu.md-dense .md-menu > .md-button {
         padding-left: 0;
@@ -9464,7 +9464,7 @@ md-menu-content.md-menu-bar-menu.md-dense {
         display: block;
         content: '\25BC';
         position: absolute;
-        top: 0px;
+        top: 0;
         speak: none;
         -webkit-transform: rotate(270deg) scaleY(0.45) scaleX(0.9);
                 transform: rotate(270deg) scaleY(0.45) scaleX(0.9);
@@ -10517,7 +10517,7 @@ md-slider {
     md-slider .md-sign:after {
       position: absolute;
       content: '';
-      left: 0px;
+      left: 0;
       border-radius: 16px;
       top: 19px;
       border-left: 14px solid transparent;
@@ -10530,7 +10530,7 @@ md-slider {
       transition: all 0.2s cubic-bezier(0.35, 0, 0.25, 1); }
       [dir=rtl] md-slider .md-sign:after {
         left: auto;
-        right: 0px; }
+        right: 0; }
     md-slider .md-sign .md-thumb-text {
       z-index: 1;
       font-size: 12px;
@@ -10857,7 +10857,7 @@ md-switch {
     margin-right: 8px;
     float: left; }
     [dir=rtl] md-switch .md-container {
-      margin-right: 0px;
+      margin-right: 0;
       margin-left: 8px; }
   md-switch.md-inverted .md-container {
     margin-right: initial;
@@ -20756,7 +20756,7 @@ span.CodeMirror-selectedtext { background: none; }
 }
 .CodeMirror-merge-pane-rightmost {
   position: absolute;
-  right: 0px;
+  right: 0;
   z-index: 1;
 }
 
@@ -20928,24 +20928,24 @@ span.CodeMirror-selectedtext { background: none; }
   border-radius: .1em;
   padding: .2em .25em .15em; }
 
-.fa-pull-left {
+.fa-float-left {
   float: left; }
 
-.fa-pull-right {
+.fa-float-right {
   float: right; }
 
-.fa.fa-pull-left,
-.fas.fa-pull-left,
-.far.fa-pull-left,
-.fal.fa-pull-left,
-.fab.fa-pull-left {
+.fa.fa-float-left,
+.fas.fa-float-left,
+.far.fa-float-left,
+.fal.fa-float-left,
+.fab.fa-float-left {
   margin-right: .3em; }
 
-.fa.fa-pull-right,
-.fas.fa-pull-right,
-.far.fa-pull-right,
-.fal.fa-pull-right,
-.fab.fa-pull-right {
+.fa.fa-float-right,
+.fas.fa-float-right,
+.far.fa-float-right,
+.fal.fa-float-right,
+.fab.fa-float-right {
   margin-left: .3em; }
 
 .fa-spin {
@@ -25239,18 +25239,18 @@ readers do not read off random characters that represent icons */
 .fas {
   font-family: 'Font Awesome 5 Free';
   font-weight: 900; }
-.ng-joyride .pull-left{
+.ng-joyride .float-left{
     float: left;
 }
-.ng-joyride .pull-right{
+.ng-joyride .float-right{
     float:right;
 }
 .ng-curtain-class{
     position: fixed;
     background: black;
     opacity: 0.5;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     height: 100%;
     width: 100%;
     z-index: 9998;

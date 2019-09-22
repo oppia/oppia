@@ -14,6 +14,7 @@
 
 """Tests for the Question Player controller."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import skill_services
 from core.tests import test_utils

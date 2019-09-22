@@ -19,12 +19,13 @@
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
-require('pages/topic-editor-page/questions-tab/questions-tab.directive.ts');
+require(
+  'pages/topic-editor-page/questions-tab/topic-questions-tab.directive.ts');
 require(
   'pages/topic-editor-page/subtopics-list-tab/subtopics-list-tab.directive.ts');
 

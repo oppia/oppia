@@ -48,7 +48,8 @@ angular.module('oppia').factory('AudioPlayerService', [
               // shortly after loading a new card or language. In such
               // cases, we do not want to attempt setting the 'onended'
               // property of the audio.
-              if (_currentTrack !== null) {
+              if (_currentTrack !== null &&
+                _currentTrack.audio !== undefined) {
                 _currentTrack.audio.onended = function() {
                   _currentTrack = null;
                   _currentTrackFilename = null;

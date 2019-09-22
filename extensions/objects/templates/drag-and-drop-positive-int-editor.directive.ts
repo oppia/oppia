@@ -27,7 +27,7 @@ angular.module('oppia').directive('dragAndDropPositiveIntEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/drag_and_drop_positive_int-editor.directive.html'),
+        '/objects/templates/drag-and-drop-positive-int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

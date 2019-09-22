@@ -52,6 +52,8 @@ module.exports = {
   entry: {
     about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
+    classroom:
+      commonPrefix + '/pages/classroom-page/classroom-page.scripts.ts',
     collection_editor:
       commonPrefix + '/pages/collection-editor-page/' +
       'collection-editor-page.scripts.ts',
@@ -116,6 +118,9 @@ module.exports = {
       commonPrefix + '/pages/story-editor-page/story-editor-page.scripts.ts',
     story_viewer:
       commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
+    subtopic_viewer:
+      commonPrefix +
+      '/pages/subtopic-viewer-page/subtopic-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.scripts.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.scripts.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.scripts.ts',
@@ -153,6 +158,16 @@ module.exports = {
         'site to create 1-1 learning scenarios for others.'
       },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['classroom'],
+      filename: 'classroom-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/classroom-page/' +
+        'classroom-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -263,11 +278,39 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error-page.mainpage.html',
+      filename: 'error-page-400.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
-      inject: false
+      inject: false,
+      statusCode: 400
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-page-401.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      statusCode: 401
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-page-404.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      statusCode: 404
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-page-500.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      statusCode: 500
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
@@ -610,10 +653,9 @@ module.exports = {
     }]
   },
   optimization: {
+    runtimeChunk: 'single',
     splitChunks: {
-      chunks: 'all',
-      minSize: 1024 * 10,
-      maxInitialRequests: 9,
-    }
+      chunks: 'all'
+    },
   }
 };
