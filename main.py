@@ -117,12 +117,12 @@ def get_redirect_route(regex_route, handler, defaults=None):
     with parameters should be formulated without the trailing slash.
 
     Args:
-        regex_route: string. The route to be redirected.
-        handler: callable or string. Custom handler method to be called.
-        defaults: dict or default. Default or extra keywords to be returned by this route.
+        regex_route: str. The route to be redirected.
+        handler: function | str. Custom handler method to be called.
+        defaults: dict | None. Default or extra keywords to be returned by this route.
 
     Returns:
-        string. Returns a route that redirects /foo/ to /foo.
+        Initializes the URL route
     """
     if defaults is None:
         defaults = {}
