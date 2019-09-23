@@ -38,13 +38,13 @@ require(
 require('services/ExplorationHtmlFormatterService.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
-  'ExplorationStatesService',
-  'PlaythroughActionsStartingIndicesBuilderObjectFactory', 'HtmlEscaperService',
+  'ExplorationStatesService', 'HtmlEscaperService',
+  'PlaythroughActionsStartingIndicesBuilderObjectFactory',
   'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
   'ACTION_TYPE_EXPLORATION_START',
   function(
-      ExplorationStatesService,
-      PlaythroughActionsStartingIndicesBuilderObjectFactory, HtmlEscaperService,
+      ExplorationStatesService, HtmlEscaperService,
+      PlaythroughActionsStartingIndicesBuilderObjectFactory,
       ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
       ACTION_TYPE_EXPLORATION_START) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
