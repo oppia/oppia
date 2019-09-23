@@ -57,7 +57,7 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
 
     /** @returns {string} - A simple summary of the suggestion thread. */
     SuggestionImprovementTask.prototype.getTitle = function() {
-      return 'Suggestion for the task "' +
+      return 'Suggestion for the card "' +
         this._suggestionThread.suggestion.stateName + '"';
     };
 

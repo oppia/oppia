@@ -190,23 +190,23 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         is_valid: true,
       });
 
-      var card = PlaythroughImprovementTaskObjectFactory.createNew(issue);
+      var task = PlaythroughImprovementTaskObjectFactory.createNew(issue);
 
-      expect(card.getTitle()).toEqual(
+      expect(task.getTitle()).toEqual(
         PlaythroughIssuesService.renderIssueStatement(issue));
-      expect(card.getDirectiveData()).toEqual({
+      expect(task.getDirectiveData()).toEqual({
         title: PlaythroughIssuesService.renderIssueStatement(issue),
         suggestions:
           PlaythroughIssuesService.renderIssueSuggestions(issue),
         playthroughIds: ['1', '2'],
       });
-      expect(card.getDirectiveType()).toEqual(
+      expect(task.getDirectiveType()).toEqual(
         PLAYTHROUGH_IMPROVEMENT_TASK_TYPE);
     });
   });
 
   describe('.fetchTasks', function() {
-    it('returns a card for each existing issue', function(done) {
+    it('returns a task for each existing issue', function(done) {
       var earlyQuitIssue =
         playthroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
@@ -218,7 +218,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
-      var earlyQuitCardTitle =
+      var earlyQuitTaskTitle =
         PlaythroughIssuesService.renderIssueStatement(earlyQuitIssue);
 
       var multipleIncorrectSubmissionsIssue =
@@ -232,7 +232,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
-      var multipleIncorrectSubmissionsCardTitle =
+      var multipleIncorrectSubmissionsTaskTitle =
         PlaythroughIssuesService.renderIssueStatement(
           multipleIncorrectSubmissionsIssue);
 
@@ -246,7 +246,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
-      var cyclicTransitionsCardTitle =
+      var cyclicTransitionsTaskTitle =
         PlaythroughIssuesService.renderIssueStatement(
           cyclicTransitionsIssue);
 
@@ -258,12 +258,12 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         ]));
 
       PlaythroughImprovementTaskObjectFactory.fetchTasks()
-        .then(function(cards) {
-          expect(cards.length).toEqual(3);
-          expect(cards[0].getTitle()).toEqual(earlyQuitCardTitle);
-          expect(cards[1].getTitle())
-            .toEqual(multipleIncorrectSubmissionsCardTitle);
-          expect(cards[2].getTitle()).toEqual(cyclicTransitionsCardTitle);
+        .then(function(tasks) {
+          expect(tasks.length).toEqual(3);
+          expect(tasks[0].getTitle()).toEqual(earlyQuitTaskTitle);
+          expect(tasks[1].getTitle())
+            .toEqual(multipleIncorrectSubmissionsTaskTitle);
+          expect(tasks[2].getTitle()).toEqual(cyclicTransitionsTaskTitle);
         }).then(done, done.fail);
 
       this.scope.$digest(); // Forces all pending promises to evaluate.
@@ -282,22 +282,22 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         schema_version: 1,
         is_valid: true,
       });
-      this.card = PlaythroughImprovementTaskObjectFactory.createNew(this.issue);
+      this.task = PlaythroughImprovementTaskObjectFactory.createNew(this.issue);
     });
 
     describe('.getActionButtons', function() {
       it('contains a specific sequence of buttons', function() {
-        expect(this.card.getActionButtons().length).toEqual(1);
-        expect(this.card.getActionButtons()[0].getText())
+        expect(this.task.getActionButtons().length).toEqual(1);
+        expect(this.task.getActionButtons()[0].getText())
           .toEqual('Mark as Resolved');
       });
     });
 
     describe('Mark as Resolved Action Button', function() {
-      it('marks the card as resolved after confirmation', function() {
-        var card = this.card;
+      it('marks the task as resolved after confirmation', function() {
+        var task = this.task;
         var issue = this.issue;
-        var resolveActionButton = card.getActionButtons()[0];
+        var resolveActionButton = task.getActionButtons()[0];
         var resolveIssueSpy =
           spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
 
@@ -305,19 +305,19 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           result: $q.resolve(), // Returned when confirm button is pressed.
         });
 
-        expect(card.getStatus()).toEqual('open');
+        expect(task.getStatus()).toEqual('open');
         resolveActionButton.execute();
 
         this.scope.$digest(); // Forces all pending promises to evaluate.
 
         expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
-        expect(card.getStatus()).not.toEqual('open');
+        expect(task.getStatus()).not.toEqual('open');
       });
 
-      it('keeps the card after cancel', function() {
-        var card = this.card;
+      it('keeps the task after cancel', function() {
+        var task = this.task;
         var issue = this.issue;
-        var resolveActionButton = card.getActionButtons()[0];
+        var resolveActionButton = task.getActionButtons()[0];
         var resolveIssueSpy =
           spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
 
@@ -325,12 +325,12 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           result: $q.reject(), // Returned when cancel button is pressed.
         });
 
-        expect(card.getStatus()).toEqual('open');
+        expect(task.getStatus()).toEqual('open');
         resolveActionButton.execute();
         this.scope.$digest(); // Forces all pending promises to evaluate.
 
         expect(resolveIssueSpy).not.toHaveBeenCalled();
-        expect(card.getStatus()).toEqual('open');
+        expect(task.getStatus()).toEqual('open');
       });
     });
   });

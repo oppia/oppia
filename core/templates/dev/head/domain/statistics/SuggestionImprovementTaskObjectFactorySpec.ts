@@ -242,7 +242,7 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
     describe('.getTitle', function() {
       it('returns the state associated with the suggestion', function() {
         expect(this.task.getTitle())
-          .toEqual('Suggestion for the task "state_1"');
+          .toEqual('Suggestion for the card "state_1"');
       });
     });
 
