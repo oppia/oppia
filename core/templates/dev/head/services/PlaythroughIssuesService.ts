@@ -26,13 +26,13 @@ require(
   'improvement-modal.service.ts');
 
 angular.module('oppia').factory('PlaythroughIssuesService', [
-  '$uibModal', 'ImprovementModalService', 'PlaythroughIssuesBackendApiService',
-  'UrlInterpolationService', 'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
-  'ISSUE_TYPE_EARLY_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  'ImprovementModalService', 'PlaythroughIssuesBackendApiService',
+  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
+  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
-      $uibModal, ImprovementModalService, PlaythroughIssuesBackendApiService,
-      UrlInterpolationService, ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
-      ISSUE_TYPE_EARLY_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+      ImprovementModalService, PlaythroughIssuesBackendApiService,
+      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
+      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
