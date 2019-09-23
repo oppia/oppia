@@ -63,7 +63,7 @@ angular.module('oppia').factory('AnswerDetailsImprovementTaskObjectFactory', [
     };
 
     AnswerDetailsImprovementTask.prototype.getTitle = function() {
-      return 'Answer details for the task "' +
+      return 'Answer details for the card "' +
         this._learnerAnswerDetails.stateName + '"';
     };
 

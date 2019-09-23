@@ -229,7 +229,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
     describe('.getTitle', function() {
       it('returns answer details as title', function() {
         expect(this.task.getTitle()).toEqual(
-          'Answer details for the task "fakeStateName"');
+          'Answer details for the card "fakeStateName"');
       });
     });
 
