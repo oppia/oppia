@@ -66,7 +66,7 @@ var ExplorationEditorImprovementsTab = function() {
     };
   };
 
-  var _buildTaskTypeMatcher = function(expectedCardType) {
+  var _buildTaskTypeMatcher = function(expectedTaskType) {
     return function(task) {
       return task.getAttribute('class')
         .then(cssClass => cssClass.includes(expectedTaskType));
@@ -75,7 +75,7 @@ var ExplorationEditorImprovementsTab = function() {
 
   var _buildTaskHasContentMatcher = function(expectedContent) {
     return function(task) {
-      return task.element(cardBodyLocator).getText()
+      return task.element(taskBodyLocator).getText()
         .then(body => body.includes(expectedContent));
     };
   };
@@ -95,34 +95,34 @@ var ExplorationEditorImprovementsTab = function() {
   };
 
   this.getAnswerDetailsTask = function(stateName) {
-    var answerDetailsTaskMatcher = _reduceCardMatchers([
+    var answerDetailsTaskMatcher = _reduceTaskMatchers([
       _buildTaskTypeMatcher('answer-details'),
       _buildTaskStateNameMatcher(stateName),
     ]);
-    return allTasks.filter(answerDetailsCardMatcher).first();
+    return allTasks.filter(answerDetailsTaskMatcher).first();
   };
 
   this.getFeedbackTask = function(latestMessage) {
-    var feedbackTaskMatcher = _reduceCardMatchers([
+    var feedbackTaskMatcher = _reduceTaskMatchers([
       _buildTaskTypeMatcher('feedback'),
       _buildTaskHasContentMatcher(latestMessage),
     ]);
-    return allTasks.filter(feedbackCardMatcher).first();
+    return allTasks.filter(feedbackTaskMatcher).first();
   };
 
   this.getSuggestionTask = function(description) {
-    var suggestionTaskMatcher = _reduceCardMatchers([
+    var suggestionTaskMatcher = _reduceTaskMatchers([
       _buildTaskTypeMatcher('suggestion'),
       _buildTaskHasContentMatcher(description),
     ]);
-    return allTasks.filter(suggestionCardMatcher).first();
+    return allTasks.filter(suggestionTaskMatcher).first();
   };
 
-  this.getTaskStatus = function(card) {
-    return task.element(cardStatusLocator).getText();
+  this.getTaskStatus = function(task) {
+    return task.element(taskStatusLocator).getText();
   };
 
-  this.clickTaskActionButton = function(card, buttonText) {
+  this.clickTaskActionButton = function(task, buttonText) {
     var buttonElement = task.element(by.buttonText(buttonText));
     waitFor.elementToBeClickable(
       buttonElement, 'Action button takes too long to become clickable');

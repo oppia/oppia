@@ -17,7 +17,7 @@
  * improvement tasks that can be rendered in the Improvements Tab.
  *
  * All Improvement Tasks should provide the following functions:
- *   - Task.fetchTasks() -> Promise<Card[]>
+ *   - Task.fetchTasks() -> Promise<Task[]>
  *       A "static" function that can be called on the factory itself. It should
  *       return a Promise of an array of tasks associated to the current
  *       exploration.

@@ -1,24 +1,24 @@
 <div class="oppia-dashboard-container improvements-tab-dashboard" style="position: relative;">
   <div class="oppia-dashboard-aggregated-stats" style="padding-top: 30px; margin-bottom: 30px">
-    <md-task layout="row" style="margin: 0">
-      <div class="open-issues stats-task" style="text-align: center; padding: 0">
+    <md-card layout="row" style="margin: 0">
+      <div class="open-issues stats-card" style="text-align: center; padding: 0">
         <span class="stat-description">Open Tasks</span>
         <h1 class="stat-value-with-rating protractor-test-improvements-open-tasks-count"
             style="margin: 0">
           <[getOpenTaskCount()]>
         </h1>
       </div>
-      <div class="options-task" style="padding: 10px; margin: auto">
+      <div class="options-card" style="padding: 10px; margin: auto">
         <input ng-model="onlyShowOpenTasks" ng-init="true" type="checkbox"
                class="protractor-test-improvements-only-open-input">
         <span style="font-size: 14px">
           Show only "Open" tasks.
         </span>
       </div>
-    </md-task>
+    </md-card>
   </div>
 
-  <md-task ng-repeat="task in getTasks() | orderBy:getTaskTitle:true | filter:isTaskShown"
+  <md-card ng-repeat="task in getTasks() | orderBy:getTaskTitle:true | filter:isTaskShown"
            ng-if="!isTaskObsolete(task)"
            ng-class="[task.getDirectiveType(), {'oppia-improvement-task': isTaskOpen(task), 'oppia-improvement-closed-task': !isTaskOpen(task)}]"
            class="protractor-test-improvements-task">
@@ -61,5 +61,5 @@
         <[actionButton.getText()]>
       </button>
     </div>
-  </md-task>
+  </md-card>
 </div>
