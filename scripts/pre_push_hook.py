@@ -58,6 +58,8 @@ PYTHON_CMD = 'python'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 NPM_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'npm')
+YARN_CMD = os.path.join(
+    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.17.3', 'bin', 'yarn')
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
@@ -280,7 +282,7 @@ def _start_python_script(scriptname):
 
 def _start_npm_audit():
     """Starts the npm audit checks and returns the returncode of the task."""
-    task = subprocess.Popen([NPM_CMD, 'audit'])
+    task = subprocess.Popen([YARN_CMD, 'audit'])
     task.communicate()
     return task.returncode
 
@@ -342,17 +344,17 @@ def _does_diff_include_js_or_ts_files(files_to_lint):
 
 
 def _does_diff_include_package_json(files_to_lint):
-    """Returns true if diff includes package.json or package-lock.json.
+    """Returns true if diff includes package.json or yarn.lock.
 
     Args:
         files_to_lint: list(str). List of files to be linted.
 
     Returns:
         bool. Whether the diff contains changes in package.json or
-            package-lock.json.
+            yarn.lock.
     """
     for filename in files_to_lint:
-        if filename == 'package.json' or filename == 'package-lock.json':
+        if filename == 'package.json' or filename == 'yarn.lock':
             return True
     return False
 

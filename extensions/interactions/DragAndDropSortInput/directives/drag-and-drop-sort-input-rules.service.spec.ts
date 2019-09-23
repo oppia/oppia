@@ -22,9 +22,9 @@ import { DragAndDropSortInputRulesService } from
 
 describe('Drag and Drop Sort Input rules service', () => {
   let ddsrs: DragAndDropSortInputRulesService = null;
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(() => {
     ddsrs = new DragAndDropSortInputRulesService();
-  }));
+  });
 
   it('should have a correct \'is equal to ordering\' rule', () => {
     var RULE_INPUT: {x: string[][]} = {

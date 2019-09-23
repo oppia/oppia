@@ -22,13 +22,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 @Injectable({
   providedIn: 'root'
 })
-
 export class SetInputRulesService {
-
   Equals(answer: string[], inputs: {x:string[]}): boolean {
     return answer.length === inputs.x.length && inputs.x.every(function(val) {
-        return answer.indexOf(val) >= 0;
-     });
+      return answer.indexOf(val) >= 0;
+    });
   }
 
   IsSubsetOf(answer: string[], inputs: {x:string[]}): boolean {

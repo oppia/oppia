@@ -80,11 +80,11 @@ def run_performance_test(test_name, xvfb_prefix):
     """
     if xvfb_prefix:
         subprocess.call([
-            xvfb_prefix, 'python', '-m', 'scripts.backend_tests',
+            xvfb_prefix, 'python', '-m', 'scripts.run_backend_tests',
             '--test_target=core.tests.performance_tests.%s' % test_name])
     else:
         subprocess.call([
-            'python', '-m', 'scripts.backend_tests',
+            'python', '-m', 'scripts.run_backend_tests',
             '--test_target=core.tests.performance_tests.%s' % test_name])
 
 
@@ -95,8 +95,8 @@ def main(args=None):
     setup.main(args=[])
     setup_gae.main(args=[])
 
-    install_third_party_libs.maybe_install_dependencies(
-        parsed_args.skip_install, parsed_args.run_minified_tests)
+    if not parsed_args.skip_install:
+        install_third_party_libs.main()
 
     if common.is_port_open(USUAL_PORT_NUMBER_FOR_GAE_SERVER_IN_START):
         common.print_each_string_after_two_new_lines([

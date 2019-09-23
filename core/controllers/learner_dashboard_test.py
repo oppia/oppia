@@ -283,9 +283,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn(
-            '<title itemprop="name">Learner Dashboard - Oppia</title>',
-            response.body)
+        self.assertIn('{"title": "Learner Dashboard - Oppia"})', response.body)
 
         self.logout()
 

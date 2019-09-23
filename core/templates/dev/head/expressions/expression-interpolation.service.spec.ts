@@ -17,7 +17,7 @@
  */
 
 require('App.ts');
-require('expressions/ExpressionInterpolationService.ts');
+require('expressions/expression-interpolation.service.ts');
 
 describe('Expression interpolation service', function() {
   beforeEach(angular.mock.module('oppia'));
