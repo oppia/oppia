@@ -21,15 +21,18 @@ require('services/PlaythroughIssuesBackendApiService.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvement-modal.service.ts');
 
 angular.module('oppia').factory('PlaythroughIssuesService', [
-  '$uibModal', 'PlaythroughIssuesBackendApiService', 'UrlInterpolationService',
-  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
-  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  '$uibModal', 'ImprovementModalService', 'PlaythroughIssuesBackendApiService',
+  'UrlInterpolationService', 'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
+  'ISSUE_TYPE_EARLY_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
-      $uibModal, PlaythroughIssuesBackendApiService, UrlInterpolationService,
-      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
-      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+      $uibModal, ImprovementModalService, PlaythroughIssuesBackendApiService,
+      UrlInterpolationService, ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
+      ISSUE_TYPE_EARLY_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
@@ -129,127 +132,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
       },
       openPlaythroughModal: function(playthroughId, index) {
         this.getPlaythrough(playthroughId).then(function(playthrough) {
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-editor-page/statistics-tab/templates/' +
-              'playthrough-modal.template.html'),
-            backdrop: true,
-            resolve: {
-              playthrough: function() {
-                return playthrough;
-              },
-              playthroughIndex: function() {
-                return index;
-              }
-            },
-            controller: [
-              '$scope', '$uibModalInstance', 'playthroughIndex',
-              'playthrough', 'AlertsService', 'LearnerActionRenderService',
-              'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
-              function(
-                  $scope, $uibModalInstance, playthroughIndex,
-                  playthrough, AlertsService, LearnerActionRenderService,
-                  ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
-                $scope.playthroughIndex = playthroughIndex;
-
-                $scope.startingIndices =
-                  LearnerActionRenderService.getStartingIndices(
-                    playthrough.actions);
-                $scope.currentChoice = 0;
-
-                $scope.isIssueMIS = false;
-                if (playthrough.issueType === (
-                  ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)) {
-                  $scope.isIssueMIS = true;
-                }
-
-                $scope.renderIssueTable = function() {
-                  var lars = LearnerActionRenderService;
-                  var tableHtml =
-                    lars.renderFinalDisplayBlockForMISIssueHTML(
-                      playthrough.actions.slice($scope.startingIndices[0]),
-                      $scope.startingIndices[0] + 1);
-                  return tableHtml;
-                };
-
-                $scope.maxHidden = $scope.startingIndices.length - 1;
-
-                /**
-                 * Returns the list of learner actions to currently be
-                 * displayed in the playthrough modal.
-                 * @returns {LearnerAction[]}
-                 */
-                $scope.getActionsToRender = function() {
-                  if ($scope.isIssueMIS) {
-                    return playthrough.actions.slice(
-                      $scope.startingIndices[$scope.currentChoice],
-                      $scope.startingIndices[0]);
-                  }
-                  return playthrough.actions.slice(
-                    $scope.startingIndices[$scope.currentChoice]);
-                };
-
-                /**
-                 * Returns the index of the learner action.
-                 * @param {LearnerAction} learnerAction.
-                 * @returns {int}
-                 */
-                $scope.getLearnerActionIndex = function(learnerAction) {
-                  return playthrough.actions.indexOf(learnerAction) + 1;
-                };
-
-                /**
-                 * Computes whether the learner action needs to be highlighted.
-                 * @param {LearnerAction} learnerAction.
-                 * @returns {boolean}
-                 */
-                $scope.isActionHighlighted = function(action) {
-                  if ($scope.startingIndices.length === 0) {
-                    return false;
-                  }
-                  return $scope.getLearnerActionIndex(action) > (
-                    $scope.startingIndices[0]);
-                };
-
-                /**
-                 * Renders the HTML of the learner action.
-                 * @param {LearnerAction} learnerAction.
-                 * @param {int} actionIndex - The index of the learner action.
-                 * @returns {string}
-                 */
-                $scope.renderLearnerAction = function(
-                    learnerAction, actionIndex) {
-                  return LearnerActionRenderService.renderLearnerAction(
-                    learnerAction, actionIndex);
-                };
-
-
-                /**
-                 * Expands the displayed learner actions by the next start
-                 * index. If there is only one index, the arrow div is not shown
-                 * at all. If the current stop index is the second last one, the
-                 * arrow div is hidden after the final stop is reached.
-                 */
-                $scope.expandActionsToRender = function(pIdx) {
-                  if ($scope.maxHidden === 1) {
-                    $scope.currentChoice += 1;
-                    document.getElementById('arrowDiv').style.display = 'none';
-                  } else {
-                    $scope.currentChoice += 1;
-                    if ($scope.currentChoice === $scope.maxHidden) {
-                      document.getElementById('arrowDiv').style.display =
-                        'none';
-                    }
-                  }
-                };
-
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
-                };
-              }
-            ]
-          });
+          ImprovementModalService.openPlaythroughModal(playthrough, index);
         });
       },
     };

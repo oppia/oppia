@@ -33,8 +33,8 @@ import { EditabilityService } from 'services/EditabilityService';
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { GroupedStartingIndicesObjectFactory } from
-  'domain/statistics/GroupedStartingIndicesObjectFactory';
+import { PlaythroughActionsStartingIndicesBuilderObjectFactory } from
+  'domain/statistics/PlaythroughActionsStartingIndicesBuilderObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -98,8 +98,8 @@ describe('Learner Action Render Service', function() {
       'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
-      'GroupedStartingIndicesObjectFactory',
-      new GroupedStartingIndicesObjectFactory());
+      'PlaythroughActionsStartingIndicesBuilderObjectFactory',
+      new PlaythroughActionsStartingIndicesBuilderObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));

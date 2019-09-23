@@ -82,4 +82,4 @@ export class PlaythroughActionsStartingIndicesBuilderObjectFactory {
 
 angular.module('oppia').factory(
   'PlaythroughActionsStartingIndicesBuilderObjectFactory',
-  downgradeInjectable(PlaythroughActionsStartingIndicesBuilder));
+  downgradeInjectable(PlaythroughActionsStartingIndicesBuilderObjectFactory));

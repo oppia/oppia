@@ -3,8 +3,8 @@
 </div>
 
 <div class="modal-body" style="padding-bottom: 8rem; margin-left:0.5rem; margin-right: 0.5rem;">
-  <div ng-if="maxHidden != 0" class="row oppia-pt2">
-    <button ng-show="currentChoice < maxHidden" type="button" name="button" ng-click="expandActionsToRender(playthroughIndex)" class="oppia-issues-btn-arrow" id="arrowDiv" style="display: block;"><i class="fas fa-arrow-up"></i></button>
+  <div ng-if="numberOfBlocks != 0" class="row oppia-pt2">
+    <button ng-show="currentBlock < numberOfBlocks" type="button" name="button" ng-click="expandActionsToRender(playthroughIndex)" class="oppia-issues-btn-arrow" id="arrowDiv" style="display: block;"><i class="fas fa-arrow-up"></i></button>
   </div>
   <div class="row oppia-pt2" style="margin-top: 0.5rem;">
     <div ng-repeat="action in getActionsToRender()" class="oppia-issues-learner-action" style="text-align: left; margin-left: 0.2rem;">

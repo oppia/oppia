@@ -34,7 +34,7 @@ require(
   'answer-submit-action.directive.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'mis-issue.directive.ts');
+  'multiple-incorrect-submissions-issue.directive.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
