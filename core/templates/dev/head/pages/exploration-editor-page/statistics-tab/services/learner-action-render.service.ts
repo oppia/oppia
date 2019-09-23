@@ -104,7 +104,7 @@ angular.module('oppia').factory('LearnerActionRenderService', [
      */
     var renderLearnerActionsTableForMultipleIncorrectIssue = function(
         finalBlock) {
-      var el = $('<mis-issue>');
+      var el = $('<multiple-incorrect-submissions-issue>');
       el.attr('finalBlock', HtmlEscaperService.objToEscapedJson(finalBlock));
       return ($('<span>').append(el)).html();
     };
