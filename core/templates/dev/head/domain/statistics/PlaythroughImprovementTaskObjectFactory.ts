@@ -45,15 +45,15 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
         ImprovementActionButtonObjectFactory.createNew(
           'Mark as Resolved', 'btn-primary', () => {
             ImprovementModalService.openConfirmationModal(
-              'Marking this action as resolved will distask the playthrough ' +
+              'Marking this action as resolved will discard the playthrough ' +
               'forever. Are you sure you want to proceed?',
               'Mark as Resolved', 'btn-danger')
               .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
-              .then(() => this._distasked = true);
+              .then(() => this._discarded = true);
           }),
       ];
       /** @type {boolean} */
-      this._distasked = false;
+      this._discarded = false;
       /** @type {Object} */
       this._directiveData = {
         title: this._title,
@@ -64,7 +64,7 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
 
     /** @returns {string} - The actionable status of this task. */
     PlaythroughImprovementTask.prototype.getStatus = function() {
-      return this._distasked ? STATUS_NOT_ACTIONABLE : STATUS_OPEN;
+      return this._discarded ? STATUS_NOT_ACTIONABLE : STATUS_OPEN;
     };
 
     /**
@@ -72,7 +72,7 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
      *    should be hidden.
      */
     PlaythroughImprovementTask.prototype.isObsolete = function() {
-      return this._distasked;
+      return this._discarded;
     };
 
     /** @returns {string} - A simple summary of the Playthrough Issue. */
