@@ -23,7 +23,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
 
-angular.module('oppia').directive('misIssue', [
+angular.module('oppia').directive('multipleIncorrectSubmissionsIssue', [
   'ExplorationHtmlFormatterService', 'ExplorationStatesService',
   'HtmlEscaperService', 'LearnerActionRenderService', 'UrlInterpolationService',
   'ACTION_TYPE_ANSWER_SUBMIT',
