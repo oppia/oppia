@@ -52,8 +52,8 @@ angular.module('oppia').directive('improvementsTab', [
         '$scope', 'ImprovementTaskService', 'ImprovementsDisplayService',
         function($scope, ImprovementTaskService, ImprovementsDisplayService) {
           var fetchedTasks = [];
-          ImprovementTaskService.fetchTasks().then(function(cards) {
-            fetchedTasks = cards;
+          ImprovementTaskService.fetchTasks().then(function(tasks) {
+            fetchedTasks = tasks;
           });
 
           $scope.onlyShowOpenTasks = true;
@@ -68,24 +68,24 @@ angular.module('oppia').directive('improvementsTab', [
             return fetchedTasks;
           };
 
-          $scope.isTaskOpen = function(card) {
+          $scope.isTaskOpen = function(task) {
             return ImprovementsDisplayService.isOpen(task.getStatus());
           };
 
-          $scope.isTaskShown = function(card) {
-            return $scope.isTaskOpen(card) || !$scope.onlyShowOpenTasks;
+          $scope.isTaskShown = function(task) {
+            return $scope.isTaskOpen(task) || !$scope.onlyShowOpenTasks;
           };
 
-          $scope.getTaskTitle = function(card) {
+          $scope.getTaskTitle = function(task) {
             return task.getTitle();
           };
 
-          $scope.isTaskObsolete = function(card) {
+          $scope.isTaskObsolete = function(task) {
             return task.isObsolete();
           };
 
           $scope.getOpenTaskCount = function() {
-            return fetchedTasks.filter($scope.isCardOpen).length;
+            return fetchedTasks.filter($scope.isTaskOpen).length;
           };
         }
       ],

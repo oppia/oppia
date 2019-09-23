@@ -18,9 +18,9 @@
     </md-task>
   </div>
 
-  <md-task ng-repeat="card in getCards() | orderBy:getCardTitle:true | filter:isCardShown"
-           ng-if="!isTaskObsolete(card)"
-           ng-class="[task.getDirectiveType(), {'oppia-improvement-card': isCardOpen(card), 'oppia-improvement-closed-card': !isCardOpen(task)}]"
+  <md-task ng-repeat="task in getTasks() | orderBy:getTaskTitle:true | filter:isTaskShown"
+           ng-if="!isTaskObsolete(task)"
+           ng-class="[task.getDirectiveType(), {'oppia-improvement-task': isTaskOpen(task), 'oppia-improvement-closed-task': !isTaskOpen(task)}]"
            class="protractor-test-improvements-task">
 
     <div class="oppia-improvement-task-header modal-header">
