@@ -49,11 +49,11 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
               'forever. Are you sure you want to proceed?',
               'Mark as Resolved', 'btn-danger')
               .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
-              .then(() => this._discarded = true);
+              .then(() => this._isObsolete = true);
           }),
       ];
       /** @type {boolean} */
-      this._discarded = false;
+      this._isObsolete = false;
       /** @type {Object} */
       this._directiveData = {
         title: this._title,
@@ -64,7 +64,7 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
 
     /** @returns {string} - The actionable status of this task. */
     PlaythroughImprovementTask.prototype.getStatus = function() {
-      return this._discarded ? STATUS_NOT_ACTIONABLE : STATUS_OPEN;
+      return this._isObsolete ? STATUS_NOT_ACTIONABLE : STATUS_OPEN;
     };
 
     /**
@@ -72,7 +72,7 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
      *    should be hidden.
      */
     PlaythroughImprovementTask.prototype.isObsolete = function() {
-      return this._discarded;
+      return this._isObsolete;
     };
 
     /** @returns {string} - A simple summary of the Playthrough Issue. */
