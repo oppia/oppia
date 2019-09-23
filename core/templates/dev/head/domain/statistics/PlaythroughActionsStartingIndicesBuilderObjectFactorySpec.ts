@@ -89,6 +89,6 @@ fdescribe('Grouped Starting Indices Object Factory', () => {
 
     startingIndices.handleChangeInState(this.action2);
     expect(startingIndices.localIndex).toEqual(2);
-    expect(startingIndices.startingIndices).toEqual([3])
+    expect(startingIndices.startingIndices).toEqual([3]);
   });
 });
