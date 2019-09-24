@@ -73,6 +73,25 @@
   </div>
 </md-card>
 
+<md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+  <div class="container" style="margin-left: 0;">
+    <h3>Load dummy new structures data (only admins)</h3>
+    <div class="row">
+      <span class="col-lg-4 col-md-4 col-sm-4">
+        Loads 2 topics (one of which is empty), a story and three skills (two in a subtopic)
+        attached to the first topic and a question attached to each skill.
+      </span>
+      <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
+        <button type="button"
+                class="btn btn-secondary float-right"
+                ng-click="$ctrl.loadNewStructuresData()">
+          Load Data
+        </button>
+      </span>
+    </div>
+  </div>
+</md-card>
+
 <style>
   .oppia-admin-page-card .row {
     margin-left: 0;
