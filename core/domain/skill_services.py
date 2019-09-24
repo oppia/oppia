@@ -28,11 +28,8 @@ from core.platform import models
 import feconf
 import python_utils
 
-(skill_models, user_models, question_models) = (
-    models.Registry.import_models([
-        models.NAMES.skill,
-        models.NAMES.user,
-        models.NAMES.question]))
+(skill_models, user_models, question_models) = models.Registry.import_models(
+    [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
