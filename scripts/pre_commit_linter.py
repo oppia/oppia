@@ -23,15 +23,6 @@ it will only lint files that have been touched in this commit.
 
 This script ignores all filepaths contained within .eslintignore.
 
-IMPORTANT NOTES:
-
-1.  Before running this script, you must install third-party dependencies by
-    running
-
-        python -m scripts.install_third_party_libs
-
-    at least once.
-
 =====================
 CUSTOMIZATION OPTIONS
 =====================
@@ -71,7 +62,12 @@ import tempfile
 import threading
 import time
 
-import python_utils
+# Install third party dependencies before proceeding.
+from . import install_third_party_libs
+install_third_party_libs.main(args=[])
+
+# pylint: disable=wrong-import-position
+import python_utils  # isort:skip
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
