@@ -832,6 +832,50 @@ def add_dimensions_to_image_tags(exp_id, html_string):
             oppia-noninteractive-image tags.
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
+    modify_image_filename(exp_id, soup)
+    
+    # To add dimensions to images inside the collapsible component.
+    for collapsible_component in soup.findAll(
+        name='oppia-noninteractive-collapsible'):
+        if (not collapsible_component.has_attr('content-with-value') or
+                collapsible_component['content-with-value'] == ''):
+            continue
+
+        collapsible_component_html_string = unescape_html(
+            collapsible_component['content-with-value'])
+        collapsible_component_soup = bs4.BeautifulSoup(
+            collapsible_component_html_string, 'html.parser')
+        modify_image_filename(exp_id, collapsible_component_soup)
+        # print('pytho_utils UNICODE: ' )
+        # print('\n')
+        print('collapsible_component_soup: ' + collapsible_component_soup.encode('unicode-escape'))
+        print('\n')
+        print('unicode-escape: ' + escape_html(str(collapsible_component_soup)))#.encode('unicode-escape').encode('utf-8'))
+        print('\n')
+        collapsible_component['content-with-value'] = escape_html(str(collapsible_component_soup))
+        #     "&amp;quot;&amp;lt;oppia-noninteractive-image alt-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;abc2_height_32_width_32.png&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;")
+
+    # To add dimensions to images inside the tab component.
+    for tab_component in soup.findAll(
+        name='oppia-noninteractive-tabs'):
+        if (not tab_component.has_attr('tab_contents-with-value') or
+                tab_component['tab_contents-with-value'] == ''):
+            continue
+
+        tab_component_html_string = unescape_html(
+            tab_component['tab_contents-with-value'])
+        tab_component_soup = bs4.BeautifulSoup(
+            tab_component_html_string.decode(
+                'unicode-escape'), 'html.parser')
+        modify_image_filename(exp_id, tab_component_soup)
+        # tab_component['tab_contents-with-value'] = (
+        #     escape_html(
+        #         python_utils.UNICODE(tab_component_soup)
+        #         .replace('<br/>', '<br>')))
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
+
+
+def modify_image_filename(exp_id, soup):
     for image in soup.findAll(name='oppia-noninteractive-image'):
         if (not image.has_attr('filepath-with-value') or
                 image['filepath-with-value'] == ''):
@@ -839,7 +883,8 @@ def add_dimensions_to_image_tags(exp_id, html_string):
             continue
 
         try:
-            filename = json.loads(unescape_html(image['filepath-with-value']))
+            print(image['filepath-with-value'].replace('\\"', ''))
+            filename = json.loads(unescape_html(image['filepath-with-value'].replace('\\"', '')))
             image['filepath-with-value'] = escape_html(json.dumps(
                 get_filename_with_dimensions(filename, exp_id)))
         except Exception as e:
@@ -847,8 +892,6 @@ def add_dimensions_to_image_tags(exp_id, html_string):
                 'Exploration %s failed to load image: %s' %
                 (exp_id, image['filepath-with-value'].encode('utf-8')))
             raise e
-    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
-
 
 def get_filename_with_dimensions(old_filename, exp_id):
     """Gets the filename with dimensions of the image file in it.
