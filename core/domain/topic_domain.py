@@ -759,8 +759,8 @@ class Topic(python_utils.OBJECT):
         """
         return cls(
             topic_id, name,
-            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [], 1,
-            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
 
