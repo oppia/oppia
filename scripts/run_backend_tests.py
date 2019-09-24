@@ -17,13 +17,11 @@
 This should not be run directly. Instead, navigate to the oppia/ folder and
 execute:
 
-    bash scripts/run_backend_tests.sh
+    python -m scripts.run_backend_tests
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# Pylint has issues with the import order of argparse.
-# pylint: disable=wrong-import-order
 import argparse
 import datetime
 import importlib
@@ -36,43 +34,43 @@ import threading
 import time
 
 import python_utils
-# pylint: enable=wrong-import-order
 
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
-THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
-PYTHONPATH = os.environ['PYTHONPATH']
+from . import common
+from . import install_third_party_libs
+from . import setup
+from . import setup_gae
+
 
 DIRS_TO_ADD_TO_SYS_PATH = [
-    os.path.join(OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
     os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
-    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
+        common.OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
     os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
+        common.OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
         'lib', 'webob_0_9'),
-    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
-    os.path.join(OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
-    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
-    CURR_DIR,
-    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
-    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
-    os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.0'),
-    os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
-    os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
-    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
-    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.42.0'),
-    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.16.0'),
-    os.path.join(THIRD_PARTY_DIR, 'six-1.12.0'),
-    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
-    os.path.join(THIRD_PARTY_DIR, 'webencodings-0.5.1'),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
+    common.CURR_DIR,
+    os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
+    os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'bleach-3.1.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'callbacks-0.3.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'graphy-1.0.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'mutagen-1.42.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'simplejson-3.16.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'six-1.12.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
 COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.3', 'coverage')
+    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -81,19 +79,25 @@ LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
 
-_PARSER = argparse.ArgumentParser()
+_PARSER = argparse.ArgumentParser(description="""
+Run this script from the oppia root folder:
+    python -m scripts.run_backend_tests
+IMPORTANT: Only one of --test_path and --test_target should be specified.
+""")
+
+_EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
+_EXCLUSIVE_GROUP.add_argument(
+    '--test_target',
+    help='optional dotted module name of the test(s) to run',
+    type=python_utils.UNICODE)
+_EXCLUSIVE_GROUP.add_argument(
+    '--test_path',
+    help='optional subdirectory path containing the test(s) to run',
+    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
     action='store_true')
-_PARSER.add_argument(
-    '--test_target',
-    help='optional dotted module name of the test(s) to run',
-    type=python_utils.UNICODE)
-_PARSER.add_argument(
-    '--test_path',
-    help='optional subdirectory path containing the test(s) to run',
-    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--exclude_load_tests',
     help='optional; if specified, exclude load tests from being run',
@@ -171,7 +175,7 @@ class TaskThread(threading.Thread):
         except Exception as e:
             self.exception = e
             if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
-                    self.exception):
+                    self.exception.args[0]):
                 log('ERROR %s: %.1f secs' %
                     (self.name, time.time() - self.start_time), show_time=True)
             self.finished = True
@@ -187,12 +191,6 @@ class TestingTaskSpec(python_utils.OBJECT):
     def run(self):
         """Runs all tests corresponding to the given test target."""
         test_target_flag = '--test_target=%s' % self.test_target
-
-        # This is done because PYTHONPATH is modified while using importlib
-        # to import modules. PYTHONPATH is changed to comma separated list
-        # after which python is unable to find certain modules. So, the old
-        # PYTHONPATH is copied here to avoid import errors.
-        os.environ['PYTHONPATH'] = PYTHONPATH
         if self.generate_coverage_report:
             exc_list = [
                 'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
@@ -308,8 +306,13 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     return result
 
 
-def main():
+def main(args=None):
     """Run the tests."""
+    parsed_args = _PARSER.parse_args(args=args)
+
+    setup.main(args=[])
+    setup_gae.main(args=[])
+
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
@@ -318,7 +321,17 @@ def main():
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    parsed_args = _PARSER.parse_args()
+    if parsed_args.generate_coverage_report:
+        python_utils.PRINT(
+            'Checking whether coverage is installed in %s'
+            % common.OPPIA_TOOLS_DIR)
+        if not os.path.exists(
+                os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')):
+            python_utils.PRINT('Installing coverage')
+            install_third_party_libs.pip_install(
+                'coverage', '4.5.4',
+                os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'))
+
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
                         'should be specified.')
@@ -366,7 +379,7 @@ def main():
 
     for task in tasks:
         if task.exception:
-            log(python_utils.convert_to_bytes(task.exception))
+            log(python_utils.convert_to_bytes(task.exception.args[0]))
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')
@@ -384,19 +397,20 @@ def main():
         if not task.finished:
             python_utils.PRINT('CANCELED  %s' % spec.test_target)
             test_count = 0
-        elif 'No tests were run' in python_utils.convert_to_bytes(
-                task.exception):
+        elif (task.exception and
+              'No tests were run' in python_utils.convert_to_bytes(
+                  task.exception.args[0])):
             python_utils.PRINT(
                 'ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
-            exc_str = python_utils.convert_to_bytes(task.exception)
+            exc_str = python_utils.convert_to_bytes(task.exception.args[0])
             python_utils.PRINT(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
                 '([0-9]+) failures',
-                python_utils.convert_to_bytes(task.exception))
+                python_utils.convert_to_bytes(task.exception.args[0]))
 
             try:
                 test_count = int(tests_failed_regex_match.group(1))
@@ -456,6 +470,19 @@ def main():
     elif total_errors or total_failures:
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
+
+    if parsed_args.generate_coverage_report:
+        subprocess.call(['python', COVERAGE_PATH, 'combine'])
+        subprocess.call([
+            'python', COVERAGE_PATH, 'report',
+            '--omit="%s*","third_party/*","/usr/share/*"'
+            % common.OPPIA_TOOLS_DIR, '--show-missing'])
+
+        python_utils.PRINT('Generating xml coverage report...')
+        subprocess.call(['python', COVERAGE_PATH, 'xml'])
+
+    python_utils.PRINT('')
+    python_utils.PRINT('Done!')
 
 
 if __name__ == '__main__':

@@ -20,16 +20,26 @@ presubmit checks.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
 import re
+import sys
 
-import astroid
-from pylint import checkers
-from pylint import interfaces
-from pylint.checkers import typecheck
-from pylint.checkers import utils as checker_utils
+import python_utils
+from . import docstrings_checker
 
-import python_utils  # isort:skip
-from . import docstrings_checker  # isort:skip
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
+sys.path.insert(0, _PYLINT_PATH)
+
+# pylint: disable=wrong-import-order
+# pylint: disable=wrong-import-position
+import astroid  # isort:skip
+from pylint import checkers  # isort:skip
+from pylint import interfaces  # isort:skip
+from pylint.checkers import typecheck  # isort:skip
+from pylint.checkers import utils as checker_utils  # isort:skip
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
 
 
 def read_from_node(node):
@@ -893,6 +903,64 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             self.add_message('newline-at-eof', line=file_length)
 
 
+class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
+    """Checks if only one space is used after a yield statement
+    when applicable ('yield' is acceptable).
+    """
+    __implements__ = interfaces.IRawChecker
+
+    name = 'single-space-after-yield'
+    priority = -1
+    msgs = {
+        'C0010': (
+            'Not using \'yield\' or a single space after yield statement.',
+            'single-space-after-yield',
+            'Ensure a single space is used after yield statement.',
+        ),
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that yield keywords are followed by
+        exactly one space, so matching 'yield *' where * is not a
+        whitespace character. Note that 'yield' is also acceptable in
+        cases where the user wants to yield nothing.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module
+                content.
+        """
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        for (line_num, line) in enumerate(file_content):
+            bare_line = line.strip()
+
+            # Single multi-line comment, ignore it.
+            if bare_line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in bare_line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            # Whitespace to right of yield keyword is important for regex.
+            # Allows alphabet characters and underscore for cases where 'yield'
+            # is used at the start of a variable name.
+            source_line = line.lstrip()
+            if (source_line.startswith(b'yield') and
+                    not re.search(br'^(yield)( \S|$|\w)', source_line)):
+                self.add_message('single-space-after-yield', line=line_num + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -907,3 +975,4 @@ def register(linter):
     linter.register_checker(FunctionArgsOrderChecker(linter))
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
+    linter.register_checker(SingleSpaceAfterYieldChecker(linter))
