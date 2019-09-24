@@ -16,16 +16,22 @@
  * @fileoverview Service to dynamically construct translation ids for i18n.
  */
 
-angular.module('oppia').factory('ConstructTranslationIdsService', [
-  function() {
-    return {
-      // Construct a translation id for library from name and a prefix.
-      // Ex: 'categories', 'art' -> 'I18N_LIBRARY_CATEGORIES_ART'
-      getLibraryId: function(prefix, name) {
-        return (
-          'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
-            name.toUpperCase().split(' ').join('_'));
-      }
-    };
-  }]
-);
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ConstructTranslationIdsService {
+  // Construct a translation id for library from name and a prefix.
+  // Ex: 'categories', 'art' -> 'I18N_LIBRARY_CATEGORIES_ART'
+  getLibraryId(prefix: string, name: string): string {
+    return (
+      'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
+        name.toUpperCase().split(' ').join('_'));
+  }
+}
+
+angular.module('oppia').factory(
+  'ConstructTranslationIdsService',
+  downgradeInjectable(ConstructTranslationIdsService));
