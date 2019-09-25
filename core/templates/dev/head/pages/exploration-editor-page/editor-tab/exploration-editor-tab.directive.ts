@@ -92,6 +92,15 @@ angular.module('oppia').directive('explorationEditorTab', [
             }
           }, true);
 
+          $scope.$watch(function() {
+            return StateEditorService.isStateEditorInitialised()
+          }, function() {
+            if (StateEditorService.isStateEditorInitialised()) {
+              var stateData = ExplorationStatesService.getState(ctrl.stateName);
+              $rootScope.$broadcast('stateEditorInitialized', stateData);
+            }
+          });
+
           ctrl.getStateContentPlaceholder = function() {
             if (
               StateEditorService.getActiveStateName() ===

@@ -1,3 +1,5 @@
+import { StateEditorService } from "../state-editor-properties-services/state-editor.service";
+
 // Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,11 +50,11 @@ angular.module('oppia').directive('stateContentEditor', [
         '/components/state-editor/state-content-editor/' +
         'state-content-editor.directive.html'),
       controller: [
-        '$scope', 'StateContentService', 'EditabilityService',
-        'EditorFirstTimeEventsService',
+        '$scope', 'StateContentService', 'StateEditorService',
+        'EditabilityService', 'EditorFirstTimeEventsService',
         function(
-            $scope, StateContentService, EditabilityService,
-            EditorFirstTimeEventsService) {
+            $scope, StateContentService, StateEditorService,
+            EditabilityService, EditorFirstTimeEventsService) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
@@ -114,6 +116,8 @@ angular.module('oppia').directive('stateContentEditor', [
             StateContentService.restoreFromMemento();
             $scope.contentEditorIsOpen = false;
           };
+
+          StateEditorService.updateStateContentEditorInitialised(true);
         }
       ]
     };

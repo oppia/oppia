@@ -454,6 +454,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
               _updateInteractionPreviewAndAnswerChoices();
             });
           };
+
+          StateEditorService.updateStateInteractionEditorInitialised(true);
         }
       ]
     };
