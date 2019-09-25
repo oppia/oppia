@@ -562,7 +562,7 @@ def increment_question_counts(skill_ids, delta):
 
 
 def update_question_counts_after_changing_skills_for_question(
-    old_skill_ids, new_skill_ids):
+        old_skill_ids, new_skill_ids):
     """Updates question_count(s) of SkillOpportunityModel(s) corresponding to
     the change in linked skill IDs for a question from old_skill_ids to
     new_skill_ids, e.g. if skill_id1 is in old_skill_ids, but not in
