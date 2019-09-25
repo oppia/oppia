@@ -23,15 +23,6 @@ it will only lint files that have been touched in this commit.
 
 This script ignores all filepaths contained within .eslintignore.
 
-IMPORTANT NOTES:
-
-1.  Before running this script, you must install third-party dependencies by
-    running
-
-        python -m scripts.install_third_party_libs
-
-    at least once.
-
 =====================
 CUSTOMIZATION OPTIONS
 =====================
@@ -71,7 +62,12 @@ import tempfile
 import threading
 import time
 
-import python_utils
+# Install third party dependencies before proceeding.
+from . import install_third_party_libs
+install_third_party_libs.main(args=[])
+
+# pylint: disable=wrong-import-position
+import python_utils  # isort:skip
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
@@ -98,7 +94,7 @@ EXCLUDED_PATHS = (
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
-    'webpack_bundles/*')
+    'webpack_bundles/*', 'core/tests/services_sources/*')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',

@@ -16,7 +16,8 @@
  * @fileoverview Controller for the main topic editor.
  */
 
-require('pages/topic-editor-page/editor-tab/stories-list.directive.ts');
+require(
+  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 
 require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
@@ -62,7 +63,7 @@ angular.module('oppia').directive('topicEditorTab', [
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/topic-editor-page/modal-templates/' +
-                  'save-pending-changes-modal.template.html'),
+                  'topic-save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',
