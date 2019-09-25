@@ -149,6 +149,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 class SkillOpportunityModel(base_models.BaseModel):
     """Model for opportunities to add questions to skills.
 
+    The id of each instance is the id of the corresponding skill.
+
     A new instance of this model is created each time a SkillModel is created.
     When a SkillModel's skill description changes, the corresponding instance
     of this model is also updated.
@@ -157,6 +159,13 @@ class SkillOpportunityModel(base_models.BaseModel):
     skill_description = ndb.StringProperty(required=True, indexed=True)
     # The number of questions associated with this opportunity's skill.
     question_count = ndb.IntegerProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Skill opportunity is deleted only if the corresponding skill is not
+        public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):

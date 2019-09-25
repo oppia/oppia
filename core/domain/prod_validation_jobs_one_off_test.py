@@ -2473,6 +2473,19 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated SkillOpportunityModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_model_with_invalid_question_count(self):
+        self.model_instance_0.question_count = 10
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_count check of '
+                'SkillOpportunityModel\', '
+                '[u\'Entity id %s: question_count: 10 does not match the '
+                'question_count of external skill model: 1\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated SkillOpportunityModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
 
 class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
 
