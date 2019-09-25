@@ -66,13 +66,13 @@ angular.module('oppia').directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$log', '$rootScope', '$scope', 'StateContentService',
+        '$rootScope', '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService',
         'StateSolicitAnswerDetailsService', 'StateSolutionService',
         'INTERACTION_SPECS',
         function(
-            $log, $rootScope, $scope, StateContentService,
+            $rootScope, $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService,
             StateSolicitAnswerDetailsService, StateSolutionService,
