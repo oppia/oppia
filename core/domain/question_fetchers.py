@@ -30,6 +30,7 @@ import feconf
     [models.NAMES.question, models.NAMES.skill])
 memcache_services = models.Registry.import_memcache_services()
 
+
 def get_questions_and_skill_descriptions_by_skill_ids(
         question_count, skill_ids, start_cursor):
     """Returns the questions linked to the given skill ids.
