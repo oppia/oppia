@@ -18,11 +18,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
+
 from core.domain import question_domain
 from core.domain import state_domain
 from core.platform import models
 
-import copy
 import feconf
 
 (question_models, skill_models) = models.Registry.import_models(
