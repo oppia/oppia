@@ -135,6 +135,11 @@ angular.module('oppia').directive('explorationEditorTab', [
             }
           };
 
+          $scope.$on('stateEditorDirectiveInitialized', function(evt) {
+            var stateData = ExplorationStatesService.getState(ctrl.stateName);
+            $rootScope.$broadcast('stateEditorInitialized', stateData);
+          });
+
           ctrl.recomputeGraph = function() {
             GraphDataService.recompute();
           };
