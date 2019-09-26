@@ -95,7 +95,8 @@ angular.module('oppia').directive('explorationEditorTab', [
           $scope.$watch(function() {
             return StateEditorService.isStateEditorInitialised();
           }, function() {
-            if (StateEditorService.isStateEditorInitialised()) {
+            if (StateEditorService.isStateEditorInitialised() &&
+            ExplorationStatesService.isInitialized()) {
               var stateData = ExplorationStatesService.getState(ctrl.stateName);
               $rootScope.$broadcast('stateEditorInitialized', stateData);
             }
@@ -145,8 +146,11 @@ angular.module('oppia').directive('explorationEditorTab', [
           };
 
           $scope.$on('stateEditorDirectiveInitialized', function(evt) {
-            var stateData = ExplorationStatesService.getState(ctrl.stateName);
-            $rootScope.$broadcast('stateEditorInitialized', stateData);
+            if (ExplorationStatesService.isInitialized()) {
+              var stateData = (
+                ExplorationStatesService.getState(ctrl.stateName));
+              $rootScope.$broadcast('stateEditorInitialized', stateData);
+            }
           });
 
           ctrl.recomputeGraph = function() {
