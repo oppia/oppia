@@ -108,5 +108,8 @@
     "yargs": "^13.2.2",
     "zone.js": "^0.9.1"
   },
-  "keywords": []
+  "keywords": [],
+  "dependencies": {
+    "handlebars": "^4.3.1"
+  }
 }
