@@ -93,6 +93,7 @@
 /.pylintrc @kevinlee12
 /.stylelintrc @kevinlee12
 /.travis.yml @kevinlee12
+/.yarnrc @kevinlee12
 /codecov.yml @lilithxxx
 /core/templates/dev/head/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
