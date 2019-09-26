@@ -102,23 +102,23 @@ angular.module('oppia').directive('stateEditor', [
           });
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
-              $scope.stateData = stateData;
-              $scope.stateName = StateEditorService.getActiveStateName();
-              StateEditorService.setInteraction(stateData.interaction);
-              StateContentService.init(
-                $scope.stateName, stateData.content);
-              StateHintsService.init(
-                $scope.stateName, stateData.interaction.hints);
-              StateInteractionIdService.init(
-                $scope.stateName, stateData.interaction.id);
-              StateCustomizationArgsService.init(
-                $scope.stateName, stateData.interaction.customizationArgs);
-              StateSolicitAnswerDetailsService.init(
-                $scope.stateName, stateData.solicitAnswerDetails);
-              StateSolutionService.init(
-                $scope.stateName, stateData.interaction.solution);
-              updateInteractionVisibility(stateData.interaction.id);
-              $scope.servicesInitialized = true;
+            $scope.stateData = stateData;
+            $scope.stateName = StateEditorService.getActiveStateName();
+            StateEditorService.setInteraction(stateData.interaction);
+            StateContentService.init(
+              $scope.stateName, stateData.content);
+            StateHintsService.init(
+              $scope.stateName, stateData.interaction.hints);
+            StateInteractionIdService.init(
+              $scope.stateName, stateData.interaction.id);
+            StateCustomizationArgsService.init(
+              $scope.stateName, stateData.interaction.customizationArgs);
+            StateSolicitAnswerDetailsService.init(
+              $scope.stateName, stateData.solicitAnswerDetails);
+            StateSolutionService.init(
+              $scope.stateName, stateData.interaction.solution);
+            updateInteractionVisibility(stateData.interaction.id);
+            $scope.servicesInitialized = true;
           });
 
           $rootScope.$broadcast('stateEditorDirectiveInitialized');
