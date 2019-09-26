@@ -102,7 +102,6 @@ angular.module('oppia').directive('stateEditor', [
           });
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
-            if ($scope.stateData === undefined) {
               $scope.stateData = stateData;
               $scope.stateName = StateEditorService.getActiveStateName();
               StateEditorService.setInteraction(stateData.interaction);
@@ -120,7 +119,6 @@ angular.module('oppia').directive('stateEditor', [
                 $scope.stateName, stateData.interaction.solution);
               updateInteractionVisibility(stateData.interaction.id);
               $scope.servicesInitialized = true;
-            }
           });
 
           $rootScope.$broadcast('stateEditorDirectiveInitialized');
