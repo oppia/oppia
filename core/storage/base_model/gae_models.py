@@ -922,7 +922,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     """
 
     # The id of the user who committed this revision.
-    committer_id = ndb.StringProperty(required=True)
+    committer_id = ndb.StringProperty(indexed=True, required=True)
     # The type of the commit associated with this snapshot.
     commit_type = ndb.StringProperty(
         required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES)
@@ -931,6 +931,18 @@ class BaseSnapshotMetadataModel(BaseModel):
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
+
+    @classmethod
+    def exists_for_user_id(cls, user_id):
+        """Check whether BaseSnapshotMetadataModel reference user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.committer_id == user_id).get() is not None
 
     def get_unversioned_instance_id(self):
         """Gets the instance id from the snapshot id.

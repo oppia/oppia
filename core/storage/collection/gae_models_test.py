@@ -39,6 +39,18 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
+    def test_has_reference_to_user_id(self):
+        collection = collection_domain.Collection.create_default_collection(
+            'id', title='A title',
+            category='A Category', objective='An Objective')
+        collection_services.save_new_collection('commiter_id', collection)
+        self.assertTrue(
+            collection_models.CollectionModel
+            .has_reference_to_user_id('commiter_id'))
+        self.assertFalse(
+            collection_models.CollectionRightsModel
+            .has_reference_to_user_id('x_id'))
+
     def test_get_collection_count(self):
         collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
@@ -58,11 +70,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'  # Related to all three collections
     USER_ID_2 = 'id_2'  # Related to a subset of the three collections
     USER_ID_3 = 'id_3'  # Related to no collections
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            collection_models.CollectionRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+    USER_ID_COMMITER = 'id_4'  # User id used in commits
 
     def setUp(self):
         super(CollectionRightsModelUnitTest, self).setUp()
@@ -77,7 +85,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            'cid', 'Created new collection right',
+            self.USER_ID_COMMITER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_2,
@@ -90,7 +98,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            'cid', 'Created new collection right',
+            self.USER_ID_COMMITER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_3,
@@ -103,8 +111,27 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            'cid', 'Created new collection right',
+            self.USER_ID_COMMITER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            collection_models.CollectionRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            collection_models.CollectionRightsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            collection_models.CollectionRightsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            collection_models.CollectionRightsModel
+            .has_reference_to_user_id(self.USER_ID_COMMITER))
+        self.assertFalse(
+            collection_models.CollectionRightsModel
+            .has_reference_to_user_id(self.USER_ID_3))
 
     def test_save(self):
         collection_models.CollectionRightsModel(
@@ -117,7 +144,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0
-            ).save('cid', 'Created new collection',
+            ).save(self.USER_ID_COMMITER, 'Created new collection',
                    [{'cmd': rights_manager.CMD_CREATE_NEW}])
         collection_model = collection_models.CollectionRightsModel.get('id')
         self.assertEqual('id', collection_model.id)
@@ -173,6 +200,27 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
 
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionCommitLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            collection_models.CollectionCommitLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        commit = collection_models.CollectionCommitLogEntryModel.create(
+            'b', 0, 'committer_id', 'username', 'msg',
+            'create', [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False
+        )
+        commit.collection_id = 'b'
+        commit.put()
+        self.assertTrue(
+            collection_models.CollectionCommitLogEntryModel
+            .has_reference_to_user_id('committer_id'))
+        self.assertFalse(
+            collection_models.CollectionCommitLogEntryModel
+            .has_reference_to_user_id('x_id'))
 
     def test_get_all_non_private_commits(self):
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
@@ -236,6 +284,35 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             collection_models.CollectionSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        collection_models.CollectionSummaryModel(
+            id='id0',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            owner_ids=['owner_id'],
+            editor_ids=['editor_id'],
+            viewer_ids=['viewer_id'],
+            contributor_ids=['contributor_id'],
+        ).put()
+        self.assertTrue(
+            collection_models.CollectionSummaryModel
+            .has_reference_to_user_id('owner_id'))
+        self.assertTrue(
+            collection_models.CollectionSummaryModel
+            .has_reference_to_user_id('editor_id'))
+        self.assertTrue(
+            collection_models.CollectionSummaryModel
+            .has_reference_to_user_id('viewer_id'))
+        self.assertTrue(
+            collection_models.CollectionSummaryModel
+            .has_reference_to_user_id('contributor_id'))
+        self.assertFalse(
+            collection_models.CollectionSummaryModel
+            .has_reference_to_user_id('x_id'))
 
     def test_get_non_private(self):
         public_collection_summary_model = (
