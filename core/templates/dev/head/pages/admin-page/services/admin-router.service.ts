@@ -86,4 +86,3 @@ export class AdminRouterService {
 
 angular.module('oppia').factory(
   'AdminRouterService', downgradeInjectable(AdminRouterService));
-
