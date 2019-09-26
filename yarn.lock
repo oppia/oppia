@@ -541,10 +541,10 @@
   resolved "https://registry.yarnpkg.com/@types/mathjax/-/mathjax-0.0.35.tgz#9b7e69dc49f4d105ad7b992775b3fba412889543"
   integrity sha512-flo9bVJE2Lzv3X5NQXVhNhv7srqk//Ngr8MT+/jRErkWGYkk8EBm42J5W0XUH6p4nWF1iLGe+atSuIkR5wA2yw==
 
-"@types/mathjs@^5.0.0":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@types/mathjs/-/mathjs-5.0.1.tgz#b98e163ea396b4f27bec20ee25ffb8fe9e656af8"
-  integrity sha512-EFBuueI+BRed9bnUO6/9my55b4FH+VQIvqMm58h9JGbtaGCkqr3YSDhnmVbM1SJjF//8SURERSypzNwejOk7lA==
+"@types/mathjs@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@types/mathjs/-/mathjs-6.0.2.tgz#fb77aff0adcd75cf9df358ae8891e239c7ca4203"
+  integrity sha512-VXRnT6ozA8k5i3xyv8WpwarNCsIwV6Z5Cuz5bPuj9pqr5jOo3rZk/tRWdHBCmC0KMchH8OBYPC72p4ftyMXK1Q==
   dependencies:
     decimal.js "^10.0.0"
 
