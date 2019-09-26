@@ -27,10 +27,11 @@ angular.module('oppia').factory('UserService', [
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
     var userInfoPromise = null;
+    var defaultUserInfo = UserInfoObjectFactory.createDefault();
 
     var getUserInfoAsync = function() {
       if (UrlService.getPathname() === '/signup') {
-        return $q.resolve(UserInfoObjectFactory.createDefault());
+        return $q.resolve(defaultUserInfo);
       }
       if (userInfoPromise) {
         return userInfoPromise;
@@ -38,10 +39,11 @@ angular.module('oppia').factory('UserService', [
       userInfoPromise = $http.get('/userinfohandler')
         .then(function(response) {
           if (response.data.user_is_logged_in) {
-            return $q.resolve(
-              UserInfoObjectFactory.createFromBackendDict(response.data));
+            let userInfoData = UserInfoObjectFactory.createFromBackendDict(
+              response.data);
+            return $q.resolve(userInfoData);
           } else {
-            return $q.resolve(UserInfoObjectFactory.createDefault());
+            return $q.resolve(defaultUserInfo);
           }
         });
       return userInfoPromise;
