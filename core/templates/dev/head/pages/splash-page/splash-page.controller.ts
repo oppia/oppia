@@ -18,19 +18,18 @@
 
 require('base-components/base-content.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 
+const html = require('./splash-page.directive.html');
+
 angular.module('oppia').directive('splashPage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/splash-page/splash-page.directive.html'),
+      template: html,
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
