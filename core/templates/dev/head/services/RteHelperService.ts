@@ -17,9 +17,10 @@
  */
 
 require('services/services.constants.ajs.ts');
-require('services/stateful/FocusManagerService.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
+require('services/stateful/FocusManagerService.ts');
 
 angular.module('oppia').factory('RteHelperService', [
   '$document', '$log', '$uibModal',
