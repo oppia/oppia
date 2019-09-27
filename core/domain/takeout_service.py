@@ -50,10 +50,10 @@ def export_data_for_user(user_id):
         'learner_playlist_data': user_models.LearnerPlaylistModel,
         'collection_progress_data': user_models.CollectionProgressModel,
         'story_progress_data': user_models.StoryProgressModel,
-        'general_feedback_thread_data': (feedback_models.
-										 GeneralFeedbackThreadModel),
-        'general_feedback_message_data': (feedback_models.
-										  GeneralFeedbackMessageModel),
+        'general_feedback_thread_data': (
+				feedback_models.GeneralFeedbackThreadModel),
+        'general_feedback_message_data': (
+				feedback_models.GeneralFeedbackMessageModel),
         'collection_rights_data': collection_models.CollectionRightsModel,
         'general_suggestion_data': suggestion_models.GeneralSuggestionModel,
         'exploration_rights_data': exploration_models.ExplorationRightsModel,
