@@ -16,23 +16,13 @@
  * @fileoverview Tests for LearnerAnswerDetailsObjectFactory.
  */
 
-require('domain/statistics/LearnerAnswerInfoObjectFactory.ts');
-require('domain/statistics/LearnerAnswerDetailsObjectFactory.ts');
+import { LearnerAnswerInfoObjectFactory } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { LearnerAnswerDetailsObjectFactory } from
+  'domain/statistics/LearnerAnswerDetailsObjectFactory';
 
-describe('Learner answer details object factory', function() {
-  var LearnerAnswerDetailsObjectFactory = null;
-  var LearnerAnswerInfoObjectFactory = null;
-
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    LearnerAnswerDetailsObjectFactory = $injector.get(
-      'LearnerAnswerDetailsObjectFactory');
-    LearnerAnswerInfoObjectFactory = $injector.get(
-      'LearnerAnswerInfoObjectFactory');
-  }));
-
-  it('should create a default learner answer details object', function() {
+describe('Learner answer details object factory', () => {
+  it('should create a default learner answer details object', () => {
     var learnerAnswerInfo = (
       LearnerAnswerInfoObjectFactory.createDefaultLearnerAnswerInfo(
         'This is answer', 'This is answer details'));

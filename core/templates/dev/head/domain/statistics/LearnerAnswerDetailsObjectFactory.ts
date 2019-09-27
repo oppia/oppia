@@ -17,38 +17,56 @@
  * domain objects.
  */
 
-angular.module('oppia').factory('LearnerAnswerDetailsObjectFactory', [
-  function() {
-    var LearnerAnswerDetails = function(
-        expId, stateName, interactionId, customizationArgs,
-        learnerAnswerInfoData) {
-      this.expId = expId;
-      this.stateName = stateName;
-      this.interactionId = interactionId;
-      this.customizationArgs = customizationArgs;
-      this.learnerAnswerInfoData = learnerAnswerInfoData;
-    };
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-    LearnerAnswerDetails.prototype.getExpId = function() {
-      return this.expId;
-    };
+import {LearnerAnswerInfoObjectFactory} from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
 
-    LearnerAnswerDetails.prototype.getStateName = function() {
-      return this.stateName;
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerAnswerDetailsObjectFactory {
+  expId: string;
+  stateName: string;
+  interactionId: string;
+  customizationArgs: any;
+  learnerAnswerInfoData: LearnerAnswerInfoObjectFactory[];
 
-    LearnerAnswerDetails.prototype.getLearnerAnswerInfoData = function() {
-      return this.learnerAnswerInfoData;
-    };
-
-    /* eslint-disable dot-notation */
-    LearnerAnswerDetails['createDefaultLearnerAnswerDetails'] = function(expId,
-        stateName, interactionId, customizationArgs, learnerAnswerInfoData) {
-    /* eslint-enable dot-notation */
-      return new LearnerAnswerDetails(expId, stateName, interactionId,
-        customizationArgs, learnerAnswerInfoData);
-    };
-
-    return LearnerAnswerDetails;
+  constructor(
+      expId: string, stateName: string, interactionId: string,
+      customizationArgs: any,
+      learnerAnswerInfoData: LearnerAnswerInfoObjectFactory[]) {
+    this.expId = expId;
+    this.stateName = stateName;
+    this.interactionId = interactionId;
+    this.customizationArgs = customizationArgs;
+    this.learnerAnswerInfoData = learnerAnswerInfoData;
   }
-]);
+
+  getExpId(): string {
+    return this.expId;
+  }
+
+  getStateName(): string {
+    return this.stateName;
+  }
+
+  getLearnerAnswerInfoData(): LearnerAnswerInfoObjectFactory[] {
+    return this.learnerAnswerInfoData;
+  }
+
+  static createDefaultLearnerAnswerDetails(
+      expId: string, stateName: string, interactionId: string,
+      customizationArgs: any,
+      learnerAnswerInfoData: LearnerAnswerInfoObjectFactory[]): (
+    LearnerAnswerDetailsObjectFactory) {
+    return new LearnerAnswerDetailsObjectFactory(
+      expId, stateName, interactionId, customizationArgs,
+      learnerAnswerInfoData);
+  }
+}
+
+angular.module('oppia').factory(
+  'LearnerAnswerDetailsObjectFactory',
+  downgradeInjectable(LearnerAnswerDetailsObjectFactory));

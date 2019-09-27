@@ -20,6 +20,7 @@
 // number-with-units-rules.service.ts is upgraded to Angular 8.
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require(
@@ -31,6 +32,12 @@ describe('Number with Units rules service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
 
   var nurs = null;
