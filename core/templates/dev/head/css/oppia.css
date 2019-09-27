@@ -487,6 +487,7 @@ p:last-child {
   display: block;
   padding: 10px 15px;
 }
+/* stylelint-disable */
 .oppia-navbar-profile > li:hover {
   background-color: white;
 }
