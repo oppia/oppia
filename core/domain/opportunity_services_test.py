@@ -22,7 +22,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import question_services
-from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_domain
@@ -431,14 +430,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'new_value': 'new_description'
             })
         ]
-        def mock_get_all_actions(*_args):
-            actions = list(self.admin.actions)
-            return actions
 
-        with self.swap(role_services, 'get_all_actions', mock_get_all_actions):
-            skill_services.update_skill(
-                self.USER_ID, self.SKILL_ID, changelist,
-                'Updated misconception name.')
+        skill_services.update_skill(
+            self.admin_id, self.SKILL_ID, changelist,
+            'Updated misconception name.')
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))

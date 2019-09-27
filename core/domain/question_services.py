@@ -142,8 +142,9 @@ def _update_linked_skill_ids_of_question(
     change_list = [question_domain.QuestionChange(change_dict)]
     update_question(
         user_id, question_id, change_list, 'updated linked skill ids')
-    opportunity_services.update_question_counts_after_changing_skills_for_question( #pylint: disable=line-too-long
-        old_linked_skill_ids, new_linked_skill_ids)
+    (opportunity_services
+     .update_question_counts_after_changing_skills_for_question(
+         old_linked_skill_ids, new_linked_skill_ids))
 
 
 def delete_question_skill_link(user_id, question_id, skill_id):

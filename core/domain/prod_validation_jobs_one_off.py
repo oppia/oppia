@@ -1402,10 +1402,13 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
 
         for (_, _, skill_model) in (
                 skill_model_class_model_id_model_tuples):
+            # The case for missing skill external model is ignored here
+            # since errors for missing skill external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
             if skill_model is None or skill_model.deleted:
                 continue
-            skill = skill_services.get_skill_from_model(
-                skill_model)
+            skill = skill_services.get_skill_from_model(skill_model)
             question_skill_links = (
                 question_services.get_question_skill_links_of_skill(
                     skill.id, skill.description))

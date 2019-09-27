@@ -23,12 +23,10 @@ import copy
 from core.domain import question_domain
 from core.domain import state_domain
 from core.platform import models
-
 import feconf
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
-memcache_services = models.Registry.import_memcache_services()
 
 
 def get_questions_and_skill_descriptions_by_skill_ids(
@@ -50,7 +48,8 @@ def get_questions_and_skill_descriptions_by_skill_ids(
             next cursor value is urlsafe.
     """
     question_skill_link_models, next_cursor = (
-        question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( #pylint: disable=line-too-long
+        question_models.QuestionSkillLinkModel
+        .get_question_skill_links_by_skill_ids(
             question_count, skill_ids, start_cursor))
     question_ids = []
     grouped_skill_ids = []

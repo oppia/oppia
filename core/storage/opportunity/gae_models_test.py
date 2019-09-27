@@ -171,6 +171,11 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
             question_count=30,
         ).put()
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            opportunity_models.SkillOpportunityModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
     def test_get_skill_opportunities(self):
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel

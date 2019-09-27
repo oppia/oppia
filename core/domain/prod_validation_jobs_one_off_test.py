@@ -2459,7 +2459,7 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated SkillOpportunityModel\', 3]']
         run_job_and_check_output(self, expected_output)
 
-    def test_model_with_invalid_skill_related_property(self):
+    def test_model_with_invalid_skill_description(self):
         self.model_instance_0.skill_description = 'invalid'
         self.model_instance_0.put()
         expected_output = [
