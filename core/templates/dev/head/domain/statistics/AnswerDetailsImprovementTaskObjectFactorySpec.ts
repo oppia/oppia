@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the FeedbackImprovementCardObjectFactory.
+ * @fileoverview Unit tests for the FeedbackImprovementTaskObjectFactory.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// FeedbackImprovementCardObjectFactory.ts is upgraded to Angular 8.
+// FeedbackImprovementTaskObjectFactory.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -73,16 +73,16 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/statistics/AnswerDetailsImprovementCardObjectFactory.ts');
+require('domain/statistics/AnswerDetailsImprovementTaskObjectFactory.ts');
 
-describe('AnswerDetailsImprovementCardObjectFactory', function() {
+describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
-  var AnswerDetailsImprovementCardObjectFactory = null;
+  var AnswerDetailsImprovementTaskObjectFactory = null;
   var ImprovementModalService = null;
   var LearnerAnswerDetailsDataService = null;
-  var ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE = null;
+  var ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE = null;
   var STATUS_NOT_ACTIONABLE = null;
   var STATUS_OPEN = null;
 
@@ -147,19 +147,19 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
-      _AnswerDetailsImprovementCardObjectFactory_, _ImprovementModalService_,
+      _AnswerDetailsImprovementTaskObjectFactory_, _ImprovementModalService_,
       _LearnerAnswerDetailsDataService_,
-      _ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE_,
+      _ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE_,
       _STATUS_NOT_ACTIONABLE_, _STATUS_OPEN_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
-    AnswerDetailsImprovementCardObjectFactory =
-      _AnswerDetailsImprovementCardObjectFactory_;
+    AnswerDetailsImprovementTaskObjectFactory =
+      _AnswerDetailsImprovementTaskObjectFactory_;
     ImprovementModalService = _ImprovementModalService_;
     LearnerAnswerDetailsDataService = _LearnerAnswerDetailsDataService_;
-    ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE =
-      _ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE_;
+    ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE =
+      _ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE_;
     STATUS_NOT_ACTIONABLE = _STATUS_NOT_ACTIONABLE_;
     STATUS_OPEN = _STATUS_OPEN_;
   }));
@@ -167,16 +167,16 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
   describe('.createNew', function() {
     it('retrieves data from passed thread', function() {
       var mockLearnerAnswerDetails = {learnerAnswerInfoData: 'sample'};
-      var card = AnswerDetailsImprovementCardObjectFactory.createNew(
+      var task = AnswerDetailsImprovementTaskObjectFactory.createNew(
         mockLearnerAnswerDetails);
 
-      expect(card.getDirectiveData()).toBe(mockLearnerAnswerDetails);
-      expect(card.getDirectiveType()).toEqual(
-        ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE);
+      expect(task.getDirectiveData()).toBe(mockLearnerAnswerDetails);
+      expect(task.getDirectiveType()).toEqual(
+        ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
     });
   });
 
-  describe('.fetchCards', function() {
+  describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
       spyOn(
         LearnerAnswerDetailsDataService,
@@ -184,12 +184,12 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
       spyOn(LearnerAnswerDetailsDataService, 'getData').and.returnValue(
         [{learnerAnswerInfoData: 'abc1'}, {learnerAnswerInfoData: 'def2'}]);
 
-      AnswerDetailsImprovementCardObjectFactory.fetchCards().then(
-        function(cards) {
+      AnswerDetailsImprovementTaskObjectFactory.fetchTasks().then(
+        function(tasks) {
           expect(
-            cards[0].getDirectiveData().learnerAnswerInfoData).toEqual('abc1');
+            tasks[0].getDirectiveData().learnerAnswerInfoData).toEqual('abc1');
           expect(
-            cards[1].getDirectiveData().learnerAnswerInfoData).toEqual('def2');
+            tasks[1].getDirectiveData().learnerAnswerInfoData).toEqual('def2');
         }).then(done, done.fail);
 
       // $q Promises need to be forcibly resolved through a JavaScript digest,
@@ -198,7 +198,7 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
     });
   });
 
-  describe('AnswerDetailsImprovementCard', function() {
+  describe('AnswerDetailsImprovementTask', function() {
     beforeEach(function() {
       this.mockLearnerAnswerDetails = {
         expId: 12,
@@ -210,63 +210,63 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
           created_on: 1441870501230.642,
         }]
       };
-      this.card =
-        AnswerDetailsImprovementCardObjectFactory.createNew(
+      this.task =
+        AnswerDetailsImprovementTaskObjectFactory.createNew(
           this.mockLearnerAnswerDetails);
     });
 
     describe('.getStatus', function() {
       it('returns open as status', function() {
-        expect(this.card.getStatus()).toEqual(STATUS_OPEN);
+        expect(this.task.getStatus()).toEqual(STATUS_OPEN);
       });
 
       it('returns not actionable as status', function() {
         this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
-        expect(this.card.getStatus()).toEqual(STATUS_NOT_ACTIONABLE);
+        expect(this.task.getStatus()).toEqual(STATUS_NOT_ACTIONABLE);
       });
     });
 
     describe('.getTitle', function() {
       it('returns answer details as title', function() {
-        expect(this.card.getTitle()).toEqual(
+        expect(this.task.getTitle()).toEqual(
           'Answer details for the card "fakeStateName"');
       });
     });
 
     describe('.isObsolete', function() {
       it('returns is obsolete as false', function() {
-        expect(this.card.isObsolete()).toEqual(false);
+        expect(this.task.isObsolete()).toEqual(false);
       });
 
       it('returns is obsolete as true', function() {
         this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
-        expect(this.card.isObsolete()).toEqual(true);
+        expect(this.task.isObsolete()).toEqual(true);
       });
     });
 
     describe('.getDirectiveType', function() {
       it('returns answer details as directive type', function() {
-        expect(this.card.getDirectiveType())
-          .toEqual(ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE);
+        expect(this.task.getDirectiveType())
+          .toEqual(ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
       });
     });
 
     describe('.getDirectiveData', function() {
       it('returns the learner answer details', function() {
-        expect(this.card.getDirectiveData()).toBe(
+        expect(this.task.getDirectiveData()).toBe(
           this.mockLearnerAnswerDetails);
       });
     });
 
     describe('.getActionButtons', function() {
       it('contains one button', function() {
-        expect(this.card.getActionButtons().length).toEqual(1);
+        expect(this.task.getActionButtons().length).toEqual(1);
       });
     });
 
     describe('first button', function() {
       beforeEach(function() {
-        this.button = this.card.getActionButtons()[0];
+        this.button = this.task.getActionButtons()[0];
       });
 
       it('opens a learner answer details modal', function() {
