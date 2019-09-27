@@ -205,13 +205,13 @@ class BaseJobManager(python_utils.OBJECT):
 
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
-        model.output = cls._compress_output_list(output_list)
+        model.output = cls.compress_output_list(output_list)
         model.put()
 
         cls._post_completed_hook(job_id)
 
     @classmethod
-    def _compress_output_list(
+    def compress_output_list(
             cls, output_list, test_only_max_output_len_chars=None):
         """Returns compressed list of strings within a max length of chars.
 
@@ -363,6 +363,20 @@ class BaseJobManager(python_utils.OBJECT):
         """
         raise NotImplementedError(
             'Subclasses of BaseJobManager should implement _real_enqueue().')
+
+    @classmethod
+    def real_enqueue(cls, job_id, queue_name, additional_job_params):
+        """Public method to test the private method
+
+        Args:
+            job_id: str. The ID of the job to enqueue.
+            queue_name: str. The queue name the job should be run in. See
+                core.platform.taskqueue.gae_taskqueue_services for supported
+                values.
+            additional_job_params: dict(str : *) or None. Additional parameters
+                on jobs.
+        """
+        cls._real_enqueue(job_id, queue_name, additional_job_params)
 
     @classmethod
     def get_status_code(cls, job_id):

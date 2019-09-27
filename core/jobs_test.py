@@ -95,7 +95,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             'Subclasses of BaseJobManager should implement _real_enqueue().'):
-            jobs.BaseJobManager._real_enqueue(  # pylint: disable=protected-access
+            jobs.BaseJobManager.real_enqueue(  # pylint: disable=protected-access
                 'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None)
 
     def test_failing_jobs(self):
@@ -435,41 +435,41 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
     def test_compress_output_list_with_single_char_outputs(self):
         input_list = [1, 2, 3, 4, 5]
         expected_output = ['1', '2', '3', '<TRUNCATED>']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+        actual_output = jobs.BaseJobManager.compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len_chars=3)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_multi_char_outputs(self):
         input_list = ['abcd', 'efgh', 'ijkl']
         expected_output = ['abcd', 'efgh', 'ij <TRUNCATED>']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+        actual_output = jobs.BaseJobManager.compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len_chars=10)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_zero_max_output_len(self):
         input_list = [1, 2, 3]
         expected_output = ['<TRUNCATED>']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+        actual_output = jobs.BaseJobManager.compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len_chars=0)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_exact_max_output_len(self):
         input_list = ['abc']
         expected_output = ['abc']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+        actual_output = jobs.BaseJobManager.compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len_chars=3)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_empty_outputs(self):
         input_list = []
         expected_output = []
-        actual_output = jobs.BaseJobManager._compress_output_list(input_list)  # pylint: disable=protected-access
+        actual_output = jobs.BaseJobManager.compress_output_list(input_list)  # pylint: disable=protected-access
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_duplicate_outputs(self):
         input_list = ['bar', 'foo'] * 3
         expected_output = ['(3x) bar', '(3x) foo']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+        actual_output = jobs.BaseJobManager.compress_output_list(  # pylint: disable=protected-access
             input_list,
             # Make sure no output gets truncated.
             test_only_max_output_len_chars=sum(len(s) for s in expected_output))
@@ -478,7 +478,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
     def test_compress_output_list_with_truncated_duplicate_outputs(self):
         input_list = ['supercalifragilisticexpialidocious'] * 3
         expected_output = ['(3x) super <TRUNCATED>']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+        actual_output = jobs.BaseJobManager.compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len_chars=10)
         self.assertEqual(actual_output, expected_output)
 
