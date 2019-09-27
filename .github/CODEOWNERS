@@ -449,11 +449,12 @@
 /webpack.prod.config.ts @jamesjay4199 @vojtechjelinek
 
 
+# User Data Takeout.
+/core/domain/takeout_service*.py @varun-tandon
+
+
 # Typings.
 /typings @ankita240796
-
-# Takeout.
-/core/domain/takeout_service*.py @varun-tandon
 
 
 # User’s profile page.

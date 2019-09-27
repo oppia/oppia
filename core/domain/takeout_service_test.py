@@ -29,15 +29,13 @@ import feconf
 import utils
 
 (
-    user_models, collection_models, exploration_models, story_models,
-    feedback_models, suggestion_models,
-    email_models) = models.Registry.import_models([
+    user_models, collection_models, exploration_models, feedback_models,
+    suggestion_models, email_models) = models.Registry.import_models([
         models.NAMES.user, models.NAMES.collection, models.NAMES.exploration,
-        models.NAMES.story, models.NAMES.feedback, models.NAMES.suggestion,
-        models.NAMES.email])
+        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.email])
 
 
-class TakeoutServiceTests(test_utils.GenericTestBase):
+class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     """Tests for the takeout service."""
 
     USER_ID_1 = 'user_1'
@@ -99,7 +97,7 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Set up all models for use in testing."""
-        super(TakeoutServiceTests, self).setUp()
+        super(TakeoutServiceUnitTests, self).setUp()
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -486,6 +484,6 @@ class TakeoutServiceTests(test_utils.GenericTestBase):
             'general_feedback_email_reply_data': expected_reply_to_id_data
         }
 
-        exported_data = takeout_service.export_all_models(self.USER_ID_1)
+        exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
 
         self.assertEqual(exported_data, expected_export)
