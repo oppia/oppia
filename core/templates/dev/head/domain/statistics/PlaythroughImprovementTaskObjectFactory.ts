@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating Playthrough Cards in the Improvements Tab.
+ * @fileoverview Factory for creating Playthrough Tasks in the Improvements Tab.
  */
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
@@ -25,19 +25,19 @@ require(
   'improvement-modal.service.ts');
 require('services/PlaythroughIssuesService.ts');
 
-angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
+angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
   'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
-  'PlaythroughIssuesService', 'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
+  'PlaythroughIssuesService', 'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE',
   'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
       ImprovementActionButtonObjectFactory, ImprovementModalService,
-      PlaythroughIssuesService, PLAYTHROUGH_IMPROVEMENT_CARD_TYPE,
+      PlaythroughIssuesService, PLAYTHROUGH_IMPROVEMENT_TASK_TYPE,
       STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
     /**
      * @constructor
-     * @param {PlaythroughIssue} issue - The issue this card is referring to.
+     * @param {PlaythroughIssue} issue - The issue this task is referring to.
      */
-    var PlaythroughImprovementCard = function(issue) {
+    var PlaythroughImprovementTask = function(issue) {
       /** @type {string} */
       this._title = PlaythroughIssuesService.renderIssueStatement(issue);
       /** @type {ImprovementActionButton[]} */
@@ -49,11 +49,11 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
               'forever. Are you sure you want to proceed?',
               'Mark as Resolved', 'btn-danger')
               .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
-              .then(() => this._discarded = true);
+              .then(() => this._isObsolete = true);
           }),
       ];
       /** @type {boolean} */
-      this._discarded = false;
+      this._isObsolete = false;
       /** @type {Object} */
       this._directiveData = {
         title: this._title,
@@ -62,64 +62,64 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
       };
     };
 
-    /** @returns {string} - The actionable status of this card. */
-    PlaythroughImprovementCard.prototype.getStatus = function() {
-      return this._discarded ? STATUS_NOT_ACTIONABLE : STATUS_OPEN;
+    /** @returns {string} - The actionable status of this task. */
+    PlaythroughImprovementTask.prototype.getStatus = function() {
+      return this._isObsolete ? STATUS_NOT_ACTIONABLE : STATUS_OPEN;
     };
 
     /**
-     * @returns {boolean} - Whether this card is no longer useful, and hence
+     * @returns {boolean} - Whether this task is no longer useful, and hence
      *    should be hidden.
      */
-    PlaythroughImprovementCard.prototype.isObsolete = function() {
-      return this._discarded;
+    PlaythroughImprovementTask.prototype.isObsolete = function() {
+      return this._isObsolete;
     };
 
     /** @returns {string} - A simple summary of the Playthrough Issue. */
-    PlaythroughImprovementCard.prototype.getTitle = function() {
+    PlaythroughImprovementTask.prototype.getTitle = function() {
       return this._title;
     };
 
     /**
-     * @returns {string} - The directive card type used to render details about
-     *    this card's data.
+     * @returns {string} - The directive task type used to render details about
+     *    this task's data.
      */
-    PlaythroughImprovementCard.prototype.getDirectiveType = function() {
-      return PLAYTHROUGH_IMPROVEMENT_CARD_TYPE;
+    PlaythroughImprovementTask.prototype.getDirectiveType = function() {
+      return PLAYTHROUGH_IMPROVEMENT_TASK_TYPE;
     };
 
     /**
      * @returns {string} - Data required by the associated directive for
      *    rendering.
      */
-    PlaythroughImprovementCard.prototype.getDirectiveData = function() {
+    PlaythroughImprovementTask.prototype.getDirectiveData = function() {
       return this._directiveData;
     };
 
     /**
      * @returns {ImprovementActionButton[]} - The list of action buttons
-     *    displayed on the card.
+     *    displayed on the task.
      */
-    PlaythroughImprovementCard.prototype.getActionButtons = function() {
+    PlaythroughImprovementTask.prototype.getActionButtons = function() {
       return this._actionButtons;
     };
 
     return {
       /**
-       * @returns {PlaythroughImprovementCard}
-       * @param {PlaythroughIssue} issue - The issue this card is referring to.
+       * @returns {PlaythroughImprovementTask}
+       * @param {PlaythroughIssue} issue - The issue this task is referring to.
        */
       createNew: function(issue) {
-        return new PlaythroughImprovementCard(issue);
+        return new PlaythroughImprovementTask(issue);
       },
       /**
-       * @returns {Promise<PlaythroughImprovementCard[]>} - The list of
+       * @returns {Promise<PlaythroughImprovementTask[]>} - The list of
        *    playthrough issues associated to the current exploration.
        */
-      fetchCards: function() {
+      fetchTasks: function() {
         return PlaythroughIssuesService.getIssues().then(function(issues) {
           return issues.map(function(issue) {
-            return new PlaythroughImprovementCard(issue);
+            return new PlaythroughImprovementTask(issue);
           });
         });
       },

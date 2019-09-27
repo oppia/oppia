@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating Answer details Cards in the Improvements
+ * @fileoverview Factory for creating Answer details Tasks in the Improvements
  * Tab.
  */
 
@@ -26,15 +26,15 @@ require('pages/exploration-editor-page/services/' +
 
 require('domain/statistics/statistics-domain.constants.ajs.ts');
 
-angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
+angular.module('oppia').factory('AnswerDetailsImprovementTaskObjectFactory', [
   'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
-  'LearnerAnswerDetailsDataService', 'ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE',
+  'LearnerAnswerDetailsDataService', 'ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE',
   'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
       ImprovementActionButtonObjectFactory, ImprovementModalService,
-      LearnerAnswerDetailsDataService, ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE,
+      LearnerAnswerDetailsDataService, ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE,
       STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
-    var AnswerDetailsImprovementCard = function(learnerAnswerDetails) {
+    var AnswerDetailsImprovementTask = function(learnerAnswerDetails) {
       this._learnerAnswerDetails = learnerAnswerDetails;
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
@@ -45,37 +45,37 @@ angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
     };
 
 
-    AnswerDetailsImprovementCard.prototype.getStatus = function() {
+    AnswerDetailsImprovementTask.prototype.getStatus = function() {
       return this._learnerAnswerDetails.learnerAnswerInfoData.length !== 0 ?
           STATUS_OPEN : STATUS_NOT_ACTIONABLE;
     };
 
-    AnswerDetailsImprovementCard.prototype.getDirectiveData = function() {
+    AnswerDetailsImprovementTask.prototype.getDirectiveData = function() {
       return this._learnerAnswerDetails;
     };
 
-    AnswerDetailsImprovementCard.prototype.getDirectiveType = function() {
-      return ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE;
+    AnswerDetailsImprovementTask.prototype.getDirectiveType = function() {
+      return ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE;
     };
 
-    AnswerDetailsImprovementCard.prototype.getActionButtons = function() {
+    AnswerDetailsImprovementTask.prototype.getActionButtons = function() {
       return this._actionButtons;
     };
 
-    AnswerDetailsImprovementCard.prototype.getTitle = function() {
+    AnswerDetailsImprovementTask.prototype.getTitle = function() {
       return 'Answer details for the card "' +
         this._learnerAnswerDetails.stateName + '"';
     };
 
-    AnswerDetailsImprovementCard.prototype.isObsolete = function() {
+    AnswerDetailsImprovementTask.prototype.isObsolete = function() {
       return this._learnerAnswerDetails.learnerAnswerInfoData.length === 0;
     };
 
     return {
       createNew: function(learnerAnswerDetails) {
-        return new AnswerDetailsImprovementCard(learnerAnswerDetails);
+        return new AnswerDetailsImprovementTask(learnerAnswerDetails);
       },
-      fetchCards: function() {
+      fetchTasks: function() {
         var createNew = this.createNew;
         return (
           LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(

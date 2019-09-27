@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Feedback Improvement card directive.
+ * @fileoverview Feedback Improvement task directive.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('oppia').directive('feedbackImprovementCard', [
+angular.module('oppia').directive('feedbackImprovementTask', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -27,8 +27,8 @@ angular.module('oppia').directive('feedbackImprovementCard', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-editor-page/improvements-tab/' +
-        'feedback-improvement-card/' +
-        'feedback-improvement-card.directive.html'),
+        'feedback-improvement-task/' +
+        'feedback-improvement-task.directive.html'),
       controller: [
         '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
         function($scope, DateTimeFormatService, ThreadStatusDisplayService) {

@@ -231,7 +231,7 @@
 /core/templates/dev/head/domain/statistics/ @brianrodri
 /core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/dev/head/services/ImprovementCardService*.ts @brianrodri
+/core/templates/dev/head/services/ImprovementTaskService*.ts @brianrodri
 /core/templates/dev/head/services/ImprovementsService*.ts @brianrodri
 /core/templates/dev/head/services/MessengerService.ts @brianrodri
 /core/templates/dev/head/services/Playthrough*.ts @brianrodri

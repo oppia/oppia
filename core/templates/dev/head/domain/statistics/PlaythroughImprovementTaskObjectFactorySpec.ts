@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the PlaythroughImprovementCardObjectFactory.
+ * @fileoverview Unit tests for the PlaythroughImprovementTaskObjectFactory.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// PlaythroughImprovementCardObjectFactory.ts is upgraded to Angular 8.
+// PlaythroughImprovementTaskObjectFactory.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -79,16 +79,16 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/statistics/PlaythroughImprovementCardObjectFactory');
+require('domain/statistics/PlaythroughImprovementTaskObjectFactory');
 
-describe('PlaythroughImprovementCardObjectFactory', function() {
+describe('PlaythroughImprovementTaskObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
-  var PlaythroughImprovementCardObjectFactory = null;
+  var PlaythroughImprovementTaskObjectFactory = null;
   var playthroughIssueObjectFactory = null;
   var PlaythroughIssuesService = null;
-  var PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = null;
+  var PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -158,17 +158,17 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
-      _PlaythroughImprovementCardObjectFactory_,
+      _PlaythroughImprovementTaskObjectFactory_,
       _PlaythroughIssueObjectFactory_, _PlaythroughIssuesService_,
-      _PLAYTHROUGH_IMPROVEMENT_CARD_TYPE_) {
+      _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
-    PlaythroughImprovementCardObjectFactory =
-      _PlaythroughImprovementCardObjectFactory_;
+    PlaythroughImprovementTaskObjectFactory =
+      _PlaythroughImprovementTaskObjectFactory_;
     playthroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
-    PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = _PLAYTHROUGH_IMPROVEMENT_CARD_TYPE_;
+    PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_;
 
     PlaythroughIssuesService.initSession(expId, expVersion);
 
@@ -190,23 +190,23 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         is_valid: true,
       });
 
-      var card = PlaythroughImprovementCardObjectFactory.createNew(issue);
+      var task = PlaythroughImprovementTaskObjectFactory.createNew(issue);
 
-      expect(card.getTitle()).toEqual(
+      expect(task.getTitle()).toEqual(
         PlaythroughIssuesService.renderIssueStatement(issue));
-      expect(card.getDirectiveData()).toEqual({
+      expect(task.getDirectiveData()).toEqual({
         title: PlaythroughIssuesService.renderIssueStatement(issue),
         suggestions:
           PlaythroughIssuesService.renderIssueSuggestions(issue),
         playthroughIds: ['1', '2'],
       });
-      expect(card.getDirectiveType()).toEqual(
-        PLAYTHROUGH_IMPROVEMENT_CARD_TYPE);
+      expect(task.getDirectiveType()).toEqual(
+        PLAYTHROUGH_IMPROVEMENT_TASK_TYPE);
     });
   });
 
-  describe('.fetchCards', function() {
-    it('returns a card for each existing issue', function(done) {
+  describe('.fetchTasks', function() {
+    it('returns a task for each existing issue', function(done) {
       var earlyQuitIssue =
         playthroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
@@ -218,7 +218,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
-      var earlyQuitCardTitle =
+      var earlyQuitTaskTitle =
         PlaythroughIssuesService.renderIssueStatement(earlyQuitIssue);
 
       var multipleIncorrectSubmissionsIssue =
@@ -232,7 +232,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
-      var multipleIncorrectSubmissionsCardTitle =
+      var multipleIncorrectSubmissionsTaskTitle =
         PlaythroughIssuesService.renderIssueStatement(
           multipleIncorrectSubmissionsIssue);
 
@@ -246,7 +246,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
-      var cyclicTransitionsCardTitle =
+      var cyclicTransitionsTaskTitle =
         PlaythroughIssuesService.renderIssueStatement(
           cyclicTransitionsIssue);
 
@@ -257,20 +257,20 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           cyclicTransitionsIssue,
         ]));
 
-      PlaythroughImprovementCardObjectFactory.fetchCards()
-        .then(function(cards) {
-          expect(cards.length).toEqual(3);
-          expect(cards[0].getTitle()).toEqual(earlyQuitCardTitle);
-          expect(cards[1].getTitle())
-            .toEqual(multipleIncorrectSubmissionsCardTitle);
-          expect(cards[2].getTitle()).toEqual(cyclicTransitionsCardTitle);
+      PlaythroughImprovementTaskObjectFactory.fetchTasks()
+        .then(function(tasks) {
+          expect(tasks.length).toEqual(3);
+          expect(tasks[0].getTitle()).toEqual(earlyQuitTaskTitle);
+          expect(tasks[1].getTitle())
+            .toEqual(multipleIncorrectSubmissionsTaskTitle);
+          expect(tasks[2].getTitle()).toEqual(cyclicTransitionsTaskTitle);
         }).then(done, done.fail);
 
       this.scope.$digest(); // Forces all pending promises to evaluate.
     });
   });
 
-  describe('PlaythroughImprovementCard', function() {
+  describe('PlaythroughImprovementTask', function() {
     beforeEach(function() {
       this.issue = playthroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
@@ -282,22 +282,22 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         schema_version: 1,
         is_valid: true,
       });
-      this.card = PlaythroughImprovementCardObjectFactory.createNew(this.issue);
+      this.task = PlaythroughImprovementTaskObjectFactory.createNew(this.issue);
     });
 
     describe('.getActionButtons', function() {
       it('contains a specific sequence of buttons', function() {
-        expect(this.card.getActionButtons().length).toEqual(1);
-        expect(this.card.getActionButtons()[0].getText())
+        expect(this.task.getActionButtons().length).toEqual(1);
+        expect(this.task.getActionButtons()[0].getText())
           .toEqual('Mark as Resolved');
       });
     });
 
     describe('Mark as Resolved Action Button', function() {
-      it('marks the card as resolved after confirmation', function() {
-        var card = this.card;
+      it('marks the task as resolved after confirmation', function() {
+        var task = this.task;
         var issue = this.issue;
-        var resolveActionButton = card.getActionButtons()[0];
+        var resolveActionButton = task.getActionButtons()[0];
         var resolveIssueSpy =
           spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
 
@@ -305,19 +305,19 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           result: $q.resolve(), // Returned when confirm button is pressed.
         });
 
-        expect(card.getStatus()).toEqual('open');
+        expect(task.getStatus()).toEqual('open');
         resolveActionButton.execute();
 
         this.scope.$digest(); // Forces all pending promises to evaluate.
 
         expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
-        expect(card.getStatus()).not.toEqual('open');
+        expect(task.getStatus()).not.toEqual('open');
       });
 
-      it('keeps the card after cancel', function() {
-        var card = this.card;
+      it('keeps the task after cancel', function() {
+        var task = this.task;
         var issue = this.issue;
-        var resolveActionButton = card.getActionButtons()[0];
+        var resolveActionButton = task.getActionButtons()[0];
         var resolveIssueSpy =
           spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
 
@@ -325,12 +325,12 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           result: $q.reject(), // Returned when cancel button is pressed.
         });
 
-        expect(card.getStatus()).toEqual('open');
+        expect(task.getStatus()).toEqual('open');
         resolveActionButton.execute();
         this.scope.$digest(); // Forces all pending promises to evaluate.
 
         expect(resolveIssueSpy).not.toHaveBeenCalled();
-        expect(card.getStatus()).toEqual('open');
+        expect(task.getStatus()).toEqual('open');
       });
     });
   });

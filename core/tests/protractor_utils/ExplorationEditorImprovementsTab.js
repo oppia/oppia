@@ -25,7 +25,7 @@ var ruleTemplates = require(
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorImprovementsTab = function() {
-  var allCards = $$('.protractor-test-improvements-card');
+  var allTasks = $$('.protractor-test-improvements-task');
   var allThreadMessages =
     $$('.protractor-test-improvements-thread-message-body');
 
@@ -54,28 +54,28 @@ var ExplorationEditorImprovementsTab = function() {
 
   var actionButtonLocator =
     by.css('.protractor-test-improvements-action-button');
-  var cardBodyLocator = by.css('.protractor-test-improvements-card-body');
-  var cardStatusLocator = by.css('.protractor-test-improvements-card-status');
+  var taskBodyLocator = by.css('.protractor-test-improvements-task-body');
+  var taskStatusLocator = by.css('.protractor-test-improvements-task-status');
   var stateNameLocator =
-    by.css('.protractor-test-improvements-card-state-name');
+    by.css('.protractor-test-improvements-task-state-name');
 
-  var _buildCardStateNameMatcher = function(expectedStateName) {
-    return function(card) {
-      return card.element(stateNameLocator).getText()
+  var _buildTaskStateNameMatcher = function(expectedStateName) {
+    return function(task) {
+      return task.element(stateNameLocator).getText()
         .then(stateName => stateName === expectedStateName);
     };
   };
 
-  var _buildCardTypeMatcher = function(expectedCardType) {
-    return function(card) {
-      return card.getAttribute('class')
-        .then(cssClass => cssClass.includes(expectedCardType));
+  var _buildTaskTypeMatcher = function(expectedTaskType) {
+    return function(task) {
+      return task.getAttribute('class')
+        .then(cssClass => cssClass.includes(expectedTaskType));
     };
   };
 
-  var _buildCardHasContentMatcher = function(expectedContent) {
-    return function(card) {
-      return card.element(cardBodyLocator).getText()
+  var _buildTaskHasContentMatcher = function(expectedContent) {
+    return function(task) {
+      return task.element(taskBodyLocator).getText()
         .then(body => body.includes(expectedContent));
     };
   };
@@ -87,43 +87,43 @@ var ExplorationEditorImprovementsTab = function() {
    * @param {Iterable.<(ElementFinder) => Promise.<boolean>>} matchers
    * @returns {(ElementFinder) => Promise.<boolean>}
    */
-  var _reduceCardMatchers = function(matchers) {
-    return function(card) {
-      return Promise.all(matchers.map(isMatch => isMatch(card)))
+  var _reduceTaskMatchers = function(matchers) {
+    return function(task) {
+      return Promise.all(matchers.map(isMatch => isMatch(task)))
         .then(matchResults => matchResults.every(m => m));
     };
   };
 
-  this.getAnswerDetailsCard = function(stateName) {
-    var answerDetailsCardMatcher = _reduceCardMatchers([
-      _buildCardTypeMatcher('answer-details'),
-      _buildCardStateNameMatcher(stateName),
+  this.getAnswerDetailsTask = function(stateName) {
+    var answerDetailsTaskMatcher = _reduceTaskMatchers([
+      _buildTaskTypeMatcher('answer-details'),
+      _buildTaskStateNameMatcher(stateName),
     ]);
-    return allCards.filter(answerDetailsCardMatcher).first();
+    return allTasks.filter(answerDetailsTaskMatcher).first();
   };
 
-  this.getFeedbackCard = function(latestMessage) {
-    var feedbackCardMatcher = _reduceCardMatchers([
-      _buildCardTypeMatcher('feedback'),
-      _buildCardHasContentMatcher(latestMessage),
+  this.getFeedbackTask = function(latestMessage) {
+    var feedbackTaskMatcher = _reduceTaskMatchers([
+      _buildTaskTypeMatcher('feedback'),
+      _buildTaskHasContentMatcher(latestMessage),
     ]);
-    return allCards.filter(feedbackCardMatcher).first();
+    return allTasks.filter(feedbackTaskMatcher).first();
   };
 
-  this.getSuggestionCard = function(description) {
-    var suggestionCardMatcher = _reduceCardMatchers([
-      _buildCardTypeMatcher('suggestion'),
-      _buildCardHasContentMatcher(description),
+  this.getSuggestionTask = function(description) {
+    var suggestionTaskMatcher = _reduceTaskMatchers([
+      _buildTaskTypeMatcher('suggestion'),
+      _buildTaskHasContentMatcher(description),
     ]);
-    return allCards.filter(suggestionCardMatcher).first();
+    return allTasks.filter(suggestionTaskMatcher).first();
   };
 
-  this.getCardStatus = function(card) {
-    return card.element(cardStatusLocator).getText();
+  this.getTaskStatus = function(task) {
+    return task.element(taskStatusLocator).getText();
   };
 
-  this.clickCardActionButton = function(card, buttonText) {
-    var buttonElement = card.element(by.buttonText(buttonText));
+  this.clickTaskActionButton = function(task, buttonText) {
+    var buttonElement = task.element(by.buttonText(buttonText));
     waitFor.elementToBeClickable(
       buttonElement, 'Action button takes too long to become clickable');
     buttonElement.click();

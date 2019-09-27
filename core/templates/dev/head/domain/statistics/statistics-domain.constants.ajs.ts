@@ -25,18 +25,18 @@ angular.module('oppia').constant(
   'LEARNER_ACTION_SCHEMA_LATEST_VERSION',
   StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
 angular.module('oppia').constant(
-  'ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE',
-  StatisticsDomainConstants.ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE);
+  'ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE',
+  StatisticsDomainConstants.ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
 angular.module('oppia').constant(
-  'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
-  StatisticsDomainConstants.PLAYTHROUGH_IMPROVEMENT_CARD_TYPE);
+  'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE',
+  StatisticsDomainConstants.PLAYTHROUGH_IMPROVEMENT_TASK_TYPE);
 
 angular.module('oppia').constant(
-  'FEEDBACK_IMPROVEMENT_CARD_TYPE',
-  StatisticsDomainConstants.FEEDBACK_IMPROVEMENT_CARD_TYPE);
+  'FEEDBACK_IMPROVEMENT_TASK_TYPE',
+  StatisticsDomainConstants.FEEDBACK_IMPROVEMENT_TASK_TYPE);
 angular.module('oppia').constant(
   'SUBMIT_LEARNER_ANSWER_DETAILS_URL',
   StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL);
 angular.module('oppia').constant(
-  'SUGGESTION_IMPROVEMENT_CARD_TYPE',
-  StatisticsDomainConstants.SUGGESTION_IMPROVEMENT_CARD_TYPE);
+  'SUGGESTION_IMPROVEMENT_TASK_TYPE',
+  StatisticsDomainConstants.SUGGESTION_IMPROVEMENT_TASK_TYPE);

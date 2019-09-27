@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating Feedback Cards in the Improvements Tab.
+ * @fileoverview Factory for creating Feedback Tasks in the Improvements Tab.
  */
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
@@ -24,13 +24,13 @@ require(
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
-angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
+angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
   '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
-  'ThreadDataService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+  'ThreadDataService', 'FEEDBACK_IMPROVEMENT_TASK_TYPE',
   function(
       $q, ImprovementActionButtonObjectFactory, ImprovementModalService,
-      ThreadDataService, FEEDBACK_IMPROVEMENT_CARD_TYPE) {
-    var FeedbackImprovementCard = function(feedbackThread) {
+      ThreadDataService, FEEDBACK_IMPROVEMENT_TASK_TYPE) {
+    var FeedbackImprovementTask = function(feedbackThread) {
       this._feedbackThread = feedbackThread;
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
@@ -39,62 +39,62 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
       ];
     };
 
-    /** @returns {string} - The actionable status of this card. */
-    FeedbackImprovementCard.prototype.getStatus = function() {
+    /** @returns {string} - The actionable status of this task. */
+    FeedbackImprovementTask.prototype.getStatus = function() {
       return this._feedbackThread.status;
     };
 
     /** @returns {string} - A simple summary of the feedback thread. */
-    FeedbackImprovementCard.prototype.getTitle = function() {
+    FeedbackImprovementTask.prototype.getTitle = function() {
       return this._feedbackThread.subject;
     };
 
     /**
-     * @returns {boolean} - Whether this card is no longer useful, and hence
+     * @returns {boolean} - Whether this task is no longer useful, and hence
      *    should be hidden away.
      */
-    FeedbackImprovementCard.prototype.isObsolete = function() {
+    FeedbackImprovementTask.prototype.isObsolete = function() {
       return false; // Feedback threads are always actionable.
     };
 
     /**
-     * @returns {string} - The directive card type used to render details about
-     *    this card's data.
+     * @returns {string} - The directive task type used to render details about
+     *    this task's data.
      */
-    FeedbackImprovementCard.prototype.getDirectiveType = function() {
-      return FEEDBACK_IMPROVEMENT_CARD_TYPE;
+    FeedbackImprovementTask.prototype.getDirectiveType = function() {
+      return FEEDBACK_IMPROVEMENT_TASK_TYPE;
     };
 
     /**
      * @returns {string} - Data required by the associated directive for
      *    rendering.
      */
-    FeedbackImprovementCard.prototype.getDirectiveData = function() {
+    FeedbackImprovementTask.prototype.getDirectiveData = function() {
       return this._feedbackThread;
     };
 
     /**
      * @returns {ImprovementActionButton[]} - The array of action buttons
-     *    displayed on the card.
+     *    displayed on the task.
      */
-    FeedbackImprovementCard.prototype.getActionButtons = function() {
+    FeedbackImprovementTask.prototype.getActionButtons = function() {
       return this._actionButtons;
     };
 
     return {
       /**
-       * @returns {FeedbackImprovementCard}
-       * @param {FeedbackThread} thread - The thread this card is referring to.
+       * @returns {FeedbackImprovementTask}
+       * @param {FeedbackThread} thread - The thread this task is referring to.
        */
       createNew: function(thread) {
-        return new FeedbackImprovementCard(thread);
+        return new FeedbackImprovementTask(thread);
       },
 
       /**
-       * @returns {Promise<FeedbackImprovementCard[]>} - The array of feedback
+       * @returns {Promise<FeedbackImprovementTask[]>} - The array of feedback
        *    threads associated to the current exploration.
        */
-      fetchCards: function() {
+      fetchTasks: function() {
         var createNew = this.createNew;
         return ThreadDataService.fetchThreads().then(function() {
           return $q.all(
