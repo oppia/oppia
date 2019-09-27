@@ -429,13 +429,6 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     user_id = ndb.StringProperty(required=False, indexed=True)
     thread_id = ndb.StringProperty(required=False, indexed=True)
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
-    # When this user thread was created and last updated. This overrides the
-    # fields in BaseModel. We are overriding them because we do not want the
-    # last_updated field to be updated when running one off job and whe the
-    # model is created we need to make sure that created_on is set before
-    # last updated.
-    created_on = ndb.DateTimeProperty(indexed=True, required=True)
-    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -627,6 +620,6 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            bool. Whether the model for user_id exists.
+            bool. Whether any models refer to the given user ID.
         """
         return cls.get_by_id(user_id) is not None

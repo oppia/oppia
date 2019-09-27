@@ -33,11 +33,6 @@ import utils
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            email_models.SentEmailModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
-
     def setUp(self):
         super(SentEmailModelUnitTests, self).setUp()
 
@@ -49,6 +44,11 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         self.generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(mock_generate_hash, email_models.SentEmailModel))
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.SentEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
         with self.generate_constant_hash_ctx:
@@ -194,19 +194,6 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
             email_models.BulkEmailModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
-    def test_has_reference_to_user_id(self):
-        email_models.BulkEmailModel.create(
-            'instance_id', ['recipient_1_id', 'recipient_2_id'],
-            'sender_id', 'sender@email.com', feconf.BULK_EMAIL_INTENT_MARKETING,
-            'Email Subject', 'Email Body', datetime.datetime.utcnow())
-
-        self.assertTrue(
-            email_models.BulkEmailModel.has_reference_to_user_id('sender_id')
-        )
-        self.assertFalse(
-            email_models.BulkEmailModel.has_reference_to_user_id('id_x')
-        )
-
 
 class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackEmailReplyToIdModel class."""
@@ -238,8 +225,7 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
             id='user_id_1.exploration.exp_id.thread_id',
             user_id='user_id_1',
             thread_id='exploration.exp_id.thread_id',
-            reply_to_id='reply_id'
-        )
+            reply_to_id='reply_id')
 
         email_reply_model.put()
 

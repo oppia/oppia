@@ -41,7 +41,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralSuggestionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
         suggestion_models.GeneralSuggestionModel.create(
@@ -455,12 +454,6 @@ class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
             suggestion_models.ReviewerRotationTrackingModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
-        )
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            suggestion_models.ReviewerRotationTrackingModel
-            .has_reference_to_user_id('any_id')
         )
 
     def test_create_and_update_model(self):

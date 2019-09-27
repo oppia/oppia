@@ -143,7 +143,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether GeneralSuggestionModel exist for user.
+        """Check whether GeneralSuggestionModel exists for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -317,20 +317,6 @@ class ReviewerRotationTrackingModel(base_models.BaseModel):
         not applicable for now.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
-        """ReviewerRotationTrackingModel is going to be reworked. Thus, return
-        False for now.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def create(cls, score_category, user_id):

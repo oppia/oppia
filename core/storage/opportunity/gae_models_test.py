@@ -29,18 +29,6 @@ import python_utils
 class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationOpportunitySummaryModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            opportunity_models.ExplorationOpportunitySummaryModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            opportunity_models.ExplorationOpportunitySummaryModel
-            .has_reference_to_user_id('any_id')
-        )
-
     def setUp(self):
         super(ExplorationOpportunitySummaryModelUnitTest, self).setUp()
 
@@ -70,6 +58,18 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             need_voice_artist_in_language_codes=['en'],
             assigned_voice_artist_in_language_codes=[]
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .has_reference_to_user_id('any_id')
+        )
 
     def test_get_all_translation_opportunities(self):
         results, cursor, more = (
