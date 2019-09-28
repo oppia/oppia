@@ -661,7 +661,7 @@ angular.module('oppia').directive('stateResponses', [
           if (StateEditorService.isInQuestionMode()) {
             $scope.onResponsesInitialized();
           }
-          StateEditorService.updateStateResponsesInitialised(true);
+          StateEditorService.updateStateResponsesInitialised();
         }
       ]
     };

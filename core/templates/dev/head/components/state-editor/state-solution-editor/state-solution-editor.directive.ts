@@ -291,7 +291,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
             });
           };
 
-          StateEditorService.updateStateSolutionEditorInitialised(true);
+          StateEditorService.updateStateSolutionEditorInitialised();
         }
       ]
     };

@@ -60,28 +60,28 @@ export class StateEditorService {
   stateSolutionEditorInitialised: boolean = false;
   stateEditorDirectiveInitialised: boolean = false;
 
-  updateStateContentEditorInitialised(value: boolean): void {
-    this.stateContentEditorInitialised = value;
+  updateStateContentEditorInitialised(): void {
+    this.stateContentEditorInitialised = true;
   }
 
-  updateStateInteractionEditorInitialised(value: boolean): void {
-    this.stateInteractionEditorInitialised = value;
+  updateStateInteractionEditorInitialised(): void {
+    this.stateInteractionEditorInitialised = true;
   }
 
-  updateStateResponsesInitialised(value: boolean): void {
-    this.stateResponsesInitialised = value;
+  updateStateResponsesInitialised(): void {
+    this.stateResponsesInitialised = true;
   }
 
-  updateStateHintsEditorInitialised(value: boolean): void {
-    this.stateHintsEditorInitialised = value;
+  updateStateHintsEditorInitialised(): void {
+    this.stateHintsEditorInitialised = true;
   }
 
-  updateStateSolutionEditorInitialised(value: boolean): void {
-    this.stateSolutionEditorInitialised = value;
+  updateStateSolutionEditorInitialised(): void {
+    this.stateSolutionEditorInitialised = true;
   }
 
-  updateStateEditorDirectiveInitialised(value: boolean): void {
-    this.stateEditorDirectiveInitialised = value;
+  updateStateEditorDirectiveInitialised(): void {
+    this.stateEditorDirectiveInitialised = true;
   }
 
   isStateEditorInitialised(): boolean {

@@ -455,7 +455,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             });
           };
 
-          StateEditorService.updateStateInteractionEditorInitialised(true);
+          StateEditorService.updateStateInteractionEditorInitialised();
         }
       ]
     };

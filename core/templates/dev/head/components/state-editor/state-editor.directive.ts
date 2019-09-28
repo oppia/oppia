@@ -122,7 +122,7 @@ angular.module('oppia').directive('stateEditor', [
           });
 
           $rootScope.$broadcast('stateEditorDirectiveInitialized');
-          StateEditorService.updateStateEditorDirectiveInitialised(true);
+          StateEditorService.updateStateEditorDirectiveInitialised();
         }
       ]
     };

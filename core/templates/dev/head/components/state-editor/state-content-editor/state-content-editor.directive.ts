@@ -115,7 +115,7 @@ angular.module('oppia').directive('stateContentEditor', [
             $scope.contentEditorIsOpen = false;
           };
 
-          StateEditorService.updateStateContentEditorInitialised(true);
+          StateEditorService.updateStateContentEditorInitialised();
         }
       ]
     };

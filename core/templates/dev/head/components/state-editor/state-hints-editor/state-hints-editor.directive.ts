@@ -287,7 +287,7 @@ angular.module('oppia').directive('stateHintsEditor', [
             $scope.onSaveHints(StateHintsService.displayed);
           };
 
-          StateEditorService.updateStateHintsEditorInitialised(true);
+          StateEditorService.updateStateHintsEditorInitialised();
         }
       ]
     };
