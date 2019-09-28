@@ -16,24 +16,24 @@
  * @fileoverview Tests for CamelCaseToHyphens filter for Oppia.
  */
 
-require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
-describe('Testing filters', function() {
-  var filterName = 'camelCaseToHyphens';
-  beforeEach(angular.mock.module('oppia'));
+describe('Testing filters', () => {
+  let filterName: CamelCaseToHyphensPipe = null;
+  beforeEach(() => {
+    filterName = new CamelCaseToHyphensPipe();
+  });
 
-  it('should have all expected filters', angular.mock.inject(function($filter) {
-    expect($filter(filterName)).not.toEqual(null);
-  }));
+  it('should have all expected filters', () => {
+    expect(filterName).not.toEqual(null);
+  });
 
-  it('should convert camelCase to hyphens properly', angular.mock.inject(
-    function($filter) {
-      var filter = $filter('camelCaseToHyphens');
-      expect(filter('test')).toEqual('test');
-      expect(filter('testTest')).toEqual('test-test');
-      expect(filter('testTestTest')).toEqual('test-test-test');
-      expect(filter('aBaBCa')).toEqual('a-ba-b-ca');
-      expect(filter('AbcDefGhi')).toEqual('abc-def-ghi');
-    }
-  ));
+  it('should convert camelCase to hyphens properly', () => {
+    expect(filterName.transform('test')).toEqual('test');
+    expect(filterName.transform('testTest')).toEqual('test-test');
+    expect(filterName.transform('testTestTest')).toEqual('test-test-test');
+    expect(filterName.transform('aBaBCa')).toEqual('a-ba-b-ca');
+    expect(filterName.transform('AbcDefGhi')).toEqual('abc-def-ghi');
+  });
 });
