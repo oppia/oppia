@@ -76,7 +76,7 @@
     "jquery": "^3.4.0",
     "karma": "^4.1.0",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-coverage": "^1.1.2",
+    "karma-coverage": "^2.0.1",
     "karma-coverage-istanbul-reporter": "^2.0.5",
     "karma-jasmine": "^2.0.1",
     "karma-json-fixtures-preprocessor": "^0.0.6",
