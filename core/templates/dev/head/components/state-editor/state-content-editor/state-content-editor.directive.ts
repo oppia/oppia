@@ -48,11 +48,11 @@ angular.module('oppia').directive('stateContentEditor', [
         '/components/state-editor/state-content-editor/' +
         'state-content-editor.directive.html'),
       controller: [
-        '$scope', 'StateContentService', 'StateEditorService',
-        'EditabilityService', 'EditorFirstTimeEventsService',
+        '$scope', 'EditabilityService', 'EditorFirstTimeEventsService',
+        'StateContentService', 'StateEditorService',
         function(
-            $scope, StateContentService, StateEditorService,
-            EditabilityService, EditorFirstTimeEventsService) {
+            $scope, EditabilityService, EditorFirstTimeEventsService,
+            StateContentService, StateEditorService) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
