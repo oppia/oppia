@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the SuggestionImprovementCardObjectFactory.
+ * @fileoverview Unit tests for the SuggestionImprovementTaskObjectFactory.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// SuggestionImprovementCardObjectFactory.ts is upgraded to Angular 8.
+// SuggestionImprovementTaskObjectFactory.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -77,18 +77,18 @@ import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
+require('domain/statistics/SuggestionImprovementTaskObjectFactory.ts');
 
-describe('SuggestionImprovementCardObjectFactory', function() {
+describe('SuggestionImprovementTaskObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
   var ImprovementModalService = null;
-  var SuggestionImprovementCardObjectFactory = null;
+  var SuggestionImprovementTaskObjectFactory = null;
   var SuggestionModalForExplorationEditorService = null;
   var SuggestionThreadObjectFactory = null;
   var ThreadDataService = null;
-  var SUGGESTION_IMPROVEMENT_CARD_TYPE = null;
+  var SUGGESTION_IMPROVEMENT_TASK_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -155,34 +155,34 @@ describe('SuggestionImprovementCardObjectFactory', function() {
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ImprovementModalService_,
-      _SuggestionImprovementCardObjectFactory_,
+      _SuggestionImprovementTaskObjectFactory_,
       _SuggestionModalForExplorationEditorService_,
       _SuggestionThreadObjectFactory_, _ThreadDataService_,
-      _SUGGESTION_IMPROVEMENT_CARD_TYPE_) {
+      _SUGGESTION_IMPROVEMENT_TASK_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
     ImprovementModalService = _ImprovementModalService_;
-    SuggestionImprovementCardObjectFactory =
-      _SuggestionImprovementCardObjectFactory_;
+    SuggestionImprovementTaskObjectFactory =
+      _SuggestionImprovementTaskObjectFactory_;
     SuggestionModalForExplorationEditorService =
       _SuggestionModalForExplorationEditorService_;
     SuggestionThreadObjectFactory = _SuggestionThreadObjectFactory_;
     ThreadDataService = _ThreadDataService_;
-    SUGGESTION_IMPROVEMENT_CARD_TYPE = _SUGGESTION_IMPROVEMENT_CARD_TYPE_;
+    SUGGESTION_IMPROVEMENT_TASK_TYPE = _SUGGESTION_IMPROVEMENT_TASK_TYPE_;
   }));
 
   describe('.createNew', function() {
     it('retrieves data from passed thread', function() {
       var mockThread = {threadId: 1};
-      var card = SuggestionImprovementCardObjectFactory.createNew(mockThread);
+      var task = SuggestionImprovementTaskObjectFactory.createNew(mockThread);
 
-      expect(card.getDirectiveData()).toBe(mockThread);
-      expect(card.getDirectiveType()).toEqual(SUGGESTION_IMPROVEMENT_CARD_TYPE);
+      expect(task.getDirectiveData()).toBe(mockThread);
+      expect(task.getDirectiveType()).toEqual(SUGGESTION_IMPROVEMENT_TASK_TYPE);
     });
   });
 
-  describe('.fetchCards', function() {
+  describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
       spyOn(ThreadDataService, 'fetchThreads').and.callFake($q.resolve);
       spyOn(ThreadDataService, 'fetchMessages').and.callFake($q.resolve);
@@ -190,9 +190,9 @@ describe('SuggestionImprovementCardObjectFactory', function() {
         suggestionThreads: [{threadId: 'abc1'}, {threadId: 'def2'}]
       });
 
-      SuggestionImprovementCardObjectFactory.fetchCards().then(function(cards) {
-        expect(cards[0].getDirectiveData().threadId).toEqual('abc1');
-        expect(cards[1].getDirectiveData().threadId).toEqual('def2');
+      SuggestionImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
+        expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
+        expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);
 
       // $q Promises need to be forcibly resolved through a JavaScript digest,
@@ -201,7 +201,7 @@ describe('SuggestionImprovementCardObjectFactory', function() {
     });
   });
 
-  describe('SuggestionImprovementCard', function() {
+  describe('SuggestionImprovementTask', function() {
     beforeEach(function() {
       var mockSuggestionThreadBackendDict = {
         last_updated: 1000,
@@ -237,45 +237,45 @@ describe('SuggestionImprovementCardObjectFactory', function() {
 
       this.mockThread = SuggestionThreadObjectFactory.createFromBackendDicts(
         mockSuggestionThreadBackendDict, mockSuggestionBackendDict);
-      this.card =
-        SuggestionImprovementCardObjectFactory.createNew(this.mockThread);
+      this.task =
+        SuggestionImprovementTaskObjectFactory.createNew(this.mockThread);
     });
 
     describe('.getStatus', function() {
       it('returns the same status as the thread', function() {
         this.mockThread.status = 'a unique status';
-        expect(this.card.getStatus()).toEqual('a unique status');
+        expect(this.task.getStatus()).toEqual('a unique status');
       });
     });
 
     describe('.getTitle', function() {
       it('returns the state associated with the suggestion', function() {
-        expect(this.card.getTitle())
+        expect(this.task.getTitle())
           .toEqual('Suggestion for the card "state_1"');
       });
     });
 
     describe('.getDirectiveType', function() {
       it('returns suggestion as directive type', function() {
-        expect(this.card.getDirectiveType())
-          .toEqual(SUGGESTION_IMPROVEMENT_CARD_TYPE);
+        expect(this.task.getDirectiveType())
+          .toEqual(SUGGESTION_IMPROVEMENT_TASK_TYPE);
       });
     });
 
     describe('.getDirectiveData', function() {
       it('returns the thread', function() {
-        expect(this.card.getDirectiveData()).toBe(this.mockThread);
+        expect(this.task.getDirectiveData()).toBe(this.mockThread);
       });
     });
 
     describe('.getActionButtons', function() {
       it('contains one button', function() {
-        expect(this.card.getActionButtons().length).toEqual(1);
+        expect(this.task.getActionButtons().length).toEqual(1);
       });
 
       describe('first button', function() {
         beforeEach(function() {
-          this.button = this.card.getActionButtons()[0];
+          this.button = this.task.getActionButtons()[0];
         });
 
         it('opens a thread modal', function() {

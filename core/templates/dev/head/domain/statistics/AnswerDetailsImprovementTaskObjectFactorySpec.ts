@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ImprovementCardService.
+ * @fileoverview Unit tests for the FeedbackImprovementTaskObjectFactory.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// ImprovementCardService.ts is upgraded to Angular 8.
+// FeedbackImprovementTaskObjectFactory.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -35,25 +35,20 @@ import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { PlaythroughObjectFactory } from
-  'domain/statistics/PlaythroughObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 /* eslint-disable max-len */
@@ -62,9 +57,8 @@ import { StateEditorService } from
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+/* eslint-enable max-len */
 import { SuggestionModalService } from 'services/SuggestionModalService';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -83,20 +77,18 @@ import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/statistics/AnswerDetailsImprovementCardObjectFactory.ts');
-require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
-require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
-require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
-require('services/ImprovementCardService.ts');
+require('domain/statistics/AnswerDetailsImprovementTaskObjectFactory.ts');
 
-describe('ImprovementCardService', function() {
+describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
-  var ImprovementCardService = null;
-  var AnswerDetailsImprovementCardObjectFactory = null;
-  var FeedbackImprovementCardObjectFactory = null;
-  var PlaythroughImprovementCardObjectFactory = null;
-  var SuggestionImprovementCardObjectFactory = null;
+  var $uibModal = null;
+  var AnswerDetailsImprovementTaskObjectFactory = null;
+  var ImprovementModalService = null;
+  var LearnerAnswerDetailsDataService = null;
+  var ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE = null;
+  var STATUS_NOT_ACTIONABLE = null;
+  var STATUS_OPEN = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -122,8 +114,6 @@ describe('ImprovementCardService', function() {
       'ImprovementActionButtonObjectFactory',
       new ImprovementActionButtonObjectFactory());
     $provide.value(
-      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
-    $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
     $provide.value(
@@ -132,25 +122,20 @@ describe('ImprovementCardService', function() {
       'ParamChangesObjectFactory', new ParamChangesObjectFactory(
         new ParamChangeObjectFactory()));
     $provide.value(
-      'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
-    $provide.value(
-      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
-        new LearnerActionObjectFactory()));
+      'StateEditorService', new StateEditorService(
+        new SolutionValidityService()));
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(
       'StateClassifierMappingService', new StateClassifierMappingService(
         new ClassifierObjectFactory()));
     $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('SuggestionModalService', new SuggestionModalService());
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value('SuggestionModalService', new SuggestionModalService());
     $provide.value(
       'ThreadStatusDisplayService', new ThreadStatusDisplayService());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
@@ -170,73 +155,135 @@ describe('ImprovementCardService', function() {
       'LearnerAnswerInfoObjectFactory', LearnerAnswerInfoObjectFactory);
   }));
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _ImprovementCardService_,
-      _AnswerDetailsImprovementCardObjectFactory_,
-      _FeedbackImprovementCardObjectFactory_,
-      _PlaythroughImprovementCardObjectFactory_,
-      _SuggestionImprovementCardObjectFactory_) {
+      _$q_, _$rootScope_, _$uibModal_,
+      _AnswerDetailsImprovementTaskObjectFactory_, _ImprovementModalService_,
+      _LearnerAnswerDetailsDataService_,
+      _ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE_,
+      _STATUS_NOT_ACTIONABLE_, _STATUS_OPEN_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
-    ImprovementCardService = _ImprovementCardService_;
-    AnswerDetailsImprovementCardObjectFactory =
-      _AnswerDetailsImprovementCardObjectFactory_;
-    FeedbackImprovementCardObjectFactory =
-      _FeedbackImprovementCardObjectFactory_;
-    PlaythroughImprovementCardObjectFactory =
-      _PlaythroughImprovementCardObjectFactory_;
-    SuggestionImprovementCardObjectFactory =
-      _SuggestionImprovementCardObjectFactory_;
-
-    this.expectedFactories = [
-      AnswerDetailsImprovementCardObjectFactory,
-      FeedbackImprovementCardObjectFactory,
-      PlaythroughImprovementCardObjectFactory,
-      SuggestionImprovementCardObjectFactory,
-    ];
+    $uibModal = _$uibModal_;
+    AnswerDetailsImprovementTaskObjectFactory =
+      _AnswerDetailsImprovementTaskObjectFactory_;
+    ImprovementModalService = _ImprovementModalService_;
+    LearnerAnswerDetailsDataService = _LearnerAnswerDetailsDataService_;
+    ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE =
+      _ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE_;
+    STATUS_NOT_ACTIONABLE = _STATUS_NOT_ACTIONABLE_;
+    STATUS_OPEN = _STATUS_OPEN_;
   }));
 
-  describe('.getImprovementCardObjectFactoryRegistry', function() {
-    it('contains all known improvement card object factories', function() {
-      var actualFactories =
-        ImprovementCardService.getImprovementCardObjectFactoryRegistry();
+  describe('.createNew', function() {
+    it('retrieves data from passed thread', function() {
+      var mockLearnerAnswerDetails = {learnerAnswerInfoData: 'sample'};
+      var task = AnswerDetailsImprovementTaskObjectFactory.createNew(
+        mockLearnerAnswerDetails);
 
-      // The registry should not be modifiable.
-      expect(Object.isFrozen(actualFactories)).toBe(true);
-
-      // Ordering isn't important, so allow the checks to be flexible.
-      expect(actualFactories.length).toEqual(this.expectedFactories.length);
-      this.expectedFactories.forEach(function(expectedFactory) {
-        expect(actualFactories).toContain(expectedFactory);
-      });
+      expect(task.getDirectiveData()).toBe(mockLearnerAnswerDetails);
+      expect(task.getDirectiveType()).toEqual(
+        ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
     });
   });
 
-  describe('.fetchCards', function() {
-    // Each individual factory should test their own fetchCards function.
+  describe('.fetchTasks', function() {
+    it('fetches threads from the backend', function(done) {
+      spyOn(
+        LearnerAnswerDetailsDataService,
+        'fetchLearnerAnswerInfoData').and.callFake($q.resolve);
+      spyOn(LearnerAnswerDetailsDataService, 'getData').and.returnValue(
+        [{learnerAnswerInfoData: 'abc1'}, {learnerAnswerInfoData: 'def2'}]);
 
-    describe('from factories which all return empty cards', function() {
-      beforeEach(function() {
-        this.expectedFactories.forEach(function(factory) {
-          spyOn(factory, 'fetchCards').and.callFake(function() {
-            return $q.resolve([]);
-          });
-        });
+      AnswerDetailsImprovementTaskObjectFactory.fetchTasks().then(
+        function(tasks) {
+          expect(
+            tasks[0].getDirectiveData().learnerAnswerInfoData).toEqual('abc1');
+          expect(
+            tasks[1].getDirectiveData().learnerAnswerInfoData).toEqual('def2');
+        }).then(done, done.fail);
+
+      // $q Promises need to be forcibly resolved through a JavaScript digest,
+      // which is what $apply helps kick-start.
+      $rootScope.$apply();
+    });
+  });
+
+  describe('AnswerDetailsImprovementTask', function() {
+    beforeEach(function() {
+      this.mockLearnerAnswerDetails = {
+        expId: 12,
+        stateName: 'fakeStateName',
+        learnerAnswerInfoData: [{
+          id: 1,
+          answer: 'fakeAnswer',
+          answer_details: 'fakeAnswerDetails',
+          created_on: 1441870501230.642,
+        }]
+      };
+      this.task =
+        AnswerDetailsImprovementTaskObjectFactory.createNew(
+          this.mockLearnerAnswerDetails);
+    });
+
+    describe('.getStatus', function() {
+      it('returns open as status', function() {
+        expect(this.task.getStatus()).toEqual(STATUS_OPEN);
       });
 
-      it('returns an empty list', function(done) {
-        var onSuccess = function(cards) {
-          expect(cards).toEqual([]);
-          done();
-        };
-        var onFailure = function(error) {
-          done.fail(error);
-        };
+      it('returns not actionable as status', function() {
+        this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
+        expect(this.task.getStatus()).toEqual(STATUS_NOT_ACTIONABLE);
+      });
+    });
 
-        ImprovementCardService.fetchCards().then(onSuccess, onFailure);
+    describe('.getTitle', function() {
+      it('returns answer details as title', function() {
+        expect(this.task.getTitle()).toEqual(
+          'Answer details for the card "fakeStateName"');
+      });
+    });
 
-        // $q Promises need to be forcibly resolved through a JavaScript digest,
-        // which is what $apply helps kick-start.
-        $rootScope.$apply();
+    describe('.isObsolete', function() {
+      it('returns is obsolete as false', function() {
+        expect(this.task.isObsolete()).toEqual(false);
+      });
+
+      it('returns is obsolete as true', function() {
+        this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
+        expect(this.task.isObsolete()).toEqual(true);
+      });
+    });
+
+    describe('.getDirectiveType', function() {
+      it('returns answer details as directive type', function() {
+        expect(this.task.getDirectiveType())
+          .toEqual(ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
+      });
+    });
+
+    describe('.getDirectiveData', function() {
+      it('returns the learner answer details', function() {
+        expect(this.task.getDirectiveData()).toBe(
+          this.mockLearnerAnswerDetails);
+      });
+    });
+
+    describe('.getActionButtons', function() {
+      it('contains one button', function() {
+        expect(this.task.getActionButtons().length).toEqual(1);
+      });
+    });
+
+    describe('first button', function() {
+      beforeEach(function() {
+        this.button = this.task.getActionButtons()[0];
+      });
+
+      it('opens a learner answer details modal', function() {
+        var spy = spyOn(ImprovementModalService, 'openLearnerAnswerDetails');
+
+        this.button.execute();
+
+        expect(spy).toHaveBeenCalledWith(this.mockLearnerAnswerDetails);
       });
     });
   });
