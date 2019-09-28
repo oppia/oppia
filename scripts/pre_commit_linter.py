@@ -3384,9 +3384,11 @@ def main(args=None):
         python_utils.PRINT('---------------------------')
 
 
+NAME_SPACE = multiprocessing.Manager().Namespace()
+PROCESSES = multiprocessing.Manager().dict()
+NAME_SPACE.files = FileCache()
+FILE_CACHE = NAME_SPACE.files
+
+
 if __name__ == '__main__':
-    NAME_SPACE = multiprocessing.Manager().Namespace()
-    PROCESSES = multiprocessing.Manager().dict()
-    NAME_SPACE.files = FileCache()
-    FILE_CACHE = NAME_SPACE.files
     main()
