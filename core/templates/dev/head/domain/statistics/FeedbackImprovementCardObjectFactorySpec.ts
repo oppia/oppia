@@ -71,6 +71,10 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { LearnerAnswerDetailsObjectFactory } from
+  'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerInfoObjectFactory } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
@@ -142,6 +146,11 @@ describe('FeedbackImprovementCardObjectFactory', function() {
       'WrittenTranslationsObjectFactory',
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
+    $provide.value(
+      'LearnerAnswerDetailsObjectFactory',
+      LearnerAnswerDetailsObjectFactory);
+    $provide.value(
+      'LearnerAnswerInfoObjectFactory', LearnerAnswerInfoObjectFactory);
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _FeedbackImprovementCardObjectFactory_,

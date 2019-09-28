@@ -16,6 +16,14 @@
  * @fileoverview Unit tests for LearnerAnswerDetailsDataService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// learner-answer-details-data.service.ts is upgraded to Angular 8.
+import { LearnerAnswerDetailsObjectFactory } from
+  'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerInfoObjectFactory } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
+// ^^^ This block is to be removed.
+
 require('pages/exploration-editor-page/services/' +
   'learner-answer-details-data.service.ts');
 require('services/CsrfTokenService.ts');
@@ -33,6 +41,11 @@ describe('Learner answer details service', function() {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
+      $provide.value(
+        'LearnerAnswerDetailsObjectFactory',
+        LearnerAnswerDetailsObjectFactory);
+      $provide.value(
+        'LearnerAnswerInfoObjectFactory', LearnerAnswerInfoObjectFactory);
     });
   });
 
