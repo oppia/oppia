@@ -73,25 +73,36 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
             'save-version-mismatch-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
-          controller: ['$scope', function($scope) {
-            // When the user clicks on discard changes button, signal backend
-            // to discard the draft and reload the page thereafter.
-            $scope.discardChanges = function() {
-              ExplorationDataService.discardDraft(function() {
-                _refreshPage(20);
-              });
-            };
+          controller: [
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
+              // When the user clicks on discard changes button, signal
+              // backend to discard the draft and reload the page thereafter.
+              $scope.discardChanges = function() {
+                ExplorationDataService.discardDraft(function() {
+                  _refreshPage(20);
+                });
+              };
 
-            $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
-            if ($scope.hasLostChanges) {
-              // TODO(sll): This should also include changes to exploration
-              // properties (such as the exploration title, category, etc.).
-              $scope.lostChangesHtml = (
-                ChangesInHumanReadableFormService.makeHumanReadable(
-                  lostChanges).html());
-              $log.error('Lost changes: ' + JSON.stringify(lostChanges));
-            }
-          }],
+              // When the user clicks on save changes button, fetch the
+              // latest changes from backend.
+              $scope.saveChanges = function() {
+                ExplorationDataService.fetchLatestSavedData().then(
+                  function() {
+                    $uibModalInstance.close();
+                  }
+                );
+              };
+              $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
+              if ($scope.hasLostChanges) {
+                // TODO(sll): This should also include changes to exploration
+                // properties (such as the exploration title, category, etc.).
+                $scope.lostChangesHtml = (
+                  ChangesInHumanReadableFormService.makeHumanReadable(
+                    lostChanges).html());
+                $log.error('Lost changes: ' + JSON.stringify(lostChanges));
+              }
+            }],
           windowClass: 'oppia-autosave-version-mismatch-modal'
         }).result.then(function() {
           _isModalOpen = false;

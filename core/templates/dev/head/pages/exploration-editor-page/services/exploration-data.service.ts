@@ -137,6 +137,18 @@ angular.module('oppia').factory('ExplorationDataService', [
           );
         }
       },
+      // Returns a promise that fetch and apply latest saved data.
+      fetchLatestSavedData: function() {
+        return (
+          EditableExplorationBackendApiService.fetchApplyDraftExploration(
+            explorationId).then(function(response) {
+            $log.info('Retrieved exploration data.');
+            $log.info(response);
+            draftChangeListId = response.draft_change_list_id;
+            explorationData.data = response;
+          })
+        );
+      },
       // Returns a promise supplying the last saved version for the current
       // exploration.
       getLastSavedData: function() {
@@ -144,7 +156,6 @@ angular.module('oppia').factory('ExplorationDataService', [
           explorationId).then(function(response) {
           $log.info('Retrieved saved exploration data.');
           $log.info(response);
-
           return response.exploration;
         });
       },
