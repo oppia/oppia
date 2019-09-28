@@ -39,7 +39,7 @@
     "@types/leaflet": "^1.4.0",
     "@types/lodash": "^4.14.136",
     "@types/mathjax": "0.0.35",
-    "@types/mathjs": "^5.0.0",
+    "@types/mathjs": "^6.0.2",
     "@types/mousetrap": "^1.6.2",
     "@types/node": "^12.7.8",
     "@types/q": "^1.5.1",
@@ -53,7 +53,7 @@
     "babel-eslint": "^10.0.1",
     "bootstrap": "3.4.1",
     "browserstack-local": "^1.3.7",
-    "cache-loader": "^3.0.1",
+    "cache-loader": "^4.1.0",
     "clean-webpack-plugin": "^2.0.1",
     "core-js": "^2.5.3",
     "css-loader": "^3.1.0",
@@ -71,12 +71,12 @@
     "htmllint-cli": "github:oppia/htmllint-cli#01a8b74",
     "is-docker": "^2.0.0",
     "istanbul-instrumenter-loader": "^3.0.1",
-    "jasmine-core": "^3.4.0",
+    "jasmine-core": "^3.5.0",
     "jasmine-spec-reporter": "^4.2.1",
     "jquery": "^3.4.0",
     "karma": "^4.3.0",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-coverage": "^1.1.2",
+    "karma-coverage": "^2.0.1",
     "karma-coverage-istanbul-reporter": "^2.0.5",
     "karma-jasmine": "^2.0.1",
     "karma-json-fixtures-preprocessor": "^0.0.6",
@@ -84,7 +84,7 @@
     "karma-webpack": "^4.0.0-rc.3",
     "lodash": "^4.17.14",
     "mathjs": "5.10.3",
-    "moment": "2.19.3",
+    "moment": "2.24.0",
     "postcss-loader": "3.0.0",
     "postcss-syntax": "^0.36.2",
     "protractor": "^5.4.2",
@@ -92,7 +92,7 @@
     "raw-loader": "3.1.0",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.4.0",
-    "sourcemapped-stacktrace": "1.1.9",
+    "sourcemapped-stacktrace": "1.1.11",
     "style-loader": "^0.23.1",
     "stylelint": "^10.0.1",
     "stylelint-config-standard": "^19.0.0",
@@ -108,8 +108,5 @@
     "yargs": "^13.2.2",
     "zone.js": "^0.9.1"
   },
-  "keywords": [],
-  "dependencies": {
-    "handlebars": "^4.3.1"
-  }
+  "keywords": []
 }
