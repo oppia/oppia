@@ -26,6 +26,31 @@ describe('Preferences', function() {
     preferencesPage = new PreferencesPage.PreferencesPage();
   });
 
+  it('should let a user upload a profile photo', function() {
+    users.createUser('eve@preferences.com', 'evePreferences');
+    users.login('eve@preferences.com');
+    preferencesPage.get();
+    expect(preferencesPage.getProfilePhotoSource())
+      .not
+      .toEqual(
+        preferencesPage.submitProfilePhoto('../data/img.png')
+          .then(function() {
+            return preferencesPage.getProfilePhotoSource();
+          })
+      );
+  });
+
+  it('should show an error if uploaded photo is too large', function() {
+    users.createUser('lou@preferences.com', 'louPreferences');
+    users.login('lou@preferences.com');
+    preferencesPage.get();
+    preferencesPage.uploadProfilePhoto(
+      '../data/dummyLargeImage.jpg')
+      .then(function() {
+        preferencesPage.expectUploadError();
+      });
+  });
+
   it('should change editor role email checkbox value', function() {
     users.createUser('alice@preferences.com', 'alicePreferences');
     users.login('alice@preferences.com');
