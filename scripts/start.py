@@ -27,13 +27,16 @@ import re
 import subprocess
 import time
 
-import python_utils
-
-from . import build
-from . import common
+# Install third party libraries before importing other files.
 from . import install_third_party_libs
-from . import setup
-from . import setup_gae
+install_third_party_libs.main(args=[])
+
+# pylint: disable=wrong-import-position
+import python_utils  # isort:skip
+
+from . import build  # isort:skip
+from . import common  # isort:skip
+# pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser(description="""
 Run the script from the oppia root folder:
@@ -74,14 +77,8 @@ def main(args=None):
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    setup.main(args=[])
-    setup_gae.main(args=[])
-    install_third_party_libs.main(args=[])
-
     # Runs cleanup function on exit.
     atexit.register(cleanup)
-
-    python_utils.PRINT('Oppia setup complete!')
 
     # Check that there isn't a server already running.
     if common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
@@ -97,25 +94,25 @@ def main(args=None):
         '--enable_console=true' if parsed_args.enable_console else '')
 
     if parsed_args.prod_env:
-        constants_env_variable = '\'DEV_MODE\': false'
+        constants_env_variable = '"DEV_MODE": false'
         for line in fileinput.input(
                 files=[os.path.join('assets', 'constants.ts')], inplace=True):
             # Inside this loop the STDOUT will be redirected to the file,
             # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
-                    r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
+                    r'"DEV_MODE": .*', constants_env_variable, line), end='')
         build.main(args=['--prod_env', '--enable_watcher'])
         app_yaml_filepath = 'app.yaml'
     else:
-        constants_env_variable = '\'DEV_MODE\': true'
+        constants_env_variable = '"DEV_MODE": true'
         for line in fileinput.input(
                 files=[os.path.join('assets', 'constants.ts')], inplace=True):
             # Inside this loop the STDOUT will be redirected to the file,
             # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
-                    r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
+                    r'"DEV_MODE": .*', constants_env_variable, line), end='')
         build.main(args=['--enable_watcher'])
         app_yaml_filepath = 'app_dev.yaml'
 
@@ -171,8 +168,7 @@ def main(args=None):
                 'INFORMATION',
                 'Setting up a local development server at localhost:%s. '
                 % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-                'Opening a',
-                'default browser window pointing to this server'])
+                'Opening a default browser window pointing to this server'])
             time.sleep(5)
             background_processes.append(
                 subprocess.Popen([
@@ -183,8 +179,7 @@ def main(args=None):
             'INFORMATION',
             'Setting up a local development server at localhost:%s. '
             % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            'Opening a',
-            'default browser window pointing to this server.'])
+            'Opening a default browser window pointing to this server.'])
         time.sleep(5)
         background_processes.append(
             subprocess.Popen([

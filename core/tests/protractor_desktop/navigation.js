@@ -214,11 +214,10 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
 
-  it('redirects to the test server', function() {
-    browser.driver.get('https://oppiaserver.appspot.com/about');
+  it('shows the error page when an incorrect url is given', function() {
+    browser.get('/splashes');
     waitFor.pageToFullyLoad();
-    browser.getCurrentUrl().then(function(url) {
-      expect(url).toBe('https://oppiatestserver.appspot.com/splash');
-    });
+    expect(element(
+      by.css('.protractor-test-error-page')).isPresent()).toBe(true);
   });
 });

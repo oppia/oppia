@@ -1308,7 +1308,6 @@ def generate_build_directory(hashes):
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
     _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
 
-    save_hashes_to_file(dict())
     python_utils.PRINT('Build completed.')
 
 
@@ -1382,13 +1381,13 @@ def main(args=None):
             'minify_third_party_libs_only should not be set in non-prod mode.')
     if options.prod_mode:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-        hashes = generate_hashes()
-        build_using_webpack()
-        generate_app_yaml()
         if not options.minify_third_party_libs_only:
+            hashes = generate_hashes()
+            build_using_webpack()
+            generate_app_yaml()
             generate_build_directory(hashes)
-    else:
-        save_hashes_to_file(dict())
+
+    save_hashes_to_file(dict())
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

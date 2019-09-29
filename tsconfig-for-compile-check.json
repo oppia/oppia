@@ -19,7 +19,8 @@
       "pages/*": ["core/templates/dev/head/pages/*"],
       "services/*": ["core/templates/dev/head/services/*"],
       "classifiers/*": ["extensions/classifiers/*"],
-      "interactions/*": ["extensions/interactions/*"]
+      "interactions/*": ["extensions/interactions/*"],
+      "filters/*": ["core/templates/dev/head/filters/*"]
     }
   },
   "files": [
@@ -31,7 +32,6 @@
   "include": ["core", "extensions", "typings"],
   "exclude": [
     "core/tests",
-    "core/templates/dev/head/dist",
     "core/templates/dev/head/google-analytics.initializer.ts"
   ]
 }

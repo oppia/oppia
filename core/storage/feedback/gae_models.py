@@ -18,8 +18,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
 from core.platform import models
 import feconf
 import python_utils
@@ -407,29 +405,6 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     user_id = ndb.StringProperty(required=False, indexed=True)
     thread_id = ndb.StringProperty(required=False, indexed=True)
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
-    # When this user thread was created and last updated. This overrides the
-    # fields in BaseModel. We are overriding them because we do not want the
-    # last_updated field to be updated when running one off job and whe the
-    # model is created we need to make sure that created_on is set before
-    # last updated.
-    created_on = ndb.DateTimeProperty(indexed=True, required=True)
-    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
-
-    def put(self, update_last_updated_time=True):
-        """Writes the given thread instance to the datastore.
-        Args:
-            update_last_updated_time: bool. Whether to update the
-                last_updated_field of the thread.
-        Returns:
-            GeneralFeedbackThreadModel. The thread entity.
-        """
-        if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
-
-        if update_last_updated_time or self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
-
-        return super(GeneralFeedbackThreadUserModel, self).put()
 
     @staticmethod
     def get_deletion_policy():
@@ -505,6 +480,25 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
         return super(GeneralFeedbackThreadUserModel, cls).get_multi(
             instance_ids)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export GeneralFeedbackThreadUserModel user-based properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict containing the user-relevant properties of
+            GeneralFeedbackThreadUserModel, i.e., which messages have been
+            read by the user (as a list of ids) in each thread.
+        """
+        found_models = cls.get_all().filter(cls.user_id == user_id)
+        user_data = {}
+        for user_model in found_models:
+            user_data[user_model.thread_id] = (
+                user_model.message_ids_read_by_user)
+        return user_data
 
 
 class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):

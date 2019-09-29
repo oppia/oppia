@@ -47,13 +47,8 @@
 function cleanup {
   # Send a kill signal to the dev server and Selenium server. The awk command
   # gets just the process ID from the grepped line.
-  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
-  kill `ps aux | grep node_modules/webdriver-manager/selenium | awk '{print $2}'`
-
-  # Wait for the servers to go down; suppress "connection refused" error output
-  # from nc since that is exactly what we are expecting to happen.
-  while ( nc -vz localhost 4444 >/dev/null 2>&1 ); do sleep 1; done
-  while ( nc -vz localhost 9001 >/dev/null 2>&1 ); do sleep 1; done
+  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'` || true
+  kill `ps aux | grep node_modules/webdriver-manager/selenium | awk '{print $2}'` || true
 
   if [ -d "../protractor-screenshots" ]; then
     echo ""
@@ -101,6 +96,15 @@ if ( nc -vz localhost 9001 ); then
   exit 1
 fi
 
+export OPPIA_DIR=`pwd`
+# Set COMMON_DIR to the absolute path of the directory above OPPIA_DIR. This
+# is necessary becaue COMMON_DIR (or subsequent variables which refer to it)
+# may use it in a situation where relative paths won't work as expected (such
+# as $PYTHONPATH).
+export COMMON_DIR=$(cd $OPPIA_DIR/..; pwd)
+export TOOLS_DIR=$COMMON_DIR/oppia_tools
+export NODE_PATH=$TOOLS_DIR/node-10.15.3
+export PATH=$NODE_PATH/bin:$PATH
 
 # Forces the cleanup function to run on exit.
 # Developers: note that at the end of this script, the cleanup() function at
@@ -124,11 +128,13 @@ for arg in "$@"; do
   fi
 done
 
-if [[ "DEV_MODE" == "true" ]]; then
+if [[ "$DEV_MODE" == "true" ]]; then
   constants_env_variable="\"DEV_MODE\": true"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
   python -m scripts.build
   APP_YAML_FILEPATH="app_dev.yaml"
+
+  node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts
 else
   constants_env_variable="\"DEV_MODE\": false"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
