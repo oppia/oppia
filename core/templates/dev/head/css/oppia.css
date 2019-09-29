@@ -487,10 +487,6 @@ p:last-child {
   display: block;
   padding: 10px 15px;
 }
-/* stylelint-disable */
-.oppia-navbar-profile > li:hover {
-  background-color: white;
-}
 .oppia-activity-summary-tile a:focus,
 .oppia-activity-summary-tile-mobile a:focus {
   box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
