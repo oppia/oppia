@@ -50,32 +50,6 @@ def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
             'Invalid suggestion_type: %s' % suggestion_type)
 
 
-def _get_exploration_suggestion_representable(suggestions):
-    """Returns a suggestion representable dict, which contains information about
-    the dict and corresponding opportunity model.
-
-    Args:
-        suggestions: list(Suggestion). A lsit of suggestion object.
-
-    Returns:
-        dict. A dict with suggestions and target_ids_to_opportunity_dicts keys
-        and corresponding values.
-    """
-    # Note that multiple translation suggestions can exist for a
-    # single exploration.
-    target_ids = set([s.target_id for s in suggestions])
-    target_ids_to_opportunities = (
-        opportunity_services.get_exploration_opportunity_summaries_by_ids(
-            list(target_ids)))
-    return {
-        'suggestions': [s.to_dict() for s in suggestions],
-        'target_ids_to_opportunity_dicts': {
-            t: d.to_dict() for (
-                t, d) in target_ids_to_opportunities.items()
-        }
-    }
-
-
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 
@@ -205,8 +179,18 @@ class ReviewableSuggestionsHandler(base.BaseHandler):
                 self.user_id, suggestion_type)
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                self.render_json(_get_exploration_suggestion_representable(
-                    suggestions))
+                target_ids = set([s.target_id for s in suggestions])
+                target_ids_to_opportunities = (
+                    opportunity_services
+                    .get_exploration_opportunity_summaries_by_ids(
+                        list(target_ids)))
+                self.render_json({
+                    'suggestions': [s.to_dict() for s in suggestions],
+                    'target_ids_to_opportunity_dicts': {
+                        t: d.to_dict() for (
+                            t, d) in target_ids_to_opportunities.items()
+                    }
+                })
             else:
                 self.render_json({})
         except Exception as e:
@@ -231,8 +215,18 @@ class UserSubmittedSuggestionsHandler(base.BaseHandler):
                 self.user_id, suggestion_type)
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                self.render_json(_get_exploration_suggestion_representable(
-                    suggestions))
+                target_ids = set([s.target_id for s in suggestions])
+                target_ids_to_opportunities = (
+                    opportunity_services
+                    .get_exploration_opportunity_summaries_by_ids(
+                        list(target_ids)))
+                self.render_json({
+                    'suggestions': [s.to_dict() for s in suggestions],
+                    'target_ids_to_opportunity_dicts': {
+                        t: d.to_dict() for (
+                            t, d) in target_ids_to_opportunities.items()
+                    }
+                })
             else:
                 self.render_json({})
         except Exception as e:

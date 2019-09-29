@@ -50,7 +50,7 @@
     <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
     <button class="btn btn-success oppia-upload-translated-text-button"
             ng-disabled="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
-            ng-click="addTranslatedText()">
+            ng-click="suggestTranslatedText()">
       <i ng-show="uploadingTranslation" class="fa fa-spinner"></i>
       <span ng-show="!uploadingTranslation && !moreAvailable">Save and close</span>
       <span ng-show="!uploadingTranslation && moreAvailable">Save and translate another</span>

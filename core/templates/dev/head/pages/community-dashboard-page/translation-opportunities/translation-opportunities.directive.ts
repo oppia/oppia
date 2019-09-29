@@ -173,10 +173,10 @@ angular.module('oppia').directive(
                       TranslateTextService.getTextToTranslate().text);
                     $scope.activeWrittenTranslation.html = '';
                   };
-                  $scope.addTranslatedText = function() {
+                  $scope.suggestTranslatedText = function() {
                     if (!$scope.uploadingTranslation && !$scope.loadingData) {
                       $scope.uploadingTranslation = true;
-                      TranslateTextService.addTranslatedText(
+                      TranslateTextService.suggestTranslatedText(
                         $scope.activeWrittenTranslation.html,
                         TranslationLanguageService.getActiveLanguageCode(),
                         function() {

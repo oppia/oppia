@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for show and review contributions.
+ * @fileoverview Directive for showing and reviewing contributions.
  */
 require(
   'pages/community-dashboard-page/login-required-message/' +

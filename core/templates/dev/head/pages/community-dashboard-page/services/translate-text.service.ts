@@ -90,7 +90,7 @@ angular.module('oppia').factory('TranslateTextService', [
           more: isMoreTextAvailableForTranslation()
         };
       },
-      addTranslatedText: function(
+      suggestTranslatedText: function(
           translationHtml, languageCode, successCallback) {
         var url = '/suggestionhandler/';
         var data = {
