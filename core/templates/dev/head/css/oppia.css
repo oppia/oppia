@@ -487,6 +487,12 @@ p:last-child {
   display: block;
   padding: 10px 15px;
 }
+
+.oppia-html-select > ul > li > a {
+  display: block;
+  padding: 3px 20px;
+}
+
 .oppia-activity-summary-tile a:focus,
 .oppia-activity-summary-tile-mobile a:focus {
   box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
@@ -524,6 +530,10 @@ p:last-child {
 }
 .oppia-activity-summary-tile span {
   vertical-align: middle;
+}
+
+.oppia-html-select > ul > li > a:hover {
+  background-color: #f5f5f5;
 }
 
 /* This will prevent the enlargement of the text in the RTE. A span tag gets
