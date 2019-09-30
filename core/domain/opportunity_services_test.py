@@ -22,7 +22,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import question_services
-from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_domain
@@ -391,6 +390,24 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['id'], self.SKILL_ID)
         self.assertEqual(opportunity['skill_description'], 'skill_description')
 
+    def test_create_skill_opportunity_counts_existing_linked_questions(self):
+        self.save_new_question(
+            self.QUESTION_ID, self.USER_ID,
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+        question_services.create_new_question_skill_link(
+            self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
+
+        opportunity_services.create_skill_opportunity(
+            self.SKILL_ID, 'description')
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertEqual(len(skill_opportunities), 1)
+        opportunity = skill_opportunities[0]
+        self.assertEqual(opportunity['id'], self.SKILL_ID)
+        self.assertEqual(opportunity['skill_description'], 'description')
+        self.assertEqual(opportunity['question_count'], 1)
+
     def test_create_skill_opportunity_for_existing_opportunity_raises_exception(
             self):
         opportunity_services.create_skill_opportunity(
@@ -413,14 +430,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'new_value': 'new_description'
             })
         ]
-        def mock_get_all_actions(*_args):
-            actions = list(self.admin.actions)
-            return actions
 
-        with self.swap(role_services, 'get_all_actions', mock_get_all_actions):
-            skill_services.update_skill(
-                self.USER_ID, self.SKILL_ID, changelist,
-                'Updated misconception name.')
+        skill_services.update_skill(
+            self.admin_id, self.SKILL_ID, changelist,
+            'Updated misconception name.')
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))

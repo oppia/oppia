@@ -54,7 +54,7 @@
 
 # Core documentation
 /AUTHORS @seanlip
-/CHANGELOG @seanlip
+/CHANGELOG @ankita240796
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
@@ -93,6 +93,7 @@
 /.pylintrc @kevinlee12
 /.stylelintrc @kevinlee12
 /.travis.yml @kevinlee12
+/.yarnrc @kevinlee12
 /codecov.yml @lilithxxx
 /core/templates/dev/head/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
@@ -103,14 +104,14 @@
 # Exploration project.
 /core/controllers/editor*.py @DubeySandeep
 /core/controllers/reader*.py @aks681
-/core/controllers/resources*.py @vojtechjelinek @seanlip
+/core/controllers/resources*.py @vojtechjelinek
 /core/domain/exp*.py @DubeySandeep
 /core/domain/fs*.py @aks681
 /core/domain/param_domain*.py @aks681
 /core/domain/rating_services*.py @DubeySandeep
 /core/domain/state_domain*.py @aks681
 /core/domain/summary_services*.py @aks681
-/core/domain/value_generators_domain*.py @vojtechjelinek @seanlip
+/core/domain/value_generators_domain*.py @vojtechjelinek
 /core/storage/exploration/ @aks681
 /core/templates/dev/head/components/entity-creation-services/exploration-creation.service*.ts @DubeySandeep
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive*.ts @aks681
@@ -144,10 +145,10 @@
 
 
 # Google-app-engine configurations
-/appengine_config.py @seanlip @nithusha21
-/cron.yaml @seanlip @nithusha21
+/appengine_config.py @nithusha21
+/cron.yaml @nithusha21
 /dispatch.yaml @seanlip
-/index.yaml @seanlip @DubeySandeep
+/index.yaml @DubeySandeep
 /queue.yaml @seanlip
 /main_taskqueue.py @seanlip
 
@@ -210,10 +211,10 @@
 /core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
 /core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
-/extensions/domain*.py @seanlip @DubeySandeep
+/extensions/domain*.py @DubeySandeep
 /extensions/interactions/ @kevinlee12 @vojtechjelinek
 /extensions/objects/ @aks681
-/extensions/value_generators/ @seanlip @vojtechjelinek
+/extensions/value_generators/ @vojtechjelinek
 /extensions/__init__.py @kevinlee12
 
 
@@ -230,7 +231,7 @@
 /core/templates/dev/head/domain/statistics/ @brianrodri
 /core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/dev/head/services/ImprovementCardService*.ts @brianrodri
+/core/templates/dev/head/services/ImprovementTaskService*.ts @brianrodri
 /core/templates/dev/head/services/ImprovementsService*.ts @brianrodri
 /core/templates/dev/head/services/MessengerService.ts @brianrodri
 /core/templates/dev/head/services/Playthrough*.ts @brianrodri
@@ -244,7 +245,7 @@
 
 # Library page.
 /core/controllers/library*.py @kevinlee12
-/core/domain/recommendations*.py @seanlip
+/core/domain/recommendations*.py @kevinlee12
 /core/domain/search_services*.py @kevinlee12
 /core/templates/dev/head/pages/library-page/ @kevinlee12
 /core/templates/dev/head/services/ConstructTranslationIdsService.ts @kevinlee12
@@ -331,16 +332,16 @@
 /main_cron.py @nithusha21
 /main_mail.py @aks681
 /main.py @nithusha21 @DubeySandeep
-/feconf.py @seanlip @nithusha21
-/constants*.py @seanlip @nithusha21
-/assets/constants.ts @seanlip @nithusha21
+/feconf.py @nithusha21 @DubeySandeep
+/constants*.py @nithusha21
+/assets/constants.ts @nithusha21
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
 /core/domain/prod_validation_jobs_one_off*.py @ankita240796
 /core/domain/storage_model_audit_jobs_test.py @ankita240796
 /core/jobs*.py @seanlip
-/core/platform/ @seanlip @DubeySandeep
+/core/platform/ @DubeySandeep
 /core/templates/dev/head/App*.ts @ankita240796
 /core/templates/dev/head/app.constants.ts @ankita240796
 /core/templates/dev/head/app.constants.ajs.ts @ankita240796
@@ -362,18 +363,18 @@
 /core/domain/change_domain.py @DubeySandeep
 /core/templates/dev/head/tests/ @DubeySandeep
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
-/schema_utils*.py @seanlip @DubeySandeep
+/schema_utils*.py @DubeySandeep
 /utils*.py @aks681
 /python_utils*.py @lilithxxx
 
 
 # Restricted pages.
 /core/controllers/admin*.py @DubeySandeep @nithusha21
-/core/controllers/moderator*.py @seanlip
-/core/controllers/recent_commits*.py @seanlip
-/core/domain/moderator_services*.py @seanlip
+/core/controllers/moderator*.py @DubeySandeep
+/core/controllers/recent_commits*.py @DubeySandeep
+/core/domain/moderator_services*.py @DubeySandeep
 /core/templates/dev/head/pages/admin-page/ @DubeySandeep @nithusha21
-/core/templates/dev/head/pages/moderator-page/ @seanlip
+/core/templates/dev/head/pages/moderator-page/ @DubeySandeep
 
 
 # QA team.
@@ -483,8 +484,8 @@
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
 /export/ @seanlip
-/manifest.json @seanlip @vojtechjelinek
-/package.json @seanlip @vojtechjelinek
-/yarn.lock @seanlip @vojtechjelinek
-/scripts/install_third_party_libs.py @seanlip @vojtechjelinek
+/manifest.json @vojtechjelinek @kevinlee12
+/package.json @vojtechjelinek @kevinlee12
+/yarn.lock @vojtechjelinek @kevinlee12
+/scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
 /.github/ @DubeySandeep

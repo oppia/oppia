@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
+from core.domain import question_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.platform import models
@@ -416,7 +417,6 @@ def get_skill_opportunity_from_model(model):
     Returns:
         SkillOpportunity. The corresponding SkillOpportunity object.
     """
-
     return opportunity_domain.SkillOpportunity(
         model.id, model.skill_description, model.question_count)
 
@@ -501,15 +501,18 @@ def create_skill_opportunity(skill_id, skill_description):
     """
     skill_opportunity_model = (
         opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
-    if skill_opportunity_model:
+    if skill_opportunity_model is not None:
         raise Exception(
             'SkillOpportunity corresponding to skill ID %s already exists.' % (
                 skill_id))
 
+    questions, _, _ = (
+        question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+            constants.MAX_QUESTIONS_PER_SKILL, [skill_id], ''))
     skill_opportunity = opportunity_domain.SkillOpportunity(
         skill_id=skill_id,
         skill_description=skill_description,
-        question_count=0
+        question_count=len(questions)
     )
     _save_skill_opportunities([skill_opportunity])
 
@@ -543,7 +546,7 @@ def update_skill_opportunity_skill_description(skill_id, new_description):
         new_description: str. The new skill_description.
     """
     skill_opportunity = _get_skill_opportunity(skill_id)
-    if skill_opportunity:
+    if skill_opportunity is not None:
         skill_opportunity.skill_description = new_description
         _save_skill_opportunities([skill_opportunity])
 
@@ -562,7 +565,7 @@ def _get_skill_opportunity(skill_id):
     """
     skill_opportunity_model = (
         opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
-    if skill_opportunity_model:
+    if skill_opportunity_model is not None:
         return get_skill_opportunity_from_model(skill_opportunity_model)
     return None
 
@@ -579,23 +582,27 @@ def delete_skill_opportunity(skill_id):
     opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
 
 
-def update_skill_opportunity_question_counts(skill_ids, delta):
+def increment_question_counts(skill_ids, delta):
     """Increments question_count(s) of SkillOpportunityModel(s) with
     corresponding skill_ids.
 
     Args:
         skill_ids: list(str). A list of skill_ids corresponding to
             SkillOpportunityModel(s).
-        delta: int. The delta for which to update each question_count.
+        delta: int. The delta for which to increment each question_count.
     """
     updated_skill_opportunities = _update_skill_opportunity_question_count(
         skill_ids, delta)
     _save_skill_opportunities(updated_skill_opportunities)
 
 
-def update_question_count_by_skill_ids(old_skill_ids, new_skill_ids):
-    """Updates question_count(s) of SkillOpportunityModel(s) by the set
-    difference of new_skill_ids - old_skill_ids.
+def update_question_counts_after_changing_skills_for_question(
+        old_skill_ids, new_skill_ids):
+    """Updates question_count(s) of SkillOpportunityModel(s) corresponding to
+    the change in linked skill IDs for a question from old_skill_ids to
+    new_skill_ids, e.g. if skill_id1 is in old_skill_ids, but not in
+    new_skill_ids, the question_count of the SkillOpportunityModel for skill_id1
+    would be decremented.
 
     Args:
         old_skill_ids: list(str). A list of old skill_id(s).
@@ -603,13 +610,15 @@ def update_question_count_by_skill_ids(old_skill_ids, new_skill_ids):
     """
     old_skill_ids_set = set(old_skill_ids)
     new_skill_ids_set = set(new_skill_ids)
-    added = new_skill_ids_set - old_skill_ids_set
-    removed = old_skill_ids_set - new_skill_ids_set
+    new_skill_ids_added_to_question = new_skill_ids_set - old_skill_ids_set
+    skill_ids_removed_from_question = old_skill_ids_set - new_skill_ids_set
     updated_skill_opportunities = []
     updated_skill_opportunities.extend(
-        _update_skill_opportunity_question_count(added, 1))
+        _update_skill_opportunity_question_count(
+            new_skill_ids_added_to_question, 1))
     updated_skill_opportunities.extend(
-        _update_skill_opportunity_question_count(removed, -1))
+        _update_skill_opportunity_question_count(
+            skill_ids_removed_from_question, -1))
     _save_skill_opportunities(updated_skill_opportunities)
 
 
@@ -624,13 +633,15 @@ def _update_skill_opportunity_question_count(skill_ids, delta):
             negative).
 
     Returns:
-        updated_skill_opportunities. list(SkillOpportunity) The updated
-            SkillOpportunities.
+        list(SkillOpportunity). The updated SkillOpportunities.
     """
     updated_skill_opportunities = []
-    for skill_id in skill_ids:
-        skill_opportunity = _get_skill_opportunity(skill_id)
-        if skill_opportunity:
+    skill_opportunity_models = (
+        opportunity_models.SkillOpportunityModel.get_multi(skill_ids))
+    for skill_opportunity_model in skill_opportunity_models:
+        if skill_opportunity_model is not None:
+            skill_opportunity = get_skill_opportunity_from_model(
+                skill_opportunity_model)
             skill_opportunity.question_count += delta
             updated_skill_opportunities.append(skill_opportunity)
     return updated_skill_opportunities

@@ -38,6 +38,7 @@ from core.domain import fs_domain
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
 from core.domain import question_domain
+from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -1401,10 +1402,13 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
 
         for (_, _, skill_model) in (
                 skill_model_class_model_id_model_tuples):
+            # The case for missing skill external model is ignored here
+            # since errors for missing skill external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
             if skill_model is None or skill_model.deleted:
                 continue
-            skill = skill_services.get_skill_from_model(
-                skill_model)
+            skill = skill_services.get_skill_from_model(skill_model)
             question_skill_links = (
                 question_services.get_question_skill_links_of_skill(
                     skill.id, skill.description))
@@ -2522,7 +2526,7 @@ class QuestionModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return question_services.get_question_from_model(item)
+        return question_fetchers.get_question_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
