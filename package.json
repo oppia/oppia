@@ -97,7 +97,7 @@
     "stylelint": "^10.0.1",
     "stylelint-config-standard": "^19.0.0",
     "thread-loader": "^2.1.2",
-    "ts-loader": "^5.4.4",
+    "ts-loader": "^6.2.0",
     "typescript": "^3.4.5",
     "uglify-js": "^3.5.8",
     "underscore-template-loader": "^1.0.0",
