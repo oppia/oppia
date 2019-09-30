@@ -44,9 +44,9 @@ describe('Learner answer details service', function() {
       });
       $provide.value(
         'LearnerAnswerDetailsObjectFactory',
-        LearnerAnswerDetailsObjectFactory);
+        new LearnerAnswerDetailsObjectFactory());
       $provide.value(
-        'LearnerAnswerInfoObjectFactory', LearnerAnswerInfoObjectFactory);
+        'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {

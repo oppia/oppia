@@ -161,9 +161,9 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         new WrittenTranslationObjectFactory()));
     $provide.value(
       'LearnerAnswerDetailsObjectFactory',
-      LearnerAnswerDetailsObjectFactory);
+      new LearnerAnswerDetailsObjectFactory());
     $provide.value(
-      'LearnerAnswerInfoObjectFactory', LearnerAnswerInfoObjectFactory);
+      'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

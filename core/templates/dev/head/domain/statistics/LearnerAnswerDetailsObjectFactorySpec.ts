@@ -24,10 +24,10 @@ import { LearnerAnswerDetailsObjectFactory } from
 describe('Learner answer details object factory', () => {
   it('should create a default learner answer details object', () => {
     var learnerAnswerInfo = (
-      LearnerAnswerInfoObjectFactory.createDefaultLearnerAnswerInfo(
+      new LearnerAnswerInfoObjectFactory().createDefaultLearnerAnswerInfo(
         'This is answer', 'This is answer details'));
     var learnerAnswerDetails = (
-      LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
+      new LearnerAnswerDetailsObjectFactory().createDefaultLearnerAnswerDetails(
         'fakeExpId', 'fakeStateName', 'fakeInteractionId',
         'fakeCustomizationArgs', [learnerAnswerInfo]));
 

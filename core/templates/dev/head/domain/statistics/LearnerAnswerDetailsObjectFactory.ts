@@ -20,23 +20,20 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import {LearnerAnswerInfoObjectFactory} from
+import { LearnerAnswerInfo } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class LearnerAnswerDetailsObjectFactory {
+export class LearnerAnswerDetails {
   expId: string;
   stateName: string;
   interactionId: string;
   customizationArgs: any;
-  learnerAnswerInfoData: LearnerAnswerInfoObjectFactory[];
+  learnerAnswerInfoData: LearnerAnswerInfo[];
 
   constructor(
       expId: string, stateName: string, interactionId: string,
       customizationArgs: any,
-      learnerAnswerInfoData: LearnerAnswerInfoObjectFactory[]) {
+      learnerAnswerInfoData: LearnerAnswerInfo[]) {
     this.expId = expId;
     this.stateName = stateName;
     this.interactionId = interactionId;
@@ -52,16 +49,20 @@ export class LearnerAnswerDetailsObjectFactory {
     return this.stateName;
   }
 
-  getLearnerAnswerInfoData(): LearnerAnswerInfoObjectFactory[] {
+  getLearnerAnswerInfoData(): LearnerAnswerInfo[] {
     return this.learnerAnswerInfoData;
   }
+}
 
-  static createDefaultLearnerAnswerDetails(
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerAnswerDetailsObjectFactory {
+  createDefaultLearnerAnswerDetails(
       expId: string, stateName: string, interactionId: string,
       customizationArgs: any,
-      learnerAnswerInfoData: LearnerAnswerInfoObjectFactory[]): (
-    LearnerAnswerDetailsObjectFactory) {
-    return new LearnerAnswerDetailsObjectFactory(
+      learnerAnswerInfoData: LearnerAnswerInfo[]): LearnerAnswerDetails {
+    return new LearnerAnswerDetails(
       expId, stateName, interactionId, customizationArgs,
       learnerAnswerInfoData);
   }

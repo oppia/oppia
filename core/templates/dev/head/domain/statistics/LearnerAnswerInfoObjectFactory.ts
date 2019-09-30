@@ -20,7 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface LearnerAnswerInfo {
+export interface LearnerAnswerInfoBackendDict {
   id: string;
   answer: string;
   /* eslint-disable camelcase */
@@ -29,10 +29,7 @@ export interface LearnerAnswerInfo {
   /* eslint-enable camelcase */
 }
 
-@Injectable({
-  providedIn: 'root'
-})
-export class LearnerAnswerInfoObjectFactory {
+export class LearnerAnswerInfo {
   _id: string;
   _answer: string;
   _answerDetails: string;
@@ -62,17 +59,21 @@ export class LearnerAnswerInfoObjectFactory {
   getCreatedOn(): number {
     return this._createdOn;
   }
+}
 
-  static createDefaultLearnerAnswerInfo(
-      answer: string, answerDetails: string): LearnerAnswerInfoObjectFactory {
-    return new LearnerAnswerInfoObjectFactory(
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerAnswerInfoObjectFactory {
+  createDefaultLearnerAnswerInfo(
+      answer: string, answerDetails: string): LearnerAnswerInfo {
+    return new LearnerAnswerInfo(
       null, answer, answerDetails, null);
   }
 
-  static createFromBackendDict(
-      learnerAnswerInfoDict: LearnerAnswerInfo): (
-        LearnerAnswerInfoObjectFactory) {
-    return new LearnerAnswerInfoObjectFactory(
+  createFromBackendDict(
+      learnerAnswerInfoDict: LearnerAnswerInfoBackendDict): LearnerAnswerInfo {
+    return new LearnerAnswerInfo(
       learnerAnswerInfoDict.id,
       learnerAnswerInfoDict.answer,
       learnerAnswerInfoDict.answer_details,
