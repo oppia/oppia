@@ -20,6 +20,8 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { UtilsService } from 'services/UtilsService';
+import { AlertsService } from 'services/AlertsService';
+import { LoggerService } from 'services/contextual/LoggerService';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +29,8 @@ import { UtilsService } from 'services/UtilsService';
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
-    'UtilsService': new UtilsService()
+    'UtilsService': new UtilsService(),
+    'AlertsService': new AlertsService(new LoggerService())
   };
   /* eslint-enable quote-props */
 }
