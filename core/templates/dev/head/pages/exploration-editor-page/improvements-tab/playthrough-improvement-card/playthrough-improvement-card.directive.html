@@ -4,14 +4,14 @@
     <li ng-repeat="suggestion in getData().suggestions"><[suggestion]></li>
   </ul>
 </div>
-<div style="margin-top: 20px;">
+<div class="playthrough-text-wrapper">
   <strong>Sample Playthroughs:</strong>
 </div>
 <div class="text-center">
-  <div style="overflow: auto">
+  <div class="playthrough-button-wrapper">
     <div ng-repeat="playthroughId in getData().playthroughIds track by playthroughId" class="col-md-4">
       <button type="button" ng-click="openPlaythroughModal(playthroughId, $index)"
-              class="oppia-hexagon text-center" style="font-size: 28px">
+              class="oppia-hexagon text-center open-playthrough-button">
         View <br> Playthrough {{$index + 1}}
       </button>
     </div>

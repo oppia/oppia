@@ -3890,6 +3890,109 @@ md-card.preview-conversation-skin-supplemental-card {
   }
 }
 
+.aggregated-stats-supplemental{
+  padding-top: 30px;
+  margin-bottom: 30px;
+}
+
+.aggregated-stats-card{
+  margin: 0;
+}
+
+.stats-card-supplemental{
+  text-align: center;
+  padding: 0;
+}
+
+.option-card-supplemental{
+  padding: 10px; margin: auto
+}
+
+.option-card-text{
+  font-size: 14px;
+}
+
+.protractor-test-improvements-action-button{
+  margin-left: 15px;
+}
+
+.playthrough-button-wrapper{
+  overflow: auto;
+}
+
+.playthrough-text-wrapper{
+  margin-top: 20px;
+}
+
+.open-playthrough-button{
+  font-size: 28px;
+}
+
+.table-answer-info-wrapper{
+  margin-left:0.5rem;
+  margin-right: 0.5rem;
+}
+
+.current-learner-answer-info{
+  margin-left: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.oppia-editable-section-supplemental{
+  height: 150px;
+  width: 150px;
+}
+
+.user-bio-text{
+  font-size: smaller;
+}
+
+.checkbox-dashboard-text{
+  padding-top: 0;
+}
+
+.preferences-subject-interests-block-wrapper{
+  height: 18px;
+  width: 550px;
+}
+
+.preferences-subject-interests-block{
+  color: red;
+  font-size: 0.8em;
+}
+
+.preferences-subject-interests-block-text{
+  font-size: smaller;
+}
+
+.oppia-subscription-card-summary-inner{
+  margin-bottom: 5px;
+  font-size: 17.5px;
+}
+
+.oppia-subscription-card-supplemental{
+  margin: 0 8px 0 0;
+}
+.creator-impact-wrapper{
+  font-size: 14.5px;
+}
+
+.preferences-preferred-text-custom{
+  font-size: smaller;
+}
+
+.oppia-editor-edit-icon-supplemental{
+  top: 8px;
+  right: 8px;
+}
+
+.oppia-profile-user-stat-text-large-screen{
+  font-size: 16px;
+}
+
+.oppia-user-bio-span-custom{
+  white-space: pre-wrap;
+}
 /* Styles for small-width screens. */
 
 .oppia-activity-summary-tile.small-width {

@@ -7,7 +7,7 @@
       </span>
     </h3>
   </div>
-  <div class="modal-body" style="margin-left:0.5rem; margin-right: 0.5rem;">
+  <div class="modal-body table-answer-info-wrapper">
     <table class="table table-hover">
       <tr ng-if="getLearnerAnswerInfos().length > 0">
         <th scope="col">Select</th>
@@ -34,7 +34,7 @@
       </tr>
     </table>
     <div ng-if="currentLearnerAnswerInfo"
-         class="row" style="margin-left: 0.5rem; margin-left: 0.5rem">
+         class="row current-learner-answer-info">
       <b>Answer:</b>
       <angular-html-bind html-data="getLearnerAnswerHtml(currentLearnerAnswerInfo)">
       </angular-html-bind>
