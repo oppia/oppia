@@ -36,8 +36,7 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(
-            config_models.ConfigPropertyModel.has_reference_to_user_id('id_x')
-        )
+            config_models.ConfigPropertyModel.has_reference_to_user_id('id_x'))
 
     def test_create_model(self):
         config_model = config_models.ConfigPropertyModel(

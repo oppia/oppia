@@ -41,8 +41,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             classifier_models.ClassifierTrainingJobModel
-            .has_reference_to_user_id('id_x')
-        )
+            .has_reference_to_user_id('id_x'))
 
     def test_create_and_get_new_training_job_runs_successfully(self):
         next_scheduled_check_time = datetime.datetime.utcnow()
@@ -224,8 +223,7 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             classifier_models.TrainingJobExplorationMappingModel
-            .has_reference_to_user_id('id_x')
-        )
+            .has_reference_to_user_id('id_x'))
 
     def test_create_and_get_new_mapping_runs_successfully(self):
         mapping_id = (

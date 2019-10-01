@@ -39,8 +39,7 @@ class StateCounterModelTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(
-            stats_models.StateCounterModel.has_reference_to_user_id('any_id')
-        )
+            stats_models.StateCounterModel.has_reference_to_user_id('any_id'))
 
     def test_state_counter_model_gets_created(self):
         # This tests whether get_or_create() can create the model.
@@ -80,8 +79,7 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.AnswerSubmittedEventLogEntryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -112,8 +110,7 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.ExplorationActualStartEventLogEntryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -140,8 +137,7 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.SolutionHitEventLogEntryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -170,8 +166,7 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.StartExplorationEventLogEntryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -203,8 +198,7 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.MaybeLeaveExplorationEventLogEntryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
 
 class CompleteExplorationEventLogEntryModelUnitTests(
@@ -220,8 +214,7 @@ class CompleteExplorationEventLogEntryModelUnitTests(
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.CompleteExplorationEventLogEntryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -254,8 +247,7 @@ class RateExplorationEventLogEntryModelUnitTests(
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.RateExplorationEventLogEntryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
 
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -269,8 +261,7 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.StateHitEventLogEntryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -299,8 +290,7 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.StateCompleteEventLogEntryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -330,8 +320,7 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.LeaveForRefresherExplorationEventLogEntryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_create_and_get_event_models(self):
         event_id = (
@@ -446,8 +435,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(
-            stats_models.PlaythroughModel.has_reference_to_user_id('any_id')
-        )
+            stats_models.PlaythroughModel.has_reference_to_user_id('any_id'))
 
     def test_create_and_get_playthrough_model(self):
         model_id = (
@@ -503,8 +491,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.LearnerAnswerDetailsModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_get_state_reference_for_exploration(self):
         exp_id_1 = 'expid1'
@@ -638,8 +625,7 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.ExplorationAnnotationsModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_create_and_get_models(self):
         stats_models.ExplorationAnnotationsModel.create(
@@ -681,8 +667,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(
-            stats_models.StateAnswersModel.has_reference_to_user_id('any_id')
-        )
+            stats_models.StateAnswersModel.has_reference_to_user_id('any_id'))
 
     def test_shard_count_is_updated_when_data_overflows(self):
 
@@ -747,8 +732,7 @@ class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             stats_models.StateAnswersCalcOutputModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_get_model_returns_created_properties(self):
 

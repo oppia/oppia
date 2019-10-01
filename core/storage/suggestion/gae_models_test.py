@@ -79,35 +79,33 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_5')
 
-    def test_has_reference_to_user_id(self):
+    def test_has_reference_to_user_id_author(self):
         self.assertTrue(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('author_1')
-        )
+            .has_reference_to_user_id('author_1'))
         self.assertTrue(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('author_2')
-        )
+            .has_reference_to_user_id('author_2'))
         self.assertTrue(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('author_3')
-        )
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('reviewer_1')
-        )
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('reviewer_2')
-        )
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('reviewer_3')
-        )
+            .has_reference_to_user_id('author_3'))
         self.assertFalse(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('id_x')
-        )
+            .has_reference_to_user_id('id_x'))
+
+    def test_has_reference_to_user_id_reviewer(self):
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_1'))
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_2'))
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_3'))
+        self.assertFalse(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('id_x'))
 
     def test_score_type_contains_delimiter(self):
         for score_type in suggestion_models.SCORE_TYPE_CHOICES:

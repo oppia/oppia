@@ -98,5 +98,5 @@ class ContinuousComputationModelTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(
-            job_models.ContinuousComputationModel.has_reference_to_user_id('id')
-        )
+            job_models.ContinuousComputationModel
+            .has_reference_to_user_id('id'))

@@ -68,8 +68,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             opportunity_models.ExplorationOpportunitySummaryModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
     def test_get_all_translation_opportunities(self):
         results, cursor, more = (

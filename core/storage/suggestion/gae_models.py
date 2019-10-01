@@ -151,13 +151,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        references_author_id = cls.query(
-            cls.author_id == user_id
+        return cls.query(
+            ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
         ).get() is not None
-        references_final_reviewer_id = cls.query(
-            cls.final_reviewer_id == user_id
-        ).get() is not None
-        return references_author_id or references_final_reviewer_id
 
     @classmethod
     def create(

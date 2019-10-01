@@ -36,8 +36,7 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(
-            file_models.FileMetadataModel.has_reference_to_user_id('any_id')
-        )
+            file_models.FileMetadataModel.has_reference_to_user_id('any_id'))
 
     def test_get_new_id_raises_not_implemented_error(self):
         with self.assertRaises(NotImplementedError):
@@ -158,8 +157,7 @@ class FileModelTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(
-            file_models.FileModel.has_reference_to_user_id('any_id')
-        )
+            file_models.FileModel.has_reference_to_user_id('any_id'))
 
     def test_file_model_content_is_reconstituted_correctly(self):
         file_model = file_models.FileModel.create(

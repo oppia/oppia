@@ -61,11 +61,9 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 email_models.SentEmailModel.has_reference_to_user_id('recip_id')
             )
             self.assertTrue(
-                email_models.SentEmailModel.has_reference_to_user_id('send_id')
-            )
+                email_models.SentEmailModel.has_reference_to_user_id('send_id'))
             self.assertFalse(
-                email_models.SentEmailModel.has_reference_to_user_id('id_x')
-            )
+                email_models.SentEmailModel.has_reference_to_user_id('id_x'))
 
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:
@@ -213,12 +211,10 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
         ).put()
         self.assertTrue(
             email_models.GeneralFeedbackEmailReplyToIdModel
-            .has_reference_to_user_id('user_id_1')
-        )
+            .has_reference_to_user_id('user_id_1'))
         self.assertFalse(
             email_models.GeneralFeedbackEmailReplyToIdModel
-            .has_reference_to_user_id('id_x')
-        )
+            .has_reference_to_user_id('id_x'))
 
     def test_put_function(self):
         email_reply_model = email_models.GeneralFeedbackEmailReplyToIdModel(
