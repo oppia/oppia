@@ -50,21 +50,6 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             email_models.SentEmailModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
-    def test_has_reference_to_user_id(self):
-        with self.generate_constant_hash_ctx:
-            email_models.SentEmailModel.create(
-                'recip_id', 'recipient@email.com', 'send_id',
-                'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
-                'Email Subject', 'Email Body', datetime.datetime.utcnow())
-
-            self.assertTrue(
-                email_models.SentEmailModel.has_reference_to_user_id('recip_id')
-            )
-            self.assertTrue(
-                email_models.SentEmailModel.has_reference_to_user_id('send_id'))
-            self.assertFalse(
-                email_models.SentEmailModel.has_reference_to_user_id('id_x'))
-
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
