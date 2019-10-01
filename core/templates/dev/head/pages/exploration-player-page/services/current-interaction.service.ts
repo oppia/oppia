@@ -21,18 +21,12 @@
 
 require(
   'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/ContextService.ts');
 
 angular.module('oppia').factory('CurrentInteractionService', [
-  'ContextService', 'StateEditorService', 'StateInteractionIdService', function(
-      ContextService, StateEditorService, StateInteractionIdService) {
+  'ContextService', 'PlayerPositionService', 'PlayerTranscriptService',
+  function(ContextService, PlayerPositionService, PlayerTranscriptService) {
     var _submitAnswerFn = null;
     var _onSubmitFn = null;
     var _validityCheckFn = null;
@@ -89,10 +83,11 @@ angular.module('oppia').factory('CurrentInteractionService', [
          * learner presses the "Submit" button.
          */
         if (_submitAnswerFn === null) {
+          var index = PlayerPositionService.getDisplayedCardIndex();
+          var displayedCard = PlayerTranscriptService.getCard(index);
           var additionalInfo = ('\nUndefined submit answer debug logs:' +
-            '\nInteraction ID: ' + StateInteractionIdService.savedMemento +
-            '\nExploration ID: ' + ContextService.getExplorationId() +
-            '\nState name: ' + StateEditorService.getActiveStateName());
+            '\nInteraction ID: ' + displayedCard.getInteractionId() +
+            '\nExploration ID: ' + ContextService.getExplorationId());
           throw Error('The current interaction did not ' +
                       'register a _submitAnswerFn.' + additionalInfo);
         } else {
