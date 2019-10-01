@@ -23,6 +23,10 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/ContextService.ts');
+require('pages/exploration-player-page/services/' +
+  'player-position.service.ts');
+require('pages/exploration-player-page/services/' +
+  'player-transcript.service.ts');
 
 angular.module('oppia').factory('CurrentInteractionService', [
   'ContextService', 'PlayerPositionService', 'PlayerTranscriptService',
