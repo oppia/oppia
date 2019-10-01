@@ -119,8 +119,8 @@ describe('Answer Details Improvements', function() {
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
 
-    var card = improvementsTab.getAnswerDetailsCard('One');
-    improvementsTab.clickCardActionButton(card, 'Review Answer Details');
+    var task = improvementsTab.getAnswerDetailsTask('One');
+    improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
     improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
     improvementsTab.closeModal();
     users.logout();
@@ -197,13 +197,13 @@ describe('Feedback Improvements', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
-    var card = improvementsTab.getFeedbackCard(feedback);
-    improvementsTab.clickCardActionButton(card, 'Review Thread');
+    var task = improvementsTab.getFeedbackTask(feedback);
+    improvementsTab.clickTaskActionButton(task, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual([feedback]);
     improvementsTab.sendResponseAndCloseModal(feedbackResponse);
 
-    card = improvementsTab.getFeedbackCard(feedbackResponse);
-    improvementsTab.clickCardActionButton(card, 'Review Thread');
+    task = improvementsTab.getFeedbackTask(feedbackResponse);
+    improvementsTab.clickTaskActionButton(task, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [feedback, feedbackResponse]);
     improvementsTab.closeModal();
@@ -247,25 +247,25 @@ describe('Feedback Improvements', function() {
     explorationEditorPage.navigateToImprovementsTab();
 
     // Mark thread as fixed.
-    var card = improvementsTab.getFeedbackCard(feedback);
-    expect(improvementsTab.getCardStatus(card)).toEqual('Open');
-    improvementsTab.clickCardActionButton(card, 'Review Thread');
+    var task = improvementsTab.getFeedbackTask(feedback);
+    expect(improvementsTab.getTaskStatus(task)).toEqual('Open');
+    improvementsTab.clickTaskActionButton(task, 'Review Thread');
     improvementsTab.sendResponseAndCloseModal(feedbackResponse, 'Fixed');
 
     improvementsTab.setShowOnlyOpenTasks(false);
-    card = improvementsTab.getFeedbackCard(feedbackResponse);
-    expect(improvementsTab.getCardStatus(card)).toEqual('Fixed');
+    task = improvementsTab.getFeedbackTask(feedbackResponse);
+    expect(improvementsTab.getTaskStatus(task)).toEqual('Fixed');
 
     browser.driver.navigate().refresh();
 
     // Re-open the thread.
     improvementsTab.setShowOnlyOpenTasks(false);
-    card = improvementsTab.getFeedbackCard(feedbackResponse);
-    expect(improvementsTab.getCardStatus(card)).toEqual('Fixed');
-    improvementsTab.clickCardActionButton(card, 'Review Thread');
+    task = improvementsTab.getFeedbackTask(feedbackResponse);
+    expect(improvementsTab.getTaskStatus(task)).toEqual('Fixed');
+    improvementsTab.clickTaskActionButton(task, 'Review Thread');
     improvementsTab.sendResponseAndCloseModal(feedbackResponse, 'Open');
     improvementsTab.setShowOnlyOpenTasks(true);
-    expect(improvementsTab.getCardStatus(card)).toEqual('Open');
+    expect(improvementsTab.getTaskStatus(task)).toEqual('Open');
 
     users.logout();
   });
@@ -349,21 +349,29 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
 
-    var cardToAccept = improvementsTab.getSuggestionCard(
+    var taskToAccept = improvementsTab.getSuggestionTask(
       suggestionDescription1);
-    improvementsTab.clickCardActionButton(cardToAccept, 'Review Thread');
+    improvementsTab.clickTaskActionButton(taskToAccept, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription1]);
     improvementsTab.acceptSuggestion();
     improvementsTab.closeModal();
 
-    var cardToReject = improvementsTab.getSuggestionCard(
+    var taskToReject = improvementsTab.getSuggestionTask(
       suggestionDescription2);
-    improvementsTab.clickCardActionButton(cardToReject, 'Review Thread');
+    improvementsTab.clickTaskActionButton(taskToReject, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription2]);
     improvementsTab.rejectSuggestion();
     improvementsTab.closeModal();
+
+    improvementsTab.setShowOnlyOpenTasks(false);
+    var acceptedTask = improvementsTab.getSuggestionTask(
+      suggestionDescription1);
+    var rejectedTask = improvementsTab.getSuggestionTask(
+      suggestionDescription2);
+    expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
+    expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
 
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
