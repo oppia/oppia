@@ -296,7 +296,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'(?!<style>)(style)'),
+        'regexp': re.compile(r'style="[^\"]*"'),
         'message': 'Please do not use inline styling.',
         'excluded_files': (),
         'excluded_dirs': ()
