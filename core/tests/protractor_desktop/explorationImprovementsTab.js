@@ -365,6 +365,14 @@ describe('Suggestions on Explorations', function() {
     improvementsTab.rejectSuggestion();
     improvementsTab.closeModal();
 
+    improvementsTab.setShowOnlyOpenTasks(false);
+    var acceptedTask = improvementsTab.getSuggestionTask(
+      suggestionDescription1);
+    var rejectedTask = improvementsTab.getSuggestionTask(
+      suggestionDescription2);
+    expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
+    expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
+
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
 
