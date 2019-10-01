@@ -105,6 +105,18 @@ class ExplorationModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationModel or its snapshots reference user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
+    @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
         return cls.get_all().count()
@@ -210,6 +222,27 @@ class ExplorationRightsModel(base_models.VersionedModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationRightsModel or its snapshots reference
+        user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return (
+            cls.query(ndb.OR(
+                cls.owner_ids == user_id,
+                cls.editor_ids == user_id,
+                cls.voice_artist_ids == user_id,
+                cls.viewer_ids == user_id
+            )).get() is not None
+            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        )
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration
@@ -324,6 +357,25 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration commit log is deleted only if the corresponding
+        exploration is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationCommitLogEntryModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def get_multi(cls, exp_id, exp_versions):
@@ -481,6 +533,24 @@ class ExpSummaryModel(base_models.BaseModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExpSummaryModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(ndb.OR(
+            cls.owner_ids == user_id,
+            cls.editor_ids == user_id,
+            cls.voice_artist_ids == user_id,
+            cls.viewer_ids == user_id,
+            cls.contributor_ids == user_id
+        )).get() is not None
 
     @classmethod
     def get_non_private(cls):

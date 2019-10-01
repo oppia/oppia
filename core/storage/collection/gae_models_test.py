@@ -48,7 +48,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionModel
             .has_reference_to_user_id('commiter_id'))
         self.assertFalse(
-            collection_models.CollectionRightsModel
+            collection_models.CollectionModel
             .has_reference_to_user_id('x_id'))
 
     def test_get_collection_count(self):

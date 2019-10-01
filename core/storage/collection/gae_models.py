@@ -193,7 +193,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether CollectionRightsModel and its snapshots reference user.
+        """Check whether CollectionRightsModel or its snapshots reference user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -329,7 +329,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether CollectionCommitLogEntryModel reference user.
+        """Check whether CollectionCommitLogEntryModel references user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -475,7 +475,7 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether CollectionSummaryModel reference user.
+        """Check whether CollectionSummaryModel references user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
