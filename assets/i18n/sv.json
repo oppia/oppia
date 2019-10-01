@@ -438,6 +438,7 @@
 	"I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2": "Utforskningar är ämnade att förbättras kontinuerligt och utforskningar som inte har redigerats på länge kan anses vara \"bortglömda\". I detta fall kan ägarskapet i stort sätt överlämnas till Oppia-gemenskapen (vid diskretion av moderatorer) så att utforskningen kan fortsätta att förbättras.",
 	"I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "Deltagandescenario",
 	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Undervisa med Oppia",
+	"I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lektion} other{# lektioner}}",
 	"I18N_TOPIC_VIEWER_PLAY": "Spela upp",
 	"I18N_TOPIC_VIEWER_REVIEW": "Granska",
 	"I18N_TOPIC_VIEWER_TRAIN": "Träna",
