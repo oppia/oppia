@@ -58,7 +58,7 @@
     "core-js": "^2.5.3",
     "css-loader": "^3.1.0",
     "d3": "^5.9.2",
-    "dotenv": "^7.0.0",
+    "dotenv": "^8.1.0",
     "enhanced-resolve": "^4.1.0",
     "eslint": "^6.5.0",
     "eslint-plugin-angular": "^4.0.1",
