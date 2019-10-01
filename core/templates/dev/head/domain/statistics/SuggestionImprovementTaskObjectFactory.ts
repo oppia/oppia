@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating Suggestion Cards in the Improvements Tab.
+ * @fileoverview Factory for creating Suggestion Tasks in the Improvements Tab.
  */
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
@@ -27,13 +27,13 @@ require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
 
-angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
+angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
   '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
-  'ThreadDataService', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
+  'ThreadDataService', 'SUGGESTION_IMPROVEMENT_TASK_TYPE',
   function(
       $q, ImprovementActionButtonObjectFactory, ImprovementModalService,
-      ThreadDataService, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
-    var SuggestionImprovementCard = function(suggestionThread) {
+      ThreadDataService, SUGGESTION_IMPROVEMENT_TASK_TYPE) {
+    var SuggestionImprovementTask = function(suggestionThread) {
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
           'Review Thread', 'btn-primary',
@@ -42,30 +42,30 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
       this._suggestionThread = suggestionThread;
     };
 
-    /** @returns {string} - The actionable status of this card. */
-    SuggestionImprovementCard.prototype.getStatus = function() {
+    /** @returns {string} - The actionable status of this task. */
+    SuggestionImprovementTask.prototype.getStatus = function() {
       return this._suggestionThread.status;
     };
 
     /**
-     * @returns {boolean} - Whether this card is no longer useful, and hence
+     * @returns {boolean} - Whether this task is no longer useful, and hence
      *    should be hidden away.
      */
-    SuggestionImprovementCard.prototype.isObsolete = function() {
+    SuggestionImprovementTask.prototype.isObsolete = function() {
       return false; // Suggestion threads are always actionable.
     };
 
     /** @returns {string} - A simple summary of the suggestion thread. */
-    SuggestionImprovementCard.prototype.getTitle = function() {
+    SuggestionImprovementTask.prototype.getTitle = function() {
       return 'Suggestion for the card "' +
         this._suggestionThread.suggestion.stateName + '"';
     };
 
     /**
-     * @returns {string} - The directive card type used to render details about
-     *    this card's data.
+     * @returns {string} - The directive task type used to render details about
+     *    this task's data.
      */
-    SuggestionImprovementCard.prototype.getDirectiveData = function() {
+    SuggestionImprovementTask.prototype.getDirectiveData = function() {
       return this._suggestionThread;
     };
 
@@ -73,32 +73,32 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
      * @returns {string} - Data required by the associated directive for
      *    rendering.
      */
-    SuggestionImprovementCard.prototype.getDirectiveType = function() {
-      return SUGGESTION_IMPROVEMENT_CARD_TYPE;
+    SuggestionImprovementTask.prototype.getDirectiveType = function() {
+      return SUGGESTION_IMPROVEMENT_TASK_TYPE;
     };
 
     /**
      * @returns {ImprovementActionButton[]} - The array of action buttons
-     *    displayed on the card.
+     *    displayed on the task.
      */
-    SuggestionImprovementCard.prototype.getActionButtons = function() {
+    SuggestionImprovementTask.prototype.getActionButtons = function() {
       return this._actionButtons;
     };
 
     return {
       /**
-       * @returns {SuggestionImprovementCard}
-       * @param {SuggestionThead} thread - The thread this card is referring to.
+       * @returns {SuggestionImprovementTask}
+       * @param {SuggestionThead} thread - The thread this task is referring to.
        */
       createNew: function(thread) {
-        return new SuggestionImprovementCard(thread);
+        return new SuggestionImprovementTask(thread);
       },
 
       /**
-       * @returns {Promise<SuggestionImprovementCard[]>} - The array of
+       * @returns {Promise<SuggestionImprovementTask[]>} - The array of
        *    suggestion threads associated to the current exploration.
        */
-      fetchCards: function() {
+      fetchTasks: function() {
         var createNew = this.createNew;
         return ThreadDataService.fetchThreads().then(function() {
           return $q.all(

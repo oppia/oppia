@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ImprovementCardService.
+ * @fileoverview Unit tests for the ImprovementTaskService.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// ImprovementCardService.ts is upgraded to Angular 8.
+// ImprovementTaskService.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -79,20 +79,20 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/statistics/AnswerDetailsImprovementCardObjectFactory.ts');
-require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
-require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
-require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
-require('services/ImprovementCardService.ts');
+require('domain/statistics/AnswerDetailsImprovementTaskObjectFactory.ts');
+require('domain/statistics/FeedbackImprovementTaskObjectFactory.ts');
+require('domain/statistics/PlaythroughImprovementTaskObjectFactory.ts');
+require('domain/statistics/SuggestionImprovementTaskObjectFactory.ts');
+require('services/ImprovementTaskService.ts');
 
-describe('ImprovementCardService', function() {
+describe('ImprovementTaskService', function() {
   var $q = null;
   var $rootScope = null;
-  var ImprovementCardService = null;
-  var AnswerDetailsImprovementCardObjectFactory = null;
-  var FeedbackImprovementCardObjectFactory = null;
-  var PlaythroughImprovementCardObjectFactory = null;
-  var SuggestionImprovementCardObjectFactory = null;
+  var ImprovementTaskService = null;
+  var AnswerDetailsImprovementTaskObjectFactory = null;
+  var FeedbackImprovementTaskObjectFactory = null;
+  var PlaythroughImprovementTaskObjectFactory = null;
+  var SuggestionImprovementTaskObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -161,35 +161,35 @@ describe('ImprovementCardService', function() {
         new WrittenTranslationObjectFactory()));
   }));
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _ImprovementCardService_,
-      _AnswerDetailsImprovementCardObjectFactory_,
-      _FeedbackImprovementCardObjectFactory_,
-      _PlaythroughImprovementCardObjectFactory_,
-      _SuggestionImprovementCardObjectFactory_) {
+      _$q_, _$rootScope_, _ImprovementTaskService_,
+      _AnswerDetailsImprovementTaskObjectFactory_,
+      _FeedbackImprovementTaskObjectFactory_,
+      _PlaythroughImprovementTaskObjectFactory_,
+      _SuggestionImprovementTaskObjectFactory_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
-    ImprovementCardService = _ImprovementCardService_;
-    AnswerDetailsImprovementCardObjectFactory =
-      _AnswerDetailsImprovementCardObjectFactory_;
-    FeedbackImprovementCardObjectFactory =
-      _FeedbackImprovementCardObjectFactory_;
-    PlaythroughImprovementCardObjectFactory =
-      _PlaythroughImprovementCardObjectFactory_;
-    SuggestionImprovementCardObjectFactory =
-      _SuggestionImprovementCardObjectFactory_;
+    ImprovementTaskService = _ImprovementTaskService_;
+    AnswerDetailsImprovementTaskObjectFactory =
+      _AnswerDetailsImprovementTaskObjectFactory_;
+    FeedbackImprovementTaskObjectFactory =
+      _FeedbackImprovementTaskObjectFactory_;
+    PlaythroughImprovementTaskObjectFactory =
+      _PlaythroughImprovementTaskObjectFactory_;
+    SuggestionImprovementTaskObjectFactory =
+      _SuggestionImprovementTaskObjectFactory_;
 
     this.expectedFactories = [
-      AnswerDetailsImprovementCardObjectFactory,
-      FeedbackImprovementCardObjectFactory,
-      PlaythroughImprovementCardObjectFactory,
-      SuggestionImprovementCardObjectFactory,
+      AnswerDetailsImprovementTaskObjectFactory,
+      FeedbackImprovementTaskObjectFactory,
+      PlaythroughImprovementTaskObjectFactory,
+      SuggestionImprovementTaskObjectFactory,
     ];
   }));
 
-  describe('.getImprovementCardObjectFactoryRegistry', function() {
-    it('contains all known improvement card object factories', function() {
+  describe('.getImprovementTaskObjectFactoryRegistry', function() {
+    it('contains all known improvement task object factories', function() {
       var actualFactories =
-        ImprovementCardService.getImprovementCardObjectFactoryRegistry();
+        ImprovementTaskService.getImprovementTaskObjectFactoryRegistry();
 
       // The registry should not be modifiable.
       expect(Object.isFrozen(actualFactories)).toBe(true);
@@ -202,28 +202,28 @@ describe('ImprovementCardService', function() {
     });
   });
 
-  describe('.fetchCards', function() {
-    // Each individual factory should test their own fetchCards function.
+  describe('.fetchTasks', function() {
+    // Each individual factory should test their own fetchTasks function.
 
-    describe('from factories which all return empty cards', function() {
+    describe('from factories which all return empty tasks', function() {
       beforeEach(function() {
         this.expectedFactories.forEach(function(factory) {
-          spyOn(factory, 'fetchCards').and.callFake(function() {
+          spyOn(factory, 'fetchTasks').and.callFake(function() {
             return $q.resolve([]);
           });
         });
       });
 
       it('returns an empty list', function(done) {
-        var onSuccess = function(cards) {
-          expect(cards).toEqual([]);
+        var onSuccess = function(tasks) {
+          expect(tasks).toEqual([]);
           done();
         };
         var onFailure = function(error) {
           done.fail(error);
         };
 
-        ImprovementCardService.fetchCards().then(onSuccess, onFailure);
+        ImprovementTaskService.fetchTasks().then(onSuccess, onFailure);
 
         // $q Promises need to be forcibly resolved through a JavaScript digest,
         // which is what $apply helps kick-start.
