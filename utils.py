@@ -272,7 +272,12 @@ def convert_png_binary_to_data_url(content):
 
 
 def convert_png_to_data_url(filepath):
-    """Converts the png file at filepath to a data URL."""
+    """Converts the png file at filepath to a data URL.
+        Arg:
+            filepath: str type (path of the file)
+        Return:
+            png file at filepath converted to data URL (Updating "file_contents" variable than passing in function.) 
+    """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
     return convert_png_binary_to_data_url(file_contents)
 
@@ -405,13 +410,20 @@ def get_time_in_millisecs(datetime_obj):
 
 
 def get_current_time_in_millisecs():
-    """Returns time in milliseconds since the Epoch."""
+    """Returns time in milliseconds since the Epoch.
+    Return:
+       Returning time in milliseconds by passing "datetime.datetime.utcnow()" this in function.
+    """
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
 def get_human_readable_time_string(time_msec):
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.
+    Arg:
+        time_msec: double (passing time in milliseconds)
+    Return:
+        Time in human redable format(str)
     """
     return time.strftime(
         '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
@@ -420,6 +432,11 @@ def get_human_readable_time_string(time_msec):
 def are_datetimes_close(later_datetime, earlier_datetime):
     """Given two datetimes, determines whether they are separated by less than
     feconf.PROXIMAL_TIMEDELTA_SECS seconds.
+    Arg:
+        later_datetime: function (later date and time)
+        earlier_datetime: function(earlier date and time)
+    Return:
+        checking if they are less than this "feconf.PROXIMAL_TIMEDELTA_SECS seconds" or not.
     """
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
     return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
@@ -447,7 +464,13 @@ def generate_new_session_id():
 
 
 def vfs_construct_path(base_path, *path_components):
-    """Mimics behavior of os.path.join on Posix machines."""
+    """Mimics behavior of os.path.join on Posix machines.
+    Arg:
+        base_path: str
+        path_components: str
+    Return:
+        Returns the valur of path after loop.
+    """
     path = base_path
     for component in path_components:
         if component.startswith('/'):
@@ -460,7 +483,13 @@ def vfs_construct_path(base_path, *path_components):
 
 
 def vfs_normpath(path):
-    """Normalize path from posixpath.py, eliminating double slashes, etc."""
+    """Normalize path from posixpath.py, eliminating double slashes, etc.
+    Arg:
+        path: str(Passing the path)
+    
+    Return:
+        Returning normlized path(str).
+    """
     # Preserve unicode (if path is unicode).
     slash, dot = (u'/', u'.') if isinstance(path, python_utils.UNICODE) else (
         '/', '.')
@@ -604,13 +633,20 @@ def is_valid_language_code(language_code):
 
 
 def unescape_encoded_uri_component(escaped_string):
-    """Unescape a string that is encoded with encodeURIComponent."""
+    """Unescape a string that is encoded with encodeURIComponent.
+    Arg:
+        escaped_string: str(Passing an escaped string.)
+    Return:
+        Returning an unescaped string which is encoded by encodeURIComponent.
+    """
     return python_utils.urllib_unquote(escaped_string).decode('utf-8')
 
 
 def get_asset_dir_prefix():
     """Returns prefix for asset directory depending whether dev or prod.
     It is used as a prefix in urls for images, css and script files.
+    Return:
+        Returning prefix.
     """
     asset_dir_prefix = ''
     if not constants.DEV_MODE:
