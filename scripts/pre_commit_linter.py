@@ -867,8 +867,8 @@ def _is_path_ignored(path_to_check):
     command = ['git', 'check-ignore', '-q', path_to_check]
 
     # The "git check-ignore <path>" command returns 0 when the path is ignored
-    # otherwise it returns 1. subprocess.check_call then returns this returncode.
-    if subprocess.check_call(command):
+    # otherwise it returns 1. subprocess.call then returns this returncode.
+    if subprocess.call(command):
         return False
     else:
         return True

@@ -82,8 +82,8 @@ def open_new_tab_in_browser_if_possible(url):
     """Opens the given URL in a new browser tab, if possible."""
     browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
-        if subprocess.check_call(['which', cmd]) == 0:
-            subprocess.check_call([cmd, url])
+        if subprocess.call(['which', cmd]) == 0:
+            subprocess.call([cmd, url])
             return
     python_utils.PRINT(
         '******************************************************************')
