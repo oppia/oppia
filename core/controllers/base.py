@@ -448,24 +448,24 @@ class BaseHandler(webapp2.RequestHandler):
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
             self._render_exception(401, {'error': python_utils.convert_to_bytes(
-                exception)})
+                exception.args[0])})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
             self._render_exception(400, {'error': python_utils.convert_to_bytes(
-                exception)})
+                exception.args[0])})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
             self._render_exception(500, {'error': python_utils.convert_to_bytes(
-                exception)})
+                exception.args[0])})
             return
 
         self.error(500)
         self._render_exception(
-            500, {'error': python_utils.convert_to_bytes(exception)})
+            500, {'error': python_utils.convert_to_bytes(exception.args[0])})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
