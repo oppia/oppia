@@ -155,7 +155,7 @@ def _execute_branch_cut():
 
     # Update the local repo.
     remote_alias = common.get_remote_alias('git@github.com:oppia/oppia.git')
-    subprocess.call(['git', 'pull', remote_alias])
+    subprocess.check_call(['git', 'pull', remote_alias])
 
     _verify_target_branch_does_not_already_exist(remote_alias)
     _verify_target_version_is_consistent_with_latest_released_version()
@@ -178,11 +178,11 @@ def _execute_branch_cut():
 
     # Cut a new release branch.
     python_utils.PRINT('Cutting a new release branch: %s' % NEW_BRANCH_NAME)
-    subprocess.call(['git', 'checkout', '-b', NEW_BRANCH_NAME])
+    subprocess.check_call(['git', 'checkout', '-b', NEW_BRANCH_NAME])
 
     # Push the new release branch to GitHub.
     python_utils.PRINT('Pushing new release branch to GitHub.')
-    subprocess.call(['git', 'push', remote_alias, NEW_BRANCH_NAME])
+    subprocess.check_call(['git', 'push', remote_alias, NEW_BRANCH_NAME])
 
     python_utils.PRINT('')
     python_utils.PRINT(
