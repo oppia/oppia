@@ -336,7 +336,7 @@ class AdminHandler(base.BaseHandler):
         skill = skill_domain.Skill.create_default_skill(
             skill_id, skill_description, rubrics)
         skill.update_explanation(
-            state_domain.SubtitledHtml('1', explanation).to_dict())
+            state_domain.SubtitledHtml('1', explanation))
         return skill
 
     def _load_dummy_new_structures_data(self):

@@ -24,6 +24,7 @@ from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import user_services
 from core.platform import models
+from core.domain import state_domain
 import feconf
 import python_utils
 
@@ -476,7 +477,7 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
-                    skill.update_explanation(change.new_value)
+                    skill.update_explanation(state_domain.SubtitledHtml.from_dict(change.new_value))
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     skill.update_worked_examples(change.new_value)
