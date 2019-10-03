@@ -44,11 +44,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         question_state_data = self._create_valid_question_data('ABC')
         linked_skill_ids = ['skill_id1', 'skill_id2']
         self.save_new_question(
-            'question_id1',
-            'owner_id',
-            question_state_data,
-            linked_skill_ids
-        )
+            'question_id1', 'owner_id', question_state_data, linked_skill_ids)
         self.assertTrue(
             question_models.QuestionModel
             .has_reference_to_user_id('owner_id'))
@@ -581,7 +577,7 @@ class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
             .has_reference_to_user_id('creator_id'))
         self.assertTrue(
             question_models.QuestionRightsModel
-                .has_reference_to_user_id('commiter_id'))
+            .has_reference_to_user_id('commiter_id'))
         self.assertFalse(
             question_models.QuestionRightsModel
             .has_reference_to_user_id('x_id'))
