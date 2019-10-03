@@ -366,18 +366,6 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether ExplorationCommitLogEntryModel references user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.query(cls.user_id == user_id).get() is not None
-
-    @classmethod
     def get_multi(cls, exp_id, exp_versions):
         """Gets the ExplorationCommitLogEntryModels for the given exploration
         id and exploration versions.

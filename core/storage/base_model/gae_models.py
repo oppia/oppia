@@ -337,6 +337,18 @@ class BaseCommitLogEntryModel(BaseModel):
     version = ndb.IntegerProperty()
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CollectionCommitLogEntryModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
+
+    @classmethod
     def create(
             cls, entity_id, version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds, status,
