@@ -16,20 +16,21 @@
  * @fileoverview Unit tests for Item Selection rules.
  */
 
-require(
-  'interactions/ItemSelectionInput/directives/' +
-  'item-selection-input-rules.service.ts');
+/* eslint-disable max-len */
+import { ItemSelectionInputRulesService } from
+  'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+/* eslint-enable max-len */
 
-describe('Item Selection rules service', function() {
+describe('Item Selection rules service', () => {
   beforeEach(angular.mock.module('oppia'));
 
-  var isirs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    isirs = $injector.get('ItemSelectionInputRulesService');
-  }));
+  let isirs: ItemSelectionInputRulesService = null;
+  beforeEach(() => {
+    isirs = new ItemSelectionInputRulesService();
+  });
 
-  it('should have a correct \'equals\' rule', function() {
-    var RULE_INPUT = {
+  it('should have a correct \'equals\' rule', () => {
+    var RULE_INPUT: {x: string[]} = {
       x: ['ab', 'c', 'e']
     };
     expect(isirs.Equals(['ab', 'c', 'e'], RULE_INPUT)).toBe(true);
@@ -41,8 +42,8 @@ describe('Item Selection rules service', function() {
     expect(isirs.Equals(['ab', '10'], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'contains at least one of\' rule', function() {
-    var RULE_INPUT = {
+  it('should have a correct \'contains at least one of\' rule', () => {
+    var RULE_INPUT: {x: string[]} = {
       x: ['a']
     };
     expect(isirs.ContainsAtLeastOneOf(['a', 'b'], RULE_INPUT)).toBe(true);
@@ -60,36 +61,33 @@ describe('Item Selection rules service', function() {
     expect(isirs.ContainsAtLeastOneOf(['10'], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'does not contain at least one of\' rule',
-    function() {
-      var RULE_INPUT = {
-        x: ['a', 'b', 'c']
-      };
-      expect(isirs.DoesNotContainAtLeastOneOf(['d'], RULE_INPUT)).toBe(true);
-      expect(isirs.DoesNotContainAtLeastOneOf([], RULE_INPUT)).toBe(true);
-      expect(
-        isirs.DoesNotContainAtLeastOneOf(['a', 'b'], RULE_INPUT)).toBe(true);
-      expect(isirs.DoesNotContainAtLeastOneOf(['a'], RULE_INPUT)).toBe(true);
-      expect(isirs.DoesNotContainAtLeastOneOf(
-        ['a', 'b', 'c'], RULE_INPUT)).toBe(false);
-      expect(isirs.DoesNotContainAtLeastOneOf(
-        ['a', 'b', 'c', 'd'], RULE_INPUT)).toBe(false);
-    }
-  );
-  it('should have a correct \'is a proper subset of\' rule',
-    function() {
-      var RULE_INPUT = {
-        x: ['a', 'b', 'c']
-      };
-      expect(isirs.IsProperSubsetOf([], RULE_INPUT)).toBe(true);
-      expect(isirs.IsProperSubsetOf(['a'], RULE_INPUT)).toBe(true);
-      expect(isirs.IsProperSubsetOf(['a', 'b'], RULE_INPUT)).toBe(true);
-      expect(isirs.IsProperSubsetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(false);
-      expect(isirs.IsProperSubsetOf(['d', 'e'], RULE_INPUT)).toBe(false);
-      expect(isirs.IsProperSubsetOf(
-        ['a', 'b', 'c', 'd'], RULE_INPUT)).toBe(false);
-      expect(isirs.IsProperSubsetOf(
-        ['b', 'c', 'd', 'e'], RULE_INPUT)).toBe(false);
-    }
-  );
+  it('should have a correct \'does not contain at least one of\' rule', () => {
+    var RULE_INPUT: {x: string[]} = {
+      x: ['a', 'b', 'c']
+    };
+    expect(isirs.DoesNotContainAtLeastOneOf(['d'], RULE_INPUT)).toBe(true);
+    expect(isirs.DoesNotContainAtLeastOneOf([], RULE_INPUT)).toBe(true);
+    expect(
+      isirs.DoesNotContainAtLeastOneOf(['a', 'b'], RULE_INPUT)).toBe(true);
+    expect(isirs.DoesNotContainAtLeastOneOf(['a'], RULE_INPUT)).toBe(true);
+    expect(isirs.DoesNotContainAtLeastOneOf(
+      ['a', 'b', 'c'], RULE_INPUT)).toBe(false);
+    expect(isirs.DoesNotContainAtLeastOneOf(
+      ['a', 'b', 'c', 'd'], RULE_INPUT)).toBe(false);
+  });
+
+  it('should have a correct \'is a proper subset of\' rule', () => {
+    var RULE_INPUT: {x: string[]} = {
+      x: ['a', 'b', 'c']
+    };
+    expect(isirs.IsProperSubsetOf([], RULE_INPUT)).toBe(true);
+    expect(isirs.IsProperSubsetOf(['a'], RULE_INPUT)).toBe(true);
+    expect(isirs.IsProperSubsetOf(['a', 'b'], RULE_INPUT)).toBe(true);
+    expect(isirs.IsProperSubsetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(false);
+    expect(isirs.IsProperSubsetOf(['d', 'e'], RULE_INPUT)).toBe(false);
+    expect(isirs.IsProperSubsetOf(
+      ['a', 'b', 'c', 'd'], RULE_INPUT)).toBe(false);
+    expect(isirs.IsProperSubsetOf(
+      ['b', 'c', 'd', 'e'], RULE_INPUT)).toBe(false);
+  });
 });

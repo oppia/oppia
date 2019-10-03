@@ -430,7 +430,7 @@ class ExplorationContentValidationJobForCKEditor(
             yield (key, output_values)
         else:
             output_values.append(key[exp_id_index:])
-            yield(key[:exp_id_index - 1], output_values)
+            yield (key[:exp_id_index - 1], output_values)
 
 
 class InteractionCustomizationArgsValidationJob(
@@ -475,7 +475,7 @@ class InteractionCustomizationArgsValidationJob(
             yield (key, output_values)
         else:
             output_values.append(key[exp_id_index:])
-            yield(key[:exp_id_index - 1], output_values)
+            yield (key[:exp_id_index - 1], output_values)
 
 
 class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -523,14 +523,3 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
-
-
-class DeleteStateIdMappingModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for wiping out state ID mapping models."""
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.StateIdMappingModel]
-
-    @staticmethod
-    def map(item):
-        item.delete()

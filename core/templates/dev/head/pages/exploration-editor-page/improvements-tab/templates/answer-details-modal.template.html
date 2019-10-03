@@ -1,6 +1,11 @@
 <div>
   <div class="modal-header d-flex text-center oppia-issues-issue-dir">
-    <h3 class="modal-title">Answer details for <[learnerAnswerDetails.getStateName()]></h3>
+    <h3 class="modal-title">
+      Answer details for
+      <span class="protractor-test-improvements-task-state-name">
+        <[learnerAnswerDetails.getStateName()]>
+      </span>
+    </h3>
   </div>
   <div class="modal-body" style="margin-left:0.5rem; margin-right: 0.5rem;">
     <table class="table table-hover">
@@ -12,13 +17,15 @@
       </tr>
       <tr ng-repeat="learnerAnswerInfo in getLearnerAnswerInfos()" class="oppia-feedback-tab-row">
         <th scope="row">
-          <input type="checkbox" ng-change="selectLearnerAnswerInfo(learnerAnswerInfo)" ng-model="myVal">
+          <input type="checkbox" ng-change="selectLearnerAnswerInfo(learnerAnswerInfo)"
+                 ng-model="myVal">
         </th>
         <td ng-click="changeView(learnerAnswerInfo)">
           <angular-html-bind html-data="getLearnerAnswerHtml(learnerAnswerInfo)">
           </angular-html-bind>
         </td>
-        <td ng-click="changeView(learnerAnswerInfo)" class="protractor-test-answer-details">
+        <td ng-click="changeView(learnerAnswerInfo)"
+            class="protractor-test-improvements-answer-details">
           <div><[getAnswerDetails(learnerAnswerInfo) | truncate:20]></div>
         </td>
         <td ng-click="changeView(learnerAnswerInfo)">
@@ -26,7 +33,8 @@
         </td>
       </tr>
     </table>
-    <div class="row" style="margin-left: 0.5rem; margin-left: 0.5rem" ng-if="currentLearnerAnswerInfo">
+    <div ng-if="currentLearnerAnswerInfo"
+         class="row" style="margin-left: 0.5rem; margin-left: 0.5rem">
       <b>Answer:</b>
       <angular-html-bind html-data="getLearnerAnswerHtml(currentLearnerAnswerInfo)">
       </angular-html-bind>
@@ -36,8 +44,15 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-danger modal-button oppia-delete-select" ng-disabled="!selectedLearnerAnswerInfo.length" ng-click="deleteSelectedLearnerAnswerInfo()">Delete selected items</button>
-    <button class="btn btn-default modal-button protractor-test-close-answer-details" ng-click="close()">Close</button>
+    <button ng-disabled="!selectedLearnerAnswerInfo.length"
+            ng-click="deleteSelectedLearnerAnswerInfo()"
+            class="btn btn-danger modal-button oppia-delete-select">
+      Delete selected items
+    </button>
+    <button ng-click="close()"
+            class="btn btn-default modal-button protractor-test-improvements-close-modal-button">
+      Close
+    </button>
   </div>
 </div>
 <style>

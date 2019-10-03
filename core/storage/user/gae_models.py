@@ -33,6 +33,10 @@ class UserSettingsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+    # User id used to identify user by GAE. Is not required for now because we
+    # need to perform migration to fill this for existing users.
+    # TODO(#7659): Set required to True.
+    gae_user_id = ndb.StringProperty(required=False, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
     # User role. Required for authorization. User gets a default role of
@@ -103,6 +107,18 @@ class UserSettingsModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserSettingsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -198,6 +214,18 @@ class CompletedActivitiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CompletedActivitiesModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
     @staticmethod
     def export_data(user_id):
         """(Takeout) Export CompletedActivitiesModel's user properties.
@@ -239,6 +267,18 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether IncompleteActivitiesModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -287,6 +327,18 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         contains information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExpUserLastPlaythroughModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -380,6 +432,18 @@ class LearnerPlaylistModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether LearnerPlaylistModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
     @staticmethod
     def export_data(user_id):
         """(Takeout) Export user-relevant properties of LearnerPlaylistModel.
@@ -425,6 +489,18 @@ class UserContributionsModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserContributionsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -476,6 +552,18 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserEmailPreferencesModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
@@ -503,6 +591,18 @@ class UserSubscriptionsModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserSubscriptionsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -532,7 +632,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
 
 class UserSubscribersModel(base_models.BaseModel):
-    """The list of subscribers of the user."""
+    """The list of subscribers of the user.
+
+    Instances of this class are keyed by the user id.
+    """
 
     # IDs of the learners who have subscribed to this user.
     subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
@@ -543,6 +646,18 @@ class UserSubscribersModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserSubscribersModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
@@ -563,6 +678,18 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserRecentChangesBatchModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -621,6 +748,18 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserStatsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
     @classmethod
     def get_or_create(cls, user_id):
@@ -719,6 +858,18 @@ class ExplorationUserDataModel(base_models.BaseModel):
         ratings.
         """
         return base_models.DELETION_POLICY.ANONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationUserDataModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -849,6 +1000,18 @@ class CollectionProgressModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CollectionProgressModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
@@ -986,6 +1149,18 @@ class StoryProgressModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether StoryProgressModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -1151,6 +1326,18 @@ class UserQueryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserQueryModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.query(cls.submitter_id == user_id).get() is not None
+
+    @classmethod
     def fetch_page(cls, page_size, cursor):
         """Fetches a list of all query_models sorted by creation date.
 
@@ -1196,6 +1383,18 @@ class UserBulkEmailsModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserBulkEmailsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
 
 class UserSkillMasteryModel(base_models.BaseModel):
     """Model for storing a user's degree of mastery of a skill in Oppia.
@@ -1218,6 +1417,18 @@ class UserSkillMasteryModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserSkillMasteryModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):
@@ -1277,6 +1488,18 @@ class UserContributionScoringModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserContributionScoringModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):

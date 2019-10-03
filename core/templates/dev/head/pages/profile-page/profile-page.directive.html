@@ -12,9 +12,12 @@
               </div>
             </div>
           </a>
-          <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-profile-picture-fullsize" alt="">
+          <img ng-src="<[$ctrl.profilePictureDataUrl]>"
+               class="oppia-profile-picture-fullsize protractor-test-profile-current-user-photo"
+               alt="">
           <img ng-if="!$ctrl.profileIsOfCurrentUser" ng-src="<[$ctrl.profilePictureDataUrl]>"
-               class="oppia-profile-picture-fullsize" alt="">
+               class="oppia-profile-picture-fullsize protractor-test-profile-other-user-photo"
+               alt="">
         </div>
       </div>
 
@@ -45,7 +48,7 @@
       </div>
     </div>
 
-    <p class="oppia-profile-user-bio">
+    <p class="oppia-profile-user-bio protractor-test-profile-bio">
       <span ng-if="$ctrl.userBio" style="white-space: pre-wrap;"><[$ctrl.userBio]></span>
       <span ng-if="!$ctrl.userBio">
         <em>This user has not supplied a bio yet.</em>
@@ -56,10 +59,12 @@
       Interests:
       <span ng-if="$ctrl.subjectInterests.length > 0"><br>
         <span ng-repeat="interest in $ctrl.subjectInterests track by $index">
-          <span class="oppia-profile-subject-interest"><[interest]></span>
+          <span class="oppia-profile-subject-interest protractor-test-profile-interest"
+          ><[interest]></span>
         </span>
       </span>
-      <span ng-if="$ctrl.subjectInterests.length === 0" class="oppia-profile-no-interests-text">
+      <span ng-if="$ctrl.subjectInterests.length === 0"
+            class="oppia-profile-no-interests-text protractor-test-profile-no-interest">
         <em>none specified</em>
       </span>
     </p>
@@ -112,15 +117,26 @@
     <span class="oppia-profile-portfolio-pages" ng-if="$ctrl.numUserPortfolioExplorations > 6">
       <i class="material-icons md-18 oppia-navigation-button"
          ng-disabled="$ctrl.startingExplorationNumber === 1"
-         ng-click="$ctrl.goToPreviousPage()">
+         ng-click="$ctrl.goToPreviousPage()"
+         ng-class="{'oppia-navigation-mouse-pointer': $ctrl.startingExplorationNumber !== 1}">
         &#xE5C4;
       </i>
       Showing <[$ctrl.startingExplorationNumber]> - <[$ctrl.endingExplorationNumber]> of <[$ctrl.numUserPortfolioExplorations]>
       <i class="material-icons md-18 oppia-navigation-button"
          ng-disabled="$ctrl.endingExplorationNumber >= $ctrl.numUserPortfolioExplorations"
-         ng-click="$ctrl.goToNextPage()">
+         ng-click="$ctrl.goToNextPage()"
+         ng-class="{'oppia-navigation-mouse-pointer': $ctrl.endingExplorationNumber < $ctrl.numUserPortfolioExplorations}">
         &#xE5C8;
       </i>
     </span>
   </md-card>
 </div>
+
+<style>
+  .oppia-profile-portfolio-pages .oppia-navigation-mouse-pointer:hover {
+    background-color: #808080;
+    border-radius: 50%;
+    color: #FFFFFF;
+    cursor: pointer;
+  }
+</style>

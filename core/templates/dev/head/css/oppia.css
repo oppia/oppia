@@ -562,8 +562,14 @@ p:last-child {
 .label, .badge {
   margin: auto 4px;
 }
+.label-default, .badge-default {
+  background-color: #888;
+}
 .label-info, .badge-info {
   background-color: #18447E;
+}
+.label-success, .badge-success {
+  background-color: #009688;
 }
 
 /*
@@ -1081,6 +1087,10 @@ textarea {
   margin: 10px;
   padding: 10px;
   width: 100%;
+}
+
+#oppia-main-content:focus {
+  outline: 0;
 }
 
 .oppia-align-center {
@@ -2449,6 +2459,7 @@ oppia-parameter {
   -o-transition: -o-transform .3s ease-out;
   transition: transform .3s ease-out;
 }
+
 @media(min-width: 768px) {
   .modal-dialog {
     width: 600px;
@@ -2462,6 +2473,13 @@ oppia-parameter {
     width: 300px
   }
 }
+
+@media(min-width: 1024px) {
+  .modal-lg {
+    width: 900px;
+  }
+}
+
 .oppia-large-modal-window .modal-body {
   height: 60vh;
 }
@@ -2968,45 +2986,47 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
-.oppia-improvement-card {
-  margin-left: auto;
-  margin-right: auto;
+.oppia-improvement-task {
+  background-color: #fff;
   margin-bottom: 30px;
-  max-width: 800px;
-  padding: 32px 32px 24px 32px;
-}
-
-.oppia-improvement-closed-card {
   margin-left: auto;
   margin-right: auto;
-  margin-top: 0;
   max-width: 800px;
   padding: 32px 32px 24px 32px;
 }
 
-.oppia-improvement-card-header {
+.oppia-improvement-closed-task {
+  background-color: #dadada;
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 800px;
+  padding: 32px 32px 24px 32px;
+}
+
+.oppia-improvement-task-header {
   padding: 0 0 24px 0;
   display: flex;
 }
 
-.oppia-improvement-closed-card-header {
+.oppia-improvement-closed-task-header {
   padding: 0;
   display: flex;
 }
 
-.oppia-improvement-card-header-title {
+.oppia-improvement-task-header-title {
   flex-grow: 1;
   padding: 0;
   padding-right: 32px;
   margin: 0;
 }
 
-.oppia-improvement-card-header-status-pill {
+.oppia-improvement-task-header-status-pill {
   flex-grow: 0;
   text-align: right;
 }
 
-.oppia-improvement-card-footer {
+.oppia-improvement-task-footer {
   padding: 24px 0 0 0;
   text-align: right;
 }

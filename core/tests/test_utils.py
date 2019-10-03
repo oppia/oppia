@@ -54,6 +54,7 @@ import utils
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
+import jinja2
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -78,6 +79,71 @@ def empty_environ():
     os.environ['USER_IS_ADMIN'] = '0'
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
+
+
+def get_filepath_from_filename(filename, rootdir):
+    """Returns filepath using the filename. Different files are present
+    in different subdirectories in the rootdir. So, we walk through the
+    rootdir and match the all the filenames with the given filename.
+    When a match is found the function returns the complete path of the
+    filename by using os.path.join(root, filename).
+
+    For example signup-page.mainpage.html is present in
+    core/templates/dev/head/pages/signup-page and error-page.mainpage.html is
+    present in core/templates/dev/head/pages/error-pages. So we walk through
+    core/templates/dev/head/pages and a match for signup-page.directive.html
+    is found in signup-page subdirectory and a match for
+    error-page.directive.html is found in error-pages subdirectory.
+
+    Args:
+        filename: str. The name of the file.
+        rootdir: str. The directory to search the file in.
+
+    Returns:
+        str | None. The path of the file if file is found otherwise
+            None.
+    """
+    # This is required since error files are served according to error status
+    # code. The file served is error-page.mainpage.html but it is compiled
+    # and stored as error-page-{status_code}.mainpage.html.
+    # So, we need to swap the name here to obtain the correct filepath.
+    if filename.startswith('error-page'):
+        filename = 'error-page.mainpage.html'
+
+    filepath = None
+    for root, _, filenames in os.walk(rootdir):
+        for name in filenames:
+            if name == filename:
+                if filepath is None:
+                    filepath = os.path.join(root, filename)
+                else:
+                    raise Exception(
+                        'Multiple files found with name: %s' % filename)
+    return filepath
+
+
+def mock_get_template(unused_self, filename):
+    """Mock for get_template function of jinja2 Environment. This mock is
+    required for backend tests since we do not have webpack compilation
+    before backend tests. The folder to search templates is webpack_bundles
+    which is generated after webpack compilation. Since this folder will be
+    missing, get_template function will return a TemplateNotFound error. So,
+    we use a mock for get_template which returns the html file from the source
+    directory instead.
+
+    Args:
+        unused_self: jinja2.environment.Environment. The Environment instance.
+        filename: str. The name of the file for which template is
+            to be returned.
+
+    Returns:
+        jinja2.environment.Template. The template for the given file.
+    """
+    filepath = get_filepath_from_filename(
+        filename, os.path.join('core', 'templates', 'dev', 'head', 'pages'))
+    with python_utils.open_file(filepath, 'r') as f:
+        file_content = f.read()
+    return jinja2.environment.Template(file_content)
 
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
@@ -546,9 +612,15 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
 
-        response = self.testapp.get(
-            url, params, expect_errors=expect_errors,
-            status=expected_status_int)
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles
+        # is only produced after webpack compilation which is not performed
+        # during backend tests.
+        with self.swap(
+            jinja2.environment.Environment, 'get_template', mock_get_template):
+            response = self.testapp.get(
+                url, params, expect_errors=expect_errors,
+                status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -630,7 +702,13 @@ tags: []
                 isinstance(params, dict),
                 msg='Expected params to be a dict, received %s' % params)
 
-        response = self.testapp.get(url, params, expect_errors=True)
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles
+        # is only produced after webpack compilation which is not performed
+        # during backend tests.
+        with self.swap(
+            jinja2.environment.Environment, 'get_template', mock_get_template):
+            response = self.testapp.get(url, params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)
 
@@ -658,6 +736,7 @@ tags: []
         expect_errors = False
         if expected_status_int >= 400:
             expect_errors = True
+
         json_response = self.testapp.get(
             url, params, expect_errors=expect_errors,
             status=expected_status_int)

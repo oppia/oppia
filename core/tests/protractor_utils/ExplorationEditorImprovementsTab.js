@@ -25,46 +25,164 @@ var ruleTemplates = require(
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorImprovementsTab = function() {
-  var answerDetailsCardStateName = element(
-    by.css('.protractor-test-answer-details-state'));
-  var answerInfoCount = element(
-    by.css('.protractor-test-answer-info-count'));
-  var reviewAnswerDetailsButton = element(
-    by.css('.protractor-test-review-answer-details'));
-  var answerDetails = element(by.css('.protractor-test-answer-details'));
-  var closeAnswerDetailsButton = element(
-    by.css('.protractor-test-close-answer-details'));
+  var allTasks = $$('.protractor-test-improvements-task');
+  var allThreadMessages =
+    $$('.protractor-test-improvements-thread-message-body');
 
-  var _getAnswerDetailsCardStateName = function() {
-    return answerDetailsCardStateName.getText();
+  var onlyOpenInput = $('.protractor-test-improvements-only-open-input');
+  var closeModalButton = $('.protractor-test-improvements-close-modal-button');
+
+  var answerDetails = $('.protractor-test-improvements-answer-details');
+  var answerInfoCount = $('.protractor-test-improvements-answer-info-count');
+
+  var responseTextarea = $('.protractor-test-improvements-response-textarea');
+  var responseStatusSelect =
+    $('.protractor-test-improvements-response-status-select');
+  var responseSendButton =
+    $('.protractor-test-improvements-response-send-button');
+  var reviewSuggestionButton =
+    $('.protractor-test-improvements-review-suggestion-button');
+
+  var acceptSuggestionButton =
+    $('.protractor-test-exploration-accept-suggestion-btn');
+  var rejectSuggestionButton =
+    $('.protractor-test-exploration-reject-suggestion-btn');
+  var suggestionReviewMessageInput =
+    $('.protractor-test-suggestion-review-message');
+  var suggestionCommitMessageInput =
+    $('.protractor-test-suggestion-commit-message');
+
+  var actionButtonLocator =
+    by.css('.protractor-test-improvements-action-button');
+  var taskBodyLocator = by.css('.protractor-test-improvements-task-body');
+  var taskStatusLocator = by.css('.protractor-test-improvements-task-status');
+  var stateNameLocator =
+    by.css('.protractor-test-improvements-task-state-name');
+
+  var _buildTaskStateNameMatcher = function(expectedStateName) {
+    return function(task) {
+      return task.element(stateNameLocator).getText()
+        .then(stateName => stateName === expectedStateName);
+    };
   };
 
-  var _getAnswerInfoCount = function() {
-    return answerInfoCount.getText();
+  var _buildTaskTypeMatcher = function(expectedTaskType) {
+    return function(task) {
+      return task.getAttribute('class')
+        .then(cssClass => cssClass.includes(expectedTaskType));
+    };
   };
 
-  var _getAnswerDetails = function() {
-    return answerDetails.getText();
+  var _buildTaskHasContentMatcher = function(expectedContent) {
+    return function(task) {
+      return task.element(taskBodyLocator).getText()
+        .then(body => body.includes(expectedContent));
+    };
   };
 
-  this.navigateReviewAnswerDetails = function() {
+  /**
+   * Combines a collection of matchers into a single one which requires all of
+   * them to pass.
+   *
+   * @param {Iterable.<(ElementFinder) => Promise.<boolean>>} matchers
+   * @returns {(ElementFinder) => Promise.<boolean>}
+   */
+  var _reduceTaskMatchers = function(matchers) {
+    return function(task) {
+      return Promise.all(matchers.map(isMatch => isMatch(task)))
+        .then(matchResults => matchResults.every(m => m));
+    };
+  };
+
+  this.getAnswerDetailsTask = function(stateName) {
+    var answerDetailsTaskMatcher = _reduceTaskMatchers([
+      _buildTaskTypeMatcher('answer-details'),
+      _buildTaskStateNameMatcher(stateName),
+    ]);
+    return allTasks.filter(answerDetailsTaskMatcher).first();
+  };
+
+  this.getFeedbackTask = function(latestMessage) {
+    var feedbackTaskMatcher = _reduceTaskMatchers([
+      _buildTaskTypeMatcher('feedback'),
+      _buildTaskHasContentMatcher(latestMessage),
+    ]);
+    return allTasks.filter(feedbackTaskMatcher).first();
+  };
+
+  this.getSuggestionTask = function(description) {
+    var suggestionTaskMatcher = _reduceTaskMatchers([
+      _buildTaskTypeMatcher('suggestion'),
+      _buildTaskHasContentMatcher(description),
+    ]);
+    return allTasks.filter(suggestionTaskMatcher).first();
+  };
+
+  this.getTaskStatus = function(task) {
+    return task.element(taskStatusLocator).getText();
+  };
+
+  this.clickTaskActionButton = function(task, buttonText) {
+    var buttonElement = task.element(by.buttonText(buttonText));
     waitFor.elementToBeClickable(
-      reviewAnswerDetailsButton,
-      'Answer details button takes too long to be clickable');
-    reviewAnswerDetailsButton.click();
+      buttonElement, 'Action button takes too long to become clickable');
+    buttonElement.click();
   };
 
-  this.checkAnswerDetailsCard = function(stateName, count) {
-    expect(_getAnswerDetailsCardStateName()).toMatch(stateName);
-    expect(_getAnswerInfoCount()).toMatch(count);
+  this.verifyAnswerDetails = function(expectedDetails, expectedInfoCount) {
+    expect(answerDetails.getText()).toMatch(expectedDetails);
+    expect(answerInfoCount.getText()).toMatch(String(expectedInfoCount));
   };
 
-  this.verifyAnswerDetails = function(answerDetails) {
-    expect(_getAnswerDetails()).toMatch(answerDetails);
+  this.getThreadMessages = function() {
+    return allThreadMessages.map(message => message.getText());
+  };
+
+  this.sendResponseAndCloseModal = function(feedbackResponse, feedbackStatus) {
+    responseTextarea.sendKeys(feedbackResponse);
+    if (feedbackStatus) {
+      responseStatusSelect.click();
+      $('option[label="' + feedbackStatus + '"]').click();
+    }
+    responseSendButton.click();
+  };
+
+  this.acceptSuggestion = function() {
     waitFor.elementToBeClickable(
-      closeAnswerDetailsButton,
-      'Answer details close button takes too long to be clickable');
-    closeAnswerDetailsButton.click();
+      reviewSuggestionButton,
+      'View Suggestion button takes too long to become clickable');
+    reviewSuggestionButton.click();
+
+    suggestionCommitMessageInput.sendKeys('Commit message');
+    waitFor.elementToBeClickable(
+      acceptSuggestionButton,
+      'Accept Suggestion button takes too long to become clickable');
+    acceptSuggestionButton.click();
+  };
+
+  this.rejectSuggestion = function() {
+    waitFor.elementToBeClickable(
+      reviewSuggestionButton,
+      'View Suggestion button takes too long to become clickable');
+    reviewSuggestionButton.click();
+
+    suggestionReviewMessageInput.sendKeys('Commit message');
+    waitFor.elementToBeClickable(
+      rejectSuggestionButton,
+      'Accept Suggestion button takes too long to become clickable');
+    rejectSuggestionButton.click();
+  };
+
+  this.setShowOnlyOpenTasks = function(choice = true) {
+    if (choice !== onlyOpenInput.isSelected()) {
+      onlyOpenInput.click();
+    }
+  };
+
+  this.closeModal = function() {
+    waitFor.elementToBeClickable(
+      closeModalButton, 'Close button takes too long to become clickable');
+    closeModalButton.click();
   };
 };
 
