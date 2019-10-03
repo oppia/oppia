@@ -162,6 +162,7 @@ def main(args=None):
             'do *NOT* use npm. For more information on how to use yarn,',
             'visit https://yarnpkg.com/en/docs/usage.'])
 
+        # NB: Update .yarnrc if the yarn version below is changed.
         yarn_version = 'v1.17.3'
         yarn_file_name = 'yarn-%s.tar.gz' % yarn_version
         python_utils.url_retrieve(

@@ -20,7 +20,8 @@
         <img-crop image="uploadedImage" result-image="croppedImageDataUrl"
                   area-type="square" result-image-size="150"
                   on-load-error="onInvalidImageLoaded()"
-                  result-image-format="image/png">
+                  result-image-format="image/png"
+                  class="protractor-test-photo-crop">
         </img-crop>
       </div>
     </div>
@@ -34,7 +35,9 @@
     img-crop loads a default white image even when nothing is uploaded. The latter
     is needed to prevent the saving of invalid files.
   -->
-  <button class="btn btn-success" ng-click="confirm()" ng-disabled="!uploadedImage || !croppedImageDataUrl" translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD"></button>
+  <button class="btn btn-success protractor-test-photo-upload-submit" ng-click="confirm()"
+          ng-disabled="!uploadedImage || !croppedImageDataUrl" translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD">
+  </button>
 </div>
 <style>
   .oppia-profile-picture-crop-area {
