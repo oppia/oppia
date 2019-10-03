@@ -967,7 +967,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
         """Initializes a RecordedVoiceovers domain object.
         
         Args:
-            voiceovers_mapping: Recorded Voiceovers domain object
+            voiceovers_mapping: Recorded Voiceovers domain object.
         """
         self.voiceovers_mapping = voiceovers_mapping
 
@@ -1297,7 +1297,8 @@ class SubtitledHtml(python_utils.OBJECT):
                 content. 
 
         Returns:
-            A default SubtitledHtml domain object."""
+            A default SubtitledHtml domain object.
+        """
         return cls(content_id, '')
 
 
@@ -1423,7 +1424,7 @@ class State(python_utils.OBJECT):
         """Retrieves training data from the State domain object.
         
         Returns:
-        list(state_training_data_by_answer_group). List of training data from state domain object
+        list(state_training_data_by_answer_group). List of training data from state domain object.
         """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
