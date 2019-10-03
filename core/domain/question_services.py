@@ -143,7 +143,7 @@ def _update_linked_skill_ids_of_question(
     update_question(
         user_id, question_id, change_list, 'updated linked skill ids')
     (opportunity_services
-     .update_question_counts_after_changing_skills_for_question(
+     .update_skill_opportunities_on_question_linked_skills_change(
          old_linked_skill_ids, new_linked_skill_ids))
 
 
