@@ -64,7 +64,7 @@ describe('Concept card object factory', function() {
           html: 'test explanation',
           content_id: 'explanation',
         },
-        worked_examples: [
+        workedExamples: [
           {
             html: 'worked example 1',
             content_id: 'worked_example_1'
@@ -74,7 +74,7 @@ describe('Concept card object factory', function() {
             content_id: 'worked_example_2'
           }
         ],
-        recorded_voiceovers: {
+        recordedVoiceovers: {
           voiceovers_mapping: {
             explanation: {},
             worked_example_1: {},

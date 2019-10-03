@@ -36,7 +36,7 @@ describe('Concept card backend API service', function() {
         html: 'test explanation 1',
         content_id: 'explanation_1'
       },
-      worked_examples: [
+      workedExamples: [
         {
           html: 'test worked example 1',
           content_id: 'worked_example_1'
@@ -46,7 +46,7 @@ describe('Concept card backend API service', function() {
           content_id: 'worked_example_2'
         }
       ],
-      recorded_voiceovers: {
+      recordedVoiceovers: {
         voiceovers_mapping: {
           explanation: {},
           worked_example_1: {},
@@ -60,7 +60,7 @@ describe('Concept card backend API service', function() {
         html: 'test explanation 2',
         content_id: 'explanation_2'
       },
-      worked_examples: [
+      workedExamples: [
         {
           html: 'test worked example 3',
           content_id: 'worked_example_3'
@@ -70,7 +70,7 @@ describe('Concept card backend API service', function() {
           content_id: 'worked_example_4'
         }
       ],
-      recorded_voiceovers: {
+      recordedVoiceovers: {
         voiceovers_mapping: {
           explanation: {},
           worked_example_3: {},

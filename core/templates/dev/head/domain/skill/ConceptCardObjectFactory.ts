@@ -36,10 +36,10 @@ angular.module('oppia').factory('ConceptCardObjectFactory', [
     ConceptCard.prototype.toBackendDict = function() {
       return {
         explanation: this._explanation.toBackendDict(),
-        worked_examples: this._workedExamples.map(function(workedExample) {
+        workedExamples: this._workedExamples.map(function(workedExample) {
           return workedExample.toBackendDict();
         }),
-        recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
+        recordedVoiceovers: this._recordedVoiceovers.toBackendDict()
       };
     };
 
@@ -74,9 +74,9 @@ angular.module('oppia').factory('ConceptCardObjectFactory', [
         SubtitledHtmlObjectFactory.createFromBackendDict(
           conceptCardBackendDict.explanation),
         _generateWorkedExamplesFromBackendDict(
-          conceptCardBackendDict.worked_examples),
+          conceptCardBackendDict.workedExamples),
         RecordedVoiceoversObjectFactory.createFromBackendDict(
-          conceptCardBackendDict.recorded_voiceovers));
+          conceptCardBackendDict.recordedVoiceovers));
     };
 
     ConceptCard.prototype.getExplanation = function() {
