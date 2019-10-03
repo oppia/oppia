@@ -18,6 +18,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
@@ -34,6 +35,37 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
+    def test_has_reference_to_user_id(self):
+        self.save_new_skill('skill_id', 'owner_id', 'description')
+        self.assertTrue(
+            skill_models.SkillModel.has_reference_to_user_id('owner_id'))
+        self.assertFalse(
+            skill_models.SkillModel.has_reference_to_user_id('x_id'))
+
+
+class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Tests the SkillCommitLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            skill_models.SkillCommitLogEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        commit = skill_models.SkillCommitLogEntryModel.create(
+            'b', 0, 'committer_id', 'username', 'msg',
+            'create', [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False
+        )
+        commit.skill_id = 'b'
+        commit.put()
+        self.assertTrue(
+            skill_models.SkillCommitLogEntryModel
+            .has_reference_to_user_id('committer_id'))
+        self.assertFalse(
+            skill_models.SkillCommitLogEntryModel
+            .has_reference_to_user_id('x_id'))
+
 
 class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillSummaryModel class."""
@@ -42,6 +74,10 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             skill_models.SkillSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            skill_models.SkillSummaryModel.has_reference_to_user_id('id_x'))
 
 
 class SkillRightsModelUnitTest(test_utils.GenericTestBase):
@@ -57,43 +93,60 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
 
         skill_models.SkillRightsModel(
             id='id_1',
-            creator_id='janet',
+            creator_id='janet_id',
             skill_is_private=True
         ).commit(
-            'janet', 'Created new skill rights',
+            'janet_commit_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         skill_models.SkillRightsModel(
             id='id_2',
-            creator_id='janet',
+            creator_id='janet_id',
             skill_is_private=True
         ).commit(
-            'janet', 'Edited skill rights',
+            'janet_commit_id', 'Edited skill rights',
             [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
         skill_models.SkillRightsModel(
             id='id_3',
-            creator_id='joe',
+            creator_id='joe_id',
             skill_is_private=False
         ).commit(
-            'joe', 'Created new skill rights',
+            'joe_commit_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         skill_models.SkillRightsModel(
             id='id_4',
-            creator_id='joe',
+            creator_id='joe_id',
             skill_is_private=True
         ).commit(
-            'joe', 'Created new skill rights',
+            'joe_commit_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            skill_models.SkillRightsModel
+            .has_reference_to_user_id('janet_id'))
+        self.assertTrue(
+            skill_models.SkillRightsModel
+            .has_reference_to_user_id('janet_commit_id'))
+        self.assertTrue(
+            skill_models.SkillRightsModel
+            .has_reference_to_user_id('joe_id'))
+        self.assertTrue(
+            skill_models.SkillRightsModel
+            .has_reference_to_user_id('joe_commit_id'))
+        self.assertFalse(
+            skill_models.SkillRightsModel
+            .has_reference_to_user_id('x_id'))
 
     def test_get_unpublished_by_creator_id(self):
         results = (
             skill_models.SkillRightsModel
-            .get_unpublished_by_creator_id('janet').fetch(2))
+            .get_unpublished_by_creator_id('janet_id').fetch(2))
         self.assertEqual(len(results), 2)
 
     def test_get_unpublished_by_creator_id_should_ignore_public_skills(self):
         results = (
             skill_models.SkillRightsModel
-            .get_unpublished_by_creator_id('joe').fetch(2))
+            .get_unpublished_by_creator_id('joe_id').fetch(2))
         self.assertEqual(len(results), 1)
 
     def test_get_unpublished_fetches_all_unpublished_skills(self):
