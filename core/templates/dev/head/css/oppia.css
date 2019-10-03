@@ -1684,6 +1684,9 @@ pre.oppia-pre-wrapped-text {
 .oppia-editor-card-section {
   padding: 20px 50px 20px 35px;
   word-wrap: break-word;
+  max-height: 400px;
+  min-height: 100px;
+  overflow: scroll;
 }
 
 .oppia-state-content {
