@@ -19,6 +19,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import types
 
+from constants import constants
+from core.domain import question_domain
+from core.domain import question_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.platform import models
@@ -36,6 +39,22 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_models.QuestionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id(self):
+        question_state_data = self._create_valid_question_data('ABC')
+        linked_skill_ids = ['skill_id1', 'skill_id2']
+        self.save_new_question(
+            'question_id1',
+            'owner_id',
+            question_state_data,
+            linked_skill_ids
+        )
+        self.assertTrue(
+            question_models.QuestionModel
+            .has_reference_to_user_id('owner_id'))
+        self.assertFalse(
+            question_models.QuestionModel
+            .has_reference_to_user_id('x_id'))
 
     def test_create_question_empty_skill_id_list(self):
         state = state_domain.State.create_default_state('ABC')
@@ -126,6 +145,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_models.QuestionSkillLinkModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            question_models.QuestionSkillLinkModel
+            .has_reference_to_user_id('id_x'))
 
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
@@ -471,6 +495,30 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                  3, skill_ids))
 
 
+class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Tests the QuestionCommitLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            question_models.QuestionCommitLogEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        commit = question_models.QuestionCommitLogEntryModel.create(
+            'b', 0, 'committer_id', 'username', 'msg',
+            'create', [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False
+        )
+        commit.question_id = 'b'
+        commit.put()
+        self.assertTrue(
+            question_models.QuestionCommitLogEntryModel
+            .has_reference_to_user_id('committer_id'))
+        self.assertFalse(
+            question_models.QuestionCommitLogEntryModel
+            .has_reference_to_user_id('x_id'))
+
+
 class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionSummaryModel class."""
 
@@ -511,3 +559,29 @@ class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             question_models.QuestionRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id(self):
+        question_services.create_new_question_rights('question_id', 'owner_id')
+        self.assertTrue(
+            question_models.QuestionRightsModel
+            .has_reference_to_user_id('owner_id'))
+        # Change creator_id so we can test separate occurrences.
+        question_rights = question_models.QuestionRightsModel.get('question_id')
+        question_rights.creator_id = 'creator_id'
+        question_rights.commit(
+            'commiter_id',
+            'Update question rights',
+            [{'cmd': question_domain.CMD_CREATE_NEW}]
+        )
+        self.assertTrue(
+            question_models.QuestionRightsModel
+            .has_reference_to_user_id('owner_id'))
+        self.assertTrue(
+            question_models.QuestionRightsModel
+            .has_reference_to_user_id('creator_id'))
+        self.assertTrue(
+            question_models.QuestionRightsModel
+                .has_reference_to_user_id('commiter_id'))
+        self.assertFalse(
+            question_models.QuestionRightsModel
+            .has_reference_to_user_id('x_id'))
