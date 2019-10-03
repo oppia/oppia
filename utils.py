@@ -273,10 +273,10 @@ def convert_png_binary_to_data_url(content):
 
 def convert_png_to_data_url(filepath):
     """Converts the png file at filepath to a data URL.
-        Arg:
+    Arg:
         filepath: str. Path of the file.
-        Return:
-            png file at filepath converted to data URL (Updating "file_contents" variable than passing in function.) 
+    Return:
+        str. Converting png file to data URL.
     """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
     return convert_png_binary_to_data_url(file_contents)
@@ -412,7 +412,7 @@ def get_time_in_millisecs(datetime_obj):
 def get_current_time_in_millisecs():
     """Returns time in milliseconds since the Epoch.
     Return:
-       Returning time in milliseconds by passing "datetime.datetime.utcnow()" this in function.
+        float. Returns time in millisecond.
     """
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
@@ -421,9 +421,9 @@ def get_human_readable_time_string(time_msec):
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.
     Arg:
-        time_msec: double (passing time in milliseconds)
+        time_msec: double. Passing time in milliseconds.
     Return:
-        Time in human redable format(str)
+        float. Time in human redable format.
     """
     return time.strftime(
         '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
@@ -433,10 +433,10 @@ def are_datetimes_close(later_datetime, earlier_datetime):
     """Given two datetimes, determines whether they are separated by less than
     feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     Arg:
-        later_datetime: function (later date and time)
-        earlier_datetime: function(earlier date and time)
+        later_datetime: function. Later date and time.
+        earlier_datetime: function. Earlier date and time.
     Return:
-        checking if they are less than this "feconf.PROXIMAL_TIMEDELTA_SECS seconds" or not.
+        float. Whether they are separated by less than feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     """
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
     return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
@@ -466,10 +466,10 @@ def generate_new_session_id():
 def vfs_construct_path(base_path, *path_components):
     """Mimics behavior of os.path.join on Posix machines.
     Arg:
-        base_path: str
-        path_components: str
+        base_path: str. The base path.
+        path_components: str. Mentioned path components.
     Return:
-        Returns the valur of path after loop.
+        str. Returns the constructed path.
     """
     path = base_path
     for component in path_components:
@@ -485,10 +485,10 @@ def vfs_construct_path(base_path, *path_components):
 def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc.
     Arg:
-        path: str(Passing the path)
+        path: str. path
     
     Return:
-        Returning normlized path(str).
+        str. Returning normlized path.
     """
     # Preserve unicode (if path is unicode).
     slash, dot = (u'/', u'.') if isinstance(path, python_utils.UNICODE) else (
@@ -635,9 +635,9 @@ def is_valid_language_code(language_code):
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent.
     Arg:
-        escaped_string: str(Passing an escaped string.)
+        escaped_string: str. Passing escaped string.
     Return:
-        Returning an unescaped string which is encoded by encodeURIComponent.
+        str. Returning an unescaped string which is encoded by encodeURIComponent.
     """
     return python_utils.urllib_unquote(escaped_string).decode('utf-8')
 
@@ -646,7 +646,7 @@ def get_asset_dir_prefix():
     """Returns prefix for asset directory depending whether dev or prod.
     It is used as a prefix in urls for images, css and script files.
     Return:
-        Returning prefix.
+        str. Returning asset directory prefix.
     """
     asset_dir_prefix = ''
     if not constants.DEV_MODE:
