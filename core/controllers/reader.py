@@ -987,6 +987,11 @@ class QuestionPlayerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Question count has to be greater than 0')
 
+        if int(question_count) > int(constants.MAX_QUESTIONS_IN_QUESTION_PLAYER):
+            raise self.InvalidInputException(
+                'Question count has to be less than %d',
+			%(constants.MAX_QUESTIONS_IN_QUESTION_PLAYER))
+
         if not (fetch_by_difficulty_value == 'true' or
                 fetch_by_difficulty_value == 'false'):
             raise self.InvalidInputException(

@@ -371,6 +371,13 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         json_response_1 = self.get_json(url)
         self.assertEqual(len(json_response_1['question_dicts']), 1)
 
+    def test_question_count_more_than_max_fails(self):
+        # Call the handler.
+        json_response_1 = self.get_json(feconf.QUESTIONS_URL_PREFIX,
+		params={
+			'question_count': str(constants.MAX_QUESTIONS_IN_QUESTION_PLAYER + 1)
+		}, expected_status_int=400)
+
     def test_question_count_more_than_available_returns_all_questions(self):
         # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
