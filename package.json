@@ -32,7 +32,7 @@
     "@types/ckeditor": "^4.9.8",
     "@types/d3": "^5.7.2",
     "@types/google.visualization": "0.0.48",
-    "@types/jasmine": "^3.3.12",
+    "@types/jasmine": "^3.4.2",
     "@types/jasminewd2": "^2.0.6",
     "@types/jquery": "^3.3.29",
     "@types/jqueryui": "^1.12.1",
