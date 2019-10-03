@@ -965,7 +965,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
 
     def __init__(self, voiceovers_mapping):
         """Initializes a RecordedVoiceovers domain object.
-        
+      
         Args:
             voiceovers_mapping: Recorded Voiceovers domain object.
         """
@@ -1422,7 +1422,7 @@ class State(python_utils.OBJECT):
 
     def get_training_data(self):
         """Retrieves training data from the State domain object.
-        
+       
         Returns:
         list(state_training_data_by_answer_group). List of training data from state domain object.
         """
