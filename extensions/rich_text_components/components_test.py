@@ -109,6 +109,12 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         }, {
             'url-with-value': 'http://link.com',
             'text-with-value': 1234
+        }, {
+          'url-with-value': 'http://user:password@example.com',
+          'text-with-value': '1234'
+        }, {
+          'url-with-value': 'https://username:password@server/resource.ext',
+          'text-with-value': '1234'
         }]
 
         self.check_validation(
