@@ -274,7 +274,7 @@ def convert_png_binary_to_data_url(content):
 def convert_png_to_data_url(filepath):
     """Converts the png file at filepath to a data URL.
         Arg:
-            filepath: str type (path of the file)
+        filepath: str. Path of the file.
         Return:
             png file at filepath converted to data URL (Updating "file_contents" variable than passing in function.) 
     """
