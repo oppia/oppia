@@ -556,8 +556,8 @@ def increment_question_counts(skill_ids, delta):
             SkillOpportunityModel(s).
         delta: int. The delta for which to increment each question_count.
     """
-    updated_skill_opportunities = _get_skill_opportunity_with_updated_question_count(
-        skill_ids, delta)
+    updated_skill_opportunities = (
+        _get_skill_opportunity_with_updated_question_count(skill_ids, delta))
     _save_skill_opportunities(updated_skill_opportunities)
 
 

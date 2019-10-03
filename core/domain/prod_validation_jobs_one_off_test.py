@@ -258,7 +258,7 @@ class BaseValidatorTests(test_utils.GenericTestBase):
 class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ActivityReferencesModelSkillOpportunityModelValidatorTestsValidatorTests, self).setUp()
+        super(ActivityReferencesModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -2479,7 +2479,7 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
             self.model_instance_2.id, self.model_instance_2.last_updated)]
 
         with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-                db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(
                 self, expected_output, sort=True, literal_eval=True)
