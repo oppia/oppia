@@ -14,16 +14,23 @@
       margin-right: 20px;
     }
   }
+  .d-lg-none-supplemental {
+    margin: 0 auto;
+    width: fit-content;
+  }
+  .libary-no-exploration-for-query-wrapper {
+    text-align: center;
+  }
 </style>
 
 <div>
-  <div class="d-lg-none" style="margin: 0 auto; width: fit-content;">
+  <div class="d-lg-none d-lg-none-supplemental">
     <search-bar></search-bar>
   </div>
   <div ng-if="!$ctrl.someResultsExist" class="oppia-search-results-intro" ng-cloak>
     <div class="oppia-search-results-no-match">
       <img ng-src="<[$ctrl.noExplorationsImgUrl]>" alt="No explorations found">
-      <p style="text-align: center;">
+      <p class="libary-no-exploration-for-query-wrapper">
         <span translate="I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY"></span><br><br>
         <a ng-if="!$ctrl.userIsLoggedIn" href="" ng-click="$ctrl.onRedirectToLogin('/creator_dashboard?mode=create')"
            translate="I18N_LIBRARY_CREATE_EXPLORATION_QUESTION">

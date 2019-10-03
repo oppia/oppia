@@ -17,7 +17,7 @@
       <div class="form-group row">
         <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PICTURE"></label>
         <div class="col-lg-10 col-md-10 col-sm-10">
-          <div class="oppia-editable-section" title="<['I18N_PREFERENCES_CHANGE_PICTURE' | translate]>">
+          <div class="oppia-editable-section oppia-editable-section-supplemental" title="<['I18N_PREFERENCES_CHANGE_PICTURE' | translate]>">
             <div class="oppia-click-to-start-editing" ng-click="$ctrl.showEditProfilePictureModal()"></div>
             <i class="material-icons oppia-editor-edit-icon oppia-editor-edit-icon-supplemental">&#xE254;</i>
             <img ng-if="$ctrl.profilePictureDataUrl" ng-src="<[$ctrl.profilePictureDataUrl]>" class="img-thumbnail">
@@ -29,7 +29,7 @@
       <div class="form-group row">
         <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_BIO"></label>
         <div class="col-lg-10 col-md-10 col-sm-10">
-          <textarea class="protractor-test-user-bio" ng-model="$ctrl.userBio" ng-blur="$ctrl.saveUserBio($ctrl.userBio)" rows="5" maxlength="2000"></textarea>
+          <textarea class="protractor-test-user-bio user-bio-text" ng-model="$ctrl.userBio" ng-blur="$ctrl.saveUserBio($ctrl.userBio)" rows="5" maxlength="2000"></textarea>
           <span class="form-text" translate="I18N_PREFERENCES_BIO_EXPLAIN_TEXT"></span>
         </div>
       </div>
@@ -54,7 +54,7 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
+      <label class="col-lg-2 col-md-2 col-sm-2 preferences-subject-interests-block" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
       <div class="col-lg-10 col-md-10 col-sm-10">
         <div ng-if="$ctrl.hasPageLoaded && $ctrl.select2DropdownIsShown">
           <select2-dropdown item="$ctrl.subjectInterests"
@@ -68,7 +68,7 @@
                             on-selection-change="$ctrl.onSubjectInterestsSelectionChange($ctrl.subjectInterests)">
           </select2-dropdown>
         </div>
-        <span class="form-text" translate="I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK"></span>
+        <span class="form-text preferences-subject-interests-block-text" translate="I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK"></span>
         <div class="preferences-subject-interests-help-block-wrapper">
           <span class="preferences-subject-interests-help-block" aria-live="assertive" ng-show="changedAtLeastOnce">
                 <[$ctrl.subjectInterestsWarningText]>
@@ -232,5 +232,37 @@
     font-size: 1.2em;
     position: relative;
     text-align: center;
+  }
+
+  .checkbox-dashboard-text {
+    padding-top: 0;
+  }
+  .preferences-subject-interests-help-block-wrapper {
+    height: 18px;
+    width: 550px;
+  }
+  .preferences-subject-interests-block {
+    color: red;
+    font-size: 0.8em;
+  }
+  .preferences-subject-interests-block-text {
+    font-size: smaller;
+  }
+  .oppia-subscription-card-summary-inner {
+    margin-bottom: 5px;
+    font-size: 17.5px;
+  }
+  .oppia-subscription-card-supplemental {
+    margin: 0 8px 0 0;
+  }
+  .creator-impact-wrapper {
+    font-size: 14.5px;
+  }
+  .preferences-preferred-text-custom {
+    font-size: smaller;
+  }
+  .oppia-editor-edit-icon-supplemental {
+    top: 8px;
+    right: 8px;
   }
 </style>
