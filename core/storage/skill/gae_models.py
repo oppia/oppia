@@ -83,7 +83,7 @@ class SkillModel(base_models.VersionedModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether SkillModel or its snapshots reference user.
+        """Check whether SkillModel snapshots reference user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.

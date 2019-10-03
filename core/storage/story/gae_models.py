@@ -70,7 +70,7 @@ class StoryModel(base_models.VersionedModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether StoryModel or its snapshots reference user.
+        """Check whether StoryModel snapshots reference user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
