@@ -124,7 +124,8 @@ class Link(BaseRteComponent):
     def validate(cls, value_dict):
         """Validates Link component."""
         super(Link, cls).validate(value_dict)
-        url_re = r'^(?P<protocol>.+?//)(?P<username>.+?):(?P<password>.+?)@(?P<address>.+)$'
+        url_re = re.compile('^(?P<protocol>.+?//)(?P<username>.+?)'
+                            ':(?P<password>.+?)@(?P<address>.+)$')
         url_val = value_dict['url-with-value']
         match_obj = re.match(url_re, url_val)
         if match_obj:
