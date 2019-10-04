@@ -965,7 +965,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
 
     def __init__(self, voiceovers_mapping):
         """Initializes a RecordedVoiceovers domain object.
-      
+
         Args:
             voiceovers_mapping: Recorded Voiceovers domain object.
         """
@@ -1294,7 +1294,7 @@ class SubtitledHtml(python_utils.OBJECT):
 
         Args:
             content_id: str. A unique id referring to the other assets for this
-                content. 
+                content.
 
         Returns:
             A default SubtitledHtml domain object.
@@ -1424,7 +1424,7 @@ class State(python_utils.OBJECT):
         """Retrieves training data from the State domain object.
        
         Returns:
-        list(state_training_data_by_answer_group). List of training data from state domain object.
+            list: List of training data from state domain object.
         """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
