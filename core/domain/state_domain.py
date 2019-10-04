@@ -1422,7 +1422,7 @@ class State(python_utils.OBJECT):
 
     def get_training_data(self):
         """Retrieves training data from the State domain object.
-        
+
         Returns:
             list: List of training data from state domain object.
         """
