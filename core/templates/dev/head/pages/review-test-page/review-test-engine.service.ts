@@ -16,21 +16,26 @@
  * @fileoverview Utility service for the review tests.
  */
 
-angular.module('oppia').factory('ReviewTestEngineService', [
-  function() {
-    return {
-      getReviewTestQuestionCount: function(numOfSkills) {
-        // numOfSkills should be a non-negative integer.
-        if (numOfSkills < 0) {
-          return 0;
-        } else if (numOfSkills < 6) {
-          return numOfSkills * 3;
-        } else if (numOfSkills < 10) {
-          return numOfSkills * 2;
-        } else {
-          return numOfSkills;
-        }
-      }
-    };
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ReviewTestEngineService {
+  getReviewTestQuestionCount(numOfSkills: number): number {
+    // numOfSkills should be a non-negative integer.
+    if (numOfSkills < 0) {
+      return 0;
+    } else if (numOfSkills < 6) {
+      return numOfSkills * 3;
+    } else if (numOfSkills < 10) {
+      return numOfSkills * 2;
+    } else {
+      return numOfSkills;
+    }
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'ReviewTestEngineService', downgradeInjectable(ReviewTestEngineService));

@@ -17,66 +17,72 @@
  * provide routing functionality, and store all available tab states.
  */
 
-require('pages/admin-page/admin-page.constants.ajs.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { AdminPageConstants } from
+  'pages/admin-page/admin-page.constants.ts';
 
-angular.module('oppia').factory('AdminRouterService', [
-  'ADMIN_TAB_URLS',
-  function(ADMIN_TAB_URLS) {
-    var currentTabHash = ADMIN_TAB_URLS.ACTIVITIES;
+@Injectable({
+  providedIn: 'root'
+})
+export class AdminRouterService {
+  currentTabHash: string = (
+    AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES);
 
-    var getTabNameByHash = function(tabHash) {
-      for (var tabName in ADMIN_TAB_URLS) {
-        if (ADMIN_TAB_URLS[tabName] === tabHash) {
-          return tabName;
-        }
+  getTabNameByHash(tabHash: string): string | null {
+    for (var tabName in AdminPageConstants.ADMIN_TAB_URLS) {
+      if (AdminPageConstants.ADMIN_TAB_URLS[tabName] === tabHash) {
+        return tabName;
       }
-      return null;
-    };
-
-    return {
-      /**
-       * Navigates the page to the specified tab based on its HTML hash.
-       */
-      showTab: function(tabHash) {
-        if (getTabNameByHash(tabHash)) {
-          currentTabHash = tabHash;
-        }
-      },
-
-      /**
-       * Returns whether the activities tab is open.
-       */
-      isActivitiesTabOpen: function() {
-        return currentTabHash === ADMIN_TAB_URLS.ACTIVITIES;
-      },
-
-      /**
-       * Returns whether the jobs tab is open.
-       */
-      isJobsTabOpen: function() {
-        return currentTabHash === ADMIN_TAB_URLS.JOBS;
-      },
-
-      /**
-       * Returns whether the config tab is open.
-       */
-      isConfigTabOpen: function() {
-        return currentTabHash === ADMIN_TAB_URLS.CONFIG;
-      },
-
-      /**
-       * Returns whether the roles tab is open.
-       */
-      isRolesTabOpen: function() {
-        return currentTabHash === ADMIN_TAB_URLS.ROLES;
-      },
-
-      /**
-       * Returns whether the miscellaneous tab is open.
-       */
-      isMiscTabOpen: function() {
-        return currentTabHash === ADMIN_TAB_URLS.MISC;
-      }
-    };
+    }
+    return null;
   }
-]);
+
+  /**
+   * Navigates the page to the specified tab based on its HTML hash.
+   */
+  showTab(tabHash: string): void {
+    if (this.getTabNameByHash(tabHash)) {
+      this.currentTabHash = tabHash;
+    }
+  }
+
+  /**
+   * Returns whether the activities tab is open.
+   */
+  isActivitiesTabOpen(): boolean {
+    return this.currentTabHash === (
+      AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES);
+  }
+
+  /**
+   * Returns whether the jobs tab is open.
+   */
+  isJobsTabOpen(): boolean {
+    return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.JOBS;
+  }
+
+  /**
+   * Returns whether the config tab is open.
+   */
+  isConfigTabOpen(): boolean {
+    return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.CONFIG;
+  }
+
+  /**
+   * Returns whether the roles tab is open.
+   */
+  isRolesTabOpen(): boolean {
+    return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.ROLES;
+  }
+
+  /**
+   * Returns whether the miscellaneous tab is open.
+   */
+  isMiscTabOpen(): boolean {
+    return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.MISC;
+  }
+}
+
+angular.module('oppia').factory(
+  'AdminRouterService', downgradeInjectable(AdminRouterService));
