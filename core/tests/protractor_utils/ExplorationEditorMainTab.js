@@ -347,6 +347,9 @@ var ExplorationEditorMainTab = function() {
         // Save feedback.
         saveOutcomeFeedbackButton.click();
       },
+      setCorrect: function() {
+        answerCorrectnessToggle.click();
+      },
       // This saves the rule after the destination is selected.
       //  - destinationName: The name of the state to move to, or null to stay
       //    on the same state.
