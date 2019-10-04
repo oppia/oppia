@@ -138,7 +138,7 @@ describe('View explorations created by user in their profile page',
       creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     });
 
-    it('another user should create a new exploration', function() {
+    it('should create a new exploration', function() {
       users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
       users.login(ANOTHER_EMAIL);
 
@@ -153,7 +153,7 @@ describe('View explorations created by user in their profile page',
       creatorDashboardPage.expectToHaveExplorationCard(EXPLORATION.title);
     });
 
-    it('user should view the exploration in another user\'s profile',
+    it('should view the exploration in another user\'s profile',
       function() {
         users.createUser(TEST_EMAIL, TEST_USERNAME);
         users.login(TEST_EMAIL);
