@@ -25,6 +25,10 @@ var waitFor = require('../protractor_utils/waitFor.js');
 
 var ProfilePage = require('../protractor_utils/ProfilePage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
+var workflow = require('../protractor_utils/workflow');
+
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 
 describe('Un-customized profile page', function() {
   var TEST_USERNAME = 'defaultProfileFeatures';
@@ -110,3 +114,60 @@ describe('Customized profile page for current user', function() {
     general.checkForConsoleErrors([]);
   });
 });
+
+describe('View explorations created by user in their profile page',
+  function() {
+    var TEST_USERNAME = 'myUser';
+    var TEST_EMAIL = TEST_USERNAME + '@example.com';
+
+    var ANOTHER_USERNAME = 'anotherUser';
+    var ANOTHER_EMAIL = ANOTHER_USERNAME + '@example.com';
+
+    var profilePage = null;
+    var creatorDashboardPage = null;
+
+    var EXPLORATION = {
+      title: 'A new exploration',
+      category: 'Learning',
+      objective: 'The goal is to create a new exploration',
+      language: 'English'
+    };
+
+    beforeAll(function() {
+      profilePage = new ProfilePage.ProfilePage();
+      creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    });
+
+    it('another user should create a new exploration', function() {
+      users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
+      users.login(ANOTHER_EMAIL);
+
+      workflow.createAndPublishExploration(
+        EXPLORATION.title,
+        EXPLORATION.category,
+        EXPLORATION.objective,
+        EXPLORATION.language
+      );
+
+      creatorDashboardPage.get();
+      creatorDashboardPage.expectToHaveExplorationCard(EXPLORATION.title);
+    });
+
+    it('user should view the exploration in another user\'s profile',
+      function() {
+        users.createUser(TEST_EMAIL, TEST_USERNAME);
+        users.login(TEST_EMAIL);
+
+        profilePage.get(ANOTHER_USERNAME);
+        profilePage.expectToHaveExplorationCards();
+        profilePage.expectToHaveExplorationCardByName(EXPLORATION.title);
+      });
+
+    afterEach(function() {
+      users.logout();
+      general.checkForConsoleErrors([
+        'Failed to load resource: the server responded with a status of 404'
+      ]);
+    });
+  }
+);

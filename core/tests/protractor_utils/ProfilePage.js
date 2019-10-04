@@ -73,6 +73,35 @@ var ProfilePage = function() {
   this.expectUserToNotHaveInterestPlaceholder = function() {
     expect(interestPlaceholder.isPresent()).toBe(false);
   };
+
+  this.expectToHaveExplorationCards = function() {
+    var allExplorationCardElements = element.all(
+      by.css('.protractor-test-exploration-dashboard-card'));
+    allExplorationCardElements.then(function(cards) {
+      if (cards.length === 0) {
+        throw 'There is no exploration card on this profile';
+      }
+      expect(cards.length).toBeGreaterThan(0);
+    });
+  };
+
+  this.expectToHaveExplorationCardByName = function(explorationName) {
+    var allExplorationCardElements = element.all(
+      by.css('.protractor-test-exploration-dashboard-card'));
+
+    var hasExplorationCard = allExplorationCardElements.filter(function(card) {
+      return card.element(
+        by.css('.protractor-test-exp-summary-tile-title')).
+        getText().then(function(title) {
+          return (title === explorationName);
+        });
+    });
+
+    if (hasExplorationCard.length === 0) {
+      throw 'There is no exploration card with name ' + explorationName;
+    }
+    expect(hasExplorationCard.count()).toBeGreaterThanOrEqual(1);
+  };
 };
 
 exports.ProfilePage = ProfilePage;
