@@ -273,8 +273,10 @@ def convert_png_binary_to_data_url(content):
 
 def convert_png_to_data_url(filepath):
     """Converts the png file at filepath to a data URL.
+    
     Arg:
         filepath: str. Path of the file.
+    
     Return:
         str. Converting png file to data URL.
     """
@@ -411,6 +413,7 @@ def get_time_in_millisecs(datetime_obj):
 
 def get_current_time_in_millisecs():
     """Returns time in milliseconds since the Epoch.
+    
     Return:
         float. Returns time in millisecond.
     """
@@ -420,8 +423,10 @@ def get_current_time_in_millisecs():
 def get_human_readable_time_string(time_msec):
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.
+    
     Arg:
         time_msec: double. Passing time in milliseconds.
+    
     Return:
         float. Time in human redable format.
     """
@@ -432,9 +437,11 @@ def get_human_readable_time_string(time_msec):
 def are_datetimes_close(later_datetime, earlier_datetime):
     """Given two datetimes, determines whether they are separated by less than
     feconf.PROXIMAL_TIMEDELTA_SECS seconds.
+    
     Arg:
         later_datetime: function. Later date and time.
         earlier_datetime: function. Earlier date and time.
+    
     Return:
         float. Whether they are separated by less than feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     """
@@ -465,9 +472,11 @@ def generate_new_session_id():
 
 def vfs_construct_path(base_path, *path_components):
     """Mimics behavior of os.path.join on Posix machines.
+    
     Arg:
         base_path: str. The base path.
         path_components: str. Mentioned path components.
+    
     Return:
         str. Returns the constructed path.
     """
@@ -484,6 +493,7 @@ def vfs_construct_path(base_path, *path_components):
 
 def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc.
+    
     Arg:
         path: str. path
     
@@ -634,8 +644,10 @@ def is_valid_language_code(language_code):
 
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent.
+    
     Arg:
         escaped_string: str. Passing escaped string.
+    
     Return:
         str. Returning an unescaped string which is encoded by encodeURIComponent.
     """
@@ -645,6 +657,7 @@ def unescape_encoded_uri_component(escaped_string):
 def get_asset_dir_prefix():
     """Returns prefix for asset directory depending whether dev or prod.
     It is used as a prefix in urls for images, css and script files.
+    
     Return:
         str. Returning asset directory prefix.
     """
