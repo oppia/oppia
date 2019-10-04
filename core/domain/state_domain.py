@@ -798,6 +798,7 @@ class WrittenTranslations(python_utils.OBJECT):
 
     def __init__(self, translations_mapping):
         """Initializes a WrittenTranslations domain object.
+        
         Args:
             translations_mapping: WrittenTranslations domain object.
         """
