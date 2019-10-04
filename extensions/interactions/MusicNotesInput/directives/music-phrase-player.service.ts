@@ -16,41 +16,55 @@
  * @fileoverview Player service for the interaction.
  */
 
-angular.module('oppia').factory('MusicPhrasePlayerService', [
-  '$timeout', function($timeout) {
-    var _MIDI_CHANNEL = 0;
-    var _MIDI_VELOCITY = 127;
-    var _SECS_TO_MILLISECS = 1000.0;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-    var _playNote = function(midiValues, durationInSecs, delayInSecs) {
-      $timeout(function() {
-        MIDI.chordOn(
-          _MIDI_CHANNEL, midiValues, _MIDI_VELOCITY, 0);
-        MIDI.chordOff(
-          _MIDI_CHANNEL, midiValues, durationInSecs);
-      }, delayInSecs * _SECS_TO_MILLISECS);
-    };
+export interface Note {
+  midiValue: number;
+  duration: number;
+  start: number;
+}
 
-    /**
-     * Plays a music phrase. The input is given as an Array of notes. Each
-     * note is represented as an object with three key-value pairs:
-     * - midiValue: Integer. The midi value of the note.
-     * - duration: Float. A decimal number representing the length of the note,
-     *     in seconds.
-     * - start: Float. A decimal number representing the time offset (after the
-     *     beginning of the phrase) at which to start playing the note.
-     */
-    var _playMusicPhrase = function(notes) {
-      MIDI.Player.stop();
+@Injectable({
+  providedIn: 'root'
+})
+export class MusicPhrasePlayerService {
+  _MIDI_CHANNEL: number = 0;
+  _MIDI_VELOCITY: number = 127;
+  _SECS_TO_MILLISECS: number = 1000.0;
 
-      for (var i = 0; i < notes.length; i++) {
-        _playNote([notes[i].midiValue], notes[i].duration, notes[i].start);
-      }
-    };
+  _playNote(
+      midiValues: number[], durationInSecs: number, delayInSecs: number): void {
+    setTimeout(() => {
+      MIDI.chordOn(
+        this._MIDI_CHANNEL, midiValues, this._MIDI_VELOCITY, 0);
+      MIDI.chordOff(
+        this._MIDI_CHANNEL, midiValues, durationInSecs);
+    }, delayInSecs * this._SECS_TO_MILLISECS);
+  }
 
-    return {
-      playMusicPhrase: function(notes) {
-        _playMusicPhrase(notes);
-      }
-    };
-  }]);
+  /**
+   * Plays a music phrase. The input is given as an Array of notes. Each
+   * note is represented as an object with three key-value pairs:
+   * - midiValue: Integer. The midi value of the note.
+   * - duration: Float. A decimal number representing the length of the note,
+   *     in seconds.
+   * - start: Float. A decimal number representing the time offset (after the
+   *     beginning of the phrase) at which to start playing the note.
+   */
+  _playMusicPhrase(notes: Note[]): void {
+    MIDI.Player.stop();
+
+    for (var i: number = 0; i < notes.length; i++) {
+      this._playNote(
+        [notes[i].midiValue], notes[i].duration, notes[i].start);
+    }
+  }
+
+  playMusicPhrase(notes: Note[]) {
+    this._playMusicPhrase(notes);
+  }
+}
+
+angular.module('oppia').factory(
+  'MusicPhrasePlayerService', downgradeInjectable(MusicPhrasePlayerService));

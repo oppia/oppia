@@ -24,7 +24,7 @@ module.exports = function(config) {
       'third_party/static/headroom-js-0.9.4/headroom.min.js',
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
-      'third_party/static/ckeditor-4.9.2/ckeditor.js',
+      'third_party/static/ckeditor-4.12.1/ckeditor.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
