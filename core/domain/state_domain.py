@@ -1406,7 +1406,11 @@ class State(python_utils.OBJECT):
         self.recorded_voiceovers.validate(content_id_list)
 
     def get_training_data(self):
-        """Retrieves training data from the State domain object."""
+        """Retrieves training data from the State domain object.
+
+        Returns:
+            A list comprising training data by answergroup
+        """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):
