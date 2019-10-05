@@ -445,6 +445,8 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            feedback_models.FeedbackAnalyticsModel, 'has_reference_to_user_id')
         self.assertFalse(
             feedback_models.FeedbackAnalyticsModel
             .has_reference_to_user_id('id_x'))

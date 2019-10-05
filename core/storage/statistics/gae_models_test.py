@@ -38,6 +38,8 @@ class StateCounterModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.StateCounterModel, 'has_reference_to_user_id')
         self.assertFalse(
             stats_models.StateCounterModel.has_reference_to_user_id('any_id'))
 
@@ -77,6 +79,9 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.AnswerSubmittedEventLogEntryModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.AnswerSubmittedEventLogEntryModel
             .has_reference_to_user_id('any_id'))
@@ -108,6 +113,9 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.ExplorationActualStartEventLogEntryModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.ExplorationActualStartEventLogEntryModel
             .has_reference_to_user_id('any_id'))
@@ -135,6 +143,9 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.SolutionHitEventLogEntryModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.SolutionHitEventLogEntryModel
             .has_reference_to_user_id('any_id'))
@@ -164,6 +175,9 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.StartExplorationEventLogEntryModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.StartExplorationEventLogEntryModel
             .has_reference_to_user_id('any_id'))
@@ -196,6 +210,9 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.MaybeLeaveExplorationEventLogEntryModel
             .has_reference_to_user_id('any_id'))
@@ -212,6 +229,9 @@ class CompleteExplorationEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.CompleteExplorationEventLogEntryModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.CompleteExplorationEventLogEntryModel
             .has_reference_to_user_id('any_id'))
@@ -245,6 +265,9 @@ class RateExplorationEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.RateExplorationEventLogEntryModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.RateExplorationEventLogEntryModel
             .has_reference_to_user_id('any_id'))
@@ -259,6 +282,8 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.StateHitEventLogEntryModel, 'has_reference_to_user_id')
         self.assertFalse(
             stats_models.StateHitEventLogEntryModel
             .has_reference_to_user_id('any_id'))
@@ -288,6 +313,9 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.StateCompleteEventLogEntryModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.StateCompleteEventLogEntryModel
             .has_reference_to_user_id('any_id'))
@@ -318,6 +346,9 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.LeaveForRefresherExplorationEventLogEntryModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.LeaveForRefresherExplorationEventLogEntryModel
             .has_reference_to_user_id('any_id'))
@@ -351,9 +382,10 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.ExplorationStatsModel, 'has_reference_to_user_id')
         self.assertFalse(
-            stats_models.ExplorationStatsModel.has_reference_to_user_id('id')
-        )
+            stats_models.ExplorationStatsModel.has_reference_to_user_id('id'))
 
     def test_create_and_get_analytics_model(self):
         model_id = (
@@ -408,9 +440,10 @@ class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.ExplorationIssuesModel, 'has_reference_to_user_id')
         self.assertFalse(
-            stats_models.ExplorationIssuesModel.has_reference_to_user_id('id')
-        )
+            stats_models.ExplorationIssuesModel.has_reference_to_user_id('id'))
 
     def test_create_and_get_exp_issues_model(self):
         model_id = (
@@ -434,6 +467,8 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.PlaythroughModel, 'has_reference_to_user_id')
         self.assertFalse(
             stats_models.PlaythroughModel.has_reference_to_user_id('any_id'))
 
@@ -489,6 +524,8 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.LearnerAnswerDetailsModel, 'has_reference_to_user_id')
         self.assertFalse(
             stats_models.LearnerAnswerDetailsModel
             .has_reference_to_user_id('any_id'))
@@ -623,6 +660,9 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.ExplorationAnnotationsModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.ExplorationAnnotationsModel
             .has_reference_to_user_id('any_id'))
@@ -666,6 +706,8 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.StateAnswersModel, 'has_reference_to_user_id')
         self.assertFalse(
             stats_models.StateAnswersModel.has_reference_to_user_id('any_id'))
 
@@ -730,6 +772,9 @@ class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            stats_models.StateAnswersCalcOutputModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             stats_models.StateAnswersCalcOutputModel
             .has_reference_to_user_id('any_id'))

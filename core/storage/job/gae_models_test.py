@@ -32,6 +32,8 @@ class JobModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            job_models.JobModelTest, 'has_reference_to_user_id')
         self.assertFalse(job_models.JobModel.has_reference_to_user_id('any_id'))
 
     def test_is_cancelable(self):
@@ -97,6 +99,8 @@ class ContinuousComputationModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            job_models.ContinuousComputationModel, 'has_reference_to_user_id')
         self.assertFalse(
             job_models.ContinuousComputationModel
             .has_reference_to_user_id('id'))

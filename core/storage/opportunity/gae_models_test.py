@@ -66,6 +66,9 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             opportunity_models.ExplorationOpportunitySummaryModel
             .has_reference_to_user_id('any_id'))

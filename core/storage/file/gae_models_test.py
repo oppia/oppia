@@ -35,6 +35,8 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            file_models.FileMetadataModel, 'has_reference_to_user_id')
         self.assertFalse(
             file_models.FileMetadataModel.has_reference_to_user_id('any_id'))
 
@@ -156,6 +158,8 @@ class FileModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            file_models.FileModel, 'has_reference_to_user_id')
         self.assertFalse(
             file_models.FileModel.has_reference_to_user_id('any_id'))
 

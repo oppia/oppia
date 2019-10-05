@@ -39,6 +39,9 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            classifier_models.ClassifierTrainingJobModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             classifier_models.ClassifierTrainingJobModel
             .has_reference_to_user_id('id_x'))
@@ -221,6 +224,9 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            classifier_models.TrainingJobExplorationMappingModel,
+            'has_reference_to_user_id')
         self.assertFalse(
             classifier_models.TrainingJobExplorationMappingModel
             .has_reference_to_user_id('id_x'))

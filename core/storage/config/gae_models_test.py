@@ -35,6 +35,8 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            config_models.ConfigPropertyModel, 'has_reference_to_user_id')
         self.assertFalse(
             config_models.ConfigPropertyModel.has_reference_to_user_id('id_x'))
 
