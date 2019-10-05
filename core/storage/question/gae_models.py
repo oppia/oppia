@@ -559,6 +559,16 @@ class QuestionSummaryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether QuestionSummaryModel exist for user.
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.creator_id == user_id).get() is not None
+
+    @classmethod
     def get_by_creator_id(cls, creator_id):
         """Gets QuestionSummaryModel by creator_id.
 
@@ -566,7 +576,7 @@ class QuestionSummaryModel(base_models.BaseModel):
             creator_id: str. The user ID of the creator of the question.
 
         Returns:
-            QuestionSummaryModel. The summary model of the question.
+            list(QuestionSummaryModel). The summary model of the question.
         """
         return QuestionSummaryModel.query().filter(
             cls.creator_id == creator_id).fetch()
