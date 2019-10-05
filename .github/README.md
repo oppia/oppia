@@ -1,6 +1,6 @@
 # [Oppia](https://www.oppia.org) [![Build Status](https://api.travis-ci.org/oppia/oppia.svg?branch=develop)](https://travis-ci.org/oppia/oppia) [![Code Coverage](https://api.codeclimate.com/v1/badges/eaa9dfe89c760481079d/test_coverage)](https://codeclimate.com/github/oppia/oppia/test_coverage) [![codecov](https://codecov.io/gh/oppia/oppia/branch/develop/graph/badge.svg)](https://codecov.io/gh/oppia/oppia) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing while getting feedback.
+Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities stimulate a one-on-one conversation with a tutor, making it possible for students to learn by doing while getting feedback.
 
 In addition to developing the Oppia platform, the team is also developing and piloting a set of free and effective [lessons](https://www.oppia.org/fractions) on basic mathematics. These lessons are targeted at learners who lack access to educational resources.
 
@@ -20,7 +20,7 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
 
 ## Installation
 
-Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for full installation instructions. This is just a short summary for developers who would like to contribute:
+Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for full installation instructions. This is just a summary for developers who would like to contribute:
 
 1. Create a new, empty folder called `opensource/` within your home folder. Navigate to it (`cd opensource`), then [fork and clone](https://github.com/oppia/oppia/wiki/Fork-and-Clone-Oppia) the Oppia repo. This will create a new folder named `opensource/oppia`.
 
