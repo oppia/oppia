@@ -17,42 +17,48 @@
  * story reference domain objects.
  */
 
-angular.module('oppia').factory('StoryReferenceObjectFactory', [function() {
-  var StoryReference = function(storyId, storyIsPublished) {
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+export class StoryReference {
+  _storyId: string;
+  _storyIsPublished: boolean;
+  constructor(storyId: string, storyIsPublished: boolean) {
     this._storyId = storyId;
     this._storyIsPublished = storyIsPublished;
-  };
-
-  // Instance methods
+  }
 
   // Returns the story id.
-  StoryReference.prototype.getStoryId = function() {
+  getStoryId(): string {
     return this._storyId;
-  };
+  }
 
   // Returns whether the story is published.
-  StoryReference.prototype.isStoryPublished = function() {
+  isStoryPublished(): boolean {
     return this._storyIsPublished;
-  };
+  }
+}
 
-  // TODO (ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  StoryReference['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      storyReferenceBackendDict, skillIdToDescriptionMap) {
+@Injectable({
+  providedIn: 'root'
+})
+export class StoryReferenceObjectFactory {
+  createFromBackendDict(
+      // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+      // 'any' because 'classifierData' is a dict with underscore_cased keys
+      // which give tslint errors against underscore_casing in favor of
+      // camelCasing.
+      storyReferenceBackendDict: any): StoryReference {
     return new StoryReference(
       storyReferenceBackendDict.story_id,
       storyReferenceBackendDict.story_is_published);
-  };
+  }
 
-  // TODO (ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  StoryReference['createFromStoryId'] = function(storyId) {
-  /* eslint-enable dot-notation */
-    // TODO (ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
+  createFromStoryId(storyId: string): StoryReference {
     return new StoryReference(storyId, false);
-  };
+  }
+}
 
-  return StoryReference;
-}]);
+angular.module('oppia').factory(
+  'StoryReferenceObjectFactory',
+  downgradeInjectable(StoryReferenceObjectFactory));

@@ -32,26 +32,26 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants.ts';
+  'classifiers/classifiers-extension.constants';
 import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants.ts';
+  'components/summary-tile/collection-summary-tile.constants';
 import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants.ts';
+  'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants.ts';
+  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants.ts';
+  'domain/objects/objects-domain.constants';
 import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
+  'domain/question/question-domain.constants';
+import { ServicesConstants } from 'services/services.constants';
 import { StateEditorConstants } from
-  'components/state-editor/state-editor.constants.ts';
+  'components/state-editor/state-editor.constants';
 import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants.ts';
+  'domain/statistics/statistics-domain.constants';
 import { ExplorationEditorPageConstants } from
-  'pages/exploration-editor-page/exploration-editor-page.constants.ts';
+  'pages/exploration-editor-page/exploration-editor-page.constants';
 
 @NgModule({
   imports: [
@@ -98,10 +98,9 @@ angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-  downgradedModule
-].concat(
-  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
+  'ui.validate', 'ui-leaflet', downgradedModule
+])
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
   .directive(

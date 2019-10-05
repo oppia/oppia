@@ -13,11 +13,44 @@
 # limitations under the License.
 
 """Common utility functions and classes used by multiple Python scripts."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import contextlib
 import os
+import socket
 import subprocess
 
+import python_utils
+
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+GOOGLE_APP_ENGINE_HOME = os.path.join(
+    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
+GOOGLE_CLOUD_SDK_HOME = os.path.join(
+    OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
+NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
+NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
+FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
+YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-v1.17.3')
+# Add path for node which is required by the node_modules.
+os.environ['PATH'] = (
+    '%s/bin:' % NODE_PATH + '%s/bin:' % YARN_PATH + os.environ['PATH'])
+
+
+def run_cmd(cmd_tokens):
+    """Runs the command and returns the output.
+    Raises subprocess.CalledProcessError upon failure.
+
+    Args:
+        cmd_tokens: list(str). The list of command tokens to execute.
+
+    Returns:
+        str. The output of the command.
+    """
+    return subprocess.check_output(cmd_tokens).strip()
 
 
 def ensure_directory_exists(d):
@@ -52,16 +85,20 @@ def open_new_tab_in_browser_if_possible(url):
         if subprocess.call(['which', cmd]) == 0:
             subprocess.call([cmd, url])
             return
-    print '******************************************************************'
-    print 'WARNING: Unable to open browser. Please manually open the following '
-    print 'URL in a browser window, then press Enter to confirm.'
-    print ''
-    print '    %s' % url
-    print ''
-    print 'NOTE: To get rid of this message, open scripts/common.py and fix'
-    print 'the function open_new_tab_in_browser_if_possible() to work on your'
-    print 'system.'
-    raw_input()
+    python_utils.PRINT(
+        '******************************************************************')
+    python_utils.PRINT(
+        'WARNING: Unable to open browser. Please manually open the following')
+    python_utils.PRINT('URL in a browser window, then press Enter to confirm.')
+    python_utils.PRINT('')
+    python_utils.PRINT('    %s' % url)
+    python_utils.PRINT('')
+    python_utils.PRINT(
+        'NOTE: To get rid of this message, open scripts/common.py and fix')
+    python_utils.PRINT(
+        'the function open_new_tab_in_browser_if_possible() to work on your')
+    python_utils.PRINT('system.')
+    python_utils.INPUT()
 
 
 def get_remote_alias(remote_url):
@@ -157,7 +194,79 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         subprocess.call(['git', 'pull', remote_alias])
 
 
-class CD(object):
+def is_port_open(port):
+    """Checks if a process is listening to the port.
+
+    Args:
+        port: int. The port number.
+
+    Return:
+        bool. True if port is open else False.
+    """
+    with contextlib.closing(
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        return bool(not s.connect_ex(('localhost', port)))
+
+
+def recursive_chown(path, uid, gid):
+    """Changes the owner and group id of all files in a path to the numeric
+    uid and gid.
+
+    Args:
+        path: str. The path for which owner id and group id need to be setup.
+        uid: int. Owner ID to be set.
+        gid: int. Group ID to be set.
+    """
+    os.chown(path, uid, gid)
+    for root, directories, filenames in os.walk(path):
+        for directory in directories:
+            os.chown(os.path.join(root, directory), uid, gid)
+        for filename in filenames:
+            os.chown(os.path.join(root, filename), uid, gid)
+
+
+def recursive_chmod(path, mode):
+    """Changes the mode of path to the passed numeric mode.
+
+    Args:
+        path: str. The path for which mode would be set.
+        mode: int. The mode to be set.
+    """
+    os.chmod(path, mode)
+    for root, directories, filenames in os.walk(path):
+        for directory in directories:
+            os.chmod(os.path.join(root, directory), mode)
+        for filename in filenames:
+            os.chmod(os.path.join(root, filename), mode)
+
+
+def print_each_string_after_two_new_lines(strings):
+    """Prints the given strings, separating adjacent strings with two newlines.
+
+    Args:
+        strings: list(str). The strings to print.
+    """
+    for string in strings:
+        python_utils.PRINT('%s\n' % string)
+
+
+def install_npm_library(library_name, version, path):
+    """Installs the npm library after ensuring its not already installed.
+
+    Args:
+        library_name: str. The library name.
+        version: str. The library version.
+        path: str. The installation path for the library.
+    """
+    python_utils.PRINT(
+        'Checking whether %s is installed in %s' % (library_name, path))
+    if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
+        python_utils.PRINT('Installing %s' % library_name)
+        subprocess.call([
+            'yarn', 'add', '%s@%s' % (library_name, version)])
+
+
+class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
 
     def __init__(self, new_path):

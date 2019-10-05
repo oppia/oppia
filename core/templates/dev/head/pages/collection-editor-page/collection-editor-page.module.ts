@@ -32,18 +32,18 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 import { CollectionDomainConstants } from
-  'domain/collection/collection-domain.constants.ts';
+  'domain/collection/collection-domain.constants';
 import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants.ts';
+  'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants.ts';
+  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
+  'domain/objects/objects-domain.constants';
+import { ServicesConstants } from 'services/services.constants';
 import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants.ts';
+  'pages/collection-editor-page/collection-editor-page.constants';
 
 @NgModule({
   imports: [
@@ -88,8 +88,7 @@ angular.module('oppia', [
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
   downgradedModule
-].concat(
-  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+])
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
   .directive(

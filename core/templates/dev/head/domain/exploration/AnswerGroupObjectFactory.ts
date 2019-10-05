@@ -17,60 +17,87 @@
  * domain objects.
  */
 
-require('domain/exploration/OutcomeObjectFactory.ts');
-require('domain/exploration/RuleObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('AnswerGroupObjectFactory', [
-  'OutcomeObjectFactory', 'RuleObjectFactory',
-  function(OutcomeObjectFactory, RuleObjectFactory) {
-    var AnswerGroup = function(
-        rules, outcome, trainingData, taggedSkillMisconceptionId) {
-      this.rules = rules;
-      this.outcome = outcome;
-      this.trainingData = trainingData;
-      this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
-    };
+import { Outcome, OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { Rule, RuleObjectFactory } from
+  'domain/exploration/RuleObjectFactory';
 
-    AnswerGroup.prototype.toBackendDict = function() {
-      return {
-        rule_specs: this.rules.map(function(rule) {
-          return rule.toBackendDict();
-        }),
-        outcome: this.outcome.toBackendDict(),
-        training_data: this.trainingData,
-        tagged_skill_misconception_id: this.taggedSkillMisconceptionId
-      };
-    };
-
-    // Static class methods. Note that "this" is not available in
-    // static contexts.
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    AnswerGroup['createNew'] = function(
-    /* eslint-enable dot-notation */
-        rules, outcome, trainingData, taggedSkillMisconceptionId) {
-      return new AnswerGroup(
-        rules, outcome, trainingData, taggedSkillMisconceptionId);
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    AnswerGroup['createFromBackendDict'] = function(answerGroupBackendDict) {
-    /* eslint-enable dot-notation */
-      return new AnswerGroup(
-        generateRulesFromBackend(answerGroupBackendDict.rule_specs),
-        OutcomeObjectFactory.createFromBackendDict(
-          answerGroupBackendDict.outcome),
-        answerGroupBackendDict.training_data,
-        answerGroupBackendDict.tagged_skill_misconception_id);
-    };
-
-    var generateRulesFromBackend = function(ruleBackendDicts) {
-      return ruleBackendDicts.map(function(ruleBackendDict) {
-        return RuleObjectFactory.createFromBackendDict(ruleBackendDict);
-      });
-    };
-
-    return AnswerGroup;
+export class AnswerGroup {
+  rules: Rule[];
+  outcome: Outcome;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'trainingData' is an array of dicts with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  trainingData: any;
+  taggedSkillMisconceptionId: string;
+  constructor(
+      rules: Rule[], outcome: Outcome, trainingData: any,
+      taggedSkillMisconceptionId: string) {
+    this.rules = rules;
+    this.outcome = outcome;
+    this.trainingData = trainingData;
+    this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
   }
-]);
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  toBackendDict(): any {
+    return {
+      rule_specs: this.rules.map((rule: Rule) => {
+        return rule.toBackendDict();
+      }),
+      outcome: this.outcome.toBackendDict(),
+      training_data: this.trainingData,
+      tagged_skill_misconception_id: this.taggedSkillMisconceptionId
+    };
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AnswerGroupObjectFactory {
+  constructor(
+    private outcomeObjectFactory: OutcomeObjectFactory,
+    private ruleObjectFactory: RuleObjectFactory) {}
+
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'ruleBackendDicts' is a complex object with elements as keys
+  // having varying types. An exact type needs tobe found.
+  generateRulesFromBackend(ruleBackendDicts: any) {
+    return ruleBackendDicts.map((ruleBackendDict: any) => {
+      return this.ruleObjectFactory.createFromBackendDict(ruleBackendDict);
+    });
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'trainingData' is an array of dicts with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createNew(
+      rules: Rule[], outcome: Outcome, trainingData: any,
+      taggedSkillMisconceptionId: string): AnswerGroup {
+    return new AnswerGroup(
+      rules, outcome, trainingData, taggedSkillMisconceptionId);
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'answerGroupBackendDict' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  createFromBackendDict(answerGroupBackendDict: any): AnswerGroup {
+    return new AnswerGroup(
+      this.generateRulesFromBackend(answerGroupBackendDict.rule_specs),
+      this.outcomeObjectFactory.createFromBackendDict(
+        answerGroupBackendDict.outcome),
+      answerGroupBackendDict.training_data,
+      answerGroupBackendDict.tagged_skill_misconception_id);
+  }
+}
+
+angular.module('oppia').factory(
+  'AnswerGroupObjectFactory', downgradeInjectable(AnswerGroupObjectFactory));

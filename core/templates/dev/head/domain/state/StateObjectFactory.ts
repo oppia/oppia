@@ -77,7 +77,7 @@ angular.module('oppia').factory('StateObjectFactory', [
     /* eslint-disable dot-notation */
     State['createDefaultState'] = function(newStateName) {
     /* eslint-enable dot-notation */
-      var newStateTemplate = NEW_STATE_TEMPLATE;
+      var newStateTemplate = angular.copy(NEW_STATE_TEMPLATE);
       var newState = this.createFromBackendDict(newStateName, {
         classifier_model_id: newStateTemplate.classifier_model_id,
         content: newStateTemplate.content,

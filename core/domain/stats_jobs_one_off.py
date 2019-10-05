@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Jobs for statistics views."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import collections
@@ -30,6 +32,7 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.platform import models
 import feconf
+import python_utils
 
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics
@@ -93,7 +96,7 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                 stats_services.get_playthrough_from_model(playthrough_model))
             playthrough.validate()
         except Exception as e:
-            validate_error = str(e)
+            validate_error = python_utils.UNICODE(e)
         else:
             validate_error = None
 
@@ -196,7 +199,7 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # Find the latest version number.
         exploration = exp_fetchers.get_exploration_by_id(exploration_model.id)
         latest_exp_version = exploration.version
-        versions = range(1, latest_exp_version + 1)
+        versions = list(python_utils.RANGE(1, latest_exp_version + 1))
 
         # Retrieve all exploration instances.
         exploration_instances = exp_models.ExplorationModel.get_multi_versions(
@@ -216,7 +219,7 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 exploration.id, versions))
 
         current_version = exploration_model.version
-        for exp_version in xrange(1, current_version + 1):
+        for exp_version in python_utils.RANGE(1, current_version + 1):
             exp_stats = old_exp_stats_instances[exp_version - 1]
             if not exp_stats:
                 curr_exploration = exploration_instances[exp_version - 1]
@@ -337,7 +340,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': str(item.created_on)
+                    'created_on': python_utils.UNICODE(item.created_on)
                 })
         elif isinstance(
                 item, stats_models.AnswerSubmittedEventLogEntryModel):
@@ -348,7 +351,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': str(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'is_feedback_useful': item.is_feedback_useful
                 })
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
@@ -359,7 +362,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': str(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
@@ -370,7 +373,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': str(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -382,7 +385,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': str(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -394,7 +397,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': str(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -406,7 +409,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': str(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         # pylint: enable=too-many-return-statements
@@ -460,7 +463,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             - The third element is the list of all the errors that occured
                 during the preparation of reduce.
         """
-        values = map(ast.literal_eval, values)
+        values = list(python_utils.MAP(ast.literal_eval, values))
         error_messages = []
 
         for value in values:
@@ -486,7 +489,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'Exploration with exploration_id %s not found' % exp_id)
             return [], [], error_messages
         latest_exp_version = exploration.version
-        versions = range(1, latest_exp_version + 1)
+        versions = list(python_utils.RANGE(1, latest_exp_version + 1))
 
         # Get a copy of the corrupted statistics models to copy uncorrupted
         # v1 fields.
@@ -516,8 +519,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 datastore_stats_for_version.num_starts_v2 = 0
                 datastore_stats_for_version.num_completions_v2 = 0
                 datastore_stats_for_version.num_actual_starts_v2 = 0
-                for state_stats in (datastore_stats_for_version.
-                                    state_stats_mapping.values()):
+                for state_stats in (list(datastore_stats_for_version.
+                                         state_stats_mapping.values())):
                     state_stats.total_answers_count_v2 = 0
                     state_stats.useful_feedback_count_v2 = 0
                     state_stats.total_hit_count_v2 = 0
@@ -649,7 +652,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             prev_stats_dict['state_stats_mapping'].pop(state_name)
 
         for old_state_name, new_state_name in (
-                exp_versions_diff.old_to_new_state_names.iteritems()):
+                exp_versions_diff.old_to_new_state_names.items()):
             prev_stats_dict['state_stats_mapping'][new_state_name] = (
                 prev_stats_dict['state_stats_mapping'].pop(old_state_name))
 
@@ -1209,12 +1212,12 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
             if value['version'] == stats_jobs_continuous.VERSION_ALL:
                 all_starts = value['starts']
                 all_completions = value['completions']
-                for (state_name, counts) in value['state_hit'].iteritems():
+                for (state_name, counts) in value['state_hit'].items():
                     all_state_hit[state_name] = counts['first_entry_count']
             else:
                 sum_starts += value['starts']
                 sum_completions += value['completions']
-                for (state_name, counts) in value['state_hit'].iteritems():
+                for (state_name, counts) in value['state_hit'].items():
                     sum_state_hit[state_name] += counts['first_entry_count']
 
         if sum_starts != all_starts:
@@ -1235,7 +1238,8 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                         key, state_name, all_state_hit[state_name]),)
 
 
-class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
+class MissingStatsModelRegenerationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
     """A one-off job to regenerate stats models which were missing due to
     incorrect handling of exploration reverts. If a model is missing at version
     x, we will regenerate all models from version x-1 till the max version of
@@ -1251,7 +1255,7 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
         all_models = (
             stats_models.ExplorationStatsModel.get_multi_stats_models(
                 [exp_domain.ExpVersionReference(exp.id, version)
-                 for version in range(1, exp.version + 1)]))
+                 for version in python_utils.RANGE(1, exp.version + 1)]))
         first_missing_version = None
         for version, model in enumerate(all_models):
             if model is None:
@@ -1266,7 +1270,10 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
             yield ('Missing model at version 1', exp.id)
             return
 
-        for version in range(first_missing_version - 1, exp.version + 1):
+        new_exp_stats_dicts = []
+
+        for version in python_utils.RANGE(
+                first_missing_version - 1, exp.version + 1):
             commit_log = exp_models.ExplorationCommitLogEntryModel.get_commit(
                 exp.id, version)
             exp_at_version = exp_models.ExplorationModel.get_version(
@@ -1279,9 +1286,10 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
 
                 # Is a revert commit.
                 revert_to_version = commit_log.commit_cmds[0]['version_number']
-                stats_services.handle_stats_creation_for_new_exp_version(
-                    exp.id, version, exp_at_version.states, None,
-                    revert_to_version)
+                new_exp_stats_dicts.append(
+                    stats_services.get_stats_for_new_exp_version(
+                        exp.id, version, exp_at_version.states, None,
+                        revert_to_version).to_dict())
             else:
                 all_models[version - 1].delete()
                 change_list = (
@@ -1289,9 +1297,12 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                      for commit_cmd in commit_log.commit_cmds])
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
-                stats_services.handle_stats_creation_for_new_exp_version(
-                    exp.id, version, exp_at_version.states,
-                    exp_versions_diff, None)
+                new_exp_stats_dicts.append(
+                    stats_services.get_stats_for_new_exp_version(
+                        exp.id, version, exp_at_version.states,
+                        exp_versions_diff, None).to_dict())
+
+        stats_models.ExplorationStatsModel.save_multi(new_exp_stats_dicts)
 
         yield ('Success', exp.id)
 

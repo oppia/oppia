@@ -15,13 +15,14 @@
 # limitations under the License.
 
 """Controllers for the collections editor."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
 
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_services
-from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import summary_services
@@ -53,16 +54,14 @@ class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
     @acl_decorators.can_edit_collection
-    def get(self, collection_id):
+    def get(self, _):
         """Handles GET requests."""
 
         self.values.update({
-            'collection_id': collection_id,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         })
 
         self.render_template('collection-editor-page.mainpage.html')

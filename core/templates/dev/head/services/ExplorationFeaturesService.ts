@@ -28,8 +28,8 @@ export class ExplorationFeaturesService {
   static settings = {
     isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false,
-    areParametersEnabled: false,
-  }
+    areParametersEnabled: false
+  };
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'explorationData' and 'featuresData' are dicts with

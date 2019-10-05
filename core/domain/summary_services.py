@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Commands that can be used to operate on activity summaries."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import activity_services
@@ -26,6 +28,7 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
 from core.domain import user_services
+import python_utils
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
@@ -79,14 +82,14 @@ def get_human_readable_contributors_summary(contributors_summary):
             },
         }
     """
-    contributor_ids = contributors_summary.keys()
+    contributor_ids = list(contributors_summary.keys())
     contributor_usernames = user_services.get_human_readable_user_ids(
         contributor_ids)
     return {
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
         }
-        for ind in xrange(len(contributor_ids))
+        for ind in python_utils.RANGE(len(contributor_ids))
     }
 
 
@@ -256,7 +259,8 @@ def get_exploration_metadata_dicts(exploration_ids, user):
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            zip(exploration_summaries, exploration_rights_objects)):
+            python_utils.ZIP(
+                exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (
                     rights_manager.ACTIVITY_STATUS_PRIVATE):
@@ -317,7 +321,8 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            zip(exploration_summaries, exploration_rights_objects)):
+            python_utils.ZIP(
+                exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (
                     rights_manager.ACTIVITY_STATUS_PRIVATE):

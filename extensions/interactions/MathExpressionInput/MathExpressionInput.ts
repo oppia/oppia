@@ -18,16 +18,16 @@
 
 require(
   'interactions/MathExpressionInput/directives/' +
-  'MathExpressionInputRulesService.ts');
+  'math-expression-input-rules.service.ts');
 require(
   'interactions/MathExpressionInput/directives/' +
-  'MathExpressionInputValidationService.ts');
+  'math-expression-input-validation.service.ts');
 require(
   'interactions/MathExpressionInput/directives/' +
-  'OppiaInteractiveMathExpressionInputDirective.ts');
+  'oppia-interactive-math-expression-input.directive.ts');
 require(
   'interactions/MathExpressionInput/directives/' +
-  'OppiaResponseMathExpressionInputDirective.ts');
+  'oppia-response-math-expression-input.directive.ts');
 require(
   'interactions/MathExpressionInput/directives/' +
-  'OppiaShortResponseMathExpressionInputDirective.ts');
+  'oppia-short-response-math-expression-input.directive.ts');

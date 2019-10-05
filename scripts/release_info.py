@@ -17,12 +17,19 @@
 """Script that simplifies releases by collecting various information.
 Should be run from the oppia root dir.
 """
-import argparse
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import collections
+import getpass
 import os
 import re
-import subprocess
 import sys
+
+import feconf
+import python_utils
+
+from . import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -47,42 +54,17 @@ FECONF_VAR_NAMES = ['CURRENT_STATE_SCHEMA_VERSION',
                     'CURRENT_COLLECTION_SCHEMA_VERSION']
 FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
+# PyGithub can fetch milestone only by using the milestone number. Milestones
+# are numbered sequentially as they are created and the number remains fixed.
+# The number for blocking_bugs milestone is 39 which is used to fetch this
+# milestone.
+BLOCKING_BUG_MILESTONE_NUMBER = 39
+FECONF_FILEPATH = os.path.join('', 'feconf.py')
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
 
-_PARSER = argparse.ArgumentParser()
-_PARSER.add_argument(
-    '--personal_access_token',
-    help=(
-        'Personal access token for your github ID. '
-        'You can create one at https://github.com/settings/tokens'),
-    type=str)
 
-
-def _run_cmd(cmd_str):
-    """Runs the command and returns the output.
-    Raises subprocess.CalledProcessError upon failure.
-
-    Args:
-        cmd_str: str. The command string to execute
-
-    Returns:
-        str. The output of the command.
-    """
-    return subprocess.check_output(cmd_str.split(' ')).strip()
-
-
-def _get_current_branch():
-    """Retrieves the branch Git is currently in.
-
-    Returns:
-        (str): The name of the current Git branch.
-    """
-    branch_name_line = _run_cmd(GIT_CMD_GET_STATUS).splitlines()[0]
-    return branch_name_line.split(' ')[2]
-
-
-def _get_current_version_tag(repo):
+def get_current_version_tag(repo):
     """Retrieves the most recent version tag.
 
     Args:
@@ -107,7 +89,7 @@ def get_extra_commits_in_new_release(base_commit, repo):
         the current commit, which haven't been cherrypicked already.
     """
     get_commits_cmd = GIT_CMD_TEMPLATE_GET_NEW_COMMITS % base_commit
-    out = _run_cmd(get_commits_cmd).split('\n')
+    out = common.run_cmd(get_commits_cmd.split(' ')).split('\n')
     commits = []
     for line in out:
         # Lines that start with a - are already cherrypicked. The commits of
@@ -119,7 +101,7 @@ def get_extra_commits_in_new_release(base_commit, repo):
     return commits
 
 
-def _gather_logs(start, stop='HEAD'):
+def gather_logs(start, stop='HEAD'):
     """Gathers the logs between the start and endpoint.
 
     Args:
@@ -131,14 +113,14 @@ def _gather_logs(start, stop='HEAD'):
     """
     get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
         GROUP_SEP, start, stop)
-    out = _run_cmd(get_logs_cmd).split('\x00')
+    out = common.run_cmd(get_logs_cmd.split(' ')).split('\x00')
     if len(out) == 1 and out[0] == '':
         return []
     else:
         return [Log(*line.strip().split(GROUP_SEP)) for line in out]
 
 
-def _extract_issues(logs):
+def extract_issues(logs):
     """Extract references to issues out of a list of Logs
 
     Args:
@@ -152,7 +134,7 @@ def _extract_issues(logs):
     return links
 
 
-def _extract_pr_numbers(logs):
+def extract_pr_numbers(logs):
     """Extract PR numbers out of a list of Logs.
 
     Args:
@@ -211,7 +193,7 @@ def get_changelog_categories(pulls):
     return dict(result)
 
 
-def _check_versions(current_release):
+def check_versions(current_release):
     """Checks if the versions for the exploration or collection schemas have
     changed.
 
@@ -223,9 +205,9 @@ def _check_versions(current_release):
     """
     feconf_changed_version = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)
-    old_feconf = _run_cmd(git_show_cmd)
-    with open('feconf.py', 'r') as feconf:
-        new_feconf = feconf.read()
+    old_feconf = common.run_cmd(git_show_cmd.split(' '))
+    with python_utils.open_file(FECONF_FILEPATH, 'r') as feconf_file:
+        new_feconf = feconf_file.read()
     for variable in FECONF_VAR_NAMES:
         old_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
                                  old_feconf)[0]
@@ -247,10 +229,10 @@ def _git_diff_names_only(left, right='HEAD'):
         list(str): List of files that are different between the two points.
     """
     diff_cmd = (GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING % (left, right))
-    return _run_cmd(diff_cmd).splitlines()
+    return common.run_cmd(diff_cmd.split(' ')).splitlines()
 
 
-def _check_setup_scripts(base_release_tag, changed_only=True):
+def check_setup_scripts(base_release_tag, changed_only=True):
     """Check if setup scripts have changed.
 
     Args:
@@ -263,7 +245,7 @@ def _check_setup_scripts(base_release_tag, changed_only=True):
             changed (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in
-                     ['setup.sh', 'setup_gae.sh', 'install_third_party.sh',
+                     ['setup.py', 'setup_gae.py', 'install_third_party_libs.py',
                       'install_third_party.py']]
     changed_files = _git_diff_names_only(base_release_tag)
     changes_dict = {script: script in changed_files
@@ -275,7 +257,7 @@ def _check_setup_scripts(base_release_tag, changed_only=True):
         return changes_dict
 
 
-def _check_storage_models(current_release):
+def check_storage_models(current_release):
     """Check if files in core/storage have changed and returns them.
 
     Args:
@@ -288,29 +270,84 @@ def _check_storage_models(current_release):
     return [item for item in diff_list if item.startswith('core/storage')]
 
 
+def get_blocking_bug_issue_count(repo):
+    """Returns the number of unresolved blocking bugs.
+
+    Args:
+        repo: github.Repository.Repository. The PyGithub object for the repo.
+
+    Returns:
+        int: Number of unresolved blocking bugs.
+    """
+    blocking_bugs_milestone = repo.get_milestone(
+        number=BLOCKING_BUG_MILESTONE_NUMBER)
+    return blocking_bugs_milestone.open_issues
+
+
+def check_prs_for_current_release_are_released(repo):
+    """Checks that all pull requests for current release have a
+    'PR: released' label.
+
+    Args:
+        repo: github.Repository.Repository. The PyGithub object for the repo.
+
+    Returns:
+        bool. Whether all pull requests for current release have a
+            PR: released label.
+    """
+    all_prs = repo.get_pulls(state='all')
+    for pr in all_prs:
+        label_names = [label.name for label in pr.labels]
+        if 'PR: released' not in label_names and (
+                'PR: for current release' in label_names):
+            return False
+    return True
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
-    branch_name = _get_current_branch()
+    branch_name = common.get_current_branch_name()
     if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
         raise Exception(
             'This script should only be run from the latest release branch.')
 
-    parsed_args = _PARSER.parse_args()
-    if parsed_args.personal_access_token is None:
-        print('No personal access token provided, please set up a personal '
-              'access token at https://github.com/settings/tokens and pass it '
-              'to the script using --personal_access_token=<token>')
-        return
+    personal_access_token = getpass.getpass(
+        prompt=(
+            'Please provide personal access token for your github ID. '
+            'You can create one at https://github.com/settings/tokens: '))
 
-    personal_access_token = parsed_args.personal_access_token
+    if personal_access_token is None:
+        raise Exception(
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script')
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
-    current_release = _get_current_version_tag(repo)
+    blocking_bugs_count = get_blocking_bug_issue_count(repo)
+    if blocking_bugs_count:
+        common.open_new_tab_in_browser_if_possible(
+            'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
+            'is%3Aissue+milestone%3A%22Blocking+bugs%22')
+        raise Exception(
+            'There are %s unresolved blocking bugs. Please ensure '
+            'that they are resolved before release summary generation.' % (
+                blocking_bugs_count))
+
+    if not check_prs_for_current_release_are_released(repo):
+        common.open_new_tab_in_browser_if_possible(
+            'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
+            '+label%3A%22PR%3A+for+current+release%22+')
+        raise Exception(
+            'There are PRs for current release which do not have '
+            'a \'PR: released\' label. Please ensure that they are released '
+            'before release summary generation.')
+
+    current_release = get_current_version_tag(repo)
     current_release_tag = current_release.name
     base_commit = current_release.commit.sha
     new_commits = get_extra_commits_in_new_release(base_commit, repo)
-    new_release_logs = _gather_logs(base_commit)
+    new_release_logs = gather_logs(base_commit)
 
     for index, log in enumerate(new_release_logs):
         is_cherrypicked = all(
@@ -318,35 +355,34 @@ def main():
         if is_cherrypicked:
             del new_release_logs[index]
 
-    past_logs = _gather_logs(FIRST_OPPIA_COMMIT, stop=base_commit)
-    issue_links = _extract_issues(new_release_logs)
-    feconf_version_changes = _check_versions(current_release_tag)
-    setup_changes = _check_setup_scripts(current_release_tag)
-    storage_changes = _check_storage_models(current_release_tag)
+    past_logs = gather_logs(FIRST_OPPIA_COMMIT, stop=base_commit)
+    issue_links = extract_issues(new_release_logs)
+    feconf_version_changes = check_versions(current_release_tag)
+    setup_changes = check_setup_scripts(current_release_tag)
+    storage_changes = check_storage_models(current_release_tag)
 
-    pr_numbers = _extract_pr_numbers(new_release_logs)
+    pr_numbers = extract_pr_numbers(new_release_logs)
     prs = get_prs_from_pr_numbers(pr_numbers, repo)
     categorized_pr_titles = get_changelog_categories(prs)
 
-    summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
-    with open(summary_file, 'w') as out:
+    with python_utils.open_file(feconf.RELEASE_SUMMARY_FILEPATH, 'w') as out:
         out.write('## Collected release information\n')
 
         if feconf_version_changes:
             out.write('\n### Feconf version changes:\nThis indicates that a '
                       'migration may be needed\n\n')
             for var in feconf_version_changes:
-                out.write('* %s  \n' % var)
+                out.write('* %s\n' % var)
 
         if setup_changes:
             out.write('\n### Changed setup scripts:\n')
             for var in setup_changes.keys():
-                out.write('* %s  \n' % var)
+                out.write('* %s\n' % var)
 
         if storage_changes:
             out.write('\n### Changed storage models:\n')
             for item in storage_changes:
-                out.write('* %s  \n' % item)
+                out.write('* %s\n' % item)
 
         past_authors = {
             log.email: log.author for log in past_logs
@@ -371,6 +407,10 @@ def main():
         for name, email in existing_authors:
             out.write('* %s <%s>\n' % (name, email))
 
+        out.write('\n### New Contributors:\n')
+        for name, email in new_authors:
+            out.write('* %s <%s>\n' % (name, email))
+
         # Generate the author sections of the email.
         out.write('\n### Email C&P Blurbs about authors:\n')
         new_author_comma_list = (
@@ -386,8 +426,8 @@ def main():
             '``Thanks to %s, our returning contributors who made this release '
             'possible.``\n' % existing_author_comma_list)
 
-        if parsed_args.personal_access_token:
-            out.write('\n### Changelog: \n')
+        if personal_access_token:
+            out.write('\n### Changelog:\n')
             for category in categorized_pr_titles:
                 out.write('%s\n' % category)
                 for pr_title in categorized_pr_titles[category]:
@@ -402,10 +442,13 @@ def main():
         if issue_links:
             out.write('\n### Issues mentioned in commits:\n')
             for link in issue_links:
-                out.write('* [%s](%s)  \n' % (link, link))
+                out.write('* [%s](%s)\n' % (link, link))
 
-    print 'Done. Summary file generated in ../release_summary.md'
+    python_utils.PRINT('Done. Summary file generated in %s' % (
+        feconf.RELEASE_SUMMARY_FILEPATH))
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when build.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

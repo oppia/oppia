@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // UndoRedoService.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory.ts';
+  'domain/editor/undo_redo/ChangeObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');

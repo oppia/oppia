@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for exploration domain objects and methods defined on them."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import os
@@ -29,6 +31,7 @@ from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -478,7 +481,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            r'There is no state in \[\'ABC\'\] corresponding to '
+            r'There is no state in \[u\'ABC\'\] corresponding to '
             'the exploration\'s initial state name initname.')
 
         # Test whether a default outcome to a non-existing state is invalid.
@@ -1031,6 +1034,194 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             old_states, exp_versions_diff)
         self.assertEqual(actual_dict, expected_dict)
 
+    def test_get_languages_with_complete_translation(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        self.assertEqual(
+            exploration.get_languages_with_complete_translation(), [])
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content_1': {
+                    'hi': {
+                        'html': '<p>Translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': '<p>Translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
+                written_translations)
+
+        self.assertEqual(
+            exploration.get_languages_with_complete_translation(), ['hi'])
+
+    def test_get_translation_counts_with_no_needs_update(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        self.assertEqual(
+            exploration.get_translation_counts(), {})
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content_1': {
+                    'hi': {
+                        'html': '<p>Translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': '<p>Translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
+                written_translations)
+
+        exploration.add_states(['New state'])
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content_1': {
+                    'hi': {
+                        'html': '<p>New state translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': '<p>New State translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        exploration.states['New state'].update_written_translations(
+            written_translations)
+
+        self.assertEqual(
+            exploration.get_translation_counts(), {'hi': 4})
+
+    def test_get_translation_counts_with_needs_update(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        self.assertEqual(
+            exploration.get_translation_counts(), {})
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content_1': {
+                    'hi': {
+                        'html': '<p>Translation in Hindi.</p>',
+                        'needs_update': True
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': '<p>Translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
+                written_translations)
+
+        self.assertEqual(
+            exploration.get_translation_counts(), {'hi': 1})
+
+    def test_get_translation_counts_with_translation_in_multiple_lang(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        self.assertEqual(
+            exploration.get_translation_counts(), {})
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content_1': {
+                    'hi-en': {
+                        'html': '<p>Translation in Hindi.</p>',
+                        'needs_update': False
+                    },
+                    'hi': {
+                        'html': '<p>Translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': '<p>Translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
+                written_translations)
+
+        self.assertEqual(
+            exploration.get_translation_counts(), {
+                'hi': 2,
+                'hi-en': 1
+            })
+
+    def test_get_content_count(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        self.assertEqual(
+            exploration.get_content_count(), 2)
+
+        exploration.add_states(['New state'])
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        init_state.update_interaction_answer_groups([answer_group_dict])
+
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            },
+        }
+        init_state.update_interaction_solution(solution)
+
+        self.assertEqual(exploration.get_content_count(), 7)
+
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')
@@ -1045,7 +1236,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_has_state_name(self):
         """Test for has_state_name."""
         demo = exp_domain.Exploration.create_default_exploration('0')
-        state_names = demo.states.keys()
+        state_names = list(demo.states.keys())
         self.assertEqual(state_names, ['Introduction'])
         self.assertEqual(demo.has_state_name('Introduction'), True)
         self.assertEqual(demo.has_state_name('Fake state name'), False)
@@ -1706,7 +1897,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """Test that the right states schema conversion methods exist."""
         current_states_schema_version = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
-        for version_num in range(current_states_schema_version):
+        for version_num in python_utils.RANGE(current_states_schema_version):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
                 '_convert_states_v%s_dict_to_v%s_dict' % (
@@ -1723,7 +1914,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_exp_schema_version = (
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
 
-        for version_num in range(1, current_exp_schema_version):
+        for version_num in python_utils.RANGE(1, current_exp_schema_version):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
                 '_convert_v%s_dict_to_v%s_dict' % (

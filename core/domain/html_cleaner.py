@@ -15,15 +15,17 @@
 # limitations under the License.
 
 """HTML sanitizing service."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import HTMLParser
+import html.parser
 import json
 import logging
-import urlparse
 
 import bleach
 import bs4
 from core.domain import rte_component_registry
+import python_utils
 
 
 def filter_a(tag, name, value):
@@ -43,7 +45,7 @@ def filter_a(tag, name, value):
     if name in ('title', 'target'):
         return True
     if name == 'href':
-        url_components = urlparse.urlsplit(value)
+        url_components = python_utils.url_split(value)
         if url_components[0] in ['http', 'https']:
             return True
         logging.error('Found invalid URL href: %s' % value)
@@ -93,7 +95,7 @@ def clean(user_submitted_html):
 
     core_tags = ATTRS_WHITELIST.copy()
     core_tags.update(oppia_custom_tags)
-    tag_names = core_tags.keys()
+    tag_names = list(core_tags.keys())
 
     # TODO(sll): Alert the caller if the input was changed due to this call.
     # TODO(sll): Add a log message if bad HTML is detected.
@@ -101,17 +103,17 @@ def clean(user_submitted_html):
         user_submitted_html, tags=tag_names, attributes=core_tags, strip=True)
 
 
-def strip_html_tags(html):
+def strip_html_tags(html_string):
     """Strips all HTML markup from an HTML string.
 
     Args:
-        html: str. An HTML string.
+        html_string: str. An HTML string.
 
     Returns:
         str. The HTML string that results after all the tags and attributes are
         stripped out.
     """
-    return bleach.clean(html, tags=[], attributes={}, strip=True)
+    return bleach.clean(html_string, tags=[], attributes={}, strip=True)
 
 
 def get_rte_components(html_string):
@@ -126,7 +128,7 @@ def get_rte_components(html_string):
         - id: str. The name of the component, i.e. 'oppia-noninteractive-link'.
         - customization_args: dict. Customization arg specs for the component.
     """
-    parser = HTMLParser.HTMLParser()
+    parser = html.parser.HTMLParser()
     components = []
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     oppia_custom_tag_attrs = (

@@ -18,7 +18,7 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { AdminPageConstants } from 'pages/admin-page/admin-page.constants.ts';
+import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 
 angular.module('oppia').constant(
   'ADMIN_ROLE_HANDLER_URL', AdminPageConstants.ADMIN_ROLE_HANDLER_URL);

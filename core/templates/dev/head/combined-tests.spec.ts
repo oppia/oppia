@@ -51,7 +51,7 @@ getTestBed().initTestEnvironment(
 // TODO(YashJipkate): Fix the tests that broke down after introduction of
 // Webpack due to templateCache.
 /* eslint-disable max-len */
-const context = require.context('../../../../', true, /(((\.s|S)pec)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!MusicNotesInputSpec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!state-name-editor\.directive\.spec\.ts)(?<!solution-verification\.service\.spec\.ts)/);
+const context = require.context('../../../../', true, /(((\.s|S)pec)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!state-name-editor\.directive\.spec\.ts)(?<!solution-verification\.service\.spec\.ts)/);
 /* eslint-enable max-len */
 // And load the modules.
 context.keys().map(context);

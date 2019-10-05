@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for user-related one-off computations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
@@ -35,6 +37,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (user_models, feedback_models, exp_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
@@ -1337,7 +1340,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i
-        ) for i in xrange(3)]
+        ) for i in python_utils.RANGE(3)]
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
@@ -1349,7 +1352,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_standard_operation(self):
-        for exp_id in xrange(3):
+        for exp_id in python_utils.RANGE(3):
             exp_models.ExplorationModel.get('%s' % exp_id).delete(
                 self.owner_id, 'deleted exploration')
 
@@ -1376,10 +1379,77 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
                 .activity_ids), 0)
         actual_output = job.get_output(job_id)
         expected_output = [
-            u'[u\"Successfully cleaned up UserSubscriptionsModel %s and '
-            'removed explorations [u\'0\', u\'1\', u\'2\']\", 1]' %
+            u'[u\'Successfully cleaned up UserSubscriptionsModel %s and '
+            'removed explorations 0, 1, 2\', 1]' %
             self.owner_id,
-            u'[u\"Successfully cleaned up UserSubscriptionsModel %s and '
-            'removed explorations [u\'0\', u\'1\', u\'2\']\", 1]' %
+            u'[u\'Successfully cleaned up UserSubscriptionsModel %s and '
+            'removed explorations 0, 1, 2\', 1]' %
             self.user_id]
         self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+
+class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for UserGaeIdOneOffJob migration."""
+
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        user_jobs_one_off.UserGaeIdOneOffJob]
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs_one_off.UserGaeIdOneOffJob.create_new()
+        user_jobs_one_off.UserGaeIdOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_jobs_one_off.UserGaeIdOneOffJob.get_output(job_id))
+
+        eval_output = [ast.literal_eval(item) for item in stringified_output]
+        output = [(item[0], int(item[1])) for item in eval_output]
+        return output
+
+    def _check_model_validity(self, user_id, email):
+        """Checks if the model was migrated correctly."""
+        migrated_user_settings_model = (
+            user_models.UserSettingsModel.get(user_id))
+        self.assertEqual(migrated_user_settings_model.id, user_id)
+        self.assertEqual(migrated_user_settings_model.gae_user_id, user_id)
+        # Check that the other values didn't change.
+        self.assertEqual(migrated_user_settings_model.email, email)
+
+    def test_successful_migration(self):
+        user_id = 'user'
+        email = 'user@domain.com'
+        user_models.UserSettingsModel(
+            id=user_id, email=email, gae_user_id=None
+        ).put()
+
+        output = self._run_one_off_job()
+
+        # The reason why SUCCESS is returned twice and not once is that one
+        # additional UserSettingsModel is created by the TestBase and the
+        # migration is also performed on that user.
+        self.assertEqual(output, [(u'SUCCESS', 2)])
+
+        self._check_model_validity(user_id, email)
+
+    def test_multiple_user_settings(self):
+        user_1_id = 'user1'
+        user_1_email = 'user1@domain.com'
+        user_models.UserSettingsModel(
+            id=user_1_id, email=user_1_email, gae_user_id=None).put()
+
+        user_2_id = 'user2'
+        user_2_email = 'user2@domain.com'
+        user_models.UserSettingsModel(id=user_2_id, email=user_2_email).put()
+
+        output = self._run_one_off_job()
+
+        # The reason why SUCCESS is returned thrice and not twice is that one
+        # additional UserSettingsModel is created by the TestBase and the
+        # migration is also performed on that user.
+        self.assertEqual(output, [(u'SUCCESS', 3)])
+
+        self._check_model_validity(user_1_id, user_1_email)
+        self._check_model_validity(user_2_id, user_2_email)

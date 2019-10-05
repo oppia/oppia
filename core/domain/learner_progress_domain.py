@@ -15,9 +15,13 @@
 # limitations under the License.
 
 """Domain objects for learner progress."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import python_utils
 
 
-class LearnerProgress(object):
+class LearnerProgress(python_utils.OBJECT):
     """Domain object for the progress of the learner."""
 
     def __init__(
@@ -50,7 +54,7 @@ class LearnerProgress(object):
         self.collection_playlist_summaries = collection_playlist
 
 
-class ActivityIdsInLearnerDashboard(object):
+class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
     """Domain object for ids of the activities completed, currently being
     completed or in the playlist of the user.
     """

@@ -17,7 +17,7 @@
  */
 
 import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory.ts';
+  'domain/editor/undo_redo/ChangeObjectFactory';
 
 describe('Factory for Change domain objects', function() {
   let changeObjectFactory: ChangeObjectFactory = null;

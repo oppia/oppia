@@ -19,7 +19,7 @@
 export class CreatorDashboardConstants {
   public static EXPLORATION_DROPDOWN_STATS = {
     OPEN_FEEDBACK: 'open_feedback'
-  }
+  };
 
   public static EXPLORATIONS_SORT_BY_KEYS = {
     TITLE: 'title',
@@ -27,7 +27,7 @@ export class CreatorDashboardConstants {
     NUM_VIEWS: 'num_views',
     OPEN_FEEDBACK: 'num_open_threads',
     LAST_UPDATED: 'last_updated_msec'
-  }
+  };
 
   public static HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = {
     TITLE: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE',
@@ -35,15 +35,15 @@ export class CreatorDashboardConstants {
     NUM_VIEWS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS',
     OPEN_FEEDBACK: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPEN_FEEDBACK',
     LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
-  }
+  };
 
   public static SUBSCRIPTION_SORT_BY_KEYS = {
     USERNAME: 'subscriber_username',
     IMPACT: 'subscriber_impact'
-  }
+  };
 
   public static HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = {
     USERNAME: 'Username',
     IMPACT: 'Impact'
-  }
+  };
 }

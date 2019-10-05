@@ -16,6 +16,7 @@
  * @fileoverview Directive for the selection dropdown with HTML content.
  */
 
+require('directives/angular-html-bind.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 // This directive allows user to put html into select's options.

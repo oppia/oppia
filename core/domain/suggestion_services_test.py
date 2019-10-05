@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for suggestion related services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -26,6 +28,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
@@ -75,7 +78,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def mock_generate_new_thread_id(self, unused_entity_type, unused_entity_id):
         return self.THREAD_ID
 
-    class MockExploration(object):
+    class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
         def __init__(self, exploration_id, states):
             self.id = exploration_id
@@ -626,7 +629,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL_2 = 'author2@example.com'
     REVIEWER_EMAIL_2 = 'reviewer2@example.com'
 
-    class MockExploration(object):
+    class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
         def __init__(self, exploration_id, states):
             self.id = exploration_id

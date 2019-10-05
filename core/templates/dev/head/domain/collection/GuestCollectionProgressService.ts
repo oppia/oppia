@@ -25,97 +25,116 @@
 // TODO(bhenning): This should be reset upon login, otherwise the progress will
 // be different depending on the user's logged in/logged out state.
 
-require('domain/collection/GuestCollectionProgressObjectFactory.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('GuestCollectionProgressService', [
-  '$window', 'GuestCollectionProgressObjectFactory',
-  function($window, GuestCollectionProgressObjectFactory) {
-    var COLLECTION_STORAGE_KEY = 'collectionProgressStore_v1';
+import { Collection } from
+  'domain/collection/CollectionObjectFactory';
+import { GuestCollectionProgress, GuestCollectionProgressObjectFactory } from
+  'domain/collection/GuestCollectionProgressObjectFactory';
+import { WindowRef } from 'services/contextual/WindowRefService';
 
-    var storeGuestCollectionProgress = function(guestCollectionProgress) {
-      $window.localStorage[COLLECTION_STORAGE_KEY] = (
-        guestCollectionProgress.toJson());
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class GuestCollectionProgressService {
+  constructor(
+      private guestCollectionProgressObjectFactory:
+        GuestCollectionProgressObjectFactory,
+      private windowRef: WindowRef) {}
 
-    var loadGuestCollectionProgress = function() {
-      return GuestCollectionProgressObjectFactory.createFromJson(
-        $window.localStorage[COLLECTION_STORAGE_KEY]);
-    };
+  COLLECTION_STORAGE_KEY = 'collectionProgressStore_v1';
 
-    var recordCompletedExploration = function(collectionId, explorationId) {
-      var guestCollectionProgress = loadGuestCollectionProgress();
-      var completedExplorationIdHasBeenAdded = (
-        guestCollectionProgress.addCompletedExplorationId(
-          collectionId, explorationId));
-      if (completedExplorationIdHasBeenAdded) {
-        storeGuestCollectionProgress(guestCollectionProgress);
+  storeGuestCollectionProgress(
+      guestCollectionProgress: GuestCollectionProgress): void {
+    this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY] = (
+      guestCollectionProgress.toJson());
+  }
+
+  loadGuestCollectionProgress(): GuestCollectionProgress {
+    return this.guestCollectionProgressObjectFactory.createFromJson(
+      this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY]);
+  }
+
+  recordCompletedExploration(
+      collectionId: string, explorationId: string): void {
+    var guestCollectionProgress = this.loadGuestCollectionProgress();
+    var completedExplorationIdHasBeenAdded = (
+      guestCollectionProgress.addCompletedExplorationId(
+        collectionId, explorationId));
+    if (completedExplorationIdHasBeenAdded) {
+      this.storeGuestCollectionProgress(guestCollectionProgress);
+    }
+  }
+
+  getValidCompletedExplorationIds(collection: Collection): string[] {
+    var collectionId = collection.getId();
+    var guestCollectionProgress = this.loadGuestCollectionProgress();
+    var completedExplorationIds = (
+      guestCollectionProgress.getCompletedExplorationIds(collectionId));
+    // Filter the exploration IDs by whether they are contained within the
+    // specified collection structure.
+    return completedExplorationIds.filter((expId) => {
+      return collection.containsCollectionNode(expId);
+    });
+  }
+
+  // This method corresponds to collection_domain.get_next_exploration_id.
+  _getNextExplorationId(
+      collection: Collection, completedIds: string[]): string {
+    var explorationIds = collection.getExplorationIds();
+
+    for (var i = 0; i < explorationIds.length; i++) {
+      if (completedIds.indexOf(explorationIds[i]) === -1) {
+        return explorationIds[i];
       }
-    };
+    }
+    return null;
+  }
 
-    var getValidCompletedExplorationIds = function(collection) {
-      var collectionId = collection.getId();
-      var guestCollectionProgress = loadGuestCollectionProgress();
-      var completedExplorationIds = (
-        guestCollectionProgress.getCompletedExplorationIds(collectionId));
-      // Filter the exploration IDs by whether they are contained within the
-      // specified collection structure.
-      return completedExplorationIds.filter(function(expId) {
-        return collection.containsCollectionNode(expId);
-      });
-    };
+  /**
+   * Records that the specified exploration was completed in the context of
+   * the specified collection, as a guest.
+   */
+  recordExplorationCompletedInCollection(
+      collectionId: string, explorationId: string): void {
+    this.recordCompletedExploration(collectionId, explorationId);
+  }
 
-    // This method corresponds to collection_domain.get_next_exploration_id.
-    var _getNextExplorationId = function(collection, completedIds) {
-      var explorationIds = collection.getExplorationIds();
+  /**
+   * Returns whether the guest user has made any progress toward completing
+   * the specified collection by completing at least one exploration related
+   * to the collection. Note that this does not account for any completed
+   * explorations which are no longer referenced by the collection;
+   * getCompletedExplorationIds() should be used for that, instead.
+   */
+  hasCompletedSomeExploration(collectionId: string): boolean {
+    var guestCollectionProgress = this.loadGuestCollectionProgress();
+    return guestCollectionProgress.hasCompletionProgress(collectionId);
+  }
 
-      for (var i = 0; i < explorationIds.length; i++) {
-        if (completedIds.indexOf(explorationIds[i]) === -1) {
-          return explorationIds[i];
-        }
-      }
-      return null;
-    };
+  /**
+   * Given a collection object, returns the list of exploration IDs
+   * completed by the guest user. The return list of exploration IDs will
+   * not include any previously completed explorations for the given
+   * collection that are no longer part of the collection.
+   */
+  getCompletedExplorationIds(collection: Collection): string[] {
+    return this.getValidCompletedExplorationIds(collection);
+  }
 
-    return {
-      /**
-       * Records that the specified exploration was completed in the context of
-       * the specified collection, as a guest.
-       */
-      recordExplorationCompletedInCollection: function(
-          collectionId, explorationId) {
-        recordCompletedExploration(collectionId, explorationId);
-      },
+  /**
+   * Given a collection object a list of completed exploration IDs, returns
+   * the next exploration ID the guest user can play as part of
+   * completing the collection. If this method returns null, the
+   * guest has completed the collection.
+   */
+  getNextExplorationId(
+      collection: Collection, completedExplorationIds: string[]): string {
+    return this._getNextExplorationId(collection, completedExplorationIds);
+  }
+}
 
-      /**
-       * Returns whether the guest user has made any progress toward completing
-       * the specified collection by completing at least one exploration related
-       * to the collection. Note that this does not account for any completed
-       * explorations which are no longer referenced by the collection;
-       * getCompletedExplorationIds() should be used for that, instead.
-       */
-      hasCompletedSomeExploration: function(collectionId) {
-        var guestCollectionProgress = loadGuestCollectionProgress();
-        return guestCollectionProgress.hasCompletionProgress(collectionId);
-      },
-
-      /**
-       * Given a collection object, returns the list of exploration IDs
-       * completed by the guest user. The return list of exploration IDs will
-       * not include any previously completed explorations for the given
-       * collection that are no longer part of the collection.
-       */
-      getCompletedExplorationIds: function(collection) {
-        return getValidCompletedExplorationIds(collection);
-      },
-
-      /**
-       * Given a collection object a list of completed exploration IDs, returns
-       * the next exploration ID the guest user can play as part of
-       * completing the collection. If this method returns null, the
-       * guest has completed the collection.
-       */
-      getNextExplorationId: function(collection, completedExplorationIds) {
-        return _getNextExplorationId(collection, completedExplorationIds);
-      }
-    };
-  }]);
+angular.module('oppia').factory(
+  'GuestCollectionProgressService',
+  downgradeInjectable(GuestCollectionProgressService));

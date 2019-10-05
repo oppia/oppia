@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for Exploration-related jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
@@ -32,6 +34,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (job_models, exp_models, base_models, classifier_models) = (
@@ -172,8 +175,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             num_exps = len(exp_specs)
             expected_job_output = {}
 
-            for ind in range(num_exps):
-                exp_id = str(ind)
+            for ind in python_utils.RANGE(num_exps):
+                exp_id = python_utils.convert_to_bytes(ind)
                 spec = default_spec
                 spec.update(exp_specs[ind])
 
@@ -263,7 +266,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             # Get and check job output.
             actual_job_output = exp_services.get_all_exploration_summaries()
             self.assertEqual(
-                actual_job_output.keys(), expected_job_output.keys())
+                list(actual_job_output.keys()),
+                list(expected_job_output.keys()))
 
             # Note: 'exploration_model_last_updated' is not expected to be the
             # same, because it is now read from the version model representing
@@ -1025,7 +1029,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-        initial_state_name = exploration.states.keys()[0]
+        initial_state_name = list(exploration.states.keys())[0]
         # Store classifier model for the new exploration.
         classifier_model_id = classifier_models.ClassifierTrainingJobModel.create( # pylint: disable=line-too-long
             'TextClassifier', 'TextInput', self.NEW_EXP_ID, exploration.version,
@@ -1045,7 +1049,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
                     self.process_and_flush_pending_tasks()
 
         new_exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        initial_state_name = new_exploration.states.keys()[0]
+        initial_state_name = list(new_exploration.states.keys())[0]
         self.assertLess(exploration.version, new_exploration.version)
         classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
             self.NEW_EXP_ID, new_exploration.version,
@@ -2197,59 +2201,3 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob)
-
-
-class DeleteStateIdMappingModelsOneOffJobTests(test_utils.GenericTestBase):
-    """Tests the state ID mapping deletion job."""
-    def test_job_deletes_all_instances_of_model(self):
-        exp_models.StateIdMappingModel.create(
-            'exp_id', 1, {'state_1': 1}, 1)
-        exp_models.StateIdMappingModel.create(
-            'exp_id', 2, {'state_1': 1}, 1)
-        exp_models.StateIdMappingModel.create(
-            'exp_id', 3, {'state_1': 1}, 1)
-
-        self.assertIsNotNone(
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 1))
-
-        self.assertIsNotNone(
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 2))
-
-        self.assertIsNotNone(
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 3))
-
-        self.assertEqual(self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-
-        job_id = (
-            exp_jobs_one_off.DeleteStateIdMappingModelsOneOffJob.create_new())
-        exp_jobs_one_off.DeleteStateIdMappingModelsOneOffJob.enqueue(job_id)
-
-        self.assertEqual(self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-
-        with self.assertRaisesRegexp(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class StateIdMappingModel with id exp_id.1 not found'):
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 1)
-
-
-        with self.assertRaisesRegexp(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class StateIdMappingModel with id exp_id.2 not found'):
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 2)
-
-        with self.assertRaisesRegexp(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class StateIdMappingModel with id exp_id.3 not found'):
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 3)

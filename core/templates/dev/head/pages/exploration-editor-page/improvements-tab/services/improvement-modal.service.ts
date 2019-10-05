@@ -22,21 +22,99 @@ require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
 require(
+  'pages/exploration-editor-page/services/' +
+  'learner-answer-details-data.service.ts');
+require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
 
 angular.module('oppia').factory('ImprovementModalService', [
   '$uibModal', 'AlertsService', 'ChangeListService', 'DateTimeFormatService',
-  'EditabilityService', 'ExplorationStatesService',
+  'EditabilityService', 'ExplorationHtmlFormatterService',
+  'ExplorationStatesService', 'LearnerAnswerDetailsDataService',
   'SuggestionModalForExplorationEditorService', 'ThreadDataService',
   'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
   function(
       $uibModal, AlertsService, ChangeListService, DateTimeFormatService,
-      EditabilityService, ExplorationStatesService,
+      EditabilityService, ExplorationHtmlFormatterService,
+      ExplorationStatesService, LearnerAnswerDetailsDataService,
       SuggestionModalForExplorationEditorService, ThreadDataService,
       ThreadStatusDisplayService, UrlInterpolationService, UserService) {
     return {
+      openLearnerAnswerDetails: function(learnerAnswerDetails) {
+        return $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/improvements-tab/templates/' +
+            'answer-details-modal.template.html'),
+          resolve: {
+            isUserLoggedIn: function() {
+              return UserService.getUserInfoAsync().then(function(userInfo) {
+                return userInfo.isLoggedIn();
+              });
+            },
+          },
+          controller: [
+            '$scope', '$uibModalInstance', 'isUserLoggedIn',
+            function($scope, $uibModalInstance, isUserLoggedIn) {
+              $scope.selectedLearnerAnswerInfo = [];
+              $scope.learnerAnswerDetails = learnerAnswerDetails;
+              $scope.currentLearnerAnswerInfo = null;
+              $scope.viewAnswerDetails = false;
+              $scope.changeView = function(learnerAnswerInfo) {
+                $scope.currentLearnerAnswerInfo = learnerAnswerInfo;
+                $scope.viewAnswerDetails = !($scope.viewAnswerDetails);
+              };
+              $scope.getLocaleAbbreviatedDatetimeString = (
+                DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
+              $scope.getLearnerAnswerInfos = function() {
+                return $scope.learnerAnswerDetails.learnerAnswerInfoData;
+              };
+              $scope.getAnswerDetails = function(learnerAnswerInfo) {
+                return learnerAnswerInfo.getAnswerDetails();
+              };
+              $scope.selectLearnerAnswerInfo = function(learnerAnswerInfo) {
+                var index = $scope.selectedLearnerAnswerInfo.indexOf(
+                  learnerAnswerInfo);
+                if (index === -1) {
+                  $scope.selectedLearnerAnswerInfo.push(learnerAnswerInfo);
+                } else {
+                  $scope.selectedLearnerAnswerInfo.splice(index, 1);
+                }
+              };
+              $scope.deleteSelectedLearnerAnswerInfo = function() {
+                for (
+                  var i = 0; i < $scope.selectedLearnerAnswerInfo.length; i++) {
+                  var index = (
+                    $scope.learnerAnswerDetails.learnerAnswerInfoData.indexOf(
+                      $scope.selectedLearnerAnswerInfo[i]));
+                  $scope.learnerAnswerDetails.learnerAnswerInfoData.splice(
+                    index, 1);
+                  LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
+                    $scope.learnerAnswerDetails.expId,
+                    $scope.learnerAnswerDetails.stateName,
+                    $scope.selectedLearnerAnswerInfo[i].getId());
+                }
+                $scope.selectedLearnerAnswerInfo = [];
+                $scope.currentLearnerAnswerInfo = null;
+                if ($scope.getLearnerAnswerInfos().length === 0) {
+                  $scope.close();
+                }
+              };
+              $scope.getLearnerAnswerHtml = function(learnerAnswerInfo) {
+                return ExplorationHtmlFormatterService.getShortAnswerHtml(
+                  learnerAnswerInfo.getAnswer(),
+                  $scope.learnerAnswerDetails.interactionId,
+                  $scope.learnerAnswerDetails.customizationArgs);
+              };
+              $scope.close = function() {
+                $uibModalInstance.close();
+              };
+            }
+          ]
+        });
+      },
       openFeedbackThread: function(thread) {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -92,7 +170,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.messageSendingInProgress = false;
                   }, function() {
                     $scope.messageSendingInProgress = false;
-                  });
+                  }).then($uibModalInstance.close);
               };
               $scope.close = function() {
                 $uibModalInstance.close();
@@ -163,7 +241,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.messageSendingInProgress = false;
                   }, function() {
                     $scope.messageSendingInProgress = false;
-                  });
+                  }).then($uibModalInstance.close);
               };
               $scope.close = function() {
                 $uibModalInstance.close();
@@ -191,6 +269,27 @@ angular.module('oppia').factory('ImprovementModalService', [
             },
           }
         );
+      },
+      /**
+       * @returns {Promise} - State is resolved when the confirmation button is
+       *    pressed, or rejected when the cancel button is pressed.
+       */
+      openConfirmationModal: function(message, buttonText, buttonClass) {
+        return $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/common-layout-directives/common-elements/' +
+            'confirmation-modal.template.html'),
+          backdrop: true,
+          controller: [
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+              $scope.confirmationMessage = message;
+              $scope.confirmationButtonText = buttonText;
+              $scope.confirmationButtonClass = buttonClass;
+              $scope.action = $uibModalInstance.close;
+              $scope.cancel = $uibModalInstance.dismiss;
+            }
+          ]
+        });
       },
     };
   },

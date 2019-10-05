@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for test_utils, mainly for the FunctionWrapper."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
@@ -26,6 +28,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
@@ -90,7 +93,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for methods."""
         data = {}
 
-        class MockClass(object):
+        class MockClass(python_utils.OBJECT):
             def __init__(self, num1):
                 self.num1 = num1
 
@@ -109,7 +112,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for class methods."""
         data = {}
 
-        class MockClass(object):
+        class MockClass(python_utils.OBJECT):
             str_attr = 'foo'
 
             @classmethod
@@ -127,7 +130,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for static methods."""
         data = {}
 
-        class MockClass(object):
+        class MockClass(python_utils.OBJECT):
             @staticmethod
             def mock_staticmethod(num):
                 data['value'] = num
@@ -168,7 +171,7 @@ class CallCounterTests(test_utils.GenericTestBase):
 
         self.assertEqual(wrapped_function.times_called, 0)
 
-        for i in xrange(5):
+        for i in python_utils.RANGE(5):
             self.assertEqual(wrapped_function(i), i ** 2)
             self.assertEqual(wrapped_function.times_called, i + 1)
 
@@ -184,7 +187,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         failing_func = test_utils.FailingFunction(
             function, MockError, test_utils.FailingFunction.INFINITY)
 
-        for i in xrange(20):
+        for i in python_utils.RANGE(20):
             with self.assertRaises(MockError):
                 failing_func(i)
 
@@ -289,7 +292,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        with open(expected_gravatar_filepath, 'r') as f:
+        with python_utils.open_file(
+            expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()
 
         headers_dict = {

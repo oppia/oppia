@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the library page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
@@ -27,6 +29,7 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (base_models, exp_models,) = models.Registry.import_models([
@@ -266,7 +269,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
             include_private_exps = False
 
         if (not isinstance(exp_ids, list) or not all([
-                isinstance(exp_id, basestring) for exp_id in exp_ids])):
+                isinstance(
+                    exp_id, python_utils.BASESTRING) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
         if include_private_exps:

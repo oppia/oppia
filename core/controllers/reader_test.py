@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for the page that allows learners to play through an exploration."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -364,15 +366,15 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_questions_are_returned_successfully(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, 'false')
         json_response_1 = self.get_json(url)
         self.assertEqual(len(json_response_1['question_dicts']), 1)
 
     def test_question_count_more_than_available_returns_all_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id, 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 2)
 
@@ -386,8 +388,8 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, skill_id_2, 0.5)
-        url = '%s?question_count=%s&skill_ids=%s,%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2)
+        url = '%s?question_count=%s&skill_ids=%s,%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2, 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 3)
         question_ids = [data['id'] for data in json_response['question_dicts']]
@@ -396,15 +398,21 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id')
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id', 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 0)
 
     def test_question_count_zero_raises_invalid_input_exception(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id, 'true')
+        self.get_json(url, expected_status_int=400)
+
+    def test_invalid_fetch_by_difficulty_raises_invalid_input_exception(self):
+        # Call the handler.
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, [])
         self.get_json(url, expected_status_int=400)
 
 
@@ -1386,23 +1394,23 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Remove one exploration.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
-                self.EXP_ID_0)))
+                self.EXP_ID_0))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_1])
 
         # Remove another exploration.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
-                self.EXP_ID_1)))
+                self.EXP_ID_1))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
@@ -1422,23 +1430,23 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Remove one collection.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
-                self.COL_ID_0)))
+                self.COL_ID_0))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
 
         # Remove another collection.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
-                self.COL_ID_1)))
+                self.COL_ID_1))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])
@@ -1844,7 +1852,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'issue_schema_version': 1
             }, csrf_token=self.csrf_token, expected_status_int=400)
 
-        self.assertEqual(response['error'], u'\'playthrough_id\'')
+        self.assertEqual(response['error'], 'u\'playthrough_id\'')
 
     def test_move_playthrough_to_correct_issue(self):
         playthrough_id = stats_models.PlaythroughModel.create(
@@ -2621,16 +2629,18 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
 
         csrf_token = self.get_new_csrf_token()
-
-        self.put_json(
-            '%s/%s/%s' % (
-                feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL, entity_type, exp_id),
-            {
-                'state_name': 'abc',
-                'interaction_id': 'TextInput',
-                'answer': 'This is an answer.',
-                'answer_details': 'This is an answer details.',
-            }, csrf_token=csrf_token, expected_status_int=404)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
+                {
+                    'state_name': 'abc',
+                    'interaction_id': 'TextInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token, expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             exploration_dict = self.get_json(

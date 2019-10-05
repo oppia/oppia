@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // SuggestionThreadObjectFactory.ts is upgraded to Angular 8.
 import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory.ts';
+  'domain/suggestion/SuggestionObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');

@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Common utilities for test classes."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import copy
@@ -46,11 +48,13 @@ import feconf
 import main
 import main_mail
 import main_taskqueue
+import python_utils
 import utils
 
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
+import jinja2
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -60,7 +64,8 @@ import webtest
 current_user_services = models.Registry.import_current_user_services()
 
 # Prefix to append to all lines printed by tests to the console.
-LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
+# We are using the b' prefix as all the stdouts are in bytes.
+LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 
 
 def empty_environ():
@@ -74,6 +79,71 @@ def empty_environ():
     os.environ['USER_IS_ADMIN'] = '0'
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
+
+
+def get_filepath_from_filename(filename, rootdir):
+    """Returns filepath using the filename. Different files are present
+    in different subdirectories in the rootdir. So, we walk through the
+    rootdir and match the all the filenames with the given filename.
+    When a match is found the function returns the complete path of the
+    filename by using os.path.join(root, filename).
+
+    For example signup-page.mainpage.html is present in
+    core/templates/dev/head/pages/signup-page and error-page.mainpage.html is
+    present in core/templates/dev/head/pages/error-pages. So we walk through
+    core/templates/dev/head/pages and a match for signup-page.directive.html
+    is found in signup-page subdirectory and a match for
+    error-page.directive.html is found in error-pages subdirectory.
+
+    Args:
+        filename: str. The name of the file.
+        rootdir: str. The directory to search the file in.
+
+    Returns:
+        str | None. The path of the file if file is found otherwise
+            None.
+    """
+    # This is required since error files are served according to error status
+    # code. The file served is error-page.mainpage.html but it is compiled
+    # and stored as error-page-{status_code}.mainpage.html.
+    # So, we need to swap the name here to obtain the correct filepath.
+    if filename.startswith('error-page'):
+        filename = 'error-page.mainpage.html'
+
+    filepath = None
+    for root, _, filenames in os.walk(rootdir):
+        for name in filenames:
+            if name == filename:
+                if filepath is None:
+                    filepath = os.path.join(root, filename)
+                else:
+                    raise Exception(
+                        'Multiple files found with name: %s' % filename)
+    return filepath
+
+
+def mock_get_template(unused_self, filename):
+    """Mock for get_template function of jinja2 Environment. This mock is
+    required for backend tests since we do not have webpack compilation
+    before backend tests. The folder to search templates is webpack_bundles
+    which is generated after webpack compilation. Since this folder will be
+    missing, get_template function will return a TemplateNotFound error. So,
+    we use a mock for get_template which returns the html file from the source
+    directory instead.
+
+    Args:
+        unused_self: jinja2.environment.Environment. The Environment instance.
+        filename: str. The name of the file for which template is
+            to be returned.
+
+    Returns:
+        jinja2.environment.Template. The template for the given file.
+    """
+    filepath = get_filepath_from_filename(
+        filename, os.path.join('core', 'templates', 'dev', 'head', 'pages'))
+    with python_utils.open_file(filepath, 'r') as f:
+        file_content = f.read()
+    return jinja2.environment.Template(file_content)
 
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
@@ -494,7 +564,9 @@ tags: []
         """Print the line with a prefix that can be identified by the
         script that calls the test.
         """
-        print '%s%s' % (LOG_LINE_PREFIX, line)
+        # We are using the b' prefix as all the stdouts are in bytes.
+        python_utils.PRINT(
+            b'%s%s' % (LOG_LINE_PREFIX, python_utils.convert_to_bytes(line)))
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -540,9 +612,15 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
 
-        response = self.testapp.get(
-            url, params, expect_errors=expect_errors,
-            status=expected_status_int)
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles
+        # is only produced after webpack compilation which is not performed
+        # during backend tests.
+        with self.swap(
+            jinja2.environment.Environment, 'get_template', mock_get_template):
+            response = self.testapp.get(
+                url, params, expect_errors=expect_errors,
+                status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -624,7 +702,13 @@ tags: []
                 isinstance(params, dict),
                 msg='Expected params to be a dict, received %s' % params)
 
-        response = self.testapp.get(url, params, expect_errors=True)
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles
+        # is only produced after webpack compilation which is not performed
+        # during backend tests.
+        with self.swap(
+            jinja2.environment.Environment, 'get_template', mock_get_template):
+            response = self.testapp.get(url, params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)
 
@@ -652,6 +736,7 @@ tags: []
         expect_errors = False
         if expected_status_int >= 400:
             expect_errors = True
+
         json_response = self.testapp.get(
             url, params, expect_errors=expect_errors,
             status=expected_status_int)
@@ -741,8 +826,14 @@ tags: []
         Returns:
             webtest.TestResponse: The response of the POST request.
         """
+        # Convert the files to bytes.
+        if upload_files is not None:
+            upload_files = tuple(
+                tuple(python_utils.convert_to_bytes(
+                    j) for j in i) for i in upload_files)
+
         json_response = app.post(
-            str(url), data, expect_errors=expect_errors,
+            url, data, expect_errors=expect_errors,
             upload_files=upload_files, headers=headers,
             status=expected_status_int)
         return json_response
@@ -792,7 +883,7 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
         json_response = self.testapp.put(
-            str(url), data, expect_errors=expect_errors)
+            python_utils.UNICODE(url), data, expect_errors=expect_errors)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -1020,9 +1111,9 @@ tags: []
 
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
-                zip(state_names[:-1], state_names[1:])):
+                python_utils.ZIP(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
-            from_state.update_interaction_id(next(interaction_ids))
+            from_state.update_interaction_id(python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
         end_state.update_interaction_id('EndExploration')
@@ -1491,7 +1582,7 @@ tags: []
 
     def save_new_skill(
             self, skill_id, owner_id,
-            description, misconceptions=None, skill_contents=None,
+            description, misconceptions=None, rubrics=None, skill_contents=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Skill and saves it.
 
@@ -1501,6 +1592,8 @@ tags: []
             description: str. The description of the skill.
             misconceptions: list(Misconception). A list of Misconception objects
                 that contains the various misconceptions of the skill.
+            rubrics: list(Rubric). A list of Rubric objects that contain the
+                rubric for each difficulty of the skill.
             skill_contents: SkillContents. A SkillContents object containing the
                 explanation and examples of the skill.
             language_code: str. The ISO 639-1 code for the language this
@@ -1509,12 +1602,23 @@ tags: []
         Returns:
             Skill. A newly-created skill.
         """
-        skill = skill_domain.Skill.create_default_skill(skill_id, description)
+        skill = skill_domain.Skill.create_default_skill(
+            skill_id, description, [])
         if misconceptions is not None:
             skill.misconceptions = misconceptions
             skill.next_misconception_id = len(misconceptions) + 1
         if skill_contents is not None:
             skill.skill_contents = skill_contents
+        if rubrics is not None:
+            skill.rubrics = rubrics
+        else:
+            skill.rubrics = [
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
@@ -1522,8 +1626,9 @@ tags: []
 
     def save_new_skill_with_defined_schema_versions(
             self, skill_id, owner_id, description, next_misconception_id,
-            misconceptions=None, skill_contents=None,
-            misconceptions_schema_version=1, skill_contents_schema_version=1,
+            misconceptions=None, rubrics=None, skill_contents=None,
+            misconceptions_schema_version=1, rubric_schema_version=1,
+            skill_contents_schema_version=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default skill with the given versions for misconceptions
         and skill contents.
@@ -1545,24 +1650,38 @@ tags: []
                 the next misconception added.
             misconceptions: list(Misconception.to_dict()). The list
                 of misconception dicts associated with the skill.
+            rubrics: list(Rubric.to_dict()). The list of rubric dicts associated
+                with the skill.
             skill_contents: SkillContents.to_dict(). A SkillContents dict
                 containing the explanation and examples of the skill.
             misconceptions_schema_version: int. The schema version for the
                 misconceptions object.
+            rubric_schema_version: int. The schema version for the
+                rubric object.
             skill_contents_schema_version: int. The schema version for the
                 skill_contents object.
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
         """
         skill_services.create_new_skill_rights(skill_id, owner_id)
+        if rubrics is None:
+            rubrics = [
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
         skill_model = skill_models.SkillModel(
             id=skill_id,
             description=description,
             language_code=language_code,
             misconceptions=misconceptions,
+            rubrics=[rubric.to_dict() for rubric in rubrics],
             skill_contents=skill_contents,
             next_misconception_id=next_misconception_id,
             misconceptions_schema_version=misconceptions_schema_version,
+            rubric_schema_version=rubric_schema_version,
             skill_contents_schema_version=skill_contents_schema_version,
             superseding_skill_id=None,
             all_questions_merged=False
@@ -1791,16 +1910,19 @@ class AppEngineTestBase(TestBase):
                 # All other tasks are expected to be mapreduce ones, or
                 # Oppia-taskqueue-related ones.
                 headers = {
-                    key: str(val) for key, val in task.headers.iteritems()
+                    key: python_utils.convert_to_bytes(
+                        val) for key, val in task.headers.items()
                 }
-                headers['Content-Length'] = str(len(task.payload or ''))
+                headers['Content-Length'] = python_utils.convert_to_bytes(
+                    len(task.payload or ''))
 
                 app = (
                     webtest.TestApp(main_taskqueue.app)
                     if task.url.startswith('/task')
                     else self.testapp)
                 response = app.post(
-                    url=str(task.url), params=(task.payload or ''),
+                    url=python_utils.UNICODE(
+                        task.url), params=(task.payload or ''),
                     headers=headers, expect_errors=True)
                 if response.status_code != 200:
                     raise RuntimeError(
@@ -1879,7 +2001,7 @@ class AppEngineTestBase(TestBase):
 GenericTestBase = AppEngineTestBase
 
 
-class FunctionWrapper(object):
+class FunctionWrapper(python_utils.OBJECT):
     """A utility for making function wrappers. Create a subclass and override
     any or both of the pre_call_hook and post_call_hook methods. See these
     methods for more info.

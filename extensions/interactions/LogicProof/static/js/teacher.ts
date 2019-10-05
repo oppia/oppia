@@ -16,6 +16,11 @@
  * @fileoverview Components used by the LogicProof interaction editor.
  */
 
+import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
+import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofParser from
+  'interactions/LogicProof/static/js/generatedParser.ts';
+
 var logicProofTeacher = (function() {
   // QUESTION
 
@@ -660,3 +665,5 @@ var logicProofTeacher = (function() {
     TEACHER_ERROR_MESSAGES: TEACHER_ERROR_MESSAGES
   };
 })();
+
+export default logicProofTeacher;

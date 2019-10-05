@@ -18,7 +18,7 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { ServicesConstants } from 'services/services.constants.ts';
+import { ServicesConstants } from 'services/services.constants';
 
 angular.module('oppia').constant(
   'PAGE_CONTEXT', ServicesConstants.PAGE_CONTEXT);

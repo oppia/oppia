@@ -17,58 +17,70 @@
  * domain objects.
  */
 
-require('pages/exploration-editor-page/services/parameter-metadata.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ParamMetadataObjectFactory', [
-  'PARAM_ACTION_GET', 'PARAM_ACTION_SET',
-  function(PARAM_ACTION_GET, PARAM_ACTION_SET) {
-    /**
-     * @private @constructor
-     * Provide metadata when a parameter is changed by a GET or SET action
-     * @param {String} action - set or get
-     * @param {String} paramName - parameter's name
-     * @param {String} source - location where the parameter was defined
-     * e.g. answer, content, feedback or param_changes (changing value of param)
-     * @param {String} sourceInd - index of this parameter in a set of changes
-     */
-    var ParamMetadata = function(action, paramName, source, sourceInd) {
-      this.action = action;
-      this.paramName = paramName;
-      this.source = source;
-      this.sourceInd = sourceInd;
-    };
+import { ExplorationEditorPageConstants } from
+  'pages/exploration-editor-page/exploration-editor-page.constants';
 
-    /**
-     * Metadata about the SET action of a parameter
-     * @param {String} paramName - parameter's name
-     * @param {String} source - location where the parameter was defined
-     * e.g. answer, content, feedback or param_changes (changing value of param)
-     * @param {String} sourceInd - index of this parameter in a set of changes
-     * @returns {ParamMetadata} - A new ParamMetadata instance
-     */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    ParamMetadata['createWithSetAction'] = function(
-    /* eslint-enable dot-notation */
-        paramName, source, sourceInd) {
-      return new ParamMetadata(PARAM_ACTION_SET, paramName, source, sourceInd);
-    };
+export class ParamMetadata {
+  action: string;
+  paramName: string;
+  source: string;
+  sourceInd: string;
+  /**
+   * @private @constructor
+   * Provide metadata when a parameter is changed by a GET or SET action
+   * @param {String} action - set or get
+   * @param {String} paramName - parameter's name
+   * @param {String} source - location where the parameter was defined
+   * e.g. answer, content, feedback or param_changes (changing value of param)
+   * @param {String} sourceInd - index of this parameter in a set of changes
+   */
+  constructor(
+      action: string, paramName: string, source: string, sourceInd: string) {
+    this.action = action;
+    this.paramName = paramName;
+    this.source = source;
+    this.sourceInd = sourceInd;
+  }
+}
 
-    /**
-     * Metadata about the GET action of a parameter
-     * @param {String} paramName - parameter's name
-     * @param {String} source - location where the parameter was defined
-     * e.g. answer, content, feedback or param_changes (changing value of param)
-     * @param {String} sourceInd - index of this parameter in a set of changes
-     * @returns {ParamMetadata} - A new ParamMetadata instance
-     */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    ParamMetadata['createWithGetAction'] = function(
-    /* eslint-enable dot-notation */
-        paramName, source, sourceInd) {
-      return new ParamMetadata(PARAM_ACTION_GET, paramName, source, sourceInd);
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class ParamMetadataObjectFactory {
+  /**
+   * Metadata about the SET action of a parameter
+   * @param {String} paramName - parameter's name
+   * @param {String} source - location where the parameter was defined
+   * e.g. answer, content, feedback or param_changes (changing value of param)
+   * @param {String} sourceInd - index of this parameter in a set of changes
+   * @returns {ParamMetadata} - A new ParamMetadata instance
+   */
+  createWithSetAction(
+      paramName: string, source: string, sourceInd: string): ParamMetadata {
+    return new ParamMetadata(
+      ExplorationEditorPageConstants.PARAM_ACTION_SET, paramName, source,
+      sourceInd);
+  }
 
-    return ParamMetadata;
-  }]);
+  /**
+   * Metadata about the GET action of a parameter
+   * @param {String} paramName - parameter's name
+   * @param {String} source - location where the parameter was defined
+   * e.g. answer, content, feedback or param_changes (changing value of param)
+   * @param {String} sourceInd - index of this parameter in a set of changes
+   * @returns {ParamMetadata} - A new ParamMetadata instance
+   */
+  createWithGetAction(
+      paramName: string, source: string, sourceInd: string): ParamMetadata {
+    return new ParamMetadata(
+      ExplorationEditorPageConstants.PARAM_ACTION_GET, paramName, source,
+      sourceInd);
+  }
+}
+
+angular.module('oppia').factory(
+  'ParamMetadataObjectFactory',
+  downgradeInjectable(ParamMetadataObjectFactory));

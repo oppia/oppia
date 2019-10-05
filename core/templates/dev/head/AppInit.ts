@@ -58,16 +58,13 @@ const bootstrapFn = (extraProviders: StaticProvider[]) => {
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
-declare var angular: any;
-
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
   downgradedModule
-].concat(
-  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+])
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
   .directive(

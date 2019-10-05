@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Services for exploration-related statistics."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
@@ -156,7 +158,7 @@ def update_stats(exp_id, exp_version, aggregated_stats):
     save_stats_model_transactional(exploration_stats)
 
 
-def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
+def get_stats_for_new_exploration(exp_id, exp_version, state_names):
     """Creates ExplorationStatsModel for the freshly created exploration and
     sets all initial values to zero.
 
@@ -164,6 +166,9 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
         state_names: list(str). State names of the exploration.
+
+    Returns:
+        ExplorationStats. The newly created exploration stats object.
     """
     state_stats_mapping = {
         state_name: stats_domain.StateStats.create_default()
@@ -172,14 +177,16 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
 
     exploration_stats = stats_domain.ExplorationStats.create_default(
         exp_id, exp_version, state_stats_mapping)
-    create_stats_model(exploration_stats)
+    return exploration_stats
 
 
-def handle_stats_creation_for_new_exp_version(
+def get_stats_for_new_exp_version(
         exp_id, exp_version, state_names, exp_versions_diff, revert_to_version):
     """Retrieves the ExplorationStatsModel for the old exp_version and makes
     any required changes to the structure of the model. Then, a new
     ExplorationStatsModel is created for the new exp_version.
+    Note: This function does not save the newly created model, it returns it.
+    Callers should explicitly save the model if required.
 
     Args:
         exp_id: str. ID of the exploration.
@@ -189,15 +196,17 @@ def handle_stats_creation_for_new_exp_version(
             the exploration versions difference, None if it is a revert.
         revert_to_version: int|None. If the change is a revert, the version.
             Otherwise, None.
+
+    Returns:
+        ExplorationStats. The newly created exploration stats object.
     """
     old_exp_version = exp_version - 1
     new_exp_version = exp_version
     exploration_stats = get_exploration_stats_by_id(
         exp_id, old_exp_version)
     if exploration_stats is None:
-        handle_stats_creation_for_new_exploration(
+        return get_stats_for_new_exploration(
             exp_id, new_exp_version, state_names)
-        return
 
     # Handling reverts.
     if revert_to_version:
@@ -214,8 +223,8 @@ def handle_stats_creation_for_new_exp_version(
             exploration_stats.state_stats_mapping = (
                 old_exp_stats.state_stats_mapping)
         exploration_stats.exp_version = new_exp_version
-        create_stats_model(exploration_stats)
-        return
+
+        return exploration_stats
 
     # Handling state deletions.
     for state_name in exp_versions_diff.deleted_state_names:
@@ -234,8 +243,7 @@ def handle_stats_creation_for_new_exp_version(
 
     exploration_stats.exp_version = new_exp_version
 
-    # Create new statistics model.
-    create_stats_model(exploration_stats)
+    return exploration_stats
 
 
 def create_exp_issues_for_new_exploration(exp_id, exp_version):
@@ -1135,7 +1143,6 @@ def create_learner_answer_details_model_instance(learner_answer_details):
         learner_answer_details.accumulated_answer_info_json_size_bytes)
 
 
-
 def save_learner_answer_details(
         entity_type, state_reference, learner_answer_details):
     """Saves the LearnerAnswerDetails domain object in the datatstore,
@@ -1191,10 +1198,9 @@ def record_learner_answer_info(
             value will be equal to 'exp_id:state_name' and for question
             this will be equal to 'question_id'.
         interaction_id: str. The ID of the interaction.
-        answer: dict or list or str or int or bool. The answer which is
-            submitted by the learner. Actually type of the answer is
-            interaction dependent, like TextInput interactions have
-            string type answer, NumericInput have int type answers etc.
+        answer: *(json-like). The answer which is submitted by the
+            learner. The actual type of answer depends on the
+            interaction.
         answer_details: str. The details the learner will submit when the
             learner will be asked questions like 'Hey how did you land on
             this answer', 'Why did you pick that answer' etc.

@@ -16,6 +16,19 @@
  * @fileoverview Directive for general schema-based viewers.
  */
 
+require(
+  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 
 angular.module('oppia').directive('schemaBasedViewer', [

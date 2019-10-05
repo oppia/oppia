@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Models for Oppia users."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -31,6 +33,10 @@ class UserSettingsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+    # User id used to identify user by GAE. Is not required for now because we
+    # need to perform migration to fill this for existing users.
+    # TODO(#7659): Set required to True.
+    gae_user_id = ndb.StringProperty(required=False, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
     # User role. Required for authorization. User gets a default role of
@@ -69,7 +75,8 @@ class UserSettingsModel(base_models.BaseModel):
     creator_dashboard_display_pref = ndb.StringProperty(
         default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
         indexed=True,
-        choices=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values())
+        choices=list(
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()))
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
     # Subject interests specified by the user.
@@ -93,6 +100,25 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+
+    @staticmethod
+    def get_deletion_policy():
+        """User settings can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserSettingsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -181,6 +207,48 @@ class CompletedActivitiesModel(base_models.BaseModel):
     # IDs of all the collections completed by the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Completed activities can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CompletedActivitiesModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export CompletedActivitiesModel's user properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict with two keys, 'completed_exploration_ids'
+            and 'completed_collection_ids'. The corresponding values are
+            lists of the IDs of the explorations and collections,
+            respectively, which the given user has completed. If the
+            user_id is invalid, returns None.
+        """
+        user_model = CompletedActivitiesModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        return {
+            'completed_exploration_ids': user_model.exploration_ids,
+            'completed_collection_ids': user_model.collection_ids
+        }
+
 
 class IncompleteActivitiesModel(base_models.BaseModel):
     """Keeps track of all the activities currently being completed by the
@@ -192,6 +260,48 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # The ids of the collections partially completed by the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Incomplete activities can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether IncompleteActivitiesModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export IncompleteActivitiesModel's user properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict with two keys, 'incomplete_exploration_ids'
+            and 'incomplete_collection_ids'. The corresponding values are
+            lists of the IDs of the explorations and collections,
+            respectively, which the given user has not yet completed. If
+            the user_id is invalid, returns None.
+        """
+        user_model = IncompleteActivitiesModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        return {
+            'incomplete_exploration_ids': user_model.exploration_ids,
+            'incomplete_collection_ids': user_model.collection_ids
+        }
 
 
 class ExpUserLastPlaythroughModel(base_models.BaseModel):
@@ -210,6 +320,25 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     # The name of the state at which the learner left the exploration when
     # he/she last played it.
     last_played_state_name = ndb.StringProperty(default=None)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration user last playthrough can be deleted since it only
+        contains information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExpUserLastPlaythroughModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -260,6 +389,30 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         return super(ExpUserLastPlaythroughModel, cls).get(
             instance_id, strict=False)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export ExpUserLastPlaythroughModel user-relevant properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict where each key is an exploration ID that the user
+            has partially completed. For each exploration ID key, the value
+            stored is a dict with two keys 'exp_version' and 'state_name',
+            which represents the exploration version and the state name
+            (aka card title) of the last playthrough for that exploration.
+        """
+        found_models = cls.get_all().filter(cls.user_id == user_id)
+        user_data = {}
+        for user_model in found_models:
+            user_data[user_model.exploration_id] = {
+                'exp_version': user_model.last_played_exp_version,
+                'state_name': user_model.last_played_state_name
+            }
+
+        return user_data
+
 
 class LearnerPlaylistModel(base_models.BaseModel):
     """Keeps track of all the explorations and collections in the playlist of
@@ -271,6 +424,48 @@ class LearnerPlaylistModel(base_models.BaseModel):
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections in the playlist of the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Learner playlist can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether LearnerPlaylistModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export user-relevant properties of LearnerPlaylistModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict with two keys, 'playlist_exploration_ids'
+            and 'playlist_collection_ids'. The corresponding values are
+            lists of the IDs of the explorations and collections,
+            respectively, which the given user has in their playlist.
+            If the user_id is invalid, returns None instead.
+        """
+        user_model = LearnerPlaylistModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        return {
+            'playlist_exploration_ids': user_model.exploration_ids,
+            'playlist_collection_ids': user_model.collection_ids
+        }
 
 
 class UserContributionsModel(base_models.BaseModel):
@@ -287,6 +482,25 @@ class UserContributionsModel(base_models.BaseModel):
     # Includes subsequently deleted and private explorations.
     edited_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=True, default=None)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User contributions can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserContributionsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -331,6 +545,25 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     subscription_notifications = ndb.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
+    @staticmethod
+    def get_deletion_policy():
+        """User email preferences can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserEmailPreferencesModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
@@ -351,6 +584,25 @@ class UserSubscriptionsModel(base_models.BaseModel):
     creator_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User subscription can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserSubscriptionsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id):
@@ -380,10 +632,32 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
 
 class UserSubscribersModel(base_models.BaseModel):
-    """The list of subscribers of the user."""
+    """The list of subscribers of the user.
+
+    Instances of this class are keyed by the user id.
+    """
 
     # IDs of the learners who have subscribed to this user.
     subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User subscribers can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserSubscribersModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
@@ -397,6 +671,25 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     # The time, in milliseconds since the epoch, when the job that computed
     # this batch model was queued.
     job_queued_msec = ndb.FloatProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User recent changes batch can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserRecentChangesBatchModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -448,6 +741,25 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             required=True,
             default=feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
             indexed=True))
+
+    @staticmethod
+    def get_deletion_policy():
+        """User stats can be deleted since it only contains information relevant
+        to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserStatsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
 
     @classmethod
     def get_or_create(cls, user_id):
@@ -539,6 +851,25 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The user's preference for receiving feedback emails for this exploration.
     mute_feedback_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration user data need to be copied to new model to preserve the
+        ratings.
+        """
+        return base_models.DELETION_POLICY.ANONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationUserDataModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -659,9 +990,28 @@ class CollectionProgressModel(base_models.BaseModel):
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The collection id.
     collection_id = ndb.StringProperty(required=True, indexed=True)
-    # The list of explorations which have been completed within the context of
-    # the collection represented by collection_id.
+    # The list of IDs of explorations which have been completed within the
+    # context of the collection represented by collection_id.
     completed_explorations = ndb.StringProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Collection progress can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CollectionProgressModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
@@ -754,6 +1104,27 @@ class CollectionProgressModel(base_models.BaseModel):
         else:
             return cls.create(user_id, collection_id)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export CollectionProgressModel user-relevant properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict where each key is the ID of a collection the user
+            is associated with. The corresponding value is a list of the
+            exploration ID's that user has completed in that respective
+            collection.
+        """
+        found_models = cls.get_all().filter(cls.user_id == user_id)
+        user_data = {}
+        for user_model in found_models:
+            user_data[user_model.collection_id] = (
+                user_model.completed_explorations)
+
+        return user_data
+
 
 class StoryProgressModel(base_models.BaseModel):
     """Stores progress a user has made within a story, including all
@@ -771,6 +1142,25 @@ class StoryProgressModel(base_models.BaseModel):
     # The list of node ids which have been completed within the context of
     # the story represented by story_id.
     completed_node_ids = ndb.StringProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Story progress can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether StoryProgressModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -866,6 +1256,24 @@ class StoryProgressModel(base_models.BaseModel):
         else:
             return cls.create(user_id, story_id)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export StoryProgressModel user-relevant properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict where each key is the ID of a story the user has
+            begun. The corresponding value is a list of the completed story
+            node ids for that respective story.
+        """
+        found_models = cls.get_all().filter(cls.user_id == user_id)
+        user_data = {}
+        for user_model in found_models:
+            user_data[user_model.story_id] = user_model.completed_node_ids
+        return user_data
+
 
 class UserQueryModel(base_models.BaseModel):
     """Model for storing result of queries.
@@ -910,6 +1318,25 @@ class UserQueryModel(base_models.BaseModel):
             feconf.USER_QUERY_STATUS_FAILED
         ])
 
+    @staticmethod
+    def get_deletion_policy():
+        """User query can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserQueryModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.query(cls.submitter_id == user_id).get() is not None
+
     @classmethod
     def fetch_page(cls, page_size, cursor):
         """Fetches a list of all query_models sorted by creation date.
@@ -949,6 +1376,25 @@ class UserBulkEmailsModel(base_models.BaseModel):
     # user.
     sent_email_model_ids = ndb.StringProperty(indexed=True, repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """User bulk emails can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserBulkEmailsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
 
 class UserSkillMasteryModel(base_models.BaseModel):
     """Model for storing a user's degree of mastery of a skill in Oppia.
@@ -964,6 +1410,25 @@ class UserSkillMasteryModel(base_models.BaseModel):
     skill_id = ndb.StringProperty(required=True, indexed=True)
     # The degree of mastery of the user in the skill.
     degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User skill mastery can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserSkillMasteryModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):
@@ -1016,6 +1481,25 @@ class UserContributionScoringModel(base_models.BaseModel):
     score = ndb.FloatProperty(required=True, indexed=True)
     # Flag to check if email to onboard reviewer has been sent for the category.
     has_email_been_sent = ndb.BooleanProperty(required=True, default=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User bulk emails can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserContributionScoringModels exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):

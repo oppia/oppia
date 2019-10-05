@@ -17,6 +17,10 @@
  */
 
 require(
+  'components/forms/forms-templates/' +
+  'mark-all-audio-and-translations-as-needing-update.controller.ts');
+require('directives/angular-html-bind.directive.ts');
+require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
   'exploration-graph.directive.ts');
 require(
@@ -28,7 +32,6 @@ require(
 require(
   'pages/exploration-editor-page/editor-tab/unresolved-answers-overview/' +
   'unresolved-answers-overview.directive.ts');
-require('components/state-editor/state-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
@@ -42,6 +45,7 @@ require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
+require('components/state-editor/state-editor.directive.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

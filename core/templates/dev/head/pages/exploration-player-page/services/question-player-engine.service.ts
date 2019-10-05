@@ -16,13 +16,15 @@
  * @fileoverview Utility service for the question player for an exploration.
  */
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
-require('expressions/ExpressionInterpolationService.ts');
+require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
+require('services/contextual/UrlService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/stateful/FocusManagerService.ts');
 
@@ -34,17 +36,27 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
   'AlertsService', 'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',
-  'QuestionObjectFactory', 'StateCardObjectFactory',
-  'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
+  'QuestionObjectFactory', 'ReadOnlyExplorationBackendApiService',
+  'StateCardObjectFactory', 'UrlService', 'INTERACTION_DISPLAY_MODE_INLINE',
+  'INTERACTION_SPECS',
   function(
       AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, FocusManagerService,
-      QuestionObjectFactory, StateCardObjectFactory,
-      INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
+      QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
+      StateCardObjectFactory, UrlService, INTERACTION_DISPLAY_MODE_INLINE,
+      INTERACTION_SPECS) {
     var _explorationId = ContextService.getExplorationId();
+    var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
+    var version = UrlService.getExplorationVersionFromUrl();
 
-    var version = GLOBALS.explorationVersion;
+    if (!_questionPlayerMode) {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(_explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    }
 
     var answerIsBeingProcessed = false;
 

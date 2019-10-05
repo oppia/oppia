@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """One-off jobs for collections."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
@@ -24,6 +26,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.platform import models
 import feconf
+import python_utils
 
 (base_models, collection_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection])
@@ -73,7 +76,7 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmds = [{
                 'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
                 'from_version': item.schema_version,
-                'to_version': str(
+                'to_version': python_utils.UNICODE(
                     feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
             }]
             collection_services.update_collection(

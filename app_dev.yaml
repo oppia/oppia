@@ -37,7 +37,6 @@ handlers:
   static_dir: build
   secure: always
   expiration: "90d"
-  application_readable: true
 - url: /third_party/static
   static_dir: third_party/static
   secure: always
@@ -187,17 +186,6 @@ handlers:
 - url: /privacy
   static_files: webpack_bundles/privacy-page.mainpage.html
   upload: webpack_bundles/privacy-page.mainpage.html
-  http_headers:
-    Pragma: no-cache
-    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
-    X-Content-Type-Options: "nosniff"
-    X-Frame-Options: "DENY"
-    X-Xss-Protection: "1; mode=block"
-  secure: always
-  expiration: "0"
-- url: /remove-account
-  static_files: webpack_bundles/remove-account-page.mainpage.html
-  upload: webpack_bundles/remove-account-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"

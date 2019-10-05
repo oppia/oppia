@@ -17,20 +17,27 @@
  * domain objects.
  */
 
-require('domain/exploration/ParamChangeObjectFactory.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('ParamChangesObjectFactory', [
-  'ParamChangeObjectFactory',
-  function(ParamChangeObjectFactory) {
-    var createFromBackendList = function(paramChangeBackendList) {
-      return paramChangeBackendList.map(function(paramChangeBackendDict) {
-        return ParamChangeObjectFactory.createFromBackendDict(
-          paramChangeBackendDict);
-      });
-    };
+import { ParamChange, ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 
-    return {
-      createFromBackendList: createFromBackendList
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class ParamChangesObjectFactory {
+  constructor(private paramChangeObjectFactory: ParamChangeObjectFactory) {}
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'paramChangeBackendList' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  createFromBackendList(paramChangeBackendList: any): ParamChange[] {
+    return paramChangeBackendList.map((paramChangeBackendDict) => {
+      return this.paramChangeObjectFactory.createFromBackendDict(
+        paramChangeBackendDict);
+    });
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'ParamChangesObjectFactory', downgradeInjectable(ParamChangesObjectFactory));

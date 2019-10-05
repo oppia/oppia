@@ -40,8 +40,8 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
     );
 
     var _showEditStateContentSuggestionModal = function(
-        activeThread, setActiveThread, isSuggestionHandled,
-        hasUnsavedChanges, isSuggestionValid) {
+        activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
+        setActiveThread = (threadId) => {}) {
       $uibModal.open({
         templateUrl: _templateUrl,
         backdrop: true,
@@ -140,16 +140,15 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
           }
         ]
       }).result.then(function(result) {
-        ThreadDataService.resolveSuggestion(
+        return ThreadDataService.resolveSuggestion(
           activeThread.threadId, result.action, result.commitMessage,
-          result.reviewMessage, result.audioUpdateRequired, function() {
-            ThreadDataService.fetchThreads(function() {
-              setActiveThread(activeThread.threadId);
-            });
+          result.reviewMessage, result.audioUpdateRequired
+        ).then(
+          function() {
+            setActiveThread(activeThread.threadId);
             // Immediately update editor to reflect accepted suggestion.
-            if (
-              result.action === SuggestionModalService.ACTION_ACCEPT_SUGGESTION
-            ) {
+            if (result.action ===
+                SuggestionModalService.ACTION_ACCEPT_SUGGESTION) {
               var suggestion = activeThread.getSuggestion();
 
               var stateName = suggestion.stateName;
@@ -169,7 +168,8 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
-          }, function() {
+          },
+          function() {
             $log.error('Error resolving suggestion');
           });
       });
@@ -180,10 +180,10 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
             extraParams.activeThread,
-            extraParams.setActiveThread,
             extraParams.isSuggestionHandled,
             extraParams.hasUnsavedChanges,
-            extraParams.isSuggestionValid
+            extraParams.isSuggestionValid,
+            extraParams.setActiveThread
           );
         }
       }

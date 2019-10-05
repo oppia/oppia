@@ -17,82 +17,102 @@
  *     Action domain objects.
  */
 
-require('domain/statistics/statistics-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('LearnerActionObjectFactory', [
-  'LEARNER_ACTION_SCHEMA_LATEST_VERSION',
-  function(LEARNER_ACTION_SCHEMA_LATEST_VERSION) {
-    /**
-     * @constructor
-     * @param {string} actionType - type of an action.
-     * @param {Object.<string, *>} actionCustomizationArgs - customization dict
-     *   for an action.
-     * @param {number} schemaVersion - schema version of the class instance.
-     */
-    var LearnerAction = function(
-        actionType, actionCustomizationArgs, schemaVersion) {
-      if (schemaVersion < 1) {
-        throw new Error('given invalid schema version');
-      }
+import { StatisticsDomainConstants } from
+  'domain/statistics/statistics-domain.constants';
 
-      /** @type {string} */
-      this.actionType = actionType;
-      /** @type {Object.<string, *>} */
-      this.actionCustomizationArgs = actionCustomizationArgs;
-      /** @type {number} */
-      this.schemaVersion = schemaVersion;
+export class LearnerAction {
+  actionType: string;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'outcome' is an outcome domain object and this can be
+  // directly typed to 'Outcome' type once 'OutcomeObjectFactory' is upgraded.
+  actionCustomizationArgs: any;
+  schemaVersion: number;
+  /**
+   * @constructor
+   * @param {string} actionType - type of an action.
+   * @param {Object.<string, *>} actionCustomizationArgs - customization dict
+   *   for an action.
+   * @param {number} schemaVersion - schema version of the class instance.
+   */
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'outcome' is an outcome domain object and this can be
+  // directly typed to 'Outcome' type once 'OutcomeObjectFactory' is upgraded.
+  constructor(
+      actionType: string, actionCustomizationArgs: any, schemaVersion: number) {
+    if (schemaVersion < 1) {
+      throw new Error('given invalid schema version');
+    }
+
+    /** @type {string} */
+    this.actionType = actionType;
+    /** @type {Object.<string, *>} */
+    this.actionCustomizationArgs = actionCustomizationArgs;
+    /** @type {number} */
+    this.schemaVersion = schemaVersion;
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  toBackendDict(): any {
+    return {
+      action_type: this.actionType,
+      action_customization_args: this.actionCustomizationArgs,
+      schema_version: this.schemaVersion,
     };
+  }
+}
 
-    /**
-     * @property {string} actionType - type of an action
-     * @property {Object.<string, *>} actionCustomizationArgs - customization
-     *   dict for an action
-     * @property {number} [schemaVersion=LEARNER_ACTION_SCHEMA_LATEST_VERSION]
-     *   - schema version of the class instance.
-     * @returns {LearnerAction}
-     */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    LearnerAction['createNew'] = function(
-    /* eslint-enable dot-notation */
-        actionType, actionCustomizationArgs, schemaVersion) {
-      schemaVersion = schemaVersion || LEARNER_ACTION_SCHEMA_LATEST_VERSION;
-      return new LearnerAction(
-        actionType, actionCustomizationArgs, schemaVersion);
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerActionObjectFactory {
+  /**
+   * @property {string} actionType - type of an action
+   * @property {Object.<string, *>} actionCustomizationArgs - customization
+   *   dict for an action
+   * @property {number} [schemaVersion=LEARNER_ACTION_SCHEMA_LATEST_VERSION]
+   *   - schema version of the class instance.
+   * @returns {LearnerAction}
+   */
+  createNew(
+      actionType: string, actionCustomizationArgs: any,
+      schemaVersion: number): LearnerAction {
+    schemaVersion = schemaVersion ||
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+    return new LearnerAction(
+      actionType, actionCustomizationArgs, schemaVersion);
+  }
 
-    /**
-     * @typedef LearnerActionBackendDict
-     * @property {string} actionType - type of an action.
-     * @property {Object.<string, *>} actionCustomizationArgs - customization
-     *   dict for an action.
-     * @property {number} schemaVersion - schema version of the class instance.
-     *   Defaults to the latest schema version.
-     */
+  /**
+   * @typedef LearnerActionBackendDict
+   * @property {string} actionType - type of an action.
+   * @property {Object.<string, *>} actionCustomizationArgs - customization
+   *   dict for an action.
+   * @property {number} schemaVersion - schema version of the class instance.
+   *   Defaults to the latest schema version.
+   */
 
-    /**
-     * @param {LearnerActionBackendDict} learnerActionBackendDict
-     * @returns {LearnerAction}
-     */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    LearnerAction['createFromBackendDict'] = function(
-    /* eslint-enable dot-notation */
-        learnerActionBackendDict) {
-      return new LearnerAction(
-        learnerActionBackendDict.action_type,
-        learnerActionBackendDict.action_customization_args,
-        learnerActionBackendDict.schema_version);
-    };
+  /**
+   * @param {LearnerActionBackendDict} learnerActionBackendDict
+   * @returns {LearnerAction}
+   */
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'learnerActionBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(learnerActionBackendDict: any): LearnerAction {
+    return new LearnerAction(
+      learnerActionBackendDict.action_type,
+      learnerActionBackendDict.action_customization_args,
+      learnerActionBackendDict.schema_version);
+  }
+}
 
-    /** @returns {LearnerActionBackendDict} */
-    LearnerAction.prototype.toBackendDict = function() {
-      return {
-        action_type: this.actionType,
-        action_customization_args: this.actionCustomizationArgs,
-        schema_version: this.schemaVersion,
-      };
-    };
-
-    return LearnerAction;
-  }]);
+angular.module('oppia').factory(
+  'LearnerActionObjectFactory',
+  downgradeInjectable(LearnerActionObjectFactory));

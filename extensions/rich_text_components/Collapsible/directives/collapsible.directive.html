@@ -1,0 +1,13 @@
+<uib-accordion>
+  <div uib-accordion-group is-open="$ctrl.isOpen">
+    <uib-accordion-heading>
+      <i class="material-icons float-right md-18" ng-hide="$ctrl.isOpen">&#xE147;</i>
+      <i class="material-icons float-right md-18" ng-show="$ctrl.isOpen">&#xE15C;</i>
+      <div class="protractor-test-collapsible-heading"><[$ctrl.heading]></div>
+    </uib-accordion-heading>
+    <div>
+      <angular-html-bind class="protractor-test-collapsible-content" html-data="$ctrl.content">
+      </angular-html-bind>
+    </div>
+  </div>
+</uib-accordion>

@@ -20,7 +20,7 @@
 
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
+  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 /* eslint-enable max-len */
 
 describe('Thread Status Display Service', () => {
@@ -48,22 +48,22 @@ describe('Thread Status Display Service', () => {
   it('should give appropriate label class for status id', () => {
     var mockStatusID = 'open';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-info');
+      'badge badge-info');
 
     mockStatusID = 'fixed';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
+      'badge badge-secondary');
 
     mockStatusID = 'ignored';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
+      'badge badge-secondary');
 
     mockStatusID = 'not_actionable';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
+      'badge badge-secondary');
 
     mockStatusID = 'compliment';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-success');
+      'badge badge-success');
   });
 });

@@ -15,12 +15,13 @@
 # limitations under the License.
 
 """Tests for the Mailgun API wrapper."""
-
-import urllib2
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class EmailTests(test_utils.GenericTestBase):
@@ -30,15 +31,26 @@ class EmailTests(test_utils.GenericTestBase):
         """Test for sending HTTP POST request."""
         swapped_urlopen = lambda x: x
         swapped_request = lambda *args: args
-        swap_urlopen_context = self.swap(urllib2, 'urlopen', swapped_urlopen)
+        swap_urlopen_context = self.swap(
+            python_utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            urllib2, 'Request', swapped_request)
+            python_utils, 'url_request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            result = mailgun_email_services.post_to_mailgun({'data': 'data'})
+            result = mailgun_email_services.post_to_mailgun({
+                'from': 'a@a.com',
+                'to': 'b@b.com',
+                'subject': 'Hola 😂 - invitation to collaborate'.encode(
+                    encoding='utf-8'),
+                'text': 'plaintext_body 😂'.encode(encoding='utf-8'),
+                'html': 'Hi abc,<br> 😂'.encode(encoding='utf-8')
+            })
             expected = (
-                'https://api.mailgun.net/v3/domain/messages', 'data=data',
+                'https://api.mailgun.net/v3/domain/messages',
+                ('to=b%40b.com&text=plaintext_body+%F0%9F%98%82&html=Hi+abc'
+                 '%2C%3Cbr%3E+%F0%9F%98%82&from=a%40a.com&subject=Hola+%F0'
+                 '%9F%98%82+-+invitation+to+collaborate'),
                 {'Authorization': 'Basic YXBpOmtleQ=='})
             self.assertEqual(result, expected)
 
@@ -135,10 +147,12 @@ class EmailTests(test_utils.GenericTestBase):
         reply_id = 123
 
         # Lambda function, will replace post_to_mailgun().
-        req_post_lambda = (lambda data=None:
-                           self.assertEqual(data['h:Reply-To'],
-                                            'reply+' + str(reply_id) + '@' +
-                                            feconf.INCOMING_EMAILS_DOMAIN_NAME))
+        req_post_lambda = (
+            lambda data=None:
+            self.assertEqual(
+                data['h:Reply-To'],
+                'reply+' + python_utils.UNICODE(reply_id) + '@' +
+                feconf.INCOMING_EMAILS_DOMAIN_NAME))
         post_request = self.swap(
             mailgun_email_services, 'post_to_mailgun', req_post_lambda)
 

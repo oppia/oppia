@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Python configuration for LogicProof interaction."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
 
@@ -26,7 +28,7 @@ class LogicProof(base.BaseInteraction):
     description = (
         'Allows learners to write proofs for simple logical statements.')
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    _dependency_ids = ['logic_proof', 'codemirror']
+    _dependency_ids = ['codemirror']
     answer_type = 'CheckedProof'
     instructions = 'Construct a proof'
     narrow_instructions = 'Construct a proof'

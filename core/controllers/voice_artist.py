@@ -15,41 +15,19 @@
 # limitations under the License.
 
 """Controllers for the translation changes."""
-
-import StringIO
-import datetime
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import user_services
-from core.platform import models
 import feconf
-import utils
+import python_utils
 
 import mutagen
 from mutagen import mp3
-
-app_identity_services = models.Registry.import_app_identity_services()
-current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
-
-
-def _require_valid_version(version_from_payload, exploration_version):
-    """Check that the payload version matches the given exploration version."""
-    if version_from_payload is None:
-        raise base.BaseHandler.InvalidInputException(
-            'Invalid POST request: a version must be specified.')
-
-    if version_from_payload != exploration_version:
-        raise base.BaseHandler.InvalidInputException(
-            'Trying to update version %s of exploration from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (exploration_version, version_from_payload))
 
 
 class AudioUploadHandler(base.BaseHandler):
@@ -66,7 +44,7 @@ class AudioUploadHandler(base.BaseHandler):
         """Saves an audio file uploaded by a content creator."""
         raw_audio_file = self.request.get('raw_audio_file')
         filename = self.payload.get('filename')
-        allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
+        allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
         if not raw_audio_file:
             raise self.InvalidInputException('No audio supplied')
@@ -82,7 +60,7 @@ class AudioUploadHandler(base.BaseHandler):
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
 
-        tempbuffer = StringIO.StringIO()
+        tempbuffer = python_utils.string_io()
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:
@@ -137,85 +115,6 @@ class AudioUploadHandler(base.BaseHandler):
             raw_audio_file, mimetype=mimetype)
 
         self.render_json({'filename': filename})
-
-
-class VoiceArtistAutosaveHandler(base.BaseHandler):
-    """Handles requests from the voice artist for draft autosave."""
-
-    @acl_decorators.can_voiceover_exploration
-    def put(self, exploration_id):
-        """Handles PUT requests for draft updation."""
-        # Raise an Exception if the draft change list fails non-strict
-        # validation.
-        try:
-            change_list_dict = self.payload.get('change_list')
-            change_list = [
-                exp_domain.ExplorationChange(change)
-                for change in change_list_dict]
-            version = self.payload.get('version')
-            exp_services.create_or_update_draft(
-                exploration_id, self.user_id, change_list, version,
-                datetime.datetime.utcnow(), is_by_voice_artist=True)
-        except utils.ValidationError as e:
-            # We leave any pre-existing draft changes in the datastore.
-            raise self.InvalidInputException(e)
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.user_id, exploration_id)
-        draft_change_list_id = exp_user_data.draft_change_list_id
-        # If the draft_change_list_id is False, have the user discard the draft
-        # changes. We save the draft to the datastore even if the version is
-        # invalid, so that it is available for recovery later.
-        self.render_json({
-            'draft_change_list_id': draft_change_list_id,
-            'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
-                exploration_id, version)})
-
-    @acl_decorators.can_voiceover_exploration
-    def post(self, exploration_id):
-        """Handles POST request for discarding draft changes."""
-        exp_services.discard_draft(exploration_id, self.user_id)
-        self.render_json({})
-
-
-class ExplorationVoiceoverHandler(base.BaseHandler):
-    """Handles updates to exploration voiceovers. It returns json format
-    response when an exception is raised.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_voiceover_exploration
-    def put(self, exploration_id):
-        """Updates properties of the given exploration.
-
-        Args:
-            exploration_id: str. Id of exploration to be updated.
-
-        Raises:
-            InvalidInputException: The exploration update operation failed.
-            PageNotFoundException: No exploration data exist for given user id
-                and exploration id.
-        """
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        version = self.payload.get('version')
-        _require_valid_version(version, exploration.version)
-        commit_message = self.payload.get('commit_message')
-        change_list_dict = self.payload.get('change_list')
-        change_list = [
-            exp_domain.ExplorationChange(change) for change in change_list_dict]
-
-        try:
-            exp_services.update_exploration(
-                self.user_id, exploration_id, change_list, commit_message,
-                is_by_voice_artist=True)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
-        exploration_data = exp_services.get_user_exploration_data(
-            self.user_id, exploration_id)
-
-        self.values.update(exploration_data)
-        self.render_json(self.values)
 
 
 class StartedTranslationTutorialEventHandler(base.BaseHandler):

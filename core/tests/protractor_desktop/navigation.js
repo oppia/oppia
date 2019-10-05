@@ -143,10 +143,9 @@ describe('DEV MODE Test', function() {
   it('should not show Dev Mode label in prod', function() {
     browser.get('/splash');
     waitFor.pageToFullyLoad();
-    general.isInDevMode().then(function(isInDevMode) {
-      expect(element(
-        by.css('.protractor-test-dev-mode')).isPresent()).toBe(isInDevMode);
-    });
+    expect(element(
+      by.css('.protractor-test-dev-mode')).isPresent())
+      .toBe(general.isInDevMode());
   });
 });
 
@@ -215,11 +214,10 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
 
-  it('redirects to the test server', function() {
-    browser.driver.get('https://oppiaserver.appspot.com/about');
+  it('shows the error page when an incorrect url is given', function() {
+    browser.get('/splashes');
     waitFor.pageToFullyLoad();
-    browser.getCurrentUrl().then(function(url) {
-      expect(url).toBe('https://oppiatestserver.appspot.com/splash');
-    });
+    expect(element(
+      by.css('.protractor-test-error-page')).isPresent()).toBe(true);
   });
 });

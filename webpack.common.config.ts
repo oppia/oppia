@@ -16,13 +16,10 @@
  * @fileoverview General config file for Webpack.
  */
 
-const CKEditorWebpackPlugin = require(
-  '@ckeditor/ckeditor5-dev-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
-const { styles } = require('@ckeditor/ckeditor5-dev-utils/lib/');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -43,8 +40,10 @@ module.exports = {
       path.resolve(__dirname, 'assets'),
       path.resolve(__dirname, 'core/templates/dev/head'),
       path.resolve(__dirname, 'extensions'),
-      path.resolve(__dirname, 'node_modules')
+      path.resolve(__dirname, 'node_modules'),
+      path.resolve(__dirname, 'third_party')
     ],
+    extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
     alias: {
       '@angular/upgrade/static': (
         '@angular/upgrade/bundles/upgrade-static.umd.js')
@@ -53,6 +52,8 @@ module.exports = {
   entry: {
     about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
+    classroom:
+      commonPrefix + '/pages/classroom-page/classroom-page.scripts.ts',
     collection_editor:
       commonPrefix + '/pages/collection-editor-page/' +
       'collection-editor-page.scripts.ts',
@@ -60,9 +61,13 @@ module.exports = {
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.scripts.ts',
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
+    console_errors: commonPrefix + '/tests/console_errors.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
       'creator-dashboard-page.scripts.ts',
+    community_dashboard:
+      commonPrefix + '/pages/community-dashboard-page/' +
+      'community-dashboard-page.scripts.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.scripts.ts',
     email_dashboard:
       commonPrefix +
@@ -100,9 +105,6 @@ module.exports = {
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.scripts.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.scripts.ts',
-    remove_account:
-      commonPrefix + '/pages/remove-account-page/' +
-        'remove-account-page.scripts.ts',
     review_test:
       commonPrefix + '/pages/review-test-page/review-test-page.scripts.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.scripts.ts',
@@ -116,6 +118,9 @@ module.exports = {
       commonPrefix + '/pages/story-editor-page/story-editor-page.scripts.ts',
     story_viewer:
       commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
+    subtopic_viewer:
+      commonPrefix +
+      '/pages/subtopic-viewer-page/subtopic-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.scripts.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.scripts.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.scripts.ts',
@@ -130,9 +135,6 @@ module.exports = {
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
   },
   plugins: [
-    new CKEditorWebpackPlugin({
-      language: 'en'
-    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',
@@ -147,12 +149,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      filename: 'base.html',
-      template: 'core/templates/dev/head/pages/base.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['about'],
       filename: 'about-page.mainpage.html',
       meta: {
@@ -162,6 +158,16 @@ module.exports = {
         'site to create 1-1 learning scenarios for others.'
       },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['classroom'],
+      filename: 'classroom-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/classroom-page/' +
+        'classroom-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -194,6 +200,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['console_errors'],
       filename: 'console_errors.html',
       template: commonPrefix + '/tests/console_errors.html',
       minify: htmlMinifyConfig,
@@ -218,6 +225,16 @@ module.exports = {
       template:
         commonPrefix + '/pages/creator-dashboard-page/' +
         'creator-dashboard-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['community_dashboard'],
+      filename: 'community-dashboard-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/community-dashboard-page/' +
+        'community-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -261,14 +278,56 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error-page.mainpage.html',
+      filename: 'error-page-400.mainpage.html',
+      meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      statusCode: 400
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-page-401.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      statusCode: 401
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-page-404.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      statusCode: 404
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-page-500.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      statusCode: 500
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-iframed.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['exploration_editor'],
       filename: 'exploration-editor-page.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Help others learn new things. Create lessons through ' +
+          'explorations and share your knowledge with the community.'
+      },
       template:
         commonPrefix + '/pages/exploration-editor-page/' +
         'exploration-editor-page.mainpage.html',
@@ -401,16 +460,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['remove_account'],
-      filename: 'remove-account-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/remove-account-page/' +
-          'remove-account-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['review_test'],
       filename: 'review-test-page.mainpage.html',
       meta: defaultMeta,
@@ -477,9 +526,20 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['story_viewer'],
       filename: 'story-viewer-page.mainpage.html',
+      meta: defaultMeta,
       template:
         commonPrefix + '/pages/story-viewer-page/' +
         'story-viewer-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['subtopic_viewer'],
+      filename: 'subtopic-viewer-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/subtopic-viewer-page/' +
+        'subtopic-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -555,33 +615,12 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
     }),
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+    new ForkTsCheckerWebpackPlugin({
+      checkSyntacticErrors: true
+    })
   ],
   module: {
     rules: [{
-      test: /ckeditor5-[^\/]+\/theme\/icons\/[^\/]+\.svg$/,
-      use: ['raw-loader']
-    },
-    {
-      test: /ckeditor5-[^\/]+\/theme\/[-\w\/]+\.css$/,
-      use: [{
-        loader: 'style-loader',
-        options: {
-          singleton: true
-        }
-      },
-      {
-        loader: 'postcss-loader',
-        options: styles.getPostCssConfig( {
-          themeImporter: {
-            themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-          },
-          minify: true
-        })
-      },
-      ]
-    },
-    {
       test: /\.ts$/,
       include: [
         path.resolve(__dirname, 'assets'),
@@ -604,13 +643,19 @@ module.exports = {
     {
       test: /\.html$/,
       loader: 'underscore-template-loader'
+    },
+    {
+      test: /\.css$/,
+      include: [
+        path.resolve(__dirname, 'extensions'),
+      ],
+      use: ['style-loader', 'css-loader']
     }]
   },
   optimization: {
+    runtimeChunk: 'single',
     splitChunks: {
-      chunks: 'all',
-      minSize: 1024 * 10,
-      maxInitialRequests: 9,
-    }
+      chunks: 'all'
+    },
   }
 };

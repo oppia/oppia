@@ -1,15 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base_components/header.html', {"title": "Skill Editor"})
-    <script>
-      var GLOBALS = {
-        ADDITIONAL_ANGULAR_MODULES: JSON.parse(
-          '{{additional_angular_modules|js_string}}'),
-        GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
-        INTERACTION_SPECS: JSON.parse('{{INTERACTION_SPECS|js_string}}')
-      };
-    </script>
+    @require('../../base-components/header.template.html', {"title": "Skill Editor"})
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
@@ -33,11 +25,9 @@
       </base-content>
     </div>
 
-    <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
-    <script src="/templates/dev/head/mathjaxConfig.js"></script>
-    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     @require('../footer_js_libs.html')
-    {{ interaction_templates }}
-    {{ dependencies_html }}
+    <script src="/third_party/static/ckeditor-4.12.1/ckeditor.js"></script>
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    @require('../../../../../../extensions/interactions/codemirror.html')
   </body>
 </html>

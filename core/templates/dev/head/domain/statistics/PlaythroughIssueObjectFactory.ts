@@ -20,7 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export class ExplorationIssue {
+export class PlaythroughIssue {
   issueType: string;
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'issueCustomizationArgs' is a dict with possible
@@ -91,14 +91,14 @@ export class PlaythroughIssueObjectFactory {
    */
   /**
    * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
-   * @returns {ExplorationIssue}
+   * @returns {PlaythroughIssue}
    */
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'explorationIssueBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  createFromBackendDict(explorationIssueBackendDict: any): ExplorationIssue {
-    return new ExplorationIssue(
+  createFromBackendDict(explorationIssueBackendDict: any): PlaythroughIssue {
+    return new PlaythroughIssue(
       explorationIssueBackendDict.issue_type,
       explorationIssueBackendDict.issue_customization_args,
       explorationIssueBackendDict.playthrough_ids,

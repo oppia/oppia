@@ -16,13 +16,20 @@
  * @fileoverview Directives for the outcome editor.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require('components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require('directives/angular-html-bind.directive.ts');
+
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
 angular.module('oppia').directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

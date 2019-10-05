@@ -61,5 +61,5 @@ export class ObjectsDomainConstants {
       front_units: [],
       base_unit: '0.01 rupee'
     }
-  }
+  };
 }

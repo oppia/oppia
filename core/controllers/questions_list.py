@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the questions list in topic editors and skill editors."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -43,7 +45,7 @@ class QuestionsListHandler(base.BaseHandler):
 
         try:
             skill_services.get_multi_skills(skill_ids)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
         question_summaries, skill_descriptions_list, next_start_cursor = (

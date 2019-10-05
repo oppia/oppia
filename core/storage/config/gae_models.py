@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Models relating to configuration properties."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import core.storage.base_model.gae_models as base_models
 
@@ -42,6 +44,11 @@ class ConfigPropertyModel(base_models.VersionedModel):
 
     # The property value.
     value = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Config property is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)

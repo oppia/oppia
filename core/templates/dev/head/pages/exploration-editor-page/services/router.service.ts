@@ -46,6 +46,21 @@ angular.module('oppia').factory('RouterService', [
 
     var SLUG_GUI = 'gui';
     var SLUG_PREVIEW = 'preview';
+    // PREVIEW_TAB_WAIT_TIME_MSEC is the minimum duration to wait
+    // before calling _actuallyNavigate. This is done in order to
+    // ensure all pending changes are saved before navigating to
+    // the preview tab.
+    // _savePendingChanges triggers 'externalSave' event which
+    // will be caught by appropriate editors that will
+    // save pending changes. However, the autosave / saving of
+    // changelist is async. Promises cannot be used here to
+    // ensure that _actuallyNavigate is called only after
+    // _savePendingChanges has completed because there is
+    // currently no way to check if all promises returned are
+    // resolved after the 'externalSave' is triggered. Therefore,
+    // to allow autosave / saving of change list to complete,
+    // PREVIEW_TAB_WAIT_TIME_MSEC is provided.
+    var PREVIEW_TAB_WAIT_TIME_MSEC = 200;
 
     var activeTabName = TABS.MAIN.name;
 
@@ -98,7 +113,7 @@ angular.module('oppia').factory('RouterService', [
           if (ExplorationFeaturesService.isInitialized()) {
             $interval.cancel(waitToCheckThatImprovementsTabIsEnabled);
             if (!ExplorationFeaturesService.isImprovementsTabEnabled()) {
-              RouterService.navigateToMainTab();
+              RouterService.navigateToMainTab(null);
             }
           }
         }, 5);
@@ -114,7 +129,7 @@ angular.module('oppia').factory('RouterService', [
           if (ExplorationFeaturesService.isInitialized()) {
             $interval.cancel(waitToCheckThatFeedbackTabIsEnabled);
             if (ExplorationFeaturesService.isImprovementsTabEnabled()) {
-              RouterService.navigateToMainTab();
+              RouterService.navigateToMainTab(null);
             }
           }
         }, 5);
@@ -235,7 +250,9 @@ angular.module('oppia').factory('RouterService', [
       navigateToPreviewTab: function() {
         if (activeTabName !== TABS.PREVIEW.name) {
           _savePendingChanges();
-          _actuallyNavigate(SLUG_PREVIEW, null);
+          $timeout(function() {
+            _actuallyNavigate(SLUG_PREVIEW, null);
+          }, PREVIEW_TAB_WAIT_TIME_MSEC);
         }
       },
       navigateToStatsTab: function() {

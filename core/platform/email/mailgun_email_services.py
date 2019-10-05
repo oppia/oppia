@@ -15,13 +15,14 @@
 # limitations under the License.
 
 """Provides mailgun api to send email."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
-import urllib
-import urllib2
 
 from core.platform.email import gae_email_services
 import feconf
+import python_utils
 
 
 def post_to_mailgun(data):
@@ -46,9 +47,9 @@ def post_to_mailgun(data):
     header = {'Authorization': auth_str}
     server = (
         'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
-    data = urllib.urlencode(data)
-    req = urllib2.Request(server, data, header)
-    return urllib2.urlopen(req)
+    data = python_utils.url_encode(data)
+    req = python_utils.url_request(server, data, header)
+    return python_utils.url_open(req)
 
 
 def send_mail(
@@ -84,9 +85,10 @@ def send_mail(
     data = {
         'from': sender_email,
         'to': recipient_email,
-        'subject': subject,
-        'text': plaintext_body,
-        'html': html_body}
+        'subject': subject.encode(encoding='utf-8'),
+        'text': plaintext_body.encode(encoding='utf-8'),
+        'html': html_body.encode(encoding='utf-8')
+    }
 
     if bcc_admin:
         data['bcc'] = feconf.ADMIN_EMAIL_ADDRESS
@@ -133,7 +135,7 @@ def send_bulk_mail(
     # https://documentation.mailgun.com/user_manual.html#batch-sending
     recipient_email_sets = [
         recipient_emails[i:i + 1000]
-        for i in xrange(0, len(recipient_emails), 1000)]
+        for i in python_utils.RANGE(0, len(recipient_emails), 1000)]
 
     for email_set in recipient_email_sets:
         # 'recipient-variable' in post data forces mailgun to send individual
@@ -142,9 +144,9 @@ def send_bulk_mail(
         data = {
             'from': sender_email,
             'to': email_set,
-            'subject': subject,
-            'text': plaintext_body,
-            'html': html_body,
+            'subject': subject.encode(encoding='utf-8'),
+            'text': plaintext_body.encode(encoding='utf-8'),
+            'html': html_body.encode(encoding='utf-8'),
             'recipient-variables': '{}'}
 
         post_to_mailgun(data)

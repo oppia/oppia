@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base_components/header.html', {"title": "Oppia"})
+    @require('../../base-components/header.template.html', {"title": "Oppia"})
     <style>
       html, body {
         background: #eeeeee no-repeat center center fixed;
@@ -94,7 +94,7 @@
           <collection-player-page></collection-player-page>
         </content>
         <page-footer>
-          <collection-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></collection-footer>
+          <collection-footer></collection-footer>
         </page-footer>
       </base-content>
     </div>

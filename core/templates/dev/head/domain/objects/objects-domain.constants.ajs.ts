@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants.ts';
+  'domain/objects/objects-domain.constants';
 
 angular.module('oppia').constant(
   'FRACTION_PARSING_ERRORS', ObjectsDomainConstants.FRACTION_PARSING_ERRORS);

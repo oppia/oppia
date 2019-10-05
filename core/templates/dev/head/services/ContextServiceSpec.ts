@@ -209,6 +209,32 @@ describe('Context service', function() {
     });
   });
 
+  describe('behavior in the subtopic viewer view', function() {
+    var ecs = null;
+
+    beforeEach(function() {
+      angular.mock.module(function($provide) {
+        $provide.value('UrlService', {
+          getPathname: function() {
+            return '/subtopic/topic_id/1';
+          }
+        });
+      });
+    });
+
+    beforeEach(angular.mock.inject(function($injector) {
+      ecs = $injector.get('ContextService');
+    }));
+
+    it('should correctly retrieve the topic id', function() {
+      expect(ecs.getEntityId()).toBe('topic_id');
+    });
+
+    it('should correctly retrieve the entity type', function() {
+      expect(ecs.getEntityType()).toBe('subtopic');
+    });
+  });
+
   describe('behavior in the story editor view', function() {
     var ecs = null;
 

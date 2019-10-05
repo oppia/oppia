@@ -15,6 +15,9 @@
 # limitations under the License.
 
 """Tests for filesystem-related domain objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import logging
 import os
 
@@ -23,6 +26,7 @@ from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 app_identity_services = models.Registry.import_app_identity_services()
@@ -64,9 +68,10 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
     def test_get_raises_error_when_file_size_is_more_than_1_mb(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
 
-        with open(
+        with python_utils.open_file(
             os.path.join(
-                feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3')) as f:
+                feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3'),
+            'rb', encoding=None) as f:
             raw_bytes = f.read()
 
         with self.assertRaisesRegexp(

@@ -16,17 +16,16 @@
  * @fileoverview Tests for StoryNodeObjectFactory.
  */
 
-require('domain/story/StoryNodeObjectFactory.ts');
+import { StoryNodeObjectFactory } from
+  'domain/story/StoryNodeObjectFactory';
 
-describe('Story node object factory', function() {
-  var StoryNodeObjectFactory = null;
+describe('Story node object factory', () => {
+  let storyNodeObjectFactory: StoryNodeObjectFactory = null;
   var _sampleSubtopic = null;
   var _sampleStoryNode = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    StoryNodeObjectFactory = $injector.get('StoryNodeObjectFactory');
+  beforeEach(() => {
+    storyNodeObjectFactory = new StoryNodeObjectFactory();
 
     var sampleStoryNodeBackendDict = {
       id: 'node_1',
@@ -38,12 +37,12 @@ describe('Story node object factory', function() {
       exploration_id: null,
       outline_is_finalized: false
     };
-    _sampleStoryNode = StoryNodeObjectFactory.createFromBackendDict(
+    _sampleStoryNode = storyNodeObjectFactory.createFromBackendDict(
       sampleStoryNodeBackendDict);
-  }));
+  });
 
-  it('should correctly create a node from node id alone', function() {
-    var storyNode = StoryNodeObjectFactory.createFromIdAndTitle(
+  it('should correctly create a node from node id alone', () => {
+    var storyNode = storyNodeObjectFactory.createFromIdAndTitle(
       'node_1', 'Title 1');
     expect(storyNode.getId()).toEqual('node_1');
     expect(storyNode.getTitle()).toEqual('Title 1');
@@ -55,11 +54,11 @@ describe('Story node object factory', function() {
     expect(storyNode.getExplorationId()).toEqual(null);
   });
 
-  it('should correctly validate a valid story node', function() {
+  it('should correctly validate a valid story node', () => {
     expect(_sampleStoryNode.validate()).toEqual([]);
   });
 
-  it('should correctly validate story nodes', function() {
+  it('should correctly validate story nodes', () => {
     _sampleStoryNode.addPrerequisiteSkillId('skill_2');
     _sampleStoryNode.addDestinationNodeId('node_1');
 
@@ -71,27 +70,27 @@ describe('Story node object factory', function() {
   });
 
   it('should correctly throw error when duplicate values are added to arrays',
-    function() {
-      expect(function() {
+    () => {
+      expect(() => {
         _sampleStoryNode.addDestinationNodeId('node_2');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryNode.addPrerequisiteSkillId('skill_1');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryNode.addAcquiredSkillId('skill_2');
       }).toThrow();
     });
 
   it('should correctly throw error when invalid values are deleted from arrays',
-    function() {
-      expect(function() {
+    () => {
+      expect(() => {
         _sampleStoryNode.removeDestinationNodeId('node_5');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryNode.removePrerequisiteSkillId('skill_4');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryNode.removeAcquiredSkillId('skill_4');
       }).toThrow();
     });

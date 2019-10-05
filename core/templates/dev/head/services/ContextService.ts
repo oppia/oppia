@@ -89,6 +89,9 @@ angular.module('oppia').factory('ContextService', [
                 pathnameArray[i] === 'review_test') {
               pageContext = PAGE_CONTEXT.QUESTION_PLAYER;
               return PAGE_CONTEXT.QUESTION_PLAYER;
+            } else if (pathnameArray[i] === 'collection_editor') {
+              pageContext = PAGE_CONTEXT.COLLECTION_EDITOR;
+              return PAGE_CONTEXT.COLLECTION_EDITOR;
             }
           }
 
@@ -109,10 +112,10 @@ angular.module('oppia').factory('ContextService', [
         var pathnameArray = UrlService.getPathname().split('/');
         for (var i = 0; i < pathnameArray.length; i++) {
           if (pathnameArray[i] === 'embed') {
-            return pathnameArray[i + 2];
+            return decodeURI(pathnameArray[i + 2]);
           }
         }
-        return pathnameArray[2];
+        return decodeURI(pathnameArray[2]);
       },
 
       getEntityType: function() {
@@ -125,6 +128,9 @@ angular.module('oppia').factory('ContextService', [
           }
           if (pathnameArray[i] === 'topic_editor') {
             return ENTITY_TYPE.TOPIC;
+          }
+          if (pathnameArray[i] === 'subtopic') {
+            return ENTITY_TYPE.SUBTOPIC;
           }
           if (pathnameArray[i] === 'story_editor') {
             return ENTITY_TYPE.STORY;

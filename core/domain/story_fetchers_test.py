@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests the methods defined in story fetchers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -88,10 +90,25 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.description, 'Description')
         self.assertEqual(story_summary.node_count, 1)
 
-    def test_get_story_by_id(self):
+    def test_get_story_by_id_with_valid_ids_returns_correct_dict(self):
         expected_story = self.story.to_dict()
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.to_dict(), expected_story)
+
+    def test_get_stories_by_ids(self):
+        expected_story = self.story.to_dict()
+        stories = story_fetchers.get_stories_by_ids([self.STORY_ID])
+        self.assertEqual(len(stories), 1)
+        self.assertEqual(stories[0].to_dict(), expected_story)
+
+    def test_get_stories_by_ids_for_non_existing_story_returns_none(self):
+        non_exiting_story_id = 'invalid_id'
+        expected_story = self.story.to_dict()
+        stories = story_fetchers.get_stories_by_ids(
+            [self.STORY_ID, non_exiting_story_id])
+        self.assertEqual(len(stories), 2)
+        self.assertEqual(stories[0].to_dict(), expected_story)
+        self.assertEqual(stories[1], None)
 
     def test_get_story_summary_by_id(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)

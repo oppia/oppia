@@ -13,10 +13,13 @@
 # limitations under the License.
 
 """Controllers for the topic viewer page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 import feconf
@@ -49,8 +52,10 @@ class TopicPageDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        canonical_story_ids = topic.get_canonical_story_ids()
-        additional_story_ids = topic.get_additional_story_ids()
+        canonical_story_ids = topic.get_canonical_story_ids(
+            include_only_published=True)
+        additional_story_ids = topic.get_additional_story_ids(
+            include_only_published=True)
         canonical_story_summaries = [
             story_fetchers.get_story_summary_by_id(
                 canonical_story_id) for canonical_story_id
@@ -72,12 +77,26 @@ class TopicPageDataHandler(base.BaseHandler):
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
         subtopics = topic.get_all_subtopics()
 
+        assigned_skill_ids = topic.get_all_skill_ids()
+        skill_descriptions = skill_services.get_skill_descriptions_by_ids(
+            topic.id, assigned_skill_ids)
+
+        if self.user_id:
+            degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
+                self.user_id, assigned_skill_ids)
+        else:
+            degrees_of_mastery = {}
+            for skill_id in assigned_skill_ids:
+                degrees_of_mastery[skill_id] = None
+
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
             'canonical_story_dicts': canonical_story_dicts,
             'additional_story_dicts': additional_story_dicts,
             'uncategorized_skill_ids': uncategorized_skill_ids,
-            'subtopics': subtopics
+            'subtopics': subtopics,
+            'degrees_of_mastery': degrees_of_mastery,
+            'skill_descriptions': skill_descriptions
         })
         self.render_json(self.values)

@@ -16,6 +16,8 @@
 # limitations under the License.
 
 """Tests for the incoming email handler."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import feedback_services
 from core.platform import models
@@ -76,8 +78,8 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
                 model.reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
             # Send email to Oppia.
             self.post_email(
-                str(recipient_email), self.USER_A_EMAIL,
-                'feedback email reply', 'New reply')
+                recipient_email, self.USER_A_EMAIL, 'feedback email reply',
+                'New reply')
 
             # Check that new message is added.
             messages = feedback_services.get_messages(thread_id)

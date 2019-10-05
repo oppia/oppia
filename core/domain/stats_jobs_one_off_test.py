@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for one off statistics jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -1396,12 +1398,13 @@ class RecomputeStatisticsValidationCopyOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(state_stats['num_completions_v2'], 9)
 
 
-class TestRegenerateMissingStatsModels(OneOffJobTestBase):
+class TestMissingStatsModelRegenerationOneOffJob(OneOffJobTestBase):
     """Tests the regeneration of missing stats models."""
-    ONE_OFF_JOB_CLASS = stats_jobs_one_off.RegenerateMissingStatsModels
+    ONE_OFF_JOB_CLASS = (
+        stats_jobs_one_off.MissingStatsModelRegenerationOneOffJob)
 
     def setUp(self):
-        super(TestRegenerateMissingStatsModels, self).setUp()
+        super(TestMissingStatsModelRegenerationOneOffJob, self).setUp()
         self.EXP_ID = 'EXP_ID'
         self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner_id')
         self.state_name = self.exp.init_state_name

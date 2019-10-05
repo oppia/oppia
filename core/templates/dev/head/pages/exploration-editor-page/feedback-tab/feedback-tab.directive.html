@@ -8,8 +8,8 @@
       <br>
     </div>
 
-    <div class="pull-right">
-      <button ng-if="$ctrl.userIsLoggedIn" class="btn btn-success pull-right" ng-click="$ctrl.showCreateThreadModal()">
+    <div class="float-right">
+      <button ng-if="$ctrl.userIsLoggedIn" class="btn btn-success float-right" ng-click="$ctrl.showCreateThreadModal()">
         Start new thread
       </button>
     </div>
@@ -31,9 +31,9 @@
 
   <div ng-if="$ctrl.activeThread">
     <div class="row">
-      <div class="col-lg-9 col-md-9 col-sm-9">
+      <div class="col-lg-8 col-md-8 col-sm-8">
         <span class="oppia-back-arrow">
-          <button type="button" class="btn btn-default btn-xs protractor-test-oppia-feedback-back-button" ng-click="$ctrl.onBackButtonClicked()">
+          <button type="button" class="btn btn-secondary btn-sm protractor-test-oppia-feedback-back-button" ng-click="$ctrl.onBackButtonClicked()">
             <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
           </button>
         </span>
@@ -41,12 +41,12 @@
         <span style="font-size: larger" ng-show="$ctrl.activeThread.isSuggestionThread()">Suggestion Thread: <[$ctrl.activeThread.subject]></span>
       </div>
 
-      <div style="float: right;" class="col-lg-5 col-md-5 col-sm-5">
-        <div class="pull-right">
-          <span ng-if="$ctrl.activeThread.stateName" class="label label-info">
+      <div class="col-lg-4 col-md-4 col-sm-4 float-right">
+        <div class="float-right">
+          <span ng-if="$ctrl.activeThread.stateName" class="badge badge-info">
             state: <[$ctrl.activeThread.stateName]>
           </span>
-          <span ng-class="$ctrl.getLabelClass($ctrl.activeThread.status)">
+          <span ng-class="$ctrl.getLabelClass($ctrl.activeThread.status)" class="protractor-test-oppia-feedback-status-name">
             <[$ctrl.getHumanReadableStatus($ctrl.activeThread.status)]>
           </span>
         </div>
@@ -116,7 +116,7 @@
         <div>
           <span ng-show="$ctrl.isExplorationEditable() && !$ctrl.activeThread.isSuggestionThread()">
             Change status (optional):
-            <select ng-model="$ctrl.tmpMessage.status"
+            <select class="protractor-test-oppia-feedback-status-menu" ng-model="$ctrl.tmpMessage.status"
                     ng-options="choice.id as choice.text for choice in $ctrl.STATUS_CHOICES"
                     ng-disabled="$ctrl.messageSendingInProgress">
             </select>
@@ -143,10 +143,13 @@
 
 
 <style>
+  feedback-tab > .btn-sm {
+    padding: 1px 5px 1px 5px;
+  }
   /* Overwrite the default "success" color to a darker shade of green in order
   to prevent this overshadowing the active action buttons (like "Create New
   Thread"). */
-  .oppia-feedback-card span.label.label-success {
+  .oppia-feedback-card span.badge.badge-success {
     background-color: #038603;
   }
   .activeThreadView {

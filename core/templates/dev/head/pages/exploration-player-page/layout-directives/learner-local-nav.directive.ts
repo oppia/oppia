@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
@@ -48,18 +49,24 @@ angular.module('oppia').directive('learnerLocalNav', [
       controller: [
         '$http', '$rootScope', '$uibModal', 'AlertsService',
         'ExplorationEngineService', 'ExplorationPlayerStateService',
-        'FocusManagerService', 'SuggestionModalForExplorationPlayerService',
+        'FocusManagerService', 'ReadOnlyExplorationBackendApiService',
+        'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
             $http, $rootScope, $uibModal, AlertsService,
             ExplorationEngineService, ExplorationPlayerStateService,
-            FocusManagerService, SuggestionModalForExplorationPlayerService,
+            FocusManagerService, ReadOnlyExplorationBackendApiService,
+            SuggestionModalForExplorationPlayerService,
             UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.explorationId = ExplorationEngineService.getExplorationId();
-          ctrl.canEdit = GLOBALS.canEdit;
+          ReadOnlyExplorationBackendApiService
+            .loadExploration(ctrl.explorationId)
+            .then(function(exploration) {
+              ctrl.canEdit = exploration.can_edit;
+            });
           ctrl.username = '';
           $rootScope.loadingMessage = 'Loading';
           UserService.getUserInfoAsync().then(function(userInfo) {

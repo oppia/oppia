@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Classes for handling events."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
@@ -26,13 +28,14 @@ from core.domain import stats_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
+import python_utils
 
 (stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class BaseEventHandler(object):
+class BaseEventHandler(python_utils.OBJECT):
     """Base class for event dispatchers."""
 
     # A string denoting the type of the event. Should be specified by
@@ -271,7 +274,7 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
         pass
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of event handlers."""
 
     # Dict mapping event types to their classes.
@@ -283,7 +286,7 @@ class Registry(object):
         cls._event_types_to_classes.clear()
 
         # Find all subclasses of BaseEventHandler in the current module.
-        for obj_name, obj in globals().iteritems():
+        for obj_name, obj in globals().items():
             if inspect.isclass(obj) and issubclass(obj, BaseEventHandler):
                 if obj_name == 'BaseEventHandler':
                     continue

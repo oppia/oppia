@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for state domain objects and methods defined on them."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 import logging
@@ -1227,7 +1229,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'RuleSpec \'Contains\' has inputs which are not recognized '
-                'parameter names: set([\'x\'])'
+                'parameter names: set([u\'x\'])'
             ]
         )
 
@@ -1455,7 +1457,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state written_translations to match the listed '
                 'content ids [\'invalid_content\']')):
-            written_translations.validate(['invalid_content'])
+            written_translations.validate([b'invalid_content'])
 
 
 class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
@@ -1689,7 +1691,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state recorded_voiceovers to match the listed '
                 'content ids [\'invalid_content\']')):
-            recorded_voiceovers.validate(['invalid_content'])
+            recorded_voiceovers.validate([b'invalid_content'])
 
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):
@@ -1718,7 +1720,8 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception,
             re.escape(
                 'Invalid audio filename: it should have one of the following '
-                'extensions: %s' % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())):
+                'extensions: %s'
+                % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))):
             self.voiceover.validate()
 
     def test_validate_non_int_file_size_bytes(self):

@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Unit tests for core.domain.collection_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -28,6 +30,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (collection_models, user_models) = models.Registry.import_models([
@@ -418,7 +421,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             observed_log_messages[0],
             'ValidationError Command invalid command is not allowed '
-            'collection_id [{\'cmd\': \'invalid command\'}]')
+            'collection_id [{u\'cmd\': u\'invalid command\'}]')
 
 
 class CollectionProgressUnitTests(CollectionServicesUnitTests):
@@ -991,7 +994,8 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
             collection.validate()
 
             duration = datetime.datetime.utcnow() - start_time
-            processing_time = duration.seconds + duration.microseconds / 1E6
+            processing_time = duration.seconds + python_utils.divide(
+                duration.microseconds, 1E6)
             self.log_line(
                 'Loaded and validated collection %s (%.2f seconds)' %
                 (collection.title.encode('utf-8'), processing_time))
@@ -1498,7 +1502,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         self.assertDictContainsSubset(
             commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in range(len(snapshots_metadata) - 1):
+        for ind in python_utils.RANGE(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -1528,7 +1532,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
         self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in range(len(snapshots_metadata) - 1):
+        for ind in python_utils.RANGE(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -1569,7 +1573,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             'add_documents_to_index',
             add_docs_counter)
 
-        for ind in xrange(5):
+        for ind in python_utils.RANGE(5):
             self.save_new_valid_collection(
                 all_collection_ids[ind],
                 self.owner_id,
@@ -1578,7 +1582,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
 
         # We're only publishing the first 4 collections, so we're not
         # expecting the last collection to be indexed.
-        for ind in xrange(4):
+        for ind in python_utils.RANGE(4):
             rights_manager.publish_collection(
                 self.owner, expected_collection_ids[ind])
 

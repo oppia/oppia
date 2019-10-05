@@ -54,7 +54,7 @@ describe('Learner answer info backend Api service', function() {
 
       $httpBackend.expect(
         'PUT',
-        '/explorehandler/learner_answer_details/exploration/exp123').respond(
+        '/learneranswerdetailshandler/exploration/exp123').respond(
         200);
       LearnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
         'exp123', 'Introduction', 'TextInput', 'sample answer',

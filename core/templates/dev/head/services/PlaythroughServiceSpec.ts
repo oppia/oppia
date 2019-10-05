@@ -19,7 +19,11 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // PlaythroughService.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService.ts';
+  'services/ExplorationFeaturesService';
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -31,6 +35,11 @@ describe('PlaythroughService', function() {
   beforeEach(angular.mock.module(function($provide) {
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
+    $provide.value(
+      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
+    $provide.value(
+      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
+        new LearnerActionObjectFactory()));
   }));
   beforeEach(angular.mock.inject(function($injector) {
     this.PlaythroughService = $injector.get('PlaythroughService');

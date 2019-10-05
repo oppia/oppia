@@ -15,7 +15,7 @@
         <div class="oppia-rule-preview">
           <div class="oppia-click-to-start-editing" ng-click="openNameEditor()">
             <i ng-if="isEditable()"
-               class="material-icons oppia-editor-edit-icon pull-right"
+               class="material-icons oppia-editor-edit-icon float-right"
                title="Edit Misconception Name">&#xE254;
             </i>
           </div>
@@ -32,15 +32,15 @@
       <div class="oppia-rule-details-header">
         <strong>Misconception Name</strong>
         <input class="form-control" type="text" ng-model="container.misconceptionName" maxlength="30">
-        <span ng-if="container.misconceptionName.length === 30" class="help-block" style="color: red; font-size: smaller">
+        <span ng-if="container.misconceptionName.length === 30" class="form-text" style="color: red; font-size: smaller">
           <em>Please use at most 30 characters.</em>
         </span>
       </div>
 
       <div class="oppia-rule-save-cancel-buttons">
-        <div class="pull-right">
+        <div class="float-right">
           <button type="button"
-                  class="btn btn-default"
+                  class="btn btn-secondary"
                   ng-click="cancelEditName()">
             Cancel
           </button>
@@ -65,7 +65,7 @@
         <div class="oppia-rule-preview">
           <div class="oppia-click-to-start-editing" ng-click="openNotesEditor()">
             <i ng-if="isEditable()"
-               class="material-icons oppia-editor-edit-icon pull-right"
+               class="material-icons oppia-editor-edit-icon float-right"
                title="Edit Misconception Notes">&#xE254;
             </i>
           </div>
@@ -87,9 +87,9 @@
       </div>
 
       <div class="oppia-rule-save-cancel-buttons">
-        <div class="pull-right">
+        <div class="float-right">
           <button type="button"
-                  class="btn btn-default"
+                  class="btn btn-secondary"
                   ng-click="cancelEditNotes()">
             Cancel
           </button>
@@ -114,7 +114,7 @@
         <div class="oppia-rule-preview">
           <div class="oppia-click-to-start-editing" ng-click="openFeedbackEditor()">
             <i ng-if="isEditable()"
-               class="material-icons oppia-editor-edit-icon pull-right"
+               class="material-icons oppia-editor-edit-icon float-right"
                title="Edit Misconception Feedback">&#xE254;
             </i>
           </div>
@@ -134,9 +134,9 @@
       </div>
 
       <div class="oppia-rule-save-cancel-buttons">
-        <div class="pull-right">
+        <div class="float-right">
           <button type="button"
-                  class="btn btn-default"
+                  class="btn btn-secondary"
                   ng-click="cancelEditFeedback()">
             Cancel
           </button>

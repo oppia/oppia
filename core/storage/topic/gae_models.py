@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Models for topics and related constructs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -73,6 +75,10 @@ class TopicModel(base_models.VersionedModel):
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Topic should be kept if it is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -201,6 +207,11 @@ class TopicSummaryModel(base_models.BaseModel):
     subtopic_count = ndb.IntegerProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Topic summary should be kept if associated topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
@@ -231,6 +242,11 @@ class SubtopicPageModel(base_models.VersionedModel):
         required=True, indexed=True)
     # The ISO 639-1 code for the language this subtopic page is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Subtopic should be kept if associated topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -320,6 +336,11 @@ class TopicRightsModel(base_models.VersionedModel):
     # Whether this topic is published.
     topic_is_published = ndb.BooleanProperty(
         indexed=True, required=True, default=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Topic rights should be kept if associated topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def get_by_user(cls, user_id):

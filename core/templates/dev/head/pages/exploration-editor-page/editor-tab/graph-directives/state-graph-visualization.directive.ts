@@ -16,6 +16,8 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+import * as d3 from 'd3';
+
 require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
@@ -91,7 +93,12 @@ angular.module('oppia').directive('stateGraphVisualization', [
             ExplorationWarningsService, StateGraphLayoutService,
             TranslationStatusService, MAX_NODES_PER_ROW,
             MAX_NODE_LABEL_LENGTH) {
-          var graphBounds = {};
+          var graphBounds = {
+            bottom: 0,
+            left: 0,
+            top: 0,
+            right: 0
+          };
           var nodeData = {};
           // The translation applied when the graph is first loaded.
           var origTranslations = [0, 0];
@@ -120,20 +127,20 @@ angular.module('oppia').directive('stateGraphVisualization', [
                 .call(d3.zoom().scaleExtent([1, 1])
                   .on('zoom', function() {
                     if (graphBounds.right - graphBounds.left < dimensions.w) {
-                      (<d3.ZoomEvent>d3.event).transform.x = 0;
+                      (d3.event).transform.x = 0;
                     } else {
-                      (<d3.ZoomEvent>d3.event).transform.x = clamp(
-                        (<d3.ZoomEvent>d3.event).transform.x,
+                      d3.event.transform.x = clamp(
+                        d3.event.transform.x,
                         dimensions.w - graphBounds.right -
                          origTranslations[0],
                         -graphBounds.left - origTranslations[0]);
                     }
 
                     if (graphBounds.bottom - graphBounds.top < dimensions.h) {
-                      (<d3.ZoomEvent>d3.event).transform.y = 0;
+                      d3.event.transform.y = 0;
                     } else {
-                      (<d3.ZoomEvent>d3.event).transform.y = clamp(
-                        (<d3.ZoomEvent>d3.event).transform.y,
+                      d3.event.transform.y = clamp(
+                        d3.event.transform.y,
                         dimensions.h - graphBounds.bottom -
                          origTranslations[1],
                         -graphBounds.top - origTranslations[1]);
@@ -142,8 +149,8 @@ angular.module('oppia').directive('stateGraphVisualization', [
                     // We need a separate layer here so that the translation
                     // does not influence the panning event receivers.
                     $scope.innerTransformStr = (
-                      'translate(' + (<d3.ZoomEvent>d3.event).transform.x +
-                      ',' + (<d3.ZoomEvent>d3.event).transform.y + ')'
+                      'translate(' + d3.event.transform.x +
+                      ',' + d3.event.transform.y + ')'
                     );
                     $scope.$apply();
                   })

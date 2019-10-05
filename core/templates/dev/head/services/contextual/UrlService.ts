@@ -55,14 +55,29 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
     },
     getTopicNameFromLearnerUrl: function() {
       var pathname = this.getPathname();
-      if (pathname.match(/\/(story|topic|practice_session)/g)) {
+      if (pathname.match(/\/(story|topic|subtopic|practice_session)/g)) {
         return decodeURIComponent(pathname.split('/')[2]);
       }
       throw Error('Invalid URL for topic');
     },
+    getClassroomNameFromUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/classroom/g)) {
+        return decodeURIComponent(pathname.split('/')[2]);
+      }
+      throw Error('Invalid URL for classroom');
+    },
+    getSubtopicIdFromUrl: function() {
+      var pathname = this.getPathname();
+      var argumentsArray = pathname.split('/');
+      if (pathname.match(/\/subtopic/g) && argumentsArray.length === 4) {
+        return decodeURIComponent(argumentsArray[3]);
+      }
+      throw Error('Invalid URL for subtopic');
+    },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();
-      if (pathname.match(/\/story_editor\/(\w|-){12}/g)) {
+      if (pathname.match(/\/(story_editor|review_test)\/(\w|-){12}/g)) {
         return pathname.split('/')[2];
       }
       throw Error('Invalid story id url');
@@ -76,8 +91,12 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
     },
     getStoryIdInPlayer: function() {
       var query = this.getCurrentQueryString();
-      if (query.match(/\?story_id=((\w|-){12})/g)) {
-        return query.split('=')[1];
+      var queryItems = query.split('&');
+      for (var i = 0; i < queryItems.length; i++) {
+        var part = queryItems[i];
+        if (part.match(/\?story_id=((\w|-){12})/g)) {
+          return part.split('=')[1];
+        }
       }
       return null;
     },
@@ -119,6 +138,16 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
     getOrigin: function() {
       return this.getCurrentLocation().origin;
     },
+    getCollectionIdFromExplorationUrl: function() {
+      var urlParams = this.getUrlParams();
+      if (urlParams.hasOwnProperty('parent')) {
+        return null;
+      }
+      if (urlParams.hasOwnProperty('collection_id')) {
+        return urlParams.collection_id;
+      }
+      return null;
+    },
     getUsernameFromProfileUrl: function() {
       var pathname = this.getPathname();
       if (pathname.match(/\/(profile)/g)) {
@@ -132,6 +161,25 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
         return decodeURIComponent(pathname.split('/')[2]);
       }
       throw Error('Invalid collection URL');
+    },
+    getCollectionIdFromEditorUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/(collection_editor\/create)/g)) {
+        return decodeURIComponent(pathname.split('/')[3]);
+      }
+      throw Error('Invalid collection editor URL');
+    },
+    getExplorationVersionFromUrl: function() {
+      var urlParams = this.getUrlParams();
+      if (urlParams.hasOwnProperty('v')) {
+        var version = urlParams.v;
+        if (version.includes('#')) {
+          // For explorations played in an iframe.
+          version = version.substring(0, version.indexOf('#'));
+        }
+        return Number(version);
+      }
+      return null;
     }
   };
 }]);

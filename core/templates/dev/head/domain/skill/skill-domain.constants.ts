@@ -49,4 +49,6 @@ export class SkillDomainConstants {
     'add_skill_misconception';
   public static CMD_DELETE_SKILL_MISCONCEPTION =
     'delete_skill_misconception';
+
+  public static CMD_UPDATE_RUBRICS = 'update_rubrics';
 }

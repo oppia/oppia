@@ -16,6 +16,11 @@
  * @fileoverview Directive for a schema-based editor for unicode strings.
  */
 
+require('interactions/codemirrorRequires.ts');
+
+require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/DeviceInfoService.ts');

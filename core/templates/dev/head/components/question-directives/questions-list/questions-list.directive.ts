@@ -33,6 +33,7 @@ require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require(

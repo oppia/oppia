@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { LearnerDashboardPageConstants } from
-  'pages/learner-dashboard-page/learner-dashboard-page.constants.ts';
+  'pages/learner-dashboard-page/learner-dashboard-page.constants';
 
 angular.module('oppia').constant(
   'LEARNER_DASHBOARD_SECTION_I18N_IDS',

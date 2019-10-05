@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Domain objects relating to stories."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import re
@@ -21,6 +23,7 @@ from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 import feconf
+import python_utils
 import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -140,7 +143,7 @@ class StoryChange(change_domain.BaseChange):
     }]
 
 
-class StoryNode(object):
+class StoryNode(python_utils.OBJECT):
     """Domain object describing a node in the exploration graph of a
     story.
     """
@@ -200,7 +203,8 @@ class StoryNode(object):
             str. The new next node id.
         """
         current_number = StoryNode.get_number_from_node_id(node_id)
-        incremented_node_id = NODE_ID_PREFIX + str(current_number + 1)
+        incremented_node_id = NODE_ID_PREFIX + python_utils.UNICODE(
+            current_number + 1)
         return incremented_node_id
 
     @classmethod
@@ -210,7 +214,7 @@ class StoryNode(object):
         Args:
             node_id: str. The node id to be validated.
         """
-        if not isinstance(node_id, basestring):
+        if not isinstance(node_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected node ID to be a string, received %s' %
                 node_id)
@@ -277,17 +281,17 @@ class StoryNode(object):
             invalid.
         """
         if self.exploration_id:
-            if not isinstance(self.exploration_id, basestring):
+            if not isinstance(self.exploration_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected exploration ID to be a string, received %s' %
                     self.exploration_id)
 
-        if not isinstance(self.outline, basestring):
+        if not isinstance(self.outline, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
                 self.outline)
 
-        if not isinstance(self.title, basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' %
                 self.title)
@@ -304,7 +308,7 @@ class StoryNode(object):
                 'Expected prerequisite skill ids to be a list, received %s' %
                 self.prerequisite_skill_ids)
         for skill_id in self.prerequisite_skill_ids:
-            if not isinstance(skill_id, basestring):
+            if not isinstance(skill_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each prerequisite skill id to be a string, '
                     'received %s' % skill_id)
@@ -319,7 +323,7 @@ class StoryNode(object):
                 'Expected acquired skill ids to be a list, received %s' %
                 self.acquired_skill_ids)
         for skill_id in self.acquired_skill_ids:
-            if not isinstance(skill_id, basestring):
+            if not isinstance(skill_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each acquired skill id to be a string, '
                     'received %s' % skill_id)
@@ -348,7 +352,7 @@ class StoryNode(object):
                     'The story node with ID %s points to itself.' % node_id)
 
 
-class StoryContents(object):
+class StoryContents(python_utils.OBJECT):
     """Domain object representing the story_contents dict."""
 
     def __init__(self, story_nodes, initial_node_id, next_node_id):
@@ -390,7 +394,7 @@ class StoryContents(object):
                     node)
             node.validate()
             for destination_node_id in node.destination_node_ids:
-                if next(
+                if python_utils.NEXT(
                         (node for node in self.nodes
                          if node.id == destination_node_id), None) is None:
                     raise utils.ValidationError(
@@ -505,6 +509,33 @@ class StoryContents(object):
             ordered_nodes_list.append(current_node)
         return ordered_nodes_list
 
+    def get_all_linked_exp_ids(self):
+        """Returns a list of exploration id linked to each of the nodes of
+        story content.
+
+        Returns:
+            list(str). A list of exploration ids.
+        """
+        exp_ids = []
+        for node in self.nodes:
+            if node.exploration_id is not None:
+                exp_ids.append(node.exploration_id)
+        return exp_ids
+
+    def get_node_with_corresponding_exp_id(self, exp_id):
+        """Returns the node object which corresponds to a given exploration ids.
+
+        Returns:
+            StoryNode or None. The StoryNode object of the corresponding
+                exploration id if exist else None.
+        """
+        for node in self.nodes:
+            if node.exploration_id == exp_id:
+                return node
+
+        raise Exception('Unable to find the exploration id in any node: %s' % (
+            exp_id))
+
     def to_dict(self):
         """Returns a dict representing this StoryContents domain object.
 
@@ -541,7 +572,7 @@ class StoryContents(object):
         return story_contents
 
 
-class Story(object):
+class Story(python_utils.OBJECT):
     """Domain object for an Oppia Story."""
 
     def __init__(
@@ -592,12 +623,12 @@ class Story(object):
         """
         self.require_valid_title(self.title)
 
-        if not isinstance(self.description, basestring):
+        if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
 
-        if not isinstance(self.notes, basestring):
+        if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected notes to be a string, received %s' % self.notes)
 
@@ -614,7 +645,7 @@ class Story(object):
                     feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
                     self.story_contents_schema_version))
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -623,7 +654,8 @@ class Story(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        if not isinstance(self.corresponding_topic_id, basestring):
+        if not isinstance(
+                self.corresponding_topic_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected corresponding_topic_id should be a string, received: '
                 '%s' % self.corresponding_topic_id)
@@ -637,7 +669,7 @@ class Story(object):
         Args:
             story_id: str. The story id to validate.
         """
-        if not isinstance(story_id, basestring):
+        if not isinstance(story_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Story id should be a string, received: %s' % story_id)
 
@@ -652,7 +684,7 @@ class Story(object):
             title: str. The title to validate.
         """
 
-        if not isinstance(title, basestring):
+        if not isinstance(title, python_utils.BASESTRING):
             raise utils.ValidationError('Title should be a string.')
         if title == '':
             raise utils.ValidationError('Title field should not be empty')
@@ -1028,7 +1060,7 @@ class Story(object):
         self.story_contents.initial_node_id = new_initial_node_id
 
 
-class StorySummary(object):
+class StorySummary(python_utils.OBJECT):
     """Domain object for Story Summary."""
 
     def __init__(
@@ -1065,14 +1097,14 @@ class StorySummary(object):
             ValidationError: One or more attributes of story summary are
                 invalid.
         """
-        if not isinstance(self.title, basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
 
         if self.title == '':
             raise utils.ValidationError('Title field should not be empty')
 
-        if not isinstance(self.description, basestring):
+        if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -1087,7 +1119,7 @@ class StorySummary(object):
                 'Expected node_count to be non-negative, received \'%s\'' % (
                     self.node_count))
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

@@ -20,7 +20,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { ExplorationEditorPageConstants } from
-  'pages/exploration-editor-page/exploration-editor-page.constants.ts';
+  'pages/exploration-editor-page/exploration-editor-page.constants';
 
 angular.module('oppia').constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
@@ -74,6 +74,18 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'ACTION_REJECT_SUGGESTION',
   ExplorationEditorPageConstants.ACTION_REJECT_SUGGESTION);
+
+angular.module('oppia').constant(
+  'STATUS_COMPLIMENT', ExplorationEditorPageConstants.STATUS_COMPLIMENT);
+angular.module('oppia').constant(
+  'STATUS_FIXED', ExplorationEditorPageConstants.STATUS_FIXED);
+angular.module('oppia').constant(
+  'STATUS_IGNORED', ExplorationEditorPageConstants.STATUS_IGNORED);
+angular.module('oppia').constant(
+  'STATUS_NOT_ACTIONABLE',
+  ExplorationEditorPageConstants.STATUS_NOT_ACTIONABLE);
+angular.module('oppia').constant(
+  'STATUS_OPEN', ExplorationEditorPageConstants.STATUS_OPEN);
 
 angular.module('oppia').constant(
   'COMPONENT_NAME_DEFAULT_OUTCOME',

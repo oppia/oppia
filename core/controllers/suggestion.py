@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Controllers for suggestions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -150,7 +152,7 @@ class SuggestionListHandler(base.BaseHandler):
         # request.GET.items() parses the params from the url into the above
         # format. So in the url, the query should be passed as:
         # ?field1=value1&field2=value2...fieldN=valueN.
-        query_fields_and_values = self.request.GET.items()
+        query_fields_and_values = list(self.request.GET.items())
 
         for query in query_fields_and_values:
             if query[0] not in suggestion_models.ALLOWED_QUERY_FIELDS:

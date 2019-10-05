@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Domain object for statistics models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import json
@@ -29,6 +31,7 @@ from core.domain import interaction_registry
 from core.domain import playthrough_issue_registry
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
@@ -61,7 +64,7 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE = 900000
 MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
 
 
-class ExplorationStats(object):
+class ExplorationStats(python_utils.OBJECT):
     """Domain object representing analytics data for an exploration."""
 
     def __init__(
@@ -205,7 +208,7 @@ class ExplorationStats(object):
             'num_completions_v2',
         ]
 
-        if not isinstance(self.exp_id, basestring):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % (self.exp_id))
 
@@ -231,7 +234,7 @@ class ExplorationStats(object):
                     self.state_stats_mapping))
 
 
-class StateStats(object):
+class StateStats(python_utils.OBJECT):
     """Domain object representing analytics data for an exploration's state.
     Instances of these domain objects pertain to the exploration ID and version
     as well.
@@ -417,7 +420,7 @@ class StateStats(object):
                     '%s cannot have negative values' % (stat_property))
 
 
-class ExplorationIssues(object):
+class ExplorationIssues(python_utils.OBJECT):
     """Domain object representing the exploration to issues mapping for an
     exploration.
     """
@@ -484,7 +487,7 @@ class ExplorationIssues(object):
 
     def validate(self):
         """Validates the ExplorationIssues domain object."""
-        if not isinstance(self.exp_id, basestring):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % type(
                     self.exp_id))
@@ -503,7 +506,7 @@ class ExplorationIssues(object):
             issue.validate()
 
 
-class Playthrough(object):
+class Playthrough(python_utils.OBJECT):
     """Domain object representing a learner playthrough."""
 
     def __init__(
@@ -598,7 +601,7 @@ class Playthrough(object):
 
     def validate(self):
         """Validates the Playthrough domain object."""
-        if not isinstance(self.exp_id, basestring):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % type(
                     self.exp_id))
@@ -608,7 +611,7 @@ class Playthrough(object):
                 'Expected exp_version to be an int, received %s' % (
                     type(self.exp_version)))
 
-        if not isinstance(self.issue_type, basestring):
+        if not isinstance(self.issue_type, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected issue_type to be a string, received %s' % type(
                     self.issue_type))
@@ -639,7 +642,7 @@ class Playthrough(object):
             action.validate()
 
 
-class ExplorationIssue(object):
+class ExplorationIssue(python_utils.OBJECT):
     """Domain object representing an exploration issue."""
 
     def __init__(
@@ -754,7 +757,7 @@ class ExplorationIssue(object):
 
     def validate(self):
         """Validates the ExplorationIssue domain object."""
-        if not isinstance(self.issue_type, basestring):
+        if not isinstance(self.issue_type, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected issue_type to be a string, received %s' % (
                     type(self.issue_type)))
@@ -781,13 +784,13 @@ class ExplorationIssue(object):
                     type(self.playthrough_ids)))
 
         for playthrough_id in self.playthrough_ids:
-            if not isinstance(playthrough_id, basestring):
+            if not isinstance(playthrough_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each playthrough_id to be a string, received '
                     '%s' % type(playthrough_id))
 
 
-class LearnerAction(object):
+class LearnerAction(python_utils.OBJECT):
     """Domain object representing a learner action."""
 
     def __init__(self, action_type, action_customization_args, schema_version):
@@ -863,7 +866,7 @@ class LearnerAction(object):
 
     def validate(self):
         """Validates the LearnerAction domain object."""
-        if not isinstance(self.action_type, basestring):
+        if not isinstance(self.action_type, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected action_type to be a string, received %s' % (
                     type(self.action_type)))
@@ -888,7 +891,7 @@ class LearnerAction(object):
 # TODO(bhenning): Monitor sizes (lengths of submitted_answer_list) of these
 # objects and determine if we should enforce an upper bound for
 # submitted_answer_list.
-class StateAnswers(object):
+class StateAnswers(python_utils.OBJECT):
     """Domain object containing answers submitted to an exploration state."""
 
     def __init__(
@@ -926,21 +929,21 @@ class StateAnswers(object):
     def validate(self):
         """Validates StateAnswers domain object entity."""
 
-        if not isinstance(self.exploration_id, basestring):
+        if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected exploration_id to be a string, received %s' % str(
-                    self.exploration_id))
+                'Expected exploration_id to be a string, received %s'
+                % python_utils.UNICODE(self.exploration_id))
 
-        if not isinstance(self.state_name, basestring):
+        if not isinstance(self.state_name, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected state_name to be a string, received %s' % str(
-                    self.state_name))
+                'Expected state_name to be a string, received %s'
+                % python_utils.UNICODE(self.state_name))
 
         if self.interaction_id is not None:
-            if not isinstance(self.interaction_id, basestring):
+            if not isinstance(self.interaction_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
-                    'Expected interaction_id to be a string, received %s' % str(
-                        self.interaction_id))
+                    'Expected interaction_id to be a string, received %s'
+                    % python_utils.UNICODE(self.interaction_id))
 
             # Verify interaction_id is valid.
             if (self.interaction_id not in
@@ -951,12 +954,12 @@ class StateAnswers(object):
         if not isinstance(self.submitted_answer_list, list):
             raise utils.ValidationError(
                 'Expected submitted_answer_list to be a list, received %s' %
-                str(self.submitted_answer_list))
+                python_utils.UNICODE(self.submitted_answer_list))
 
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
-                'Expected schema_version to be an integer, received %s' % str(
-                    self.schema_version))
+                'Expected schema_version to be an integer, received %s'
+                % python_utils.UNICODE(self.schema_version))
 
         if self.schema_version < 1:
             raise utils.ValidationError(
@@ -970,7 +973,7 @@ class StateAnswers(object):
                     self.schema_version))
 
 
-class SubmittedAnswer(object):
+class SubmittedAnswer(python_utils.OBJECT):
     """Domain object representing an answer submitted to a state."""
 
     # NOTE TO DEVELOPERS: do not use the rule_spec_str and answer_str
@@ -1050,41 +1053,42 @@ class SubmittedAnswer(object):
                 'SubmittedAnswers must have a provided session_id')
 
         if self.rule_spec_str is not None and not isinstance(
-                self.rule_spec_str, basestring):
+                self.rule_spec_str, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected rule_spec_str to be either None or a string, '
-                'received %s' % str(self.rule_spec_str))
+                'received %s' % python_utils.UNICODE(self.rule_spec_str))
 
         if self.answer_str is not None and not isinstance(
-                self.answer_str, basestring):
+                self.answer_str, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected answer_str to be either None or a string, received '
-                '%s' % str(self.answer_str))
+                '%s' % python_utils.UNICODE(self.answer_str))
 
-        if not isinstance(self.session_id, basestring):
+        if not isinstance(self.session_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected session_id to be a string, received %s' %
-                str(self.session_id))
+                python_utils.UNICODE(self.session_id))
 
         if not isinstance(self.time_spent_in_sec, numbers.Number):
             raise utils.ValidationError(
                 'Expected time_spent_in_sec to be a number, received %s' %
-                str(self.time_spent_in_sec))
+                python_utils.UNICODE(self.time_spent_in_sec))
 
         if not isinstance(self.params, dict):
             raise utils.ValidationError(
-                'Expected params to be a dict, received %s' % str(self.params))
+                'Expected params to be a dict, received %s'
+                % python_utils.UNICODE(self.params))
 
         if not isinstance(self.answer_group_index, int):
             raise utils.ValidationError(
                 'Expected answer_group_index to be an integer, received %s' %
-                str(self.answer_group_index))
+                python_utils.UNICODE(self.answer_group_index))
 
         if self.rule_spec_index is not None and not (
                 isinstance(self.rule_spec_index, int)):
             raise utils.ValidationError(
                 'Expected rule_spec_index to be an integer, received %s' %
-                str(self.rule_spec_index))
+                python_utils.UNICODE(self.rule_spec_index))
 
         if self.answer_group_index < 0:
             raise utils.ValidationError(
@@ -1119,7 +1123,7 @@ class SubmittedAnswer(object):
                 self.classification_categorization)
 
 
-class AnswerOccurrence(object):
+class AnswerOccurrence(python_utils.OBJECT):
     """Domain object that represents a specific answer that occurred some number
     of times.
     """
@@ -1165,7 +1169,7 @@ class AnswerOccurrence(object):
             answer_occurrence_dict['frequency'])
 
 
-class AnswerCalculationOutput(object):
+class AnswerCalculationOutput(python_utils.OBJECT):
     """Domain object superclass that represents the output of an answer
     calculation.
     """
@@ -1253,7 +1257,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         return {
             category: answer_frequency_list.to_raw_type()
             for category, answer_frequency_list in (
-                self.categorized_answer_freq_lists.iteritems())
+                self.categorized_answer_freq_lists.items())
         }
 
     @classmethod
@@ -1278,11 +1282,11 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         return cls({
             category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
             for category, answer_occurrence_list in (
-                categorized_frequency_dict.iteritems())
+                categorized_frequency_dict.items())
         })
 
 
-class StateAnswersCalcOutput(object):
+class StateAnswersCalcOutput(python_utils.OBJECT):
     """Domain object that represents output of calculations operating on
     state answers.
     """
@@ -1331,20 +1335,20 @@ class StateAnswersCalcOutput(object):
         # ValidationError is raised if an answer exceeds the maximum size.
         max_bytes_per_calc_output_data = 999999
 
-        if not isinstance(self.exploration_id, basestring):
+        if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected exploration_id to be a string, received %s' % str(
-                    self.exploration_id))
+                'Expected exploration_id to be a string, received %s'
+                % python_utils.UNICODE(self.exploration_id))
 
-        if not isinstance(self.state_name, basestring):
+        if not isinstance(self.state_name, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected state_name to be a string, received %s' % str(
-                    self.state_name))
+                'Expected state_name to be a string, received %s'
+                % python_utils.UNICODE(self.state_name))
 
-        if not isinstance(self.calculation_id, basestring):
+        if not isinstance(self.calculation_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected calculation_id to be a string, received %s' % str(
-                    self.calculation_id))
+                'Expected calculation_id to be a string, received %s'
+                % python_utils.UNICODE(self.calculation_id))
 
         if (not isinstance(self.calculation_output, AnswerFrequencyList)
                 and not isinstance(
@@ -1361,10 +1365,11 @@ class StateAnswersCalcOutput(object):
             # too long answers produce a ValidationError.
             raise utils.ValidationError(
                 'calculation_output is too big to be stored (size: %d): %s' % (
-                    sys.getsizeof(output_data), str(output_data)))
+                    sys.getsizeof(output_data),
+                    python_utils.UNICODE(output_data)))
 
 
-class LearnerAnswerDetails(object):
+class LearnerAnswerDetails(python_utils.OBJECT):
     """Domain object that represents the answer details submitted by the
     learner.
     """
@@ -1452,15 +1457,15 @@ class LearnerAnswerDetails(object):
     def validate(self):
         """Validates LearnerAnswerDetails domain object."""
 
-        if not isinstance(self.state_reference, basestring):
+        if not isinstance(self.state_reference, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected state_reference to be a string, received %s' % str(
-                    self.state_reference))
+                'Expected state_reference to be a string, received %s'
+                % python_utils.UNICODE(self.state_reference))
 
-        if not isinstance(self.entity_type, basestring):
+        if not isinstance(self.entity_type, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected entity_type to be a string, received %s' % str(
-                    self.entity_type))
+                'Expected entity_type to be a string, received %s'
+                % python_utils.UNICODE(self.entity_type))
 
         split_state_reference = self.state_reference.split(':')
         if self.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
@@ -1479,10 +1484,10 @@ class LearnerAnswerDetails(object):
             raise utils.ValidationError(
                 'Invalid entity type received %s' % (self.entity_type))
 
-        if not isinstance(self.interaction_id, basestring):
+        if not isinstance(self.interaction_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected interaction_id to be a string, received %s' % str(
-                    self.interaction_id))
+                'Expected interaction_id to be a string, received %s'
+                % python_utils.UNICODE(self.interaction_id))
 
         if (self.interaction_id not in
                 interaction_registry.Registry.get_all_interaction_ids()):
@@ -1498,7 +1503,8 @@ class LearnerAnswerDetails(object):
         if not isinstance(self.learner_answer_info_list, list):
             raise utils.ValidationError(
                 'Expected learner_answer_info_list to be a list, '
-                'received %s' % str(self.learner_answer_info_list))
+                'received %s'
+                % python_utils.UNICODE(self.learner_answer_info_list))
 
         for learner_answer_info in self.learner_answer_info_list:
             learner_answer_info.validate()
@@ -1564,7 +1570,7 @@ class LearnerAnswerDetails(object):
         self.state_reference = new_state_reference
 
 
-class LearnerAnswerInfo(object):
+class LearnerAnswerInfo(python_utils.OBJECT):
     """Domain object containing the answer details submitted by the learner."""
 
     def __init__(
@@ -1634,7 +1640,7 @@ class LearnerAnswerInfo(object):
 
     def validate(self):
         """Validates the LearnerAnswerInfo domain object."""
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.id)
         if self.answer is None:
@@ -1644,11 +1650,11 @@ class LearnerAnswerInfo(object):
             if self.answer == {}:
                 raise utils.ValidationError(
                     'The answer submitted cannot be an empty dict.')
-        if isinstance(self.answer, basestring):
+        if isinstance(self.answer, python_utils.BASESTRING):
             if self.answer == '':
                 raise utils.ValidationError(
                     'The answer submitted cannot be an empty string')
-        if not isinstance(self.answer_details, basestring):
+        if not isinstance(self.answer_details, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected answer_details to be a string, received %s' % type(
                     self.answer_details))
@@ -1660,8 +1666,8 @@ class LearnerAnswerInfo(object):
                                         'to be stored')
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
-                'Expected created_on to be a datetime, received %s' % str(
-                    self.created_on))
+                'Expected created_on to be a datetime, received %s'
+                % python_utils.UNICODE(self.created_on))
 
     def get_learner_answer_info_dict_size(self):
         """Returns a size overestimate (in bytes) of the given learner answer
@@ -1671,4 +1677,5 @@ class LearnerAnswerInfo(object):
             int. Size of the learner_answer_info_dict in bytes.
         """
         learner_answer_info_dict = self.to_dict()
-        return sys.getsizeof(json.dumps(learner_answer_info_dict, default=str))
+        return sys.getsizeof(
+            json.dumps(learner_answer_info_dict, default=python_utils.UNICODE))

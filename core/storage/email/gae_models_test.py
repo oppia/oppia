@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for core.storage.email.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import types
@@ -22,12 +24,19 @@ import types
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
-(email_models,) = models.Registry.import_models([models.NAMES.email])
+(base_models, email_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.email])
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.SentEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
 
     def setUp(self):
         super(SentEmailModelUnitTests, self).setUp()
@@ -172,6 +181,109 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 'user1', 'exploration.exp1.1')
 
 
+class BulkEmailModelUnitTests(test_utils.GenericTestBase):
+    """Test the BulkEmailModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.BulkEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+
+class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
+    """Tests for the GeneralFeedbackEmailReplyToIdModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_put_function(self):
+        email_reply_model = email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='user_id_1.exploration.exp_id.thread_id',
+            user_id='user_id_1',
+            thread_id='exploration.exp_id.thread_id',
+            reply_to_id='reply_id')
+
+        email_reply_model.put()
+
+        last_updated = email_reply_model.last_updated
+
+        # If we do not wish to update the last_updated time, we should set
+        # the update_last_updated_time argument to False in the put function.
+        email_reply_model.put(update_last_updated_time=False)
+        self.assertEqual(email_reply_model.last_updated, last_updated)
+
+        # If we do wish to change it however, we can simply use the put function
+        # as the default value of update_last_updated_time is True.
+        email_reply_model.put()
+        self.assertNotEqual(email_reply_model.last_updated, last_updated)
+
+    def test_create_new_object(self):
+        actual_model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'exploration.exp_id.thread_id')
+
+        self.assertEqual(
+            actual_model.id,
+            'user_id.exploration.exp_id.thread_id')
+        self.assertEqual(actual_model.user_id, 'user_id')
+        self.assertEqual(
+            actual_model.thread_id,
+            'exploration.exp_id.thread_id')
+
+    def test_get_object(self):
+        actual_model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'exploration.exp_id.thread_id')
+        actual_model.put()
+        expected_model = email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='user_id.exploration.exp_id.thread_id',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id')
+
+        actual_model = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.get(
+                'user_id', 'exploration.exp_id.thread_id'))
+
+        self.assertEqual(actual_model.id, expected_model.id)
+        self.assertEqual(actual_model.user_id, expected_model.user_id)
+        self.assertEqual(actual_model.thread_id, expected_model.thread_id)
+
+    def test_get_multi_by_user_ids(self):
+        actual_model1 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id_1', 'exploration.exp_id.thread_id')
+        actual_model1.put()
+        actual_model2 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id_2', 'exploration.exp_id.thread_id')
+        actual_model2.put()
+
+        expected_model_1 = email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='user_id_1.exploration.exp_id.thread_id',
+            user_id='user_id_1',
+            thread_id='exploration.exp_id.thread_id')
+        expected_model_2 = email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='user_id_2.exploration.exp_id.thread_id',
+            user_id='user_id_2',
+            thread_id='exploration.exp_id.thread_id')
+
+        actual_models = (
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .get_multi_by_user_ids(
+                ['user_id_1', 'user_id_2'],
+                'exploration.exp_id.thread_id'))
+
+        actual_model_1 = actual_models['user_id_1']
+        actual_model_2 = actual_models['user_id_2']
+
+        self.assertEqual(actual_model_1.id, expected_model_1.id)
+        self.assertEqual(actual_model_1.user_id, expected_model_1.user_id)
+        self.assertEqual(actual_model_1.thread_id, expected_model_1.thread_id)
+
+        self.assertEqual(actual_model_2.id, expected_model_2.id)
+        self.assertEqual(actual_model_2.user_id, expected_model_2.user_id)
+        self.assertEqual(actual_model_2.thread_id, expected_model_2.thread_id)
+
+
 class GenerateHashTests(test_utils.GenericTestBase):
     """Test that generating hash functionality works as expected."""
 
@@ -206,3 +318,57 @@ class GenerateHashTests(test_utils.GenericTestBase):
             'recipient_id2', 'email_subject2', 'email_html_body2')
         self.assertNotEqual(email_hash1, email_hash2)
         # pylint: enable=protected-access
+
+
+class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
+    """Tests for the GeneralFeedbackEmailReplyToId model."""
+    USER_ID_1 = 'user_id_1'
+    USER_ID_2 = 'user_id_2'
+    THREAD_ID_1 = 'thread_id_1'
+    THREAD_ID_2 = 'thread_id_2'
+    USER_2_REPLY_TO_ID_1 = 'user_2_reply_to_id_thread_1'
+    USER_2_REPLY_TO_ID_2 = 'user_2_reply_to_id_thread_2'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(GeneralFeedbackEmailReplyToIdTests, self).setUp()
+
+        # Since reply-to-id is generated using a random generator
+        # that does not support seeding (SystemRandom) and whose
+        # output is hashed by utils.convert_to_hash, we will
+        # (for testing purposes) instead replace convert_to_hash
+        # with a lambda that returns a predetermined value.
+        user_two_fake_hash_lambda_one = (
+            lambda rand_int, reply_to_id_length: self.USER_2_REPLY_TO_ID_1)
+        user_two_fake_hash_one = self.swap(
+            utils, 'convert_to_hash', user_two_fake_hash_lambda_one)
+        with user_two_fake_hash_one:
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.USER_ID_2, self.THREAD_ID_1).put()
+
+        user_two_fake_hash_lambda_two = (
+            lambda rand_int, reply_to_id_length: self.USER_2_REPLY_TO_ID_2)
+        user_two_fake_hash_two = self.swap(
+            utils, 'convert_to_hash', user_two_fake_hash_lambda_two)
+        with user_two_fake_hash_two:
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.USER_ID_2, self.THREAD_ID_2).put()
+
+    def test_export_data_on_user_with_data(self):
+        """Verify proper export data output on a normal user case."""
+        user_data = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
+                self.USER_ID_2))
+        expected_data = {
+            self.THREAD_ID_1: self.USER_2_REPLY_TO_ID_1,
+            self.THREAD_ID_2: self.USER_2_REPLY_TO_ID_2
+        }
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_on_user_without_data(self):
+        """Verify proper export data output on user with no models."""
+        user_data = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
+                self.USER_ID_1))
+        expected_data = {}
+        self.assertEqual(expected_data, user_data)

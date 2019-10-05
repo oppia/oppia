@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for the learner dashboard and the notifications dashboard."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -281,9 +283,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn(
-            '<title itemprop="name">Learner Dashboard - Oppia</title>',
-            response.body)
+        self.assertIn('{"title": "Learner Dashboard - Oppia"})', response.body)
 
         self.logout()
 

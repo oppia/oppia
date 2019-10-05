@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Unit tests for core.domain.moderator services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import moderator_services
 from core.tests import test_utils

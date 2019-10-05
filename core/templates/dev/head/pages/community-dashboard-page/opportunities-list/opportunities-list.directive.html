@@ -1,0 +1,120 @@
+<div class="oppia-opportunities-list">
+  <div infinite-scroll="$ctrl.showMoreOpportunities()"
+       infinite-scroll-distance="1"
+       infinite-scroll-disabled="false">
+    <div ng-repeat="opportunity in getOpportunities()">
+      <opportunities-list-item opportunity="opportunity"></opportunities-list-item>
+    </div>
+  </div>
+  <div ng-show="isDataLoading()">
+    <opportunities-list-item></opportunities-list-item>
+    <opportunities-list-item></opportunities-list-item>
+  </div>
+  <div class="oppia-end-availability" ng-if="!isDataLoading() && !isMoreOpportunitiesAvailable()">
+    <div class="oppia-end-availability-line"></div>
+    <div class="oppia-opportunity-availablity-message" ng-if="!opportunities.length">No opportunity available!</div>
+    <div class="oppia-opportunity-availablity-message" ng-if="opportunities.length">***</div>
+    <div class="oppia-end-availability-line"></div>
+  </div>
+</div>
+<style>
+  .oppia-opportunity-availablity-message {
+    color: #ababab;
+    font-style: italic;
+    padding: 0 2%;
+  }
+  .oppia-end-availability {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .oppia-end-availability-line {
+    border: 1px solid #ababab;
+    width: 35%;
+  }
+  .oppia-opportunities-list {
+    margin: auto;
+    max-width: 1200px;
+    overflow: auto;
+    width: 85%;
+  }
+  /* All of the css for opportunities-list-item is added here to avoid having duplicate css properties.*/
+  .oppia-opportunities-button {
+    background-color: #ffffff;
+    border: 2px solid #009688;
+    border-radius: 5px;
+    color: #009688;
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 64%;
+    text-align: center;
+  }
+  .oppia-opportunities-button:hover {
+    background-color: #009688;
+    color: #ffffff;
+    transition: background-color 200ms ease-out;
+    -webkit-transition: background-color 200ms ease-out;
+    -ms-transition: background-color 200ms ease-out;
+  }
+  .oppia-opportunities-progress-bar {
+    border-radius: 10px;
+    height: 20px;
+    width: 60%;
+  }
+  .oppia-opportunities-progress-bar .progress {
+    height: 12px;
+  }
+  .oppia-opportunities-progress-label {
+    margin-left: 1px;
+    margin-top: -6px;
+  }
+  .oppia-opportunities-subheading {
+    color: #009688;
+    font-size: 14px;
+    height: 40%;
+    width: 60%;
+  }
+  .oppia-opportunities-heading {
+    color: #4a4a4a;
+    font-size: 20px;
+    font-weight: bold;
+    height: 50%;
+    width: 90%;
+  }
+  .oppia-opportunities-button-container {
+    align-items: center;
+    display: flex;
+    justify-content: flex-end;
+    margin: 1% 0;
+    width: 20%;
+  }
+  .oppia-opportunities-progress {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 1% 0;
+    width: 25%;
+  }
+  .oppia-opportunities-details {
+    display: flex;
+    flex-direction: column;
+    margin: 1.8% 0;
+    width: 60%;
+  }
+  .oppia-opportunities-list-item {
+    background-color: #ffffff;
+    display: flex;
+    height: 90px;
+    justify-content: space-between;
+    margin-top: 24px;
+    padding: 0% 3%;
+  }
+  .oppia-animate-fadein {
+    animation: fadein 0.5s linear 1 normal forwards;
+    -webkit-animation: fadein 0.5s linear 1 normal forwards; /* Safari, Chrome and Opera > 12.1 */
+    -moz-animation: fadein 0.5s linear 1 normal forwards; /* Firefox < 16 */
+    -ms-animation: fadein 0.5s linear 1 normal forwards; /* Internet Explorer */
+    -o-animation: fadein 0.5s linear 1 normal forwards; /* Opera < 12.1 */
+  }
+</style>

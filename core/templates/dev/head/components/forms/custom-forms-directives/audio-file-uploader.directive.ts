@@ -68,7 +68,7 @@ angular.module('oppia').directive('audioFileUploader', [
           'audio-file-uploader-form' + IdGenerationService.generateNewId());
         angular.element(document).on(
           'change', '.' + scope.inputFieldClassName, function(evt) {
-            var file = evt.currentTarget.files[0];
+            var file = (<HTMLInputElement>evt.currentTarget).files[0];
             if (!file) {
               scope.onFileCleared();
               return;

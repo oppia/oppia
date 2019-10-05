@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants.ts';
+  'domain/editor/editor-domain.constants';
 
 angular.module('oppia').constant(
   'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',

@@ -17,102 +17,114 @@
  * collection node domain objects.
  */
 
-angular.module('oppia').factory('CollectionNodeObjectFactory', [
-  'ACTIVITY_STATUS_PRIVATE',
-  function(ACTIVITY_STATUS_PRIVATE) {
-    var CollectionNode = function(collectionNodeBackendObject) {
-      this._explorationId = collectionNodeBackendObject.exploration_id;
-      this._explorationSummaryObject = angular.copy(
-        collectionNodeBackendObject.exploration_summary);
-    };
+import cloneDeep from 'lodash/cloneDeep';
 
-    // Instance methods
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-    // Returns the ID of the exploration represented by this collection node.
-    // This property is immutable.
-    CollectionNode.prototype.getExplorationId = function() {
-      return this._explorationId;
-    };
+import { AppConstants } from 'app.constants';
 
-    // Returns the title of the exploration represented by this collection node.
-    // This property is immutable. The value returned by this function is
-    // null if doesExplorationExist() returns false.
-    CollectionNode.prototype.getExplorationTitle = function() {
-      if (this._explorationSummaryObject) {
-        return this._explorationSummaryObject.title;
-      } else {
-        return null;
-      }
-    };
-
-    // Returns whether the exploration referenced by this node is known to exist
-    // in the backend. This property is immutable.
-    CollectionNode.prototype.doesExplorationExist = function() {
-      return this._explorationSummaryObject !== null;
-    };
-
-    // Returns whether the exploration referenced by this node is private and
-    // not published. This property is immutable. The value returned by this
-    // function is undefined if doesExplorationExist() returns false.
-    CollectionNode.prototype.isExplorationPrivate = function() {
-      if (this._explorationSummaryObject) {
-        return this._explorationSummaryObject.status === (
-          ACTIVITY_STATUS_PRIVATE);
-      } else {
-        return undefined;
-      }
-    };
-
-    // Returns a raw exploration summary object, as supplied by the backend for
-    // frontend exploration summary tile displaying. Changes to the returned
-    // object are not reflected in this domain object. The value returned by
-    // this function is null if doesExplorationExist() returns false.
-    CollectionNode.prototype.getExplorationSummaryObject = function() {
-      // TODO(bhenning): This should be represented by a
-      // frontend summary domain object that is also shared with
-      // the search result and profile pages.
-      return angular.copy(this._explorationSummaryObject);
-    };
-
-    // Sets the raw exploration summary object stored within this node.
-    CollectionNode.prototype.setExplorationSummaryObject = function(
-        explorationSummaryBackendObject) {
-      this._explorationSummaryObject = angular.copy(
-        explorationSummaryBackendObject);
-    };
-
-    CollectionNode.prototype.getCapitalizedObjective = function() {
-      return (
-        this._explorationSummaryObject.objective.charAt(0).toUpperCase() +
-        this._explorationSummaryObject.objective.slice(1));
-    };
-
-    // Static class methods. Note that "this" is not available in static
-    // contexts. This function takes a JSON object which represents a backend
-    // collection node python dict.
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    CollectionNode['create'] = function(collectionNodeBackendObject) {
-    /* eslint-enable dot-notation */
-      return new CollectionNode(collectionNodeBackendObject);
-    };
-
-    // TODO(bhenning): Ensure this matches the backend dict elements for
-    // collection nodes.
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    CollectionNode['createFromExplorationId'] = function(explorationId) {
-    /* eslint-enable dot-notation */
-      // TODO(ankita240796): Remove the bracket notation once Angular2
-      // gets in.
-      /* eslint-disable dot-notation */
-      return CollectionNode['create']({
-      /* eslint-enable dot-notation */
-        exploration_id: explorationId,
-        exploration_summary: null
-      });
-    };
-
-    return CollectionNode;
+export class CollectionNode {
+  _explorationId: string;
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since '_explorationSummaryObject' is a dict of varying keys.
+  _explorationSummaryObject: any;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'collectionNodeBackendObject' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  constructor(collectionNodeBackendObject: any) {
+    this._explorationId = collectionNodeBackendObject.exploration_id;
+    this._explorationSummaryObject = cloneDeep(
+      collectionNodeBackendObject.exploration_summary);
   }
-]);
+
+  // Returns the ID of the exploration represented by this collection node.
+  // This property is immutable.
+  getExplorationId(): string {
+    return this._explorationId;
+  }
+
+  // Returns the title of the exploration represented by this collection node.
+  // This property is immutable. The value returned by this function is
+  // null if doesExplorationExist() returns false.
+  getExplorationTitle(): string {
+    if (this._explorationSummaryObject) {
+      return this._explorationSummaryObject.title;
+    } else {
+      return null;
+    }
+  }
+
+  // Returns whether the exploration referenced by this node is known to exist
+  // in the backend. This property is immutable.
+  doesExplorationExist(): boolean {
+    return this._explorationSummaryObject !== null;
+  }
+
+  // Returns whether the exploration referenced by this node is private and
+  // not published. This property is immutable. The value returned by this
+  // function is undefined if doesExplorationExist() returns false.
+  isExplorationPrivate(): boolean {
+    if (this._explorationSummaryObject) {
+      return this._explorationSummaryObject.status === (
+        AppConstants.ACTIVITY_STATUS_PRIVATE);
+    } else {
+      return undefined;
+    }
+  }
+
+  // Returns a raw exploration summary object, as supplied by the backend for
+  // frontend exploration summary tile displaying. Changes to the returned
+  // object are not reflected in this domain object. The value returned by
+  // this function is null if doesExplorationExist() returns false.
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since '_explorationSummaryObject' is a dict of varying keys.
+  getExplorationSummaryObject(): any {
+    // TODO(bhenning): This should be represented by a
+    // frontend summary domain object that is also shared with
+    // the search result and profile pages.
+    return cloneDeep(this._explorationSummaryObject);
+  }
+
+  // Sets the raw exploration summary object stored within this node.
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since '_explorationSummaryObject' is a dict of varying keys.
+  setExplorationSummaryObject(explorationSummaryBackendObject: any): any {
+    this._explorationSummaryObject = cloneDeep(
+      explorationSummaryBackendObject);
+  }
+
+  getCapitalizedObjective(): string {
+    return (
+      this._explorationSummaryObject.objective.charAt(0).toUpperCase() +
+      this._explorationSummaryObject.objective.slice(1));
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CollectionNodeObjectFactory {
+  // Static class methods. Note that "this" is not available in static
+  // contexts. This function takes a JSON object which represents a backend
+  // collection node python dict.
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'collectionNodeBackendObject' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  create(collectionNodeBackendObject: any): CollectionNode {
+    return new CollectionNode(collectionNodeBackendObject);
+  }
+
+  createFromExplorationId(explorationId: string): CollectionNode {
+    return this.create({
+      exploration_id: explorationId,
+      exploration_summary: null
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'CollectionNodeObjectFactory',
+  downgradeInjectable(CollectionNodeObjectFactory));

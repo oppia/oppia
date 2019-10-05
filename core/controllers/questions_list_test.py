@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """ Tests for the questions list. """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import question_services
@@ -22,6 +24,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
@@ -57,7 +60,7 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
 class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
 
     def test_get_questions_succeeds(self):
-        for _ in range(0, 4):
+        for _ in python_utils.RANGE(0, 4):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
@@ -87,7 +90,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             question_summary_dicts_2 = (
                 json_response['question_summary_dicts'])
             self.assertEqual(len(question_summary_dicts_2), 2)
-            for i in range(0, 2):
+            for i in python_utils.RANGE(0, 2):
                 self.assertEqual(
                     question_summary_dicts[i]['skill_descriptions'],
                     ['Skill Description 2', 'Skill Description'])

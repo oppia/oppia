@@ -16,15 +16,18 @@
  * @fileoverview Requires for FractionInput interaction.
  */
 
-require('interactions/FractionInput/directives/FractionInputRulesService.ts');
-require(
-  'interactions/FractionInput/directives/FractionInputValidationService.ts');
 require(
   'interactions/FractionInput/directives/' +
-  'OppiaInteractiveFractionInputDirective.ts');
+  'fraction-input-rules.service.ts');
 require(
   'interactions/FractionInput/directives/' +
-  'OppiaResponseFractionInputDirective.ts');
+  'fraction-input-validation.service.ts');
 require(
   'interactions/FractionInput/directives/' +
-  'OppiaShortResponseFractionInputDirective.ts');
+  'oppia-interactive-fraction-input.directive.ts');
+require(
+  'interactions/FractionInput/directives/' +
+  'oppia-response-fraction-input.directive.ts');
+require(
+  'interactions/FractionInput/directives/' +
+  'oppia-short-response-fraction-input.directive.ts');

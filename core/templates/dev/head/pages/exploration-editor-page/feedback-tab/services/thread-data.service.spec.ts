@@ -20,9 +20,9 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // thread-data.service.ts is upgraded to Angular 8.
 import { FeedbackThreadObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+  'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory.ts';
+  'domain/suggestion/SuggestionObjectFactory';
 // ^^^ This block is to be removed.
 
 require(

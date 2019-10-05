@@ -17,7 +17,7 @@
  * status label for a thread in the feedback tab of the exploration editor.
  */
 
-import * as cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -47,11 +47,11 @@ export class ThreadStatusDisplayService {
 
   getLabelClass(status: string): string {
     if (status === 'open') {
-      return 'label label-info';
+      return 'badge badge-info';
     } else if (status === 'compliment') {
-      return 'label label-success';
+      return 'badge badge-success';
     } else {
-      return 'label label-default';
+      return 'badge badge-secondary';
     }
   }
 

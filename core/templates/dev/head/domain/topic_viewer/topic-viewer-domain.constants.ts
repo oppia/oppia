@@ -18,4 +18,7 @@
 
 export class TopicViewerDomainConstants {
   public static TOPIC_DATA_URL_TEMPLATE = '/topic_data_handler/<topic_name>';
+  public static STORY_VIEWER_URL_TEMPLATE = '/story/<story_id>';
+  public static SUBTOPIC_VIEWER_URL_TEMPLATE =
+    '/subtopic/<topic_name>/<subtopic_id>';
 }

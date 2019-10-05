@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the profile page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
@@ -243,7 +245,7 @@ class SignupPage(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
-        return_url = str(self.request.get('return_url', self.request.uri))
+        return_url = self.request.get('return_url', self.request.uri)
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
@@ -386,6 +388,8 @@ class UserInfoHandler(base.BaseHandler):
                 'preferred_site_language_code': (
                     user_settings.preferred_site_language_code),
                 'username': user_settings.username,
+                'email': user_services.get_email_from_username(
+                    user_settings.username),
                 'user_is_logged_in': True
             })
         else:

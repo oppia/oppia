@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for collection models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -25,12 +27,17 @@ from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 
-(collection_models,) = models.Registry.import_models(
-    [models.NAMES.collection])
+(base_models, collection_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.collection])
 
 
 class CollectionModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            collection_models.CollectionModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_get_collection_count(self):
         collection = collection_domain.Collection.create_default_collection(
@@ -51,6 +58,11 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'  # Related to all three collections
     USER_ID_2 = 'id_2'  # Related to a subset of the three collections
     USER_ID_3 = 'id_3'  # Related to no collections
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            collection_models.CollectionRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def setUp(self):
         super(CollectionRightsModelUnitTest, self).setUp()
@@ -177,7 +189,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         public_commit.put()
         commits = (
             collection_models.CollectionCommitLogEntryModel
-            .get_all_non_private_commits(2, None, None))
+            .get_all_non_private_commits(2, None, max_age=None))
         self.assertEqual(False, commits[2])
         self.assertEqual('collection-b-0', commits[0][0].id)
 
@@ -187,7 +199,8 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'max_age must be a datetime.timedelta instance or None.'):
             (
                 collection_models.CollectionCommitLogEntryModel
-                .get_all_non_private_commits(2, None, 'invalid_max_age'))
+                .get_all_non_private_commits(
+                    2, None, max_age='invalid_max_age'))
 
     def test_get_all_non_private_commits_with_max_age(self):
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
@@ -210,7 +223,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         max_age = datetime.timedelta(hours=1)
         results, _, more = (
             collection_models.CollectionCommitLogEntryModel
-            .get_all_non_private_commits(2, None, max_age))
+            .get_all_non_private_commits(2, None, max_age=max_age))
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
         self.assertEqual('collection-b-0', results[0].id)
@@ -218,6 +231,11 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
 class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     """Tests for the CollectionSummaryModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            collection_models.CollectionSummaryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_get_non_private(self):
         public_collection_summary_model = (

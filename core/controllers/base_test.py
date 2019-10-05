@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for generic controller behavior."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import importlib
@@ -36,6 +38,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import main
+import python_utils
 import utils
 
 from mapreduce import main as mapreduce_main
@@ -47,6 +50,26 @@ current_user_services = models.Registry.import_current_user_services()
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
+
+
+class UniqueTemplateNamesTests(test_utils.GenericTestBase):
+    """Tests to ensure that all template filenames in
+    core/templates/dev/head/pages have unique filenames. This is required
+    for the backend tests to work correctly since they fetch templates
+    from this directory based on name of the template. For details, refer
+    get_filepath_from_filename function in test_utils.py.
+    """
+
+    def test_template_filenames_are_unique(self):
+        templates_dir = os.path.join(
+            'core', 'templates', 'dev', 'head', 'pages')
+        all_template_names = []
+        for root, _, filenames in os.walk(templates_dir):
+            template_filenames = [
+                filename for filename in filenames if filename.endswith(
+                    '.html')]
+            all_template_names = all_template_names + template_filenames
+        self.assertEqual(len(all_template_names), len(set(all_template_names)))
 
 
 class BaseHandlerTests(test_utils.GenericTestBase):
@@ -112,6 +135,16 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             else:
                 url = route.template
             url = re.sub('<([^/^:]+)>', 'abc123', url)
+
+            # This url is ignored since it is only needed for a protractor test.
+            # The backend tests fetch templates from
+            # core/templates/dev/head/pages instead of webpack_bundles since we
+            # skip webpack compilation for backend tests.
+            # The console_errors.html template is present in
+            # core/templates/dev/head/tests and we want one canonical
+            # directory for retrieving templates so we ignore this url.
+            if url == '/console_errors':
+                continue
 
             # Some of these will 404 or 302. This is expected.
             self.get_response_without_checking_for_errors(
@@ -391,7 +424,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             import main  # pylint: disable-all
 
         headers_dict = {
-            'X-AppEngine-TaskName': 'taskname'
+            'X-AppEngine-TaskName': b'taskname'
         }
         self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
         self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
@@ -462,6 +495,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.post_json('/frontend_errors', {'error': 'errors'})
 
         self.assertEqual(observed_log_messages, ['Frontend error: errors'])
+
+    def test_redirect_oppia_test_server(self):
+        # The old demo server redirects to the new demo server.
+        response = self.get_html_response(
+            'https://oppiaserver.appspot.com/splash', expected_status_int=301)
+        self.assertEqual(
+            response.headers['Location'], 'https://oppiatestserver.appspot.com')
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
@@ -698,8 +738,9 @@ class I18nDictsTests(test_utils.GenericTestBase):
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
         for filename in filenames:
-            with open(os.path.join(os.getcwd(), 'assets', 'i18n', filename),
-                      mode='r') as f:
+            with python_utils.open_file(
+                os.path.join(os.getcwd(), 'assets', 'i18n', filename),
+                mode='r') as f:
                 lines = f.readlines()
                 self.assertEqual(lines[0], '{\n')
                 self.assertEqual(lines[-1], '}\n')
@@ -756,7 +797,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         # HTML tags and Angular variable interpolations.
         master_tags_dict = {
             key: self._get_tags(value, key, 'en.json')
-            for key, value in master_translation_dict.iteritems()
+            for key, value in master_translation_dict.items()
         }
 
         mismatches = []
@@ -768,7 +809,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 continue
             translation_dict = json.loads(utils.get_file_contents(
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename)))
-            for key, value in translation_dict.iteritems():
+            for key, value in translation_dict.items():
                 tags = self._get_tags(value, key, filename)
                 if tags != master_tags_dict[key]:
                     mismatches.append('%s (%s): %s != %s' % (
@@ -864,7 +905,7 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
 
         def get(self):
-            self.values.update(self.request.GET.items())
+            self.values.update(list(self.request.GET.items()))
             self.render_json(self.values)
 
     def test_get_items(self):

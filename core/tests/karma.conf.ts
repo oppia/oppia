@@ -2,6 +2,7 @@ var argv = require('yargs').argv;
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
+const isDocker = require('is-docker')();
 if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
@@ -23,7 +24,7 @@ module.exports = function(config) {
       'third_party/static/headroom-js-0.9.4/headroom.min.js',
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
-      'third_party/static/ckeditor-4.9.2/ckeditor.js',
+      'third_party/static/ckeditor-4.12.1/ckeditor.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -33,7 +34,7 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.template.html',
       'local_compiled_js/extensions/**/*.js',
       'core/templates/dev/head/AppInit.ts',
-      // This is a file that is generated on running the run_frontend_tests.sh
+      // This is a file that is generated on running the run_frontend_tests.py
       // script. This generated file is a combination of all the spec files
       // since Karma is unable to run tests on multiple files due to some
       // unknown reason.
@@ -44,7 +45,7 @@ module.exports = function(config) {
         served: true,
         included: false
       },
-      'extensions/interactions/**/*_directive.html',
+      'extensions/interactions/**/*.directive.html',
       'extensions/interactions/rule_templates.json',
       'core/tests/data/*.json',
       {
@@ -76,7 +77,7 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
       'core/templates/dev/head/**/*.directive.html': ['ng-html2js'],
       'core/templates/dev/head/**/*.template.html': ['ng-html2js'],
-      'extensions/interactions/**/*_directive.html': ['ng-html2js'],
+      'extensions/interactions/**/*.directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
@@ -103,8 +104,16 @@ module.exports = function(config) {
     singleRun: true,
     customLaunchers: {
       Chrome_Travis: {
-        base: 'Chrome',
-        flags: ['--no-sandbox']
+        // Karma can only connect to ChromeHeadless when inside Docker.
+        base: isDocker ? 'ChromeHeadless' : 'Chrome',
+        // Discussion of the necessity of extra flags can be found here:
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/154
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/180
+        flags: isDocker ? [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-web-security'
+        ] : ['--no-sandbox']
       }
     },
 
@@ -136,12 +145,14 @@ module.exports = function(config) {
       mode: 'development',
       resolve: {
         modules: [
-          'core/tests/build_sources/assets',
+          'core/tests/data',
           'assets',
           'core/templates/dev/head',
           'extensions',
           'node_modules',
+          'third_party',
         ],
+        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
       devtool: 'inline-source-map',
       module: {
@@ -171,6 +182,10 @@ module.exports = function(config) {
               loader: 'istanbul-instrumenter-loader',
               options: { esModules: true }
             }
+          },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
           }
         ]
       },

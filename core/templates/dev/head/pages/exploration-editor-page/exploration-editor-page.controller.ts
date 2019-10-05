@@ -17,128 +17,6 @@
  *               help tab in the navbar.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
-// introduce webpack for /extensions
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-require(
-  'components/forms/custom-forms-directives/apply-validation.directive.ts');
-require(
-  'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
-require('filters/convert-unicode-with-params-to-html.filter.ts');
-require('filters/convert-html-to-unicode.filter.ts');
-require('filters/convert-unicode-to-html.filter.ts');
-require(
-  'components/forms/custom-forms-directives/require-is-float.directive.ts');
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
-require('components/forms/custom-forms-directives/html-select.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-bool-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-choices-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-custom-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-dict-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-expression-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-float-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-html-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-list-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-unicode-editor.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
-require('components/forms/validators/is-at-least.filter.ts');
-require('components/forms/validators/is-at-most.filter.ts');
-require('components/forms/validators/is-float.filter.ts');
-require('components/forms/validators/is-integer.filter.ts');
-require('components/forms/validators/is-nonempty.filter.ts');
-require(
-  'components/state-directives/answer-group-editor/' +
-  'answer-group-editor.directive.ts');
-require('components/state-directives/hint-editor/hint-editor.directive.ts');
-require(
-  'components/state-directives/outcome-editor/outcome-editor.directive.ts');
-require(
-  'components/state-directives/outcome-editor/' +
-  'outcome-destination-editor.directive.ts');
-require(
-  'components/state-directives/outcome-editor/' +
-  'outcome-feedback-editor.directive.ts');
-require(
-  'components/state-directives/response-header/response-header.directive.ts');
-require('components/state-directives/rule-editor/rule-editor.directive.ts');
-require(
-  'components/state-directives/rule-editor/rule-type-selector.directive.ts');
-require(
-  'components/state-directives/solution-editor/solution-editor.directive.ts');
-require(
-  'components/state-directives/solution-editor/' +
-  'solution-explanation-editor.directive.ts');
-require(
-  'components/version-diff-visualization/codemirror-mergeview.directive.ts');
-require('directives/angular-html-bind.directive.ts');
-require('directives/mathjax-bind.directive.ts');
-require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
-require('filters/string-utility-filters/capitalize.filter.ts');
-require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
-require('filters/format-rte-preview.filter.ts');
-require('filters/format-timer.filter.ts');
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require(
-  'filters/string-utility-filters/' +
-  'normalize-whitespace-punctuation-and-case.filter.ts');
-require('filters/parameterize-rule-description.filter.ts');
-require('filters/remove-duplicates-in-array.filter.ts');
-require(
-  'filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
-require('filters/summarize-nonnegative-number.filter.ts');
-require('filters/string-utility-filters/truncate.filter.ts');
-require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
-require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
-require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
-require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
-require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
-require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-require(
-  'components/forms/forms-templates/' +
-  'mark-all-audio-and-translations-as-needing-update.controller.ts');
-require(
-  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.directive.ts');
-require(
-  'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
-  'suggestion-modal-for-exploration-editor.service.ts');
-// ^^^ this block of requires should be removed ^^^
-
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
@@ -147,6 +25,8 @@ require(
   'attribution-guide.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('components/profile-link-directives/profile-link-text.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
@@ -179,6 +59,8 @@ require(
   'improvements-tab.directive.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.directive.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/pie-chart.directive.ts');
 require(
@@ -243,6 +125,9 @@ require(
 require(
   'pages/exploration-editor-page/services/user-email-preferences.service.ts');
 require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
+require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -290,7 +175,8 @@ angular.module('oppia').directive('explorationEditorPage', [
         'StateEditorService', 'StateTopAnswersStatsBackendApiService',
         'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
         'ThreadDataService', 'UrlInterpolationService',
-        'UserEmailPreferencesService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
+        'UserEmailPreferencesService', 'UserExplorationPermissionsService',
+        'EVENT_EXPLORATION_PROPERTY_CHANGED',
         function(
             $http, $log, $q, $rootScope, $scope, $templateCache,
             $timeout, $uibModal, $window, AutosaveInfoModalsService,
@@ -309,7 +195,8 @@ angular.module('oppia').directive('explorationEditorPage', [
             StateEditorService, StateTopAnswersStatsBackendApiService,
             StateTopAnswersStatsService, StateTutorialFirstTimeService,
             ThreadDataService, UrlInterpolationService,
-            UserEmailPreferencesService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
+            UserEmailPreferencesService, UserExplorationPermissionsService,
+            EVENT_EXPLORATION_PROPERTY_CHANGED) {
           var ctrl = this;
           ctrl.EditabilityService = EditabilityService;
           ctrl.StateEditorService = StateEditorService;
@@ -429,13 +316,15 @@ angular.module('oppia').directive('explorationEditorPage', [
                 explorationData.email_preferences
                   .mute_suggestion_notifications);
 
-              if (GLOBALS.can_edit) {
-                EditabilityService.markEditable();
-              }
-
-              if (GLOBALS.can_voiceover || GLOBALS.can_edit) {
-                EditabilityService.markTranslatable();
-              }
+              UserExplorationPermissionsService.getPermissionsAsync()
+                .then(function(permissions) {
+                  if (permissions.can_edit) {
+                    EditabilityService.markEditable();
+                  }
+                  if (permissions.can_voiceover || permissions.can_edit) {
+                    EditabilityService.markTranslatable();
+                  }
+                });
 
               StateEditorService.updateExplorationWhitelistedStatus(
                 featuresData.is_exploration_whitelisted);
@@ -654,11 +543,14 @@ angular.module('oppia').directive('explorationEditorPage', [
           // Remove save from tutorial if user does not has edit rights for
           // exploration since in that case Save Draft button will not be
           // visible on the create page.
-          if (!GLOBALS.can_edit) {
-            var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
-              saveButtonTutorialElement);
-            ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
-          }
+          UserExplorationPermissionsService.getPermissionsAsync()
+            .then(function(permissions) {
+              if (!permissions.can_edit) {
+                var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
+                  saveButtonTutorialElement);
+                ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
+              }
+            });
 
           // Replace the ng-joyride template with one that uses <[...]>
           // interpolators instead of/ {{...}} interpolators.

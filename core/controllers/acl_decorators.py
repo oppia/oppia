@@ -15,9 +15,10 @@
 # limitations under the License.
 
 """Decorators to provide authorization across the site."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
-import urllib
 
 from core.controllers import base
 from core.domain import feedback_services
@@ -36,6 +37,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -960,6 +962,7 @@ def can_edit_exploration(handler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
+
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1018,6 +1021,54 @@ def can_voiceover_exploration(handler):
     test_can_voiceover.__wrapped__ = True
 
     return test_can_voiceover
+
+
+def can_save_exploration(handler):
+    """Decorator to check whether user can save exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks if
+            a user has permission to save a given exploration.
+    """
+
+    def test_can_save(self, exploration_id, **kwargs):
+        """Checks if the user can save the exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+            **kwargs: dict(str: *). Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to save changes to this exploration.
+        """
+
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_save_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have permissions to save this exploration.')
+
+    test_can_save.__wrapped__ = True
+
+    return test_can_save
 
 
 def can_delete_exploration(handler):
@@ -2319,7 +2370,7 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        topic_name = urllib.unquote_plus(topic_name)
+        topic_name = python_utils.url_unquote_plus(topic_name)
         topic = topic_fetchers.get_topic_by_name(topic_name)
 
         if topic is None:
@@ -2399,11 +2450,11 @@ def can_access_subtopic_viewer_page(handler):
             if the user can access the give subtopic viewer page.
     """
 
-    def test_can_access(self, topic_id, subtopic_id, **kwargs):
+    def test_can_access(self, topic_name, subtopic_id, **kwargs):
         """Checks if the user can access subtopic viewer page.
 
         Args:
-            topic_id: str. The id of the topic.
+            topic_name: str. The name of the topic.
             subtopic_id: str. The id of the Subtopic.
             **kwargs: *. Keyword arguments.
 
@@ -2413,12 +2464,26 @@ def can_access_subtopic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic is None:
+            raise self.PageNotFoundException
+
+        topic_rights = topic_services.get_topic_rights(topic.id)
+        if topic_rights is None or not topic_rights.topic_is_published:
+            raise self.PageNotFoundException
+
+        subtopic_is_present = any(
+            subtopic.id == int(subtopic_id) for subtopic in topic.subtopics)
+
+        if not subtopic_is_present:
+            raise self.PageNotFoundException
+
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-            topic_id, subtopic_id, strict=False)
+            topic.id, int(subtopic_id), strict=False)
         if subtopic_page is None:
             raise self.PageNotFoundException
         else:
-            return handler(self, topic_id, subtopic_id, **kwargs)
+            return handler(self, topic_name, subtopic_id, **kwargs)
     test_can_access.__wrapped__ = True
 
     return test_can_access

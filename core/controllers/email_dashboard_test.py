@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for email dashboard handler."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
@@ -153,9 +155,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         response = self.get_html_response('/emaildashboard')
-        self.assertIn(
-            '<title itemprop="name">Email Dashboard - Oppia</title>',
-            response.body)
+        self.assertIn('{"title": "Email Dashboard - Oppia"})', response.body)
 
         self.logout()
 
@@ -214,8 +214,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         response = self.get_html_response('/emaildashboardresult/%s' % query_id)
 
         self.assertIn(
-            '<title itemprop="name">Email Dashboard Result - Oppia</title>',
-            response.body)
+            '{"title": "Email Dashboard Result - Oppia"})', response.body)
 
         self.logout()
 

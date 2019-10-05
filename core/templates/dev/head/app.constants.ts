@@ -34,10 +34,10 @@ export class AppConstants {
     I18N_SIGNUP_LOADING: 'Loading'
   };
 
-  public static RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
+  public static ACTIVITY_STATUS_PRIVATE = 'private';
+  public static ACTIVITY_STATUS_PUBLIC = 'public';
 
-  public static FEEDBACK_SUBJECT_MAX_CHAR_LIMIT =
-    constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT;
+  public static RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
 
   /* Called always when learner moves to a new card.
      Also called when card is selected by clicking on progress dots */
@@ -53,8 +53,6 @@ export class AppConstants {
     '/explorehandler/init/<exploration_id>';
   public static EXPLORATION_VERSION_DATA_URL_TEMPLATE =
     '/explorehandler/init/<exploration_id>?v=<version>';
-  public static VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE =
-    '/createhandler/voiceover/<exploration_id>';
   /* New card is available but user hasn't gone to it yet (when oppia
      gives a feedback and waits for user to press 'continue.
      Not called when a card is selected by clicking progress dots */
@@ -154,8 +152,11 @@ export class AppConstants {
     EXPLORATION: 'exploration',
     TOPIC: 'topic',
     SKILL: 'skill',
-    STORY: 'story'
-  }
+    STORY: 'story',
+    SUBTOPIC: 'subtopic'
+  };
 }
+
+const constants = require('constants.ts');
 
 Object.assign(AppConstants, constants);

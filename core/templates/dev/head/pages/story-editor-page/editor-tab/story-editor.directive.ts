@@ -18,7 +18,6 @@
 
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('directives/angular-html-bind.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
 
 require('domain/editor/undo_redo/UndoRedoService.ts');

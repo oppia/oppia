@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for core.domain.question_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -117,7 +119,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             questions[0].to_dict(), question_1.to_dict())
 
-    def test_get_questions_by_skill_ids(self):
+    def test_get_questions_by_skill_ids_with_fetch_by_difficulty(self):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -126,7 +128,23 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.editor_id, self.question_id_2, 'skill_2', 0.5)
 
         questions = question_services.get_questions_by_skill_ids(
-            4, ['skill_1', 'skill_2'])
+            2, ['skill_1', 'skill_2'], True)
+        questions.sort(key=lambda question: question.last_updated)
+
+        self.assertEqual(len(questions), 2)
+        self.assertEqual(questions[0].to_dict(), self.question.to_dict())
+        self.assertEqual(questions[1].to_dict(), self.question_2.to_dict())
+
+    def test_get_questions_by_skill_ids_without_fetch_by_difficulty(self):
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_1', 0.3)
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_1, 'skill_2', 0.8)
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_2, 'skill_2', 0.5)
+
+        questions = question_services.get_questions_by_skill_ids(
+            4, ['skill_1', 'skill_2'], False)
         questions.sort(key=lambda question: question.last_updated)
 
         self.assertEqual(len(questions), 3)
@@ -134,12 +152,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[1].to_dict(), self.question_1.to_dict())
         self.assertEqual(questions[2].to_dict(), self.question_2.to_dict())
 
-    def test_get_questions_by_skill_ids_raise_error(self):
+    def test_get_questions_by_skill_ids_raise_error_with_high_question_count(
+            self):
         with self.assertRaisesRegexp(
             Exception, 'Question count is too high, please limit the question '
             'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             question_services.get_questions_by_skill_ids(
-                25, ['skill_1', 'skill_2'])
+                25, ['skill_1', 'skill_2'], False)
 
     def test_create_multi_question_skill_links_for_question(self):
         self.question = self.save_new_question(
@@ -477,9 +496,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'updated question language code')
 
         self.assertEqual(len(observed_log_messages), 1)
-        self.assertEqual(
+        self.assertRegexpMatches(
             observed_log_messages[0],
-            'AttributeError \'str\' object has no attribute \'cmd\' %s '
+            'object has no attribute \'cmd\' %s '
             'invalid_change_list' % self.question_id)
 
     def test_replace_skill_id_for_all_questions(self):

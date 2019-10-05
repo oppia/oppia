@@ -37,6 +37,9 @@ require(
   'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time.service.ts');
 require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
+require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require(
@@ -62,11 +65,13 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
         'StateEditorService', 'StateRecordedVoiceoversService',
         'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
         'TranslationTabActiveModeService',
+        'UserExplorationPermissionsService',
         function($scope, $rootScope, $templateCache, $uibModal,
             ContextService, EditabilityService, ExplorationStatesService,
             StateEditorService, StateRecordedVoiceoversService,
             StateTutorialFirstTimeService, StateWrittenTranslationsService,
-            TranslationTabActiveModeService) {
+            TranslationTabActiveModeService,
+            UserExplorationPermissionsService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
           $scope.showTranslationTabSubDirectives = false;
@@ -272,12 +277,20 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
             $scope.leaveTutorial();
           };
 
+          var permissions = null;
           $scope.onStartTutorial = function() {
-            if (GLOBALS.can_voiceover) {
+            if (permissions === null) {
+              return;
+            }
+            if (permissions.can_voiceover) {
               EditabilityService.onStartTutorial();
               $scope.translationTutorial = true;
             }
           };
+          UserExplorationPermissionsService.getPermissionsAsync()
+            .then(function(explorationPermissions) {
+              permissions = explorationPermissions;
+            });
 
           $scope.showWelcomeTranslationModal = function() {
             var modalInstance = $uibModal.open({

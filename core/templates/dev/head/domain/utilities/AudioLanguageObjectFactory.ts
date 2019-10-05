@@ -43,7 +43,7 @@ export class AudioLanguageObjectFactory {
     return new AudioLanguage(
       audioLanguageDict.id,
       audioLanguageDict.description,
-      audioLanguageDict.related_languages);
+      audioLanguageDict.relatedLanguages);
   }
 }
 angular.module('oppia').factory(

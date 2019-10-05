@@ -19,18 +19,22 @@
 
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/RubricObjectFactory.ts');
 require('services/ValidatorsService.ts');
 
 angular.module('oppia').factory('SkillObjectFactory', [
-  'ConceptCardObjectFactory', 'MisconceptionObjectFactory', 'ValidatorsService',
+  'ConceptCardObjectFactory', 'MisconceptionObjectFactory',
+  'RubricObjectFactory', 'ValidatorsService', 'SKILL_DIFFICULTIES',
   function(
-      ConceptCardObjectFactory, MisconceptionObjectFactory, ValidatorsService) {
+      ConceptCardObjectFactory, MisconceptionObjectFactory,
+      RubricObjectFactory, ValidatorsService, SKILL_DIFFICULTIES) {
     var Skill = function(
-        id, description, misconceptions, conceptCard, languageCode, version,
-        nextMisconceptionId, supersedingSkillId, allQuestionsMerged) {
+        id, description, misconceptions, rubrics, conceptCard, languageCode,
+        version, nextMisconceptionId, supersedingSkillId, allQuestionsMerged) {
       this._id = id;
       this._description = description;
       this._misconceptions = misconceptions;
+      this._rubrics = rubrics;
       this._conceptCard = conceptCard;
       this._languageCode = languageCode;
       this._version = version;
@@ -55,6 +59,11 @@ angular.module('oppia').factory('SkillObjectFactory', [
         issues.push(
           'There should be review material in the concept card.');
       }
+      if (this.getRubrics().length !== 3) {
+        issues.push(
+          'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
+          'in rubrics.');
+      }
       return issues;
     };
 
@@ -64,6 +73,9 @@ angular.module('oppia').factory('SkillObjectFactory', [
         description: this._description,
         misconceptions: this._misconceptions.map(function(misconception) {
           return misconception.toBackendDict();
+        }),
+        rubrics: this._rubrics.map(function(rubric) {
+          return rubric.toBackendDict();
         }),
         skill_contents: this._conceptCard.toBackendDict(),
         language_code: this._languageCode,
@@ -78,6 +90,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
       this._id = skill.getId();
       this._description = skill.getDescription();
       this._misconceptions = skill.getMisconceptions();
+      this._rubrics = skill.getRubrics();
       this._conceptCard = skill.getConceptCard();
       this._languageCode = skill.getLanguageCode();
       this._version = skill.getVersion();
@@ -94,6 +107,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
         skillBackendDict.id,
         skillBackendDict.description,
         generateMisconceptionsFromBackendDict(skillBackendDict.misconceptions),
+        generateRubricsFromBackendDict(skillBackendDict.rubrics),
         ConceptCardObjectFactory.createFromBackendDict(
           skillBackendDict.skill_contents),
         skillBackendDict.language_code,
@@ -111,8 +125,8 @@ angular.module('oppia').factory('SkillObjectFactory', [
     Skill['createInterstitialSkill'] = function() {
     /* eslint-enable dot-notation */
       return new Skill(null, 'Skill description loading',
-        [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en', 1,
-        0, null, false);
+        [], [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en',
+        1, 0, null, false);
     };
 
     var generateMisconceptionsFromBackendDict = function(
@@ -121,6 +135,12 @@ angular.module('oppia').factory('SkillObjectFactory', [
           misconceptionsBackendDict) {
         return MisconceptionObjectFactory.createFromBackendDict(
           misconceptionsBackendDict);
+      });
+    };
+
+    var generateRubricsFromBackendDict = function(rubricBackendDicts) {
+      return rubricBackendDicts.map(function(rubricBackendDict) {
+        return RubricObjectFactory.createFromBackendDict(rubricBackendDict);
       });
     };
 
@@ -142,6 +162,10 @@ angular.module('oppia').factory('SkillObjectFactory', [
 
     Skill.prototype.getMisconceptions = function() {
       return this._misconceptions.slice();
+    };
+
+    Skill.prototype.getRubrics = function() {
+      return this._rubrics.slice();
     };
 
     Skill.prototype.appendMisconception = function(newMisconception) {
@@ -193,6 +217,29 @@ angular.module('oppia').factory('SkillObjectFactory', [
 
     Skill.prototype.getMisconceptionAtIndex = function(idx) {
       return this._misconceptions[idx];
+    };
+
+    Skill.prototype.getRubricExplanation = function(difficulty) {
+      for (var idx in this._rubrics) {
+        if (this._rubrics[idx].getDifficulty() === difficulty) {
+          return this._rubrics[idx].getExplanation();
+        }
+      }
+      return null;
+    };
+
+    Skill.prototype.updateRubricForDifficulty = function(
+        difficulty, explanation) {
+      if (SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
+        throw Error('Invalid difficulty value passed');
+      }
+      for (var idx in this._rubrics) {
+        if (this._rubrics[idx].getDifficulty() === difficulty) {
+          this._rubrics[idx].setExplanation(explanation);
+          return;
+        }
+      }
+      this._rubrics.push(RubricObjectFactory.create(difficulty, explanation));
     };
 
     return Skill;

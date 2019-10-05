@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for File System services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
@@ -23,6 +25,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 gae_image_services = models.Registry.import_gae_image_services()
 
@@ -62,7 +65,9 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.user_id_admin)
 
     def test_save_original_and_compressed_versions_of_image(self):
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
+            encoding=None) as f:
             original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
@@ -87,7 +92,9 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         # MAX_RESIZE_DIMENSION_PX so that it can be treated as a big image.
         max_resize_dimension_px_swap = self.swap(
             gae_image_services, 'MAX_RESIZE_DIMENSION_PX', 20)
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
+            encoding=None) as f:
             original_image_content = f.read()
 
         # The scaling factor changes if the dimensions of the image is
@@ -132,7 +139,9 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
                 (20, 20))
 
     def test_compress_image_on_prod_mode_with_small_image_size(self):
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
+            encoding=None) as f:
             original_image_content = f.read()
 
         with self.swap(constants, 'DEV_MODE', False):

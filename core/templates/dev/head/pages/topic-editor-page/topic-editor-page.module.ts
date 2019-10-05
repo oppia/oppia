@@ -32,22 +32,22 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants.ts';
+  'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants.ts';
+  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants.ts';
+  'domain/objects/objects-domain.constants';
 import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants.ts';
+  'domain/question/question-domain.constants';
 import { QuestionsListConstants } from
-  'components/question-directives/questions-list/questions-list.constants.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
-import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
-import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
+  'components/question-directives/questions-list/questions-list.constants';
+import { ServicesConstants } from 'services/services.constants';
+import { StoryDomainConstants } from 'domain/story/story-domain.constants';
+import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { TopicEditorPageConstants } from
-  'pages/topic-editor-page/topic-editor-page.constants.ts';
+  'pages/topic-editor-page/topic-editor-page.constants';
 
 @NgModule({
   imports: [
@@ -93,10 +93,9 @@ angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-  downgradedModule
-].concat(
-  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
+  'ui.validate', downgradedModule
+])
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
   .directive(

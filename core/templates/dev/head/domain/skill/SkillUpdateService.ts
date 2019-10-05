@@ -25,22 +25,24 @@ require('domain/skill/skill-domain.constants.ajs.ts');
 angular.module('oppia').factory('SkillUpdateService', [
   'ChangeObjectFactory',
   'UndoRedoService', 'CMD_ADD_SKILL_MISCONCEPTION',
-  'CMD_DELETE_SKILL_MISCONCEPTION', 'CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
+  'CMD_DELETE_SKILL_MISCONCEPTION', 'CMD_UPDATE_RUBRICS',
+  'CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
   'CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
   'CMD_UPDATE_SKILL_PROPERTY',
   'SKILL_CONTENTS_PROPERTY_EXPLANATION',
-  'SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES',
+  'SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'SKILL_DIFFICULTIES',
   'SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK',
   'SKILL_MISCONCEPTIONS_PROPERTY_NAME',
   'SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'SKILL_PROPERTY_DESCRIPTION',
   function(
       ChangeObjectFactory,
       UndoRedoService, CMD_ADD_SKILL_MISCONCEPTION,
-      CMD_DELETE_SKILL_MISCONCEPTION, CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+      CMD_DELETE_SKILL_MISCONCEPTION, CMD_UPDATE_RUBRICS,
+      CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
       CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
       CMD_UPDATE_SKILL_PROPERTY,
       SKILL_CONTENTS_PROPERTY_EXPLANATION,
-      SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+      SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES, SKILL_DIFFICULTIES,
       SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
       SKILL_MISCONCEPTIONS_PROPERTY_NAME,
       SKILL_MISCONCEPTIONS_PROPERTY_NOTES, SKILL_PROPERTY_DESCRIPTION) {
@@ -68,6 +70,14 @@ angular.module('oppia').factory('SkillUpdateService', [
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue),
         misconception_id: misconceptionId,
+      }, apply, reverse);
+    };
+
+    var _applyRubricPropertyChange = function(
+        skill, difficulty, explanation, apply, reverse) {
+      _applyChange(skill, CMD_UPDATE_RUBRICS, {
+        difficulty: angular.copy(difficulty),
+        explanation: angular.copy(explanation)
       }, apply, reverse);
     };
 
@@ -259,6 +269,20 @@ angular.module('oppia').factory('SkillUpdateService', [
               misconception.setFeedback(oldFeedback);
             });
         }
+      },
+
+      updateRubricForDifficulty: function(skill, difficulty, explanation) {
+        if (SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
+          throw Error('Invalid difficulty value passed');
+        }
+        var oldExplanation = skill.getRubricExplanation(difficulty);
+        _applyRubricPropertyChange(
+          skill, difficulty, explanation,
+          function(changeDict, skill) {
+            skill.updateRubricForDifficulty(difficulty, explanation);
+          }, function(changeDict, skill) {
+            skill.updateRubricForDifficulty(difficulty, oldExplanation);
+          });
       }
     };
   }
