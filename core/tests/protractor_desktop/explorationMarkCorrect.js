@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview End-to-end tests for the procedure of enabling correctness of
+ * solutions.
+ */
+
 var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -21,6 +26,8 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Exploration history', function() {
@@ -29,15 +36,21 @@ describe('Exploration history', function() {
   var explorationEditorSettingsTab = null;
   var libraryPage = null;
   var explorationPlayerPage = null;
+  var creatorDashboardPage = null;
+  const EXPLORATION_TITLE = 'Dummy Exploration';
+  const CORRECT_OPTION = 'This is correct!';
+
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   });
 
-  it('should display the history', function() {
+  it('should mark one option as correctness by creating interaction first' +
+     'and turn on "Enable Correctness" later', function() {
     users.createUser('user@markCorrect.com', 'userMarkCorrect');
     users.login('user@markCorrect.com');
     workflow.createExploration();
@@ -48,13 +61,13 @@ describe('Exploration history', function() {
     explorationEditorMainTab.setContent(forms.toRichText(
       'Select the right option.'));
     explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-      forms.toRichText('This is correct!'),
+      forms.toRichText(CORRECT_OPTION),
       forms.toRichText('This is wrong!'),
       forms.toRichText('Is this wrong?'),
       forms.toRichText('That was wrong!')
     ]);
     explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput', null, 'end', true, 'Equals', 'This is correct!');
+      'MultipleChoiceInput', null, 'end', true, 'Equals', CORRECT_OPTION);
     var responseEditor = explorationEditorMainTab.getResponseEditor(0);
     responseEditor.setFeedback(forms.toRichText('You are so good!'));
     responseEditor = explorationEditorMainTab.getResponseEditor('default');
@@ -62,7 +75,7 @@ describe('Exploration history', function() {
     explorationEditorMainTab.moveToState('end');
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Dummy Exploration');
+    explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
     explorationEditorSettingsTab.setCategory('Algorithm');
     explorationEditorSettingsTab.setObjective('Learn more about Oppia');
     explorationEditorSettingsTab.setLanguage('English');
@@ -74,9 +87,27 @@ describe('Exploration history', function() {
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
     libraryPage.get();
-    libraryPage.findExploration('Dummy Exploration');
-    libraryPage.playExploration('Dummy Exploration');
-    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'This is correct!');
-    waitsFor.visibilityOf(element(by.css('.inner-container-alignment')), 'Waiting for correctness.');
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    explorationPlayerPage.submitAnswer(
+      'MultipleChoiceInput', 'This is correct!');
+    waitsFor.visibilityOf(
+      element(by.css(
+        '.inner-container-alignment')), 'Waiting for correctness.');
+  });
+
+  // it('should mark one option as correctness by enabling mark correctness
+  //  first' +
+  //    'and add interaction later', function() {
+  //   users.createUser('user@markCorrect.com', 'userMarkCorrect');
+  //   users.login('user@markCorrect.com');
+  //   workflow.createExploration();
+  // });
+
+  afterEach(function() {
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration(EXPLORATION_TITLE);
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.deleteExploration();
   });
 });
