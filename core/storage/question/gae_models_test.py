@@ -491,7 +491,7 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             question_models.QuestionSummaryModel
-            .has_reference_to_user_id('user_id_1'))
+            .has_reference_to_user_id('user_id'))
         self.assertFalse(
             question_models.QuestionSummaryModel
             .has_reference_to_user_id('user_id_x'))
