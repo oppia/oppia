@@ -537,7 +537,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     The key of each instance is the question id.
     """
     # The user ID of the creator of the question.
-    creator_id = ndb.StringProperty(required=True)
+    creator_id = ndb.StringProperty(required=True, indexed=True)
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
