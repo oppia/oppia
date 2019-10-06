@@ -22,13 +22,13 @@ var PLACEHOLDER_INTEREST_TEXT = 'none specified';
 var users = require('../protractor_utils/users.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
-
-var ProfilePage = require('../protractor_utils/ProfilePage.js');
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
-var workflow = require('../protractor_utils/workflow');
+var workflow = require('../protractor_utils/workflow.js');
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
+var ProfilePage = require('../protractor_utils/ProfilePage.js');
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
+
 
 describe('Un-customized profile page', function() {
   var TEST_USERNAME = 'defaultProfileFeatures';
@@ -115,7 +115,7 @@ describe('Customized profile page for current user', function() {
   });
 });
 
-describe('View explorations created by user in their profile page',
+describe('Visiting user profile page',
   function() {
     var TEST_USERNAME = 'myUser';
     var TEST_EMAIL = TEST_USERNAME + '@example.com';
@@ -136,9 +136,7 @@ describe('View explorations created by user in their profile page',
     beforeAll(function() {
       profilePage = new ProfilePage.ProfilePage();
       creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    });
 
-    it('should create a new exploration', function() {
       users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
       users.login(ANOTHER_EMAIL);
 
@@ -151,9 +149,10 @@ describe('View explorations created by user in their profile page',
 
       creatorDashboardPage.get();
       creatorDashboardPage.expectToHaveExplorationCard(EXPLORATION.title);
+      users.logout();
     });
 
-    it('should view the exploration in another user\'s profile',
+    it('should show the explorations created by the user',
       function() {
         users.createUser(TEST_EMAIL, TEST_USERNAME);
         users.login(TEST_EMAIL);
@@ -165,9 +164,7 @@ describe('View explorations created by user in their profile page',
 
     afterEach(function() {
       users.logout();
-      general.checkForConsoleErrors([
-        'Failed to load resource: the server responded with a status of 404'
-      ]);
+      general.checkForConsoleErrors([]);
     });
   }
 );

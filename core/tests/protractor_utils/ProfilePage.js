@@ -29,6 +29,8 @@ var ProfilePage = function() {
     by.css('.protractor-test-profile-interest'));
   var interestPlaceholder = element(
     by.css('.protractor-test-profile-no-interest'));
+  var allExplorationCardElements = element.all(
+    by.css('.protractor-test-exploration-dashboard-card'));
 
   this.get = function(userName) {
     browser.get('/profile/' + userName);
@@ -75,8 +77,6 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCards = function() {
-    var allExplorationCardElements = element.all(
-      by.css('.protractor-test-exploration-dashboard-card'));
     allExplorationCardElements.then(function(cards) {
       if (cards.length === 0) {
         throw 'There is no exploration card on this profile';
@@ -86,21 +86,20 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCardByName = function(explorationName) {
-    var allExplorationCardElements = element.all(
-      by.css('.protractor-test-exploration-dashboard-card'));
+    var explorationsCardByName = allExplorationCardElements.filter(
+      function(card) {
+        var cardTitle = card.element(
+          by.css('.protractor-test-exp-summary-tile-title'));
+        return cardTitle.
+          getText().then(function(title) {
+            return (title === explorationName);
+          });
+      });
 
-    var hasExplorationCard = allExplorationCardElements.filter(function(card) {
-      return card.element(
-        by.css('.protractor-test-exp-summary-tile-title')).
-        getText().then(function(title) {
-          return (title === explorationName);
-        });
-    });
-
-    if (hasExplorationCard.length === 0) {
+    if (explorationsCardByName.length === 0) {
       throw 'There is no exploration card with name ' + explorationName;
     }
-    expect(hasExplorationCard.count()).toBeGreaterThanOrEqual(1);
+    expect(explorationsCardByName.count()).toBeGreaterThanOrEqual(1);
   };
 };
 
