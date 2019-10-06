@@ -140,7 +140,8 @@ class BaseJobManager(python_utils.OBJECT):
 
     @classmethod
     def enqueue(
-            cls, job_id, queue_name, additional_job_params=None, test_only=False):
+            cls, job_id, queue_name,
+            additional_job_params=None, test_only=False):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
@@ -215,7 +216,8 @@ class BaseJobManager(python_utils.OBJECT):
         # For testing _compress_output_list.
         if not job_id:
             return cls._compress_output_list(
-                output_list, test_only_max_output_len_chars=test_only_max_output_len_chars)
+                output_list,
+                test_only_max_output_len_chars=test_only_max_output_len_chars)
 
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
