@@ -93,8 +93,8 @@ EXCLUDED_PATHS = (
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
-    'webpack_bundles/*', 'core/tests/services_sources/*')
+    'core/tests/linter_tests/*', '*.mp3', '*.mp4', 'node_modules/*',
+    'typings/*', 'local_compiled_js/*', 'webpack_bundles/*')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
@@ -1259,7 +1259,7 @@ def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
     return failed
 
 
-def _check_codeowner_file(verbose_mode_enabled):
+def check_codeowner_file(verbose_mode_enabled):
     """Checks the CODEOWNERS file for any uncovered dirs/files and also
     checks that every pattern in the CODEOWNERS file matches at least one
     file/dir. Note that this checks the CODEOWNERS file according to the
@@ -1402,7 +1402,7 @@ def _lint_css_files(
         python_utils.PRINT('There are no CSS files to lint.')
         return
 
-    python_utils.PRINT('Total css files: ', num_css_files)
+    python_utils.PRINT('Total css files: %s' % num_css_files)
     stylelint_cmd_args = [
         node_path, stylelint_path, '--config=' + config_path]
     result_list = []
@@ -3355,7 +3355,7 @@ def main(args=None):
     linting_processes, result_queues, result_stdout = _lint_all_files(
         _FILES['.js'], _FILES['.ts'], _FILES['.py'], _FILES['.html'],
         _FILES['.css'], verbose_mode_enabled)
-    code_owner_message = _check_codeowner_file(verbose_mode_enabled)
+    code_owner_message = check_codeowner_file(verbose_mode_enabled)
     # Pylint requires to provide paramter "this_bases" and "d", guess due to
     # meta class.
     js_ts_lint_checks_manager = JsTsLintChecksManager( # pylint: disable=no-value-for-parameter
