@@ -139,7 +139,8 @@ class BaseJobManager(python_utils.OBJECT):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id, queue_name, additional_job_params=None, test_only=False):
+    def enqueue(
+            cls, job_id, queue_name, additional_job_params=None, test_only=False):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
@@ -198,7 +199,8 @@ class BaseJobManager(python_utils.OBJECT):
         cls._post_start_hook(job_id)
 
     @classmethod
-    def register_completion(cls, job_id, output_list, test_max_output_len_chars=None):
+    def register_completion(
+            cls, job_id, output_list, test_only_max_output_len_chars=None):
         """Marks a job as completed.
 
         Args:
@@ -206,10 +208,14 @@ class BaseJobManager(python_utils.OBJECT):
             output_list: list(object). The output produced by the job.
             test_max_output_len_chars: int. Overrides the intended
                 max output len limit when not None.
+
+        Returns:
+            list(str). The compressed stringified output values if test.
         """
         # For testing _compress_output_list.
         if not job_id:
-            return cls._compress_output_list(output_list, test_max_output_len_chars)
+            return cls._compress_output_list(
+                output_list, test_only_max_output_len_chars=test_only_max_output_len_chars)
 
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)

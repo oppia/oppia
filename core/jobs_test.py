@@ -436,28 +436,28 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         input_list = [1, 2, 3, 4, 5]
         expected_output = ['1', '2', '3', '<TRUNCATED>']
         actual_output = jobs.BaseJobManager.register_completion(
-            None, input_list, 3)
+            None, input_list, test_only_max_output_len_chars=3)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_multi_char_outputs(self):
         input_list = ['abcd', 'efgh', 'ijkl']
         expected_output = ['abcd', 'efgh', 'ij <TRUNCATED>']
         actual_output = jobs.BaseJobManager.register_completion(
-            None, input_list, 10)
+            None, input_list, test_only_max_output_len_chars=10)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_zero_max_output_len(self):
         input_list = [1, 2, 3]
         expected_output = ['<TRUNCATED>']
         actual_output = jobs.BaseJobManager.register_completion(
-            None, input_list, 0)
+            None, input_list, test_only_max_output_len_chars=0)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_exact_max_output_len(self):
         input_list = ['abc']
         expected_output = ['abc']
         actual_output = jobs.BaseJobManager.register_completion(
-            None, input_list, 3)
+            None, input_list, test_only_max_output_len_chars=3)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_empty_outputs(self):
@@ -472,14 +472,14 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         actual_output = jobs.BaseJobManager.register_completion(
             None, input_list,
             # Make sure no output gets truncated.
-            sum(len(s) for s in expected_output))
+            test_only_max_output_len_chars=sum(len(s) for s in expected_output))
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_truncated_duplicate_outputs(self):
         input_list = ['supercalifragilisticexpialidocious'] * 3
         expected_output = ['(3x) super <TRUNCATED>']
         actual_output = jobs.BaseJobManager.register_completion(
-            None, input_list, 10)
+            None, input_list, test_only_max_output_len_chars=10)
         self.assertEqual(actual_output, expected_output)
 
 
