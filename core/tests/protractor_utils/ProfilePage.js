@@ -90,10 +90,9 @@ var ProfilePage = function() {
       function(card) {
         var cardTitle = card.element(
           by.css('.protractor-test-exp-summary-tile-title'));
-        return cardTitle.
-          getText().then(function(title) {
-            return (title === explorationName);
-          });
+        return cardTitle.getText().then(function(title) {
+          return (title === explorationName);
+        });
       });
 
     if (explorationsCardByName.length === 0) {

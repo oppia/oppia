@@ -29,7 +29,6 @@ var CreatorDashboardPage =
 var ProfilePage = require('../protractor_utils/ProfilePage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 
-
 describe('Un-customized profile page', function() {
   var TEST_USERNAME = 'defaultProfileFeatures';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
@@ -115,56 +114,53 @@ describe('Customized profile page for current user', function() {
   });
 });
 
-describe('Visiting user profile page',
-  function() {
-    var TEST_USERNAME = 'myUser';
-    var TEST_EMAIL = TEST_USERNAME + '@example.com';
+describe('Visiting user profile page', function() {
+  var TEST_USERNAME = 'myUser';
+  var TEST_EMAIL = TEST_USERNAME + '@example.com';
 
-    var ANOTHER_USERNAME = 'anotherUser';
-    var ANOTHER_EMAIL = ANOTHER_USERNAME + '@example.com';
+  var ANOTHER_USERNAME = 'anotherUser';
+  var ANOTHER_EMAIL = ANOTHER_USERNAME + '@example.com';
 
-    var profilePage = null;
-    var creatorDashboardPage = null;
+  var profilePage = null;
+  var creatorDashboardPage = null;
 
-    var EXPLORATION = {
-      title: 'A new exploration',
-      category: 'Learning',
-      objective: 'The goal is to create a new exploration',
-      language: 'English'
-    };
+  var EXPLORATION = {
+    title: 'A new exploration',
+    category: 'Learning',
+    objective: 'The goal is to create a new exploration',
+    language: 'English'
+  };
 
-    beforeAll(function() {
-      profilePage = new ProfilePage.ProfilePage();
-      creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+  beforeAll(function() {
+    profilePage = new ProfilePage.ProfilePage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
 
-      users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
-      users.login(ANOTHER_EMAIL);
+    users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
+    users.login(ANOTHER_EMAIL);
 
-      workflow.createAndPublishExploration(
-        EXPLORATION.title,
-        EXPLORATION.category,
-        EXPLORATION.objective,
-        EXPLORATION.language
-      );
+    workflow.createAndPublishExploration(
+      EXPLORATION.title,
+      EXPLORATION.category,
+      EXPLORATION.objective,
+      EXPLORATION.language
+    );
 
-      creatorDashboardPage.get();
-      creatorDashboardPage.expectToHaveExplorationCard(EXPLORATION.title);
-      users.logout();
-    });
+    creatorDashboardPage.get();
+    creatorDashboardPage.expectToHaveExplorationCard(EXPLORATION.title);
+    users.logout();
+  });
 
-    it('should show the explorations created by the user',
-      function() {
-        users.createUser(TEST_EMAIL, TEST_USERNAME);
-        users.login(TEST_EMAIL);
+  it('should show the explorations created by the user', function() {
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+    users.login(TEST_EMAIL);
 
-        profilePage.get(ANOTHER_USERNAME);
-        profilePage.expectToHaveExplorationCards();
-        profilePage.expectToHaveExplorationCardByName(EXPLORATION.title);
-      });
+    profilePage.get(ANOTHER_USERNAME);
+    profilePage.expectToHaveExplorationCards();
+    profilePage.expectToHaveExplorationCardByName(EXPLORATION.title);
+  });
 
-    afterEach(function() {
-      users.logout();
-      general.checkForConsoleErrors([]);
-    });
-  }
-);
+  afterEach(function() {
+    users.logout();
+    general.checkForConsoleErrors([]);
+  });
+});
