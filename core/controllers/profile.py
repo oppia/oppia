@@ -27,6 +27,7 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -247,6 +248,10 @@ class SignupPage(base.BaseHandler):
         """Handles GET requests."""
         return_url = self.request.get('return_url', self.request.uri)
         # Validating return_url for no external redirections.
+        if re.search('create', return_url) is not None and (
+                user_services.has_fully_registered(self.user_id)):
+            self.redirect(python_utils.convert_to_bytes(return_url))
+            return
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
         if user_services.has_fully_registered(self.user_id):
