@@ -139,7 +139,7 @@ class BaseJobManager(python_utils.OBJECT):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id, queue_name, additional_job_params=None):
+    def enqueue(cls, job_id, queue_name, additional_job_params=None, test_only = False):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
@@ -149,7 +149,13 @@ class BaseJobManager(python_utils.OBJECT):
                 values.
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
+            test_only: boolean. For testing _real_enqueue method.
         """
+        # for testing the method _real_enqueue
+        if test_only:
+            cls._real_enqueue(job_id, queue_name, additional_job_params)
+            return
+
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -166,6 +172,8 @@ class BaseJobManager(python_utils.OBJECT):
         model.put()
 
         cls._post_enqueue_hook(job_id)
+
+
 
     @classmethod
     def register_start(cls, job_id, metadata=None):
@@ -190,13 +198,19 @@ class BaseJobManager(python_utils.OBJECT):
         cls._post_start_hook(job_id)
 
     @classmethod
-    def register_completion(cls, job_id, output_list):
+    def register_completion(cls, job_id, output_list, test_max_output_len_chars = None):
         """Marks a job as completed.
 
         Args:
             job_id: str. The ID of the job to complete.
             output_list: list(object). The output produced by the job.
+            test_max_output_len_chars: int. Overrides the intended
+                max output len limit when not None.
         """
+        # for testing _compress_output_list
+        if not job_id:
+            return cls._compress_output_list(output_list, test_max_output_len_chars)
+
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -205,13 +219,13 @@ class BaseJobManager(python_utils.OBJECT):
 
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
-        model.output = cls.compress_output_list(output_list)
+        model.output = cls._compress_output_list(output_list)
         model.put()
 
         cls._post_completed_hook(job_id)
 
     @classmethod
-    def compress_output_list(
+    def _compress_output_list(
             cls, output_list, test_only_max_output_len_chars=None):
         """Returns compressed list of strings within a max length of chars.
 
