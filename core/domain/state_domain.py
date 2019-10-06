@@ -1425,7 +1425,7 @@ class State(python_utils.OBJECT):
         """Retrieves training data from the State domain object.
 
         Returns:
-            list(state_training_data_by_answer_group). List of training data from state domain object.
+            list(dict). List of training data from state domain object.
         """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
