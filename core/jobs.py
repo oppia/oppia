@@ -206,7 +206,7 @@ class BaseJobManager(python_utils.OBJECT):
         Args:
             job_id: str. The ID of the job to complete.
             output_list: list(object). The output produced by the job.
-            test_max_output_len_chars: int. Overrides the intended
+            test_only_max_output_len_chars: int. Overrides the intended
                 max output len limit when not None.
 
         Returns:
