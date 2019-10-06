@@ -96,8 +96,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             NotImplementedError,
             'Subclasses of BaseJobManager should implement _real_enqueue().'):
             jobs.BaseJobManager.enqueue(
-                'job_id',
-                taskqueue_services.QUEUE_NAME_DEFAULT, None, test_only=True)
+                'job_id',taskqueue_services.QUEUE_NAME_DEFAULT,
+                additional_job_params=None, test_only=True)
 
     def test_failing_jobs(self):
         observed_log_messages = []
