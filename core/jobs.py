@@ -139,7 +139,7 @@ class BaseJobManager(python_utils.OBJECT):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id, queue_name, additional_job_params=None, test_only = False):
+    def enqueue(cls, job_id, queue_name, additional_job_params=None, test_only=False):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
@@ -198,7 +198,7 @@ class BaseJobManager(python_utils.OBJECT):
         cls._post_start_hook(job_id)
 
     @classmethod
-    def register_completion(cls, job_id, output_list, test_max_output_len_chars = None):
+    def register_completion(cls, job_id, output_list, test_max_output_len_chars=None):
         """Marks a job as completed.
 
         Args:
