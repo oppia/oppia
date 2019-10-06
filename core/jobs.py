@@ -151,7 +151,7 @@ class BaseJobManager(python_utils.OBJECT):
                 for the job.
             test_only: boolean. For testing _real_enqueue method.
         """
-        # for testing the method _real_enqueue
+        # For testing the method _real_enqueue.
         if test_only:
             cls._real_enqueue(job_id, queue_name, additional_job_params)
             return
@@ -207,7 +207,7 @@ class BaseJobManager(python_utils.OBJECT):
             test_max_output_len_chars: int. Overrides the intended
                 max output len limit when not None.
         """
-        # for testing _compress_output_list
+        # For testing _compress_output_list.
         if not job_id:
             return cls._compress_output_list(output_list, test_max_output_len_chars)
 
