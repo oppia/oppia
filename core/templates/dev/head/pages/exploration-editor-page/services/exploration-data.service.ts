@@ -146,6 +146,13 @@ angular.module('oppia').factory('ExplorationDataService', [
             $log.info(response);
             draftChangeListId = response.draft_change_list_id;
             explorationData.data = response;
+            explorationData.autosaveChangeList(
+              response.draft_changes, function() {
+              // A reload is needed so that the changelist just saved is
+              // loaded as opposed to the exploration returned by this
+              // response.
+              $window.location.reload();
+            });
           })
         );
       },
