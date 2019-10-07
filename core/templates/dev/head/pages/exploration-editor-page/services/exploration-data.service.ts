@@ -151,8 +151,8 @@ angular.module('oppia').factory('ExplorationDataService', [
               // A reload is needed so that the changelist just saved is
               // loaded as opposed to the exploration returned by this
               // response.
-              $window.location.reload();
-            });
+                $window.location.reload();
+              });
           })
         );
       },
