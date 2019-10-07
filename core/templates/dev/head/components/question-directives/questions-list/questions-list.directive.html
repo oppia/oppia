@@ -6,8 +6,9 @@
 <table class="dashboard-table" ng-if="$ctrl.questionSummaries.length > 0">
   <colgroup>
     <col style="width: 5%;">
-    <col style="width: 60%;">
-    <col style="width: 35%;">
+    <col style="width: 50%;">
+    <col ng-if="$ctrl.skillDescriptionsAreShown()" style="width: 35%;">
+    <col ng-if="$ctrl.skillDescriptionsAreShown()" style="width: 10%;">
   </colgroup>
   <tr>
     <th class="dashboard-table-headings">
@@ -19,6 +20,9 @@
     <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
       <p> Skill Description </p>
     </th>
+    <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
+      <p> Unlink questions from skill(s) </p>
+    </th>
   </tr>
   <tr ng-repeat="questionSummary in $ctrl.questionSummaries"
       class="list-item protractor-test-question-list-item"
@@ -27,6 +31,12 @@
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
     <td> <[$ctrl.truncatedQuestionSummaries[$index]]> </td>
     <td ng-if="$ctrl.skillDescriptionsAreShown()"> <[$ctrl.getSkillDescription(questionSummary.skill_descriptions)]> </td>
+    <td ng-if="$ctrl.skillDescriptionsAreShown()" class="delete-icon" ng-click="$event.stopPropagation()">
+      <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummary.summary.id, questionSummary.skill_descriptions)"
+            class="list-summary">
+        <i class="material-icons">link_off</i>
+      </span>
+    </td>
   </tr>
 </table>
 <h4 ng-if="$ctrl.questionSummaries.length === 0" style="color: gray;">

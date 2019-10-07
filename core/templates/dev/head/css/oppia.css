@@ -1806,6 +1806,14 @@ pre.oppia-pre-wrapped-text {
   max-width: 550px;
 }
 
+.toast-success {
+  background-color: #28a745;
+}
+
+.toast-info {
+  background-color: #337ab7;
+}
+
 .tooltip {
   font-size: 12px;
 }

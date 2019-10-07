@@ -30,8 +30,7 @@
     <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
       <topics-list topic-summaries="$ctrl.topicSummaries"
                    ng-if="$ctrl.topicSummaries.length > 0"
-                   user-can-delete-topic="$ctrl.userCanDeleteTopic"
-                   in-modal="false">
+                   user-can-delete-topic="$ctrl.userCanDeleteTopic">
       </topics-list>
       <p class="intro-card-message" ng-if="$ctrl.isTopicTabHelpTextVisible()" style="padding-top: 6px;">
         No topics have been created yet.
@@ -44,7 +43,6 @@
                    editable-topic-summaries="$ctrl.editableTopicSummaries"
                    mergeable-skill-summaries="$ctrl.mergeableSkillSummaries"
                    user-can-create-skill="$ctrl.userCanCreateSkill"
-                   in-modal="false"
                    user-can-delete-skill="$ctrl.userCanDeleteSkill">
       </skills-list>
       <p class="intro-card-message" ng-if="$ctrl.isSkillsTabHelpTextVisible()" style="padding-top: 6px;">
@@ -55,7 +53,6 @@
     <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_UNPUBLISHED_SKILLS">
       <skills-list skill-summaries="$ctrl.unpublishedSkillSummaries"
                    editable-topic-summaries="$ctrl.editableTopicSummaries"
-                   in-modal="false"
                    user-can-create-skill="$ctrl.userCanCreateSkill"
                    user-can-delete-skill="$ctrl.userCanDeleteSkill"
                    unpublished-skill="true">

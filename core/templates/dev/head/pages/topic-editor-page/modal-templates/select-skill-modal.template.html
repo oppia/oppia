@@ -5,7 +5,7 @@
       No skills linked to topic
     </h3>
     <h3 ng-if="skillSummaries.length > 0">
-      Select the skill to link the question to:
+      <[instructionMessage]>
     </h3>
   </div>
   <div class="modal-body select-skill-modal">
@@ -27,7 +27,7 @@
       <button class="btn btn-secondary" ng-click="cancelModal()"> Cancel </button>
       <button class="btn btn-success protractor-test-confirm-skill-button"
               ng-disabled="selectedSkillIds.length === 0"
-              ng-click="goToSelectDifficultyView()"> Next
+              ng-click="goToNextStep()"> Next
       </button>
     </div>
     <div ng-switch-when="false">

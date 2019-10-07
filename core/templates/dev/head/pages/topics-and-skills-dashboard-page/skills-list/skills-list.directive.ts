@@ -17,6 +17,9 @@
  */
 
 require(
+  'pages/topics-and-skills-dashboard-page/skill-selector/' +
+  'skill-selector.directive.ts');
+require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
 
@@ -38,9 +41,7 @@ angular.module('oppia').directive('skillsList', [
       scope: {
         getSkillSummaries: '&skillSummaries',
         getEditableTopicSummaries: '&editableTopicSummaries',
-        isInModal: '&inModal',
         getMergeableSkillSummaries: '&mergeableSkillSummaries',
-        selectedSkill: '=',
         canDeleteSkill: '&userCanDeleteSkill',
         canCreateSkill: '&userCanCreateSkill',
         isUnpublishedSkill: '&unpublishedSkill'
@@ -49,13 +50,13 @@ angular.module('oppia').directive('skillsList', [
         '/pages/topics-and-skills-dashboard-page/skills-list/' +
         'skills-list.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
-        'EditableSkillBackendApiService',
+        '$scope', '$uibModal', '$rootScope', '$timeout',
+        'EditableTopicBackendApiService', 'EditableSkillBackendApiService',
         'TopicsAndSkillsDashboardBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
-            $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
-            EditableSkillBackendApiService,
+            $scope, $uibModal, $rootScope, $timeout,
+            EditableTopicBackendApiService, EditableSkillBackendApiService,
             TopicsAndSkillsDashboardBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           $scope.SKILL_HEADINGS = [
@@ -97,8 +98,10 @@ angular.module('oppia').directive('skillsList', [
             modalInstance.result.then(function() {
               EditableSkillBackendApiService.deleteSkill(skillId).then(
                 function(status) {
-                  $rootScope.$broadcast(
-                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                  $timeout(function() {
+                    $rootScope.$broadcast(
+                      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                  }, 100);
                 }
               );
             }).then(function() {
@@ -144,8 +147,10 @@ angular.module('oppia').directive('skillsList', [
                       'Added skill with id ' + skillId + ' to topic.',
                       changeList
                     ).then(function() {
-                      $rootScope.$broadcast(
-                        EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                      $timeout(function() {
+                        $rootScope.$broadcast(
+                          EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                      }, 100);
                     }).then(function() {
                       var successToast = (
                         'The skill has been assigned to the topic.');
@@ -155,10 +160,6 @@ angular.module('oppia').directive('skillsList', [
                 }
               }
             });
-          };
-
-          $scope.selectSkill = function(skill) {
-            $scope.selectedSkill = skill;
           };
 
           $scope.mergeSkill = function(skill) {
@@ -172,11 +173,11 @@ angular.module('oppia').directive('skillsList', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
-                  $scope.selectedSkill = {};
+                  $scope.selectedSkillId = '';
                   $scope.done = function() {
                     $uibModalInstance.close(
                       {skill: skill,
-                        supersedingSkillId: $scope.selectedSkill.id
+                        supersedingSkillId: $scope.selectedSkillId
                       });
                   };
                   $scope.cancel = function() {
@@ -194,8 +195,10 @@ angular.module('oppia').directive('skillsList', [
                 skill.id, supersedingSkillId).then(function() {
                 // Broadcast will update the skills list in the dashboard so
                 // that the merged skills are not shown anymore.
-                $rootScope.$broadcast(
-                  EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                $timeout(function() {
+                  $rootScope.$broadcast(
+                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                }, 100);
               });
             });
           };

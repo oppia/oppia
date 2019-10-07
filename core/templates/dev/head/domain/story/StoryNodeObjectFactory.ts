@@ -108,6 +108,9 @@ export class StoryNode {
     var acquiredSkillIds = this._acquiredSkillIds;
     var destinationNodeIds = this._destinationNodeIds;
 
+    if (this._explorationId === '') {
+      issues.push('Exploration ID fields should not be empty, once edited.');
+    }
     for (var i = 0; i < prerequisiteSkillIds.length; i++) {
       var skillId = prerequisiteSkillIds[i];
       if (prerequisiteSkillIds.indexOf(skillId) <
