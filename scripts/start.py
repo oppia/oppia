@@ -94,25 +94,25 @@ def main(args=None):
         '--enable_console=true' if parsed_args.enable_console else '')
 
     if parsed_args.prod_env:
-        constants_env_variable = '\'DEV_MODE\': false'
+        constants_env_variable = '"DEV_MODE": false'
         for line in fileinput.input(
                 files=[os.path.join('assets', 'constants.ts')], inplace=True):
             # Inside this loop the STDOUT will be redirected to the file,
             # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
-                    r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
+                    r'"DEV_MODE": .*', constants_env_variable, line), end='')
         build.main(args=['--prod_env', '--enable_watcher'])
         app_yaml_filepath = 'app.yaml'
     else:
-        constants_env_variable = '\'DEV_MODE\': true'
+        constants_env_variable = '"DEV_MODE": true'
         for line in fileinput.input(
                 files=[os.path.join('assets', 'constants.ts')], inplace=True):
             # Inside this loop the STDOUT will be redirected to the file,
             # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
-                    r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
+                    r'"DEV_MODE": .*', constants_env_variable, line), end='')
         build.main(args=['--enable_watcher'])
         app_yaml_filepath = 'app_dev.yaml'
 
@@ -168,8 +168,7 @@ def main(args=None):
                 'INFORMATION',
                 'Setting up a local development server at localhost:%s. '
                 % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-                'Opening a',
-                'default browser window pointing to this server'])
+                'Opening a default browser window pointing to this server'])
             time.sleep(5)
             background_processes.append(
                 subprocess.Popen([
@@ -180,8 +179,7 @@ def main(args=None):
             'INFORMATION',
             'Setting up a local development server at localhost:%s. '
             % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            'Opening a',
-            'default browser window pointing to this server.'])
+            'Opening a default browser window pointing to this server.'])
         time.sleep(5)
         background_processes.append(
             subprocess.Popen([
