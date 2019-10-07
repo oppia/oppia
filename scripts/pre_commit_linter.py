@@ -1849,7 +1849,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         summary_messages = []
         failed = False
         stdout = python_utils.string_io()
-        with _redirect_stdout(_TARGET_STDOUT):
+        with _redirect_stdout(stdout):
             sets_of_patterns_to_match = [
                 MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
             for filepath in self.all_filepaths:
@@ -3384,9 +3384,11 @@ def main(args=None):
         python_utils.PRINT('---------------------------')
 
 
+NAME_SPACE = multiprocessing.Manager().Namespace()
+PROCESSES = multiprocessing.Manager().dict()
+NAME_SPACE.files = FileCache()
+FILE_CACHE = NAME_SPACE.files
+
+
 if __name__ == '__main__':
-    NAME_SPACE = multiprocessing.Manager().Namespace()
-    PROCESSES = multiprocessing.Manager().dict()
-    NAME_SPACE.files = FileCache()
-    FILE_CACHE = NAME_SPACE.files
     main()

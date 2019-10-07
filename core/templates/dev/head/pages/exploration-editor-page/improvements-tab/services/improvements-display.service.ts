@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service that provides information about how to display the
- * cards and data in the improvements tab of the exploration editor.
+ * tasks and data in the improvements tab of the exploration editor.
  */
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
