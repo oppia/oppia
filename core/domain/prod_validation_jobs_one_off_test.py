@@ -2532,7 +2532,7 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_0.question_count = -1
         self.model_instance_0.put()
 
-        with self.assertRaises(RuntimeError) as cm:
+        with self.assertRaises(RuntimeError):
             expected_output = 'Expect exception to be raised.'
             run_job_and_check_output(self, expected_output, sort=True)
 
