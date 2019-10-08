@@ -45,7 +45,7 @@
     "@types/q": "^1.5.1",
     "@types/select2": "^4.0.48",
     "@types/selenium-webdriver": "^4.0.0",
-    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.2",
     "ajv": "^6.10.0",
     "angular": "1.6.6",
