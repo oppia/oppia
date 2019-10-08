@@ -54,10 +54,11 @@ class QuestionsListHandler(base.BaseHandler):
         )
         return_dicts = []
         for index, summary in enumerate(question_summaries):
-            return_dicts.append({
-                'summary': summary.to_dict(),
-                'skill_descriptions': skill_descriptions_list[index]
-            })
+            if summary is not None:
+                return_dicts.append({
+                    'summary': summary.to_dict(),
+                    'skill_descriptions': skill_descriptions_list[index]
+                })
 
         self.values.update({
             'question_summary_dicts': return_dicts,
