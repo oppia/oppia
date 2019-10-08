@@ -427,6 +427,7 @@ class UrlHandler(base.BaseHandler):
 
 
 def is_same_domain(request_uri, return_uri):
+    """Checks if the two URIs passed belong to the same domain."""
     request_domain = python_utils.url_parse(request_uri).netloc
     return_domain = python_utils.url_parse(return_uri).netloc
     return (request_domain == return_domain) or (
