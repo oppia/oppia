@@ -787,17 +787,14 @@ class Skill(python_utils.OBJECT):
         """Updates the explanation of the skill.
 
         Args:
-            explanation: SubtitledHtml.
-            The representation of the explanation of the skill.
+            explanation: SubtitledHtml.The representation
+            of the explanation of the skill.
         """
         old_content_ids = []
         if self.skill_contents.explanation:
             old_content_ids = [self.skill_contents.explanation.content_id]
 
         self.skill_contents.explanation = explanation
-
-        # self.skill_contents.explanation = (
-        #     state_domain.SubtitledHtml.from_dict(explanation))
 
         new_content_ids = [self.skill_contents.explanation.content_id]
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
