@@ -83,7 +83,7 @@
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "karma-webpack": "^4.0.0-rc.3",
     "lodash": "^4.17.14",
-    "mathjs": "5.10.3",
+    "mathjs": "6.2.3",
     "moment": "2.24.0",
     "postcss-loader": "3.0.0",
     "postcss-syntax": "^0.36.2",
