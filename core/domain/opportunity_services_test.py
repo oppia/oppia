@@ -441,6 +441,14 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity['id'], self.SKILL_ID)
         self.assertEqual(opportunity['skill_description'], 'new_description')
 
+    def test_update_skill_opportunity_skill_description_invalid_skill_id(self):
+        opportunity_services.update_skill_opportunity_skill_description(
+            'bad_skill_id', 'bad_description')
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertEqual(len(skill_opportunities), 0)
+
     def test_delete_skill_deletes_skill_opportunity(self):
         self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
         skill_opportunities, _, _ = (
