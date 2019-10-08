@@ -248,12 +248,10 @@ class SignupPage(base.BaseHandler):
         """Handles GET requests."""
         return_url = self.request.get('return_url', self.request.uri)
         # Validating return_url for no external redirections.
-        if re.search('create', return_url) is not None and (
-                user_services.has_fully_registered(self.user_id)):
-            self.redirect(python_utils.convert_to_bytes(return_url))
-            return
-        if re.match('^/[^//]', return_url) is None:
+        if not is_same_domain(self.request.uri, return_url):
             return_url = '/'
+        if isinstance(return_url, python_utils.UNICODE):
+            return_url = python_utils.convert_to_bytes(return_url)
         if user_services.has_fully_registered(self.user_id):
             self.redirect(return_url)
             return
@@ -426,3 +424,10 @@ class UrlHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Incomplete or empty GET parameters passed'
                 )
+
+
+def is_same_domain(request_uri, return_uri):
+    request_domain = python_utils.url_parse(request_uri).netloc
+    return_domain = python_utils.url_parse(return_uri).netloc
+    return (request_domain == return_domain) or (
+        re.match('^/[^//]', return_uri) is not None)
