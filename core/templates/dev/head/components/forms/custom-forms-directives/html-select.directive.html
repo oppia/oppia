@@ -6,7 +6,7 @@
     </div>
   </button>
   <ul uib-dropdown-menu style="max-width: 80%; overflow: auto; width: auto;">
-    <li ng-repeat="choice in options" style="float: left;">
+    <li ng-repeat="choice in options" style="float: left;" class="dropdown-item">
       <a ng-click="select(choice.id)">
         <angular-html-bind class="oppia-html-select-option protractor-test-html-select-option" html-data="choice.val">
         </angular-html-bind>
