@@ -31,10 +31,10 @@ def export_data_for_user(user_id):
     """Exports selected models according to model defined export_data functions.
 
     Args:
-            user_id: str. The user_id of the user to export.
+        user_id: str. The user_id of the user to export.
 
     Returns:
-            dict. Dictionary containing all user data.
+        dict. Dictionary containing all user data.
     """
 
     models_export_format = {
