@@ -99,7 +99,7 @@
     "thread-loader": "^2.1.2",
     "ts-loader": "^6.2.0",
     "typescript": "^3.4.5",
-    "uglify-js": "^3.5.8",
+    "uglify-js": "^3.6.1",
     "underscore-template-loader": "^1.0.0",
     "webdriver-manager": "13.0.0",
     "webpack": "^4.30.0",
