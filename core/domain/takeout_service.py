@@ -39,11 +39,11 @@ def export_data_for_user(user_id):
 
     models_export_format = {
         'stats_data': user_models.UserStatsModel,
-        'user_settings_data': user_models.UserSettingsModel,
-        'user_subscriptions_data': user_models.UserSubscriptionsModel,
-        'user_skill_data': user_models.UserSkillMasteryModel,
-        'user_contribution_data': user_models.UserContributionsModel,
-        'user_exploration_data': user_models.ExplorationUserDataModel,
+        'settings_data': user_models.UserSettingsModel,
+        'subscriptions_data': user_models.UserSubscriptionsModel,
+        'skill_data': user_models.UserSkillMasteryModel,
+        'contribution_data': user_models.UserContributionsModel,
+        'exploration_data': user_models.ExplorationUserDataModel,
         'completed_activities_data': user_models.CompletedActivitiesModel,
         'incomplete_activities_data': user_models.IncompleteActivitiesModel,
         'last_playthrough_data': user_models.ExpUserLastPlaythroughModel,

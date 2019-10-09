@@ -279,15 +279,15 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'num_ratings': self.USER_1_NUM_RATINGS,
             'weekly_creator_stats_list': self.USER_1_WEEKLY_CREATOR_STATS_LIST
         }
-        user_skill_data = {
+        skill_data = {
             self.SKILL_ID_1: self.DEGREE_OF_MASTERY,
             self.SKILL_ID_2: self.DEGREE_OF_MASTERY
         }
-        user_contribution_data = {
+        contribution_data = {
             'created_exploration_ids': [self.EXPLORATION_IDS[0]],
             'edited_exploration_ids': [self.EXPLORATION_IDS[0]]
         }
-        user_exploration_data = {
+        exploration_data = {
             self.EXPLORATION_IDS[0]: {
                 'rating': 2,
                 'rated_on': self.GENERIC_DATE,
@@ -423,7 +423,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 [self.EXPLORATION_IDS[0]]),
             'viewable_exploration_ids': [self.EXPLORATION_IDS[0]]
         }
-        user_settings_data = {
+        settings_data = {
             'email': self.USER_1_EMAIL,
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
@@ -455,7 +455,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         activities = self.ACTIVITY_IDS
         activities.extend(self.EXPLORATION_IDS)
 
-        user_subscriptions_data = {
+        subscriptions_data = {
             'creator_ids': self.CREATOR_IDS,
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS,
@@ -465,11 +465,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         expected_export = {
             'stats_data': stats_data,
-            'user_settings_data': user_settings_data,
-            'user_subscriptions_data': user_subscriptions_data,
-            'user_skill_data': user_skill_data,
-            'user_contribution_data': user_contribution_data,
-            'user_exploration_data': user_exploration_data,
+            'settings_data': settings_data,
+            'subscriptions_data': subscriptions_data,
+            'skill_data': skill_data,
+            'contribution_data': contribution_data,
+            'exploration_data': exploration_data,
             'completed_activities_data': completed_activities_data,
             'incomplete_activities_data': incomplete_activities_data,
             'last_playthrough_data': last_playthrough_data,
