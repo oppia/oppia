@@ -8,7 +8,8 @@
 </learner-dashboard-icons>
 
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"
-         style="position: relative; z-index: 5;" ng-if="!isRefresherExploration">
+         style="position: relative; z-index: 5;" ng-if="!isRefresherExploration"
+         class="protractor-test-exploration-dashboard-card">
   <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
       <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="isPlaylistTile() && {'top': '4px', 'width': '50px'}">
