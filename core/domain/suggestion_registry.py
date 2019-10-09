@@ -447,8 +447,13 @@ class SuggestionTranslateContent(BaseSuggestion):
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         if self.change.state_name not in exploration.states:
             raise utils.ValidationError(
-                'Expected %s to be a valid state name' %
-                self.change.state_name)
+                'Expected %s to be a valid state name' % self.change.state_name)
+        content_html = exploration.get_content_html(
+            self.change.state_name, self.change.content_id)
+        if content_html != self.change.content_html:
+            raise Exception(
+                'The given content_html does not match the content of the '
+                'exploration.')
 
     def accept(self, commit_message):
         """Accepts the suggestion.

@@ -73,10 +73,8 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
-        # Validate whether the content_html matches the exploration content.
-        content_html = (
-            exploration.get_content_html(
-                change['state_name'], change['content_id']))
+        content_html = exploration.get_content_html(
+            change['state_name'], change['content_id'])
         if content_html != change['content_html']:
             raise Exception(
                 'The given content_html does not match the content of the '
