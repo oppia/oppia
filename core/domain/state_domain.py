@@ -798,6 +798,8 @@ class WrittenTranslations(python_utils.OBJECT):
 
     def __init__(self, translations_mapping):
         """Initializes a WrittenTranslations domain object.
+        Args:
+            translations_mapping: WrittenTranslations.  WrittenTranslations domain object.
         """
         self.translations_mapping = translations_mapping
 
@@ -965,7 +967,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
         """Initializes a RecordedVoiceovers domain object.
 
         Args:
-            voiceovers_mapping: Recorded Voiceovers. Recorded Voiceovers domain object.
+            voiceovers_mapping: Voiceovers. Voiceovers domain object.
         """
         self.voiceovers_mapping = voiceovers_mapping
 
