@@ -27,7 +27,6 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
-import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -248,10 +247,8 @@ class SignupPage(base.BaseHandler):
         """Handles GET requests."""
         return_url = self.request.get('return_url', self.request.uri)
         # Validating return_url for no external redirections.
-        if not is_same_domain(self.request.uri, return_url):
+        if re.match('^/[^//]', return_url) is None:
             return_url = '/'
-        if isinstance(return_url, python_utils.UNICODE):
-            return_url = python_utils.convert_to_bytes(return_url)
         if user_services.has_fully_registered(self.user_id):
             self.redirect(return_url)
             return
@@ -424,11 +421,3 @@ class UrlHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Incomplete or empty GET parameters passed'
                 )
-
-
-def is_same_domain(request_uri, return_uri):
-    """Checks if the two URIs passed belong to the same domain."""
-    request_domain = python_utils.url_parse(request_uri).netloc
-    return_domain = python_utils.url_parse(return_uri).netloc
-    return (request_domain == return_domain) or (
-        re.match('^/[^//]', return_uri) is not None)
