@@ -538,7 +538,6 @@ angular.module('oppia').directive('filepathEditor', [
               url: imageDataURI,
               frames: 'all',
               outputType: 'canvas',
-              cumulative: true
             }).then(async function(frameData) {
               let frames = [];
               for (let i = 0; i < frameData.length; i += 1) {
@@ -724,7 +723,6 @@ angular.module('oppia').directive('filepathEditor', [
               url: imageDataURI,
               frames: 'all',
               outputType: 'canvas',
-              cumulative: true
             }).then(function(frameData) {
               let frames = [];
               for (let i = 0; i < frameData.length; i += 1) {
