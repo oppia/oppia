@@ -169,7 +169,7 @@ angular.module('oppia').directive('filepathEditor', [
               cropCanvas.height = height;
               var cropCtx = cropCanvas.getContext('2d');
               cropCtx.putImageData(data, 0, 0);
-              resolve(cropCanvas.toDataURL('image/jpeg', 1));
+              resolve(cropCanvas.toDataURL('image/jpeg'));
             }, false);
             img.addEventListener('error', () => {
               reject(new Error('Image could not be loaded.'));
@@ -527,9 +527,12 @@ angular.module('oppia').directive('filepathEditor', [
           const imageDataURI = ctrl.data.metadata.uploadedImageData;
           const mimeType = imageDataURI.split(';')[0];
 
-          var newImageFile;
+          let newImageFile;
 
           if (mimeType === 'data:image/gif') {
+            // looping through individual gif frames can take a while
+            // especially if there are a lot. Changing the cursor will let the
+            // user know that something is happening
             document.body.style.cursor = 'wait';
             gifFrames({
               url: imageDataURI,
@@ -542,7 +545,7 @@ angular.module('oppia').directive('filepathEditor', [
                 let canvas = frameData[i].getImage();
                 frames.push(
                   await getCroppedGIFData(
-                    canvas.toDataURL('image/jpeg', 1), x1, y1, width, height
+                    canvas.toDataURL('image/jpeg'), x1, y1, width, height
                   ));
               }
               gifshot.createGIF({
@@ -711,7 +714,12 @@ angular.module('oppia').directive('filepathEditor', [
           const imageDataURI = ctrl.data.metadata.uploadedImageData;
           const mimeType = imageDataURI.split(';')[0];
           let resampledFile;
+
           if (mimeType === 'data:image/gif') {
+            // looping through individual gif frames can take a while
+            // especially if there are a lot. Changing the cursor will let the
+            // user know that something is happening
+            document.body.style.cursor = 'wait';
             gifFrames({
               url: imageDataURI,
               frames: 'all',
@@ -722,7 +730,7 @@ angular.module('oppia').directive('filepathEditor', [
               for (let i = 0; i < frameData.length; i += 1) {
                 let canvas = frameData[i].getImage();
                 frames.push(
-                  canvas.toDataURL('image/jpeg', 1)
+                  canvas.toDataURL('image/jpeg')
                 );
               }
               gifshot.createGIF({
@@ -737,6 +745,7 @@ angular.module('oppia').directive('filepathEditor', [
                     return;
                   }
                   ctrl.postImageToServer(dimensions, resampledFile, 'gif');
+                  document.body.style.cursor = 'default';
                 }
               });
             });
