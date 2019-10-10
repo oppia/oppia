@@ -55,7 +55,7 @@ CSRF_SECRET = config_domain.ConfigProperty(
 def _clear_login_cookies(response_headers):
     """Clears login cookies from the given response headers.
     Args:
-        response_headers: RequestHandler. The given response headers
+        response_headers: RequestHandler. The given response headers.
     """
 
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
@@ -299,8 +299,8 @@ class BaseHandler(webapp2.RequestHandler):
         """Prepares downloadable content to be sent to the client.
         Args:
             values: dict. Key-value pairs to encode in the download.
-            filename: str. The name of the file to be sent
-            content_type: content. Indicates the media type of the resource
+            filename: str. The name of the file to be sent.
+            content_type: content. Indicates the media type of the resource.
         """
         self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
             content_type)
