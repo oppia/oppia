@@ -169,7 +169,7 @@ angular.module('oppia').directive('filepathEditor', [
               cropCanvas.height = height;
               var cropCtx = cropCanvas.getContext('2d');
               cropCtx.putImageData(data, 0, 0);
-              resolve(cropCanvas.toDataURL('image/jpeg'));
+              resolve(cropCanvas.toDataURL('image/png'));
             }, false);
             img.addEventListener('error', () => {
               reject(new Error('Image could not be loaded.'));
@@ -545,7 +545,7 @@ angular.module('oppia').directive('filepathEditor', [
                 let canvas = frameData[i].getImage();
                 frames.push(
                   await getCroppedGIFData(
-                    canvas.toDataURL('image/jpeg'), x1, y1, width, height
+                    canvas.toDataURL('image/png'), x1, y1, width, height
                   ));
               }
               gifshot.createGIF({
@@ -730,7 +730,7 @@ angular.module('oppia').directive('filepathEditor', [
               for (let i = 0; i < frameData.length; i += 1) {
                 let canvas = frameData[i].getImage();
                 frames.push(
-                  canvas.toDataURL('image/jpeg')
+                  canvas.toDataURL('image/png')
                 );
               }
               gifshot.createGIF({
