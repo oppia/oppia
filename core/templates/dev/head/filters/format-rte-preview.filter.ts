@@ -16,6 +16,8 @@
  * @fileoverview FormatRtePreview filter for Oppia.
  */
 
+require('filters/string-utility-filters/capitalize.filter.ts');
+
 /* The following filter replaces each RTE element occurrence in the input html
    by its corresponding name in square brackets and returns a string
    which contains the name in the same location as in the input html.
