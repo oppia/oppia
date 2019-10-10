@@ -32,8 +32,8 @@ angular.module('oppia').directive('filepathEditor', [
   '$sce', 'AlertsService', 'AssetsBackendApiService',
   'ContextService', 'CsrfTokenService', 'UrlInterpolationService',
   function(
-      $sce, AlertsService, AssetsBackendApiService,
-      ContextService, CsrfTokenService, UrlInterpolationService) {
+    $sce, AlertsService, AssetsBackendApiService,
+    ContextService, CsrfTokenService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -111,6 +111,7 @@ angular.module('oppia').directive('filepathEditor', [
           return canvas.toDataURL('image/' + OUTPUT_IMAGE_FORMAT.png, 1);
         };
 
+
         /**
          * Crops an image to the specified rectangular region.
          *
@@ -121,6 +122,7 @@ angular.module('oppia').directive('filepathEditor', [
          * @param height The height of the crop region.
          * @return A DOMString containing the output image data URI.
          */
+
         var getCroppedImageData = function(imageDataURI, x, y, width, height) {
           // Put the original image in a canvas.
           var img = new Image();
@@ -142,6 +144,41 @@ angular.module('oppia').directive('filepathEditor', [
           cropCtx.putImageData(data, 0, 0);
           return cropCanvas.toDataURL('image/' + OUTPUT_IMAGE_FORMAT.png, 1);
         };
+
+
+        var getCroppedGIFData = function(imageDataURI, x, y, width, height) {
+          return new Promise((resolve, reject) => {
+            // Put the original image in a canvas. 
+            var img = new Image();
+            img.src = imageDataURI;
+            img.addEventListener('load', () => {
+              // If the image loads,
+              // fulfill the promise with the cropped dataURL
+              var canvas = document.createElement('canvas');
+              canvas.width = x + width;
+              canvas.height = y + height;
+              var ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0);
+
+              // Get image data for a cropped selection.
+              var data = ctx.getImageData(x, y, width, height);
+
+              // Draw on a separate canvas and return the dataURL.
+              var cropCanvas = document.createElement('canvas');
+              cropCanvas.width = width;
+              cropCanvas.height = height;
+              var cropCtx = cropCanvas.getContext('2d');
+              cropCtx.putImageData(data, 0, 0);
+              resolve(cropCanvas.toDataURL('image/jpeg', 1));
+            }, false);
+            img.addEventListener('error', () => {
+              reject(new Error('Image could not be loaded.'));
+            }, false);
+          })
+
+        };
+
+
 
         var convertImageDataToImageFile = function(dataURI) {
           // Convert base64/URLEncoded data component to raw binary data
@@ -488,13 +525,49 @@ angular.module('oppia').directive('filepathEditor', [
           var width = (ctrl.cropArea.x2 - ctrl.cropArea.x1) * r;
           var height = (ctrl.cropArea.y2 - ctrl.cropArea.y1) * r;
 
-          // Generate new image data and file.
-          var newImageData = getCroppedImageData(
-            ctrl.data.metadata.uploadedImageData,
-            x1, y1, width, height);
+          const imageDataURI = ctrl.data.metadata.uploadedImageData;
+          const mimeType = imageDataURI.split(';')[0];
 
-          var newImageFile = convertImageDataToImageFile(newImageData);
+          var newImageFile;
 
+          if (mimeType === 'data:image/gif') {
+            document.body.style.cursor = 'wait';
+            gifFrames({
+              url: imageDataURI,
+              frames: 'all',
+              outputType: 'canvas',
+              cumulative: true
+            }).then(async function(frameData) {
+              let frames = [];
+              for (let i = 0; i < frameData.length; i += 1) {
+                let canvas = frameData[i].getImage();
+                frames.push(
+                  await getCroppedGIFData(canvas.toDataURL('image/jpeg', 1), x1, y1, width, height)
+                );
+              }
+              gifshot.createGIF({
+                gifWidth: width,
+                gifHeight: height,
+                images: frames
+              }, function(obj) {
+                newImageFile = convertImageDataToImageFile(obj.image);
+                ctrl.updateDimensions(newImageFile, obj.image, width, height);
+                document.body.style.cursor = 'default';
+              });
+            });
+          } else {
+            // Generate new image data and file.
+            var newImageData = getCroppedImageData(
+              ctrl.data.metadata.uploadedImageData,
+              x1, y1, width, height);
+
+            newImageFile = convertImageDataToImageFile(newImageData);
+            ctrl.updateDimensions(newImageFile, newImageData, width, height);
+          }
+        };
+
+
+        ctrl.updateDimensions = function(newImageFile, newImageData, width, height) {
           // Update image data.
           ctrl.data.metadata.uploadedFile = newImageFile;
           ctrl.data.metadata.uploadedImageData = newImageData;
@@ -510,8 +583,7 @@ angular.module('oppia').directive('filepathEditor', [
             x2: dimensions.width,
             y2: dimensions.height
           };
-        };
-
+        }
         ctrl.cancelCropImage = function() {
           var dimensions = ctrl.calculateTargetImageDimensions();
           ctrl.cropArea.x1 = 0;
@@ -637,20 +709,19 @@ angular.module('oppia').directive('filepathEditor', [
           // Check mime type from imageDataURI
           const imageDataURI = ctrl.data.metadata.uploadedImageData;
           const mimeType = imageDataURI.split(';')[0];
-
           let resampledFile;
-
           if (mimeType === 'data:image/gif') {
             gifFrames({
               url: imageDataURI,
               frames: 'all',
               outputType: 'canvas',
+              cumulative: true
             }).then(function(frameData) {
               let frames = [];
               for (let i = 0; i < frameData.length; i += 1) {
                 let canvas = frameData[i].getImage();
                 frames.push(
-                  canvas.toDataURL('image/' + OUTPUT_IMAGE_FORMAT.gif)
+                  canvas.toDataURL('image/jpeg', 1)
                 );
               }
               gifshot.createGIF({
@@ -683,7 +754,7 @@ angular.module('oppia').directive('filepathEditor', [
         };
 
         ctrl.postImageToServer = function(dimensions, resampledFile,
-            imageType = 'png') {
+          imageType = 'png') {
           let form = new FormData();
           form.append('image', resampledFile);
           form.append('payload', JSON.stringify({
@@ -697,9 +768,9 @@ angular.module('oppia').directive('filepathEditor', [
             $.ajax({
               url: UrlInterpolationService.interpolateUrl(
                 imageUploadUrlTemplate, {
-                  entity_type: ctrl.entityType,
-                  entity_id: ctrl.entityId
-                }
+                entity_type: ctrl.entityType,
+                entity_id: ctrl.entityId
+              }
               ),
               data: form,
               processData: false,
@@ -732,7 +803,7 @@ angular.module('oppia').directive('filepathEditor', [
 
 
         ctrl.generateImageFilename = function(height, width,
-            imageType = 'png') {
+          imageType = 'png') {
           var date = new Date();
           return 'img_' +
             date.getFullYear() +
