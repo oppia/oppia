@@ -538,6 +538,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity['question_count'], 0)
 
+
 class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     """Test the opportunity services methods."""
     def setUp(self):
