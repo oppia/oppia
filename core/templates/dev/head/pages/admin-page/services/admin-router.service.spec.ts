@@ -16,98 +16,97 @@
  * @fileoverview Tests for AdminRouterService.
  */
 
-require('pages/admin-page/services/admin-router.service.ts');
+import { AdminRouterService } from
+  'pages/admin-page/services/admin-router.service.ts';
 
-describe('Admin router service', function() {
-  var AdminRouterService = null;
+describe('Admin router service', () => {
+  let ars: AdminRouterService = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    AdminRouterService = $injector.get('AdminRouterService');
-  }));
-
-  it('should initially be routed to the activities tab', function() {
-    expect(AdminRouterService.isActivitiesTabOpen()).toBe(true);
-    expect(AdminRouterService.isConfigTabOpen()).toBe(false);
-    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
-    expect(AdminRouterService.isJobsTabOpen()).toBe(false);
-    expect(AdminRouterService.isMiscTabOpen()).toBe(false);
+  beforeEach(() => {
+    ars = new AdminRouterService();
   });
 
-  it('should be able to navigate to the activities tab', function() {
+  it('should initially be routed to the activities tab', () => {
+    expect(ars.isActivitiesTabOpen()).toBe(true);
+    expect(ars.isConfigTabOpen()).toBe(false);
+    expect(ars.isRolesTabOpen()).toBe(false);
+    expect(ars.isJobsTabOpen()).toBe(false);
+    expect(ars.isMiscTabOpen()).toBe(false);
+  });
+
+  it('should be able to navigate to the activities tab', () => {
     // Navigate away from the activities tab (relying on other tests to verify
     // this works correctly) in order to navigate back.
-    AdminRouterService.showTab('#jobs');
+    ars.showTab('#jobs');
 
-    expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
-    AdminRouterService.showTab('#activities');
-    expect(AdminRouterService.isActivitiesTabOpen()).toBe(true);
-    expect(AdminRouterService.isConfigTabOpen()).toBe(false);
-    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
-    expect(AdminRouterService.isJobsTabOpen()).toBe(false);
-    expect(AdminRouterService.isMiscTabOpen()).toBe(false);
+    expect(ars.isActivitiesTabOpen()).toBe(false);
+    ars.showTab('#activities');
+    expect(ars.isActivitiesTabOpen()).toBe(true);
+    expect(ars.isConfigTabOpen()).toBe(false);
+    expect(ars.isRolesTabOpen()).toBe(false);
+    expect(ars.isJobsTabOpen()).toBe(false);
+    expect(ars.isMiscTabOpen()).toBe(false);
   });
 
-  it('should be able to navigate to the config tab', function() {
-    expect(AdminRouterService.isConfigTabOpen()).toBe(false);
-    AdminRouterService.showTab('#config');
-    expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
-    expect(AdminRouterService.isConfigTabOpen()).toBe(true);
-    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
-    expect(AdminRouterService.isJobsTabOpen()).toBe(false);
-    expect(AdminRouterService.isMiscTabOpen()).toBe(false);
+  it('should be able to navigate to the config tab', () => {
+    expect(ars.isConfigTabOpen()).toBe(false);
+    ars.showTab('#config');
+    expect(ars.isActivitiesTabOpen()).toBe(false);
+    expect(ars.isConfigTabOpen()).toBe(true);
+    expect(ars.isRolesTabOpen()).toBe(false);
+    expect(ars.isJobsTabOpen()).toBe(false);
+    expect(ars.isMiscTabOpen()).toBe(false);
   });
 
-  it('should be able to navigate to the roles tab', function() {
-    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
-    AdminRouterService.showTab('#roles');
-    expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
-    expect(AdminRouterService.isConfigTabOpen()).toBe(false);
-    expect(AdminRouterService.isRolesTabOpen()).toBe(true);
-    expect(AdminRouterService.isJobsTabOpen()).toBe(false);
-    expect(AdminRouterService.isMiscTabOpen()).toBe(false);
+  it('should be able to navigate to the roles tab', () => {
+    expect(ars.isRolesTabOpen()).toBe(false);
+    ars.showTab('#roles');
+    expect(ars.isActivitiesTabOpen()).toBe(false);
+    expect(ars.isConfigTabOpen()).toBe(false);
+    expect(ars.isRolesTabOpen()).toBe(true);
+    expect(ars.isJobsTabOpen()).toBe(false);
+    expect(ars.isMiscTabOpen()).toBe(false);
   });
 
-  it('should be able to navigate to the jobs tab', function() {
-    expect(AdminRouterService.isJobsTabOpen()).toBe(false);
-    AdminRouterService.showTab('#jobs');
-    expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
-    expect(AdminRouterService.isConfigTabOpen()).toBe(false);
-    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
-    expect(AdminRouterService.isJobsTabOpen()).toBe(true);
-    expect(AdminRouterService.isMiscTabOpen()).toBe(false);
+  it('should be able to navigate to the jobs tab', () => {
+    expect(ars.isJobsTabOpen()).toBe(false);
+    ars.showTab('#jobs');
+    expect(ars.isActivitiesTabOpen()).toBe(false);
+    expect(ars.isConfigTabOpen()).toBe(false);
+    expect(ars.isRolesTabOpen()).toBe(false);
+    expect(ars.isJobsTabOpen()).toBe(true);
+    expect(ars.isMiscTabOpen()).toBe(false);
   });
 
-  it('should be able to navigate to the misc tab', function() {
-    expect(AdminRouterService.isMiscTabOpen()).toBe(false);
-    AdminRouterService.showTab('#misc');
-    expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
-    expect(AdminRouterService.isConfigTabOpen()).toBe(false);
-    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
-    expect(AdminRouterService.isJobsTabOpen()).toBe(false);
-    expect(AdminRouterService.isMiscTabOpen()).toBe(true);
+  it('should be able to navigate to the misc tab', () => {
+    expect(ars.isMiscTabOpen()).toBe(false);
+    ars.showTab('#misc');
+    expect(ars.isActivitiesTabOpen()).toBe(false);
+    expect(ars.isConfigTabOpen()).toBe(false);
+    expect(ars.isRolesTabOpen()).toBe(false);
+    expect(ars.isJobsTabOpen()).toBe(false);
+    expect(ars.isMiscTabOpen()).toBe(true);
   });
 
-  it('should be able to navigate to the same tab twice', function() {
-    expect(AdminRouterService.isJobsTabOpen()).toBe(false);
+  it('should be able to navigate to the same tab twice', () => {
+    expect(ars.isJobsTabOpen()).toBe(false);
 
-    AdminRouterService.showTab('#jobs');
-    expect(AdminRouterService.isJobsTabOpen()).toBe(true);
+    ars.showTab('#jobs');
+    expect(ars.isJobsTabOpen()).toBe(true);
 
-    AdminRouterService.showTab('#jobs');
-    expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
-    expect(AdminRouterService.isConfigTabOpen()).toBe(false);
-    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
-    expect(AdminRouterService.isJobsTabOpen()).toBe(true);
-    expect(AdminRouterService.isMiscTabOpen()).toBe(false);
+    ars.showTab('#jobs');
+    expect(ars.isActivitiesTabOpen()).toBe(false);
+    expect(ars.isConfigTabOpen()).toBe(false);
+    expect(ars.isRolesTabOpen()).toBe(false);
+    expect(ars.isJobsTabOpen()).toBe(true);
+    expect(ars.isMiscTabOpen()).toBe(false);
   });
 
-  it('should stay on the current tab if an invalid tab is shown', function() {
-    AdminRouterService.showTab('#jobs');
+  it('should stay on the current tab if an invalid tab is shown', () => {
+    ars.showTab('#jobs');
 
-    expect(AdminRouterService.isJobsTabOpen()).toBe(true);
-    AdminRouterService.showTab('#unknown');
-    expect(AdminRouterService.isJobsTabOpen()).toBe(true);
+    expect(ars.isJobsTabOpen()).toBe(true);
+    ars.showTab('#unknown');
+    expect(ars.isJobsTabOpen()).toBe(true);
   });
 });

@@ -78,6 +78,11 @@ angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
         return $q(function(resolve, reject) {
           _fetchExpSummaries(explorationIds, true, resolve, reject);
         });
+      },
+      loadPublicExplorationSummaries: function(explorationIds) {
+        return $q(function(resolve, reject) {
+          _fetchExpSummaries(explorationIds, false, resolve, reject);
+        });
       }
     };
   }
