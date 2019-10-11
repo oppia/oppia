@@ -461,9 +461,7 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
-        feedback_models.UnsentFeedbackEmailModel(
-            id='user_id',
-        ).put()
+        feedback_models.UnsentFeedbackEmailModel(id='user_id').put()
         self.assertTrue(
             feedback_models.UnsentFeedbackEmailModel
             .has_reference_to_user_id('user_id'))
