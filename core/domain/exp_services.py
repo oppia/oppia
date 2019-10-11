@@ -407,6 +407,10 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.WrittenTranslations.from_dict(
                             change.new_value))
                     state.update_written_translations(written_translations)
+            elif change.cmd == exp_domain.CMD_ADD_TRANSLATION:
+                exploration.states[change.state_name].add_translation(
+                    change.content_id, change.language_code,
+                    change.translation_html)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)

@@ -223,6 +223,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<opportunity_type>' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
         community_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
+        r'/gettranslatabletexthandler',
+        community_dashboard.TranslatableTextHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
@@ -566,6 +569,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),
+    get_redirect_route(
+        r'/getreviewablesuggestions/<target_type>/<suggestion_type>',
+        suggestion.ReviewableSuggestionsHandler),
+    get_redirect_route(
+        r'/getsubmittedsuggestions/<target_type>/<suggestion_type>',
+        suggestion.UserSubmittedSuggestionsHandler),
     get_redirect_route(
         r'%s' % feconf.SUBSCRIBE_URL_PREFIX,
         subscriptions.SubscribeHandler),

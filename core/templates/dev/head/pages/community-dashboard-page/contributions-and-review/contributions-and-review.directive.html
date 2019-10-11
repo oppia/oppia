@@ -1,0 +1,127 @@
+<div class="oppia-contributions-show-review">
+  <div class="oppia-contributions-show-review-side-navbar-container" >
+    <div class="oppia-contributions-side-navbar-part" ng-if="$ctrl.isAdmin">
+      <div class="oppia-contributions-navbar-items-list" navbar-label="Things to do">
+        <div class="oppia-contributions-navbar-item">
+          <button class="oppia-contributions-navbar-button"
+                  ng-click="$ctrl.switchToReviewTab()"
+                  ng-class="$ctrl.reviewTabActive ? 'oppia-contributions-active-navbar': ''"> Review Translations
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="oppia-contributions-side-navbar-part" ng-if="$ctrl.userIsLoggedIn">
+      <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions">
+        <div class="oppia-contributions-navbar-item">
+          <button class="oppia-contributions-navbar-button"
+                  ng-click="$ctrl.switchToContributionsTab()"
+                  ng-class="$ctrl.reviewTabActive ? '' : 'oppia-contributions-active-navbar'">Translations
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-contributions-show-review-container">
+    <div class="oppia-login-required" ng-if="!ctrl.userDeatilsLoading && !$ctrl.userIsLoggedIn">
+      <login-required-message></login-required-message>
+    </div>
+    <div class="oppia-login-required" ng-if="$ctrl.userIsLoggedIn">
+      <opportunities-list opportunity-data-is-loading="$ctrl.contributionsDataLoading"
+                          opportunities="$ctrl.contributionSummaries"
+                          on-click-action-button="$ctrl.onClickViewSuggestion"
+                          label-required="!$ctrl.reviewTabActive">
+      </opportunities-list>
+    </div>
+  </div>
+</div>
+
+<style>
+  contributions-and-review .oppia-contributions-show-review {
+    display: flex;
+    justify-content: center;
+    height: 70vh;
+    margin: auto;
+    max-width: 1200px;
+    width: 80%;
+  }
+
+  contributions-and-review .oppia-contributions-show-review-side-navbar-container {
+    background-color: #009688;
+    display: flex;
+    flex-wrap: wrap;
+    width: 25%;
+  }
+
+  contributions-and-review .oppia-contributions-show-review-container {
+    background-color: white;
+    overflow-y: auto;
+    width: 75%;
+  }
+  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar {
+    width: 7px;
+  }
+  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar-track {
+    border-radius: 5px;
+    box-shadow: inset 0 0 3px grey;
+  }
+  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar-thumb {
+    background: grey;
+    border-radius: 5px;
+    transition: background 0.5s ease;
+  }
+  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar-thumb:hover {
+    background: black;
+  }
+
+  contributions-and-review .oppia-contributions-side-navbar-part {
+    height: 50%;
+    padding-top: 20%;
+    width: 100%;
+  }
+
+  contributions-and-review .oppia-contributions-navbar-items-list {
+    position: relative;
+  }
+
+  contributions-and-review .oppia-contributions-navbar-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  contributions-and-review .oppia-contributions-navbar-button {
+    background-color: unset;
+    border: unset;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    height: 28px;
+    margin-right: 20%;
+    padding-left: 20%;
+    text-align: left;
+    width: 80%;
+  }
+
+  contributions-and-review .oppia-contributions-active-navbar,
+  contributions-and-review .oppia-contributions-navbar-button:hover {
+    background-color: #0b6c63;
+  }
+
+  contributions-and-review .oppia-contributions-navbar-items-list::before {
+    border-bottom: 1px solid #fff;
+    bottom: 35px;
+    color: #fff;
+    content: attr(navbar-label);
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 10%;
+    position: absolute;
+    width: 90%;
+  }
+
+  contributions-and-review .oppia-login-required {
+    height: 100%;
+    width: 100%;
+  }
+</style>
