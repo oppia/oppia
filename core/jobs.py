@@ -387,20 +387,6 @@ class BaseJobManager(python_utils.OBJECT):
             'Subclasses of BaseJobManager should implement _real_enqueue().')
 
     @classmethod
-    def real_enqueue(cls, job_id, queue_name, additional_job_params):
-        """Public method to test the private method
-
-        Args:
-            job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in. See
-                core.platform.taskqueue.gae_taskqueue_services for supported
-                values.
-            additional_job_params: dict(str : *) or None. Additional parameters
-                on jobs.
-        """
-        cls._real_enqueue(job_id, queue_name, additional_job_params)
-
-    @classmethod
     def get_status_code(cls, job_id):
         """Returns the status code of the job.
 
