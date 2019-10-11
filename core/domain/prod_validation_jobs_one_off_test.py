@@ -2537,7 +2537,6 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
 
 
-
 class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):

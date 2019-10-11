@@ -154,6 +154,25 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                          self.question_id)]
         self.assertItemsEqual(skill_ids, ['skill_1', 'skill_2'])
 
+    def test_delete_question_skill_link(self):
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_1', 0.3)
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_2', 0.3)
+        question_services.delete_question_skill_link(
+            self.editor_id, self.question_id, 'skill_1')
+        skill_ids = [skill.id for skill in
+                     question_services.get_skills_linked_to_question(
+                         self.question_id)]
+        self.assertItemsEqual(skill_ids, ['skill_2'])
+
+        question_services.delete_question_skill_link(
+            self.editor_id, self.question_id, 'skill_2')
+
+        question = question_services.get_question_by_id(
+            self.question_id, strict=False)
+        self.assertIsNone(question)
+
     def test_linking_same_skill_to_question_twice(self):
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
