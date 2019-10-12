@@ -253,7 +253,12 @@ var ExplorationEditorMainTab = function() {
     expect(addResponseButton.isDisplayed()).toEqual(true);
     // Open the "Add Response" modal if it is not already open.
     addResponseButton.click();
+    this.setResponse.apply(null, arguments);
+  };
 
+  this.setResponse = function(
+      interactionId, feedbackInstructions, destStateName,
+      createNewState, ruleName) {
     // Set the rule description.
     var args = [addResponseDetails, interactionId, ruleName];
     for (var i = 5; i < arguments.length; i++) {
@@ -262,7 +267,6 @@ var ExplorationEditorMainTab = function() {
     expect(addResponseDetails.isDisplayed()).toBe(true);
     _selectRule(addResponseDetails, interactionId, ruleName);
     _setRuleParameters.apply(null, args);
-
     // Open the feedback entry form if it is not already open.
     feedbackEditor.isPresent().then(function(isVisible) {
       if (isVisible) {
@@ -291,24 +295,26 @@ var ExplorationEditorMainTab = function() {
   };
 
   // Rules are zero-indexed; 'default' denotes the default outcome.
+  // 'pop' denotes the currently opened one.
   this.getResponseEditor = function(responseNum) {
-    var headerElem;
-    if (responseNum === 'default') {
-      headerElem = defaultResponseTab;
-    } else {
-      headerElem = responseTab.get(
-        responseNum);
-    }
-
-    responseBody(responseNum).isPresent().then(function(isVisible) {
-      if (!isVisible) {
-        expect(headerElem.isDisplayed()).toBe(true);
-        waitFor.elementToBeClickable(
-          headerElem, 'Response Editor header is not clickable');
-        headerElem.click();
+    if (responseNum !== 'pop') {
+      var headerElem;
+      if (responseNum === 'default') {
+        headerElem = defaultResponseTab;
+      } else {
+        headerElem = responseTab.get(
+          responseNum);
       }
-    });
 
+      responseBody(responseNum).isPresent().then(function(isVisible) {
+        if (!isVisible) {
+          expect(headerElem.isDisplayed()).toBe(true);
+          waitFor.elementToBeClickable(
+            headerElem, 'Response Editor header is not clickable');
+          headerElem.click();
+        }
+      });
+    }
     return {
       /**
        * Check for correct rule parameters.
@@ -346,9 +352,6 @@ var ExplorationEditorMainTab = function() {
 
         // Save feedback.
         saveOutcomeFeedbackButton.click();
-      },
-      setCorrect: function() {
-        answerCorrectnessToggle.click();
       },
       // This saves the rule after the destination is selected.
       //  - destinationName: The name of the state to move to, or null to stay
@@ -624,6 +627,10 @@ var ExplorationEditorMainTab = function() {
       interaction, 'interaction takes too long to appear');
   };
 
+  this.setInteractionWithoutCloseAddResponse = function(interactionId) {
+    createNewInteraction(interactionId);
+    customizeInteraction.apply(null, arguments);
+  };
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
   var createNewInteraction = function(interactionId) {
@@ -660,7 +667,13 @@ var ExplorationEditorMainTab = function() {
     expect(interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId])
       .isDisplayed()).toBe(true);
     interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
-    expect(interactionTile(interactionId).isDisplayed()).toBe(true);
+
+    var targetTile = interactionTile(interactionId);
+    waitFor.elementToBeClickable(
+      targetTile,
+      'Interaction tile ' + interactionId + ' takes too long to be clickable'
+    );
+    expect(targetTile.isDisplayed()).toBe(true);
     interactionTile(interactionId).click();
   };
 
