@@ -165,7 +165,7 @@ describe('Visiting user profile page', function() {
 
     profilePage.get(ANOTHER_USERNAME);
     profilePage.expectToHaveCreatedExplorationStat('1');
-  })
+  });
 
   afterEach(function() {
     users.logout();

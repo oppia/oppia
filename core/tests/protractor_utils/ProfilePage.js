@@ -105,7 +105,7 @@ var ProfilePage = function() {
 
   this.expectToHaveCreatedExplorationStat = function(expectedStat) {
     expect(createdExplorationStat.getText()).toMatch(expectedStat);
-  }
+  };
 };
 
 exports.ProfilePage = ProfilePage;
