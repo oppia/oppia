@@ -36,6 +36,10 @@ POST_COMMIT_STATUS_PRIVATE = 'private'
 # Whether to unconditionally log info messages.
 DEBUG = False
 
+# The path for generating release_summary.md file for the current release.
+RELEASE_SUMMARY_FILEPATH = os.path.join(
+    os.getcwd(), os.pardir, 'release_summary.md')
+
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.

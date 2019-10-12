@@ -38,9 +38,19 @@ class EmailTests(test_utils.GenericTestBase):
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            result = mailgun_email_services.post_to_mailgun({'data': 'data'})
+            result = mailgun_email_services.post_to_mailgun({
+                'from': 'a@a.com',
+                'to': 'b@b.com',
+                'subject': 'Hola 😂 - invitation to collaborate'.encode(
+                    encoding='utf-8'),
+                'text': 'plaintext_body 😂'.encode(encoding='utf-8'),
+                'html': 'Hi abc,<br> 😂'.encode(encoding='utf-8')
+            })
             expected = (
-                'https://api.mailgun.net/v3/domain/messages', 'data=data',
+                'https://api.mailgun.net/v3/domain/messages',
+                ('to=b%40b.com&text=plaintext_body+%F0%9F%98%82&html=Hi+abc'
+                 '%2C%3Cbr%3E+%F0%9F%98%82&from=a%40a.com&subject=Hola+%F0'
+                 '%9F%98%82+-+invitation+to+collaborate'),
                 {'Authorization': 'Basic YXBpOmtleQ=='})
             self.assertEqual(result, expected)
 

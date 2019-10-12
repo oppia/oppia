@@ -101,6 +101,61 @@ def _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_model_list)
 
 
+def _create_exploration_opportunity_summary(topic, story, exploration):
+    """Create an ExplorationOpportunitySummary object with the given topic,
+    story and exploration object.
+
+    Args:
+        topic: Topic. The topic object to which the opportunity belongs.
+        story: Story. The story object to which the opportunity belongs.
+        exploration: Exploration. The exploration object to which the
+            opportunity belongs.
+
+    Returns:
+        ExplorationOpportunitySummary. The exploration opportunity summary
+        object.
+    """
+
+    audio_language_codes = set([
+        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+
+    complete_translation_languages = set(
+        exploration.get_languages_with_complete_translation())
+
+    incomplete_translation_language_codes = (
+        audio_language_codes - complete_translation_languages)
+    need_voice_artist_in_language_codes = complete_translation_languages
+
+    if exploration.language_code in incomplete_translation_language_codes:
+        # Removing exploration language from incomplete translation
+        # languages list as exploration does not need any translation in
+        # its own language.
+        incomplete_translation_language_codes.discard(
+            exploration.language_code)
+        # Adding exploration language to voiceover required languages
+        # list as exploration can be voiceovered in it's own language.
+        need_voice_artist_in_language_codes.add(exploration.language_code)
+
+    content_count = exploration.get_content_count()
+    translation_counts = exploration.get_translation_counts()
+
+    story_node = story.story_contents.get_node_with_corresponding_exp_id(
+        exploration.id)
+
+    # TODO(#7376): Once the voiceover application functionality is
+    # implemented change this method such that it also populates the
+    # assigned_voice_artist_in_language_codes with the required data.
+
+    exploration_opportunity_summary = (
+        opportunity_domain.ExplorationOpportunitySummary(
+            exploration.id, topic.id, topic.name, story.id, story.title,
+            story_node.title, content_count,
+            list(incomplete_translation_language_codes), translation_counts,
+            list(need_voice_artist_in_language_codes), []))
+
+    return exploration_opportunity_summary
+
+
 def add_new_exploration_opportunities(story_id, exp_ids):
     """Adds new exploration opportunity into the model.
 
@@ -115,46 +170,10 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
 
     exploration_opportunity_summary_list = []
-    for exp_id, exploration in explorations.items():
-        node = story.story_contents.get_node_with_corresponding_exp_id(exp_id)
-
-        audio_language_codes = set([
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
-
-        complete_translation_languages = set(
-            exploration.get_languages_with_complete_translation())
-
-        incomplete_translation_language_codes = (
-            audio_language_codes - complete_translation_languages)
-        need_voice_artist_in_language_codes = complete_translation_languages
-
-        if exploration.language_code in incomplete_translation_language_codes:
-            # Removing exploration language from incomplete translation
-            # languages list as exploration does not need any translation in
-            # its own language.
-            incomplete_translation_language_codes.discard(
-                exploration.language_code)
-            # Adding exploration language to voiceover required languages
-            # list as exploration can be voiceovered in it's own language.
-            need_voice_artist_in_language_codes.add(exploration.language_code)
-
-        content_count = exploration.get_content_count()
-        translation_counts = exploration.get_translation_counts()
-
-        # TODO(#7376): Once the voiceover application functionality is
-        # implemented change this method such that it also populates the
-        # assigned_voice_artist_in_language_codes with the required data.
-
-        exploration_opportunity_summary = (
-            opportunity_domain.ExplorationOpportunitySummary(
-                exp_id, topic.id, topic.name, story.id, story.title, node.title,
-                content_count, list(incomplete_translation_language_codes),
-                translation_counts, list(need_voice_artist_in_language_codes),
-                []))
-
+    for exploration in explorations.values():
         exploration_opportunity_summary_list.append(
-            exploration_opportunity_summary)
-
+            _create_exploration_opportunity_summary(
+                topic, story, exploration))
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
 
@@ -362,6 +381,29 @@ def get_voiceover_opportunities(language_code, cursor):
     return opportunities, cursor, more
 
 
+def get_exploration_opportunity_summaries_by_ids(ids):
+    """Returns a list of ExplorationOpportunitySummary objects corresponding to
+    the given list of ids.
+
+    Args:
+        ids: list(str). A list of the opportunity ids.
+
+    Returns:
+        dict(str, ExplorationOpportunitySummary). A dict with key as an ID and
+        value as corresponding ExplorationOpportunitySummary object.
+    """
+    exp_opportunity_summary_models = (
+        opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
+    opportunities = {}
+    for exp_opportunity_summary_model in exp_opportunity_summary_models:
+        exp_opportunity_summary = (
+            get_exploration_opportunity_summary_from_model(
+                exp_opportunity_summary_model))
+        opportunities[exp_opportunity_summary.id] = exp_opportunity_summary
+
+    return opportunities
+
+
 def update_opportunities_with_new_topic_name(topic_id, topic_name):
     """Updates the exploration opportunity summary models with new topic name.
 
@@ -386,3 +428,61 @@ def update_opportunities_with_new_topic_name(topic_id, topic_name):
 
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
+
+
+def regenerate_opportunities_related_to_topic(
+        topic_id, delete_existing_opportunities=False):
+    """Regenerates opportunity models which belongs to a given topic.
+
+    Args:
+        topic_id: str. The ID of the topic.
+        delete_existing_opportunities: bool. Whether to delete all the existing
+            opportunities related to the given topic.
+
+    Returns:
+        int. The number of opportunity models created.
+    """
+    if delete_existing_opportunities:
+        exp_opportunity_models = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
+                topic_id))
+        opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
+            exp_opportunity_models)
+
+    topic = topic_fetchers.get_topic_by_id(topic_id)
+    story_ids = topic.get_canonical_story_ids()
+    stories = story_fetchers.get_stories_by_ids(story_ids)
+    exp_ids = []
+    non_existing_story_ids = []
+
+    for index, story in enumerate(stories):
+        if story is None:
+            non_existing_story_ids.append(story_ids[index])
+        else:
+            exp_ids += story.story_contents.get_all_linked_exp_ids()
+
+    exp_ids_to_exp = exp_fetchers.get_multiple_explorations_by_id(
+        exp_ids, strict=False)
+    non_existing_exp_ids = set(exp_ids) - set(exp_ids_to_exp.keys())
+
+    if len(non_existing_exp_ids) > 0 or len(non_existing_story_ids) > 0:
+        raise Exception(
+            'Failed to regenerate opportunities for topic id: %s, '
+            'missing_exp_with_ids: %s, missing_story_with_ids: %s' % (
+                topic_id, list(non_existing_exp_ids), non_existing_story_ids))
+
+    exploration_opportunity_summary_list = []
+    for story in stories:
+        for exp_id in story.story_contents.get_all_linked_exp_ids():
+            exploration_opportunity_summary_list.append(
+                _create_exploration_opportunity_summary(
+                    topic, story, exp_ids_to_exp[exp_id]))
+
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list)
+    return len(exploration_opportunity_summary_list)
+
+
+def delete_all_exploration_opportunity_summary_models():
+    """Deletes all of the ExplorationOpportunitySummaryModel."""
+    opportunity_models.ExplorationOpportunitySummaryModel.delete_all()

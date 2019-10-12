@@ -1,9 +1,11 @@
 sudo: required
-# In order to install Chrome stable we need trusty distribution.
-dist: trusty
+dist: xenial
 language: python
 python:
-- 2.7
+  - 2.7
+
+services:
+  - xvfb
 
 branches:
   only:
@@ -76,21 +78,13 @@ notifications:
     on_failure: always
 
 before_install:
-# For the rationale behind the next two lines, see:
-#   https://github.com/travis-ci/travis-ci/issues/6928#issuecomment-264227708
-- source /opt/jdk_switcher/jdk_switcher.sh
-- jdk_switcher use oraclejdk8
 - pip install codecov
-- pip install pyyaml
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
-- bash -e /etc/init.d/xvfb start
 
 install:
 - pushd $TRAVIS_BUILD_DIR
-- source scripts/setup.sh || exit 1
-- source scripts/setup_gae.sh || exit 1
-- bash scripts/install_third_party.sh
+- python -m scripts.install_third_party_libs
 
 script:
 # These lines are commented out because these checks are being run on CircleCI

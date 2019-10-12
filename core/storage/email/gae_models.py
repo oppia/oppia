@@ -310,6 +310,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     suggestion emails. The id/key of instances of this model has form of
     [USER_ID].[THREAD_ID]
     """
+
+    user_id = ndb.StringProperty(required=False, indexed=True)
+    thread_id = ndb.StringProperty(required=False, indexed=True)
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -374,7 +377,14 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                             ' already exists.')
 
         reply_to_id = cls._generate_unique_reply_to_id()
-        return cls(id=instance_id, reply_to_id=reply_to_id)
+        feedback_email_reply_model_instance = cls(
+            id=instance_id,
+            user_id=user_id,
+            thread_id=thread_id,
+            reply_to_id=reply_to_id)
+
+        feedback_email_reply_model_instance.put()
+        return feedback_email_reply_model_instance
 
     @classmethod
     def get_by_reply_to_id(cls, reply_to_id):
@@ -429,7 +439,25 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """
         instance_ids = [cls._generate_id(user_id, thread_id)
                         for user_id in user_ids]
-        user_models = cls.get_multi(instance_ids)
+        retrieved_models = cls.get_multi(instance_ids)
         return {
             user_id: model for user_id, model in python_utils.ZIP(
-                user_ids, user_models)}
+                user_ids, retrieved_models)}
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export GeneralFeedbackEmailReplyToIdModel's user data.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict whose keys are IDs of threads the user is
+            involved in. The corresponding value is the reply_to_id of that
+            thread.
+        """
+        user_data = {}
+        email_reply_models = cls.get_all().filter(cls.user_id == user_id)
+        for model in email_reply_models:
+            user_data[model.thread_id] = model.reply_to_id
+        return user_data

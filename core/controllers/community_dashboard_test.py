@@ -227,3 +227,104 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/invalid_opportunity_type' % (
                     feconf.COMMUNITY_OPPORTUNITIES_DATA_URL),
                 expected_status_int=404)
+
+
+class TranslatableTextHandlerTest(test_utils.GenericTestBase):
+    """Unit test for the ContributionOpportunitiesHandler."""
+
+    def setUp(self):
+        super(TranslatableTextHandlerTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(2)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id='0', name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
+
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d' % i,
+            corresponding_topic_id='0'
+        ) for i in python_utils.RANGE(2)]
+
+        for index, story in enumerate(stories):
+            story.language_code = 'en'
+            story_services.save_new_story(self.owner_id, story)
+            topic_services.add_canonical_story(
+                self.owner_id, topic.id, story.id)
+            story_services.update_story(
+                self.owner_id, story.id, [story_domain.StoryChange({
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_1',
+                    'title': 'Node1',
+                }), story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': explorations[index].id
+                })], 'Changes.')
+
+    def test_handler_with_invalid_language_code_raise_exception(self):
+        self.get_json('/gettranslatabletexthandler', params={
+            'language_code': 'hi',
+            'exp_id': '0'
+        }, expected_status_int=200)
+
+        self.get_json('/gettranslatabletexthandler', params={
+            'language_code': 'invalid_lang_code',
+            'exp_id': '0'
+        }, expected_status_int=400)
+
+    def test_handler_with_exp_id_not_for_contribution_raise_exception(self):
+        self.get_json('/gettranslatabletexthandler', params={
+            'language_code': 'hi',
+            'exp_id': '0'
+        }, expected_status_int=200)
+
+        new_exp = exp_domain.Exploration.create_default_exploration(
+            'not_for_contribution')
+        exp_services.save_new_exploration(self.owner_id, new_exp)
+
+        self.get_json('/gettranslatabletexthandler', params={
+            'language_code': 'hi',
+            'exp_id': 'not_for_contribution'
+        }, expected_status_int=400)
+
+    def test_handler_returns_correct_data(self):
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': '<p>A content to translate.</p>'
+                }
+            })], 'Changes content.')
+
+        output = self.get_json('/gettranslatabletexthandler', params={
+            'language_code': 'hi',
+            'exp_id': '0'
+        })
+
+        expected_output = {
+            'version': 2,
+            'state_names_to_content_id_mapping': {
+                'Introduction': {
+                    'content': '<p>A content to translate.</p>'
+                }
+            }
+        }
+
+        self.assertEqual(output, expected_output)

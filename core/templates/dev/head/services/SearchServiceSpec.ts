@@ -250,7 +250,7 @@ describe('Search service', function() {
     }
   );
 
-  it('should error when category selection url component is malformed',
+  it('should omit url component if it is malformed',
     function() {
       var results = {
         categories: {
@@ -270,67 +270,36 @@ describe('Search service', function() {
           summary: ''
         }
       };
-      var urlComponent = '?q=protractor%20test&category=(("Mathematics")' +
-                         '&language_code=("en"%20OR%20"ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'categories: category=(("Mathematics")'));
-      expect(results.languageCodes.selections).toEqual({});
-      expect(results.categories.selections).toEqual({});
-
-      var urlComponent = '?q=protractor%20test&category=("Mathematics"' +
-                         '&language_code=("en"%20OR%20"ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'categories: category=("Mathematics"'));
-      expect(results.languageCodes.selections).toEqual({});
-      expect(results.categories.selections).toEqual({});
-    }
-  );
-
-  it('should error when language selection url component is malformed',
-    function() {
-      var results = {
-        categories: {
-          description: '',
-          itemsName: 'categories',
-          masterList: [],
-          numSelections: 0,
-          selections: {},
-          summary: ''
-        },
-        languageCodes: {
-          description: '',
-          itemsName: 'languages',
-          masterList: [],
-          numSelections: 0,
-          selections: {},
-          summary: ''
-        }
-      };
-      var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
-                         '&language_code="en" OR "ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'languageCodes: language_code="en" OR "ar")'));
+      // In the two cases below, language_code param is not wrapped in
+      // parentheses. However, the category param is defined correctly.
+      // updateSearchFieldsBasedOnUrlQuery is expected to clean language_code.
+      var urlComponent = (
+        '?q=protractor%20test&category=("Mathematics")&' +
+        'language_code="en" OR "ar")');
+      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({
         Mathematics: true
       });
 
-      var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
-                         '&language_code="en" OR "ar"';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'languageCodes: language_code="en" OR "ar"'));
+      var urlComponent = (
+        '?q=protractor%20test&category=("Mathematics")&' +
+        'language_code="en" OR "ar"');
+      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({
         Mathematics: true
       });
+
+      // In this case, neither of the params are wrapped in parentheses.
+      // updateSearchFieldsBasedOnUrlQuery is expected to clean category and
+      // language_code.
+      var urlComponent = (
+        '?q=protractor%20test&category="Mathematics"&' +
+        'language_code="en" OR "ar"');
+      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+      expect(results.languageCodes.selections).toEqual({});
+      expect(results.categories.selections).toEqual({});
     }
   );
 });
