@@ -63,7 +63,7 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
-    IS_LOGGED_IN_CHECK_REQUIRED = True
+    pass
 
 
 class ExplorationPage(EditorHandler):

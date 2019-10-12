@@ -2895,6 +2895,21 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 expected_status_int=401)
         self.logout()
 
+    def test_guest_user_cannot_edit_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_EXPLORATION, self.private_exp_id),
+                expected_status_int=401)
+
+    def test_no_exception_raised_for_guest_user_with_log_in_check_off(self):
+        with self.swap(self, 'testapp', self.mock_testapp), self.swap(
+            self.MockHandler, 'IS_LOGGED_IN_CHECK_REQUIRED', False):
+            self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_EXPLORATION, self.private_exp_id),
+                expected_status_int=200)
+
     def test_can_edit_question_with_valid_question_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
