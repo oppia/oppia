@@ -2,6 +2,16 @@
 <div class="oppia-topics-and-skills-dashboard" style="position: relative;">
   <div>
     <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"></h2>
+    <div class="create-buttons">
+      <button ng-click="$ctrl.createTopic()" ng-if="$ctrl.userCanCreateTopic"
+              class="btn oppia-navbar-button oppia-transition-200">
+        <span class="oppia-navbar-tab-content">Create Topic</span>
+      </button>
+      <button ng-click="$ctrl.createSkill()" ng-if="$ctrl.userCanCreateSkill"
+              class="btn oppia-navbar-button oppia-transition-200">
+        <span class="oppia-navbar-tab-content">Create Skill</span>
+      </button>
+    </div>
   </div>
   <div ng-if="$ctrl.topicSummaries.length > 0 || $ctrl.untriagedSkillSummaries.length > 0 || $ctrl.unpublishedSkillSummaries.length > 0">
     <ul class="dashboard-tabs">
@@ -90,6 +100,11 @@
     padding-left: 0;
     padding-top: 6%;
     text-align: center;
+  }
+
+  .oppia-topics-and-skills-dashboard .create-buttons {
+    margin-left: 40vw;
+    display: none;
   }
 
   .oppia-topics-and-skills-dashboard .dashboard-tabs li {
@@ -184,6 +199,12 @@
     margin-left: auto;
     margin-right: 7.5px;
     width: auto;
+  }
+
+  @media(max-width: 992px) {
+    .oppia-topics-and-skills-dashboard .create-buttons {
+      display: block;
+    }
   }
 
   @media(max-width: 815px) {
