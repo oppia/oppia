@@ -53,6 +53,46 @@ export class StateEditorService {
   misconceptionsBySkill: {} = {};
   explorationIsWhitelisted: boolean = false;
   solicitAnswerDetails: boolean = null;
+  stateContentEditorInitialised: boolean = false;
+  stateInteractionEditorInitialised: boolean = false;
+  stateResponsesInitialised: boolean = false;
+  stateHintsEditorInitialised: boolean = false;
+  stateSolutionEditorInitialised: boolean = false;
+  stateEditorDirectiveInitialised: boolean = false;
+
+  updateStateContentEditorInitialised(): void {
+    this.stateContentEditorInitialised = true;
+  }
+
+  updateStateInteractionEditorInitialised(): void {
+    this.stateInteractionEditorInitialised = true;
+  }
+
+  updateStateResponsesInitialised(): void {
+    this.stateResponsesInitialised = true;
+  }
+
+  updateStateHintsEditorInitialised(): void {
+    this.stateHintsEditorInitialised = true;
+  }
+
+  updateStateSolutionEditorInitialised(): void {
+    this.stateSolutionEditorInitialised = true;
+  }
+
+  updateStateEditorDirectiveInitialised(): void {
+    this.stateEditorDirectiveInitialised = true;
+  }
+
+  isStateEditorInitialised(): boolean {
+    return (
+      this.stateContentEditorInitialised &&
+      this.stateInteractionEditorInitialised &&
+      this.stateResponsesInitialised &&
+      this.stateHintsEditorInitialised &&
+      this.stateSolutionEditorInitialised &&
+      this.stateEditorDirectiveInitialised);
+  }
 
   getActiveStateName(): string {
     return this.activeStateName;

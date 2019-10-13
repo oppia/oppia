@@ -290,6 +290,8 @@ angular.module('oppia').directive('stateSolutionEditor', [
               StateEditorService.deleteCurrentSolutionValidity();
             });
           };
+
+          StateEditorService.updateStateSolutionEditorInitialised();
         }
       ]
     };
