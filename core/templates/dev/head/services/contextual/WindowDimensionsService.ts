@@ -23,10 +23,10 @@ import { HostListener, Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class WindowDimensionsService {
-  onResizeHooks : Array<any> = [];
+  onResizeHooks: Array<any> = [];
 
   @HostListener('window:resize', ['$event'])
-  onResize(event : Event): void {
+  onResize(event: Event): void {
     this.onResizeHooks.forEach(function(hookFn) {
       hookFn();
     });
