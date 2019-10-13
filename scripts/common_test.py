@@ -347,3 +347,9 @@ class CommonTests(test_utils.GenericTestBase):
 
         with self.swap(subprocess, 'call', _mock_subprocess_call):
             common.install_npm_library('library_name', 'version', 'path')
+
+    def test_ask_user_to_confirm(self):
+        def mock_input():
+            return 'Y'
+        with self.swap(python_utils, 'INPUT', mock_input):
+            common.ask_user_to_confirm('Testing')

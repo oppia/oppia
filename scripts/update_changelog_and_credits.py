@@ -365,23 +365,6 @@ def create_branch(repo_fork, target_branch, github_username):
         'Please create a pull request from the %s branch' % target_branch)
 
 
-def ask_user_to_confirm(message):
-    """Asks user to perform a task and confirm once they are done.
-
-    Args:
-        message: str. The message which specifies the task user has
-            to do.
-    """
-    while True:
-        python_utils.PRINT(
-            '******************************************************')
-        python_utils.PRINT(message)
-        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
-        answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
-            return
-
-
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
@@ -427,7 +410,7 @@ def main():
         'authors and contributors to update AUTHORS, CONTRIBUTORS '
         'and developer_names section in about-page.directive.html\n' % (
             feconf.RELEASE_SUMMARY_FILEPATH))
-    ask_user_to_confirm(message)
+    common.ask_user_to_confirm(message)
 
     release_summary_lines = []
     with python_utils.open_file(
@@ -447,7 +430,7 @@ def main():
         'following files:\n1. %s\n2. %s\n3. %s\n4. %s\n' % (
             CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
             ABOUT_PAGE_FILEPATH))
-    ask_user_to_confirm(message)
+    common.ask_user_to_confirm(message)
 
     create_branch(repo_fork, target_branch, github_username)
 

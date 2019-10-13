@@ -266,6 +266,23 @@ def install_npm_library(library_name, version, path):
             'yarn', 'add', '%s@%s' % (library_name, version)])
 
 
+def ask_user_to_confirm(message):
+    """Asks user to perform a task and confirm once they are done.
+
+    Args:
+        message: str. The message which specifies the task user has
+            to do.
+    """
+    while True:
+        python_utils.PRINT(
+            '******************************************************')
+        python_utils.PRINT(message)
+        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
+        answer = python_utils.INPUT().lower()
+        if answer in ['y', 'ye', 'yes']:
+            return
+
+
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
 
