@@ -16,26 +16,37 @@
  * @fileoverview Service for computing the window dimensions.
  */
 
-angular.module('oppia').factory('WindowDimensionsService', [
-  '$window', function($window) {
-    var onResizeHooks = [];
-    angular.element($window).bind('resize', function() {
-      onResizeHooks.forEach(function(hookFn) {
-        hookFn();
-      });
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HostListener, Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class WindowDimensionsService {
+  onResizeHooks : Array<any> = [];
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.onResizeHooks.forEach(function(hookFn) {
+      hookFn();
     });
-    return {
-      getWidth: function() {
-        return (
-          $window.innerWidth || document.documentElement.clientWidth ||
-          document.body.clientWidth);
-      },
-      registerOnResizeHook: function(hookFn) {
-        onResizeHooks.push(hookFn);
-      },
-      isWindowNarrow: function() {
-        var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
-        return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
-      }
-    };
-  }]);
+  }
+
+  getWidth() {
+    return ( window.innerWidth || document.documentElement.clientWidth ||
+        document.body.clientWidth);
+  }
+
+  registerOnResizeHook(hookFn) {
+    this.onResizeHooks.push(hookFn);
+  }
+
+  isWindowNarrow() {
+    let NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
+    return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
+  }
+}
+
+angular.module('oppia').factory(
+  'WindowDimensionsService',
+  downgradeInjectable(WindowDimensionsService));

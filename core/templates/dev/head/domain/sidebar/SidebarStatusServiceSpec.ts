@@ -16,12 +16,18 @@
  * @fileoverview Tests for SidebarStatusService.
  */
 
+import { WindowDimensionsService } from
+  '../../services/contextual/WindowDimensionsService';
+
 require('domain/sidebar/SidebarStatusService.ts');
 
 describe('SidebarStatusService', function() {
   var SidebarStatusService, $window;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('WindowDimensionsService', new WindowDimensionsService());
+  }));
+
   beforeEach(angular.mock.inject(function($injector, _$window_) {
     $window = _$window_;
     $window.innerWidth = 600;
