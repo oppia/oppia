@@ -19,6 +19,7 @@
  */
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/skill/RubricObjectFactory.ts');
 require('domain/story/EditableStoryBackendApiService.ts');
 require('domain/story/StorySummaryObjectFactory.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
@@ -34,7 +35,7 @@ require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 angular.module('oppia').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'QuestionsListService', 'StorySummaryObjectFactory',
+  'QuestionsListService', 'RubricObjectFactory', 'StorySummaryObjectFactory',
   'SubtopicPageObjectFactory', 'TopicObjectFactory',
   'TopicRightsBackendApiService', 'TopicRightsObjectFactory', 'UndoRedoService',
   'EVENT_STORY_SUMMARIES_INITIALIZED',
@@ -42,7 +43,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
   'EVENT_TOPIC_REINITIALIZED', function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
-      QuestionsListService, StorySummaryObjectFactory,
+      QuestionsListService, RubricObjectFactory, StorySummaryObjectFactory,
       SubtopicPageObjectFactory, TopicObjectFactory,
       TopicRightsBackendApiService, TopicRightsObjectFactory, UndoRedoService,
       EVENT_STORY_SUMMARIES_INITIALIZED,
@@ -97,7 +98,12 @@ angular.module('oppia').factory('TopicEditorStateService', [
           newBackendTopicDict, skillIdToDescriptionDict));
     };
     var _updateSkillIdToRubricsObject = function(skillIdToRubricsObject) {
-      _skillIdToRubricsObject = skillIdToRubricsObject;
+      for (var skillId in skillIdToRubricsObject) {
+          var rubrics = skillIdToRubricsObject[skillId].map(function(rubric) {
+            return RubricObjectFactory.createFromBackendDict(rubric);
+          });
+          _skillIdToRubricsObject[skillId] = rubrics;
+      }
     };
     var _setSubtopicPage = function(subtopicPage) {
       _subtopicPage.copyFromSubtopicPage(subtopicPage);

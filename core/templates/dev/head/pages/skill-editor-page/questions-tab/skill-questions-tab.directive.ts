@@ -50,6 +50,7 @@ angular.module('oppia').directive('questionsTab', [
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionsListService', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
         'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
+        'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             SkillEditorStateService, QuestionCreationService, UrlService,
@@ -57,12 +58,21 @@ angular.module('oppia').directive('questionsTab', [
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionsListService, EVENT_QUESTION_SUMMARIES_INITIALIZED,
             StateEditorService, QuestionUndoRedoService, UndoRedoService,
+            EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
             NUM_QUESTIONS_PER_PAGE) {
-          $scope.skill = SkillEditorStateService.getSkill();
-          $scope.getQuestionSummariesAsync =
-            QuestionsListService.getQuestionSummariesAsync;
-          $scope.isLastQuestionBatch =
-           QuestionsListService.isLastQuestionBatch;
+          var _init = function() {
+            $scope.skill = SkillEditorStateService.getSkill();
+            $scope.getQuestionSummariesAsync =
+              QuestionsListService.getQuestionSummariesAsync;
+            $scope.isLastQuestionBatch =
+             QuestionsListService.isLastQuestionBatch;
+             $scope.skillIdToRubricsObject = {};
+             $scope.skillIdToRubricsObject[$scope.skill.getId()] =
+               $scope.skill.getRubrics();
+          };
+          _init();
+          $scope.$on(EVENT_SKILL_INITIALIZED, _init);
+          $scope.$on(EVENT_SKILL_REINITIALIZED, _init);
         }
       ]
     };
