@@ -33,11 +33,11 @@ export class WindowDimensionsService {
   }
 
   getWidth(): number {
-    return ( window.innerWidth || document.documentElement.clientWidth ||
+    return (window.innerWidth || document.documentElement.clientWidth ||
         document.body.clientWidth);
   }
 
-  registerOnResizeHook(hookFn: any): void {
+  registerOnResizeHook(hookFn: Function): void {
     this.onResizeHooks.push(hookFn);
   }
 
