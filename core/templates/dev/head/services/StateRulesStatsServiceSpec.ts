@@ -24,6 +24,8 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
+import { FractionInputRulesService } from
+  'interactions/FractionInput/directives/fraction-input-rules.service.ts';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
@@ -41,6 +43,9 @@ describe('State Rules Stats Service', function() {
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
+    $provide.value(
+      'FractionInputRulesService', new FractionInputRulesService(
+        new FractionObjectFactory()));
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
