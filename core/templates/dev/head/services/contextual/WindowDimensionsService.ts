@@ -32,16 +32,16 @@ export class WindowDimensionsService {
     });
   }
 
-  getWidth() {
+  getWidth(): number {
     return ( window.innerWidth || document.documentElement.clientWidth ||
         document.body.clientWidth);
   }
 
-  registerOnResizeHook(hookFn) {
+  registerOnResizeHook(hookFn): void {
     this.onResizeHooks.push(hookFn);
   }
 
-  isWindowNarrow() {
+  isWindowNarrow(): boolean {
     let NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
     return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
   }

@@ -17,7 +17,7 @@
  */
 
 import { WindowDimensionsService } from
-  '../../services/contextual/WindowDimensionsService';
+  'services/contextual/WindowDimensionsService';
 
 require('domain/sidebar/SidebarStatusService.ts');
 
