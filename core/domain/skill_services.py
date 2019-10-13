@@ -378,6 +378,44 @@ def get_skill_descriptions_by_ids(topic_id, skill_ids):
     return skill_id_to_description_dict
 
 
+def get_rubrics_by_skill_ids(topic_id, skill_ids):
+    """Returns a list of skill rubrics corresponding to given skill ids.
+
+    Args:
+        topic_id: str. The id of the topic that these skills are a part of.
+        skill_ids: list(str). The list of skill ids.
+
+    Returns:
+        dict. The skill rubrics of skills keyed by their corresponding ids.
+    """
+    backend_skill_models = skill_models.SkillModel.get_multi(skill_ids)
+    skill_id_to_rubrics_dict = {}
+
+    for skill_model in backend_skill_models:
+        if skill_model is not None:
+            skill_id_to_rubrics_dict[skill_model.id] = skill_model.rubrics
+
+    deleted_skill_ids = []
+    for skill_id in skill_ids:
+        if skill_id not in skill_id_to_rubrics_dict:
+            skill_id_to_rubrics_dict[skill_id] = None
+            deleted_skill_ids.append(skill_id)
+
+    if deleted_skill_ids:
+        deleted_skills_string = ', '.join(deleted_skill_ids)
+        logging.error(
+            'The deleted skills: %s are still present in topic with id %s'
+            % (deleted_skills_string, topic_id)
+        )
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_mail_to_admin(
+                'Deleted skills present in topic',
+                'The deleted skills: %s are still present in topic with id %s'
+                % (deleted_skills_string, topic_id))
+
+    return skill_id_to_rubrics_dict
+
+
 def get_new_skill_id():
     """Returns a new skill id.
 

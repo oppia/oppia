@@ -123,6 +123,71 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].misconception_count, 1)
         self.assertEqual(skill_summaries[0].worked_examples_count, 1)
 
+    def test_get_rubrics_by_skill_ids(self):
+        self.save_new_skill(
+            'skill_2', self.USER_ID, 'Description 2', misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+        self.save_new_skill(
+            'skill_3', self.USER_ID, 'Description 3', misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            skill_rubrics = skill_services.get_rubrics_by_skill_ids(
+                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+
+            skill_services.delete_skill(self.USER_ID, 'skill_2')
+            skill_rubrics = skill_services.get_rubrics_by_skill_ids(
+                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: skill_2 are still'
+                ' present in topic with id topic_id')
+            self.assertEqual(len(messages), 1)
+            self.assertIn(
+                expected_email_html_body,
+                messages[0].html.decode())
+            self.assertEqual(
+                skill_rubrics, {
+                    self.SKILL_ID: [
+                        skill_domain.Rubric(
+                            constants.SKILL_DIFFICULTIES[0], 'Explanation 1'
+                        ).to_dict(),
+                        skill_domain.Rubric(
+                            constants.SKILL_DIFFICULTIES[1], 'Explanation 2'
+                        ).to_dict(),
+                        skill_domain.Rubric(
+                            constants.SKILL_DIFFICULTIES[2], 'Explanation 3'
+                        ).to_dict()],
+                    'skill_2': None,
+                    'skill_3': [
+                        skill_domain.Rubric(
+                            constants.SKILL_DIFFICULTIES[0], 'Explanation 1'
+                        ).to_dict(),
+                        skill_domain.Rubric(
+                            constants.SKILL_DIFFICULTIES[1], 'Explanation 2'
+                        ).to_dict(),
+                        skill_domain.Rubric(
+                            constants.SKILL_DIFFICULTIES[2], 'Explanation 3'
+                        ).to_dict()]
+                }
+            )
+
     def test_get_skill_descriptions_by_ids(self):
         self.save_new_skill(
             'skill_2', self.USER_ID, 'Description 2', misconceptions=[],

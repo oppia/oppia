@@ -62,6 +62,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
+    var _skillIdToRubricsObject = {};
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -94,6 +95,9 @@ angular.module('oppia').factory('TopicEditorStateService', [
       _setTopic(
         TopicObjectFactory.create(
           newBackendTopicDict, skillIdToDescriptionDict));
+    };
+    var _updateSkillIdToRubricsObject = function(skillIdToRubricsObject) {
+      _skillIdToRubricsObject = skillIdToRubricsObject;
     };
     var _setSubtopicPage = function(subtopicPage) {
       _subtopicPage.copyFromSubtopicPage(subtopicPage);
@@ -134,6 +138,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
               newBackendTopicObject.topicDict,
               newBackendTopicObject.skillIdToDescriptionDict
             );
+            _updateSkillIdToRubricsObject(
+              newBackendTopicObject.skillIdToRubricsDict);
             EditableTopicBackendApiService.fetchStories(topicId).then(
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
@@ -196,6 +202,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
        */
       hasLoadedTopic: function() {
         return _topicIsInitialized;
+      },
+
+      getSkillIdToRubricsObject: function() {
+        return _skillIdToRubricsObject;
       },
 
       /**
@@ -351,6 +361,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
               topicBackendObject.topicDict,
               topicBackendObject.skillIdToDescriptionDict
             );
+            _updateSkillIdToRubricsObject(
+              topicBackendDict.skillIdToRubricsDict);
             var changeList = UndoRedoService.getCommittableChangeList();
             for (var i = 0; i < changeList.length; i++) {
               if (changeList[i].cmd === 'delete_canonical_story' ||

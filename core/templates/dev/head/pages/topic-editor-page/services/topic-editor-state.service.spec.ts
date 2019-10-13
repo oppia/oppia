@@ -224,6 +224,9 @@ describe('Topic editor state service', function() {
       },
       skillIdToDescriptionDict: {
         skill_1: 'Description 1'
+      },
+      skillIdToRubricsDict: {
+        skill_1: []
       }
     };
 
@@ -261,6 +264,11 @@ describe('Topic editor state service', function() {
         skill_2: 'Description 2',
         skill_3: 'Description 3',
         skill_5: 'Description 5'
+      },
+      skillIdToRubricsDict: {
+        skill_2: [],
+        skill_3: [],
+        skill_5: []
       }
     };
 

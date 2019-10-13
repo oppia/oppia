@@ -168,9 +168,14 @@ class EditableTopicDataHandler(base.BaseHandler):
         skill_id_to_description_dict = (
             skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
 
+        skill_id_to_rubrics_dict = (
+            skill_services.get_rubrics_by_skill_ids(topic_id, skill_ids)
+        )
+
         self.values.update({
             'topic_dict': topic.to_dict(),
-            'skill_id_to_description_dict': skill_id_to_description_dict
+            'skill_id_to_description_dict': skill_id_to_description_dict,
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })
 
         self.render_json(self.values)
@@ -215,9 +220,14 @@ class EditableTopicDataHandler(base.BaseHandler):
         skill_id_to_description_dict = (
             skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
 
+        skill_id_to_rubrics_dict = (
+            skill_services.get_rubrics_by_skill_ids(topic_id, skill_ids)
+        )
+
         self.values.update({
             'topic_dict': topic.to_dict(),
-            'skill_id_to_description_dict': skill_id_to_description_dict
+            'skill_id_to_description_dict': skill_id_to_description_dict,
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })
 
         self.render_json(self.values)
