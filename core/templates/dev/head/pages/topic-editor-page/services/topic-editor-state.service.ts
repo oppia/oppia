@@ -99,10 +99,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
     };
     var _updateSkillIdToRubricsObject = function(skillIdToRubricsObject) {
       for (var skillId in skillIdToRubricsObject) {
-          var rubrics = skillIdToRubricsObject[skillId].map(function(rubric) {
-            return RubricObjectFactory.createFromBackendDict(rubric);
-          });
-          _skillIdToRubricsObject[skillId] = rubrics;
+        var rubrics = skillIdToRubricsObject[skillId].map(function(rubric) {
+          return RubricObjectFactory.createFromBackendDict(rubric);
+        });
+        _skillIdToRubricsObject[skillId] = rubrics;
       }
     };
     var _setSubtopicPage = function(subtopicPage) {

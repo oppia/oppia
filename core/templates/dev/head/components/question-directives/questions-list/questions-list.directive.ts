@@ -216,7 +216,6 @@ angular.module('oppia').directive('questionsList', [
                       linkedSkillsWithDifficulty;
                     $scope.skillSummaries = allSkillSummaries;
                     $scope.skillIdToRubricsObject = skillIdToRubricsObject;
-                    console.log(skillIdToRubricsObject);
                   };
 
                   $scope.selectOrDeselectSkill = function(skillId, index) {
