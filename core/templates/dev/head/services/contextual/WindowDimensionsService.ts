@@ -26,7 +26,7 @@ export class WindowDimensionsService {
   onResizeHooks : Array<any> = [];
 
   @HostListener('window:resize', ['$event'])
-  onResize(event) {
+  onResize(event : Event): void {
     this.onResizeHooks.forEach(function(hookFn) {
       hookFn();
     });
@@ -37,7 +37,7 @@ export class WindowDimensionsService {
         document.body.clientWidth);
   }
 
-  registerOnResizeHook(hookFn): void {
+  registerOnResizeHook(hookFn: any): void {
     this.onResizeHooks.push(hookFn);
   }
 
