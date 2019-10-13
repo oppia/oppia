@@ -25,6 +25,10 @@ var suites = {
       'protractor_desktop/additionalPlayerFeatures.js'
     ],
 
+    adminTabFeatures: [
+      'protractor_desktop/adminTabFeatures.js'
+    ],
+
     collections: [
       'protractor_desktop/collections.js'
     ],

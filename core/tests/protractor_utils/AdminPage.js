@@ -34,6 +34,13 @@ var AdminPage = function() {
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('[ng-if="$ctrl.statusMessage"]'));
 
+  // Viewing roles can be done by two methods: 1. By roles 2. By username
+  var viewRoleMethod = element(by.css('.protractor-test-view-role-method'));
+  var viewRoleByRoleValue = element(by.css('.protractor-test-view-role-value'));
+  var viewRoleByUsername = element(by.css(
+    '.protractor-test-view-username-value'));
+  var viewRoleButton = element(by.css('.protractor-test-view-role-success'));
+
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
@@ -151,6 +158,37 @@ var AdminPage = function() {
       statusMessage, 'successfully updated to',
       'Could not set role successfully');
     return true;
+  };
+
+  this.viewRolesbyRole = function(role) {
+    waitFor.visibilityOf(viewRoleMethod,
+      'View role dropdown taking too long to be  visible');
+    viewRoleMethod.sendKeys('By Role');
+
+    viewRoleByRoleValue.click();
+    viewRoleByRoleValue.sendKeys(role);
+
+    viewRoleButton.click();
+    return true;
+  };
+
+  this.viewRolesbyUsername = function(username) {
+    waitFor.visibilityOf(viewRoleMethod,
+      'View role dropdown taking too long to be  visible');
+    viewRoleMethod.sendKeys('By Username');
+
+    viewRoleByUsername.click();
+    viewRoleByUsername.sendKeys(username);
+
+    viewRoleButton.click();
+    return true;
+  };
+
+  this.expectNumberOfUsers = function(expectedCount) {
+    element.all(
+      by.css('.protractor-test-roles-result-rows')).then(function(rows) {
+      expect(rows.length).toBe(expectedCount);
+    });
   };
 };
 
