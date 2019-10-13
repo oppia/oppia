@@ -55,7 +55,11 @@ describe('Story editor state service', function() {
           resolve({
             story: self.newBackendStoryObject,
             topicName: 'Topic Name',
-            storyIsPublished: false
+            storyIsPublished: false,
+            skillSummaries: [{
+              id: 'Skill 1',
+              description: 'Skill Description'
+            }]
           });
         } else {
           reject();
