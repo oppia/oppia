@@ -21,6 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from './contextual/WindowDimensionsService';
+import { LoggerService } from './LoggerService';
+import { SearchService } from './SearchService';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +31,9 @@ export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
     'UtilsService': new UtilsService(),
-    'WindowDimensionsService': new WindowDimensionsService()
+    'WindowDimensionsService': new WindowDimensionsService(),
+    'LoggerService': new LoggerService(),
+    'SearchService': new SearchService()
   };
   /* eslint-enable quote-props */
 }
