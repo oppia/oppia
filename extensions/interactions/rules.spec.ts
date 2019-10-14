@@ -40,6 +40,10 @@ import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import { NumberWithUnitsRulesService } from
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory.ts';
 import { UpgradedServices } from 'services/UpgradedServices';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
@@ -70,6 +74,10 @@ describe('Rule spec services', function() {
       'MusicNotesInputRulesService', new MusicNotesInputRulesService());
     $provide.value(
       'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
+    $provide.value(
+      'NumberWithUnitsRulesService', new NumberWithUnitsRulesService(
+        new NumberWithUnitsObjectFactory(
+          new UnitsObjectFactory(), new FractionObjectFactory())));
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The

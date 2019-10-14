@@ -35,7 +35,7 @@ export class UpgradedServices {
   upgradedServices = {
     'UtilsService': new UtilsService(),
     'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
-        new UnitsObjectFactory(), new FractionObjectFactory());
+      new UnitsObjectFactory(), new FractionObjectFactory())
   };
   /* eslint-enable quote-props */
 }
