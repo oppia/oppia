@@ -78,7 +78,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             _recalculateAvailableNodes();
             $scope.skillIdToSummaryMap = {};
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
-            for (idx in skillSummaries) {
+            for (var idx in skillSummaries) {
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
                 skillSummaries[idx].description;
             }

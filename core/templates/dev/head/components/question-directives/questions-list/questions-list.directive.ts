@@ -203,7 +203,7 @@ angular.module('oppia').directive('questionsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
-                'select-skill-modal.template.html'),
+                'select-skill-and-difficulty-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -357,7 +357,7 @@ angular.module('oppia').directive('questionsList', [
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/topic-editor-page/modal-templates/' +
-                  'select-skill-modal.template.html'),
+                  'select-skill-and-difficulty-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',

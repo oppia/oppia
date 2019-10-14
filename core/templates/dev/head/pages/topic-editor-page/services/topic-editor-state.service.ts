@@ -368,7 +368,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
               topicBackendObject.skillIdToDescriptionDict
             );
             _updateSkillIdToRubricsObject(
-              topicBackendDict.skillIdToRubricsDict);
+              topicBackendObject.skillIdToRubricsDict);
             var changeList = UndoRedoService.getCommittableChangeList();
             for (var i = 0; i < changeList.length; i++) {
               if (changeList[i].cmd === 'delete_canonical_story' ||
