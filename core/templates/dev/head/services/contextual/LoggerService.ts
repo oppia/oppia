@@ -42,33 +42,33 @@ export class LoggerService {
       this.level === LogLevel.All);
   }
 
-  debug(msg: string, optionalParams: any[]) {
+  debug(msg: string, optionalParams?: any[]) {
     if (this.shouldLog(LogLevel.Debug)) {
       // eslint-disable-next-line no-console
       console.debug(msg, optionalParams);
     }
   }
 
-  info(msg: string, optionalParams: any[]) {
+  info(msg: string, optionalParams?: any[]) {
     if (this.shouldLog(LogLevel.Info)) {
       // eslint-disable-next-line no-console
       console.info(msg, optionalParams);
     }
   }
 
-  warn(msg: string, optionalParams: any[]) {
+  warn(msg: string, optionalParams?: any[]) {
     if (this.shouldLog(LogLevel.Warn)) {
       console.warn(msg, optionalParams);
     }
   }
 
-  error(msg: string, optionalParams: any[]) {
+  error(msg: string, optionalParams?: any[]) {
     if (this.shouldLog(LogLevel.Error)) {
       console.error(msg, optionalParams);
     }
   }
 
-  log(msg: string, optionalParams: any[]) {
+  log(msg: string, optionalParams?: any[]) {
     // eslint-disable-next-line no-console
     console.log(msg, optionalParams);
   }
