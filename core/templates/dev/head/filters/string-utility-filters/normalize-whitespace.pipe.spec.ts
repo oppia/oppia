@@ -16,38 +16,35 @@
  * @fileoverview Tests for NormalizeWhitespace pipe for Oppia.
  */
 
-import { NormalizeWhitespacePipe } from 
-  'filters/string-utility-filters/normalize-whitespace.pipe'
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { TestBed } from '@angular/core/testing';
 
-describe('Testing pipe', () => {
+describe('Testing NormalizeWhitespacePipe', () => {
   let nwp: NormalizeWhitespacePipe = null;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe]
     });
-
     nwp = TestBed.get(NormalizeWhitespacePipe);
-
   });
 
-  it('should have all expected filters', () => {
+  it('should have all expected pipes', () => {
     expect(nwp).not.toEqual(null);
   });
 
   it('should correctly normalize whitespace', () => {
-    
-      expect(nwp.transform('')).toEqual('');
-      expect(nwp.transform(null)).toEqual(null);
-      expect(nwp.transform(undefined)).toEqual(undefined);
+    expect(nwp.transform('')).toEqual('');
+    expect(nwp.transform(null)).toEqual(null);
+    expect(nwp.transform(undefined)).toEqual(undefined);
 
-      expect(nwp.transform('a')).toEqual('a');
-      expect(nwp.transform('a  ')).toEqual('a');
-      expect(nwp.transform('  a')).toEqual('a');
-      expect(nwp.transform('  a  ')).toEqual('a');
+    expect(nwp.transform('a')).toEqual('a');
+    expect(nwp.transform('a  ')).toEqual('a');
+    expect(nwp.transform('  a')).toEqual('a');
+    expect(nwp.transform('  a  ')).toEqual('a');
 
-      expect(nwp.transform('a  b ')).toEqual('a b');
-      expect(nwp.transform('  a  b ')).toEqual('a b');
-      expect(nwp.transform('  ab c ')).toEqual('ab c');
+    expect(nwp.transform('a  b ')).toEqual('a b');
+    expect(nwp.transform('  a  b ')).toEqual('a b');
+    expect(nwp.transform('  ab c ')).toEqual('ab c');
   });
 });

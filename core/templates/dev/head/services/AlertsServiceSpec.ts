@@ -26,9 +26,7 @@ describe('Alerts Service', function() {
     TestBed.configureTestingModule({
       providers: [AlertsService]
     });
-
     alertsService = TestBed.get(AlertsService);
-
   });
 
   describe('Warnings', () => {
