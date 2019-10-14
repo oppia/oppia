@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for storing all generic functions which have to be
- * used at multiple places in the codebase.
+ * @fileoverview Service for storing all upgraded services
  */
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { UtilsService } from 'services/UtilsService';
+import { WindowDimensionsService } from './contextual/WindowDimensionsService';
+
 @Injectable({
   providedIn: 'root'
 })
-export class UtilsService {
-  isEmpty(obj: any): boolean {
-    for (var property in obj) {
-      if (obj.hasOwnProperty(property)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  isString(input: any): boolean {
-    return (typeof input === 'string' || input instanceof String);
-  }
+export class UpgradedServices {
+  /* eslint-disable quote-props */
+  upgradedServices = {
+    'UtilsService': new UtilsService(),
+    'WindowDimensionsService': new WindowDimensionsService()
+  };
+  /* eslint-enable quote-props */
 }
 
 angular.module('oppia').factory(
-  'UtilsService',
-  downgradeInjectable(UtilsService));
+  'UpgradedServices',
+  downgradeInjectable(UpgradedServices));

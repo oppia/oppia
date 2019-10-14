@@ -16,20 +16,13 @@
  * @fileoverview Tests for LearnerAnswerInfoObjectFactory.
  */
 
-require('domain/statistics/LearnerAnswerInfoObjectFactory.ts');
+import { LearnerAnswerInfoObjectFactory } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
 
-describe('Learner answer info object factory', function() {
-  var LearnerAnswerInfoObjectFactory = null;
-
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    LearnerAnswerInfoObjectFactory = $injector.get(
-      'LearnerAnswerInfoObjectFactory');
-  }));
-
+describe('Learner answer info object factory', () => {
+  var laiof = new LearnerAnswerInfoObjectFactory();
   it('should create a learner answer info object from a backend dict',
-    function() {
+    () => {
       var learnerAnswerInfoBackendDict = {
         id: 'sample_id',
         answer: 'sample_answer',
@@ -37,7 +30,7 @@ describe('Learner answer info object factory', function() {
         created_on: 1000
       };
       var learnerAnswerInfo = (
-        LearnerAnswerInfoObjectFactory.createFromBackendDict(
+        laiof.createFromBackendDict(
           learnerAnswerInfoBackendDict));
       expect(learnerAnswerInfo.getId()).toEqual('sample_id');
       expect(learnerAnswerInfo.getAnswer()).toEqual('sample_answer');
@@ -46,9 +39,9 @@ describe('Learner answer info object factory', function() {
       expect(learnerAnswerInfo.getCreatedOn()).toEqual(1000);
     });
 
-  it('should create a default learner answer info object', function() {
+  it('should create a default learner answer info object', () => {
     var learnerAnswerInfo = (
-      LearnerAnswerInfoObjectFactory.createDefaultLearnerAnswerInfo(
+      laiof.createDefaultLearnerAnswerInfo(
         'This is answer', 'This is answer details'));
 
     expect(learnerAnswerInfo.getId()).toBeNull();

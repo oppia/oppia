@@ -16,40 +16,35 @@
  * @fileoverview Tests that the utility functions are working as expected.
  */
 
-require('services/UtilsService.ts');
+import { UtilsService } from 'services/UtilsService';
 
-describe('Utils Service', function() {
-  var UtilsService;
+describe('Utils Service', () => {
+  let uts: UtilsService = new UtilsService();
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    UtilsService = $injector.get('UtilsService');
-  }));
-
-  it('should check if an object is empty', function() {
-    expect(UtilsService.isEmpty({
+  it('should check if an object is empty', () => {
+    expect(uts.isEmpty({
       a: 'b'
     })).toEqual(false);
 
-    expect(UtilsService.isEmpty({})).toEqual(true);
+    expect(uts.isEmpty({})).toEqual(true);
 
     // Test against invalid inputs.
-    expect(UtilsService.isEmpty(NaN)).toEqual(true);
-    expect(UtilsService.isEmpty(undefined)).toEqual(true);
-    expect(UtilsService.isEmpty(null)).toEqual(true);
+    expect(uts.isEmpty(NaN)).toEqual(true);
+    expect(uts.isEmpty(undefined)).toEqual(true);
+    expect(uts.isEmpty(null)).toEqual(true);
   });
 
-  it('should check if the input is a string', function() {
-    expect(UtilsService.isString(12)).toEqual(false);
+  it('should check if the input is a string', () => {
+    expect(uts.isString(12)).toEqual(false);
 
-    expect(UtilsService.isString('')).toEqual(true);
-    expect(UtilsService.isString('xyz')).toEqual(true);
-    expect(UtilsService.isString(new String())).toEqual(true);
+    expect(uts.isString('')).toEqual(true);
+    expect(uts.isString('xyz')).toEqual(true);
+    expect(uts.isString(new String())).toEqual(true);
 
     // Test against invalid inputs
-    expect(UtilsService.isString(NaN)).toEqual(false);
-    expect(UtilsService.isString(undefined)).toEqual(false);
-    expect(UtilsService.isString(null)).toEqual(false);
-    expect(UtilsService.isString({})).toEqual(false);
+    expect(uts.isString(NaN)).toEqual(false);
+    expect(uts.isString(undefined)).toEqual(false);
+    expect(uts.isString(null)).toEqual(false);
+    expect(uts.isString({})).toEqual(false);
   });
 });
