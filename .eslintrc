@@ -231,5 +231,6 @@
       "error",
       "any"
     ]
-  }
+  },
+  "reportUnusedDisableDirectives": true
 }
