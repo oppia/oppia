@@ -56,8 +56,8 @@ describe('FractionInputValidationService', () => {
       new FractionObjectFactory(), new baseInteractionValidationService());
     oof = new OutcomeObjectFactory(new SubtitledHtmlObjectFactory());
     agof = new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory());
+      new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+      new RuleObjectFactory());
     rof = new RuleObjectFactory();
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 

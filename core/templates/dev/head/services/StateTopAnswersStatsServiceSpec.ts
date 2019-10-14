@@ -130,7 +130,7 @@ describe('StateTopAnswersStatsService', function() {
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
-    $provide.value('FractionInputRulesService',new FractionInputRulesService(
+    $provide.value('FractionInputRulesService', new FractionInputRulesService(
       new FractionObjectFactory()));
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(

@@ -30,8 +30,8 @@ describe('Fraction Input rules service', () => {
   });
 
   let createNegativeFractionDict = (
-    wholeNumber: number, numerator: number,
-    denominator: number): FractionAnswer => {
+      wholeNumber: number, numerator: number,
+      denominator: number): FractionAnswer => {
     return {
       isNegative: true,
       wholeNumber: wholeNumber,

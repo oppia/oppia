@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
-import { baseInteractionValidationService } from 
+import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service.ts';
 import { AppConstants } from 'app.constants';
 
