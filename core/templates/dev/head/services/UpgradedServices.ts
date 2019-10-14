@@ -20,6 +20,12 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { UtilsService } from 'services/UtilsService';
+import { FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory.ts';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory.ts';
+import { UnitsObjectFactory } from
+  'domain/objects/UnitsObjectFactory.ts';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +33,9 @@ import { UtilsService } from 'services/UtilsService';
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
-    'UtilsService': new UtilsService()
+    'UtilsService': new UtilsService(),
+    'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
+        new UnitsObjectFactory(), new FractionObjectFactory());
   };
   /* eslint-enable quote-props */
 }
