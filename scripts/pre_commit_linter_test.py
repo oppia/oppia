@@ -71,6 +71,7 @@ def all_checks_passed(linter_stdout):
     """
     return 'All Checks Passed.' in linter_stdout
 
+
 def appears_in_linter_stdout(phrases, linter_stdout):
     """Checks to see if all of the phrases appear in at least one of the
     linter_stdout outputs.
@@ -109,19 +110,8 @@ class LintTests(test_utils.GenericTestBase):
                 *args: Variable length argument list of values to print in
                 the same line of output.
             """
-            if len(args) == 1:
-                if isinstance(args[0], list):
-                    # Assumption that passing in a list by itself implies
-                    # that each item was a print statement.
-                    self.linter_stdout.extend(args[0])
-                else:
-                    self.linter_stdout.append(args[0])
-            else:
-                # This is included in order to support the common python
-                # print functionality print('a', 'b') -> 'a b'. This is a
-                # separate condition since pre_commit_linter prints
-                # occasionally passes in a unicode input by itself.
-                self.linter_stdout.append(' '.join(str(arg) for arg in args))
+            self.linter_stdout.append(
+                ' '.join(python_utils.UNICODE(arg) for arg in args))
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
         self.sys_swap = self.swap(sys, 'exit', mock_exit)
 
@@ -186,8 +176,9 @@ class CSSLintTests(LintTests):
         self.assertTrue(
             appears_in_linter_stdout(
                 ['18:16',
-                'Unexpected whitespace before \":\"   declaration-colon-space-before',
-                'FAILED    1 CSS file'],
+                 'Unexpected whitespace before \":\"   declaration-colon-spac'
+                 'e-before',
+                 'FAILED    1 CSS file'],
                 self.linter_stdout
                 )
             )
@@ -222,9 +213,8 @@ class PythonLintTests(LintTests):
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(appears_in_linter_stdout(
             ['C: 24, 0: Missing class docstring (missing-docstring)',
-            'FAILED    Python linting failed'],
-            self.linter_stdout)
-        )
+             'FAILED    Python linting failed'],
+            self.linter_stdout))
 
 
 class JsAndTsLintTests(LintTests):
@@ -255,11 +245,10 @@ class JsAndTsLintTests(LintTests):
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(appears_in_linter_stdout(
             ['35:63  error  Closing curly brace should be on the same line '
-            'as opening curly brace or on the line after the previous block  '
-            'brace-style',
-            'FAILED    1 JavaScript and Typescript files'],
-            self.linter_stdout)
-        )
+             'as opening curly brace or on the line after the previous block  '
+             'brace-style',
+             'FAILED    1 JavaScript and Typescript files'],
+            self.linter_stdout))
 
     def test_valid_ts_file(self):
         with self.print_swap, self.other_lints_swap, self.check_codeowner_swap:
@@ -278,9 +267,8 @@ class JsAndTsLintTests(LintTests):
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(appears_in_linter_stdout(
             ['21:3  error  Extra space after key \'value\'  key-spacing',
-            'FAILED    1 JavaScript and Typescript files'],
-            self.linter_stdout)
-        )
+             'FAILED    1 JavaScript and Typescript files'],
+            self.linter_stdout))
 
 
 class GeneralLintTests(LintTests):
@@ -302,4 +290,3 @@ class GeneralLintTests(LintTests):
 
     def test_invalid_codeowner_file(self):
         pass
-
