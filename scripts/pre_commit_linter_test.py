@@ -34,8 +34,11 @@ INVALID_HTML_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.html')
 VALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.css')
 INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 
-VALID_PYTHON_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
-INVALID_PYTHON_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.py')
+VALID_PYTHON_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid_via_pylintrc.py')
+INVALID_PYTHON_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_via_pylintrc.py')
+
+VALID_PYTHON_FILEPATH_2 = os.path.join(LINTER_TESTS_DIR, 'valid_via_extensions.py')
+INVALID_PYTHON_FILEPATH_2 = os.path.join(LINTER_TESTS_DIR, 'invalid_via_extensions.py')
 
 VALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 INVALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.js')
@@ -195,7 +198,7 @@ class PythonLintTests(LintTests):
             pre_commit_linter, 'check_codeowner_file',
             mock_check_codeowner_file)
 
-    def test_valid_python_file(self):
+    def test_valid_python_file_pylintrc(self):
         with self.print_swap, self.js_ts_lint_swap, self.check_codeowner_swap:
             pre_commit_linter.main(args=['--path=%s' % VALID_PYTHON_FILEPATH])
         self.assertTrue(all_checks_passed(self.linter_stdout))
@@ -205,7 +208,7 @@ class PythonLintTests(LintTests):
                 self.linter_stdout)
             )
 
-    def test_invalid_python_file(self):
+    def test_invalid_python_file_pylintrc(self):
         with self.print_swap, self.sys_swap:
             with self.js_ts_lint_swap, self.check_codeowner_swap:
                 pre_commit_linter.main(
@@ -213,6 +216,28 @@ class PythonLintTests(LintTests):
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(appears_in_linter_stdout(
             ['C: 24, 0: Missing class docstring (missing-docstring)',
+             'FAILED    Python linting failed'],
+            self.linter_stdout))
+
+    def test_valid_python_file_pylint_extensions(self):
+        with self.print_swap, self.js_ts_lint_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % VALID_PYTHON_FILEPATH_2])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['SUCCESS   1 Python files linted'],
+                self.linter_stdout)
+            )
+
+    def test_invalid_python_file_pylint_extensions(self):
+        with self.print_swap, self.sys_swap:
+            with self.js_ts_lint_swap, self.check_codeowner_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_PYTHON_FILEPATH_2])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(appears_in_linter_stdout(
+            ['C: 40, 0: Not using \'yield\' or a single space after yield'
+             ' statement. (single-space-after-yield)',
              'FAILED    Python linting failed'],
             self.linter_stdout))
 
