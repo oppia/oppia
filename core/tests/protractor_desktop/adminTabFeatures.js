@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for collections.
+ * @fileoverview End-to-end tests for admin page functionality.
  */
 
 var general = require('../protractor_utils/general.js');
@@ -27,7 +27,7 @@ describe('Admin Tab', function() {
     adminPage = new AdminPage.AdminPage();
   });
 
-  it('assign and show roles correctly', function() {
+  it('should allow assigning roles and show them', function() {
     users.createUser('moderator1@adminTab.com', 'moderator1');
     users.createUser('moderator2@adminTab.com', 'moderator2');
     users.createUser('collectionEdtior1@adminTab.com', 'collectionEditor1');

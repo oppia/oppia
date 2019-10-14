@@ -35,9 +35,9 @@ var AdminPage = function() {
   var statusMessage = element(by.css('[ng-if="$ctrl.statusMessage"]'));
 
   // Viewing roles can be done by two methods: 1. By roles 2. By username
-  var viewRoleMethod = element(by.css('.protractor-test-view-role-method'));
-  var viewRoleByRoleValue = element(by.css('.protractor-test-view-role-value'));
-  var viewRoleByUsername = element(by.css(
+  var roleDropdown = element(by.css('.protractor-test-view-role-method'));
+  var roleValueOption = element(by.css('.protractor-test-view-role-value'));
+  var roleUsernameOption = element(by.css(
     '.protractor-test-view-username-value'));
   var viewRoleButton = element(by.css('.protractor-test-view-role-success'));
 
@@ -161,24 +161,24 @@ var AdminPage = function() {
   };
 
   this.viewRolesbyRole = function(role) {
-    waitFor.visibilityOf(viewRoleMethod,
-      'View role dropdown taking too long to be  visible');
-    viewRoleMethod.sendKeys('By Role');
+    waitFor.visibilityOf(roleDropdown,
+      'View role dropdown taking too long to be visible');
+    roleDropdown.sendKeys('By Role');
 
-    viewRoleByRoleValue.click();
-    viewRoleByRoleValue.sendKeys(role);
+    roleValueOption.click();
+    roleValueOption.sendKeys(role);
 
     viewRoleButton.click();
     return true;
   };
 
   this.viewRolesbyUsername = function(username) {
-    waitFor.visibilityOf(viewRoleMethod,
-      'View role dropdown taking too long to be  visible');
-    viewRoleMethod.sendKeys('By Username');
+    waitFor.visibilityOf(roleDropdown,
+      'View role dropdown taking too long to be visible');
+    roleDropdown.sendKeys('By Username');
 
-    viewRoleByUsername.click();
-    viewRoleByUsername.sendKeys(username);
+    roleUsernameOption.click();
+    roleUsernameOption.sendKeys(username);
 
     viewRoleButton.click();
     return true;
