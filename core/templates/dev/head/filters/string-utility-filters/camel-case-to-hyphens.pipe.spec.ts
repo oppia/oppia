@@ -20,20 +20,20 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 describe('Testing pipes', () => {
-  let pipeName: CamelCaseToHyphensPipe = null;
+  let pipe: CamelCaseToHyphensPipe = null;
   beforeEach(() => {
-    pipeName = new CamelCaseToHyphensPipe();
+    pipe = new CamelCaseToHyphensPipe();
   });
 
   it('should have all expected pipes', () => {
-    expect(pipeName).not.toEqual(null);
+    expect(pipe).not.toEqual(null);
   });
 
   it('should convert camelCase to hyphens properly', () => {
-    expect(pipeName.transform('test')).toEqual('test');
-    expect(pipeName.transform('testTest')).toEqual('test-test');
-    expect(pipeName.transform('testTestTest')).toEqual('test-test-test');
-    expect(pipeName.transform('aBaBCa')).toEqual('a-ba-b-ca');
-    expect(pipeName.transform('AbcDefGhi')).toEqual('abc-def-ghi');
+    expect(pipe.transform('test')).toEqual('test');
+    expect(pipe.transform('testTest')).toEqual('test-test');
+    expect(pipe.transform('testTestTest')).toEqual('test-test-test');
+    expect(pipe.transform('aBaBCa')).toEqual('a-ba-b-ca');
+    expect(pipe.transform('AbcDefGhi')).toEqual('abc-def-ghi');
   });
 });
