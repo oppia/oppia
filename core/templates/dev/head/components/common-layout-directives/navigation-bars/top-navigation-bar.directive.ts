@@ -193,7 +193,7 @@ angular.module('oppia').directive('topNavigationBar', [
 
           WindowDimensionsService.registerOnResizeHook(function() {
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-            $scope.$apply();
+            $scope.$applyAsync();
             // If window is resized larger, try displaying the hidden elements.
             if (currentWindowWidth < WindowDimensionsService.getWidth()) {
               for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
