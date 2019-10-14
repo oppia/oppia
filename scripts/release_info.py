@@ -54,11 +54,6 @@ FECONF_VAR_NAMES = ['CURRENT_STATE_SCHEMA_VERSION',
                     'CURRENT_COLLECTION_SCHEMA_VERSION']
 FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
-# PyGithub can fetch milestone only by using the milestone number. Milestones
-# are numbered sequentially as they are created and the number remains fixed.
-# The number for blocking_bugs milestone is 39 which is used to fetch this
-# milestone.
-BLOCKING_BUG_MILESTONE_NUMBER = 39
 FECONF_FILEPATH = os.path.join('', 'feconf.py')
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
@@ -280,7 +275,7 @@ def get_blocking_bug_issue_count(repo):
         int: Number of unresolved blocking bugs.
     """
     blocking_bugs_milestone = repo.get_milestone(
-        number=BLOCKING_BUG_MILESTONE_NUMBER)
+        number=feconf.BLOCKING_BUG_MILESTONE_NUMBER)
     return blocking_bugs_milestone.open_issues
 
 
@@ -295,11 +290,12 @@ def check_prs_for_current_release_are_released(repo):
         bool. Whether all pull requests for current release have a
             PR: released label.
     """
-    all_prs = repo.get_pulls(state='all')
-    for pr in all_prs:
+    current_release_label = repo.get_label('PR: for current release')
+    current_release_prs = repo.get_issues(
+        state='all', labels=[current_release_label])
+    for pr in current_release_prs:
         label_names = [label.name for label in pr.labels]
-        if 'PR: released' not in label_names and (
-                'PR: for current release' in label_names):
+        if 'PR: released' not in label_names:
             return False
     return True
 

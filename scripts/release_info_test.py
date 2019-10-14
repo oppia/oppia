@@ -336,12 +336,21 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                 'title': 'PR2', 'number': 2, 'labels': [
                     {'name': 'PR: released'},
                     {'name': 'PR: for current release'}]}, completed='')
+        label = github.Label.Label(
+            requester='', headers='',
+            attributes={'name': 'PR: for current release'}, completed='')
         # pylint: disable=unused-argument
-        def mock_get_pulls(unused_self, state):
+        def mock_get_issues(unused_self, state, labels):
             return [pull1, pull2]
         # pylint: enable=unused-argument
-        with self.swap(
-            github.Repository.Repository, 'get_pulls', mock_get_pulls):
+        def mock_get_label(unused_self, unused_name):
+            return [label]
+
+        get_issues_swap = self.swap(
+            github.Repository.Repository, 'get_issues', mock_get_issues)
+        get_label_swap = self.swap(
+            github.Repository.Repository, 'get_label', mock_get_label)
+        with get_issues_swap, get_label_swap:
             self.assertEqual(
                 release_info.check_prs_for_current_release_are_released(
                     self.mock_repo), True)
@@ -359,12 +368,21 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                 'title': 'PR2', 'number': 2, 'labels': [
                     {'name': 'PR: released'},
                     {'name': 'PR: for current release'}]}, completed='')
+        label = github.Label.Label(
+            requester='', headers='',
+            attributes={'name': 'PR: for current release'}, completed='')
         # pylint: disable=unused-argument
-        def mock_get_pulls(unused_self, state):
+        def mock_get_issues(unused_self, state, labels):
             return [pull1, pull2]
         # pylint: enable=unused-argument
-        with self.swap(
-            github.Repository.Repository, 'get_pulls', mock_get_pulls):
+        def mock_get_label(unused_self, unused_name):
+            return [label]
+
+        get_issues_swap = self.swap(
+            github.Repository.Repository, 'get_issues', mock_get_issues)
+        get_label_swap = self.swap(
+            github.Repository.Repository, 'get_label', mock_get_label)
+        with get_issues_swap, get_label_swap:
             self.assertEqual(
                 release_info.check_prs_for_current_release_are_released(
                     self.mock_repo), False)
