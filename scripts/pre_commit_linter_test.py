@@ -35,10 +35,13 @@ VALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.css')
 INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 
 VALID_PYTHON_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid_via_pylintrc.py')
-INVALID_PYTHON_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_via_pylintrc.py')
+INVALID_PYTHON_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_via_pylintrc.py')
 
-VALID_PYTHON_FILEPATH_2 = os.path.join(LINTER_TESTS_DIR, 'valid_via_extensions.py')
-INVALID_PYTHON_FILEPATH_2 = os.path.join(LINTER_TESTS_DIR, 'invalid_via_extensions.py')
+VALID_PYTHON_FILEPATH_2 = os.path.join(
+    LINTER_TESTS_DIR, 'valid_via_extensions.py')
+INVALID_PYTHON_FILEPATH_2 = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_via_extensions.py')
 
 VALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 INVALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.js')
