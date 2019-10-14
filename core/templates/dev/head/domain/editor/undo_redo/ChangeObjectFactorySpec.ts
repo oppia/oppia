@@ -19,14 +19,14 @@
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 
-describe('Factory for Change domain objects', function() {
+describe('Factory for Change domain objects', () => {
   let changeObjectFactory: ChangeObjectFactory = null;
 
   beforeEach(() => {
     changeObjectFactory = new ChangeObjectFactory();
   });
 
-  it('should invoke no callbacks after creation', function() {
+  it('should invoke no callbacks after creation', () => {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
@@ -39,7 +39,7 @@ describe('Factory for Change domain objects', function() {
     expect(reverseFunc).not.toHaveBeenCalled();
   });
 
-  it('should invoke the apply callback when applied', function() {
+  it('should invoke the apply callback when applied', () => {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
@@ -59,7 +59,7 @@ describe('Factory for Change domain objects', function() {
     expect(reverseFunc).not.toHaveBeenCalled();
   });
 
-  it('should invoke the reverse callback when reversed', function() {
+  it('should invoke the reverse callback when reversed', () => {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
@@ -80,12 +80,12 @@ describe('Factory for Change domain objects', function() {
   });
 
   it('should not receive changes to the provided change backend object',
-    function() {
+    () => {
       var backendChangeObject = {
         property_name: 'value'
       };
       var changeDomainObject = changeObjectFactory.create(
-        backendChangeObject, function() {}, function() {});
+        backendChangeObject, () => {}, () => {});
 
       var returnedBackendObject = changeDomainObject.getBackendChangeObject();
       returnedBackendObject.property_name = 'new value';

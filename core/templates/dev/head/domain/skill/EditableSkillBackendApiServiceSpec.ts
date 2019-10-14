@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for EditableSkillBackendApiService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');
 require('services/CsrfTokenService.ts');
@@ -29,6 +34,12 @@ describe('Editable skill backend API service', function() {
   var sampleResponse2 = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.inject(function($injector, $q) {
     EditableSkillBackendApiService = $injector.get(
