@@ -15,7 +15,6 @@
 /**
  * @fileoverview Controller for the story node editor.
  */
-
 require(
   'components/skill-selector/skill-selector.directive.ts');
 
