@@ -18,27 +18,26 @@
       </th>
     </tr>
     <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
-        ng-click="isInModal() && selectSkill(skill)"
-        class="list-item protractor-test-skills-list-item"
-        ng-init="skillLink = isInModal() ? '#' : getSkillEditorUrl(skill.id)">
+        ng-click="selectSkill(skill)"
+        class="list-item protractor-test-skills-list-item">
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[skillLink]>" class="list-summary">
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <span class="protractor-test-skill-description"> <[skill.description]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[skillLink]>" class="list-summary">
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <span> <[skill.worked_examples_count]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[skillLink]>" class="list-summary">
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <span> <[skill.misconception_count]> </span>
         </a>
       </td>

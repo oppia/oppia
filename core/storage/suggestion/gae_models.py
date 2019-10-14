@@ -51,10 +51,12 @@ STATUS_CHOICES = [
 
 # Constants defining various suggestion types.
 SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
 SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
 
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
@@ -240,6 +242,42 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.score_category.IN(score_categories)).filter(
                 cls.author_id != user_id).fetch(
                     feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_in_review_suggestions_of_suggestion_type(
+            cls, suggestion_type, user_id):
+        """Gets all suggestions of suggestion_type which are in review.
+
+        Args:
+            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+                As a user cannot review their own suggestions, suggestions
+                authored by the user will be excluded.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are of the given
+                type, which are in review, but not created by the given user.
+        """
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.suggestion_type == suggestion_type).filter(
+                cls.author_id != user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_user_created_suggestions_of_suggestion_type(
+            cls, suggestion_type, user_id):
+        """Gets all suggestions of suggestion_type which the user has created.
+
+        Args:
+            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are of the given
+                type, which the given user has created.
+        """
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.suggestion_type == suggestion_type).filter(
+                cls.author_id == user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_all_score_categories(cls):
