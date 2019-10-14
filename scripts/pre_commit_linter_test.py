@@ -281,12 +281,3 @@ class GeneralLintTests(LintTests):
         self.js_ts_lint_swap = self.swap(
             pre_commit_linter.JsTsLintChecksManager, 'perform_all_lint_checks',
             mock_perform_all_lint_checks)
-
-    # TODO(#7590): Add codeowner checks.
-    # Don't want to run this over snapshot of current branch, need a smaller
-    # example in core/tests/linter_tests with spoofed .github/CODEOWNERS files.
-    def test_valid_codeowner_file(self):
-        pass
-
-    def test_invalid_codeowner_file(self):
-        pass
