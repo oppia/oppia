@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import opportunity_domain
 from core.domain import opportunity_services
 from core.domain import question_services
 from core.domain import skill_domain
@@ -536,3 +537,64 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity['question_count'], 0)
+
+
+class OpportunityServicesUnitTest(test_utils.GenericTestBase):
+    """Test the opportunity services methods."""
+    def setUp(self):
+        super(OpportunityServicesUnitTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.TOPIC_ID = 'topic'
+        self.STORY_ID = 'story'
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(5)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id=self.TOPIC_ID, name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, title='A story',
+            corresponding_topic_id=self.TOPIC_ID)
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+
+    def test_get_exploration_opportunity_summaries_by_ids_returns_list_of_objects(self): # pylint: disable=line-too-long
+        output = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                []))
+
+        self.assertEqual(output, {})
+
+        opportunities = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['0']))
+
+        self.assertEqual(len(opportunities), 1)
+        self.assertIsInstance(
+            opportunities['0'],
+            opportunity_domain.ExplorationOpportunitySummary)
+        self.assertEqual(opportunities['0'].id, '0')

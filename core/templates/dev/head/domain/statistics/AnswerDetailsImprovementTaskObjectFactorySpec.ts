@@ -71,6 +71,11 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { LearnerAnswerDetailsObjectFactory } from
+  'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerInfoObjectFactory } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/statistics/AnswerDetailsImprovementTaskObjectFactory.ts');
@@ -144,6 +149,17 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
       'WrittenTranslationsObjectFactory',
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
+    $provide.value(
+      'LearnerAnswerDetailsObjectFactory',
+      new LearnerAnswerDetailsObjectFactory());
+    $provide.value(
+      'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
