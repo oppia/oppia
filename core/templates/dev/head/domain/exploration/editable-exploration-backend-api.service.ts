@@ -16,8 +16,8 @@
  * @fileoverview Service to send changes to a exploration to the backend.
  */
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');

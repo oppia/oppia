@@ -16,7 +16,7 @@
  * @fileoverview Service to receive questions as pretests for an exploration.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('domain/question/question-domain.constants.ajs.ts');
 

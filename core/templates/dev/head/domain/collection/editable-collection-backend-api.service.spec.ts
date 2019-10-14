@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for EditableCollectionBackendApiService.
  */
 
-require('domain/collection/EditableCollectionBackendApiService.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/collection/editable-collection-backend-api.service.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('services/CsrfTokenService.ts');
 
 describe('Editable collection backend API service', function() {

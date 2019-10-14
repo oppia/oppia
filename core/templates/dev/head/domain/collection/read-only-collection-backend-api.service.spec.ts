@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ReadOnlyCollectionBackendApiService.
  */
 
-require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('domain/collection/read-only-collection-backend-api.service.ts');
 
 describe('Read only collection backend API service', function() {
   var ReadOnlyCollectionBackendApiService = null;

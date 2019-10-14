@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for EditableExplorationBackendApiService.
  */
 
-require('domain/exploration/EditableExplorationBackendApiService.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('services/CsrfTokenService.ts');
 
 describe('Editable exploration backend API service', function() {

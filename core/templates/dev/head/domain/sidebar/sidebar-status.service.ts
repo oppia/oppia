@@ -17,7 +17,7 @@
  * hamburger-menu sidebar.
  */
 
-require('services/contextual/WindowDimensionsService.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').factory('SidebarStatusService', [
   'WindowDimensionsService', function(WindowDimensionsService) {

@@ -16,7 +16,7 @@
  * @fileoverview Service to send changes to a skill to the backend.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('domain/skill/skill-domain.constants.ajs.ts');
 

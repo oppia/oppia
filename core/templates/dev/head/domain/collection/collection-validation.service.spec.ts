@@ -23,7 +23,7 @@ import { CollectionNodeObjectFactory } from
 import { Collection, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionValidationService } from
-  'domain/collection/CollectionValidationService';
+  'domain/collection/collection-validation.service';
 
 describe('Collection validation service', function() {
   let collectionValidationService: CollectionValidationService = null;

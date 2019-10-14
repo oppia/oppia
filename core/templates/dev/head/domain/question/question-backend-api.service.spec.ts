@@ -15,7 +15,7 @@
  * @fileoverview Unit tests for QuestionBackendApiService.
  */
 
-require('domain/question/QuestionBackendApiService.ts');
+require('domain/question/question-backend-api.service.ts');
 
 describe('Question backend Api service', function() {
   var QuestionBackendApiService = null;

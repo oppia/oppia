@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ConceptCardBackendApiService.
  */
 
-require('domain/skill/ConceptCardBackendApiService.ts');
+require('domain/skill/concept-card-backend-api.service.ts');
 
 describe('Concept card backend API service', function() {
   var ConceptCardBackendApiService = null;

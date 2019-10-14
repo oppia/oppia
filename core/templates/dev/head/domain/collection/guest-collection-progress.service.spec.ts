@@ -23,7 +23,7 @@ import { CollectionNodeObjectFactory } from
 import { Collection, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { GuestCollectionProgressService } from
-  'domain/collection/GuestCollectionProgressService';
+  'domain/collection/guest-collection-progress.service';
 
 describe('Guest collection progress service', () => {
   let guestCollectionProgressService = null;

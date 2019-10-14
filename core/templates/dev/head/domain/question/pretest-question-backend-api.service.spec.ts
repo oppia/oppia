@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for PretestQuestionBackendApiService.
  */
 
-require('domain/question/PretestQuestionBackendApiService.ts');
+require('domain/question/pretest-question-backend-api.service.ts');
 
 describe('Pretest question backend API service', function() {
   var PretestQuestionBackendApiService = null;

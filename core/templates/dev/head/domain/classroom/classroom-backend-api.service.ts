@@ -16,7 +16,7 @@
  * @fileoverview Service to get classroom data.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('domain/classroom/classroom-domain.constants.ajs.ts');
 

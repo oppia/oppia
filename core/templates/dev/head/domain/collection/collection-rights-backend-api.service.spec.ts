@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CollectionRightsBackendApiService.
  */
 
-require('domain/collection/CollectionRightsBackendApiService.ts');
+require('domain/collection/collection-rights-backend-api.service.ts');
 require('pages/collection-editor-page/collection-editor-page.directive.ts');
 require('services/CsrfTokenService.ts');
 

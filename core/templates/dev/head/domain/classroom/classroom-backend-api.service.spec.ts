@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TopicViewerBackendApiService.
  */
 
-require('domain/classroom/ClassroomBackendApiService.ts');
+require('domain/classroom/classroom-backend-api.service.ts');
 
 describe('Classroom backend API service', function() {
   var ClassroomBackendApiService = null;

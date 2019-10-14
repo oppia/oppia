@@ -16,7 +16,7 @@
  * @fileoverview Service to change the rights of collections in the backend.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('CollectionRightsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',

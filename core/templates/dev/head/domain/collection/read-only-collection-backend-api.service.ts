@@ -17,7 +17,7 @@
  * about collections from the backend.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 // TODO(bhenning): For preview mode, this service should be replaced by a
 // separate CollectionDataService implementation which returns a local copy of

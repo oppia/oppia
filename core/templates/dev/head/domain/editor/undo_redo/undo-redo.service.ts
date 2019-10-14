@@ -16,7 +16,7 @@
  * @fileoverview Undo Redo Service.
  */
 
-require('domain/editor/undo_redo/BaseUndoRedoService.ts');
+require('domain/editor/undo_redo/base-undo-redo.service.ts');
 
 angular.module('oppia').factory('UndoRedoService', [
   'BaseUndoRedoService', function(BaseUndoRedoService) {

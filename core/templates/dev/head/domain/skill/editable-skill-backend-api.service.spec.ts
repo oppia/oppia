@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for EditableSkillBackendApiService.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/skill/editable-skill-backend-api.service.ts');
 require('services/CsrfTokenService.ts');
 
 describe('Editable skill backend API service', function() {

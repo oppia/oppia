@@ -17,7 +17,7 @@
  */
 
 require('App.ts');
-require('domain/skill/SkillRightsBackendApiService.ts');
+require('domain/skill/skill-rights-backend-api.service.ts');
 require('pages/skill-editor-page/skill-editor-page.controller.ts');
 require('services/CsrfTokenService.ts');
 

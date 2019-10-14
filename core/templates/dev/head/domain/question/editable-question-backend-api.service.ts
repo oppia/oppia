@@ -17,14 +17,14 @@
  *  backend.
  */
 
-require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/collection/guest-collection-progress.service.ts');
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/ParamSpecObjectFactory.ts');
 require('domain/exploration/WrittenTranslationObjectFactory.ts');
 require('domain/objects/FractionObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('domain/question/question-domain.constants.ajs.ts');
 

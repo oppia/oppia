@@ -16,8 +16,8 @@
  * @fileoverview Service to search explorations metadata.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').factory('SearchExplorationsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',

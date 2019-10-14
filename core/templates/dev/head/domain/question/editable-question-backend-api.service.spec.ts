@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
-require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/editable-question-backend-api.service.ts');
 require('services/CsrfTokenService.ts');
 
 describe('Editable question backend API service', function() {

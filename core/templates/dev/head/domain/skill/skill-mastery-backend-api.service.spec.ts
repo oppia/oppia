@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SkillMasteryBackendApiService.
  */
 
-require('domain/skill/SkillMasteryBackendApiService.ts');
+require('domain/skill/skill-mastery-backend-api.service.ts');
 
 describe('Skill mastery backend API service', function() {
   var SkillMasteryBackendApiService = null;

@@ -26,8 +26,8 @@ import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/collection/CollectionUpdateService.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/collection/collection-update.service.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 
 describe('Collection update service', function() {
   var CollectionUpdateService = null;

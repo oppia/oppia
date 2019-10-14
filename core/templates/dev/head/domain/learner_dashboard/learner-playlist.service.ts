@@ -16,7 +16,7 @@
  * @fileoverview Service related to the learner playlist.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 
 angular.module('oppia').factory('LearnerPlaylistService', [

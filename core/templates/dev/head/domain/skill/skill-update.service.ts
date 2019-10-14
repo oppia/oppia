@@ -17,7 +17,7 @@
  */
 
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/skill/SkillObjectFactory.ts');
 
 require('domain/skill/skill-domain.constants.ajs.ts');

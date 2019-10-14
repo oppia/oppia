@@ -16,8 +16,8 @@
  * @fileoverview Tests for LearnerPlaylistService.js.
  */
 
-require('domain/learner_dashboard/LearnerPlaylistService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/learner_dashboard/learner-playlist.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/CsrfTokenService.ts');
 
 describe('Learner playlist service factory', function() {

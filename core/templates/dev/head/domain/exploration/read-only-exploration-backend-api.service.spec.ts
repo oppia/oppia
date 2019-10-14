@@ -19,7 +19,7 @@
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
 describe('Read only exploration backend API service', function() {

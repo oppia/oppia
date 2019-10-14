@@ -16,7 +16,7 @@
  * @fileoverview Tests for SidebarStatusService.
  */
 
-require('domain/sidebar/SidebarStatusService.ts');
+require('domain/sidebar/sidebar-status.service.ts');
 
 describe('SidebarStatusService', function() {
   var SidebarStatusService, $window;
