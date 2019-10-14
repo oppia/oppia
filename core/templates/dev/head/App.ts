@@ -37,7 +37,6 @@ require('services/UserService.ts');
 require('services/PromoBarService.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 require('services/stateful/FocusManagerService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -71,18 +70,22 @@ require('google-analytics.initializer.ts');
 // loaded after app.constants.ts
 require('I18nFooter.ts');
 
+import {WindowDimensionsService} from
+  './services/contextual/WindowDimensionsService';
+// ^^^ This block is to be removed.
+
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider',
+  '$interpolateProvider', '$locationProvider', '$provide',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider) {
+      $interpolateProvider, $locationProvider, $provide) {
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
-
+    $provide.value('WindowDimensionsService', new WindowDimensionsService());
     // Set the AngularJS interpolators as <[ and ]>, to not conflict with
     // Jinja2 templates.
     $interpolateProvider.startSymbol('<[');
