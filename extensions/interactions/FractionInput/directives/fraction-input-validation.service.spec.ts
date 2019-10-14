@@ -16,22 +16,15 @@
  * @fileoverview Unit tests for fraction input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// fraction-input-validation.service.ts is upgraded to Angular 8.
 import { AppConstants } from 'app.constants';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
 describe('FractionInputValidationService', () => {
   var validatorService, WARNING_TYPES;
@@ -52,13 +45,10 @@ describe('FractionInputValidationService', () => {
   var oof, agof, rof;
 
   beforeEach(() => {
-    validatorService = new FractionInputValidationService(
-      new FractionObjectFactory(), new baseInteractionValidationService());
-    oof = new OutcomeObjectFactory(new SubtitledHtmlObjectFactory());
-    agof = new AnswerGroupObjectFactory(
-      new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-      new RuleObjectFactory());
-    rof = new RuleObjectFactory();
+    validatorService = TestBed.get(FractionInputValidationService);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     createFractionDict = function(
