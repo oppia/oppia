@@ -21,6 +21,11 @@
 // needs to be imported explicitly.
 import $ from 'jquery';
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('services/CsrfTokenService.ts');
 
 describe('Csrf Token Service', function() {
@@ -30,6 +35,12 @@ describe('Csrf Token Service', function() {
   var CsrfTokenService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function(
       _$httpBackend_, _$q_, _$rootScope_, _CsrfTokenService_) {
     $httpBackend = _$httpBackend_;

@@ -19,15 +19,15 @@
 import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
 
-describe('Skill Difficulty object factory', function() {
-  describe('SkillDifficultyObjectFactory', function() {
+describe('Skill Difficulty object factory', () => {
+  describe('SkillDifficultyObjectFactory', () => {
     let skillDifficultyObjectFactory: SkillDifficultyObjectFactory;
 
     beforeEach(() => {
       skillDifficultyObjectFactory = new SkillDifficultyObjectFactory();
     });
 
-    it('should create a new skill difficulty instance', function() {
+    it('should create a new skill difficulty instance', () => {
       var skillDifficulty =
         skillDifficultyObjectFactory.create('1', 'test skill', 0.3);
       expect(skillDifficulty.getId()).toEqual('1');
@@ -35,7 +35,7 @@ describe('Skill Difficulty object factory', function() {
       expect(skillDifficulty.getDifficulty()).toEqual(0.3);
     });
 
-    it('should convert to a backend dictionary', function() {
+    it('should convert to a backend dictionary', () => {
       var skillDifficulty =
         skillDifficultyObjectFactory.create('1', 'test skill', 0.3);
       var skillDifficultyDict = {

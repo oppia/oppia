@@ -38,8 +38,8 @@ describe('ImprovementActionButtonObjectFactory', () => {
     });
   });
 
-  describe('.execute', function() {
-    it('executes the passed function when called', function() {
+  describe('.execute', () => {
+    it('executes the passed function when called', () => {
       var flagToSetOnCallback = false;
       var improvementAction = improvementActionButtonObjectFactory.createNew(
         'Test', 'btn-success', () => flagToSetOnCallback = true);
@@ -50,15 +50,15 @@ describe('ImprovementActionButtonObjectFactory', () => {
     });
   });
 
-  describe('.isEnabled', function() {
-    it('is always true when no enabled func is provided', function() {
+  describe('.isEnabled', () => {
+    it('is always true when no enabled func is provided', () => {
       var improvementAction = improvementActionButtonObjectFactory.createNew(
         'Test', 'btn-success', () => {});
 
       expect(improvementAction.isEnabled()).toBe(true);
     });
 
-    it('returns the same value that the enabled func does', function() {
+    it('returns the same value that the enabled func does', () => {
       var boolValue = true;
       var improvementAction = improvementActionButtonObjectFactory.createNew(
         'Test', 'btn-success', () => {}, () => boolValue);

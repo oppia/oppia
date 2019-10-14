@@ -24,6 +24,7 @@ import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('services/PlaythroughIssuesBackendApiService.ts');
@@ -38,6 +39,12 @@ describe('PlaythroughIssuesBackendApiService', function() {
     $provide.value(
       'PlaythroughObjectFactory', new PlaythroughObjectFactory(
         new LearnerActionObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

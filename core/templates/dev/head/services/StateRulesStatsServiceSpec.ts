@@ -27,6 +27,7 @@ import { ClassifierObjectFactory } from
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -42,6 +43,12 @@ describe('State Rules Stats Service', function() {
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());

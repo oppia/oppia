@@ -17,52 +17,71 @@
  * domain objects.
  */
 
-angular.module('oppia').factory('LearnerAnswerInfoObjectFactory', [
-  function() {
-    var LearnerAnswerInfo = function(learnerAnswerInfoId, answer,
-        answerDetails, createdOn) {
-      this._id = learnerAnswerInfoId;
-      this._answer = answer;
-      this._answerDetails = answerDetails;
-      this._createdOn = createdOn;
-    };
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-    LearnerAnswerInfo.prototype.getId = function() {
-      return this._id;
-    };
+export interface LearnerAnswerInfoBackendDict {
+  id: string;
+  answer: string;
+  /* eslint-disable camelcase */
+  answer_details: string;
+  created_on: number;
+  /* eslint-enable camelcase */
+}
 
-    LearnerAnswerInfo.prototype.getAnswer = function() {
-      return this._answer;
-    };
+export class LearnerAnswerInfo {
+  _id: string;
+  _answer: string;
+  _answerDetails: string;
+  _createdOn: number;
 
-    LearnerAnswerInfo.prototype.getAnswerDetails = function() {
-      return this._answerDetails;
-    };
-
-    LearnerAnswerInfo.prototype.getCreatedOn = function() {
-      return this._createdOn;
-    };
-
-    /* eslint-disable dot-notation */
-    LearnerAnswerInfo['createDefaultLearnerAnswerInfo'] = function(answer,
-        answerDetails) {
-    /* eslint-enable dot-notation */
-      return new LearnerAnswerInfo(null, answer, answerDetails,
-        null);
-    };
-
-    /* eslint-disable dot-notation */
-    LearnerAnswerInfo['createFromBackendDict'] = function(
-        learnerAnswerInfoDict) {
-    /* eslint-enable dot-notation */
-      return new LearnerAnswerInfo(
-        learnerAnswerInfoDict.id,
-        learnerAnswerInfoDict.answer,
-        learnerAnswerInfoDict.answer_details,
-        learnerAnswerInfoDict.created_on
-      );
-    };
-
-    return LearnerAnswerInfo;
+  constructor(
+      learnerAnswerInfoId: string, answer: string, answerDetails: string,
+      createdOn: number) {
+    this._id = learnerAnswerInfoId;
+    this._answer = answer;
+    this._answerDetails = answerDetails;
+    this._createdOn = createdOn;
   }
-]);
+
+  getId(): string {
+    return this._id;
+  }
+
+  getAnswer(): string {
+    return this._answer;
+  }
+
+  getAnswerDetails(): string {
+    return this._answerDetails;
+  }
+
+  getCreatedOn(): number {
+    return this._createdOn;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerAnswerInfoObjectFactory {
+  createDefaultLearnerAnswerInfo(
+      answer: string, answerDetails: string): LearnerAnswerInfo {
+    return new LearnerAnswerInfo(
+      null, answer, answerDetails, null);
+  }
+
+  createFromBackendDict(
+      learnerAnswerInfoDict: LearnerAnswerInfoBackendDict): LearnerAnswerInfo {
+    return new LearnerAnswerInfo(
+      learnerAnswerInfoDict.id,
+      learnerAnswerInfoDict.answer,
+      learnerAnswerInfoDict.answer_details,
+      learnerAnswerInfoDict.created_on
+    );
+  }
+}
+
+angular.module('oppia').factory(
+  'LearnerAnswerInfoObjectFactory',
+  downgradeInjectable(LearnerAnswerInfoObjectFactory));

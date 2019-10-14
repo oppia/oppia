@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for RubricObjectFactory.
  */
 
-import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory.ts';
+import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
 
 describe('Rubric object factory', () => {
   describe('RubricObjectFactory', () => {

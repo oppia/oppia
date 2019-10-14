@@ -18,14 +18,14 @@
 
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 
-describe('Count vectorizer service', function() {
-  describe('Test count vectorizer service', function() {
+describe('Count vectorizer service', () => {
+  describe('Test count vectorizer service', () => {
     let service: CountVectorizerService;
     beforeEach(() => {
       service = new CountVectorizerService();
     });
 
-    it('should produce correct vector from tokens', function() {
+    it('should produce correct vector from tokens', () => {
       var tokens = ['a', 'b', 'a', 'c', 'd', 'b', 'a'];
       var vocabulary = {
         a: 0, b: 1, c: 2

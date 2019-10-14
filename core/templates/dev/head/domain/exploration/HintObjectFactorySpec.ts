@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 
-describe('Hint object factory', function() {
+describe('Hint object factory', () => {
   var hof: HintObjectFactory = null;
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -31,7 +31,7 @@ describe('Hint object factory', function() {
   });
 
   it('should create a Hint from dict and convert a Hint Object to' +
-     'backend dict correctly', inject(function() {
+     'backend dict correctly', inject(() => {
     var testHint = hof.createNew('content_id', '<p>Some Hint</p>');
     expect(testHint.toBackendDict()).toEqual({
       hint_content: {
@@ -47,7 +47,7 @@ describe('Hint object factory', function() {
     })).toEqual(hof.createNew('content_id', '<p>Some Hint</p>'));
   }));
 
-  it('should be able to create a new hint object', inject(function() {
+  it('should be able to create a new hint object', inject(() => {
     expect(hof.createNew('content_id', '<p>Some Hint</p>')).toEqual(
       hof.createFromBackendDict({
         hint_content: {

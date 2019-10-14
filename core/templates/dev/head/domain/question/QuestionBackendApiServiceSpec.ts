@@ -15,6 +15,11 @@
  * @fileoverview Unit tests for QuestionBackendApiService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/question/QuestionBackendApiService.ts');
 
 describe('Question backend Api service', function() {
@@ -27,6 +32,12 @@ describe('Question backend Api service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionBackendApiService = $injector.get(

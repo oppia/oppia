@@ -18,39 +18,39 @@
 
 import { EditabilityService } from 'services/EditabilityService';
 
-describe('EditabilityService', function() {
+describe('EditabilityService', () => {
   let editabilityService: EditabilityService;
 
   beforeEach(() => {
     editabilityService = new EditabilityService();
   });
 
-  it('should allow to edit an exploration after the tutorial ends', function() {
+  it('should allow to edit an exploration after the tutorial ends', () => {
     editabilityService.onEndTutorial();
     editabilityService.markEditable();
     expect(editabilityService.isEditable()).toBe(true);
   });
 
   it('should allow to translate an exploration after the tutorial ends',
-    function() {
+    () => {
       editabilityService.onEndTutorial();
       editabilityService.markTranslatable();
       expect(editabilityService.isTranslatable()).toBe(true);
     });
 
   it('should allow to edit an exploration outside the tutorial mode',
-    function() {
+    () => {
       editabilityService.markEditable();
       expect(editabilityService.isEditableOutsideTutorialMode()).toBe(true);
     });
 
   it('should not allow to edit an exploration during tutorial mode',
-    function() {
+    () => {
       editabilityService.onStartTutorial();
       expect(editabilityService.isEditable()).toBe(false);
     });
 
-  it('should not allow to edit an uneditable exploration', function() {
+  it('should not allow to edit an uneditable exploration', () => {
     editabilityService.markNotEditable();
     expect(editabilityService.isEditable()).toBe(false);
   });

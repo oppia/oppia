@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for the editor prerequisites page.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('pages/signup-page/signup-page.controller.ts');
 require('services/CsrfTokenService.ts');
 
@@ -26,6 +31,12 @@ describe('Signup controller', function() {
 
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+        $provide.value(key, value);
+      }
+    }));
 
     beforeEach(angular.mock.inject(function(
         _$componentController_, $http, _$httpBackend_, $injector, $rootScope,

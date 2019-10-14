@@ -21,6 +21,7 @@
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/library-page/library-page.directive.ts');
@@ -35,6 +36,12 @@ describe('Library controller', function() {
     beforeEach(function() {
       angular.mock.module('ui.bootstrap');
     });
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+        $provide.value(key, value);
+      }
+    }));
 
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));

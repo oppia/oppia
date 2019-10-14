@@ -84,12 +84,12 @@ describe('Collection validation service', function() {
       _sampleCollection);
   };
 
-  it('should not find issues with a collection with one node', function() {
+  it('should not find issues with a collection with one node', () => {
     var issues = _findPrivateValidationIssues();
     expect(issues).toEqual([]);
   });
 
-  it('should expect at least one collection node', function() {
+  it('should expect at least one collection node', () => {
     expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
     expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
 
@@ -98,7 +98,7 @@ describe('Collection validation service', function() {
       'There should be at least 1 exploration in the collection.']);
   });
 
-  it('should detect nonexistent/inaccessible explorations', function() {
+  it('should detect nonexistent/inaccessible explorations', () => {
     expect(_addCollectionNode(
       'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS)).toBe(true);
     var node0 = _getCollectionNode('exp_id0');
@@ -112,7 +112,7 @@ describe('Collection validation service', function() {
   });
 
   it('should allow private and public explorations in a private collection',
-    function() {
+    () => {
       expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
       expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBe(true);
       var node0 = _getCollectionNode('exp_id0');
@@ -125,7 +125,7 @@ describe('Collection validation service', function() {
   );
 
   it('should not allow private explorations in a public collection',
-    function() {
+    () => {
       expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
       var node1 = _getCollectionNode('exp_id1');
       var node0 = _getCollectionNode('exp_id0');
@@ -141,7 +141,7 @@ describe('Collection validation service', function() {
     }
   );
 
-  it('should be able to detect multiple validation issues', function() {
+  it('should be able to detect multiple validation issues', () => {
     expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
     expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
 
@@ -156,7 +156,7 @@ describe('Collection validation service', function() {
     ]);
   });
 
-  it('should return false if the tags are not valid', function() {
+  it('should return false if the tags are not valid', () => {
     expect(collectionValidationService.isTagValid(['test'])).toBe(true);
     expect(collectionValidationService.isTagValid(['test', 'math'])).toBe(true);
 

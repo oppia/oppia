@@ -22,6 +22,7 @@ import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/objects/FractionObjectFactory.ts');
@@ -33,6 +34,12 @@ describe('NumberWithUnitsObjectFactory', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
 
   describe('number with units object factory', function() {
