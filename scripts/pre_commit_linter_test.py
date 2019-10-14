@@ -31,8 +31,17 @@ LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'linter_tests')
 VALID_HTML_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.html')
 INVALID_HTML_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.html')
 
+VALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.css')
+INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
+
 VALID_PYTHON_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
 INVALID_PYTHON_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.py')
+
+VALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.js')
+INVALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.js')
+
+VALID_TS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
+INVALID_TS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.ts')
 
 
 def mock_exit(unused_status):
@@ -92,17 +101,27 @@ class LintTests(test_utils.GenericTestBase):
     def setUp(self):
         super(LintTests, self).setUp()
         self.linter_stdout = []
-        def mock_print(val):
+        def mock_print(*args):
             """Mock for python_utils.PRINT. Append the values to print to
             linter_stdout list.
 
             Args:
-                val: str. The value to print.
+                *args: Variable length argument list of values to print in
+                the same line of output.
             """
-            if isinstance(val, list):
-                self.linter_stdout.extend(val)
+            if len(args) == 1:
+                if isinstance(args[0], list):
+                    # Assumption that passing in a list by itself implies
+                    # that each item was a print statement.
+                    self.linter_stdout.extend(args[0])
+                else:
+                    self.linter_stdout.append(args[0])
             else:
-                self.linter_stdout.append(val)
+                # This is included in order to support the common python
+                # print functionality print('a', 'b') -> 'a b'. This is a
+                # separate condition since pre_commit_linter prints
+                # occasionally passes in a unicode input by itself.
+                self.linter_stdout.append(' '.join(str(arg) for arg in args))
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
         self.sys_swap = self.swap(sys, 'exit', mock_exit)
 
@@ -137,6 +156,43 @@ class HTMLLintTests(LintTests):
         self.assertTrue('FAILED   HTML linting failed' in self.linter_stdout)
 
 
+class CSSLintTests(LintTests):
+    """"Test the CSS lint functions."""
+    def setUp(self):
+        super(CSSLintTests, self).setUp()
+        self.js_ts_lint_swap = self.swap(
+            pre_commit_linter.JsTsLintChecksManager, 'perform_all_lint_checks',
+            mock_perform_all_lint_checks)
+        self.check_codeowner_swap = self.swap(
+            pre_commit_linter, 'check_codeowner_file',
+            mock_check_codeowner_file)
+
+    def test_valid_css_file(self):
+        with self.print_swap, self.js_ts_lint_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % VALID_CSS_FILEPATH])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['SUCCESS   1 CSS file linted'],
+                self.linter_stdout)
+            )
+
+    def test_invalid_css_file(self):
+        with self.print_swap, self.sys_swap:
+            with self.js_ts_lint_swap, self.check_codeowner_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_CSS_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['18:16',
+                'Unexpected whitespace before \":\"   declaration-colon-space-before',
+                'FAILED    1 CSS file'],
+                self.linter_stdout
+                )
+            )
+
+
 class PythonLintTests(LintTests):
     """Test the Python lint functions."""
     def setUp(self):
@@ -155,7 +211,8 @@ class PythonLintTests(LintTests):
         self.assertTrue(
             appears_in_linter_stdout(
                 ['SUCCESS   1 Python files linted'],
-                self.linter_stdout))
+                self.linter_stdout)
+            )
 
     def test_invalid_python_file(self):
         with self.print_swap, self.sys_swap:
@@ -166,4 +223,83 @@ class PythonLintTests(LintTests):
         self.assertTrue(appears_in_linter_stdout(
             ['C: 24, 0: Missing class docstring (missing-docstring)',
             'FAILED    Python linting failed'],
-            self.linter_stdout))
+            self.linter_stdout)
+        )
+
+
+class JsAndTsLintTests(LintTests):
+    """Test the JavaScript and TypeScript lint functions."""
+    def setUp(self):
+        super(JsAndTsLintTests, self).setUp()
+        self.other_lints_swap = self.swap(
+            pre_commit_linter.OtherLintChecksManager, 'perform_all_lint_checks',
+            mock_perform_all_lint_checks)
+        self.check_codeowner_swap = self.swap(
+            pre_commit_linter, 'check_codeowner_file',
+            mock_check_codeowner_file)
+
+    def test_valid_js_file(self):
+        with self.print_swap, self.other_lints_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % VALID_JS_FILEPATH])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['SUCCESS   1 JavaScript and Typescript files linted'],
+                self.linter_stdout)
+            )
+
+    def test_invalid_js_file(self):
+        with self.print_swap, self.sys_swap:
+            with self.other_lints_swap, self.check_codeowner_swap:
+                pre_commit_linter.main(args=['--path=%s' % INVALID_JS_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(appears_in_linter_stdout(
+            ['35:63  error  Closing curly brace should be on the same line '
+            'as opening curly brace or on the line after the previous block  '
+            'brace-style',
+            'FAILED    1 JavaScript and Typescript files'],
+            self.linter_stdout)
+        )
+
+    def test_valid_ts_file(self):
+        with self.print_swap, self.other_lints_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % VALID_TS_FILEPATH])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['SUCCESS   1 JavaScript and Typescript files linted'],
+                self.linter_stdout)
+            )
+
+    def test_invalid_ts_file(self):
+        with self.print_swap, self.sys_swap:
+            with self.other_lints_swap, self.check_codeowner_swap:
+                pre_commit_linter.main(args=['--path=%s' % INVALID_TS_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(appears_in_linter_stdout(
+            ['21:3  error  Extra space after key \'value\'  key-spacing',
+            'FAILED    1 JavaScript and Typescript files'],
+            self.linter_stdout)
+        )
+
+
+class GeneralLintTests(LintTests):
+    """"Tests all other general lint functions."""
+    def setUp(self):
+        super(GeneralLintTests, self).setUp()
+        self.other_lints_swap = self.swap(
+            pre_commit_linter.OtherLintChecksManager, 'perform_all_lint_checks',
+            mock_perform_all_lint_checks)
+        self.js_ts_lint_swap = self.swap(
+            pre_commit_linter.JsTsLintChecksManager, 'perform_all_lint_checks',
+            mock_perform_all_lint_checks)
+
+    # TODO(#7590): Add codeowner checks.
+    # Don't want to run this over snapshot of current branch, need a smaller
+    # example in core/tests/linter_tests with spoofed .github/CODEOWNERS files.
+    def test_valid_codeowner_file(self):
+        pass
+
+    def test_invalid_codeowner_file(self):
+        pass
+
