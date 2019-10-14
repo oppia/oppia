@@ -23,6 +23,7 @@ import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
 
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
@@ -35,7 +36,8 @@ export class ServiceBootstrapComponent {}
 @NgModule({
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    TranslateModule.forRoot()
   ],
   declarations: [
     ServiceBootstrapComponent
