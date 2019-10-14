@@ -16,12 +16,24 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { Injectable } from '@angular/core';
+import {ErrorHandler, Injectable} from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { UtilsService } from 'services/UtilsService';
 import { LoggerService } from './LoggerService';
 import { SearchService } from './SearchService';
+import {EventService} from './EventService';
+import {HttpClient, HttpEvent, HttpHandler,
+  HttpRequest} from '@angular/common/http';
+import {
+  MissingTranslationHandler, MissingTranslationHandlerParams,
+  TranslateCompiler,
+  TranslateLoader,
+  TranslateParser,
+  TranslateService,
+  TranslateStore
+} from '@ngx-translate/core';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -30,8 +42,36 @@ export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
     'UtilsService': new UtilsService(),
-    'LoggerService': new LoggerService(),
-    'SearchService': new SearchService()
+    'LoggerService': new LoggerService(new ErrorHandler()),
+    'SearchService': new SearchService(new EventService(),
+      new LoggerService(new ErrorHandler()),
+      new HttpClient(new class extends HttpHandler {
+        handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+          return undefined;
+        }
+      }), new TranslateService(new TranslateStore(),
+        new class extends TranslateLoader {
+          getTranslation(lang: string): Observable<any> {
+            return undefined;
+          }
+        }, new class extends TranslateCompiler {
+          compile(value: string, lang: string): string | Function {
+            return undefined;
+          }
+
+          compileTranslations(translations: any, lang: string): any {
+          }
+        }, new class extends TranslateParser {
+          getValue(target: any, key: string): any {
+          }
+
+          interpolate(expr: string | Function, params?: any): string {
+            return '';
+          }
+        }, new class extends MissingTranslationHandler {
+          handle(params: MissingTranslationHandlerParams): any {
+          }
+        }))
   };
   /* eslint-enable quote-props */
 }

@@ -16,29 +16,72 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
+import {SearchService} from './SearchService';
+import {EventService} from './EventService';
+import {LoggerService} from './LoggerService';
+import {ErrorHandler} from '@angular/core';
+import {HttpClient, HttpEvent, HttpHandler,
+  HttpRequest} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {
+  MissingTranslationHandler, MissingTranslationHandlerParams,
+  TranslateCompiler,
+  TranslateLoader,
+  TranslateParser,
+  TranslateService,
+  TranslateStore
+} from '@ngx-translate/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('services/SearchService.ts');
-
 describe('Search service', function() {
-  var SearchService;
+  var searchService: SearchService;
 
-  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.upgradedServices)) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector) {
-    SearchService = $injector.get('SearchService');
-  }));
+
+  beforeEach(() => {
+    searchService = new SearchService(new EventService(),
+      new LoggerService(new ErrorHandler()),
+      new HttpClient(new class extends HttpHandler {
+        handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+          return undefined;
+        }
+      }), new TranslateService(new TranslateStore(),
+        new class extends TranslateLoader {
+          getTranslation(lang: string): Observable<any> {
+            return undefined;
+          }
+        }, new class extends TranslateCompiler {
+          compile(value: string, lang: string): string | Function {
+            return undefined;
+          }
+
+          compileTranslations(translations: any, lang: string): any {
+          }
+        }, new class extends TranslateParser {
+          getValue(target: any, key: string): any {
+          }
+
+          interpolate(expr: string | Function, params?: any): string {
+            return '';
+          }
+        }, new class extends MissingTranslationHandler {
+          handle(params: MissingTranslationHandlerParams): any {
+          }
+        }));
+  });
+
 
   it('should find two categories and two languages if given in url search',
-    function() {
+    () => {
       var results = {
         categories: {
           description: '',
@@ -59,7 +102,7 @@ describe('Search service', function() {
       };
       var urlComponent = '?q=test&category=("Architecture"%20OR%20' +
                          '"Mathematics")&language_code=("en"%20OR%20"ar")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         ar: true,
@@ -72,7 +115,7 @@ describe('Search service', function() {
     });
 
   it('should find one category and two languages if given in url search',
-    function() {
+    () => {
       var results = {
         categories: {
           description: '',
@@ -93,7 +136,7 @@ describe('Search service', function() {
       };
       var urlComponent = '?q=test&category=("Mathematics")&' +
                          'language_code=("en"%20OR%20"ar")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         ar: true,
@@ -106,7 +149,7 @@ describe('Search service', function() {
   );
 
   it('should find one category and one language if given in url search',
-    function() {
+    () => {
       var results = {
         categories: {
           description: '',
@@ -127,7 +170,7 @@ describe('Search service', function() {
       };
       var urlComponent =
         '?q=test&category=("Mathematics")&language_code=("en")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         en: true
@@ -139,7 +182,7 @@ describe('Search service', function() {
   );
 
   it('should find no categories and one language if given in url search',
-    function() {
+    () => {
       var results = {
         categories: {
           description: '',
@@ -159,7 +202,7 @@ describe('Search service', function() {
         }
       };
       var urlComponent = '?q=test&language_code=("en")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         en: true
@@ -169,7 +212,7 @@ describe('Search service', function() {
   );
 
   it('should find as many keywords as provided in search query',
-    function() {
+    () => {
       var results = {
         categories: {
           description: '',
@@ -189,7 +232,7 @@ describe('Search service', function() {
         }
       };
       var urlComponent = '?q=protractor%20test&language_code=("en")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('protractor test');
       expect(results.languageCodes.selections).toEqual({
         en: true
@@ -199,7 +242,7 @@ describe('Search service', function() {
   );
 
   it('should not find languages nor categories when ampersand is escaped',
-    function() {
+    () => {
       var results = {
         categories: {
           description: '',
@@ -220,7 +263,7 @@ describe('Search service', function() {
       };
       var urlComponent = '?q=protractor%20test%26category=("Mathematics")' +
                          '%26language_code=("en"%20OR%20"ar")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('protractor test&category=("Mathematics")' +
                        '&language_code=("en" OR "ar")');
       expect(results.languageCodes.selections).toEqual({});
@@ -229,7 +272,7 @@ describe('Search service', function() {
   );
 
   it('should only use correct fields when ampersand is not escaped anywhere',
-    function() {
+    () => {
       var results = {
         categories: {
           description: '',
@@ -251,7 +294,7 @@ describe('Search service', function() {
       var urlComponent = '?q=protractor&test&category=("Mathematics")' +
                          '&language_code=("en"%20OR%20"ar")';
       expect(
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
       ).toBe('protractor');
       expect(results.languageCodes.selections).toEqual({
         en: true,
@@ -262,7 +305,7 @@ describe('Search service', function() {
   );
 
   it('should omit url component if it is malformed',
-    function() {
+    () => {
       var results = {
         categories: {
           description: '',
@@ -287,7 +330,7 @@ describe('Search service', function() {
       var urlComponent = (
         '?q=protractor%20test&category=("Mathematics")&' +
         'language_code="en" OR "ar")');
-      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+      searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({
         Mathematics: true
@@ -296,7 +339,7 @@ describe('Search service', function() {
       var urlComponent = (
         '?q=protractor%20test&category=("Mathematics")&' +
         'language_code="en" OR "ar"');
-      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+      searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({
         Mathematics: true
@@ -308,7 +351,7 @@ describe('Search service', function() {
       var urlComponent = (
         '?q=protractor%20test&category="Mathematics"&' +
         'language_code="en" OR "ar"');
-      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+      searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({});
     }

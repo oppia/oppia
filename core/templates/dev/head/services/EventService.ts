@@ -20,7 +20,7 @@ export class EventService {
       this._eventsSubject.next({ key, value });
     }
 
-    public GetEvent(key: string): Observable<T> {
+    public GetEvent(key: string): Observable<any> {
       return this._eventsSubject.asObservable()
         .pipe(
           filter(e => e.key === key),
