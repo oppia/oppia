@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for Expression Evaluator Service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('App.ts');
 require('expressions/expression-evaluator.service.ts');
 require('expressions/expression-parser.service.js');
@@ -24,6 +29,12 @@ require('services/UtilsService.ts');
 
 describe('Expression evaluator service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   var ees = null;
   var eps = null;
