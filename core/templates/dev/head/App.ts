@@ -41,7 +41,6 @@ require('services/UserService.ts');
 require('services/PromoBarService.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 require('services/stateful/FocusManagerService.ts');
 require('services/SiteAnalyticsService.ts');
