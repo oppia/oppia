@@ -39,7 +39,7 @@ def export_data_for_user(user_id):
         dict. Dictionary containing all user data.
     """
     models_to_export = [
-        user_models.UserStatsModel, 
+        user_models.UserStatsModel,
         user_models.UserSettingsModel,
         user_models.UserSubscriptionsModel,
         user_models.UserSkillMasteryModel,
