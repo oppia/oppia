@@ -75,7 +75,7 @@ import { ExplorationEditorPageConstants } from
     ServicesConstants,
     StateEditorConstants,
     StatisticsDomainConstants,
-    ExplorationEditorPageConstants
+    ExplorationEditorPageConstants,
   ]
 })
 class ExplorationEditorPageModule {
