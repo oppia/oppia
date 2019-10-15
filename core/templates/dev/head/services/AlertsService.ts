@@ -55,7 +55,7 @@ export class AlertsService {
   MAX_TOTAL_WARNINGS: number = 10;
   MAX_TOTAL_MESSAGES: number = 10;
 
-  constructor(log: LoggerService) {}
+  constructor(private log: LoggerService) {}
 
   /**
    * Adds a warning message.
