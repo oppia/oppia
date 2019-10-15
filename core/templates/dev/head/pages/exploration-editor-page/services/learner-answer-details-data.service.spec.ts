@@ -22,12 +22,15 @@ import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { UserInfoObjectFactory } from
+  'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/' +
   'learner-answer-details-data.service.ts');
 require('services/CsrfTokenService.ts');
+require('services/UserService.ts');
 
 describe('Learner answer details service', function() {
   var expId = '12345';
@@ -35,6 +38,8 @@ describe('Learner answer details service', function() {
   var sampleDataResults = null;
   var $httpBackend = null;
   var CsrfService = null;
+  var UserService = null;
+  var $q = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -47,6 +52,8 @@ describe('Learner answer details service', function() {
         new LearnerAnswerDetailsObjectFactory());
       $provide.value(
         'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
+      $provide.value(
+        'UserInfoObjectFactory', new UserInfoObjectFactory());
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -61,6 +68,7 @@ describe('Learner answer details service', function() {
       'LearnerAnswerDetailsDataService');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
+    UserService = $injector.get('UserService');
 
     sampleDataResults = {
       learner_answer_info_data: [{
@@ -81,6 +89,10 @@ describe('Learner answer details service', function() {
     });
   }));
 
+  beforeEach(angular.mock.inject(function(_$q_) {
+    $q = _$q_;
+  }));
+
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
@@ -92,8 +104,13 @@ describe('Learner answer details service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/userinfohandler').respond(
-      {user_is_logged_in: true});
+    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
+      return $q.resolve({
+        isLoggedIn: function() {
+          return true;
+        }
+      });
+    });
     $httpBackend.expect('GET', '/learneranswerinfohandler/' +
       'learner_answer_details/exploration/12345').respond(sampleDataResults);
     LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
@@ -110,12 +127,15 @@ describe('Learner answer details service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/userinfohandler').respond(
-      {user_is_logged_in: false});
+    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
+      return $q.resolve({
+        isLoggedIn: function() {
+          return false;
+        }
+      });
+    });
     LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
       successHandler, failHandler);
-    $httpBackend.flush();
-
     expect(successHandler).toHaveBeenCalledWith({
       learner_answer_info_data: []
     });

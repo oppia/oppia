@@ -21,13 +21,14 @@ require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/statistics/LearnerAnswerInfoObjectFactory.ts');
 require('domain/statistics/LearnerAnswerDetailsObjectFactory.ts');
+require('services/UserService.ts');
 
 angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
   '$http', '$q', 'ExplorationDataService', 'LearnerAnswerDetailsObjectFactory',
-  'LearnerAnswerInfoObjectFactory', 'UrlInterpolationService',
+  'LearnerAnswerInfoObjectFactory', 'UrlInterpolationService', 'UserService',
   function(
       $http, $q, ExplorationDataService, LearnerAnswerDetailsObjectFactory,
-      LearnerAnswerInfoObjectFactory, UrlInterpolationService) {
+      LearnerAnswerInfoObjectFactory, UrlInterpolationService, UserService) {
     var _expId = ExplorationDataService.explorationId;
     var _data = [];
     var learnerAnswerInfoData = null;
@@ -36,10 +37,8 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
       '<entity_id>');
 
     var _fetchLearnerAnswerInfoData = function() {
-      return $http.get(
-        '/userinfohandler'
-      ).then(function(response) {
-        if (response.data.user_is_logged_in) {
+      return UserService.getUserInfoAsync().then(function(userInfo) {
+        if (userInfo.isLoggedIn()) {
           var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
             LEARNER_ANSWER_INFO_DATA_URL, {
               entity_type: 'exploration',
