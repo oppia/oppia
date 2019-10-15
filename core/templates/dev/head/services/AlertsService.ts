@@ -54,18 +54,15 @@ export class AlertsService {
   // This is to prevent infinite loops.
   MAX_TOTAL_WARNINGS: number = 10;
   MAX_TOTAL_MESSAGES: number = 10;
-  log: LoggerService;
 
-  constructor(logger: LoggerService) {
-    this.log = logger;
-  }
+  constructor(log: LoggerService) {}
 
   /**
    * Adds a warning message.
    * @param {string} warning - The warning message to display.
    */
   addWarning(warning: string): void {
-    this.log.warn(warning);
+    this.log.error(warning);
     if (this.warnings.length >= this.MAX_TOTAL_WARNINGS) {
       return;
     }
