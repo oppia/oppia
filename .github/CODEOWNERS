@@ -12,12 +12,11 @@
 #   can be optimized further.
 
 # Angular Migration team
+/core/templates/dev/head/services/contextual/LoggerService.ts @bansalnitish
 /core/templates/dev/head/services/UpgradedServices.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 /tsconfig-for-compile-check.json @ankita240796
-/core/templates/dev/head/services/UpgradedServices.ts @bansalnitish
-/core/templates/dev/head/services/contextual/LoggerService.ts @bansalnitish
 
 
 # Answer classification team.
