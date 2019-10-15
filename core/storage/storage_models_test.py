@@ -121,7 +121,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     msg='has_reference_to_user_id is not defined for %s' % (
                         clazz.__name__))
 
-    def test_base_models_do_not_have_has_reference_to_user_id(self):
+    def test_base_models_do_not_have_method_has_reference_to_user_id(self):
         for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
                 with self.assertRaises(NotImplementedError):
