@@ -2599,8 +2599,6 @@ def can_edit_entity(handler):
         # for the corresponding decorators.
         reduced_handler = functools.partial(
             arg_swapped_handler, entity_type)
-        if not self.IS_LOGGED_IN_CHECK_REQUIRED and not self.user_id:
-            return reduced_handler(self, entity_id, **kwargs)
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             return can_edit_exploration(reduced_handler)(
                 self, entity_id, **kwargs)

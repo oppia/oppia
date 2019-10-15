@@ -36,12 +36,23 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
       '<entity_id>');
 
     var _fetchLearnerAnswerInfoData = function() {
-      var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
-        LEARNER_ANSWER_INFO_DATA_URL, {
-          entity_type: 'exploration',
-          entity_id: _expId});
-
-      return $http.get(learnerAnswerInfoDataUrl);
+      var user_is_logged_in = false
+      $http.get(
+        '/userinfohandler'
+      ).then(function(response) {
+        if (response.data.user_is_logged_in) {
+          user_is_logged_in = true;
+        }
+      });
+      if (user_is_logged_in) {
+        var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
+            LEARNER_ANSWER_INFO_DATA_URL, {
+              entity_type: 'exploration',
+              entity_id: _expId});
+        return $http.get(learnerAnswerInfoDataUrl);
+      } else {
+        return $q.resolve({data: {learner_answer_info_data: []}})
+      }
     };
 
     var _deleteLearnerAnswerInfo = function(

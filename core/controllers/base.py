@@ -116,10 +116,6 @@ class BaseHandler(webapp2.RequestHandler):
     # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
 
-    # Whether exception is to be raised if user is not logged in and tries to
-    # edit any activity.
-    IS_LOGGED_IN_CHECK_REQUIRED = True
-
     # What format the get method returns when exception raised, json or html.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

@@ -780,7 +780,6 @@ class LearnerAnswerInfoHandler(EditorHandler):
     """Handles the learner answer info for an exploration state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    IS_LOGGED_IN_CHECK_REQUIRED = False
 
     @acl_decorators.can_edit_entity
     def get(self, entity_type, entity_id):
@@ -792,7 +791,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
         learner_answer_info_data = []
 
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION and self.user_id:
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             exp = exp_fetchers.get_exploration_by_id(entity_id)
             for state_name in exp.states:
                 state_reference = (
@@ -812,7 +811,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
                             learner_answer_info in
                             learner_answer_details.learner_answer_info_list]
                     })
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION and self.user_id:
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
             question = question_services.get_question_by_id(entity_id)
             state_reference = stats_services.get_state_reference_for_question(
                 entity_id)
