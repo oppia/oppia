@@ -180,6 +180,8 @@
 
 
 # Global frontend services
+/core/templates/dev/head/services/LoggerService.ts @showtim3
+/core/templates/dev/head/services/EventService.ts @showtim3
 /core/templates/dev/head/services/PromoBarService*.ts @ankita240796
 /core/templates/dev/head/services/HtmlEscaperService*.ts @ankita240796
 /core/templates/dev/head/services/DebouncerService*.ts @ankita240796
