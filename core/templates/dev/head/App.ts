@@ -75,12 +75,6 @@ require('google-analytics.initializer.ts');
 // loaded after app.constants.ts
 require('I18nFooter.ts');
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import {WindowDimensionsService} from
-  './services/contextual/WindowDimensionsService';
-// ^^^ This block is to be removed.
-
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
