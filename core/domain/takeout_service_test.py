@@ -444,7 +444,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0]
         }
 
-        expected_reply_to_id_data = {
+        expected_reply_to_data = {
             self.THREAD_ID_1: self.USER_1_REPLY_TO_ID_1,
             self.THREAD_ID_2: self.USER_1_REPLY_TO_ID_2
         }
@@ -464,15 +464,15 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         expected_export = {
-            'stats_data': stats_data,
-            'settings_data': settings_data,
-            'subscriptions_data': subscriptions_data,
-            'skill_data': skill_data,
-            'contribution_data': contribution_data,
-            'exploration_data': exploration_data,
+            'user_stats_data': stats_data,
+            'user_settings_data': settings_data,
+            'user_subscriptions_data': subscriptions_data,
+            'user_skill_mastery_data': skill_data,
+            'user_contributions_data': contribution_data,
+            'exploration_user_data_data': exploration_data,
             'completed_activities_data': completed_activities_data,
             'incomplete_activities_data': incomplete_activities_data,
-            'last_playthrough_data': last_playthrough_data,
+            'exp_user_last_playthrough_data': last_playthrough_data,
             'learner_playlist_data': learner_playlist_data,
             'collection_progress_data': collection_progress_data,
             'story_progress_data': story_progress_data,
@@ -481,7 +481,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'collection_rights_data': collection_rights_data,
             'general_suggestion_data': general_suggestion_data,
             'exploration_rights_data': exploration_rights_data,
-            'general_feedback_email_reply_data': expected_reply_to_id_data
+            'general_feedback_email_reply_to_id_data': expected_reply_to_data
         }
 
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)

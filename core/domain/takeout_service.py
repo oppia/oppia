@@ -19,6 +19,7 @@ from __future__ import absolute_import   # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+import re
 
 (
     user_models, collection_models, exploration_models, feedback_models,
@@ -36,34 +37,33 @@ def export_data_for_user(user_id):
     Returns:
         dict. Dictionary containing all user data.
     """
-
-    models_export_format = {
-        'stats_data': user_models.UserStatsModel,
-        'settings_data': user_models.UserSettingsModel,
-        'subscriptions_data': user_models.UserSubscriptionsModel,
-        'skill_data': user_models.UserSkillMasteryModel,
-        'contribution_data': user_models.UserContributionsModel,
-        'exploration_data': user_models.ExplorationUserDataModel,
-        'completed_activities_data': user_models.CompletedActivitiesModel,
-        'incomplete_activities_data': user_models.IncompleteActivitiesModel,
-        'last_playthrough_data': user_models.ExpUserLastPlaythroughModel,
-        'learner_playlist_data': user_models.LearnerPlaylistModel,
-        'collection_progress_data': user_models.CollectionProgressModel,
-        'story_progress_data': user_models.StoryProgressModel,
-        'general_feedback_thread_data': (
-            feedback_models.GeneralFeedbackThreadModel),
-        'general_feedback_message_data': (
-            feedback_models.GeneralFeedbackMessageModel),
-        'collection_rights_data': collection_models.CollectionRightsModel,
-        'general_suggestion_data': suggestion_models.GeneralSuggestionModel,
-        'exploration_rights_data': exploration_models.ExplorationRightsModel,
-        'general_feedback_email_reply_data': (
-            email_models.GeneralFeedbackEmailReplyToIdModel)
-    }
+    models_to_export = [
+        user_models.UserStatsModel, 
+        user_models.UserSettingsModel,
+        user_models.UserSubscriptionsModel,
+        user_models.UserSkillMasteryModel,
+        user_models.UserContributionsModel,
+        user_models.ExplorationUserDataModel,
+        user_models.CompletedActivitiesModel,
+        user_models.IncompleteActivitiesModel,
+        user_models.ExpUserLastPlaythroughModel,
+        user_models.LearnerPlaylistModel,
+        user_models.CollectionProgressModel,
+        user_models.StoryProgressModel,
+        feedback_models.GeneralFeedbackThreadModel,
+        feedback_models.GeneralFeedbackMessageModel,
+        collection_models.CollectionRightsModel,
+        suggestion_models.GeneralSuggestionModel,
+        exploration_models.ExplorationRightsModel,
+        email_models.GeneralFeedbackEmailReplyToIdModel
+    ]
 
     exported_data = dict()
-    for k, v in models_export_format.items():
-        exported_data[k] = v.export_data(user_id)
+    for model in models_to_export:
+        split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
+        final_name = ('_').join([x.lower() for x in split_name]) + '_data'
+        print(final_name)
+        exported_data[final_name] = model.export_data(user_id)
 
     # Combine the data into a single dictionary.
     return exported_data
