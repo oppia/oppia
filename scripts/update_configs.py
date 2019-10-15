@@ -23,12 +23,22 @@ Usage: Run this script from your oppia root folder:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import getpass
 import os
 import re
+import sys
 
 import python_utils
 
 from . import common
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 FECONF_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'feconf_updates.config')
@@ -36,9 +46,11 @@ CONSTANTS_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
 LOCAL_FECONF_PATH = os.path.join(os.getcwd(), 'feconf.py')
 LOCAL_CONSTANTS_PATH = os.path.join(os.getcwd(), 'assets', 'constants.ts')
+FECONF_REGEX = '^([A-Z_]+ = ).*$'
+CONSTANTS_REGEX = '^(  "[A-Z_]+": ).*$'
 
 
-def _apply_changes_based_on_config(
+def apply_changes_based_on_config(
         local_filepath, config_filepath, expected_config_line_regex):
     """Updates the local file based on the deployment configuration specified
     in the config file.
@@ -86,8 +98,75 @@ def _apply_changes_based_on_config(
         writable_local_file.write('\n'.join(local_lines) + '\n')
 
 
-def _update_configs():
-    """Updates the 'feconf.py' and 'constants.ts' files after doing the
+def check_updates_to_terms_of_service():
+    """Checks if updates are made to terms of service and updates
+    REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
+    """
+    personal_access_token = getpass.getpass(
+        prompt=(
+            'Please provide personal access token for your github ID. '
+            'You can create one at https://github.com/settings/tokens: '))
+
+    if personal_access_token is None:
+        raise Exception(
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script')
+    g = github.Github(personal_access_token)
+    repo = g.get_organization('oppia').get_repo('oppia')
+
+    common.open_new_tab_in_browser_if_possible(
+        'https://github.com/oppia/oppia/commits/develop/core/'
+        'templates/dev/head/pages/terms-page/terms-page.mainpage.html')
+    python_utils.PRINT(
+        'Is terms of service of changed? Check commits/changes made '
+        'to the file: terms-page.mainpage.html. Enter y/ye/yes if they '
+        'are changed else enter n/no.')
+    is_terms_of_service_changed = python_utils.INPUT().lower()
+    if is_terms_of_service_changed.lower() not in ['y', 'ye', 'yes', 'n', 'no']:
+        raise Exception('Invalid Input: %s' % is_terms_of_service_changed)
+
+    if is_terms_of_service_changed in ['y', 'ye', 'yes']:
+        python_utils.PRINT(
+            'Enter sha of the commit which changed the terms of service.')
+        commit_sha = python_utils.INPUT().lstrip().rstrip()
+        commit_time = repo.get_commit(commit_sha).commit.committer.date
+        time_tuple = (
+            commit_time.year, commit_time.month, commit_time.day,
+            commit_time.hour, commit_time.minute, commit_time.second)
+        feconf_lines = []
+        with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
+            feconf_lines = f.readlines()
+        with python_utils.open_file(LOCAL_FECONF_PATH, 'w') as f:
+            for line in feconf_lines:
+                if line.startswith('REGISTRATION_PAGE_LAST_UPDATED_UTC'):
+                    line = (
+                        'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                        'datetime.datetime(%s, %s, %s, %s, %s, %s)\n' % (
+                            time_tuple))
+                f.write(line)
+
+
+def add_mailgun_api():
+    """Adds mailgun api to feconf.py."""
+    mailgun_api = getpass.getpass(
+        prompt=('Enter mailgun api key from the release process doc.'))
+
+    if re.match('^key-[a-z0-9]{32}$', mailgun_api) is None:
+        raise Exception('Invalid mailgun api key.')
+
+    feconf_lines = []
+    with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
+        feconf_lines = f.readlines()
+
+    feconf_lines.append('MAILGUN_API_KEY = \'%s\'\n' % mailgun_api)
+    with python_utils.open_file(LOCAL_FECONF_PATH, 'w') as f:
+        for line in feconf_lines:
+            f.write(line)
+
+
+def main():
+    """Updates the LOCAL_FECONF_PATH and 'constants.ts' files after doing the
     prerequisite checks.
     """
     # Do prerequisite checks.
@@ -95,14 +174,22 @@ def _update_configs():
     assert common.get_current_branch_name().startswith('release-')
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
 
-    _apply_changes_based_on_config(
-        LOCAL_FECONF_PATH, FECONF_CONFIG_PATH, '^([A-Z_]+ = ).*$')
-    _apply_changes_based_on_config(
-        LOCAL_CONSTANTS_PATH, CONSTANTS_CONFIG_PATH, '^(  "[A-Z_]+": ).*$')
+    try:
+        check_updates_to_terms_of_service()
+        add_mailgun_api()
+
+        apply_changes_based_on_config(
+            LOCAL_FECONF_PATH, FECONF_CONFIG_PATH, FECONF_REGEX)
+        apply_changes_based_on_config(
+            LOCAL_CONSTANTS_PATH, CONSTANTS_CONFIG_PATH, CONSTANTS_REGEX)
+    except Exception as e:
+        common.run_cmd(('git checkout -- %s %s' % (
+            LOCAL_FECONF_PATH, LOCAL_CONSTANTS_PATH)).split(' '))
+        raise Exception(e)
 
     python_utils.PRINT(
         'Done! Please check manually to ensure all the changes are correct.')
 
 
 if __name__ == '__main__':
-    _update_configs()
+    main()
