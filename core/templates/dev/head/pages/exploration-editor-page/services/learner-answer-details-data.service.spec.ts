@@ -86,21 +86,41 @@ describe('Learner answer details service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully fetch learner answer info data from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch learner answer info data from the backend ' +
+    'if user is logged in',
+  function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/learneranswerinfohandler/' +
-        'learner_answer_details/exploration/12345').respond(sampleDataResults);
-      LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+    $httpBackend.expect('GET', '/userinfohandler').respond(
+      {user_is_logged_in: true});
+    $httpBackend.expect('GET', '/learneranswerinfohandler/' +
+      'learner_answer_details/exploration/12345').respond(sampleDataResults);
+    LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
+      successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should fetch empty learner answer info data from the backend ' +
+    'if user is not logged in',
+  function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('GET', '/userinfohandler').respond(
+      {user_is_logged_in: false});
+    LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      learner_answer_info_data: []
+    });
+    expect(failHandler).not.toHaveBeenCalled();
+  });
 
   it('should delete learner answer info',
     function() {
