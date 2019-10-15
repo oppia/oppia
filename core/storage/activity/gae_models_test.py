@@ -34,6 +34,13 @@ class ActivityListModelTest(test_utils.GenericTestBase):
             activity_models.ActivityReferencesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            activity_models.ActivityReferencesModel, 'has_reference_to_user_id')
+        self.assertFalse(
+            activity_models.ActivityReferencesModel
+            .has_reference_to_user_id('id_x'))
+
     def test_featured_activity_list_always_exists(self):
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))

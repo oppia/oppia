@@ -29,19 +29,44 @@ import feconf
 class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     """Unit tests for the RoleQueryAuditModel class."""
 
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_ID = 'user_id'
+    ID = 'user_id.111.update.111'
+    USERNAME = 'username'
+    ROLE = 'role'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(RoleQueryAuditModelUnitTests, self).setUp()
+
+        audit_models.RoleQueryAuditModel(
+            id=self.ID,
+            user_id=self.USER_ID,
+            intent=feconf.ROLE_ACTION_UPDATE,
+            role=self.ROLE,
+            username=self.USERNAME
+        ).put()
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             audit_models.RoleQueryAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
-    def test_create_and_get_model(self):
-        audit_models.RoleQueryAuditModel(
-            id='a', user_id='b', intent=feconf.ROLE_ACTION_UPDATE,
-            role='c', username='d').put()
-        audit_model = audit_models.RoleQueryAuditModel.get('a')
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            audit_models.RoleQueryAuditModel
+            .has_reference_to_user_id(self.USER_ID)
+        )
+        self.assertFalse(
+            audit_models.RoleQueryAuditModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
 
-        self.assertEqual(audit_model.id, 'a')
+    def test_get_model(self):
+        audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
+
+        self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_UPDATE)
-        self.assertEqual(audit_model.user_id, 'b')
-        self.assertEqual(audit_model.role, 'c')
-        self.assertEqual(audit_model.username, 'd')
+        self.assertEqual(audit_model.user_id, self.USER_ID)
+        self.assertEqual(audit_model.role, self.ROLE)
+        self.assertEqual(audit_model.username, self.USERNAME)

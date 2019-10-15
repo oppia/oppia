@@ -52,6 +52,20 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def has_reference_to_user_id(unused_user_id):
+        """ExplorationOpportunitySummaryModel doesn't reference any user_id
+        directly.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data
+            should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
     @classmethod
     def get_all_translation_opportunities(
             cls, page_size, urlsafe_start_cursor, language_code):

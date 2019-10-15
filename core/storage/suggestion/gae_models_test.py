@@ -36,11 +36,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     target_version_at_submission = 1
     change_cmd = {}
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            suggestion_models.GeneralSuggestionModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
-
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
         suggestion_models.GeneralSuggestionModel.create(
@@ -78,6 +73,39 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_REJECTED, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_5')
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            suggestion_models.GeneralSuggestionModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id_author(self):
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('author_1'))
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('author_2'))
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('author_3'))
+        self.assertFalse(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('id_x'))
+
+    def test_has_reference_to_user_id_reviewer(self):
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_1'))
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_2'))
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_3'))
+        self.assertFalse(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('id_x'))
 
     def test_score_type_contains_delimiter(self):
         for score_type in suggestion_models.SCORE_TYPE_CHOICES:
@@ -423,8 +451,7 @@ class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_models.ReviewerRotationTrackingModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE
-        )
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_and_update_model(self):
         suggestion_models.ReviewerRotationTrackingModel.create(

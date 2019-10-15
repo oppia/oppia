@@ -33,11 +33,6 @@ import utils
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            email_models.SentEmailModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
-
     def setUp(self):
         super(SentEmailModelUnitTests, self).setUp()
 
@@ -49,6 +44,11 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         self.generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(mock_generate_hash, email_models.SentEmailModel))
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.SentEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
 
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:
@@ -141,7 +141,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'The id generator for SentEmailModel is '
             'producing too many collisions.'
-            ):
+        ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 email_models.SentEmailModel, 'get_by_id',
@@ -168,18 +168,6 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 email_models.GeneralFeedbackEmailReplyToIdModel.create(
                     'user', 'exploration.exp0.0')
 
-    def test_raise_exception_with_existing_reply_to_id(self):
-        # Test Exception for GeneralFeedbackEmailReplyToIdModel.
-        model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user1', 'exploration.exp1.1')
-        model.put()
-
-        with self.assertRaisesRegexp(
-            Exception, 'Unique reply-to ID for given user and thread '
-            'already exists.'):
-            email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                'user1', 'exploration.exp1.1')
-
 
 class BulkEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the BulkEmailModel class."""
@@ -198,6 +186,20 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
             email_models.GeneralFeedbackEmailReplyToIdModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='user_id_1.exploration.exp_id.thread_id',
+            user_id='user_id_1',
+            thread_id='exploration.exp_id.thread_id',
+            reply_to_id='reply_id'
+        ).put()
+        self.assertTrue(
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .has_reference_to_user_id('user_id_1'))
+        self.assertFalse(
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .has_reference_to_user_id('id_x'))
 
     def test_put_function(self):
         email_reply_model = email_models.GeneralFeedbackEmailReplyToIdModel(
@@ -282,6 +284,18 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
         self.assertEqual(actual_model_2.id, expected_model_2.id)
         self.assertEqual(actual_model_2.user_id, expected_model_2.user_id)
         self.assertEqual(actual_model_2.thread_id, expected_model_2.thread_id)
+
+    def test_raise_exception_with_existing_reply_to_id(self):
+        # Test Exception for GeneralFeedbackEmailReplyToIdModel.
+        model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user1', 'exploration.exp1.1')
+        model.put()
+
+        with self.assertRaisesRegexp(
+            Exception, 'Unique reply-to ID for given user and thread '
+            'already exists.'):
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                'user1', 'exploration.exp1.1')
 
 
 class GenerateHashTests(test_utils.GenericTestBase):
