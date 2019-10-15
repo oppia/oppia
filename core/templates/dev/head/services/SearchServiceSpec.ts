@@ -16,13 +16,13 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
-import {SearchService} from './SearchService';
-import {EventService} from './EventService';
-import {LoggerService} from './LoggerService';
-import {ErrorHandler} from '@angular/core';
-import {HttpClient, HttpEvent, HttpHandler,
-  HttpRequest} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import { SearchService } from './SearchService';
+import { EventService } from './EventService';
+import { LoggerService} from './LoggerService';
+import { ErrorHandler } from '@angular/core';
+import { HttpClient, HttpEvent, HttpHandler,
+  HttpRequest } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import {
   MissingTranslationHandler, MissingTranslationHandlerParams,
   TranslateCompiler,

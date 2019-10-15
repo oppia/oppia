@@ -22,9 +22,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { UtilsService } from 'services/UtilsService';
 import { LoggerService } from './LoggerService';
 import { SearchService } from './SearchService';
-import {EventService} from './EventService';
-import {HttpClient, HttpEvent, HttpHandler,
-  HttpRequest} from '@angular/common/http';
+import { EventService } from './EventService';
+import { HttpClient, HttpEvent, HttpHandler,
+  HttpRequest } from '@angular/common/http';
 import {
   MissingTranslationHandler, MissingTranslationHandlerParams,
   TranslateCompiler,
@@ -33,7 +33,7 @@ import {
   TranslateService,
   TranslateStore
 } from '@ngx-translate/core';
-import {Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
