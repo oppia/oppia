@@ -18,8 +18,9 @@ user_id.
 from __future__ import absolute_import   # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.platform import models
 import re
+
+from core.platform import models
 
 (
     user_models, collection_models, exploration_models, feedback_models,
