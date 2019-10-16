@@ -78,8 +78,8 @@ class TopicPageDataHandler(base.BaseHandler):
         subtopics = topic.get_all_subtopics()
 
         assigned_skill_ids = topic.get_all_skill_ids()
-        skill_descriptions = skill_services.get_skill_descriptions_by_ids(
-            topic.id, assigned_skill_ids)
+        skill_descriptions = topic_fetchers.get_skill_descriptions_by_ids(
+            topic.id)
 
         if self.user_id:
             degrees_of_mastery = skill_services.get_multi_user_skill_mastery(

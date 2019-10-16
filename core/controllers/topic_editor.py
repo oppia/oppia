@@ -22,7 +22,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import role_services
-from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -163,13 +162,11 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        skill_ids = topic.get_all_skill_ids()
-
         skill_id_to_description_dict = (
-            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
+            topic_fetchers.get_skill_descriptions_by_ids(topic_id))
 
         skill_id_to_rubrics_dict = (
-            skill_services.get_rubrics_by_skill_ids(topic_id, skill_ids)
+            topic_fetchers.get_rubrics_by_skill_ids(topic_id)
         )
 
         self.values.update({
@@ -215,13 +212,12 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        skill_ids = topic.get_all_skill_ids()
 
         skill_id_to_description_dict = (
-            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
+            topic_fetchers.get_skill_descriptions_by_ids(topic_id))
 
         skill_id_to_rubrics_dict = (
-            skill_services.get_rubrics_by_skill_ids(topic_id, skill_ids)
+            topic_fetchers.get_rubrics_by_skill_ids(topic_id)
         )
 
         self.values.update({
