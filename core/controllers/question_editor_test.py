@@ -279,62 +279,6 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             self.question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'), [self.skill_id])
 
-    def test_post_with_non_admin_or_topic_manager_email_disallows_access(self):
-        self.login(self.NEW_USER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '%s/%s/%s' % (
-                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
-                self.skill_id
-            ), {}, csrf_token=csrf_token, expected_status_int=401)
-        self.logout()
-
-    def test_post_with_incorrect_skill_id_returns_404(self):
-        self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        incorrect_skill_id = 'abc123456789'
-        self.post_json(
-            '%s/%s/%s' % (
-                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
-                incorrect_skill_id
-            ), {}, csrf_token=csrf_token, expected_status_int=404)
-        self.logout()
-
-    def test_post_with_admin_email_allows_question_linking(self):
-        self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '%s/%s/%s' % (
-                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
-                self.skill_id
-            ), {}, csrf_token=csrf_token)
-        question_summaries, grouped_skill_descriptions, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                5, [self.skill_id], ''))
-        self.assertEqual(len(question_summaries), 1)
-        self.assertEqual(
-            question_summaries[0].id, self.question_id)
-        self.assertEqual(
-            grouped_skill_descriptions[0], ['Skill Description'])
-        self.logout()
-
-    def test_post_with_topic_manager_email_allows_question_linking(self):
-        self.login(self.TOPIC_MANAGER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '%s/%s/%s' % (
-                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
-                self.skill_id
-            ), {}, csrf_token=csrf_token)
-        question_summaries, grouped_skill_descriptions, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                5, [self.skill_id], ''))
-        self.assertEqual(len(question_summaries), 1)
-        self.assertEqual(question_summaries[0].id, self.question_id)
-        self.assertEqual(
-            grouped_skill_descriptions[0], ['Skill Description'])
-        self.logout()
-
     def test_delete_with_non_admin_or_topic_manager_disallows_access(self):
         self.login(self.NEW_USER_EMAIL)
         self.delete_json(
@@ -346,7 +290,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_delete_with_admin_email_allows_question_deletion(self):
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id, self.skill_id, 0.3)
+            self.editor_id, self.question_id, self.skill_id, 0.5)
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_2, self.skill_id, 0.3)
         self.login(self.ADMIN_EMAIL)
@@ -355,19 +299,22 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
             ))
-        question_summaries, grouped_skill_descriptions, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                5, [self.skill_id], ''))
+        (
+            question_summaries, grouped_skill_descriptions,
+            grouped_difficulties, _) = (
+                question_services.get_question_summaries_and_skill_descriptions(
+                    5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             question_summaries[0].id, self.question_id_2)
         self.assertEqual(
             grouped_skill_descriptions[0], ['Skill Description'])
+        self.assertEqual(grouped_difficulties[0], [0.3])
         self.logout()
 
     def test_delete_with_topic_manager_email_allows_question_deletion(self):
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id, self.skill_id, 0.5)
+            self.editor_id, self.question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_2, self.skill_id, 0.5)
         self.login(self.TOPIC_MANAGER_EMAIL)
@@ -376,14 +323,17 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
             ))
-        question_summaries, grouped_skill_descriptions, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                5, [self.skill_id], ''))
+        (
+            question_summaries, grouped_skill_descriptions,
+            grouped_difficulties, _) = (
+                question_services.get_question_summaries_and_skill_descriptions(
+                    5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             question_summaries[0].id, self.question_id_2)
         self.assertEqual(
             grouped_skill_descriptions[0], ['Skill Description'])
+        self.assertEqual(grouped_difficulties[0], [0.5])
         self.logout()
 
 

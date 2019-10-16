@@ -246,7 +246,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, 'skill_2', 0.2)
 
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, skill_descriptions, skill_difficulties, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_2', 'skill_3'], ''))
 
@@ -256,12 +256,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], '')
         question_ids = [summary.id for summary in question_summaries]
-        skill_descriptions = [
-            description for description in skill_descriptions
-        ]
 
         self.assertEqual(len(question_ids), 3)
         self.assertEqual(len(skill_descriptions), 3)
+        self.assertEqual(len(skill_difficulties), 3)
         self.assertItemsEqual(
             question_ids, [self.question_id, question_id_2, question_id_3])
 
@@ -276,7 +274,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             else:
                 self.assertEqual(['Skill Description 2'], description)
 
-        question_summaries, skill_descriptions, _ = (
+        for index, difficulty in enumerate(skill_difficulties):
+            if question_ids[index] == self.question_id:
+                self.assertEqual(
+                    [0.8, 0.5], difficulty)
+            elif question_ids[index] == question_id_2:
+                self.assertEqual([0.3], difficulty)
+            else:
+                self.assertEqual([0.2], difficulty)
+
+        question_summaries, skill_descriptions, skill_difficulties, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_3'], ''))
         question_ids = [summary.id for summary in question_summaries]
@@ -299,12 +306,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, 'skill_1', 0.5)
 
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, skill_descriptions, skill_difficulties, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 2, [], ''))
 
         self.assertEqual(question_summaries, [])
         self.assertEqual(skill_descriptions, [])
+        self.assertEqual(skill_difficulties, [])
 
     def test_cannot_get_question_from_model_with_invalid_schema_version(self):
         # Delete all question models.

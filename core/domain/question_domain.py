@@ -486,6 +486,7 @@ class QuestionSkillLink(python_utils.OBJECT):
         skill_id: str. The ID of the skill to which the
             question is linked.
         skill_description: str. The description of the corresponding skill.
+        skill_difficulty: float. The difficulty between [0, 1] of the skill.
     """
 
     def __init__(

@@ -67,7 +67,7 @@ angular.module('oppia').directive('questionsList', [
         'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'SkillDifficultyObjectFactory',
         'DEFAULT_SKILL_DIFFICULTY', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
-        'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL',
+        'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL', 'SKILL_DIFFICULTIES',
         'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
@@ -76,7 +76,7 @@ angular.module('oppia').directive('questionsList', [
             EditableSkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, SkillDifficultyObjectFactory,
             DEFAULT_SKILL_DIFFICULTY, EVENT_QUESTION_SUMMARIES_INITIALIZED,
-            MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL,
+            MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL, SKILL_DIFFICULTIES,
             StateEditorService, QuestionUndoRedoService, UndoRedoService) {
           var ctrl = this;
           ctrl.currentPage = 0;
@@ -127,8 +127,17 @@ angular.module('oppia').directive('questionsList', [
             }
           };
 
-          ctrl.getSkillDescription = function(skillDescriptions) {
-            return skillDescriptions.join(', ');
+          ctrl.getSkillDescription = function(
+              skillDescriptions, skillDifficulties) {
+            var returnString = '';
+            for (var idx in skillDescriptions) {
+              returnString +=
+                skillDescriptions[idx] + ': ' +
+                (skillDifficulties[idx] === 0.3 ? SKILL_DIFFICULTIES[0] :
+                (skillDifficulties[idx] === 0.6 ? SKILL_DIFFICULTIES[1] :
+                SKILL_DIFFICULTIES[2])) + ', ';
+            }
+            return returnString.substr(0, returnString.length - 2);
           };
 
           ctrl.saveAndPublishQuestion = function() {

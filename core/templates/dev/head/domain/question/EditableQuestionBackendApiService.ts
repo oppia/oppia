@@ -104,24 +104,6 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       });
     };
 
-    var _addQuestionSkillLink = function(
-        questionId, skillId, successCallback, errorCallback) {
-      var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
-        QUESTION_SKILL_LINK_URL_TEMPLATE, {
-          question_id: questionId,
-          skill_id: skillId
-        });
-      $http.post(addQuestionSkillLinkUrl).then(function(response) {
-        if (successCallback) {
-          successCallback();
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
     var _deleteQuestionFromSkill = function(
         questionId, skillId, successCallback, errorCallback) {
       var deleteQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
@@ -176,13 +158,6 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
           _updateQuestion(
             questionId, questionVersion, commitMessage, changeList,
             resolve, reject);
-        });
-      },
-
-      addQuestionSkillLink: function(
-          questionId, skillId) {
-        return $q(function(resolve, reject) {
-          _addQuestionSkillLink(questionId, skillId, resolve, reject);
         });
       }
     };

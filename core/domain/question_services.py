@@ -500,14 +500,15 @@ def get_question_summaries_and_skill_descriptions(
         a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), list(list(str)), str|None. The list of question
-            linked to the given skill ids, the list of skill summaries grouped
-            by each question, and the next cursor value to be used for the next
-            batch of questions (or None if no more pages are left). The returned
-            next cursor value is urlsafe.
+        list(QuestionSummary), list(list(str)), list(list(int)), str|None.
+            The list of question linked to the given skill ids,
+            the list of skill summaries grouped by each question, the list of
+            skill difficulties grouped by question and the next cursor value to
+            be used for the next batch of questions (or None if no more pages
+            are left). The returned next cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
-        return [], [], None
+        return [], [], [], None
 
     if len(skill_ids) > 3:
         raise Exception(
@@ -521,13 +522,17 @@ def get_question_summaries_and_skill_descriptions(
     # the same question.
     question_ids = []
     grouped_skill_ids = []
+    grouped_difficulties = []
     grouped_skill_descriptions = []
     for question_skill_link in question_skill_link_models:
         if question_skill_link.question_id not in question_ids:
             question_ids.append(question_skill_link.question_id)
             grouped_skill_ids.append([question_skill_link.skill_id])
+            grouped_difficulties.append([question_skill_link.skill_difficulty])
         else:
             grouped_skill_ids[-1].append(question_skill_link.skill_id)
+            grouped_difficulties[-1].append(
+                question_skill_link.skill_difficulty)
 
     for skill_ids_list in grouped_skill_ids:
         skills = skill_models.SkillModel.get_multi(skill_ids_list)
@@ -535,7 +540,9 @@ def get_question_summaries_and_skill_descriptions(
             [skill.description if skill else None for skill in skills])
 
     question_summaries = get_question_summaries_by_ids(question_ids)
-    return question_summaries, grouped_skill_descriptions, next_cursor
+    return (
+        question_summaries, grouped_skill_descriptions, grouped_difficulties,
+        next_cursor)
 
 
 def get_questions_by_ids(question_ids):
