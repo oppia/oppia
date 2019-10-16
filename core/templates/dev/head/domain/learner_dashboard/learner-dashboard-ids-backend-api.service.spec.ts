@@ -22,7 +22,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { LearnerDashboardIdsBackendApiService } from
-  'domain/learner_dashboard/LearnerDashboardIdsBackendApiService';
+  'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 
 describe('Learner Dashboard Backend API Service', () => {
   var learnerDashboardIdsBackendApiService:

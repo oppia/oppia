@@ -45,7 +45,7 @@ import { WrittenTranslationsObjectFactory } from
 // ^^^ This block is to be removed.
 
 require('App.ts');
-require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
+require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/QuestionUpdateService.ts');
 require('domain/state/StateObjectFactory.ts');
