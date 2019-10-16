@@ -41,7 +41,7 @@ import { MultipleChoiceInputRulesService } from
 import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { FractionInputRulesService } from
-  'interactions/FractionInput/directives/fraction-input-rules.service.ts';
+  'interactions/FractionInput/directives/fraction-input-rules.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.

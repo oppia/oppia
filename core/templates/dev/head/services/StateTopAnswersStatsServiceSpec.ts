@@ -32,7 +32,7 @@ import { ClassifierObjectFactory } from
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionInputRulesService } from
-  'interactions/FractionInput/directives/fraction-input-rules.service.ts';
+  'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from

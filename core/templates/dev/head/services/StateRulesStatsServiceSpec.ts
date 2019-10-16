@@ -25,7 +25,7 @@ import { AnswerClassificationResultObjectFactory } from
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { FractionInputRulesService } from
-  'interactions/FractionInput/directives/fraction-input-rules.service.ts';
+  'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
