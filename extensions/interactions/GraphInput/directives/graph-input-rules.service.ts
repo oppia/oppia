@@ -195,7 +195,7 @@ export class GraphInputRulesService {
     return false;
   }
 
-  HasGraphProperty(answer: any, inputs: {f: string}): boolean {
+  HasGraphProperty(answer: any, inputs: {p: string}): boolean {
     if (inputs.p === 'strongly_connected') {
       return this.isStronglyConnected(answer);
     } else if (inputs.p === 'weakly_connected') {
@@ -208,7 +208,7 @@ export class GraphInputRulesService {
       return false;
     }
   }
-  IsIsomorphicTo(answer: any, inputs: {f: string}): boolean {
+  IsIsomorphicTo(answer: any, inputs: {g: any}): boolean {
     return this.isIsomorphic(answer, inputs.g);
   }
 }
