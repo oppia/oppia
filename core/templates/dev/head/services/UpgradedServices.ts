@@ -16,7 +16,7 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import {ErrorHandler, Injectable} from '@angular/core';
+import { ErrorHandler, Injectable} from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { UtilsService } from 'services/UtilsService';
