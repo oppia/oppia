@@ -1291,7 +1291,7 @@ class SubtitledHtml(python_utils.OBJECT):
 
     @classmethod
     def create_default_subtitled_html(cls, content_id):
-        """Return a default SubtitledHtml domain object.
+        """Returns a default SubtitledHtml domain object.
 
         Args:
             content_id: str. A unique id referring to the other assets for this
