@@ -2453,15 +2453,56 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
 
         self.model_instance_0 = (
             opportunity_models.SkillOpportunityModel.get('0'))
+        self.model_instance_1 = (
+            opportunity_models.SkillOpportunityModel.get('1'))
+        self.model_instance_2 = (
+            opportunity_models.SkillOpportunityModel.get('2'))
 
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated SkillOpportunityModel\', 3]']
         run_job_and_check_output(self, expected_output)
 
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'SkillOpportunityModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\', '
+            'u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\', '
+            'u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (
+            self.model_instance_0.id, self.model_instance_0.last_updated,
+            self.model_instance_1.id, self.model_instance_1.last_updated,
+            self.model_instance_2.id, self.model_instance_2.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(
+                self, expected_output, sort=True, literal_eval=True)
+
+    def test_missing_skill_model_failure(self):
+        skill_model = skill_models.SkillModel.get_by_id('0')
+        skill_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for skill_ids field '
+                'check of SkillOpportunityModel\', '
+                '[u"Entity id 0: based on field skill_ids having '
+                'value 0, expect model SkillModel with id 0 but it '
+                'doesn\'t exist"]]'
+            ),
+            u'[u\'fully-validated SkillOpportunityModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
     def test_model_with_invalid_skill_description(self):
         self.model_instance_0.skill_description = 'invalid'
         self.model_instance_0.put()
+
         expected_output = [
             (
                 u'[u\'failed validation check for skill_description field '
@@ -2476,6 +2517,7 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_question_count(self):
         self.model_instance_0.question_count = 10
         self.model_instance_0.put()
+
         expected_output = [
             (
                 u'[u\'failed validation check for question_count check of '
@@ -2485,6 +2527,14 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
             ) % self.model_instance_0.id,
             u'[u\'fully-validated SkillOpportunityModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_domain_validator_failure(self):
+        self.model_instance_0.question_count = -1
+        self.model_instance_0.put()
+
+        with self.assertRaises(RuntimeError):
+            expected_output = 'Expect exception to be raised.'
+            run_job_and_check_output(self, expected_output, sort=True)
 
 
 class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):

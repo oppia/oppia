@@ -382,6 +382,29 @@ def get_voiceover_opportunities(language_code, cursor):
     return opportunities, cursor, more
 
 
+def get_exploration_opportunity_summaries_by_ids(ids):
+    """Returns a list of ExplorationOpportunitySummary objects corresponding to
+    the given list of ids.
+
+    Args:
+        ids: list(str). A list of the opportunity ids.
+
+    Returns:
+        dict(str, ExplorationOpportunitySummary). A dict with key as an ID and
+        value as corresponding ExplorationOpportunitySummary object.
+    """
+    exp_opportunity_summary_models = (
+        opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
+    opportunities = {}
+    for exp_opportunity_summary_model in exp_opportunity_summary_models:
+        exp_opportunity_summary = (
+            get_exploration_opportunity_summary_from_model(
+                exp_opportunity_summary_model))
+        opportunities[exp_opportunity_summary.id] = exp_opportunity_summary
+
+    return opportunities
+
+
 def update_opportunities_with_new_topic_name(topic_id, topic_name):
     """Updates the exploration opportunity summary models with new topic name.
 
@@ -579,7 +602,8 @@ def delete_skill_opportunity(skill_id):
     """
     skill_opportunity_model = (
         opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
-    opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
+    if skill_opportunity_model is not None:
+        opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
 
 
 def increment_question_counts(skill_ids, delta):
@@ -591,18 +615,22 @@ def increment_question_counts(skill_ids, delta):
             SkillOpportunityModel(s).
         delta: int. The delta for which to increment each question_count.
     """
-    updated_skill_opportunities = _update_skill_opportunity_question_count(
-        skill_ids, delta)
+    updated_skill_opportunities = (
+        _get_skill_opportunity_with_updated_question_count(skill_ids, delta))
     _save_skill_opportunities(updated_skill_opportunities)
 
 
-def update_question_counts_after_changing_skills_for_question(
+def update_skill_opportunities_on_question_linked_skills_change(
         old_skill_ids, new_skill_ids):
     """Updates question_count(s) of SkillOpportunityModel(s) corresponding to
     the change in linked skill IDs for a question from old_skill_ids to
     new_skill_ids, e.g. if skill_id1 is in old_skill_ids, but not in
     new_skill_ids, the question_count of the SkillOpportunityModel for skill_id1
     would be decremented.
+
+    NOTE: Since this method is updating the question_counts based on the change
+    of skill_ids from old_skill_ids to new_skill_ids, the input skill_id lists
+    must be related.
 
     Args:
         old_skill_ids: list(str). A list of old skill_id(s).
@@ -614,22 +642,22 @@ def update_question_counts_after_changing_skills_for_question(
     skill_ids_removed_from_question = old_skill_ids_set - new_skill_ids_set
     updated_skill_opportunities = []
     updated_skill_opportunities.extend(
-        _update_skill_opportunity_question_count(
+        _get_skill_opportunity_with_updated_question_count(
             new_skill_ids_added_to_question, 1))
     updated_skill_opportunities.extend(
-        _update_skill_opportunity_question_count(
+        _get_skill_opportunity_with_updated_question_count(
             skill_ids_removed_from_question, -1))
     _save_skill_opportunities(updated_skill_opportunities)
 
 
-def _update_skill_opportunity_question_count(skill_ids, delta):
+def _get_skill_opportunity_with_updated_question_count(skill_ids, delta):
     """Returns a list of SkillOpportunities with corresponding skill_ids
     with question_count(s) updated by delta.
 
     Args:
         skill_ids: iterable(str). The IDs of the matching SkillOpportunityModels
             in the datastore.
-        delta: int. The delta for which to update each question_count (can be
+        delta: int. The delta by which to update each question_count (can be
             negative).
 
     Returns:

@@ -143,7 +143,7 @@ def _update_linked_skill_ids_of_question(
     update_question(
         user_id, question_id, change_list, 'updated linked skill ids')
     (opportunity_services
-     .update_question_counts_after_changing_skills_for_question(
+     .update_skill_opportunities_on_question_linked_skills_change(
          old_linked_skill_ids, new_linked_skill_ids))
 
 
@@ -165,9 +165,14 @@ def delete_question_skill_link(user_id, question_id, skill_id):
             question_id, skill_id))
     question_skill_link_model = question_models.QuestionSkillLinkModel.get(
         question_skill_link_id)
-    _update_linked_skill_ids_of_question(
-        user_id, question_id,
-        new_linked_skill_ids, question.linked_skill_ids)
+
+    if new_linked_skill_ids:
+        _update_linked_skill_ids_of_question(
+            user_id, question_id,
+            new_linked_skill_ids, question.linked_skill_ids)
+    else:
+        delete_question(user_id, question_id)
+
     question_skill_link_model.delete()
 
 
