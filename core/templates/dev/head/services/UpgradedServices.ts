@@ -26,6 +26,7 @@ import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
 import { UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory.ts';
+import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,7 @@ export class UpgradedServices {
     'UtilsService': new UtilsService(),
     'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
       new UnitsObjectFactory(), new FractionObjectFactory())
+    'WindowDimensionsService': new WindowDimensionsService()
   };
   /* eslint-enable quote-props */
 }
