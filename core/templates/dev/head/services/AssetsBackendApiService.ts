@@ -84,7 +84,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
             // not be played on Safari.
             assetBlob = new Blob([data], {type: 'audio/mpeg'});
           } else {
-            assetBlob = new Blob([data]);
+            assetBlob = new Blob([data], {type: data.type});
           }
         } catch (exception) {
           window.BlobBuilder = window.BlobBuilder ||
