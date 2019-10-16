@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
-describe('Story object factory', function() {
+describe('Story object factory', () => {
   let storyObjectFactory: StoryObjectFactory = null;
   let _sampleStory: Story = null;
 
@@ -58,7 +58,7 @@ describe('Story object factory', function() {
       sampleStoryBackendDict);
   });
 
-  it('should be able to create an interstitial story object', function() {
+  it('should be able to create an interstitial story object', () => {
     var story = storyObjectFactory.createInterstitialStory();
     expect(story.getId()).toEqual(null);
     expect(story.getTitle()).toEqual('Story title loading');
@@ -69,18 +69,18 @@ describe('Story object factory', function() {
     expect(story.getCorrespondingTopicId()).toEqual(null);
   });
 
-  it('should correctly validate a valid story', function() {
+  it('should correctly validate a valid story', () => {
     expect(_sampleStory.validate()).toEqual([]);
   });
 
-  it('should correctly validate a story', function() {
+  it('should correctly validate a story', () => {
     _sampleStory.setTitle('');
     expect(_sampleStory.validate()).toEqual([
       'Story title should not be empty'
     ]);
   });
 
-  it('should be able to copy from another story', function() {
+  it('should be able to copy from another story', () => {
     var secondStory = storyObjectFactory.createFromBackendDict({
       id: 'sample_story_id_2s',
       title: 'Story title 2',

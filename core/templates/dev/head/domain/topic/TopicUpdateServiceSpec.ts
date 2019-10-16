@@ -39,6 +39,7 @@ import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -92,6 +93,12 @@ describe('Topic update service', function() {
           new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
           new SubtitledHtmlObjectFactory())));
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

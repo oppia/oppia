@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for GenerateContentIdService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('services/GenerateContentIdService.ts');
 
 describe('GenerateContentIdService', function() {
@@ -23,6 +28,12 @@ describe('GenerateContentIdService', function() {
     $provide.value('COMPONENT_NAME_FEEDBACK', 'feedback');
     $provide.value('COMPONENT_NAME_HINT', 'hint');
     $provide.value('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
   var gcis = null;
 
