@@ -36,7 +36,7 @@ export class UpgradedServices {
   upgradedServices = {
     'UtilsService': new UtilsService(),
     'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
-      new UnitsObjectFactory(), new FractionObjectFactory())
+      new UnitsObjectFactory(), new FractionObjectFactory()),
     'WindowDimensionsService': new WindowDimensionsService()
   };
   /* eslint-enable quote-props */
