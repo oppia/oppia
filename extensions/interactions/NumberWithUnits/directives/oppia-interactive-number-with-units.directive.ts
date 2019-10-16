@@ -17,6 +17,7 @@
  */
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('domain/objects/objects-domain.constants.ajs.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
