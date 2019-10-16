@@ -153,6 +153,30 @@ def create_new_question_skill_link(
             question.linked_skill_ids)
 
 
+def update_question_skill_link_difficulty(
+        question_id, skill_id, new_difficulty):
+    """Updates the difficulty value of question skill link.
+
+    Args:
+        question_id: str. ID of the question.
+        skill_id: str. ID of the skill.
+        new_difficulty: float. New difficulty value.
+
+    Raises:
+        Exception. Given question and skill are not linked.
+    """
+    question_skill_link_id = (
+        question_models.QuestionSkillLinkModel.get_model_id(
+            question_id, skill_id))
+    question_skill_link_model = question_models.QuestionSkillLinkModel.get(
+        question_skill_link_id, strict=False)
+
+    if question_skill_link_model is None:
+        raise Exception('The given question and skill are not linked.')
+    question_skill_link_model.skill_difficulty = new_difficulty
+    question_skill_link_model.put()
+
+
 def _update_linked_skill_ids_of_question(
         user_id, question_id, new_linked_skill_ids, old_linked_skill_ids):
     """Updates the question linked_skill ids in the Question model.

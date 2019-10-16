@@ -115,6 +115,16 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     """A handler for linking and unlinking questions to or from a skill."""
 
     @acl_decorators.can_manage_question_skill_status
+    def put(self, question_id, skill_id):
+        """Updates properties of the given question."""
+        new_difficulty = float(self.payload.get('new_difficulty'))
+
+        question_services.update_question_skill_link_difficulty(
+            question_id, skill_id, new_difficulty)
+
+        self.render_json(self.values)
+
+    @acl_decorators.can_manage_question_skill_status
     def delete(self, question_id, skill_id):
         """Unlinks a question from a skill."""
         question_services.delete_question_skill_link(

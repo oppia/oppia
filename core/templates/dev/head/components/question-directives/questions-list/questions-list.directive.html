@@ -6,9 +6,10 @@
 <table class="dashboard-table" ng-if="$ctrl.questionSummaries.length > 0">
   <colgroup>
     <col style="width: 5%;">
-    <col style="width: 50%;">
-    <col ng-if="$ctrl.skillDescriptionsAreShown()" style="width: 35%;">
-    <col ng-if="$ctrl.skillDescriptionsAreShown()" style="width: 10%;">
+    <col style="width: 40%;">
+    <col style="width: 35%;">
+    <col style="width: 10%;">
+    <col style="width: 10%;">
   </colgroup>
   <tr>
     <th class="dashboard-table-headings">
@@ -17,11 +18,23 @@
     <th class="dashboard-table-headings">
       <p> Question Content </p>
     </th>
+    <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
+      <p> Difficulty</p>
+    </th>
     <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
       <p> Linked Skills And Corresponding Difficulty</p>
     </th>
+    <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
+      <p> Change Difficulty </p>
+    </th>
+    <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
+      <p> Change difficulty for each skill </p>
+    </th>
     <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
       <p> Unlink questions from skill(s) </p>
+    </th>
+    <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
+      <p> Unlink question from skill </p>
     </th>
   </tr>
   <tr ng-repeat="questionSummary in $ctrl.questionSummaries"
@@ -30,8 +43,15 @@
       ng-click="$ctrl.editQuestion(questionSummary.summary)">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
     <td> <[$ctrl.truncatedQuestionSummaries[$index]]> </td>
-    <td ng-if="$ctrl.skillDescriptionsAreShown()"> <[$ctrl.getSkillDescription(questionSummary.skill_descriptions, questionSummary.skill_difficulties)]> </td>
-    <td ng-if="$ctrl.skillDescriptionsAreShown()" class="delete-icon" ng-click="$event.stopPropagation()">
+    <td ng-if="!$ctrl.skillDescriptionsAreShown()"> <[$ctrl.getQuestionDifficulty(questionSummary.skill_difficulties)]> </td>
+    <td ng-if="$ctrl.skillDescriptionsAreShown()"> <[$ctrl.getSkillDescriptionAndDifficulty(questionSummary.skill_descriptions, questionSummary.skill_difficulties)]> </td>
+    <td class="edit-icon" ng-click="$event.stopPropagation()">
+      <span ng-click="$ctrl.changeDifficulty(questionSummary.summary.id, questionSummary.skill_descriptions, questionSummary.skill_difficulties)"
+            class="list-summary">
+        <i class="material-icons">edit</i>
+      </span>
+    </td>
+    <td class="delete-icon" ng-click="$event.stopPropagation()">
       <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummary.summary.id, questionSummary.skill_descriptions)"
             class="list-summary">
         <i class="material-icons">link_off</i>

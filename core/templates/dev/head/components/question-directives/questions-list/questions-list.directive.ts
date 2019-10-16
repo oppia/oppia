@@ -127,7 +127,16 @@ angular.module('oppia').directive('questionsList', [
             }
           };
 
-          ctrl.getSkillDescription = function(
+          ctrl.getQuestionDifficulty = function(difficulty) {
+            return (
+              difficulty[0] === 0.3 ? SKILL_DIFFICULTIES[0] :
+              (
+                difficulty[0] === 0.6 ? SKILL_DIFFICULTIES[1] :
+                SKILL_DIFFICULTIES[2])
+            );
+          };
+
+          ctrl.getSkillDescriptionAndDifficulty = function(
               skillDescriptions, skillDifficulties) {
             var returnString = '';
             for (var idx in skillDescriptions) {
@@ -352,6 +361,17 @@ angular.module('oppia').directive('questionsList', [
                   });
                 }
               });
+              // For the case when, it is in the skill editor.
+              if (ctrl.getAllSkillSummaries().length === 0) {
+                EditableQuestionBackendApiService.deleteQuestionFromSkill(
+                  questionId, ctrl.skillIds[0]).then(function() {
+                  ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
+                    0, ctrl.skillIds, true, true
+                  );
+                  ctrl.currentPage = 0;
+                  AlertsService.addSuccessMessage('Deleted Question');
+                });
+              }
             } else {
               var allSkillSummaries = ctrl.getAllSkillSummaries().filter(
                 function(summary) {
@@ -435,6 +455,100 @@ angular.module('oppia').directive('questionsList', [
                 });
               });
             }
+          };
+
+          ctrl.changeDifficulty = function(
+              questionId, skillDescriptions, skillDifficulties) {
+            if (!ctrl.canEditQuestion()) {
+              AlertsService.addWarning(
+                'User does not have enough rights to edit the question');
+              return;
+            }
+            var linkedSkillsWithDifficulty = [];
+            if (ctrl.getAllSkillSummaries().length === 0) {
+              linkedSkillsWithDifficulty.push(
+                SkillDifficultyObjectFactory.create(
+                  ctrl.skillIds[0], skillDescriptions[0], skillDifficulties[0])
+              );
+            } else {
+              var allSkillSummaries = ctrl.getAllSkillSummaries().filter(
+                function(summary) {
+                  summary.isSelected = false;
+                  return (
+                    skillDescriptions.indexOf(
+                      summary.getDescription()) !== -1);
+                });
+              for (var idx in allSkillSummaries) {
+                var index = skillDescriptions.indexOf(
+                  allSkillSummaries[idx].getDescription());
+                linkedSkillsWithDifficulty.push(
+                  SkillDifficultyObjectFactory.create(
+                    allSkillSummaries[idx].getId(),
+                    allSkillSummaries[idx].getDescription(),
+                    skillDifficulties[index]));
+              }
+            }
+            var oldLinkedSkillWithDifficulty = angular.copy(
+              linkedSkillsWithDifficulty);
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/question-directives/modal-templates/' +
+                'change-question-difficulty-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  var init = function() {
+                    $scope.linkedSkillsWithDifficulty =
+                      linkedSkillsWithDifficulty;
+                  };
+
+                  $scope.cancelModal = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.done = function() {
+                    $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
+                  };
+
+                  init();
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(linkedSkillsWithDifficulty) {
+              var changedDifficultyCount = 0, count = 0;
+              for (var idx in linkedSkillsWithDifficulty) {
+                var object = linkedSkillsWithDifficulty[idx];
+                if (
+                  object.getDifficulty() !==
+                  oldLinkedSkillWithDifficulty[idx].getDifficulty()) {
+                  changedDifficultyCount++;
+                }
+              }
+              for (var idx in linkedSkillsWithDifficulty) {
+                var object = linkedSkillsWithDifficulty[idx];
+                if (
+                  object.getDifficulty() !==
+                  oldLinkedSkillWithDifficulty[idx].getDifficulty()) {
+                  EditableQuestionBackendApiService.changeDifficulty(
+                    questionId, object.getId(), object.getDifficulty()).then(
+                    function() {
+                      count++;
+                      if (count === changedDifficultyCount) {
+                        $timeout(function() {
+                          ctrl.questionSummaries =
+                            ctrl.getQuestionSummariesAsync(
+                              0, ctrl.skillIds, true, true
+                            );
+                          ctrl.currentPage = 0;
+                          AlertsService.addSuccessMessage('Updated Difficulty');
+                        }, 100 * count);
+                      }
+                    });
+                }
+              }
+            });
           };
 
           ctrl.openQuestionEditor = function() {

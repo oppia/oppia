@@ -122,6 +122,27 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       });
     };
 
+    var _changeDifficulty = function(
+        questionId, skillId, newDifficulty, successCallback, errorCallback) {
+      var changeDifficultyUrl = UrlInterpolationService.interpolateUrl(
+        QUESTION_SKILL_LINK_URL_TEMPLATE, {
+          question_id: questionId,
+          skill_id: skillId
+        });
+      var putData = {
+        new_difficulty: newDifficulty
+      };
+      $http.put(changeDifficultyUrl, putData).then(function(response) {
+        if (successCallback) {
+          successCallback();
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     return {
       createQuestion: function(skillIds, skillDifficulties, questionDict) {
         return $q(function(resolve, reject) {
@@ -139,6 +160,13 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       deleteQuestionFromSkill: function(questionId, skillId) {
         return $q(function(resolve, reject) {
           _deleteQuestionFromSkill(questionId, skillId, resolve, reject);
+        });
+      },
+
+      changeDifficulty: function(questionId, skillId, newDifficulty) {
+        return $q(function(resolve, reject) {
+          _changeDifficulty(
+            questionId, skillId, newDifficulty, resolve, reject);
         });
       },
 

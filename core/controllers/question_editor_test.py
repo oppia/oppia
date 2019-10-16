@@ -336,6 +336,61 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.assertEqual(grouped_difficulties[0], [0.5])
         self.logout()
 
+    def test_put_with_non_admin_or_topic_manager_disallows_access(self):
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        _ = self.put_json(
+            '%s/%s/%s' % (
+                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                self.skill_id
+            ), {'new_difficulty': 0.6}, csrf_token=csrf_token,
+            expected_status_int=401)
+        self.logout()
+
+    def test_put_with_admin_email_allows_updation(self):
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, self.skill_id, 0.5)
+        (
+            question_summaries, _, grouped_difficulties, _) = (
+                question_services.get_question_summaries_and_skill_descriptions(
+                    5, [self.skill_id], ''))
+        self.assertEqual(len(question_summaries), 1)
+        self.assertEqual(grouped_difficulties[0], [0.5])
+
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        _ = self.put_json(
+            '%s/%s/%s' % (
+                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                self.skill_id
+            ), {'new_difficulty': 0.9}, csrf_token=csrf_token)
+        (
+            question_summaries, _, grouped_difficulties, _) = (
+                question_services.get_question_summaries_and_skill_descriptions(
+                    5, [self.skill_id], ''))
+        self.assertEqual(len(question_summaries), 1)
+        self.assertEqual(grouped_difficulties[0], [0.9])
+        self.logout()
+
+    def test_put_with_topic_manager_email_allows_updation(self):
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, self.skill_id, 0.3)
+
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        _ = self.put_json(
+            '%s/%s/%s' % (
+                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                self.skill_id
+            ), {'new_difficulty': 0.6}, csrf_token=csrf_token)
+        (
+            question_summaries, _, grouped_difficulties, _) = (
+                question_services.get_question_summaries_and_skill_descriptions(
+                    5, [self.skill_id], ''))
+        self.assertEqual(len(question_summaries), 1)
+        self.assertEqual(grouped_difficulties[0], [0.6])
+        self.logout()
+
 
 class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     """Tests get, put and delete methods of editable questions data handler."""

@@ -135,6 +135,29 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[0].to_dict(), self.question.to_dict())
         self.assertEqual(questions[1].to_dict(), self.question_2.to_dict())
 
+    def test_update_question_skill_link_difficulty(self):
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_1', 0.3)
+
+        _, _, difficulties, _ = (
+            question_services.get_question_summaries_and_skill_descriptions(
+                2, ['skill_1'], ''))
+        self.assertEqual(difficulties[0], [0.3])
+
+        question_services.update_question_skill_link_difficulty(
+            self.question_id, 'skill_1', 0.9)
+
+        _, _, difficulties, _ = (
+            question_services.get_question_summaries_and_skill_descriptions(
+                2, ['skill_1'], ''))
+        self.assertEqual(difficulties[0], [0.9])
+
+        with self.assertRaisesRegexp(
+            Exception, 'The given question and skill are not linked.'):
+            question_services.update_question_skill_link_difficulty(
+                self.question_id, 'skill_10', 0.9)
+
+
     def test_get_questions_by_skill_ids_without_fetch_by_difficulty(self):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
