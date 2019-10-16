@@ -62,9 +62,8 @@ import tempfile
 import threading
 import time
 
-# Install third party dependencies before proceeding.
+# Installation happens only when script is executed directly.
 from . import install_third_party_libs
-install_third_party_libs.main(args=[])
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
@@ -3391,4 +3390,5 @@ FILE_CACHE = NAME_SPACE.files
 
 
 if __name__ == '__main__':
+    install_third_party_libs.main(args=[])
     main()
