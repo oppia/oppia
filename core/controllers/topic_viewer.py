@@ -78,7 +78,7 @@ class TopicPageDataHandler(base.BaseHandler):
         subtopics = topic.get_all_subtopics()
 
         assigned_skill_ids = topic.get_all_skill_ids()
-        skill_descriptions = topic_fetchers.get_skill_descriptions_by_ids(
+        skill_descriptions = topic_fetchers.get_descriptions_of_linked_skills(
             topic.id)
 
         if self.user_id:

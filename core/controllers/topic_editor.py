@@ -163,10 +163,10 @@ class EditableTopicDataHandler(base.BaseHandler):
                 Exception('The topic with the given id doesn\'t exist.'))
 
         skill_id_to_description_dict = (
-            topic_fetchers.get_skill_descriptions_by_ids(topic_id))
+            topic_fetchers.get_descriptions_of_linked_skills(topic_id))
 
         skill_id_to_rubrics_dict = (
-            topic_fetchers.get_rubrics_by_skill_ids(topic_id)
+            topic_fetchers.get_rubrics_of_linked_skills(topic_id)
         )
 
         self.values.update({
@@ -214,10 +214,10 @@ class EditableTopicDataHandler(base.BaseHandler):
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         skill_id_to_description_dict = (
-            topic_fetchers.get_skill_descriptions_by_ids(topic_id))
+            topic_fetchers.get_descriptions_of_linked_skills(topic_id))
 
         skill_id_to_rubrics_dict = (
-            topic_fetchers.get_rubrics_by_skill_ids(topic_id)
+            topic_fetchers.get_rubrics_of_linked_skills(topic_id)
         )
 
         self.values.update({

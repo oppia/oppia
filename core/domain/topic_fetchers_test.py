@@ -142,7 +142,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.to_dict(), expected_topic)
 
-    def test_get_rubrics_by_skill_ids(self):
+    def test_get_rubrics_of_linked_skills(self):
         self.save_new_skill(
             self.skill_id_1, self.user_id_admin, 'Description 1',
             misconceptions=[],
@@ -167,17 +167,17 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'The topic with given id doesn\'t exist'):
-            topic_fetchers.get_rubrics_by_skill_ids('invalid_id')
+            topic_fetchers.get_rubrics_of_linked_skills('invalid_id')
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            skill_rubrics = topic_fetchers.get_rubrics_by_skill_ids(
+            skill_rubrics = topic_fetchers.get_rubrics_of_linked_skills(
                 self.TOPIC_ID)
             messages = self.mail_stub.get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
 
             skill_services.delete_skill(self.user_id_admin, 'skill_2')
-            skill_rubrics = topic_fetchers.get_rubrics_by_skill_ids(
+            skill_rubrics = topic_fetchers.get_rubrics_of_linked_skills(
                 self.TOPIC_ID)
             messages = self.mail_stub.get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
@@ -204,7 +204,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
                 }
             )
 
-    def test_get_skill_descriptions_by_ids(self):
+    def test_get_descriptions_of_linked_skills(self):
         self.save_new_skill(
             self.skill_id_1, self.user_id_admin, 'Description 1',
             misconceptions=[],
@@ -229,18 +229,20 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'The topic with given id doesn\'t exist'):
-            topic_fetchers.get_skill_descriptions_by_ids('invalid_id')
+            topic_fetchers.get_descriptions_of_linked_skills('invalid_id')
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            skill_descriptions = topic_fetchers.get_skill_descriptions_by_ids(
-                self.TOPIC_ID)
+            skill_descriptions = (
+                topic_fetchers.get_descriptions_of_linked_skills(
+                    self.TOPIC_ID))
             messages = self.mail_stub.get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
 
             skill_services.delete_skill(self.user_id_admin, self.skill_id_2)
-            skill_descriptions = topic_fetchers.get_skill_descriptions_by_ids(
-                self.TOPIC_ID)
+            skill_descriptions = (
+                topic_fetchers.get_descriptions_of_linked_skills(
+                    self.TOPIC_ID))
 
             messages = self.mail_stub.get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)

@@ -194,7 +194,7 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             return None
 
 
-def get_rubrics_by_skill_ids(topic_id):
+def get_rubrics_of_linked_skills(topic_id):
     """Returns a list of rubrics corresponding to the skills in the
     topic.
 
@@ -240,7 +240,7 @@ def get_rubrics_by_skill_ids(topic_id):
     return skill_id_to_rubrics_dict
 
 
-def get_skill_descriptions_by_ids(topic_id):
+def get_descriptions_of_linked_skills(topic_id):
     """Returns a list of skill descriptions corresponding to the skills in the
     topic.
 
