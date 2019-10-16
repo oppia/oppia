@@ -34,6 +34,12 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
             file_models.FileMetadataModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            file_models.FileMetadataModel, 'has_reference_to_user_id')
+        self.assertFalse(
+            file_models.FileMetadataModel.has_reference_to_user_id('any_id'))
+
     def test_get_new_id_raises_not_implemented_error(self):
         with self.assertRaises(NotImplementedError):
             file_models.FileMetadataModel.get_new_id('entity1')
@@ -150,6 +156,12 @@ class FileModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             file_models.FileModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertStaticMethod(
+            file_models.FileModel, 'has_reference_to_user_id')
+        self.assertFalse(
+            file_models.FileModel.has_reference_to_user_id('any_id'))
 
     def test_file_model_content_is_reconstituted_correctly(self):
         file_model = file_models.FileModel.create(

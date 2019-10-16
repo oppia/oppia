@@ -20,6 +20,7 @@ import {ErrorHandler, Injectable} from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { UtilsService } from 'services/UtilsService';
+import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 import { LoggerService } from './LoggerService';
 import { SearchService } from './SearchService';
 import { EventService } from './EventService';
@@ -42,6 +43,7 @@ export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
     'UtilsService': new UtilsService(),
+    'WindowDimensionsService': new WindowDimensionsService(),
     'LoggerService': new LoggerService(new ErrorHandler()),
     'SearchService': new SearchService(new EventService(),
       new LoggerService(new ErrorHandler()),
