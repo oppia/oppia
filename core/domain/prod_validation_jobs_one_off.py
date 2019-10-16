@@ -176,14 +176,12 @@ class BaseModelValidator(python_utils.OBJECT):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        model_domain_object_instance = cls._get_model_domain_object_instance(
-            item)
-
-        if model_domain_object_instance is None:
-            # No domain object exists for this storage model class.
-            return
-
         try:
+            model_domain_object_instance = (
+                cls._get_model_domain_object_instance(item))
+            if model_domain_object_instance is None:
+                # No domain object exists for this storage model class.
+                return
             model_domain_object_instance.validate()
         except Exception as e:
             cls.errors['domain object check'].append((

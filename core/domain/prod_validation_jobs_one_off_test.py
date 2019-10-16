@@ -2528,13 +2528,25 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated SkillOpportunityModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_domain_validator_failure(self):
+    def test_model_with_invalid_question_count_schema(self):
         self.model_instance_0.question_count = -1
         self.model_instance_0.put()
 
-        with self.assertRaises(RuntimeError):
-            expected_output = 'Expect exception to be raised.'
-            run_job_and_check_output(self, expected_output, sort=True)
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'SkillOpportunityModel\', '
+                '[u\'Entity id 0: Entity fails domain validation with the '
+                'error Expected question_count to be a non-negative integer, '
+                'received -1\']]'
+            ),
+            (
+                u'[u\'failed validation check for question_count check of '
+                'SkillOpportunityModel\', '
+                '[u\'Entity id 0: question_count: -1 does not match the '
+                'question_count of external skill model: 1\']]'
+            ), u'[u\'fully-validated SkillOpportunityModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
 
 class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
