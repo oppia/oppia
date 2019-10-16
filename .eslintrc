@@ -22,7 +22,7 @@
   "rules": {
     "angular/di": [
       "error",
-      "array",
+      "array"
     ],
     "angular/di-unused": "error",
     "angular/directive-restrict": [
@@ -202,7 +202,7 @@
       {
         "anonymous": "never",
         "asyncArrow": "never",
-        "named": "never",
+        "named": "never"
       }
     ],
     "spaced-comment": [
@@ -216,7 +216,7 @@
       "error",
       {
         "words": true,
-        "nonwords": false,
+        "nonwords": false
       }
     ],
     "switch-colon-spacing": [
