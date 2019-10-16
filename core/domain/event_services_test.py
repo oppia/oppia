@@ -23,6 +23,8 @@ import inspect
 import os
 import re
 
+import python_utils
+
 from core.domain import event_services
 from core.platform import models
 from core.tests import test_utils
@@ -237,7 +239,7 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
             if not (directory.startswith('./core/') or
                     directory.startswith('./extensions/')):
                 continue
-            if directory.startswith('./core/tests/linter_tests/'):
+            if directory.startswith('./core/tests/linter_tests'):
                 continue
             for file_name in files:
                 if not file_name.endswith('.py'):

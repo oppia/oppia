@@ -95,7 +95,7 @@ class VisualizationsNameTests(test_utils.GenericTestBase):
             for file_name in files:
                 filepath = os.path.relpath(
                     os.path.join(_dir, file_name), current_dir)
-                if filepath.startswith('core/tests/linter_tests/'):
+                if filepath.startswith('core/tests/linter_tests'):
                     continue
                 if filepath.endswith('.py') and (
                         filepath.startswith('core/') or (
