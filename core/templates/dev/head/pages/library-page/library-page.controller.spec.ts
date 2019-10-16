@@ -20,6 +20,8 @@
 // library-page.controller.ts is upgraded to Angular 8.
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+import { WindowDimensionsService } from
+  'services/contextual/WindowDimensionsService';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
@@ -57,6 +59,7 @@ describe('Library controller', function() {
             }
           };
         }]);
+      $provide.value('WindowDimensionsService', new WindowDimensionsService());
       $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
       $provide.value('PageTitleService', {
         setPageTitle(title) {
