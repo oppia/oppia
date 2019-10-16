@@ -66,3 +66,7 @@ export class NumberWithUnitsRulesService {
     return math.unit(answerString).equals(math.unit(inputsString));
   }
 }
+
+angular.module('oppia').factory(
+  'NumberWithUnitsRulesService', downgradeInjectable(
+    NumberWithUnitsRulesService));

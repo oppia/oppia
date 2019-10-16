@@ -41,8 +41,10 @@ export class NumberWithUnits {
   real;
   fraction;
   units;
-  constructor(
-    private uof: UnitsObjectFactory, type, real, fractionObj, unitsObj) {
+  // Service is not injected into the constructor, since the schema for
+  // NumberWithUnits is set to take in 4 values -- check line 956 in objects.py.
+  uof = new UnitsObjectFactory();
+  constructor(type, real, fractionObj, unitsObj) {
     this.type = type;
     this.real = real;
     this.fraction = fractionObj;
@@ -233,12 +235,11 @@ export class NumberWithUnitsObjectFactory {
     }
 
     var unitsObj = this.uof.fromRawInputString(units);
-    return new NumberWithUnits(this.uof, type, real, fractionObj, unitsObj);
+    return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
   fromDict(numberWithUnitsDict) {
     return new NumberWithUnits(
-      this.uof,
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,
       this.fof.fromDict(numberWithUnitsDict.fraction),
