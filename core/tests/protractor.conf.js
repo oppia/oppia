@@ -44,10 +44,6 @@ var suites = {
     explorationFeedbackTab: [
       'protractor_desktop/explorationFeedbackTab.js'
     ],
-  
-    explorationEnableCorrectnessFeedback: [
-      'protractor_desktop/explorationEnableCorrectnessFeedback.js'
-    ],
 
     explorationHistoryTab: [
       'protractor_desktop/explorationHistoryTab.js'
