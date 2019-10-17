@@ -370,6 +370,19 @@ class DeployTests(test_utils.GenericTestBase):
                 deploy.update_and_check_indexes('oppiaserver')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
+    def test_build(self):
+        process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
+        cmd_tokens = []
+        # pylint: disable=unused-argument
+        def mock_popen(tokens, stdout):
+            cmd_tokens.extend(tokens)
+            return process
+        # pylint: enable=unused-argument
+        with self.swap(subprocess, 'Popen', mock_popen):
+            deploy.build_scripts()
+        self.assertEqual(
+            cmd_tokens, ['python', '-m', 'scripts.build', '--prod_env'])
+
     def test_build_failure(self):
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         process.return_code = 1

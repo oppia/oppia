@@ -417,5 +417,7 @@ def execute_deployment():
     python_utils.PRINT('Done!')
 
 
-if __name__ == '__main__':
-    execute_deployment()
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when build.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
+    main()
