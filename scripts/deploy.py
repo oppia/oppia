@@ -29,9 +29,9 @@ IMPORTANT NOTES:
 
 2.  This script should be run from the oppia root folder:
 
-        python -m scripts.deploy --app_name=[APP_NAME]
+        python -m scripts.deploy --app_name=[app_name]
 
-    where [APP_NAME] is the name of your app. Note that the root folder MUST be
+    where [app_name] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -42,9 +42,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import datetime
 import os
-import random
 import shutil
-import string
 import subprocess
 
 import python_utils
@@ -64,35 +62,13 @@ APP_NAME_OPPIASERVER = 'oppiaserver'
 APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
 BUCKET_NAME_SUFFIX = '-resources'
 
-PARSED_ARGS = _PARSER.parse_args()
-if PARSED_ARGS.app_name:
-    APP_NAME = PARSED_ARGS.app_name
-    if APP_NAME not in [
-            APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER] and (
-                'migration' not in APP_NAME):
-        raise Exception('Invalid app name: %s' % APP_NAME)
-    if PARSED_ARGS.version and APP_NAME == APP_NAME_OPPIASERVER:
-        raise Exception('Cannot use custom version with production app.')
-    # Note that CUSTOM_VERSION may be None.
-    CUSTOM_VERSION = PARSED_ARGS.version
-else:
-    raise Exception('No app name specified.')
-
 CURRENT_DATETIME = datetime.datetime.utcnow()
-
-CURRENT_BRANCH_NAME = common.get_current_branch_name()
-
-RELEASE_DIR_NAME = 'deploy-%s-%s-%s' % (
-    '-'.join('-'.join(APP_NAME.split('.')).split(':')),
-    CURRENT_BRANCH_NAME,
-    CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
-RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 INDEX_YAML_PATH = os.path.join('.', 'index.yaml')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-DEPLOY_DATA_PATH = os.path.join(
-    os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', APP_NAME)
+FECONF_PATH = os.path.join('.', 'feconf.py')
+CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 
 FILES_AT_ROOT = ['favicon.ico', 'robots.txt']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
@@ -101,26 +77,33 @@ IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
 # lowercase alphanumeric characters.
 CACHE_SLUG_PROD_LENGTH = 6
 
+DOT_CHAR = '.'
+HYPHEN_CHAR = '-'
 
-def preprocess_release():
+
+def preprocess_release(app_name, deploy_data_path):
     """Pre-processes release files.
 
-    This function should be called from within RELEASE_DIR_NAME. Currently it
-    does the following:
+    This function should be called from within release_dir_name defined
+    in execute_deployment function. Currently it does the following:
 
     (1) Substitutes files from the per-app deployment data.
     (2) Change the DEV_MODE constant in assets/constants.ts.
     (3) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
     (4) Removes the "version" field from app.yaml, since gcloud does not like
         it (when deploying).
+
+    Args:
+        app_name: str. Name of the app to deploy.
+        deploy_data_path: str. Path for deploy data directory.
     """
-    if not os.path.exists(DEPLOY_DATA_PATH):
+    if not os.path.exists(deploy_data_path):
         raise Exception(
-            'Could not find deploy_data directory at %s' % DEPLOY_DATA_PATH)
+            'Could not find deploy_data directory at %s' % deploy_data_path)
 
     # Copies files in root folder to assets/.
     for filename in FILES_AT_ROOT:
-        src = os.path.join(DEPLOY_DATA_PATH, filename)
+        src = os.path.join(deploy_data_path, filename)
         dst = os.path.join(os.getcwd(), 'assets', filename)
         if not os.path.exists(src):
             raise Exception(
@@ -134,7 +117,7 @@ def preprocess_release():
 
     # Copies files in images to /assets/images.
     for dir_name in IMAGE_DIRS:
-        src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
+        src_dir = os.path.join(deploy_data_path, 'images', dir_name)
         dst_dir = os.path.join(os.getcwd(), 'assets', 'images', dir_name)
 
         if not os.path.exists(src_dir):
@@ -150,18 +133,18 @@ def preprocess_release():
 
     # Changes the DEV_MODE constant in assets/constants.ts.
     with python_utils.open_file(
-        os.path.join('assets', 'constants.ts'), 'r') as assets_file:
+        os.path.join(CONSTANTS_FILE_PATH), 'r') as assets_file:
         content = assets_file.read()
-    bucket_name = APP_NAME + BUCKET_NAME_SUFFIX
+    bucket_name = app_name + BUCKET_NAME_SUFFIX
     assert '"DEV_MODE": true' in content
     assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
-    os.remove(os.path.join('assets', 'constants.ts'))
+    os.remove(os.path.join(CONSTANTS_FILE_PATH))
     content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
     content = content.replace(
         '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
     with python_utils.open_file(
-        os.path.join('assets', 'constants.ts'), 'w+') as new_assets_file:
+        os.path.join(CONSTANTS_FILE_PATH), 'w+') as new_assets_file:
         new_assets_file.write(content)
 
 
@@ -190,48 +173,199 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
             return False
 
 
-def _execute_deployment():
+def update_and_check_indexes(app_name):
+    """Updates indexes and checks if all indexes are serving.
+
+    Args:
+        app_name: str. The name of the app to deploy.
+
+    Raises:
+        Exception: All indexes are not serving on the indexes page.
+    """
+    # Update indexes, then prompt for a check that they are all serving
+    # before continuing with the deployment.
+    # NOTE: This assumes that the build process does not modify the
+    # index.yaml file or create a different version of it to use in
+    # production.
+    indexes_page_url = (
+        'https://console.cloud.google.com/datastore/indexes'
+        '?project=%s') % app_name
+    gcloud_adapter.update_indexes(INDEX_YAML_PATH, app_name)
+    if not gcloud_adapter.check_all_indexes_are_serving(app_name):
+        common.open_new_tab_in_browser_if_possible(indexes_page_url)
+        raise Exception(
+            'Please wait for all indexes to serve, then run this '
+            'script again to complete the deployment. For details, '
+            'visit the indexes page. Exiting.')
+
+
+def build_scripts():
+    """Builds and Minifies all the scripts.
+
+    Raises:
+        Exception: The build process fails.
+    """
+    # Do a build, while outputting to the terminal.
+    python_utils.PRINT('Building and minifying scripts...')
+    build_process = subprocess.Popen(
+        ['python', '-m', 'scripts.build', '--prod_env'],
+        stdout=subprocess.PIPE)
+    while True:
+        line = build_process.stdout.readline().strip()
+        if not line:
+            break
+        python_utils.PRINT(line)
+    # Wait for process to terminate, then check return code.
+    build_process.communicate()
+    if build_process.returncode > 0:
+        raise Exception('Build failed.')
+
+
+def deploy_application_and_write_log_entry(
+        app_name, version_to_deploy_to, current_git_revision):
+    """Deploys the app and writes the log entry.
+
+    Args:
+        app_name: str. The name of the app to deploy.
+        version_to_deploy_to: str. The version to deploy to.
+        current_git_revision: str. The current git revision.
+    """
+    # Deploy export service to GAE.
+    gcloud_adapter.deploy_application('export/app.yaml', app_name)
+    # Deploy app to GAE.
+    gcloud_adapter.deploy_application(
+        './app.yaml', app_name, version=version_to_deploy_to)
+    # Writing log entry.
+    common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
+    with python_utils.open_file(LOG_FILE_PATH, 'a') as log_file:
+        log_file.write(
+            'Successfully deployed to %s at %s (version %s)\n' % (
+                app_name, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
+                current_git_revision))
+
+
+def flush_memcache(app_name):
+    """Flushes the memcache.
+
+    Args:
+        app_name: str. The name of the app to deploy.
+    """
+    memcache_url = (
+        'https://pantheon.corp.google.com/appengine/memcache?'
+        'project=%s') % app_name
+    if not gcloud_adapter.flush_memcache(app_name):
+        python_utils.PRINT('Memcache flushing failed. Please do it manually.')
+        common.open_new_tab_in_browser_if_possible(memcache_url)
+
+
+def switch_version(app_name, current_release_version):
+    """Switches version if library page loads correctly.
+
+    Args:
+        app_name: str. The name of the app to deploy.
+        current_release_version: str. The version of the current release.
+
+    Raises:
+        Exception. The library page does not load correctly.
+    """
+    release_version_library_url = (
+        'https://%s-dot-%s.appspot.com/library' % (
+            current_release_version, app_name))
+    library_page_loads_correctly = check_errors_in_a_page(
+        release_version_library_url, 'Library page is loading correctly?')
+    if library_page_loads_correctly:
+        gcloud_adapter.switch_version(
+            app_name, current_release_version)
+        python_utils.PRINT('Successfully migrated traffic to release version!')
+    else:
+        raise Exception(
+            'Aborting version switch due to issues in library page '
+            'loading.')
+
+
+def check_breakage(app_name, current_release_version):
+    """Checks if there is any major breakage for test server deployment
+    and asks the user to file an issue if that is the case.
+
+    Args:
+        app_name: str. The name of the app to deploy.
+        current_release_version: str. The version of the current release.
+
+    Raises:
+        Exception. There is major breakage found through test server logs.
+    """
+    # If this is a test server deployment and the current release version is
+    # already serving, open the GAE error logs.
+
+    test_server_error_logs_url = (
+        'https://console.cloud.google.com/logs/viewer?'
+        'project=%s&key1=default&minLogLevel=500') % app_name
+    release_journal_url = (
+        'https://drive.google.com/drive/folders/'
+        '0B9KSjiibL_WDNjJyYlEtbTNvY3c')
+    issue_filing_url = 'https://github.com/oppia/oppia/milestone/39'
+
+    currently_served_version = (
+        gcloud_adapter.get_currently_served_version(app_name))
+    if (app_name == APP_NAME_OPPIATESTSERVER or 'migration' in app_name) and (
+            currently_served_version == current_release_version):
+        major_breakage = check_errors_in_a_page(
+            test_server_error_logs_url, 'Is anything major broken?')
+        if major_breakage:
+            common.open_new_tab_in_browser_if_possible(release_journal_url)
+            common.open_new_tab_in_browser_if_possible(issue_filing_url)
+            raise Exception(
+                'Please note the issue in the release journal for this month, '
+                'file a blocking bug and switch to the last known good '
+                'version.')
+
+
+def execute_deployment():
     """Executes the deployment process after doing the prerequisite checks."""
+    parsed_args = _PARSER.parse_args()
+    if parsed_args.app_name:
+        app_name = parsed_args.app_name
+        if app_name not in [
+                APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER] and (
+                    'migration' not in app_name):
+            raise Exception('Invalid app name: %s' % app_name)
+        if parsed_args.version and app_name == APP_NAME_OPPIASERVER:
+            raise Exception('Cannot use custom version with production app.')
+        # Note that custom_version may be None.
+        custom_version = parsed_args.version
+    else:
+        raise Exception('No app name specified.')
+
+    current_branch_name = common.get_current_branch_name()
+
+    release_dir_name = 'deploy-%s-%s-%s' % (
+        '-'.join('-'.join(app_name.split('.')).split(':')),
+        current_branch_name,
+        CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
+    release_dir_path = os.path.join(os.getcwd(), '..', release_dir_name)
+
+    deploy_data_path = os.path.join(
+        os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', app_name)
 
     install_third_party_libs.main(args=[])
 
     if not common.is_current_branch_a_release_branch():
         raise Exception(
             'The deployment script must be run from a release branch.')
-    current_release_version = CURRENT_BRANCH_NAME[len(
-        common.RELEASE_BRANCH_NAME_PREFIX):].replace('.', '-')
+    current_release_version = current_branch_name[len(
+        common.RELEASE_BRANCH_NAME_PREFIX):].replace(DOT_CHAR, HYPHEN_CHAR)
 
-    # This is required to compose the release_version_library_url correctly.
+    # This is required to compose the release_version_library_url
+    # (defined in switch_version function) correctly.
     if '.' in current_release_version:
         raise Exception('Current release version has \'.\' character.')
-
-    indexes_page_url = (
-        'https://console.cloud.google.com/datastore/indexes'
-        '?project=%s') % APP_NAME
-    release_version_library_url = (
-        'https://%s-dot-%s.appspot.com/library' % (
-            current_release_version, APP_NAME))
-    memcache_url = (
-        'https://pantheon.corp.google.com/appengine/memcache?'
-        'project=%s') % APP_NAME
-    test_server_error_logs_url = (
-        'https://console.cloud.google.com/logs/viewer?'
-        'project=%s&key1=default&minLogLevel=500') % APP_NAME
-    release_journal_url = (
-        'https://drive.google.com/drive/folders/'
-        '0B9KSjiibL_WDNjJyYlEtbTNvY3c')
-    issue_filing_url = 'https://github.com/oppia/oppia/milestone/39'
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
     gcloud_adapter.require_gcloud_to_be_available()
-    if APP_NAME in [APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER]:
-        if not common.is_current_branch_a_release_branch():
-            raise Exception(
-                'The deployment script must be run from a release branch.')
-    if APP_NAME == APP_NAME_OPPIASERVER:
-        with python_utils.open_file('./feconf.py', 'r') as f:
+    if app_name == APP_NAME_OPPIASERVER:
+        with python_utils.open_file(FECONF_PATH, 'r') as f:
             feconf_contents = f.read()
             if ('MAILGUN_API_KEY' not in feconf_contents or
                     'MAILGUN_API_KEY = None' in feconf_contents):
@@ -248,16 +382,16 @@ def _execute_deployment():
 
     # Create a folder in which to save the release candidate.
     python_utils.PRINT('Ensuring that the release directory parent exists')
-    common.ensure_directory_exists(os.path.dirname(RELEASE_DIR_PATH))
+    common.ensure_directory_exists(os.path.dirname(release_dir_path))
 
     # Copy files to the release directory. Omits the .git subfolder.
     python_utils.PRINT('Copying files to the release directory')
     shutil.copytree(
-        os.getcwd(), RELEASE_DIR_PATH, ignore=shutil.ignore_patterns('.git'))
+        os.getcwd(), release_dir_path, ignore=shutil.ignore_patterns('.git'))
 
     # Change the current directory to the release candidate folder.
-    with common.CD(RELEASE_DIR_PATH):
-        if not os.getcwd().endswith(RELEASE_DIR_NAME):
+    with common.CD(release_dir_path):
+        if not os.getcwd().endswith(release_dir_name):
             raise Exception(
                 'Invalid directory accessed during deployment: %s'
                 % os.getcwd())
@@ -265,94 +399,23 @@ def _execute_deployment():
         python_utils.PRINT('Changing directory to %s' % os.getcwd())
 
         python_utils.PRINT('Preprocessing release...')
-        preprocess_release()
+        preprocess_release(app_name, deploy_data_path)
 
-        # Update indexes, then prompt for a check that they are all serving
-        # before continuing with the deployment.
-        # NOTE: This assumes that the build process does not modify the
-        # index.yaml file or create a different version of it to use in
-        # production.
-        gcloud_adapter.update_indexes(INDEX_YAML_PATH, APP_NAME)
-        if not gcloud_adapter.check_all_indexes_are_serving(APP_NAME):
-            common.open_new_tab_in_browser_if_possible(indexes_page_url)
-            raise Exception(
-                'Please wait for all indexes to serve, then run this '
-                'script again to complete the deployment. For details, '
-                'visit the indexes page. Exiting.')
-
-        # Do a build, while outputting to the terminal.
-        python_utils.PRINT('Building and minifying scripts...')
-        build_process = subprocess.Popen(
-            ['python', '-m', 'scripts.build', '--prod_env'],
-            stdout=subprocess.PIPE)
-        while True:
-            line = build_process.stdout.readline().strip()
-            if not line:
-                break
-            python_utils.PRINT(line)
-        # Wait for process to terminate, then check return code.
-        build_process.communicate()
-        if build_process.returncode > 0:
-            raise Exception('Build failed.')
-
-        # Deploy export service to GAE.
-        gcloud_adapter.deploy_application('export/app.yaml', APP_NAME)
-        # Deploy app to GAE.
-        gcloud_adapter.deploy_application(
-            './app.yaml', APP_NAME, version=(
-                CUSTOM_VERSION if CUSTOM_VERSION else current_release_version))
-
-        # Writing log entry.
-        common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
-        with python_utils.open_file(LOG_FILE_PATH, 'a') as log_file:
-            log_file.write(
-                'Successfully deployed to %s at %s (version %s)\n' % (
-                    APP_NAME, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
-                    current_git_revision))
+        update_and_check_indexes(app_name)
+        build_scripts()
+        deploy_application_and_write_log_entry(
+            app_name, (
+                custom_version if custom_version else current_release_version),
+            current_git_revision)
 
         python_utils.PRINT('Returning to oppia/ root directory.')
 
-    library_page_loads_correctly = check_errors_in_a_page(
-        release_version_library_url, 'Library page is loading correctly?')
-    if library_page_loads_correctly:
-        gcloud_adapter.switch_version(
-            APP_NAME, current_release_version)
-        python_utils.PRINT('Successfully migrated traffic to release version!')
-    else:
-        raise Exception(
-            'Aborting version switch due to issues in library page '
-            'loading.')
-
-    if not gcloud_adapter.flush_memcache(APP_NAME):
-        python_utils.PRINT('Memcache flushing failed. Please do it manually.')
-        common.open_new_tab_in_browser_if_possible(memcache_url)
-
-    # If this is a test server deployment and the current release version is
-    # already serving, open the library page (for sanity checking) and the GAE
-    # error logs.
-    currently_served_version = (
-        gcloud_adapter.get_currently_served_version(APP_NAME))
-    if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
-            currently_served_version == current_release_version):
-        major_breakage = check_errors_in_a_page(
-            test_server_error_logs_url, 'Is anything major broken?')
-        if major_breakage:
-            common.open_new_tab_in_browser_if_possible(release_journal_url)
-            common.open_new_tab_in_browser_if_possible(issue_filing_url)
-            raise Exception(
-                'Please note the issue in the release journal for this month, '
-                'file a blocking bug and switch to the last known good '
-                'version.')
+    switch_version(app_name, current_release_version)
+    flush_memcache(app_name)
+    check_breakage(app_name, current_release_version)
 
     python_utils.PRINT('Done!')
 
 
-def get_unique_id():
-    """Returns a unique id."""
-    unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
-                        for _ in python_utils.RANGE(CACHE_SLUG_PROD_LENGTH))
-    return unique_id
-
-
 if __name__ == '__main__':
-    _execute_deployment()
+    execute_deployment()
