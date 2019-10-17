@@ -77,6 +77,36 @@ var ExplorationPlayerPage = function() {
   var suggestionPopupLink =
     element(by.css('.protractor-test-exploration-suggestion-popup-link'));
 
+  var audioExpandButton = element(
+    by.css('.protractor-test-audio-expand-button'));
+  var audioControlButton = element(
+    by.css('.protractor-test-audio-control-button'));
+  var audioControlButton = element(
+    by.css('.protractor-test-audio-control-button'));
+
+  this.clickExpandAudioButton = function() {
+    waitFor.elementToBeClickable(
+      audioExpandButton, 'Audio expand button takes too long to be clickable');
+    audioExpandButton.click();
+  };
+
+  this.clickPlayAudioButton = function() {
+    waitFor.elementToBeClickable(
+      audioControlButton,
+      'Audio control button takes too long to be clickable');
+    expect(element(by.css('.fa-play-circle')).isPresent()).toBe(true);
+    audioControlButton.click();
+  };
+
+
+  this.clickPauseAudioButton = function() {
+    waitFor.elementToBeClickable(
+      audioControlButton,
+      'Audio control button takes too long to be clickable');
+    expect(element(by.css('.fa-pause-circle')).isPresent()).toBe(true);
+    audioControlButton.click();
+  };
+
   this.clickThroughToNextCard = function() {
     waitFor.elementToBeClickable(
       nextCardButton, '"Next Card" button takes too long to be clickable');
