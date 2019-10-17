@@ -21,11 +21,20 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import re
+import sys
 
 import feconf
 import python_utils
 
 from . import common
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 
 def remove_release_labels(repo):
@@ -90,8 +99,9 @@ def main():
             'Release summary file %s is missing. Please run the '
             'release_info.py script and re-run this script.' % (
                 feconf.RELEASE_SUMMARY_FILEPATH))
-
-    repo = common.get_repo()
+    personal_access_token = common.get_personal_access_token()
+    g = github.Github(personal_access_token)
+    repo = g.get_organization('oppia').get_repo('oppia')
 
     remove_blocking_bugs_milestone_from_issues(repo)
     remove_release_labels(repo)

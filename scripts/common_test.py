@@ -34,14 +34,6 @@ import python_utils
 
 from . import common
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
-sys.path.insert(0, _PY_GITHUB_PATH)
-
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
-
 
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
@@ -383,24 +375,3 @@ class CommonTests(test_utils.GenericTestBase):
             'access token at https://github.com/settings/tokens and re-run '
             'the script'):
             common.get_personal_access_token()
-
-    def test_get_repo(self):
-        mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
-            return 'token'
-        # pylint: enable=unused-argument
-        def mock_get_organization(unused_self, unused_name):
-            return github.Organization.Organization(
-                requester='', headers='', attributes={}, completed='')
-        def mock_get_repo(unused_self, unused_org):
-            return mock_repo
-
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        get_org_swap = self.swap(
-            github.Github, 'get_organization', mock_get_organization)
-        get_repo_swap = self.swap(
-            github.Organization.Organization, 'get_repo', mock_get_repo)
-        with getpass_swap, get_org_swap, get_repo_swap:
-            self.assertEqual(common.get_repo(), mock_repo)

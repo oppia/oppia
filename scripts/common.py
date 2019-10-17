@@ -21,18 +21,9 @@ import getpass
 import os
 import socket
 import subprocess
-import sys
 
 import feconf
 import python_utils
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
-sys.path.insert(0, _PY_GITHUB_PATH)
-
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -314,18 +305,6 @@ def get_personal_access_token():
             'access token at https://github.com/settings/tokens and re-run '
             'the script')
     return personal_access_token
-
-
-def get_repo():
-    """Gets the github object for Oppia repo.
-
-    Returns:
-        github.Repository.Repository. The PyGithub object for the repo.
-    """
-    personal_access_token = get_personal_access_token()
-    g = github.Github(personal_access_token)
-    repo = g.get_organization('oppia').get_repo('oppia')
-    return repo
 
 
 class CD(python_utils.OBJECT):

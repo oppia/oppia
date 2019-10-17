@@ -24,11 +24,20 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import os
 import re
+import sys
 
 import feconf
 import python_utils
 
 from . import common
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
 GIT_CMD_TEMPLATE_GET_NEW_COMMITS = 'git cherry %s -v'
@@ -298,7 +307,8 @@ def main():
         raise Exception(
             'This script should only be run from the latest release branch.')
     personal_access_token = common.get_personal_access_token()
-    repo = common.get_repo()
+    g = github.Github(personal_access_token)
+    repo = g.get_organization('oppia').get_repo('oppia')
 
     blocking_bugs_count = get_blocking_bug_issue_count(repo)
     if blocking_bugs_count:

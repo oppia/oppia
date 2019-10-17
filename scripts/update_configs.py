@@ -27,11 +27,20 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import getpass
 import os
 import re
+import sys
 
 import feconf
 import python_utils
 
 from . import common
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 FECONF_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'feconf_updates.config')
@@ -95,7 +104,9 @@ def check_updates_to_terms_of_service():
     """Checks if updates are made to terms of service and updates
     REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
     """
-    repo = common.get_repo()
+    personal_access_token = common.get_personal_access_token()
+    g = github.Github(personal_access_token)
+    repo = g.get_organization('oppia').get_repo('oppia')
 
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia/commits/develop/core/'
