@@ -70,8 +70,8 @@ describe('Enable correctness feedback and set correctness', function() {
     workflow.createExploration();
   });
 
-  it('should enable correctness feedback after the interaction is created.' +
-     'Correctness feedback is set in response editor.', function() {
+  it('should allow selecting correct feedback from the response editor ' +
+     'after the interaction is created', function() {
     explorationEditorMainTab.setStateName('First');
     explorationEditorMainTab.setContent(forms.toRichText(
       'Select the right option.'));
@@ -100,8 +100,8 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorPage.saveChanges();
   });
 
-  it('should turn on enable correctness feedback before create interaction.' +
-     'Correctness feedback is set in add response modal.', function() {
+  it('should allow selecting correct feedback from the response editor ' +
+     'during set the interaction', function() {
     // Turn on correctness feedback first.
     applyCommonSettings();
 
@@ -130,29 +130,29 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorPage.saveChanges();
   });
 
-  it('should turn on correctness feedback before create interaction.' +
-    'Correctness feedback is set in response editor.', function() {
-    // Turn on correctness feedback first.
-    applyCommonSettings();
+  it('should allow selecting correct feedback from the default response editor',
+    function() {
+      // Turn on correctness feedback first.
+      applyCommonSettings();
 
-    // Go back to main tab to create interactions.
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.setStateName('First');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'Select the right option.'));
-    explorationEditorMainTab.setInteraction('NumericInput');
+      // Go back to main tab to create interactions.
+      explorationEditorPage.navigateToMainTab();
+      explorationEditorMainTab.setStateName('First');
+      explorationEditorMainTab.setContent(forms.toRichText(
+        'Select the right option.'));
+      explorationEditorMainTab.setInteraction('NumericInput');
 
-    // Set correctness in response editor.
-    responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.markAsCorrect();
-    responseEditor.setFeedback(forms.toRichText('Correct!'));
-    responseEditor.setDestination('End', true, true);
+      // Set correctness in response editor.
+      responseEditor = explorationEditorMainTab.getResponseEditor('default');
+      responseEditor.markAsCorrect();
+      responseEditor.setFeedback(forms.toRichText('Correct!'));
+      responseEditor.setDestination('End', true, true);
       explorationEditorMainTab.expectTickMarkIsDisplayed();
 
-    explorationEditorMainTab.moveToState('End');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-  });
+      explorationEditorMainTab.moveToState('End');
+      explorationEditorMainTab.setInteraction('EndExploration');
+      explorationEditorPage.saveChanges();
+    });
 
   afterEach(function() {
     workflow.publishExploration();
