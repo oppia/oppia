@@ -3,17 +3,21 @@
        infinite-scroll-distance="1"
        infinite-scroll-disabled="false">
     <div ng-repeat="opportunity in getOpportunities()">
-      <opportunities-list-item opportunity="opportunity"></opportunities-list-item>
+      <opportunities-list-item opportunity="opportunity"
+                               on-click-action-button="onClickActionButton"
+                               progress-bar-required="isProgressBarRequired()"
+                               label-required="isLabelRequired()">
+      </opportunities-list-item>
     </div>
   </div>
-  <div ng-show="isDataLoading()">
+  <div ng-show="opportunityDataIsLoading">
     <opportunities-list-item></opportunities-list-item>
     <opportunities-list-item></opportunities-list-item>
   </div>
-  <div class="oppia-end-availability" ng-if="!isDataLoading() && !isMoreOpportunitiesAvailable()">
+  <div class="oppia-end-availability" ng-if="!opportunityDataIsLoading && !isMoreOpportunitiesAvailable()">
     <div class="oppia-end-availability-line"></div>
-    <div class="oppia-opportunity-availablity-message" ng-if="!opportunities.length">No opportunity available!</div>
-    <div class="oppia-opportunity-availablity-message" ng-if="opportunities.length">***</div>
+    <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length === 0">No opportunity available!</div>
+    <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length !== 0">***</div>
     <div class="oppia-end-availability-line"></div>
   </div>
 </div>
@@ -89,12 +93,28 @@
     margin: 1% 0;
     width: 20%;
   }
+  .oppia-opportunities-label-container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 1% 0;
+    width: 25%;
+  }
+  .oppia-opportunities-label {
+    background-color: #ffffff;
+    border-radius: 8px;
+    height: 20px;
+    min-width: 200px;
+    text-align: center;
+    opacity: 0.8;
+  }
   .oppia-opportunities-progress {
     align-items: center;
     display: flex;
     justify-content: center;
     margin: 1% 0;
     width: 25%;
+    min-width: 200px;
   }
   .oppia-opportunities-details {
     display: flex;
@@ -104,6 +124,7 @@
   }
   .oppia-opportunities-list-item {
     background-color: #ffffff;
+    border: 1px solid #e8e7e2;
     display: flex;
     height: 90px;
     justify-content: space-between;
