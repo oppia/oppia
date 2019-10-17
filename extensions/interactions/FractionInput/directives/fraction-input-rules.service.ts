@@ -34,6 +34,22 @@ export interface FractionAnswer {
 export class FractionInputRulesService {
   constructor(private fractionObjectFactory: FractionObjectFactory) {}
 
+  private isEquivalent(a, b): boolean {
+    // Create arrays of property names
+    var aProps = Object.getOwnPropertyNames(a);
+    var bProps = Object.getOwnPropertyNames(b);
+    if (aProps.length !== bProps.length) {
+      return false;
+    }
+    for (var i = 0; i < aProps.length; i++) {
+      var propName = aProps[i];
+      if (a[propName] !== b[propName]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   toFloat(fractionDict: FractionAnswer) {
     return this.fractionObjectFactory.fromDict(fractionDict).toFloat();
   }
@@ -46,14 +62,12 @@ export class FractionInputRulesService {
     var simplestForm =
       this.fractionObjectFactory.fromDict(inputs.f).convertToSimplestForm();
     return this.toFloat(answer) === this.toFloat(inputs.f) &&
-      JSON.stringify(answer).toLowerCase() === JSON.stringify(
-        simplestForm).toLowerCase();
+      this.isEquivalent(answer, simplestForm);
   }
   IsExactlyEqualTo(
       answer: FractionAnswer, inputs: {f: FractionAnswer}): boolean {
     // Only returns true if both answers are structurally equal.
-    return JSON.stringify(answer).toLowerCase() === JSON.stringify(
-      inputs.f).toLowerCase();
+    return this.isEquivalent(answer, inputs.f);
   }
   IsLessThan(
       answer: FractionAnswer, inputs: {f: FractionAnswer}): boolean {
