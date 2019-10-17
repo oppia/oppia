@@ -1158,7 +1158,11 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 self.failed = True
 
     def handle_endtag(self, tag):
-        """Handle end tag of a HTML line."""
+        """Handle end tag of a HTML line.
+
+        Args:
+            tag: str. end tag of a HTML line.
+        """
         line_number, _ = self.getpos()
         tag_line = self.file_lines[line_number - 1]
         leading_spaces_count = len(tag_line) - len(tag_line.lstrip())
