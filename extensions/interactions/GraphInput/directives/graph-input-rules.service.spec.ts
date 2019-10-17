@@ -181,7 +181,7 @@ describe('Graph Input service', () => {
       ], [2, 0, 1])).toBe(true);
     });
   });
-
+  // TODO(#7165): Replace 'any' with the exact type.
   let undirectedEmptyGraph = (): any => {
     return {
       vertices: [],
@@ -191,7 +191,7 @@ describe('Graph Input service', () => {
       isLabeled: false
     };
   };
-
+  // TODO(#7165): Replace 'any' with the exact type.
   let undirectedNullGraph = (numVertices: number): any => {
     var graph = undirectedEmptyGraph();
     for (var i = 0; i < numVertices; i++) {
@@ -203,7 +203,7 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-
+  // TODO(#7165): Replace 'any' with the exact type.
   let undirectedCycleGraph = (numVertices: number): any => {
     var graph = undirectedNullGraph(numVertices);
     if (numVertices === 1) {
@@ -218,8 +218,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-
-  let undirectedCompleteGraph = (numVertices: number) => {
+  // TODO(#7165): Replace 'any' with the exact type.
+  let undirectedCompleteGraph = (numVertices: number): any => {
     var graph = undirectedNullGraph(numVertices);
     for (var i = 0; i < numVertices; i++) {
       for (var j = i + 1; j < numVertices; j++) {
@@ -232,8 +232,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-
-  let undirectedStarGraph = (numVertices: number) => {
+  // TODO(#7165): Replace 'any' with the exact type.
+  let undirectedStarGraph = (numVertices: number): any => {
     var graph = undirectedNullGraph(numVertices);
     for (var i = 1; i < numVertices; i++) {
       graph.edges.push({
@@ -244,8 +244,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-
-  let directedEmptyGraph = () => {
+  // TODO(#7165): Replace 'any' with the exact type.
+  let directedEmptyGraph = (): any => {
     return {
       vertices: [],
       edges: [],
@@ -254,8 +254,8 @@ describe('Graph Input service', () => {
       isLabeled: false
     };
   };
-
-  let directedNullGraph = (numVertices: number) => {
+  // TODO(#7165): Replace 'any' with the exact type.
+  let directedNullGraph = (numVertices: number): any => {
     var graph = directedEmptyGraph();
     for (var i = 0; i < numVertices; i++) {
       graph.vertices.push({
@@ -266,8 +266,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-
-  let directedCycleGraph = (numVertices: number) => {
+  // TODO(#7165): Replace 'any' with the exact type.
+  let directedCycleGraph = (numVertices: number): any => {
     var graph = directedNullGraph(numVertices);
     if (numVertices === 1) {
       return graph;

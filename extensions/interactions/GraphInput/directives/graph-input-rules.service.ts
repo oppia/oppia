@@ -194,7 +194,7 @@ export class GraphInputRulesService {
     }
     return false;
   }
-
+  // TODO(#7165): Replace 'any' with the exact type.
   HasGraphProperty(answer: any, inputs: {p: string}): boolean {
     if (inputs.p === 'strongly_connected') {
       return this.isStronglyConnected(answer);
@@ -208,6 +208,7 @@ export class GraphInputRulesService {
       return false;
     }
   }
+  // TODO(#7165): Replace 'any' with the exact type.
   IsIsomorphicTo(answer: any, inputs: {g: any}): boolean {
     return this.isIsomorphic(answer, inputs.g);
   }
