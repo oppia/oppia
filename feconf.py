@@ -29,6 +29,9 @@ from constants import constants
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
 ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 
+# Affirmative user confirmations.
+AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
+
 # PyGithub can fetch milestone only by using the milestone number. Milestones
 # are numbered sequentially as they are created and the number remains fixed.
 # The number for blocking_bugs milestone is 39 which is used to fetch this

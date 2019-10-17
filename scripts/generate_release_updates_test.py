@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/generate_release_updates.py."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -51,26 +52,28 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         self.input_swap = self.swap(
             python_utils, 'INPUT', mock_input)
 
-    def test_write_message_template(self):
+    def test_create_new_file_with_release_message_template(self):
         temp_mail_file = tempfile.NamedTemporaryFile().name
         mail_file_swap = self.swap(
             generate_release_updates,
             'RELEASE_MAIL_MESSAGE_FILEPATH', temp_mail_file)
         with self.input_swap, mail_file_swap:
-            generate_release_updates.write_message_template()
+            (
+                generate_release_updates
+                .create_new_file_with_release_message_template())
             with python_utils.open_file(temp_mail_file, 'r') as f:
                 self.assertEqual(
                     f.read(),
                     generate_release_updates.RELEASE_MAIL_MESSAGE_TEMPLATE)
 
-    def test_check_updated_message_with_valid_message(self):
+    def test_validate_release_message_with_valid_message(self):
         mail_file_swap = self.swap(
             generate_release_updates, 'RELEASE_MAIL_MESSAGE_FILEPATH',
             VALID_RELEASE_MAIL_MESSAGE_FILEPATH)
         with mail_file_swap:
-            generate_release_updates.check_updated_message()
+            generate_release_updates.validate_release_message()
 
-    def test_check_updated_message_with_invalid_message(self):
+    def test_validate_release_message_with_invalid_message(self):
         mail_file_swap = self.swap(
             generate_release_updates, 'RELEASE_MAIL_MESSAGE_FILEPATH',
             INVALID_RELEASE_MAIL_MESSAGE_FILEPATH)
@@ -80,16 +83,16 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
                 'still not updated: \\[Add main changes\\], '
                 '\\[Add names of release testers\\].\nPlease re-run '
                 'the scripts and make the updates again.')):
-            generate_release_updates.check_updated_message()
+            generate_release_updates.validate_release_message()
 
-    def test_send_and_check_updates(self):
+    def test_prompt_user_to_send_announcement_email(self):
         def mock_open_new_tab_in_browser_if_possible(unused_url):
             pass
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible',
             mock_open_new_tab_in_browser_if_possible)
         with self.input_swap, open_tab_swap:
-            generate_release_updates.send_and_check_updates()
+            generate_release_updates.prompt_user_to_send_announcement_email()
 
     def test_invalid_branch_name(self):
         def mock_get_current_branch_name():
@@ -114,21 +117,24 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
 
     def test_function_calls(self):
         check_function_calls = {
-            'write_message_template_gets_called': False,
-            'check_updated_message_gets_called': False,
-            'send_and_check_updates_gets_called': False,
+            'create_new_file_with_release_message_template_gets_called': False,
+            'validate_release_message_gets_called': False,
+            'prompt_user_to_send_announcement_email_gets_called': False,
         }
         expected_check_function_calls = {
-            'write_message_template_gets_called': True,
-            'check_updated_message_gets_called': True,
-            'send_and_check_updates_gets_called': True,
+            'create_new_file_with_release_message_template_gets_called': True,
+            'validate_release_message_gets_called': True,
+            'prompt_user_to_send_announcement_email_gets_called': True,
         }
-        def mock_write_message_template():
-            check_function_calls['write_message_template_gets_called'] = True
-        def mock_check_updated_message():
-            check_function_calls['check_updated_message_gets_called'] = True
-        def mock_send_and_check_updates():
-            check_function_calls['send_and_check_updates_gets_called'] = True
+        def mock_create_new_file_with_release_message_template():
+            check_function_calls[
+                'create_new_file_with_release_message_template_gets_called'
+                ] = True
+        def mock_validate_release_message():
+            check_function_calls['validate_release_message_gets_called'] = True
+        def mock_prompt_user_to_send_announcement_email():
+            check_function_calls[
+                'prompt_user_to_send_announcement_email_gets_called'] = True
         def mock_exists(unused_filepath):
             return True
         def mock_remove(unused_filepath):
@@ -137,14 +143,15 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         release_summary_swap = self.swap(
             feconf, 'RELEASE_SUMMARY_FILEPATH', MOCK_RELEASE_SUMMARY_FILEPATH)
         write_swap = self.swap(
-            generate_release_updates, 'write_message_template',
-            mock_write_message_template)
+            generate_release_updates,
+            'create_new_file_with_release_message_template',
+            mock_create_new_file_with_release_message_template)
         check_swap = self.swap(
-            generate_release_updates, 'check_updated_message',
-            mock_check_updated_message)
+            generate_release_updates, 'validate_release_message',
+            mock_validate_release_message)
         send_swap = self.swap(
-            generate_release_updates, 'send_and_check_updates',
-            mock_send_and_check_updates)
+            generate_release_updates, 'prompt_user_to_send_announcement_email',
+            mock_prompt_user_to_send_announcement_email)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         remove_swap = self.swap(os, 'remove', mock_remove)
 

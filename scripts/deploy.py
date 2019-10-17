@@ -47,6 +47,7 @@ import shutil
 import string
 import subprocess
 
+import feconf
 import python_utils
 
 from . import common
@@ -184,7 +185,7 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
             'PLEASE CONFIRM: %s See %s '
             '(y/n)' % (msg_to_confirm, url_to_check))
         answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
+        if answer in feconf.AFFIRMATIVE_CONFIRMATIONS:
             return True
         elif answer:
             return False

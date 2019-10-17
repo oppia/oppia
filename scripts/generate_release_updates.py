@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Script that generates announcement mail for the release."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -50,7 +51,7 @@ RELEASE_MAIL_MESSAGE_FILEPATH = os.path.join(
     PARENT_DIR, 'release_mail_message.txt')
 
 
-def write_message_template():
+def create_new_file_with_release_message_template():
     """Adds the template message to release mail filepath."""
     with python_utils.open_file(RELEASE_MAIL_MESSAGE_FILEPATH, 'w') as f:
         f.write(RELEASE_MAIL_MESSAGE_TEMPLATE)
@@ -66,12 +67,12 @@ def write_message_template():
         '   6. Your name\n' % RELEASE_MAIL_MESSAGE_FILEPATH)
 
 
-def check_updated_message():
+def validate_release_message():
     """Checks the message after the mail template is updated by the
     user.
 
     Raises:
-        Exception: If the message still contains sections from template
+        Exception: The message still contains sections from template
             which are not updated.
     """
     with python_utils.open_file(RELEASE_MAIL_MESSAGE_FILEPATH, 'r') as f:
@@ -87,7 +88,7 @@ def check_updated_message():
                     ', '.join(extra_sections)))
 
 
-def send_and_check_updates():
+def prompt_user_to_send_announcement_email():
     """Asks the user to send release announcement mail and check if
     it is in announcement category.
     """
@@ -121,9 +122,9 @@ def main():
                 feconf.RELEASE_SUMMARY_FILEPATH))
 
     try:
-        write_message_template()
-        check_updated_message()
-        send_and_check_updates()
+        create_new_file_with_release_message_template()
+        validate_release_message()
+        prompt_user_to_send_announcement_email()
 
     finally:
         if os.path.exists(RELEASE_MAIL_MESSAGE_FILEPATH):

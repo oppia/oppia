@@ -19,6 +19,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
+import getpass
 import http.server
 import os
 import shutil
@@ -32,6 +33,14 @@ from core.tests import test_utils
 import python_utils
 
 from . import common
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 
 class CommonTests(test_utils.GenericTestBase):
@@ -353,3 +362,45 @@ class CommonTests(test_utils.GenericTestBase):
             return 'Y'
         with self.swap(python_utils, 'INPUT', mock_input):
             common.ask_user_to_confirm('Testing')
+
+    def test_get_personal_access_token_with_valid_token(self):
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return 'token'
+        # pylint: enable=unused-argument
+        with self.swap(getpass, 'getpass', mock_getpass):
+            self.assertEqual(common.get_personal_access_token(), 'token')
+
+    def test_get_personal_access_token_with_token_as_none(self):
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return None
+        # pylint: enable=unused-argument
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+        with getpass_swap, self.assertRaisesRegexp(
+            Exception,
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script'):
+            common.get_personal_access_token()
+
+    def test_get_repo(self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return 'token'
+        # pylint: enable=unused-argument
+        def mock_get_organization(unused_self, unused_name):
+            return github.Organization.Organization(
+                requester='', headers='', attributes={}, completed='')
+        def mock_get_repo(unused_self, unused_org):
+            return mock_repo
+
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+        get_org_swap = self.swap(
+            github.Github, 'get_organization', mock_get_organization)
+        get_repo_swap = self.swap(
+            github.Organization.Organization, 'get_repo', mock_get_repo)
+        with getpass_swap, get_org_swap, get_repo_swap:
+            self.assertEqual(common.get_repo(), mock_repo)

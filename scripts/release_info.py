@@ -17,27 +17,18 @@
 """Script that simplifies releases by collecting various information.
 Should be run from the oppia root dir.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import getpass
 import os
 import re
-import sys
 
 import feconf
 import python_utils
 
 from . import common
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
-sys.path.insert(0, _PY_GITHUB_PATH)
-
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
 GIT_CMD_TEMPLATE_GET_NEW_COMMITS = 'git cherry %s -v'
@@ -306,19 +297,8 @@ def main():
     if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
         raise Exception(
             'This script should only be run from the latest release branch.')
-
-    personal_access_token = getpass.getpass(
-        prompt=(
-            'Please provide personal access token for your github ID. '
-            'You can create one at https://github.com/settings/tokens: '))
-
-    if personal_access_token is None:
-        raise Exception(
-            'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and re-run '
-            'the script')
-    g = github.Github(personal_access_token)
-    repo = g.get_organization('oppia').get_repo('oppia')
+    personal_access_token = common.get_personal_access_token()
+    repo = common.get_repo()
 
     blocking_bugs_count = get_blocking_bug_issue_count(repo)
     if blocking_bugs_count:

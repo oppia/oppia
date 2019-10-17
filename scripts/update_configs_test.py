@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/update_configs.py."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -111,13 +112,22 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs.check_updates_to_terms_of_service()
 
     def test_invalid_user_input(self):
+        print_msgs = []
         def mock_input():
-            return 'invalid'
+            if print_msgs:
+                return 'n'
+            else:
+                return 'invalid'
+        def mock_print(msg):
+            if 'Invalid Input' in msg:
+                print_msgs.append(msg)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        print_swap = self.swap(python_utils, 'PRINT', mock_print)
         with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
-            with self.open_tab_swap, input_swap, self.assertRaisesRegexp(
-                Exception, ('Invalid Input: invalid')):
+            with self.open_tab_swap, input_swap, print_swap:
                 update_configs.check_updates_to_terms_of_service()
+        self.assertEqual(
+            print_msgs, ['Invalid Input: invalid. Please enter yes or no.'])
 
     def test_update_to_registration_updated_date(self):
         def mock_input():
@@ -163,7 +173,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with getpass_swap, self.assertRaisesRegexp(
             Exception, 'Invalid mailgun api key.'):
-            update_configs.add_mailgun_api()
+            update_configs.add_mailgun_api_key()
 
     def test_addition_of_mailgun_api_key(self):
         # pylint: disable=unused-argument
@@ -190,7 +200,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         feconf_swap = self.swap(
             update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
         with getpass_swap, feconf_swap:
-            update_configs.add_mailgun_api()
+            update_configs.add_mailgun_api_key()
         with python_utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
@@ -200,7 +210,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with self.feconf_swap, config_swap, self.assertRaisesRegexp(
             Exception,
             'Invalid line in invalid_feconf_updates.config '
-            'config file: INVALID: \'invalid\''):
+            'config file: INVALID_KEY: \'invalid\''):
             update_configs.apply_changes_based_on_config(
                 update_configs.LOCAL_FECONF_PATH,
                 update_configs.FECONF_CONFIG_PATH, update_configs.FECONF_REGEX)
@@ -212,7 +222,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with self.feconf_swap, config_swap, self.assertRaisesRegexp(
             Exception,
             'Could not find correct number of lines in '
-            'feconf.txt matching: EXTRA = \'extra\''):
+            'feconf.txt matching: EXTRA_KEY = \'extra\''):
             update_configs.apply_changes_based_on_config(
                 update_configs.LOCAL_FECONF_PATH,
                 update_configs.FECONF_CONFIG_PATH, update_configs.FECONF_REGEX)
@@ -265,19 +275,19 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
     def test_function_calls(self):
         check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': False,
-            'add_mailgun_api_gets_called': False,
+            'add_mailgun_api_key_gets_called': False,
             'apply_changes_based_on_config_gets_called': False
         }
         expected_check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': True,
-            'add_mailgun_api_gets_called': True,
+            'add_mailgun_api_key_gets_called': True,
             'apply_changes_based_on_config_gets_called': True
         }
         def mock_check_updates():
             check_function_calls[
                 'check_updates_to_terms_of_service_gets_called'] = True
-        def mock_add_mailgun_api():
-            check_function_calls['add_mailgun_api_gets_called'] = True
+        def mock_add_mailgun_api_key():
+            check_function_calls['add_mailgun_api_key_gets_called'] = True
         def mock_apply_changes(
                 unused_local_filepath, unused_config_filepath,
                 unused_expected_config_line_regex):
@@ -287,11 +297,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         check_updates_swap = self.swap(
             update_configs, 'check_updates_to_terms_of_service',
             mock_check_updates)
-        add_mailgun_api_swap = self.swap(
-            update_configs, 'add_mailgun_api', mock_add_mailgun_api)
+        add_mailgun_api_key_swap = self.swap(
+            update_configs, 'add_mailgun_api_key', mock_add_mailgun_api_key)
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
         with self.branch_name_swap, self.release_scripts_exist_swap:
-            with check_updates_swap, add_mailgun_api_swap, apply_changes_swap:
-                update_configs.main()
+            with check_updates_swap, add_mailgun_api_key_swap:
+                with apply_changes_swap:
+                    update_configs.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)

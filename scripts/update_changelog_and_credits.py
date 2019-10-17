@@ -20,13 +20,13 @@ using release_summary.md.
 This script should only be run after release_info.py script is run
 successfully.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import collections
 import datetime
-import getpass
 import os
 import re
 import sys
@@ -111,7 +111,7 @@ def check_ordering_of_sections(release_summary_lines):
             ../release_summary.md.
 
     Raises:
-        Exception: If expected ordering does not match the ordering
+        Exception: The expected ordering does not match the ordering
             in release_summary.md.
     """
     sections = [
@@ -385,16 +385,7 @@ def main():
             'script specifying a username using --username=<Your username>')
     github_username = parsed_args.github_username
 
-    personal_access_token = getpass.getpass(
-        prompt=(
-            'Please provide personal access token for your github ID. '
-            'You can create one at https://github.com/settings/tokens: '))
-
-    if personal_access_token is None:
-        raise Exception(
-            'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and re-run '
-            'the script')
+    personal_access_token = common.get_personal_access_token()
     g = github.Github(personal_access_token)
     repo_fork = g.get_repo('%s/oppia' % github_username)
 

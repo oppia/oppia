@@ -15,25 +15,17 @@
 # limitations under the License.
 
 """Script that performs task to wrap up the release."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import getpass
 import os
 import re
-import sys
 
 import feconf
+import python_utils
 
 from . import common
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
-sys.path.insert(0, _PY_GITHUB_PATH)
-
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
 
 
 def remove_release_labels(repo):
@@ -61,6 +53,7 @@ def remove_release_labels(repo):
     released_prs = repo.get_issues(state='closed', labels=[released_label])
     for pr in released_prs:
         pr.remove_from_labels('PR: released')
+        python_utils.PRINT('Label removed from PR: #%s' % pr.number)
 
 
 def remove_blocking_bugs_milestone_from_issues(repo):
@@ -75,6 +68,9 @@ def remove_blocking_bugs_milestone_from_issues(repo):
     blocking_bug_milestone = repo.get_milestone(
         number=feconf.BLOCKING_BUG_MILESTONE_NUMBER)
     if blocking_bug_milestone.open_issues:
+        common.open_new_tab_in_browser_if_possible(
+            'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
+            'is%3Aissue+milestone%3A%22Blocking+bugs%22')
         raise Exception('%s blocking bugs are not resolved.' % (
             blocking_bug_milestone.open_issues))
     issues = repo.get_issues(milestone=blocking_bug_milestone, state='closed')
@@ -95,18 +91,7 @@ def main():
             'release_info.py script and re-run this script.' % (
                 feconf.RELEASE_SUMMARY_FILEPATH))
 
-    personal_access_token = getpass.getpass(
-        prompt=(
-            'Please provide personal access token for your github ID. '
-            'You can create one at https://github.com/settings/tokens: '))
-
-    if personal_access_token is None:
-        raise Exception(
-            'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and re-run '
-            'the script')
-    g = github.Github(personal_access_token)
-    repo = g.get_organization('oppia').get_repo('oppia')
+    repo = common.get_repo()
 
     remove_blocking_bugs_milestone_from_issues(repo)
     remove_release_labels(repo)

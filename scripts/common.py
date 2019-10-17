@@ -17,11 +17,22 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
+import getpass
 import os
 import socket
 import subprocess
+import sys
 
+import feconf
 import python_utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -279,8 +290,42 @@ def ask_user_to_confirm(message):
         python_utils.PRINT(message)
         python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
         answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
+        if answer in feconf.AFFIRMATIVE_CONFIRMATIONS:
             return
+
+
+def get_personal_access_token():
+    """"Returns the personal access token for the GitHub id of user.
+
+    Returns:
+        str. The personal access token for the GitHub id of user.
+
+    Raises:
+        Exception: Personal access token is None.
+    """
+    personal_access_token = getpass.getpass(
+        prompt=(
+            'Please provide personal access token for your github ID. '
+            'You can create one at https://github.com/settings/tokens: '))
+
+    if personal_access_token is None:
+        raise Exception(
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script')
+    return personal_access_token
+
+
+def get_repo():
+    """Gets the github object for Oppia repo.
+
+    Returns:
+        github.Repository.Repository. The PyGithub object for the repo.
+    """
+    personal_access_token = get_personal_access_token()
+    g = github.Github(personal_access_token)
+    repo = g.get_organization('oppia').get_repo('oppia')
+    return repo
 
 
 class CD(python_utils.OBJECT):

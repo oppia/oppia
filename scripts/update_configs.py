@@ -20,25 +20,18 @@ Usage: Run this script from your oppia root folder:
 
     python -m scripts.update_configs
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import getpass
 import os
 import re
-import sys
 
+import feconf
 import python_utils
 
 from . import common
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
-sys.path.insert(0, _PY_GITHUB_PATH)
-
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
 
 FECONF_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'feconf_updates.config')
@@ -102,31 +95,23 @@ def check_updates_to_terms_of_service():
     """Checks if updates are made to terms of service and updates
     REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
     """
-    personal_access_token = getpass.getpass(
-        prompt=(
-            'Please provide personal access token for your github ID. '
-            'You can create one at https://github.com/settings/tokens: '))
-
-    if personal_access_token is None:
-        raise Exception(
-            'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and re-run '
-            'the script')
-    g = github.Github(personal_access_token)
-    repo = g.get_organization('oppia').get_repo('oppia')
+    repo = common.get_repo()
 
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia/commits/develop/core/'
         'templates/dev/head/pages/terms-page/terms-page.mainpage.html')
     python_utils.PRINT(
-        'Is terms of service of changed? Check commits/changes made '
+        'Are the terms of service changed? Check commits/changes made '
         'to the file: terms-page.mainpage.html. Enter y/ye/yes if they '
         'are changed else enter n/no.')
     is_terms_of_service_changed = python_utils.INPUT().lower()
-    if is_terms_of_service_changed.lower() not in ['y', 'ye', 'yes', 'n', 'no']:
-        raise Exception('Invalid Input: %s' % is_terms_of_service_changed)
+    while is_terms_of_service_changed not in ['y', 'ye', 'yes', 'n', 'no']:
+        python_utils.PRINT(
+            'Invalid Input: %s. Please enter yes or no.' % (
+                is_terms_of_service_changed))
+        is_terms_of_service_changed = python_utils.INPUT().lower()
 
-    if is_terms_of_service_changed in ['y', 'ye', 'yes']:
+    if is_terms_of_service_changed in feconf.AFFIRMATIVE_CONFIRMATIONS:
         python_utils.PRINT(
             'Enter sha of the commit which changed the terms of service.')
         commit_sha = python_utils.INPUT().lstrip().rstrip()
@@ -147,19 +132,19 @@ def check_updates_to_terms_of_service():
                 f.write(line)
 
 
-def add_mailgun_api():
-    """Adds mailgun api to feconf.py."""
-    mailgun_api = getpass.getpass(
+def add_mailgun_api_key():
+    """Adds mailgun api key to feconf.py."""
+    mailgun_api_key = getpass.getpass(
         prompt=('Enter mailgun api key from the release process doc.'))
 
-    if re.match('^key-[a-z0-9]{32}$', mailgun_api) is None:
+    if re.match('^key-[a-z0-9]{32}$', mailgun_api_key) is None:
         raise Exception('Invalid mailgun api key.')
 
     feconf_lines = []
     with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
         feconf_lines = f.readlines()
 
-    feconf_lines.append('MAILGUN_API_KEY = \'%s\'\n' % mailgun_api)
+    feconf_lines.append('MAILGUN_API_KEY = \'%s\'\n' % mailgun_api_key)
     with python_utils.open_file(LOCAL_FECONF_PATH, 'w') as f:
         for line in feconf_lines:
             f.write(line)
@@ -176,7 +161,7 @@ def main():
 
     try:
         check_updates_to_terms_of_service()
-        add_mailgun_api()
+        add_mailgun_api_key()
 
         apply_changes_based_on_config(
             LOCAL_FECONF_PATH, FECONF_CONFIG_PATH, FECONF_REGEX)

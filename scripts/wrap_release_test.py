@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/wrap_release.py."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -94,12 +95,16 @@ class WrapReleaseTests(test_utils.GenericTestBase):
                 requester='', headers='',
                 attributes={'open_issues': 10}, completed='')
         # pylint: enable=unused-argument
-        with self.swap(
-            github.Repository.Repository, 'get_milestone', mock_get_milestone):
-            with self.assertRaisesRegexp(
-                Exception, '10 blocking bugs are not resolved.'):
-                wrap_release.remove_blocking_bugs_milestone_from_issues(
-                    self.mock_repo)
+        def mock_open_tab(unused_url):
+            pass
+        get_milestone_swap = self.swap(
+            github.Repository.Repository, 'get_milestone', mock_get_milestone)
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        with get_milestone_swap, open_tab_swap, self.assertRaisesRegexp(
+            Exception, '10 blocking bugs are not resolved.'):
+            wrap_release.remove_blocking_bugs_milestone_from_issues(
+                self.mock_repo)
 
     def test_blocking_bugs_milestone_removal(self):
         blocking_bug_milestone = github.Milestone.Milestone(
