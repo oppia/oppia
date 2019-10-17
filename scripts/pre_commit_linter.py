@@ -667,8 +667,8 @@ def _lint_all_files(
     HTML, CSS) with their respective third party linters.
 
     Args:
-        js_filepaths: list(str). The list of js filepaths to be linted. 
-        ts_filepaths: list(str). The list of ts filepaths to be linted. 
+        js_filepaths: list(str). The list of js filepaths to be linted.
+        ts_filepaths: list(str). The list of ts filepaths to be linted.
         py_filepaths: list(str). The list of python filepaths to be linted.
         html_filepaths: list(str). The list of HTML filepaths to be linted.
         css_filepaths: list(str). The list of CSS filepaths to be linted.
@@ -677,10 +677,10 @@ def _lint_all_files(
     Returns:
         linting_processes: list(multiprocessing.Process). A list of linting
         processes.
-        result_queues: list(multiprocessing.Queue). A list of queues to put results of 
-        tests.
-        stdout_queus: list(multiprocessing.Queue). A list of queues to store Stylelint 
-        outputs.
+        result_queues: list(multiprocessing.Queue). A list of queues to put
+        results of tests.
+        stdout_queus: list(multiprocessing.Queue). A list of queues to store
+        Stylelint outputs.
     """
 
     python_utils.PRINT('Starting Js, Ts, Python, HTML, and CSS linter...')
@@ -2044,8 +2044,8 @@ class JsTsLintChecksManager(LintChecksManager):
         returns the parsed contents as a Python dictionary.
 
         Returns:
-            dict. contains the contents of js and ts files after 
-            validating and parsing the files. 
+            dict. contains the contents of js and ts files after
+            validating and parsing the files.
         """
 
         # Select JS files which need to be checked.
