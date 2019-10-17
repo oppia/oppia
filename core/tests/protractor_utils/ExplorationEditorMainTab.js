@@ -145,6 +145,12 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-solicit-answer-details-checkbox'));
 
   /*
+   * Symbols
+   */
+  var tickMark = element(
+    by.css('.protractor-test-correct-tick-mark'));
+
+  /*
    * Actions
    */
 
@@ -442,6 +448,10 @@ var ExplorationEditorMainTab = function() {
     expect(addResponseButton.isPresent()).toBeFalsy();
   };
 
+  this.expectTickMarkIsDisplayed = function() {
+    expect(tickMark.isDisplayed()).toBe(true);
+  };
+
   var _setOutcomeDest = function(
       destName, createNewDest, refresherExplorationId) {
     expect(destName === null && createNewDest).toBe(false);
@@ -669,12 +679,16 @@ var ExplorationEditorMainTab = function() {
     interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
 
     var targetTile = interactionTile(interactionId);
+    waitFor.visibilityOf(
+      targetTile,
+      'Interaction tile ' + interactionId + ' takes too long to be visible'
+    );
     waitFor.elementToBeClickable(
       targetTile,
       'Interaction tile ' + interactionId + ' takes too long to be clickable'
     );
     expect(targetTile.isDisplayed()).toBe(true);
-    interactionTile(interactionId).click();
+    targetTile.click();
   };
 
   // This function should not usually be invoked directly; please consider

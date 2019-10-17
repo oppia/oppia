@@ -108,6 +108,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.enableCorrectnessFeedback = function() {
+    expect(enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
     enableCorrectnessFeedbackButton.click();
   };
 

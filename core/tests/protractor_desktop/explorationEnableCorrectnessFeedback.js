@@ -44,8 +44,6 @@ describe('Enable correctness feedback and set correctness', function() {
     ['NumericInput', 3]
   ];
 
-  var tickMark = element(
-    by.css('.protractor-test-correct-tick-mark'));
 
   var applyCommonSettings = function() {
     explorationEditorPage.navigateToSettingsTab();
@@ -98,7 +96,7 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorMainTab.moveToState('First');
     responseEditor = explorationEditorMainTab.getResponseEditor(0);
     responseEditor.markAsCorrect();
-    expect(tickMark.isDisplayed()).toBe(true);
+    explorationEditorMainTab.expectTickMarkIsDisplayed();
     explorationEditorPage.saveChanges();
   });
 
@@ -124,7 +122,7 @@ describe('Enable correctness feedback and set correctness', function() {
       'TextInput', forms.toRichText('Correct!'),
       'End', true, 'Equals', 'One');
 
-    expect(tickMark.isDisplayed()).toBe(true);
+    explorationEditorMainTab.expectTickMarkIsDisplayed();
     responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setFeedback(forms.toRichText('Wrong!'));
     explorationEditorMainTab.moveToState('End');
@@ -149,7 +147,7 @@ describe('Enable correctness feedback and set correctness', function() {
     responseEditor.markAsCorrect();
     responseEditor.setFeedback(forms.toRichText('Correct!'));
     responseEditor.setDestination('End', true, true);
-    expect(tickMark.isDisplayed()).toBe(true);
+      explorationEditorMainTab.expectTickMarkIsDisplayed();
 
     explorationEditorMainTab.moveToState('End');
     explorationEditorMainTab.setInteraction('EndExploration');
