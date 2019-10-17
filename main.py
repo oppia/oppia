@@ -112,12 +112,12 @@ class HomePageRedirectPage(base.BaseHandler):
 
 def get_redirect_route(regex_route, handler, defaults=None):
     """Returns a route that redirects /foo/ to /foo.
-    Arg:
-        regex_route : str(string) ,for RegEx
-        handler : function , handler function
-        defaults : dict
-    Return:
-        routes.RedirectRoute : returning regex_route, handler, name (redirect route module)
+    Args:
+        regex_route: str. For regex for routing
+        handler: function.  handler function
+        defaults: dict.
+    Returns:
+        routes.RedirectRoute : return redirect route module
 
     Warning: this method strips off parameters after the trailing slash. URLs
     with parameters should be formulated without the trailing slash.
