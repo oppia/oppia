@@ -16,10 +16,21 @@
  * @fileoverview Unit tests for Text Input rules.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('interactions/TextInput/directives/text-input-rules.service.ts');
 
 describe('Text Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   var tirs = null;
   beforeEach(angular.mock.inject(function($injector) {
