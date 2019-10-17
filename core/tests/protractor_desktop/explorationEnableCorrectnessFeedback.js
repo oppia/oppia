@@ -25,18 +25,31 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Enable correctness feedback and set correctness', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
+  var explorationPlayerPage = null;
+  var currentExplorationIndex = 0;
+  var EXPLORATION_TITLE = 'Dummy Exploration';
+  var explorationTitle = null;
+  var libraryPage = null;
+  var correctOptions = [
+    ['MultipleChoiceInput', 'Correct!'],
+    ['TextInput', 'One'],
+    ['NumericInput', 3]
+  ];
 
   var tickMark = element(
     by.css('.protractor-test-correct-tick-mark'));
 
   var applyCommonSettings = function() {
     explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Dummy Exploration');
+    explorationEditorSettingsTab.setTitle(explorationTitle);
     explorationEditorSettingsTab.setCategory('Algorithm');
     explorationEditorSettingsTab.setObjective('Learn more about Oppia');
     explorationEditorSettingsTab.setLanguage('English');
@@ -49,6 +62,9 @@ describe('Enable correctness feedback and set correctness', function() {
   });
 
   beforeEach(function() {
+    explorationTitle = EXPLORATION_TITLE + String(currentExplorationIndex);
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
@@ -138,5 +154,19 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorMainTab.moveToState('End');
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
+  });
+
+  afterEach(function() {
+    workflow.publishExploration();
+    libraryPage.get();
+    libraryPage.findExploration(explorationTitle);
+    libraryPage.playExploration(explorationTitle);
+    explorationPlayerPage.submitAnswer.apply(
+      null, correctOptions[currentExplorationIndex]);
+    explorationPlayerPage.expectCorrectFeedback();
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
+    libraryPage.get();
+    currentExplorationIndex += 1;
   });
 });
