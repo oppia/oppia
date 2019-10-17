@@ -302,7 +302,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         (
             question_summaries, grouped_skill_descriptions,
             grouped_difficulties, _) = (
-                question_services.get_question_summaries_and_skill_descriptions(
+                question_services.get_displayable_question_skill_link_details(
                     5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
@@ -326,7 +326,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         (
             question_summaries, grouped_skill_descriptions,
             grouped_difficulties, _) = (
-                question_services.get_question_summaries_and_skill_descriptions(
+                question_services.get_displayable_question_skill_link_details(
                     5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
@@ -352,7 +352,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             self.editor_id, self.question_id, self.skill_id, 0.5)
         (
             question_summaries, _, grouped_difficulties, _) = (
-                question_services.get_question_summaries_and_skill_descriptions(
+                question_services.get_displayable_question_skill_link_details(
                     5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(grouped_difficulties[0], [0.5])
@@ -366,7 +366,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             ), {'new_difficulty': 0.9}, csrf_token=csrf_token)
         (
             question_summaries, _, grouped_difficulties, _) = (
-                question_services.get_question_summaries_and_skill_descriptions(
+                question_services.get_displayable_question_skill_link_details(
                     5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(grouped_difficulties[0], [0.9])
@@ -385,7 +385,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             ), {'new_difficulty': 0.6}, csrf_token=csrf_token)
         (
             question_summaries, _, grouped_difficulties, _) = (
-                question_services.get_question_summaries_and_skill_descriptions(
+                question_services.get_displayable_question_skill_link_details(
                     5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(grouped_difficulties[0], [0.6])

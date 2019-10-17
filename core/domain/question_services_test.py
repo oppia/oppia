@@ -140,7 +140,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.editor_id, self.question_id, 'skill_1', 0.3)
 
         _, _, difficulties, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
+            question_services.get_displayable_question_skill_link_details(
                 2, ['skill_1'], ''))
         self.assertEqual(difficulties[0], [0.3])
 
@@ -148,7 +148,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_id, 'skill_1', 0.9)
 
         _, _, difficulties, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
+            question_services.get_displayable_question_skill_link_details(
                 2, ['skill_1'], ''))
         self.assertEqual(difficulties[0], [0.9])
 
@@ -270,13 +270,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.editor_id, question_id_3, 'skill_2', 0.2)
 
         question_summaries, skill_descriptions, skill_difficulties, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
+            question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_2', 'skill_3'], ''))
 
         with self.assertRaisesRegexp(
             Exception, 'Querying linked question summaries for more than 3 '
             'skills at a time is not supported currently.'):
-            question_services.get_question_summaries_and_skill_descriptions(
+            question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], '')
         question_ids = [summary.id for summary in question_summaries]
 
@@ -307,7 +307,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.assertEqual([0.2], difficulty)
 
         question_summaries, skill_descriptions, skill_difficulties, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
+            question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_3'], ''))
         question_ids = [summary.id for summary in question_summaries]
         self.assertEqual(len(question_ids), 2)
@@ -319,7 +319,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.create_new_question_skill_link(
                 self.editor_id, self.question_id, 'skill_1', 0.3)
 
-    def test_get_question_summaries_and_skill_descriptions_with_no_skill_ids(
+    def test_get_displayable_question_skill_link_details_with_no_skill_ids(
             self):
         question_id = question_services.get_new_question_id()
         self.save_new_question(
@@ -330,7 +330,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.editor_id, question_id, 'skill_1', 0.5)
 
         question_summaries, skill_descriptions, skill_difficulties, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
+            question_services.get_displayable_question_skill_link_details(
                 2, [], ''))
 
         self.assertEqual(question_summaries, [])

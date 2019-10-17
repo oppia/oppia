@@ -696,7 +696,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED)
         (
             questions, grouped_skill_descriptions, grouped_difficulties, _) = (
-                question_services.get_question_summaries_and_skill_descriptions(
+                question_services.get_displayable_question_skill_link_details(
                     1, [self.SKILL_ID], ''))
         self.assertEqual(len(questions), 1)
         self.assertEqual(questions[0].creator_id, self.author_id)

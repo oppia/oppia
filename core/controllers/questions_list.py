@@ -51,7 +51,7 @@ class QuestionsListHandler(base.BaseHandler):
         (
             question_summaries, skill_descriptions_list, difficulties_list,
             next_start_cursor) = (
-                question_services.get_question_summaries_and_skill_descriptions(
+                question_services.get_displayable_question_skill_link_details(
                     constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
             )
         return_dicts = []

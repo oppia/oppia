@@ -127,13 +127,14 @@ angular.module('oppia').directive('questionsList', [
             }
           };
 
-          ctrl.getQuestionDifficulty = function(difficulty) {
-            return (
-              difficulty[0] === 0.3 ? SKILL_DIFFICULTIES[0] :
-              (
-                difficulty[0] === 0.6 ? SKILL_DIFFICULTIES[1] :
-                SKILL_DIFFICULTIES[2])
-            );
+          ctrl.getDifficultyString = function(difficulty) {
+            if (difficulty === 0.3) {
+              return SKILL_DIFFICULTIES[0];
+            } else if (difficulty === 0.6) {
+              return SKILL_DIFFICULTIES[1];
+            } else {
+              return SKILL_DIFFICULTIES[2];
+            }
           };
 
           ctrl.getSkillDescriptionAndDifficulty = function(
@@ -142,9 +143,7 @@ angular.module('oppia').directive('questionsList', [
             for (var idx in skillDescriptions) {
               returnString +=
                 skillDescriptions[idx] + ': ' +
-                (skillDifficulties[idx] === 0.3 ? SKILL_DIFFICULTIES[0] :
-                (skillDifficulties[idx] === 0.6 ? SKILL_DIFFICULTIES[1] :
-                SKILL_DIFFICULTIES[2])) + ', ';
+                ctrl.getDifficultyString(skillDifficulties[idx]) + ', ';
             }
             return returnString.substr(0, returnString.length - 2);
           };

@@ -507,7 +507,7 @@ def replace_skill_id_for_all_questions(
     question_models.QuestionModel.put_multi_questions(new_questions)
 
 
-def get_question_summaries_and_skill_descriptions(
+def get_displayable_question_skill_link_details(
         question_count, skill_ids, start_cursor):
     """Returns the list of question summaries and corresponding skill
     descriptions linked to all the skills given by skill_ids.

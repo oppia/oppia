@@ -116,7 +116,9 @@ class QuestionSkillLinkHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_question_skill_status
     def put(self, question_id, skill_id):
-        """Updates properties of the given question."""
+        """Updates the difficulty of the question with respect to the given
+        skill.
+        """
         new_difficulty = float(self.payload.get('new_difficulty'))
 
         question_services.update_question_skill_link_difficulty(
