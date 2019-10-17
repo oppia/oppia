@@ -16,9 +16,6 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
-import { SearchService } from './SearchService';
-import { EventService } from './EventService';
-import { LoggerService} from './LoggerService';
 import { ErrorHandler } from '@angular/core';
 import { HttpClient, HttpEvent, HttpHandler,
   HttpRequest } from '@angular/common/http';
@@ -31,6 +28,10 @@ import {
   TranslateService,
   TranslateStore
 } from '@ngx-translate/core';
+
+import { EventService } from './EventService';
+import { LoggerService} from './LoggerService';
+import { SearchService } from './SearchService';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.

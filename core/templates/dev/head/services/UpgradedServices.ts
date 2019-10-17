@@ -16,14 +16,8 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import {ErrorHandler, Injectable} from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-
-import { UtilsService } from 'services/UtilsService';
-import { WindowDimensionsService } from './contextual/WindowDimensionsService';
-import { LoggerService } from './LoggerService';
-import { SearchService } from './SearchService';
-import { EventService } from './EventService';
+import { ErrorHandler, Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpHandler,
   HttpRequest } from '@angular/common/http';
 import {
@@ -35,6 +29,12 @@ import {
   TranslateStore
 } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
+
+import { EventService } from './EventService';
+import { LoggerService } from './LoggerService';
+import { SearchService } from './SearchService';
+import { UtilsService } from 'services/UtilsService';
+import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 
 @Injectable({
   providedIn: 'root'
