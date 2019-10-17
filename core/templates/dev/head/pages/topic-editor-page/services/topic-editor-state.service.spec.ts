@@ -39,6 +39,7 @@ import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/topic/TopicObjectFactory.ts');
@@ -173,6 +174,12 @@ describe('Topic editor state service', function() {
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     });
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
