@@ -665,6 +665,22 @@ def _lint_all_files(
     """This function is used to check if node-eslint dependencies are
     installed and pass ESLint binary path and lint all the files(JS, Python,
     HTML, CSS) with their respective third party linters.
+
+    Args:
+        js_filepaths: list(str). The list of js filepaths to be linted. 
+        ts_filepaths: list(str). The list of ts filepaths to be linted. 
+        py_filepaths: list(str). The list of python filepaths to be linted.
+        html_filepaths: list(str). The list of HTML filepaths to be linted.
+        css_filepaths: list(str). The list of CSS filepaths to be linted.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+
+    Returns:
+        linting_processes: list(multiprocessing.Process). A list of linting
+        processes.
+        result_queues: list(multiprocessing.Queue). A list of queues to put results of 
+        tests.
+        stdout_queus: list(multiprocessing.Queue). A list of queues to store Stylelint 
+        outputs.
     """
 
     python_utils.PRINT('Starting Js, Ts, Python, HTML, and CSS linter...')
@@ -1045,7 +1061,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
     def __init__(self, filepath, file_lines, debug, failed=False):
-        """Define various variables to parse HTML."""
+        """Define various variables to parse HTML.
+
+        Args:
+            filepath: str. path of the file.
+            file_lines: list(str). list of the lines in the file.
+            debug: bool. if true prints tag_stack for the file.
+            failed: bool. true if the HTML indentation check fails.
+        """
         html.parser.HTMLParser.__init__(self)
         self.tag_stack = []
         self.debug = debug
@@ -1060,7 +1083,12 @@ class CustomHTMLParser(html.parser.HTMLParser):
             'param', 'source', 'track', 'wbr']
 
     def handle_starttag(self, tag, attrs):
-        """Handle start tag of a HTML line."""
+        """Handle start tag of a HTML line.
+
+        Args:
+            tag: str. start tag of a HTML line.
+            attrs: list(str). list of attributes in the start tag.
+        """
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
         expected_indentation = self.indentation_level * self.indentation_width
@@ -1196,7 +1224,11 @@ class CustomHTMLParser(html.parser.HTMLParser):
             python_utils.PRINT(self.tag_stack)
 
     def handle_data(self, data):
-        """Handle indentation level."""
+        """Handle indentation level.
+
+        Args:
+            data: str. contents of HTML file to be parsed.
+        """
         data_lines = data.split('\n')
         opening_block = tuple(
             ['{% block', '{% macro', '{% if', '% for', '% if'])
@@ -2010,6 +2042,10 @@ class JsTsLintChecksManager(LintChecksManager):
     def _validate_and_parse_js_and_ts_files(self):
         """This function validates JavaScript and Typescript files and
         returns the parsed contents as a Python dictionary.
+
+        Returns:
+            dict. contains the contents of js and ts files after 
+            validating and parsing the files. 
         """
 
         # Select JS files which need to be checked.
@@ -2057,6 +2093,10 @@ class JsTsLintChecksManager(LintChecksManager):
     def _get_expressions_from_parsed_script(self):
         """This function returns the expressions in the script parsed using
         js and ts files.
+
+        Returns:
+            dict. contains the expressions in the script parsed using js
+            and ts files.
         """
 
         parsed_expressions_in_files = collections.defaultdict(dict)
