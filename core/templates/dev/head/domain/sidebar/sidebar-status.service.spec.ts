@@ -16,16 +16,13 @@
  * @fileoverview Tests for SidebarStatusService.
  */
 
-<<<<<<< HEAD:core/templates/dev/head/domain/sidebar/sidebar-status.service.spec.ts
 require('domain/sidebar/sidebar-status.service.ts');
-=======
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/sidebar/SidebarStatusService.ts');
->>>>>>> 52aad4675b85c3706741d8824a6e30cc72012cfa:core/templates/dev/head/domain/sidebar/SidebarStatusServiceSpec.ts
 
 describe('SidebarStatusService', function() {
   var SidebarStatusService, $window;

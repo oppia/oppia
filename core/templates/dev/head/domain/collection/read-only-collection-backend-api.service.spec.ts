@@ -16,16 +16,12 @@
  * @fileoverview Unit tests for ReadOnlyCollectionBackendApiService.
  */
 
-<<<<<<< HEAD:core/templates/dev/head/domain/collection/read-only-collection-backend-api.service.spec.ts
 require('domain/collection/read-only-collection-backend-api.service.ts');
-=======
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
->>>>>>> 52aad4675b85c3706741d8824a6e30cc72012cfa:core/templates/dev/head/domain/collection/ReadOnlyCollectionBackendApiServiceSpec.ts
 
 describe('Read only collection backend API service', function() {
   var ReadOnlyCollectionBackendApiService = null;

@@ -16,17 +16,13 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
-<<<<<<< HEAD:core/templates/dev/head/domain/question/editable-question-backend-api.service.spec.ts
 require('domain/question/editable-question-backend-api.service.ts');
-=======
+require('services/CsrfTokenService.ts');
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-
-require('domain/question/EditableQuestionBackendApiService.ts');
->>>>>>> 52aad4675b85c3706741d8824a6e30cc72012cfa:core/templates/dev/head/domain/question/EditableQuestionBackendApiServiceSpec.ts
-require('services/CsrfTokenService.ts');
 
 describe('Editable question backend API service', function() {
   var EditableQuestionBackendApiService = null;

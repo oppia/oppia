@@ -16,19 +16,15 @@
  * @fileoverview Unit tests for EditableSkillBackendApiService.
  */
 
-<<<<<<< HEAD:core/templates/dev/head/domain/skill/editable-skill-backend-api.service.spec.ts
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/skill/editable-skill-backend-api.service.ts');
-=======
+require('services/CsrfTokenService.ts');
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/skill/EditableSkillBackendApiService.ts');
->>>>>>> 52aad4675b85c3706741d8824a6e30cc72012cfa:core/templates/dev/head/domain/skill/EditableSkillBackendApiServiceSpec.ts
-require('services/CsrfTokenService.ts');
 
 describe('Editable skill backend API service', function() {
   var EditableSkillBackendApiService = null;

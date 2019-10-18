@@ -15,16 +15,13 @@
  * @fileoverview Unit tests for QuestionBackendApiService.
  */
 
-<<<<<<< HEAD:core/templates/dev/head/domain/question/question-backend-api.service.spec.ts
 require('domain/question/question-backend-api.service.ts');
-=======
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/question/QuestionBackendApiService.ts');
->>>>>>> 52aad4675b85c3706741d8824a6e30cc72012cfa:core/templates/dev/head/domain/question/QuestionBackendApiServiceSpec.ts
 
 describe('Question backend Api service', function() {
   var QuestionBackendApiService = null;

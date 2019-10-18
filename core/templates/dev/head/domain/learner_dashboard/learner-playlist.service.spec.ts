@@ -16,19 +16,15 @@
  * @fileoverview Tests for LearnerPlaylistService.js.
  */
 
-<<<<<<< HEAD:core/templates/dev/head/domain/learner_dashboard/learner-playlist.service.spec.ts
 require('domain/learner_dashboard/learner-playlist.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-=======
+require('services/CsrfTokenService.ts');
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/learner_dashboard/LearnerPlaylistService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
->>>>>>> 52aad4675b85c3706741d8824a6e30cc72012cfa:core/templates/dev/head/domain/learner_dashboard/LearnerPlaylistServiceSpec.ts
-require('services/CsrfTokenService.ts');
 
 describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;

@@ -16,19 +16,14 @@
  * @fileoverview Unit tests for EditableExplorationBackendApiService.
  */
 
-<<<<<<< HEAD:core/templates/dev/head/domain/exploration/editable-exploration-backend-api.service.spec.ts
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
-=======
+require('services/CsrfTokenService.ts');
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-
-require('domain/exploration/EditableExplorationBackendApiService.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
->>>>>>> 52aad4675b85c3706741d8824a6e30cc72012cfa:core/templates/dev/head/domain/exploration/EditableExplorationBackendApiServiceSpec.ts
-require('services/CsrfTokenService.ts');
 
 describe('Editable exploration backend API service', function() {
   var EditableExplorationBackendApiService = null;
