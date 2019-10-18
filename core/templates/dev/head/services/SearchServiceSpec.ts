@@ -60,21 +60,24 @@ describe('Search service', function() {
           getTranslation(lang: string): Observable<any> {
             return undefined;
           }
-        }, new class extends TranslateCompiler {
+        },
+        new class extends TranslateCompiler {
           compile(value: string, lang: string): string | Function {
             return undefined;
           }
 
           compileTranslations(translations: any, lang: string): any {
           }
-        }, new class extends TranslateParser {
+        },
+        new class extends TranslateParser {
           getValue(target: any, key: string): any {
           }
 
           interpolate(expr: string | Function, params?: any): string {
             return '';
           }
-        }, new class extends MissingTranslationHandler {
+        },
+        new class extends MissingTranslationHandler {
           handle(params: MissingTranslationHandlerParams): any {
           }
         }));

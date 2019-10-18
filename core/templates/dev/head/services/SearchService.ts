@@ -16,13 +16,12 @@
  * @fileoverview search service for activityTilesInfinityGrid
  */
 
-import {HttpClient} from '@angular/common/http';
-import { TranslateService } from '@ngx-translate/core';
-
-import { ServicesConstants } from 'services/services.constants';
-import { LoggerService } from './LoggerService';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
 import { EventService } from './EventService';
+import { LoggerService } from './LoggerService';
+import { ServicesConstants } from 'services/services.constants';
+import { TranslateService } from '@ngx-translate/core';
 
 require('services/services.constants.ajs.ts');
 
@@ -126,6 +125,9 @@ export class SearchService {
 
     this._isCurrentlyFetchingResults = true;
     this.numSearchesInProgress++;
+
+    // TODO(#7165): Replace 'any' with the exact type. This response is coming
+    // from the backend so we need to check what response we are getting
     this.httpClient.get(queryUrl).subscribe((response: any) => {
       let data = response.data;
       this._lastQuery = searchQuery;
@@ -167,6 +169,7 @@ export class SearchService {
   isSearchInProgress(): boolean {
     return this.numSearchesInProgress > 0;
   }
+
   // The following takes in the url search component as an argument and the
   // selectionDetails. It will update selectionDetails with the relevant
   // fields that were extracted from the url. It returns the unencoded
@@ -208,7 +211,7 @@ export class SearchService {
       this._lastSelectedLanguageCodes);
   }
 
-  loadMoreData(successCallback, failureCallback): void {
+  loadMoreData(successCallback: Function, failureCallback: Function): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.
     if (this._isCurrentlyFetchingResults || this.hasReachedEndOfPage()) {
@@ -224,6 +227,8 @@ export class SearchService {
 
     this._isCurrentlyFetchingResults = true;
 
+    // TODO(#7165): Replace 'any' with the exact type. This response is coming
+    // from the backend so we need to check what response we are getting
     this.httpClient.get(queryUrl).subscribe((response: any) => {
       this._searchCursor = response.data.search_cursor;
       this._isCurrentlyFetchingResults = false;
