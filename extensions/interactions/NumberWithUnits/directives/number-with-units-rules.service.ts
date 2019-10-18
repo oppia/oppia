@@ -34,8 +34,8 @@ export class NumberWithUnitsRulesService {
       this.nwuof.createCurrencyUnits();
     } catch (parsingError) {}
   }
-
-  private isEquivalent(a, b): boolean {
+  // Checks if a === b.
+  private isEquivalent(a: any, b: any): boolean {
     // Create arrays of property names
     var aProps = Object.getOwnPropertyNames(a);
     var bProps = Object.getOwnPropertyNames(b);
@@ -44,7 +44,11 @@ export class NumberWithUnitsRulesService {
     }
     for (var i = 0; i < aProps.length; i++) {
       var propName = aProps[i];
-      if (a[propName] !== b[propName]) {
+      if (typeof a[propName] === 'object' && !this.isEquivalent(
+        a[propName], b[propName])) {
+        return false;
+      }
+      if (typeof a[propName] !== 'object' && a[propName] !== b[propName]) {
         return false;
       }
     }

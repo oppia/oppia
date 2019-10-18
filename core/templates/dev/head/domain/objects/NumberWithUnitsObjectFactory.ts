@@ -41,9 +41,6 @@ export class NumberWithUnits {
   real;
   fraction;
   units;
-  // Service is not injected into the constructor, since the schema for
-  // NumberWithUnits is set to take in 4 values -- check line 956 in objects.py.
-  uof = new UnitsObjectFactory();
   constructor(type, real, fractionObj, unitsObj) {
     this.type = type;
     this.real = real;
@@ -53,7 +50,12 @@ export class NumberWithUnits {
 
   toString(): string {
     var numberWithUnitsString: string = '';
-    var unitsString: string = this.uof.fromList(this.units).toString();
+    // The NumberWithUnits class is allowed to have 4 properties namely
+    // type, real, fraction and units. Hence, we cannot inject
+    // UnitsObjectFactory, since that'll lead to creation of 5th property
+    // which isn't allowed. Refer objects.py L#956.
+    var unitsString: string = (new UnitsObjectFactory()).fromList(
+      this.units).toString();
     if (unitsString.includes('$')) {
       unitsString = unitsString.replace('$', '');
       numberWithUnitsString += '$' + ' ';
@@ -79,8 +81,10 @@ export class NumberWithUnits {
 
   toMathjsCompatibleString(): string {
     var numberWithUnitsString: string = '';
-    var unitsString: string = this.uof.fromList(this.units).toString();
-    unitsString = this.uof.toMathjsCompatibleString(unitsString);
+    var unitsString: string = (new UnitsObjectFactory()).fromList(
+      this.units).toString();
+    unitsString = (new UnitsObjectFactory()).toMathjsCompatibleString(
+      unitsString);
 
     if (this.type === 'real') {
       numberWithUnitsString += this.real + ' ';
