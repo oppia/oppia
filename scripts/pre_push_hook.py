@@ -277,6 +277,7 @@ def _start_python_script(scriptname):
         os.path.join('scripts', scriptname).replace('/', '.')]
     task = subprocess.Popen(cmd)
     task.communicate()
+    task.wait()
     return task.returncode
 
 

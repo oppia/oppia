@@ -1,0 +1,8 @@
+<div class="list-group">
+  <a class="list-group-item protractor-test-skills-list-item"
+     ng-repeat="skillSummary in skillSummaries"
+     ng-click="selectSkill(skillSummary.id)"
+     ng-class="{'list-group-item-success': (skillSummary.id === selectedSkillId)}">
+    <label class="list-group-item-heading"><[skillSummary.description]></label>
+  </a>
+</div>

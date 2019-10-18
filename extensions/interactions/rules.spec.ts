@@ -40,6 +40,9 @@ import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import { GraphInputRulesService } from
+  'interactions/GraphInput/directives/graph-input-rules.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
@@ -69,6 +72,9 @@ describe('Rule spec services', function() {
       'MusicNotesInputRulesService', new MusicNotesInputRulesService());
     $provide.value(
       'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
+    $provide.value(
+      'GraphInputRulesService', new GraphInputRulesService(
+        new GraphUtilsService()));
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The
@@ -96,6 +102,12 @@ describe('Rule spec services', function() {
       }
     });
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
 
   var getRulesServiceName = function(interactionId) {
