@@ -44,6 +44,8 @@ import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
+import { GraphInputRulesService } from
+  'interactions/GraphInput/directives/graph-input-rules.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
@@ -75,9 +77,14 @@ describe('Rule spec services', function() {
     $provide.value(
       'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
     $provide.value(
+<<<<<<< HEAD
       'NumberWithUnitsRulesService', new NumberWithUnitsRulesService(
         new NumberWithUnitsObjectFactory(
           new UnitsObjectFactory(), new FractionObjectFactory())));
+=======
+      'GraphInputRulesService', new GraphInputRulesService(
+        new GraphUtilsService()));
+>>>>>>> develop
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The

@@ -35,6 +35,21 @@ export class NumberWithUnitsRulesService {
     } catch (parsingError) {}
   }
 
+  private isEquivalent(a, b): boolean {
+    // Create arrays of property names
+    var aProps = Object.getOwnPropertyNames(a);
+    var bProps = Object.getOwnPropertyNames(b);
+    if (aProps.length !== bProps.length) {
+      return false;
+    }
+    for (var i = 0; i < aProps.length; i++) {
+      var propName = aProps[i];
+      if (a[propName] !== b[propName]) {
+        return false;
+      }
+    }
+    return true;
+  }
   IsEqualTo(answer, inputs): boolean {
     // Returns true only if input is exactly equal to answer.
     answer = this.nwuof.fromDict(answer);
@@ -47,8 +62,7 @@ export class NumberWithUnitsRulesService {
       answerString).toDict();
     var inputsList = this.nwuof.fromRawInputString(
       inputsString).toDict();
-    return JSON.stringify(answerList).toLowerCase() === JSON.stringify(
-      inputsList).toLowerCase();
+    return this.isEquivalent(answerList, inputsList);
   }
   IsEquivalentTo(answer, inputs): boolean {
     answer = this.nwuof.fromDict(answer);
