@@ -50,5 +50,18 @@ class ConfigPropertyModel(base_models.VersionedModel):
         """Config property is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def has_reference_to_user_id(unused_user_id):
+        """ConfigPropertyModel doesn't reference any user_id.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data
+            should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
