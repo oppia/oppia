@@ -428,7 +428,7 @@ def get_human_readable_time_string(time_msec):
         time_msec: float. Passing time in milliseconds.
 
     Returns:
-        str. Time in human redable format.
+        str. Time in human readable format.
     """
     return time.strftime(
         '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
