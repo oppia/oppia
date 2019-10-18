@@ -143,7 +143,7 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
-  fit('should prevent going back when help card is shown', function() {
+  it('should prevent going back when help card is shown', function() {
     users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     users.login('user2@editorAndPlayer.com');
     workflow.createExploration();
