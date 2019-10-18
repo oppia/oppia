@@ -34,7 +34,7 @@ export interface FractionAnswer {
 export class FractionInputRulesService {
   constructor(private fractionObjectFactory: FractionObjectFactory) {}
 
-  private isEquivalent(a, b): boolean {
+  private isEquivalent(a: any, b: any): boolean {
     // Create arrays of property names
     var aProps = Object.getOwnPropertyNames(a);
     var bProps = Object.getOwnPropertyNames(b);
