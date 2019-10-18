@@ -149,7 +149,7 @@ export class GraphUtilsService {
     return adjMatrix;
   }
 
-  nextPermutation(permutation: number[]): number | number[] {
+  nextPermutation(permutation: number[]): number[] {
     // Generates (in place) the next lexicographical permutation.
     // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1]
 
