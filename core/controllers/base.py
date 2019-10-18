@@ -56,7 +56,7 @@ def _clear_login_cookies(response_headers):
     """Clears login cookies from the given response headers.
 
     Args:
-        response_headers: RequestHandler. The given response headers.
+        response_headers: Response Header. The given response headers.
     """
 
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
