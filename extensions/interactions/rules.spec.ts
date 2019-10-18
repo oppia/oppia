@@ -40,6 +40,8 @@ import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import { FractionInputRulesService } from
+  'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -72,6 +74,9 @@ describe('Rule spec services', function() {
       'MusicNotesInputRulesService', new MusicNotesInputRulesService());
     $provide.value(
       'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
+    $provide.value(
+      'FractionInputRulesService', new FractionInputRulesService(
+        new FractionObjectFactory()));
     $provide.value(
       'GraphInputRulesService', new GraphInputRulesService(
         new GraphUtilsService()));
