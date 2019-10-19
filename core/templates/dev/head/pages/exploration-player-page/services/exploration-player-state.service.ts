@@ -17,7 +17,7 @@
  *  like engine service.
  */
 
-require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/editable-exploration-backend-api.service.tx');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
 require('domain/question/QuestionBackendApiService.ts');

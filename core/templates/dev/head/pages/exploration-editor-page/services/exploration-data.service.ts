@@ -17,7 +17,7 @@
  * with the exploration editor backend.
  */
 
-require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/editable-exploration-backend-api.service.tx');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
