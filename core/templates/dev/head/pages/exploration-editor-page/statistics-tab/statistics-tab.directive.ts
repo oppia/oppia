@@ -17,7 +17,7 @@
  * exploration editor.
  */
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');

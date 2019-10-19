@@ -18,7 +18,7 @@
  */
 
 require('domain/exploration/editable-exploration-backend-api.service.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
 require('domain/question/QuestionBackendApiService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');

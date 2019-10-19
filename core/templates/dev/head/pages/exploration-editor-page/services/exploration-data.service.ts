@@ -18,7 +18,7 @@
  */
 
 require('domain/exploration/editable-exploration-backend-api.service.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/LocalStorageService.ts');

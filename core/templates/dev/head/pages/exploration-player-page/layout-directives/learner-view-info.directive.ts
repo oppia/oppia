@@ -25,7 +25,7 @@ require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('components/ratings/rating-computation/rating-computation.service.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');

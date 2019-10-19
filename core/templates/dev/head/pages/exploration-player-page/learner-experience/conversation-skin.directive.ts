@@ -41,7 +41,7 @@ require(
 require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('domain/exploration/editable-exploration-backend-api.service.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
 require('domain/skill/ConceptCardBackendApiService.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
