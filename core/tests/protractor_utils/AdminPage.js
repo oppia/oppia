@@ -198,7 +198,7 @@ var AdminPage = function() {
 
         expectedUsersArray.sort();
         foundUsersArray.sort();
-        foundUsersArray.forEach(function(name, ind){
+        foundUsersArray.forEach(function(name, ind) {
           expect(name).toEqual(expectedUsersArray[ind]);
         });
       });
