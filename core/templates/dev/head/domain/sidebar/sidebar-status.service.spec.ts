@@ -28,7 +28,6 @@ import { WindowRef } from 'services/contextual/WindowRefService';
 
 describe('SidebarStatusService', () => {
   let sss, $window;
->>>>>>> 8bbc77fae909b14bb3b77f5b7e3ea783976e2e30:core/templates/dev/head/domain/sidebar/SidebarStatusServiceSpec.ts
 
   beforeEach(() => {
     $window = TestBed.get(WindowRef);
