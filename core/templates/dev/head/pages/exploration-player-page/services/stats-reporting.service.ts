@@ -111,11 +111,13 @@ angular.module('oppia').factory('StatsReportingService', [
       }
     };
 
-    if (!_editorPreviewMode && !_questionPlayerMode ) {
-      $interval(function() {
-        postStatsToBackend();
-      }, 300000);
-    }
+    var startStatsTimer = function() {
+      if (!_editorPreviewMode && !_questionPlayerMode ) {
+        $interval(function() {
+          postStatsToBackend();
+        }, 300000);
+      }
+    };
 
     // This method is called whenever a learner tries to leave an exploration,
     // when a learner starts an exploration, when a learner completes an
@@ -142,6 +144,7 @@ angular.module('oppia').factory('StatsReportingService', [
         stateStopwatch = StopwatchObjectFactory.create();
         optionalCollectionId = collectionId;
         refreshAggregatedStats();
+        startStatsTimer();
       },
       // Note that this also resets the stateStopwatch.
       recordExplorationStarted: function(stateName, params) {

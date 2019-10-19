@@ -20,6 +20,7 @@
 // SuggestionThreadObjectFactory.ts is upgraded to Angular 8.
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
@@ -30,6 +31,12 @@ describe('Suggestion thread object factory', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
   var SuggestionThreadObjectFactory = null;
   var suggestionObjectFactory = null;

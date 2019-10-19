@@ -51,10 +51,12 @@ STATUS_CHOICES = [
 
 # Constants defining various suggestion types.
 SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
 SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
 
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
@@ -140,6 +142,20 @@ class GeneralSuggestionModel(base_models.BaseModel):
     def get_deletion_policy():
         """General suggestion needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralSuggestionModel exists for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
+        ).get() is not None
 
     @classmethod
     def create(
@@ -242,6 +258,42 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
+    def get_in_review_suggestions_of_suggestion_type(
+            cls, suggestion_type, user_id):
+        """Gets all suggestions of suggestion_type which are in review.
+
+        Args:
+            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+                As a user cannot review their own suggestions, suggestions
+                authored by the user will be excluded.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are of the given
+                type, which are in review, but not created by the given user.
+        """
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.suggestion_type == suggestion_type).filter(
+                cls.author_id != user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_user_created_suggestions_of_suggestion_type(
+            cls, suggestion_type, user_id):
+        """Gets all suggestions of suggestion_type which the user has created.
+
+        Args:
+            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are of the given
+                type, which the given user has created.
+        """
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.suggestion_type == suggestion_type).filter(
+                cls.author_id == user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
     def get_all_score_categories(cls):
         """Gets all the score categories for which suggestions have been
         created.
@@ -295,8 +347,8 @@ class ReviewerRotationTrackingModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Reviewer rotation tracking is going to be reworked oon.
-        Thus, using using not applicable for now.
+        """Reviewer rotation tracking is going to be reworked. Thus, using
+        not applicable for now.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
