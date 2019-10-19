@@ -17,7 +17,7 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// QuestionUpdateService.ts is upgraded to Angular 8.
+// question-update.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ChangeObjectFactory } from
@@ -48,7 +48,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('App.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/question/QuestionUpdateService.ts');
+require('domain/question/question-update.service.ts');
 require('domain/state/StateObjectFactory.ts');
 require(
   'components/question-directives/question-editor/' +

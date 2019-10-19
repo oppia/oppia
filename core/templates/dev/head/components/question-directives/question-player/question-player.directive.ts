@@ -102,8 +102,8 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
 
-require('domain/question/QuestionBackendApiService.ts');
-require('domain/skill/SkillMasteryBackendApiService.ts');
+require('domain/question/question-backend-api.service.ts');
+require('domain/skill/skill-mastery-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/UserService.ts');

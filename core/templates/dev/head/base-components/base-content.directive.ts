@@ -19,7 +19,7 @@
 require('base-components/warning-loader.directive.ts');
 require('pages/OppiaFooterDirective.ts');
 
-require('domain/sidebar/SidebarStatusService.ts');
+require('domain/sidebar/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/UrlService.ts');
 require('services/stateful/BackgroundMaskService.ts');

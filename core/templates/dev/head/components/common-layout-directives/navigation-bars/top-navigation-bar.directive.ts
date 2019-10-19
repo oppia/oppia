@@ -18,7 +18,7 @@
  * the editor pages).
  */
 
-require('domain/sidebar/SidebarStatusService.ts');
+require('domain/sidebar/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/DebouncerService.ts');
 require('services/NavigationService.ts');

@@ -24,8 +24,8 @@ require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.directive.ts');
 
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
-require('domain/learner_dashboard/LearnerDashboardIdsBackendApiService.ts');
-require('domain/learner_dashboard/LearnerPlaylistService.ts');
+require('domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
+require('domain/learner_dashboard/learner-playlist.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');

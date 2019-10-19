@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('domain/sidebar/SidebarStatusService.ts');
+require('domain/sidebar/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/CsrfTokenService.ts');

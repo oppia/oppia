@@ -22,9 +22,9 @@ require(
 require('components/state-editor/state-editor.directive.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
-require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/question/QuestionUpdateService.ts');
+require('domain/question/question-update.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(
