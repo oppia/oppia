@@ -17,7 +17,7 @@
  */
 
 require('domain/collection/GuestCollectionProgressService.ts');
-require('domain/exploration/editable-exploration-backend-api.service.tx');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/state_card/StateCardObjectFactory.ts');

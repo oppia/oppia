@@ -40,7 +40,7 @@ require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
 require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
-require('domain/exploration/editable-exploration-backend-api.service.tx');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
 require('domain/skill/ConceptCardBackendApiService.ts');
