@@ -17,51 +17,58 @@
  * hamburger-menu sidebar.
  */
 
-require('services/contextual/WindowDimensionsService.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('SidebarStatusService', [
-  'WindowDimensionsService', function(WindowDimensionsService) {
-    var pendingSidebarClick = false;
-    var sidebarIsShown = false;
+import { WindowDimensionsService } from
+  'services/contextual/WindowDimensionsService';
 
-    var _openSidebar = function() {
-      if (WindowDimensionsService.isWindowNarrow() && !sidebarIsShown) {
-        sidebarIsShown = true;
-        pendingSidebarClick = true;
-      }
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class SidebarStatusService {
+  constructor(private wds: WindowDimensionsService) {}
+  private pendingSidebarClick: boolean = false;
+  private sidebarIsShown: boolean = false;
 
-    var _closeSidebar = function() {
-      if (sidebarIsShown) {
-        sidebarIsShown = false;
-        pendingSidebarClick = false;
-      }
-    };
-
-    return {
-      isSidebarShown: function() {
-        return sidebarIsShown;
-      },
-      openSidebar: function() {
-        _openSidebar();
-      },
-      closeSidebar: function() {
-        _closeSidebar();
-      },
-      toggleSidebar: function() {
-        if (!sidebarIsShown) {
-          _openSidebar();
-        } else {
-          _closeSidebar();
-        }
-      },
-      onDocumentClick: function() {
-        if (!pendingSidebarClick) {
-          sidebarIsShown = false;
-        } else {
-          pendingSidebarClick = false;
-        }
-      }
-    };
+  private _openSidebar(): void {
+    if (this.wds.isWindowNarrow() && !this.sidebarIsShown) {
+      this.sidebarIsShown = true;
+      this.pendingSidebarClick = true;
+    }
   }
-]);
+
+  private _closeSidebar(): void {
+    if (this.sidebarIsShown) {
+      this.sidebarIsShown = false;
+      this.pendingSidebarClick = false;
+    }
+  }
+
+  isSidebarShown(): boolean {
+    return this.sidebarIsShown;
+  }
+  openSidebar(): void {
+    this._openSidebar();
+  }
+  closeSidebar(): void {
+    this._closeSidebar();
+  }
+  toggleSidebar(): void {
+    if (!this.sidebarIsShown) {
+      this._openSidebar();
+    } else {
+      this._closeSidebar();
+    }
+  }
+  onDocumentClick(): void {
+    if (!this.pendingSidebarClick) {
+      this.sidebarIsShown = false;
+    } else {
+      this.pendingSidebarClick = false;
+    }
+  }
+}
+
+angular.module('oppia').factory(
+  'SidebarStatusService', downgradeInjectable(SidebarStatusService));

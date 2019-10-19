@@ -16,53 +16,43 @@
  * @fileoverview Tests for SidebarStatusService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
+import { TestBed } from '@angular/core/testing';
+import { WindowRef } from 'services/contextual/WindowRefService';
 
-require('domain/sidebar/SidebarStatusService.ts');
+describe('SidebarStatusService', () => {
+  let sss, $window;
 
-describe('SidebarStatusService', function() {
-  var SidebarStatusService, $window;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector, _$window_) {
-    $window = _$window_;
-    $window.innerWidth = 600;
-    SidebarStatusService = $injector.get('SidebarStatusService');
-  }));
-
-  it('should open the sidebar if its not open', function() {
-    SidebarStatusService.openSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
+  beforeEach(() => {
+    $window = TestBed.get(WindowRef);
+    $window.nativeWindow.innerWidth = 600;
+    sss = TestBed.get(SidebarStatusService);
   });
 
-  it('should close the sidebar when its open', function() {
-    SidebarStatusService.openSidebar();
-    SidebarStatusService.closeSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(false);
+  it('should open the sidebar if its not open', () => {
+    sss.openSidebar();
+    expect(sss.isSidebarShown()).toBe(true);
   });
 
-  it('should toggle the sidebar to open and then close', function() {
-    SidebarStatusService.toggleSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
-    SidebarStatusService.toggleSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(false);
+  it('should close the sidebar when its open', () => {
+    sss.openSidebar();
+    sss.closeSidebar();
+    expect(sss.isSidebarShown()).toBe(false);
+  });
+
+  it('should toggle the sidebar to open and then close', () => {
+    sss.toggleSidebar();
+    expect(sss.isSidebarShown()).toBe(true);
+    sss.toggleSidebar();
+    expect(sss.isSidebarShown()).toBe(false);
   });
 
 
-  it('should falsify pendingSidebarClick on document click', function() {
-    SidebarStatusService.openSidebar();
-    SidebarStatusService.onDocumentClick();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
-    SidebarStatusService.onDocumentClick();
-    expect(SidebarStatusService.isSidebarShown()).toBe(false);
+  it('should falsify pendingSidebarClick on document click', () => {
+    sss.openSidebar();
+    sss.onDocumentClick();
+    expect(sss.isSidebarShown()).toBe(true);
+    sss.onDocumentClick();
+    expect(sss.isSidebarShown()).toBe(false);
   });
 });
