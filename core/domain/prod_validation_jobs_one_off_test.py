@@ -2421,6 +2421,134 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(SkillOpportunityModelValidatorTests, self).setUp()
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SkillOpportunityModelAuditOneOffJob)
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
+        for i in python_utils.RANGE(3):
+            skill_id = '%s' % i
+            self.save_new_skill(skill_id, self.admin_id, 'description %d' % i)
+            skill_services.publish_skill(skill_id, self.admin_id)
+
+        self.QUESTION_ID = question_services.get_new_question_id()
+        self.save_new_question(
+            self.QUESTION_ID, self.owner_id,
+            self._create_valid_question_data('ABC'), ['0'])
+        question_services.create_new_question_skill_link(
+            self.owner_id, self.QUESTION_ID, '0', 0.3)
+
+        self.model_instance_0 = (
+            opportunity_models.SkillOpportunityModel.get('0'))
+        self.model_instance_1 = (
+            opportunity_models.SkillOpportunityModel.get('1'))
+        self.model_instance_2 = (
+            opportunity_models.SkillOpportunityModel.get('2'))
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated SkillOpportunityModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'SkillOpportunityModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\', '
+            'u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\', '
+            'u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (
+            self.model_instance_0.id, self.model_instance_0.last_updated,
+            self.model_instance_1.id, self.model_instance_1.last_updated,
+            self.model_instance_2.id, self.model_instance_2.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(
+                self, expected_output, sort=True, literal_eval=True)
+
+    def test_missing_skill_model_failure(self):
+        skill_model = skill_models.SkillModel.get_by_id('0')
+        skill_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for skill_ids field '
+                'check of SkillOpportunityModel\', '
+                '[u"Entity id 0: based on field skill_ids having '
+                'value 0, expect model SkillModel with id 0 but it '
+                'doesn\'t exist"]]'
+            ),
+            u'[u\'fully-validated SkillOpportunityModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_skill_description(self):
+        self.model_instance_0.skill_description = 'invalid'
+        self.model_instance_0.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for skill_description field '
+                'check of SkillOpportunityModel\', '
+                '[u\'Entity id %s: skill_description field in entity: invalid '
+                'does not match corresponding skill description field: '
+                'description 0\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated SkillOpportunityModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_question_count(self):
+        self.model_instance_0.question_count = 10
+        self.model_instance_0.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_count check of '
+                'SkillOpportunityModel\', '
+                '[u\'Entity id %s: question_count: 10 does not match the '
+                'question_count of external skill model: 1\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated SkillOpportunityModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_question_count_schema(self):
+        self.model_instance_0.question_count = -1
+        self.model_instance_0.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'SkillOpportunityModel\', '
+                '[u\'Entity id 0: Entity fails domain validation with the '
+                'error Expected question_count to be a non-negative integer, '
+                'received -1\']]'
+            ),
+            (
+                u'[u\'failed validation check for question_count check of '
+                'SkillOpportunityModel\', '
+                '[u\'Entity id 0: question_count: -1 does not match the '
+                'question_count of external skill model: 1\']]'
+            ), u'[u\'fully-validated SkillOpportunityModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
 class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
