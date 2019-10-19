@@ -202,6 +202,10 @@ class BaseModelValidator(python_utils.OBJECT):
             dict(str, (ndb.Model, list(str)). A dictionary whose keys are
             field names of the model to validate, and whose values are tuples
             that consist of the external model class and list of keys to fetch.
+
+        Raises:
+            NotImplementedError: Method or function hasn't
+                been implemented yet.
         """
         raise NotImplementedError
 
@@ -281,6 +285,9 @@ class BaseModelValidator(python_utils.OBJECT):
 
         Each validation function should accept only a single arg, which is the
         model instance to validate.
+
+        Returns:
+            Returns the list of custom validation functions to run.
         """
         return []
 
@@ -319,6 +326,10 @@ class BaseSummaryModelValidator(BaseModelValidator):
                 cls.external_instance_details and the third element
                 as a properties dict with key as property name in summary
                 model and value as property name in external model.
+
+        Raises:
+            NotImplementedError: Method or function hasn't 
+                been implemented yet.
         """
         raise NotImplementedError
 
@@ -478,6 +489,10 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         Returns:
             change_domain.BaseChange: A domain object class for the
                 changes made by commit commands of the model.
+
+        Raises:
+            NotImplementedError: Method or function 
+                hasn't been implemented yet.
         """
         raise NotImplementedError
 

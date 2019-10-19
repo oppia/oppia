@@ -496,7 +496,7 @@ def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc.
 
     Args:
-        path: str. path
+        path: str. The path is the file path to be processed.
 
     Returns:
         str. Returning normlized path.
@@ -647,7 +647,8 @@ def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent.
 
     Args:
-        escaped_string: str. Passing escaped string.
+        escaped_string: str. Passing escaped string 
+            with encodeURIComponent.
 
     Returns:
         str. Unescape a string that is encoded with encodeURIComponent.

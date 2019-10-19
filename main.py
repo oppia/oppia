@@ -115,8 +115,9 @@ def get_redirect_route(regex_route, handler, defaults=None):
 
     Args:
         regex_route: str. For regex for routing
-        handler: function. Handler function
-        defaults: dict. For defaults it's None
+        handler: function. Handler function for the admin page.
+        defaults: dict. Will be passed in the 
+            redirect if there is any.
 
     Returns:
         routes.RedirectRoute : Return redirect route module
