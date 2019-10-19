@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview CamelCaseToHyphens filter for Oppia.
+ * @fileoverview CamelCaseToHyphens pipe for Oppia.
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
