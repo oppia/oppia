@@ -51,7 +51,6 @@ describe('Admin Tab', function() {
     adminPage.expectUsers(['collectionEditor1']);
   });
 
-
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });
