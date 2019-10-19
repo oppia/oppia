@@ -20,7 +20,7 @@
 require('components/button-directives/hint-and-solution-buttons.directive.ts');
 
 require('domain/summary/ExplorationSummaryBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');

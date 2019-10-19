@@ -19,7 +19,7 @@
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
 angular.module('oppia').directive('subtopicsListTab', [

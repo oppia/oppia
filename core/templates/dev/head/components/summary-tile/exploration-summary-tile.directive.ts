@@ -23,7 +23,7 @@ require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
 require('components/ratings/rating-computation/rating-computation.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 require('services/contextual/UrlService.ts');

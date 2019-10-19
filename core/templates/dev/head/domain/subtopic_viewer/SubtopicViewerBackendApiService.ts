@@ -16,7 +16,7 @@
  * @fileoverview Service to get subtopic data.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('domain/subtopic_viewer/subtopic-viewer-domain.constants.ajs.ts');
 

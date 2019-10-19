@@ -25,7 +25,7 @@ require(
 
 require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 
 require(

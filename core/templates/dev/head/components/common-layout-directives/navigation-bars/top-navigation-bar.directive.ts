@@ -19,7 +19,7 @@
  */
 
 require('domain/sidebar/SidebarStatusService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/DebouncerService.ts');
 require('services/NavigationService.ts');
 require('services/SiteAnalyticsService.ts');

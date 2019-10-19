@@ -16,7 +16,7 @@
  * @fileoverview Service to get story data.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('domain/story_viewer/story-viewer-domain.constants.ajs.ts');
 

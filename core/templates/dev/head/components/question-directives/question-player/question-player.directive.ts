@@ -104,7 +104,7 @@ require(
 
 require('domain/question/QuestionBackendApiService.ts');
 require('domain/skill/SkillMasteryBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/contextual/UrlService.ts');

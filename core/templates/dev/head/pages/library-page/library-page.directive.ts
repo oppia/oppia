@@ -26,7 +26,7 @@ require('pages/library-page/search-results/search-results.directive.ts');
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
 require('domain/learner_dashboard/LearnerDashboardIdsBackendApiService.ts');
 require('domain/learner_dashboard/LearnerPlaylistService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/SearchService.ts');
