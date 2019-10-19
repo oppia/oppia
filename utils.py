@@ -496,7 +496,7 @@ def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc.
 
     Args:
-        path: str. The path is the file path to be processed.
+        path: str. Path of the file to be processed.
 
     Returns:
         str. Returning normlized path.

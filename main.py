@@ -120,7 +120,7 @@ def get_redirect_route(regex_route, handler, defaults=None):
             redirect if there is any.
 
     Returns:
-        routes.RedirectRoute : Return redirect route module
+        routes.RedirectRoute: Return redirect route module
 
     Warning: this method strips off parameters after the trailing slash. URLs
     with parameters should be formulated without the trailing slash.
