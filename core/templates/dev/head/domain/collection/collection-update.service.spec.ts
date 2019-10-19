@@ -17,7 +17,7 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// CollectionUpdateService.ts is upgraded to Angular 8.
+// collection-update.service.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionNodeObjectFactory } from

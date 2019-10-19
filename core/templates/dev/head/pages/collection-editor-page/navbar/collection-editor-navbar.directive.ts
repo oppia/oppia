@@ -23,7 +23,7 @@ require(
   'loading-dots.directive.ts');
 
 require('domain/collection/CollectionRightsBackendApiService.ts');
-require('domain/collection/CollectionUpdateService.ts');
+require('domain/collection/collection-update.service.ts');
 require('domain/collection/CollectionValidationService.ts');
 require('domain/collection/EditableCollectionBackendApiService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');

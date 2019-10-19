@@ -17,7 +17,7 @@
  */
 
 require('domain/collection/CollectionNodeObjectFactory.ts');
-require('domain/collection/CollectionUpdateService.ts');
+require('domain/collection/collection-update.service.ts');
 require('domain/collection/SearchExplorationsBackendApiService.ts');
 require('domain/summary/ExplorationSummaryBackendApiService.ts');
 require('domain/utilities/url-interpolation.service.ts');
