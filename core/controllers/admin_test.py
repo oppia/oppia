@@ -27,7 +27,7 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import question_services
+from core.domain import question_fetchers
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -240,7 +240,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
         questions, _, _ = (
-            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
                 10, [
                     skill_summaries[0].id, skill_summaries[1].id,
                     skill_summaries[2].id], '')

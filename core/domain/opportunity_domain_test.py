@@ -350,3 +350,70 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'incomplete_translation, needs_voiceover and assigned_voiceover'
                 ' to be the same as the supported audio languages, '
                 r'received \[\'en\', \'hi-en\'\]')
+
+
+class SkillOpportunityDomainTest(test_utils.GenericTestBase):
+    """Tests for the SkillOpportunity domain object."""
+
+    def setUp(self):
+        super(SkillOpportunityDomainTest, self).setUp()
+        self.valid_skill_opportunity = (
+            opportunity_domain.SkillOpportunity.from_dict({
+                'id': 'skill_1',
+                'skill_description': 'A new skill',
+                'question_count': 10
+            }))
+
+    def test_to_and_from_dict_works_correctly(self):
+        skill_opportunity_dict = {
+            'id': 'skill_1',
+            'skill_description': 'A new skill',
+            'question_count': 5,
+        }
+
+        skill_opportunity = opportunity_domain.SkillOpportunity.from_dict(
+            skill_opportunity_dict)
+
+        self.assertTrue(isinstance(
+            skill_opportunity, opportunity_domain.SkillOpportunity))
+        self.assertEqual(skill_opportunity.to_dict(), {
+            'id': 'skill_1',
+            'skill_description': 'A new skill',
+            'question_count': 5,
+        })
+
+    def test_invalid_skill_description_fails_validation_check(self):
+        self.assertTrue(isinstance(
+            self.valid_skill_opportunity.skill_description,
+            python_utils.BASESTRING))
+
+        # Object with skill_description as string passes the validation check.
+        self.valid_skill_opportunity.validate()
+        self.valid_skill_opportunity.skill_description = True
+        # Object with skill_id as bool fails the validation check.
+        self._assert_validation_error(
+            self.valid_skill_opportunity,
+            'Expected skill_description to be a string, received True')
+
+    def test_invalid_question_count_fails_validation_check(self):
+        self.assertTrue(isinstance(
+            self.valid_skill_opportunity.question_count, int))
+
+        # Object with question_count as int passes the validation check.
+        self.valid_skill_opportunity.validate()
+        self.valid_skill_opportunity.question_count = '123abc'
+        self._assert_validation_error(
+            self.valid_skill_opportunity,
+            'Expected question_count to be an integer, received 123abc')
+
+    def test_negative_question_count_fails_validation_check(self):
+        self.assertTrue(isinstance(
+            self.valid_skill_opportunity.question_count, int))
+
+        # Object with question_count as int passes the validation check.
+        self.valid_skill_opportunity.validate()
+        self.valid_skill_opportunity.question_count = -5
+        self._assert_validation_error(
+            self.valid_skill_opportunity,
+            'Expected question_count to be a non-negative integer, '
+            'received -5')

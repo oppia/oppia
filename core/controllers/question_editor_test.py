@@ -16,6 +16,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import user_services
@@ -214,7 +215,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=200)
         all_models = question_models.QuestionModel.get_all()
         questions = [
-            question_services.get_question_from_model(model)
+            question_fetchers.get_question_from_model(model)
             for model in all_models
         ]
         self.assertEqual(len(questions), 2)
@@ -233,7 +234,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token)
         all_models = question_models.QuestionModel.get_all()
         questions = [
-            question_services.get_question_from_model(model)
+            question_fetchers.get_question_from_model(model)
             for model in all_models
         ]
         self.assertEqual(len(questions), 2)

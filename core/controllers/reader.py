@@ -33,6 +33,7 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
+from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -278,7 +279,7 @@ class PretestHandler(base.BaseHandler):
         if not story.has_exploration(exploration_id):
             raise self.InvalidInputException
         pretest_questions, _, next_start_cursor = (
-            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
                 feconf.NUM_PRETEST_QUESTIONS,
                 story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
                 start_cursor)
