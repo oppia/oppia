@@ -251,7 +251,8 @@ class BaseHandler(webapp2.RequestHandler):
         """Base method to handle GET requests.
 
         Raises:
-            PageNotFoundException: Page not found error.
+            PageNotFoundException: Page not found error 
+                or error code 404.
         """
         raise self.PageNotFoundException
 
