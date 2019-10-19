@@ -20,7 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');

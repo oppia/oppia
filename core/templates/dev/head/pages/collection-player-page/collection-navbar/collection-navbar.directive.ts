@@ -16,7 +16,7 @@
  * @fileoverview Directive for the collection player navbar
  */
 
-require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/UrlService.ts');
 

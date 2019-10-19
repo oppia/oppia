@@ -16,7 +16,7 @@
  * @fileoverview Controller for the stories list viewer.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/url-interpolation.service.ts');

@@ -16,7 +16,7 @@
  * @fileoverview Controller for the navbar breadcrumb of the story editor.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('pages/story-editor-page/editor-tab/story-editor.directive.ts');

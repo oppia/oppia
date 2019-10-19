@@ -38,8 +38,8 @@ require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
-require('domain/collection/GuestCollectionProgressService.ts');
-require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('domain/collection/guest-collection-progress.service.ts');
+require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');

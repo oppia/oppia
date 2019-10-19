@@ -16,7 +16,7 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/collection/guest-collection-progress.service.ts');
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');

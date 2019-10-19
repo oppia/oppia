@@ -26,8 +26,8 @@ require('components/summary-tile/exploration-summary-tile.directive.ts');
 
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionPlaythroughObjectFactory.ts');
-require('domain/collection/GuestCollectionProgressService.ts');
-require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('domain/collection/guest-collection-progress.service.ts');
+require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');

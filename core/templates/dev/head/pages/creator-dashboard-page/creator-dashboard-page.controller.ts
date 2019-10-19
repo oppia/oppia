@@ -33,7 +33,7 @@ require('objects/objectComponentsRequires.ts');
 
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('components/ratings/rating-computation/rating-computation.service.ts');
-require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
+require('domain/creator_dashboard/creator-dashboard-backend-api.service.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');

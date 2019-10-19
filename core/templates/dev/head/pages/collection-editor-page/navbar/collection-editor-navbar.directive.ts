@@ -22,11 +22,11 @@ require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
-require('domain/collection/CollectionRightsBackendApiService.ts');
+require('domain/collection/collection-rights-backend-api.service.ts');
 require('domain/collection/collection-update.service.ts');
-require('domain/collection/CollectionValidationService.ts');
-require('domain/collection/EditableCollectionBackendApiService.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/collection/collection-validation.service.ts');
+require('domain/collection/editable-collection-backend-api.service.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');

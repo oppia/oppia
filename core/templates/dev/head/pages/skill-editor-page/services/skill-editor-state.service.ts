@@ -17,7 +17,7 @@
  * in the skill editor.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/QuestionBackendApiService.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/skill/SkillObjectFactory.ts');

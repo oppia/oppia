@@ -22,7 +22,7 @@ require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 
 require('domain/collection/collection-update.service.ts');
-require('domain/collection/CollectionValidationService.ts');
+require('domain/collection/collection-validation.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/collection-editor-page/collection-editor-page.directive.ts');
 require(
