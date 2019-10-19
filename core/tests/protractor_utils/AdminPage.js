@@ -184,11 +184,24 @@ var AdminPage = function() {
     return true;
   };
 
-  this.expectNumberOfUsers = function(expectedCount) {
-    element.all(
-      by.css('.protractor-test-roles-result-rows')).then(function(rows) {
-      expect(rows.length).toBe(expectedCount);
-    });
+  this.expectUsers = function(expectedUsersArray) {
+    var foundUsersArray = [];
+    element.all(by.css('.protractor-test-roles-result-rows'))
+      .map(function(elm) {
+        return elm.getText();
+      })
+      .then(function(texts) {
+        texts.forEach(function(name) {
+          foundUsersArray.push(name);
+        });
+        expect(foundUsersArray.length).toEqual(expectedUsersArray.length);
+
+        expectedUsersArray.sort();
+        foundUsersArray.sort();
+        foundUsersArray.forEach(function(name, ind){
+          expect(name).toEqual(expectedUsersArray[ind]);
+        });
+      });
   };
 };
 
