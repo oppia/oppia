@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
+require('services/AlertsService.ts');
 
 angular.module('oppia').factory('SearchExplorationsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
