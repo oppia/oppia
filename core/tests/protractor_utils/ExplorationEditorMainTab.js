@@ -147,7 +147,7 @@ var ExplorationEditorMainTab = function() {
   /*
    * Symbols
    */
-  var tickMark = element(
+  var correctAnswerTickMark = element(
     by.css('.protractor-test-correct-tick-mark'));
 
   /*
@@ -303,8 +303,8 @@ var ExplorationEditorMainTab = function() {
   // Rules are zero-indexed; 'default' denotes the default outcome.
   // 'pop' denotes the currently opened one.
   this.getResponseEditor = function(responseNum) {
+    var headerElem;
     if (responseNum !== 'pop') {
-      var headerElem;
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
@@ -320,6 +320,9 @@ var ExplorationEditorMainTab = function() {
           headerElem.click();
         }
       });
+    } else {
+      headerElem = addResponseHeader;
+      expect(headerElem.isDisplayed()).toBe(true)
     }
     return {
       /**
@@ -449,7 +452,7 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.expectTickMarkIsDisplayed = function() {
-    expect(tickMark.isDisplayed()).toBe(true);
+    expect(correctAnswerTickMark.isDisplayed()).toBe(true);
   };
 
   var _setOutcomeDest = function(

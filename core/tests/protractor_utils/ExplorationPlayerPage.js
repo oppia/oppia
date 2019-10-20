@@ -71,7 +71,7 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-return-to-parent-button'));
   var answerDetailsSubmitButton = element(
     by.css('.protractor-test-answer-details-submit-button'));
-  var correctFeedback = element(
+  var correctFeedbackElement = element(
     by.css('.protractor-test-correct-feedback'));
 
   var feedbackPopupLink =
@@ -309,7 +309,7 @@ var ExplorationPlayerPage = function() {
 
   this.expectCorrectFeedback = function() {
     waitFor.visibilityOf(
-      correctFeedback,
+      correctFeedbackElement,
       'Correct feedback footer takes too long to appear');
   };
 };

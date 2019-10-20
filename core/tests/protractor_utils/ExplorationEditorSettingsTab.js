@@ -109,6 +109,8 @@ var ExplorationEditorSettingsTab = function() {
 
   this.enableCorrectnessFeedback = function() {
     expect(enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
+    waitFor.elementToBeClickable(enableCorrectnessFeedbackButton, 
+      'Enable correctness feedback button is not clickable.');
     enableCorrectnessFeedbackButton.click();
   };
 
