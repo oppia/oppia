@@ -22,9 +22,16 @@ import 'zone.js';
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { TranslateModule } from '@ngx-translate/core';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {
+  TranslateLoader,
+  TranslateModule
+} from '@ngx-translate/core';
+import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 
+
+export const HttpLoaderFactory =
+    (http: HttpClient) => new TranslateHttpLoader(http);
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
 @Component({
@@ -37,7 +44,13 @@ export class ServiceBootstrapComponent {}
   imports: [
     BrowserModule,
     HttpClientModule,
-    TranslateModule.forRoot()
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    })
   ],
   declarations: [
     ServiceBootstrapComponent

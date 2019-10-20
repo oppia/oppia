@@ -110,6 +110,7 @@
   },
   "keywords": [],
   "dependencies": {
-    "@ngx-translate/core": "^11.0.1"
+    "@ngx-translate/core": "^11.0.1",
+    "@ngx-translate/http-loader": "^4.0.0"
   }
 }
