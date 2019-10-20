@@ -17,8 +17,8 @@
  */
 
 import { ErrorHandler } from '@angular/core';
-import { HtmlEscaperService } from './HtmlEscaperService';
-import { LoggerService } from './LoggerService';
+import { HtmlEscaperService } from 'services/HtmlEscaperService';
+import { LoggerService } from 'services/LoggerService';
 
 describe('HTML escaper service', () => {
   let ohe: HtmlEscaperService;

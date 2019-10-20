@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { LoggerService } from './LoggerService';
+import { LoggerService } from 'services/LoggerService';
 
 @Injectable({
   providedIn: 'root'

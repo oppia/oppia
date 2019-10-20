@@ -18,9 +18,9 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HtmlEscaperService } from './HtmlEscaperService';
+import { HtmlEscaperService } from 'services/HtmlEscaperService';
 import { CamelCaseToHyphensPipe } from
-  '../filters/string-utility-filters/camel-case-to-hyphens.pipe';
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 // Service for assembling extension tags (for interactions).
 
