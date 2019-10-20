@@ -113,6 +113,11 @@ def preprocess_release():
     (3) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
     (4) Removes the "version" field from app.yaml, since gcloud does not like
         it (when deploying).
+
+    Raises:
+        Exception: Could not find deploy data directory.
+        Exception: Could not find source path.
+        Exception: Could not find destination path.
     """
     if not os.path.exists(DEPLOY_DATA_PATH):
         raise Exception(
@@ -191,7 +196,19 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
 
 
 def _execute_deployment():
-    """Executes the deployment process after doing the prerequisite checks."""
+    """Executes the deployment process after doing the prerequisite checks.
+
+    Raises:
+        Exception: The deployment script is not run from a release branch.
+        Exception: Current release version has '.' character.
+        Exception: The mailgun API key is not added before deployment.
+        Exception: Could not find third party directory.
+        Exception: Invalid directory accessed during deployment.
+        Exception: All the indexes have not been served before deployment.
+        Exception: Build failed.
+        Exception: Issue in library page loading.
+        Exception: There is a major breakage.
+    """
 
     install_third_party_libs.main(args=[])
 
@@ -348,7 +365,11 @@ def _execute_deployment():
 
 
 def get_unique_id():
-    """Returns a unique id."""
+    """Returns a unique id.
+
+    Returns:
+        str. The unique id to be returned.
+    """
     unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
                         for _ in python_utils.RANGE(CACHE_SLUG_PROD_LENGTH))
     return unique_id

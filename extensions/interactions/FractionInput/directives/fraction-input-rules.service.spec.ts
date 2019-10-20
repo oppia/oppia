@@ -16,27 +16,22 @@
  * @fileoverview Unit tests for Fraction Input rules.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// FractionObjectFactory.ts is upgraded to Angular 8.
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-// ^^^ This block is to be removed.
+import { FractionAnswer, FractionInputRulesService } from
+  'interactions/FractionInput/directives/fraction-input-rules.service';
+import { TestBed } from '@angular/core/testing';
 
-require(
-  'interactions/FractionInput/directives/fraction-input-rules.service.ts');
+describe('Fraction Input rules service', () => {
+  let firs: FractionInputRulesService = null;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [FractionInputRulesService]
+    });
+    firs = TestBed.get(FractionInputRulesService);
+  });
 
-describe('Fraction Input rules service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-  }));
-
-  var firs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    firs = $injector.get('FractionInputRulesService');
-  }));
-
-  var createNegativeFractionDict = function(
-      wholeNumber, numerator, denominator) {
+  let createNegativeFractionDict = (
+      wholeNumber: number, numerator: number,
+      denominator: number): FractionAnswer => {
     return {
       isNegative: true,
       wholeNumber: wholeNumber,
@@ -45,8 +40,9 @@ describe('Fraction Input rules service', function() {
     };
   };
 
-  var createPositiveFractionDict = function(
-      wholeNumber, numerator, denominator) {
+  let createPositiveFractionDict = (
+      wholeNumber: number, numerator: number,
+      denominator: number): FractionAnswer => {
     return {
       isNegative: false,
       wholeNumber: wholeNumber,
@@ -55,7 +51,7 @@ describe('Fraction Input rules service', function() {
     };
   };
 
-  var RULE_INPUT = {
+  let RULE_INPUT: {f: FractionAnswer} = {
     f: {
       isNegative: false,
       wholeNumber: 1,
@@ -64,11 +60,11 @@ describe('Fraction Input rules service', function() {
     }
   };
 
-  var INTEGER_RULE_INPUT = {
+  let INTEGER_RULE_INPUT: {x: number} = {
     x: 20
   };
 
-  var FRACTIONAL_RULE_INPUT = {
+  let FRACTIONAL_RULE_INPUT: {f: FractionAnswer} = {
     f: {
       isNegative: false,
       wholeNumber: 0,
@@ -77,7 +73,7 @@ describe('Fraction Input rules service', function() {
     }
   };
 
-  it('should have a correct \'equivalence\' rule', function() {
+  it('should have a correct \'equivalence\' rule', () => {
     expect(firs.IsEquivalentTo(
       createNegativeFractionDict(1, 8, 4), RULE_INPUT)).toBe(false);
     expect(firs.IsEquivalentTo(
@@ -97,7 +93,7 @@ describe('Fraction Input rules service', function() {
   });
 
   it('should have a correct \'equivalent to and in simplest form\' rule',
-    function() {
+    () => {
       expect(firs.IsEquivalentToAndInSimplestForm(
         createPositiveFractionDict(1, 2, 1), RULE_INPUT)).toBe(true);
       // Equivalent to but not in simplest form.
@@ -110,7 +106,7 @@ describe('Fraction Input rules service', function() {
         createPositiveFractionDict(1, 5, 3), RULE_INPUT)).toBe(false);
     });
 
-  it('should have a correct \'exactly equal to\' rule', function() {
+  it('should have a correct \'exactly equal to\' rule', () => {
     expect(firs.IsExactlyEqualTo(
       createPositiveFractionDict(1, 40, 20), RULE_INPUT)).toBe(true);
     expect(firs.IsExactlyEqualTo(
@@ -119,7 +115,7 @@ describe('Fraction Input rules service', function() {
       createPositiveFractionDict(1, 4, 2), RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'less than\' rule', function() {
+  it('should have a correct \'less than\' rule', () => {
     expect(firs.IsLessThan(
       createPositiveFractionDict(1, 37, 20), RULE_INPUT)).toBe(true);
     expect(firs.IsLessThan(
@@ -128,7 +124,7 @@ describe('Fraction Input rules service', function() {
       createPositiveFractionDict(1, 16, 2), RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'greater than\' rule', function() {
+  it('should have a correct \'greater than\' rule', () => {
     expect(firs.IsGreaterThan(
       createPositiveFractionDict(1, 49, 20), RULE_INPUT)).toBe(true);
     expect(firs.IsGreaterThan(
@@ -137,7 +133,7 @@ describe('Fraction Input rules service', function() {
       createPositiveFractionDict(1, 0, 2), RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'has integer part equal to\' rule', function() {
+  it('should have a correct \'has integer part equal to\' rule', () => {
     expect(firs.HasIntegerPartEqualTo(
       createPositiveFractionDict(20, 0, 20), INTEGER_RULE_INPUT)).toBe(
       true);
@@ -152,7 +148,7 @@ describe('Fraction Input rules service', function() {
       false);
   });
 
-  it('should have a correct \'has numerator equal to\' rule', function() {
+  it('should have a correct \'has numerator equal to\' rule', () => {
     expect(firs.HasNumeratorEqualTo(
       createPositiveFractionDict(0, 20, 60), INTEGER_RULE_INPUT)).toBe(
       true);
@@ -164,7 +160,7 @@ describe('Fraction Input rules service', function() {
       false);
   });
 
-  it('should have a correct \'has denominator equal to\' rule', function() {
+  it('should have a correct \'has denominator equal to\' rule', () => {
     expect(firs.HasDenominatorEqualTo(
       createPositiveFractionDict(1, 49, 20), INTEGER_RULE_INPUT)).toBe(
       true);
@@ -176,7 +172,7 @@ describe('Fraction Input rules service', function() {
       false);
   });
 
-  it('should check if the fraction is a whole number', function() {
+  it('should check if the fraction is a whole number', () => {
     expect(firs.HasNoFractionalPart(
       createPositiveFractionDict(0, 0, 1))).toBe(true);
     expect(firs.HasNoFractionalPart(
@@ -185,7 +181,7 @@ describe('Fraction Input rules service', function() {
       createPositiveFractionDict(1, 8, 4))).toBe(false);
   });
 
-  it('should check if \'fractional part is exactly equal\' rule', function() {
+  it('should check if \'fractional part is exactly equal\' rule', () => {
     expect(firs.HasFractionalPartExactlyEqualTo(
       createPositiveFractionDict(1, 1, 2), FRACTIONAL_RULE_INPUT)).toBe(false);
     expect(firs.HasFractionalPartExactlyEqualTo(
