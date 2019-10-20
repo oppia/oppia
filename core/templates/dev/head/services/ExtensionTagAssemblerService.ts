@@ -17,21 +17,29 @@
  * the learner and editor views.
  */
 
-require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+import { HtmlEscaperService } from './HtmlEscaperService';
+import { CamelCaseToHyphensPipe } from
+  '../filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 // Service for assembling extension tags (for interactions).
-angular.module('oppia').factory('ExtensionTagAssemblerService', [
-  '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {
-    return {
-      formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
-        for (var caSpecName in customizationArgSpecs) {
-          var caSpecValue = customizationArgSpecs[caSpecName].value;
-          element.attr(
-            $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-            HtmlEscaperService.objToEscapedJson(caSpecValue));
-        }
-        return element;
-      }
-    };
+
+export class ExtensionTagAssemblerService {
+  constructor(private htmlEscaperService: HtmlEscaperService,
+              private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
+
+  formatCustomizationArgAttrs(element, customizationArgSpecs) {
+    for (let caSpecName in customizationArgSpecs) {
+      let caSpecValue = customizationArgSpecs[caSpecName].value;
+      element.attr(
+        this.camelCaseToHyphens.transform(caSpecName) + '-with-value',
+        this.htmlEscaperService.objToEscapedJson(caSpecValue));
+    }
+    return element;
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'ExtensionTagAssemblerService',
+  downgradeInjectable(ExtensionTagAssemblerService));
+

@@ -16,11 +16,15 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { Injectable } from '@angular/core';
+import {ErrorHandler, Injectable} from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from './contextual/WindowDimensionsService';
+import {HtmlEscaperService} from './HtmlEscaperService';
+import {LoggerService} from './LoggerService';
+import {ExtensionTagAssemblerService} from './ExtensionTagAssemblerService';
+import {CamelCaseToHyphensPipe} from '../filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +33,12 @@ export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
     'UtilsService': new UtilsService(),
-    'WindowDimensionsService': new WindowDimensionsService()
+    'WindowDimensionsService': new WindowDimensionsService(),
+    'HtmlEscaperService': new HtmlEscaperService(
+      new LoggerService(new ErrorHandler())),
+    'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
+      new HtmlEscaperService(new LoggerService(new ErrorHandler())),
+      new CamelCaseToHyphensPipe(new UtilsService()))
   };
   /* eslint-enable quote-props */
 }
