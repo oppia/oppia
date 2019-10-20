@@ -61,19 +61,16 @@ export class UpgradedServices {
           compile(value: string, lang: string): string | Function {
             return undefined;
           }
-
           compileTranslations(translations: any, lang: string): any {
           }
         }, new class extends TranslateParser {
-          getValue(target: any, key: string): any {
-          }
+          getValue(target: any, key: string): any {}
 
           interpolate(expr: string | Function, params?: any): string {
             return '';
           }
         }, new class extends MissingTranslationHandler {
-          handle(params: MissingTranslationHandlerParams): any {
-          }
+          handle(params: MissingTranslationHandlerParams): any {}
         })),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService())
