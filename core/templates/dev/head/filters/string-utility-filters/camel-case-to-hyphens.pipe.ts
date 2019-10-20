@@ -16,8 +16,8 @@
  * @fileoverview CamelCaseToHyphensPipe for Oppia
  */
 
-import { UtilsService } from 'services/UtilsService.ts';
 import { Pipe, PipeTransform } from '@angular/core';
+import { UtilsService } from 'services/UtilsService.ts';
 
 // Pipe that converts camelCase to hyphens
 @Pipe({name: 'camelCaseToHyphens'})

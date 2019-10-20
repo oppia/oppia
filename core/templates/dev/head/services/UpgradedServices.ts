@@ -19,12 +19,13 @@
 import {ErrorHandler, Injectable} from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { CamelCaseToHyphensPipe } from
+  '../filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ExtensionTagAssemblerService } from './ExtensionTagAssemblerService';
+import { HtmlEscaperService } from './HtmlEscaperService';
+import { LoggerService } from './LoggerService';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from './contextual/WindowDimensionsService';
-import {HtmlEscaperService} from './HtmlEscaperService';
-import {LoggerService} from './LoggerService';
-import {ExtensionTagAssemblerService} from './ExtensionTagAssemblerService';
-import {CamelCaseToHyphensPipe} from '../filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 @Injectable({
   providedIn: 'root'

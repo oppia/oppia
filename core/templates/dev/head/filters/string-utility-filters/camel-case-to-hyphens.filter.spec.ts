@@ -16,9 +16,9 @@
  * @fileoverview Tests for CamelCaseToHyphens filter for Oppia.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { TestBed } from '@angular/core/testing';
 import { UtilsService } from '../../services/UtilsService';
 
 describe('Testing filters', () => {

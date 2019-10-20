@@ -17,10 +17,10 @@
  * the learner and editor views.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { HtmlEscaperService } from './HtmlEscaperService';
 import { CamelCaseToHyphensPipe } from
   '../filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 // Service for assembling extension tags (for interactions).
 
