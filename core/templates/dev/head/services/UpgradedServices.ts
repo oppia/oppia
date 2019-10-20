@@ -30,6 +30,7 @@ import {
 } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 
+import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
 import { EventService } from './EventService';
 import { LoggerService } from './LoggerService';
 import { SearchService } from './SearchService';
@@ -73,7 +74,9 @@ export class UpgradedServices {
         }, new class extends MissingTranslationHandler {
           handle(params: MissingTranslationHandlerParams): any {
           }
-        }))
+        })),
+    'SidebarStatusService': new SidebarStatusService(
+      new WindowDimensionsService())
   };
   /* eslint-enable quote-props */
 }
