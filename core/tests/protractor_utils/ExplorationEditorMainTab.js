@@ -322,7 +322,7 @@ var ExplorationEditorMainTab = function() {
       });
     } else {
       headerElem = addResponseHeader;
-      expect(headerElem.isDisplayed()).toBe(true)
+      expect(headerElem.isDisplayed()).toBe(true);
     }
     return {
       /**
