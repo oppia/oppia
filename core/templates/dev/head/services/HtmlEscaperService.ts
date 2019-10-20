@@ -26,11 +26,11 @@ import { LoggerService } from './LoggerService';
 export class HtmlEscaperService {
   constructor(private loggerService: LoggerService) {}
 
-  objToEscapedJson(obj) {
+  objToEscapedJson(obj: Object): string {
     return this.unescapedStrToEscapedStr(JSON.stringify(obj));
   }
 
-  escapedJsonToObj(json) {
+  escapedJsonToObj(json: string): Object {
     if (!json) {
       this.loggerService.error('Empty string was passed to JSON decoder.');
       return '';
@@ -38,7 +38,7 @@ export class HtmlEscaperService {
     return JSON.parse(this.escapedStrToUnescapedStr(json));
   }
 
-  unescapedStrToEscapedStr(str) {
+  unescapedStrToEscapedStr(str: string): string {
     return String(str)
       .replace(/&/g, '&amp;')
       .replace(/"/g, '&quot;')
@@ -46,7 +46,7 @@ export class HtmlEscaperService {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   }
-  escapedStrToUnescapedStr(value) {
+  escapedStrToUnescapedStr(value: string): string {
     return String(value)
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, '\'')

@@ -28,7 +28,8 @@ export class ExtensionTagAssemblerService {
   constructor(private htmlEscaperService: HtmlEscaperService,
               private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
 
-  formatCustomizationArgAttrs(element, customizationArgSpecs) {
+  formatCustomizationArgAttrs(element: any,
+      customizationArgSpecs: Object): any {
     for (let caSpecName in customizationArgSpecs) {
       let caSpecValue = customizationArgSpecs[caSpecName].value;
       element.attr(
