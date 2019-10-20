@@ -110,8 +110,11 @@ class BaseJobManager(python_utils.OBJECT):
         return cls in ABSTRACT_BASE_CLASSES
 
     @classmethod
-    def create_new(cls):
+    def create_new(cls, test_only=False):
         """Creates a new job of this class type.
+
+        Args:
+            test_only: boolean. for testing _is_abstract method.
 
         Returns:
             str. The unique id of this job.
@@ -120,6 +123,10 @@ class BaseJobManager(python_utils.OBJECT):
             Exception: This method (instead of a subclass method) was directly
                 used to create a new job.
         """
+
+        if test_only:
+            return cls._is_abstract()
+
         if cls._is_abstract():
             raise Exception(
                 'Tried to directly create a job using the abstract base '

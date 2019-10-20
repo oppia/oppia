@@ -48,12 +48,24 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
     """
 
     @classmethod
-    def get_event_types_listened_to(cls):
+    def get_event_types_listened_to(cls, test_only_get_realtime_datastore=False,
+                                    test_only_get_batch_job_manager=False):
         """Get the event types that this class is subscribed to.
+
+        Args:
+            test_only_get_realtime_datastore:
+            boolean. for testing _get_realtime_datastore_class method.
+            test_only_get_batch_job_manager:
+            boolean for testing _get_batch_job_manager_class method.
 
         Returns:
             list(str). List of event types that this class is subscribed to.
         """
+        if test_only_get_realtime_datastore:
+            return cls._get_realtime_datastore_class()
+        if test_only_get_batch_job_manager:
+            return cls._get_batch_job_manager_class()
+
         return [feconf.EVENT_TYPE_NEW_THREAD_CREATED,
                 feconf.EVENT_TYPE_THREAD_STATUS_CHANGED]
 

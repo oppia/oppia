@@ -762,7 +762,7 @@ class JobRegistryTests(test_utils.GenericTestBase):
 
     def test_each_one_off_class_is_not_abstract(self):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
-            self.assertFalse(klass._is_abstract())  # pylint: disable=protected-access
+            self.assertFalse(klass.create_new(test_only=True))
 
     def test_validity_of_each_continuous_computation_class(self):
         for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
@@ -779,10 +779,6 @@ class JobRegistryTests(test_utils.GenericTestBase):
                         event_type),
                     event_services.BaseEventHandler))
 
-            rdc = klass._get_realtime_datastore_class()  # pylint: disable=protected-access
-            self.assertTrue(issubclass(
-                rdc, jobs.BaseRealtimeDatastoreClassForContinuousComputations))
-
             # The list of allowed base classes. This can be extended as the
             # need arises, though we may also want to implement
             # _get_continuous_computation_class() and
@@ -790,9 +786,14 @@ class JobRegistryTests(test_utils.GenericTestBase):
             # that are added to this list.
             allowed_base_batch_job_classes = [
                 jobs.BaseMapReduceJobManagerForContinuousComputations]
+            rdc = klass.get_event_types_listened_to(
+                test_only_get_realtime_datastore=True)
             self.assertTrue(any([
-                issubclass(klass._get_batch_job_manager_class(), superclass)  # pylint: disable=protected-access
+                issubclass(klass.get_event_types_listened_to(
+                    test_only_get_batch_job_manager=True), superclass)  # pylint: disable=protected-access
                 for superclass in allowed_base_batch_job_classes]))
+            self.assertTrue(issubclass(
+                rdc, jobs.BaseRealtimeDatastoreClassForContinuousComputations))
 
 
 class BaseMapReduceJobManagerForContinuousComputationsTests(
