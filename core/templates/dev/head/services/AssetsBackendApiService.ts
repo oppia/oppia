@@ -79,13 +79,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       }).success(function(data) {
         var assetBlob = null;
         try {
-          if (assetType === ASSET_TYPE_AUDIO) {
-            // Add type for audio assets. Without this, translations can
-            // not be played on Safari.
-            assetBlob = new Blob([data], {type: 'audio/mpeg'});
-          } else {
-            assetBlob = new Blob([data], {type: data.type});
-          }
+          assetBlob = new Blob([data], {type: data.type});
         } catch (exception) {
           window.BlobBuilder = window.BlobBuilder ||
                          window.WebKitBlobBuilder ||
