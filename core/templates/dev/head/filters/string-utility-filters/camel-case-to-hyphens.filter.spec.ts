@@ -19,7 +19,6 @@
 import { TestBed } from '@angular/core/testing';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { UtilsService } from '../../services/UtilsService';
 
 describe('Testing filters', () => {
   let camelCaseToHyphensPipe: CamelCaseToHyphensPipe ;
@@ -27,7 +26,7 @@ describe('Testing filters', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    camelCaseToHyphensPipe = new CamelCaseToHyphensPipe(new UtilsService());
+    camelCaseToHyphensPipe = new CamelCaseToHyphensPipe();
   });
 
   it('should have all expected filters', () => {
