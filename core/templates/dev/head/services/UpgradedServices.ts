@@ -44,7 +44,6 @@ export class UpgradedServices {
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService())
   };
-  /* eslint-enable quote-props */
 }
 
 angular.module('oppia').factory(
