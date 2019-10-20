@@ -16,9 +16,10 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import {ErrorHandler, Injectable} from '@angular/core';
+import { ErrorHandler, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
 import { CamelCaseToHyphensPipe } from
   '../filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ExtensionTagAssemblerService } from './ExtensionTagAssemblerService';
@@ -39,7 +40,9 @@ export class UpgradedServices {
       new LoggerService(new ErrorHandler())),
     'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
       new HtmlEscaperService(new LoggerService(new ErrorHandler())),
-      new CamelCaseToHyphensPipe(new UtilsService()))
+      new CamelCaseToHyphensPipe()),
+    'SidebarStatusService': new SidebarStatusService(
+      new WindowDimensionsService())
   };
   /* eslint-enable quote-props */
 }

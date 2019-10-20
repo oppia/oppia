@@ -13,25 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview CamelCaseToHyphensPipe for Oppia
+ * @fileoverview CamelCaseToHyphens pipe for Oppia.
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { UtilsService } from 'services/UtilsService.ts';
 
-// Pipe that converts camelCase to hyphens
 @Pipe({name: 'camelCaseToHyphens'})
 export class CamelCaseToHyphensPipe implements PipeTransform {
-  constructor(private utilsService: UtilsService) {}
-  transform(input: any): any {
-    if (this.utilsService.isString(input)) {
-      let result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
-      if (result[0] === '-') {
-        result = result.substring(1);
-      }
-      return result;
-    } else {
-      return input;
+  transform(input: string): string {
+    var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
+    if (result[0] === '-') {
+      result = result.substring(1);
     }
+    return result;
   }
 }
