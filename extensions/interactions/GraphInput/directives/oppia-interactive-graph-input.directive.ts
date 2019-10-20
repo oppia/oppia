@@ -22,7 +22,7 @@
 
 require('interactions/GraphInput/directives/graph-viz.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('interactions/GraphInput/directives/graph-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');

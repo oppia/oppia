@@ -21,7 +21,7 @@
  */
 
 require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/contextual/UrlService.ts');
