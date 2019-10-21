@@ -336,15 +336,17 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
             is_valid: true,
           });
 
-        spyOn(PlaythroughIssuesService, 'getIssues').and.returnValue(
-          $q.resolve([
-            earlyQuitIssue,
-            multipleIncorrectSubmissionsIssue,
-            cyclicTransitionsIssue,
-          ]));
+        var backendCallSpy = spyOn(PlaythroughIssuesService, 'getIssues')
+          .and.returnValue(
+            $q.resolve([
+              earlyQuitIssue,
+              multipleIncorrectSubmissionsIssue,
+              cyclicTransitionsIssue,
+            ]));
 
         PlaythroughImprovementTaskObjectFactory.fetchTasks().then(tasks => {
           expect(tasks).toEqual([]);
+          expect(backendCallSpy).not.toHaveBeenCalled();
         }).then(done, done.fail);
 
         this.scope.$digest(); // Forces all pending promises to evaluate.
