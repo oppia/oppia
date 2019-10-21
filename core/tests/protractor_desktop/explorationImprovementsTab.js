@@ -34,7 +34,7 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
-describe('Answer Details Improvements', function() {
+fdescribe('Answer Details Improvements', function() {
   var EXPLORATION_TITLE = 'Check';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
@@ -77,6 +77,7 @@ describe('Answer Details Improvements', function() {
 
     // Creator creates and publishes an exploration.
     workflow.createExplorationAsAdmin();
+    general.getExplorationIdFromEditor().then(expId => this.expId = expId);
     explorationEditorMainTab.exitTutorial();
 
     explorationEditorPage.navigateToSettingsTab();
@@ -100,30 +101,46 @@ describe('Answer Details Improvements', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
+    users.logout();
   });
 
-  it('checks solicit answer details feature', function() {
-    users.login('learner@user.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.submitAnswer('TextInput', 'One');
-    explorationPlayerPage.submitAnswerDetails('I liked this choice of answer');
-    explorationPlayerPage.expectExplorationToNotBeOver();
+  fdescribe('checks solicit answer details feature', function() {
+    beforeAll(function() {
+      users.login('learner@user.com');
+      libraryPage.get();
+      libraryPage.findExploration(EXPLORATION_TITLE);
+      libraryPage.playExploration(EXPLORATION_TITLE);
+      explorationPlayerPage.submitAnswer('TextInput', 'One');
+      explorationPlayerPage.submitAnswerDetails(
+        'I liked this choice of answer');
+      explorationPlayerPage.expectExplorationToNotBeOver();
+      oppiaLogo.click();
+      general.acceptAlert();
+      users.logout();
+    });
 
-    oppiaLogo.click();
-    general.acceptAlert();
-    users.logout();
-    users.login('creator@user.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.navigateToExplorationEditor();
-    explorationEditorPage.navigateToImprovementsTab();
+    it('is visible for creators', function() {
+      users.login('creator@user.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.navigateToExplorationEditor();
+      explorationEditorPage.navigateToImprovementsTab();
 
-    var task = improvementsTab.getAnswerDetailsTask('One');
-    improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
-    improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
-    improvementsTab.closeModal();
-    users.logout();
+      var task = improvementsTab.getAnswerDetailsTask('One');
+      improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
+      improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
+      improvementsTab.closeModal();
+      users.logout();
+    });
+
+    fit('is visible for guests', function() {
+      general.openEditor(this.expId);
+      explorationEditorPage.navigateToImprovementsTab();
+
+      var task = improvementsTab.getAnswerDetailsTask('One');
+      improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
+      improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
+      improvementsTab.closeModal();
+    });
   });
 
   afterAll(function() {
@@ -177,6 +194,7 @@ describe('Feedback Improvements', function() {
 
     // Creator creates and publishes an exploration.
     users.login('creator@ExplorationFeedback.com');
+
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
