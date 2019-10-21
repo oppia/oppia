@@ -21,16 +21,14 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require(
-<<<<<<< HEAD
-  'pages/community-dashboard-page/skill-opportunities/' +
-  'skill-opportunities.directive.ts');
-=======
   'components/common-layout-directives/common-elements/' +
   'lazy-loading.directive.ts');
 require(
   'pages/community-dashboard-page/contributions-and-review/' +
   'contributions-and-review.directive.ts');
->>>>>>> community-dashboard-list-skill-opportunities
+require(
+  'pages/community-dashboard-page/skill-opportunities/' +
+  'skill-opportunities.directive.ts');
 require(
   'pages/community-dashboard-page/translation-opportunities/' +
   'translation-opportunities.directive.ts');
