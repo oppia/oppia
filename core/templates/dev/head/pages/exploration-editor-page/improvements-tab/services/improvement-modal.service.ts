@@ -58,6 +58,7 @@ angular.module('oppia').factory('ImprovementModalService', [
           controller: [
             '$scope', '$uibModalInstance', 'isUserLoggedIn',
             function($scope, $uibModalInstance, isUserLoggedIn) {
+              $scope.isUserLoggedIn = isUserLoggedIn;
               $scope.selectedLearnerAnswerInfo = [];
               $scope.learnerAnswerDetails = learnerAnswerDetails;
               $scope.currentLearnerAnswerInfo = null;
