@@ -120,7 +120,7 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
       fetchTasks: function() {
         // TODO(#7816): Remove this branch once all explorations maintain an
         // ExplorationIssuesModel.
-        if (ExplorationFeaturesService.isPlaythroughRecordingEnabled()) {
+        if (!ExplorationFeaturesService.isPlaythroughRecordingEnabled()) {
           return $q.resolve([]);
         }
         return PlaythroughIssuesService.getIssues().then(function(issues) {
