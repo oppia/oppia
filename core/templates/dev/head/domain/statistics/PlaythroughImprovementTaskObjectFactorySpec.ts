@@ -113,6 +113,8 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
+      'ExplorationFeaturesService', new ExplorationFeaturesService());
+    $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
