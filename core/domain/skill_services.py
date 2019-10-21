@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import user_services
@@ -261,6 +262,59 @@ def get_multi_skills(skill_ids):
         for skill_model in local_skill_models
         if skill_model is not None]
     return skills
+
+
+def get_rubrics_of_skills(skill_ids):
+    """Returns a list of rubrics corresponding to given skills.
+
+    Args:
+        skill_ids: list(str). The list of skill IDs.
+
+    Returns:
+        dict, list(str). The skill rubrics of skills keyed by their
+            corresponding ids and the list of deleted skill ids, if any.
+    """
+    backend_skill_models = skill_models.SkillModel.get_multi(skill_ids)
+    skill_id_to_rubrics_dict = {}
+
+    for skill_model in backend_skill_models:
+        if skill_model is not None:
+            skill_id_to_rubrics_dict[skill_model.id] = skill_model.rubrics
+
+    deleted_skill_ids = []
+    for skill_id in skill_ids:
+        if skill_id not in skill_id_to_rubrics_dict:
+            skill_id_to_rubrics_dict[skill_id] = None
+            deleted_skill_ids.append(skill_id)
+
+    return skill_id_to_rubrics_dict, deleted_skill_ids
+
+
+def get_descriptions_of_skills(skill_ids):
+    """Returns a list of skill descriptions corresponding to the given skills.
+
+    Args:
+        skill_ids: list(str). The list of skill ids.
+
+    Returns:
+        dict, list(str). The skill descriptions of skills keyed by their
+            corresponding ids and the list of deleted skill ids, if any.
+    """
+    skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
+    skill_id_to_description_dict = {}
+
+    for skill_summary_model in skill_summary_models:
+        if skill_summary_model is not None:
+            skill_id_to_description_dict[skill_summary_model.id] = (
+                skill_summary_model.description)
+
+    deleted_skill_ids = []
+    for skill_id in skill_ids:
+        if skill_id not in skill_id_to_description_dict:
+            skill_id_to_description_dict[skill_id] = None
+            deleted_skill_ids.append(skill_id)
+
+    return skill_id_to_description_dict, deleted_skill_ids
 
 
 def get_skill_summary_from_model(skill_summary_model):

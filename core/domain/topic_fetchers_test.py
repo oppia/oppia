@@ -18,10 +18,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -141,124 +137,6 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         expected_topic = self.topic.to_dict()
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.to_dict(), expected_topic)
-
-    def test_get_rubrics_of_linked_skills(self):
-        self.save_new_skill(
-            self.skill_id_1, self.user_id_admin, 'Description 1',
-            misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
-                state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-        self.save_new_skill(
-            self.skill_id_2, self.user_id_admin, 'Description 2',
-            misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
-                state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'The topic with given id doesn\'t exist'):
-            topic_fetchers.get_rubrics_of_linked_skills('invalid_id')
-
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            skill_rubrics = topic_fetchers.get_rubrics_of_linked_skills(
-                self.TOPIC_ID)
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
-
-            skill_services.delete_skill(self.user_id_admin, 'skill_2')
-            skill_rubrics = topic_fetchers.get_rubrics_of_linked_skills(
-                self.TOPIC_ID)
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            expected_email_html_body = (
-                'The deleted skills: skill_2 are still'
-                ' present in topic with id %s' % self.TOPIC_ID)
-            self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
-            self.assertEqual(
-                skill_rubrics, {
-                    self.skill_id_1: [
-                        skill_domain.Rubric(
-                            constants.SKILL_DIFFICULTIES[0], 'Explanation 1'
-                        ).to_dict(),
-                        skill_domain.Rubric(
-                            constants.SKILL_DIFFICULTIES[1], 'Explanation 2'
-                        ).to_dict(),
-                        skill_domain.Rubric(
-                            constants.SKILL_DIFFICULTIES[2], 'Explanation 3'
-                        ).to_dict()],
-                    self.skill_id_2: None
-                }
-            )
-
-    def test_get_descriptions_of_linked_skills(self):
-        self.save_new_skill(
-            self.skill_id_1, self.user_id_admin, 'Description 1',
-            misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
-                state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-        self.save_new_skill(
-            self.skill_id_2, self.user_id_admin, 'Description 2',
-            misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
-                state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'The topic with given id doesn\'t exist'):
-            topic_fetchers.get_descriptions_of_linked_skills('invalid_id')
-
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            skill_descriptions = (
-                topic_fetchers.get_descriptions_of_linked_skills(
-                    self.TOPIC_ID))
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
-
-            skill_services.delete_skill(self.user_id_admin, self.skill_id_2)
-            skill_descriptions = (
-                topic_fetchers.get_descriptions_of_linked_skills(
-                    self.TOPIC_ID))
-
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            expected_email_html_body = (
-                'The deleted skills: skill_2 are still'
-                ' present in topic with id %s' % self.TOPIC_ID)
-            self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
-            self.assertEqual(
-                skill_descriptions, {
-                    self.skill_id_1: 'Description 1',
-                    self.skill_id_2: None
-                }
-            )
 
     def test_get_topic_by_version(self):
         topic_id = topic_services.get_new_topic_id()

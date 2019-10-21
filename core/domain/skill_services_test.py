@@ -98,6 +98,84 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(new_skill_id), 12)
         self.assertEqual(skill_models.SkillModel.get_by_id(new_skill_id), None)
 
+    def test_get_descriptions_of_skills(self):
+        self.save_new_skill(
+            'skill_id_1', self.user_id_admin, 'Description 1',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+        self.save_new_skill(
+            'skill_id_2', self.user_id_admin, 'Description 2',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+
+        skill_services.delete_skill(self.user_id_admin, 'skill_id_2')
+        skill_descriptions, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(
+                ['skill_id_1', 'skill_id_2']))
+        self.assertEqual(deleted_skill_ids, ['skill_id_2'])
+        self.assertEqual(
+            skill_descriptions, {
+                'skill_id_1': 'Description 1',
+                'skill_id_2': None
+            }
+        )
+
+    def test_get_rubrics_of_linked_skills(self):
+        self.save_new_skill(
+            'skill_id_1', self.user_id_admin, 'Description 1',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+        self.save_new_skill(
+            'skill_id_2', self.user_id_admin, 'Description 2',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+
+        skill_services.delete_skill(self.user_id_admin, 'skill_id_2')
+        skill_rubrics, deleted_skill_ids = (
+            skill_services.get_rubrics_of_skills(
+                ['skill_id_1', 'skill_id_2']))
+        self.assertEqual(deleted_skill_ids, ['skill_id_2'])
+
+        self.assertEqual(
+            skill_rubrics, {
+                'skill_id_1': [
+                    skill_domain.Rubric(
+                        constants.SKILL_DIFFICULTIES[0], 'Explanation 1'
+                    ).to_dict(),
+                    skill_domain.Rubric(
+                        constants.SKILL_DIFFICULTIES[1], 'Explanation 2'
+                    ).to_dict(),
+                    skill_domain.Rubric(
+                        constants.SKILL_DIFFICULTIES[2], 'Explanation 3'
+                    ).to_dict()],
+                'skill_id_2': None
+            }
+        )
+
     def test_get_skill_from_model(self):
         skill_model = skill_models.SkillModel.get(self.SKILL_ID)
         skill = skill_services.get_skill_from_model(skill_model)

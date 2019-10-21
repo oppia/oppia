@@ -19,9 +19,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
-import logging
 
-from core.domain import email_manager
 from core.domain import topic_domain
 from core.platform import models
 import feconf
@@ -192,99 +190,6 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             return topic
         else:
             return None
-
-
-def get_rubrics_of_linked_skills(topic_id):
-    """Returns a list of rubrics corresponding to the skills in the
-    topic.
-
-    Args:
-        topic_id: str. The id of the topic.
-
-    Raises:
-        Exception. The topic with given ID doesn't exist.
-
-    Returns:
-        dict. The skill rubrics of skills keyed by their corresponding ids.
-    """
-    topic = get_topic_by_id(topic_id, strict=False)
-    if topic is None:
-        raise Exception('The topic with given id doesn\'t exist')
-
-    skill_ids = topic.get_all_skill_ids()
-    backend_skill_models = skill_models.SkillModel.get_multi(skill_ids)
-    skill_id_to_rubrics_dict = {}
-
-    for skill_model in backend_skill_models:
-        if skill_model is not None:
-            skill_id_to_rubrics_dict[skill_model.id] = skill_model.rubrics
-
-    deleted_skill_ids = []
-    for skill_id in skill_ids:
-        if skill_id not in skill_id_to_rubrics_dict:
-            skill_id_to_rubrics_dict[skill_id] = None
-            deleted_skill_ids.append(skill_id)
-
-    if deleted_skill_ids:
-        deleted_skills_string = ', '.join(deleted_skill_ids)
-        logging.error(
-            'The deleted skills: %s are still present in topic with id %s'
-            % (deleted_skills_string, topic_id)
-        )
-        if feconf.CAN_SEND_EMAILS:
-            email_manager.send_mail_to_admin(
-                'Deleted skills present in topic',
-                'The deleted skills: %s are still present in topic with id %s'
-                % (deleted_skills_string, topic_id))
-
-    return skill_id_to_rubrics_dict
-
-
-def get_descriptions_of_linked_skills(topic_id):
-    """Returns a list of skill descriptions corresponding to the skills in the
-    topic.
-
-    Args:
-        topic_id: str. The id of the topic.
-
-    Raises:
-        Exception. The topic with given ID doesn't exist.
-
-    Returns:
-        dict. The skill descriptions of skills keyed by their corresponding ids.
-    """
-    topic = get_topic_by_id(topic_id, strict=False)
-    if topic is None:
-        raise Exception('The topic with given id doesn\'t exist')
-
-    skill_ids = topic.get_all_skill_ids()
-    skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
-    skill_id_to_description_dict = {}
-
-    for skill_summary_model in skill_summary_models:
-        if skill_summary_model is not None:
-            skill_id_to_description_dict[skill_summary_model.id] = (
-                skill_summary_model.description)
-
-    deleted_skill_ids = []
-    for skill_id in skill_ids:
-        if skill_id not in skill_id_to_description_dict:
-            skill_id_to_description_dict[skill_id] = None
-            deleted_skill_ids.append(skill_id)
-
-    if deleted_skill_ids:
-        deleted_skills_string = ', '.join(deleted_skill_ids)
-        logging.error(
-            'The deleted skills: %s are still present in topic with id %s'
-            % (deleted_skills_string, topic_id)
-        )
-        if feconf.CAN_SEND_EMAILS:
-            email_manager.send_mail_to_admin(
-                'Deleted skills present in topic',
-                'The deleted skills: %s are still present in topic with id %s'
-                % (deleted_skills_string, topic_id))
-
-    return skill_id_to_description_dict
 
 
 def get_topics_by_ids(topic_ids):
