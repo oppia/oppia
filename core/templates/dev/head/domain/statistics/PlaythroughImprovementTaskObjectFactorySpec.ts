@@ -182,7 +182,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
 
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
-      _ExplorationFeaturesService_, _PlaythroughImprovementTaskObjectFactory_,
+      _PlaythroughImprovementTaskObjectFactory_,
       _PlaythroughIssueObjectFactory_, _PlaythroughIssuesService_,
       _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_) {
     $q = _$q_;
