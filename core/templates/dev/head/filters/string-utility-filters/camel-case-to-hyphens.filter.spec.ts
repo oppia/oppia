@@ -16,26 +16,35 @@
  * @fileoverview Tests for CamelCaseToHyphens filter for Oppia.
  */
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
-describe('Testing filters', () => {
-  let camelCaseToHyphensPipe: CamelCaseToHyphensPipe ;
-  beforeEach(() => {
-    camelCaseToHyphensPipe = new CamelCaseToHyphensPipe();
-  });
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 
-  it('should have all expected filters', () => {
-    expect(camelCaseToHyphensPipe).not.toEqual(null);
-  });
+describe('Testing filters', function() {
+  var filterName = 'camelCaseToHyphens';
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
-  it('should convert camelCase to hyphens properly', () => {
-    expect(camelCaseToHyphensPipe.transform('test')).toEqual('test');
-    expect(camelCaseToHyphensPipe.transform('testTest')).toEqual('test-test');
-    expect(camelCaseToHyphensPipe.transform('testTestTest'))
-      .toEqual('test-test-test');
-    expect(camelCaseToHyphensPipe.transform('aBaBCa')).toEqual('a-ba-b-ca');
-    expect(camelCaseToHyphensPipe.transform('AbcDefGhi'))
-      .toEqual('abc-def-ghi');
-  });
+  it('should have all expected filters', angular.mock.inject(function($filter) {
+    expect($filter(filterName)).not.toEqual(null);
+  }));
+
+  it('should convert camelCase to hyphens properly', angular.mock.inject(
+    function($filter) {
+      var filter = $filter('camelCaseToHyphens');
+      expect(filter('test')).toEqual('test');
+      expect(filter('testTest')).toEqual('test-test');
+      expect(filter('testTestTest')).toEqual('test-test-test');
+      expect(filter('aBaBCa')).toEqual('a-ba-b-ca');
+      expect(filter('AbcDefGhi')).toEqual('abc-def-ghi');
+    }
+  ));
 });
