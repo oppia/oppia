@@ -230,7 +230,6 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     it(
       'returns a task for each existing issue when exploration is whitelisted',
       function(done) {
-        console.log(angular.toJson(ExplorationFeaturesService, true));
         spyOn(ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
           .and.returnValue(true);
 
