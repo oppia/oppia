@@ -57,15 +57,12 @@ describe('Answer Details Improvements', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    explorationPlayerPage =
-      new ExplorationPlayerPage.ExplorationPlayerPage();
 
     improvementsTab = explorationEditorPage.getImprovementsTab();
 
-    users.createUser(
-      'learner@user.com', 'learnerUser');
+    users.createUser('learner@ExplorationAnswerDetails.com', 'learnerUser');
     users.createAndLoginAdminUser(
-      'creator@user.com', 'creatorUser');
+      'creator@ExplorationAnswerDetails.com', 'creatorUser');
 
     adminPage.editConfigProperty(
       'Always ask learners for answer details. For testing -- do not use',
@@ -104,9 +101,9 @@ describe('Answer Details Improvements', function() {
     users.logout();
   });
 
-  describe('checks solicit answer details feature', function() {
+  describe('Solicit answer details', function() {
     beforeAll(function() {
-      users.login('learner@user.com');
+      users.login('learner@ExplorationAnswerDetails.com');
       libraryPage.get();
       libraryPage.findExploration(EXPLORATION_TITLE);
       libraryPage.playExploration(EXPLORATION_TITLE);
@@ -120,7 +117,7 @@ describe('Answer Details Improvements', function() {
     });
 
     it('is visible for creators', function() {
-      users.login('creator@user.com');
+      users.login('creator@ExplorationAnswerDetails.com');
       creatorDashboardPage.get();
       creatorDashboardPage.navigateToExplorationEditor();
       explorationEditorPage.navigateToImprovementsTab();
