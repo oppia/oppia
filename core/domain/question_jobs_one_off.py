@@ -92,7 +92,7 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class QuestionSummaryModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class QuestionSummaryModelIndexesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for indexing the creator_id for all
     QuestionSummaryModels.
     """
