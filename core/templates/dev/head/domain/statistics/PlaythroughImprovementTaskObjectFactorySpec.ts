@@ -336,7 +336,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
             is_valid: true,
           });
 
-        var backendCallSpy = spyOn(PlaythroughIssuesService, 'getIssues')
+        var getIssuesSpy = spyOn(PlaythroughIssuesService, 'getIssues')
           .and.returnValue(
             $q.resolve([
               earlyQuitIssue,
@@ -346,7 +346,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
 
         PlaythroughImprovementTaskObjectFactory.fetchTasks().then(tasks => {
           expect(tasks).toEqual([]);
-          expect(backendCallSpy).not.toHaveBeenCalled();
+          expect(getIssuesSpy).not.toHaveBeenCalled();
         }).then(done, done.fail);
 
         this.scope.$digest(); // Forces all pending promises to evaluate.
