@@ -781,7 +781,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_entity
+    @acl_decorators.can_play_entity
     def get(self, entity_type, entity_id):
         """Handles the GET requests for learner answer info for an
         exploration state.
