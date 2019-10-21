@@ -357,8 +357,9 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# Committer id for system actions.
+# Committer idS for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
+SYSTEM_COMMITTER_GAE_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'

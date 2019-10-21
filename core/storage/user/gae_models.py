@@ -169,6 +169,19 @@ class UserSettingsModel(base_models.BaseModel):
             cls.normalized_username == normalized_username).get())
 
     @classmethod
+    def get_by_gae_user_id(cls, gae_user_id):
+        """Returns a user model with given GAE user ID.
+
+        Args:
+            gae_user_id: str. The GAE user ID that is being queried for.
+
+        Returns:
+            UserSettingsModel. The UserSettingsModel instance which has the same
+            GAE user ID.
+        """
+        return cls.get_all().filter(cls.gae_user_id == gae_user_id).get()
+
+    @classmethod
     def get_by_normalized_username(cls, normalized_username):
         """Returns a user model given a normalized username.
 

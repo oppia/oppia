@@ -75,13 +75,13 @@ class GaeCurrentUserServicesTests(test_utils.GenericTestBase):
         user_id = gae_current_user_services.get_user_id_from_email('')
         self.assertEqual(user_id, None)
 
-    def test_get_current_user_id(self):
+    def test_get_current_gae_user_id(self):
         self.login(self.OWNER_EMAIL)
-        user_id = gae_current_user_services.get_current_user_id()
+        user_id = gae_current_user_services.get_current_gae_user_id()
         self.assertEqual(user_id, self.EXPECTED_OWNER_USER_ID)
         self.logout()
 
-        user_id = gae_current_user_services.get_current_user_id()
+        user_id = gae_current_user_services.get_current_gae_user_id()
         self.assertEqual(user_id, None)
 
     def test_get_current_user_email(self):
