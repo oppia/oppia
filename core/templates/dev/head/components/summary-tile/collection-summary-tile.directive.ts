@@ -16,7 +16,7 @@
  * @fileoverview Summary tile for collections.
  */
 
-require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
+require('domain/learner_dashboard/learner-dashboard-icons.directive.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
