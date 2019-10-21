@@ -44,14 +44,11 @@
       </div>
     </div>
   </div>
-<<<<<<< HEAD
-  <div ng-if="$ctrl.activeTabName === 'questionTab'">
-    <skill-opportunities></skill-opportunities>
-=======
   <div ng-if="$ctrl.activeTabName === 'myContributionTab' || !$ctrl.activeTabName">
     <contributions-and-review></contributions-and-review>
->>>>>>> community-dashboard-list-skill-opportunities
   </div>
+  <div ng-if="$ctrl.activeTabName === 'questionTab'">
+    <skill-opportunities></skill-opportunities>
   <div ng-if="$ctrl.activeTabName === 'translationTab'">
     <translation-opportunities></translation-opportunities>
   </div>
