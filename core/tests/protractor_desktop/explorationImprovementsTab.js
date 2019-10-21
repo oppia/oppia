@@ -191,7 +191,6 @@ describe('Feedback Improvements', function() {
 
     // Creator creates and publishes an exploration.
     users.login('creator@ExplorationFeedback.com');
-
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
