@@ -18,6 +18,7 @@
  */
 
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+require('services/HtmlEscaperService.ts');
 
 // Service for assembling extension tags (for interactions).
 angular.module('oppia').factory('ExtensionTagAssemblerService', [

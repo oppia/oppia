@@ -322,6 +322,18 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralFeedbackEmailReplyToIdModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
+
+    @classmethod
     def _generate_id(cls, user_id, thread_id):
         """Returns the unique id corresponding to the given user and thread ids.
 

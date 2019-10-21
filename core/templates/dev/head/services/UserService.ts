@@ -75,7 +75,7 @@ angular.module('oppia').factory('UserService', [
       },
       getLoginUrlAsync: function() {
         var urlParameters = {
-          current_url: $window.location.href
+          current_url: $window.location.pathname
         };
         return $http.get('/url_handler', {params: urlParameters}).then(
           function(response) {
