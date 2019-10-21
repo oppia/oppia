@@ -695,15 +695,16 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)
         (
-            questions, grouped_skill_descriptions, grouped_difficulties, _) = (
+            questions, merged_question_skill_links, _) = (
                 question_services.get_displayable_question_skill_link_details(
                     1, [self.SKILL_ID], ''))
         self.assertEqual(len(questions), 1)
         self.assertEqual(questions[0].creator_id, self.author_id)
         self.assertEqual(
-            grouped_skill_descriptions[0], [self.SKILL_DESCRIPTION])
+            merged_question_skill_links[0].skill_descriptions,
+            [self.SKILL_DESCRIPTION])
         self.assertEqual(
-            grouped_difficulties[0], [0.3])
+            merged_question_skill_links[0].skill_difficulties, [0.3])
         self.assertEqual(
             questions[0].question_content,
             self.question_dict['question_state_data']['content']['html']

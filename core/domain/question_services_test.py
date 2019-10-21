@@ -114,18 +114,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
 
-        _, _, difficulties, _ = (
+        _, merged_question_skill_links, _ = (
             question_services.get_displayable_question_skill_link_details(
                 2, ['skill_1'], ''))
-        self.assertEqual(difficulties[0], [0.3])
+        self.assertEqual(
+            merged_question_skill_links[0].skill_difficulties, [0.3])
 
         question_services.update_question_skill_link_difficulty(
             self.question_id, 'skill_1', 0.9)
 
-        _, _, difficulties, _ = (
+        _, merged_question_skill_links, _ = (
             question_services.get_displayable_question_skill_link_details(
                 2, ['skill_1'], ''))
-        self.assertEqual(difficulties[0], [0.9])
+        self.assertEqual(
+            merged_question_skill_links[0].skill_difficulties, [0.9])
 
         with self.assertRaisesRegexp(
             Exception, 'The given question and skill are not linked.'):
@@ -244,7 +246,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, 'skill_2', 0.2)
 
-        question_summaries, skill_descriptions, skill_difficulties, _ = (
+        question_summaries, merged_question_skill_links, _ = (
             question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_2', 'skill_3'], ''))
 
@@ -256,32 +258,35 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_ids = [summary.id for summary in question_summaries]
 
         self.assertEqual(len(question_ids), 3)
-        self.assertEqual(len(skill_descriptions), 3)
-        self.assertEqual(len(skill_difficulties), 3)
+        self.assertEqual(len(merged_question_skill_links), 3)
         self.assertItemsEqual(
             question_ids, [self.question_id, question_id_2, question_id_3])
+        self.assertItemsEqual(
+            question_ids, [
+                question_skill_link.question_id
+                for question_skill_link in merged_question_skill_links])
 
         # Make sure the correct skill description corresponds to respective
         # question summaries.
-        for index, description in enumerate(skill_descriptions):
+        for index, link_object in enumerate(merged_question_skill_links):
             if question_ids[index] == self.question_id:
                 self.assertEqual(
-                    ['Skill Description 3', 'Skill Description 1'], description)
-            elif question_ids[index] == question_id_2:
-                self.assertEqual(['Skill Description 1'], description)
-            else:
-                self.assertEqual(['Skill Description 2'], description)
-
-        for index, difficulty in enumerate(skill_difficulties):
-            if question_ids[index] == self.question_id:
+                    ['Skill Description 3', 'Skill Description 1'],
+                    link_object.skill_descriptions)
                 self.assertEqual(
-                    [0.8, 0.5], difficulty)
+                    [0.8, 0.5], link_object.skill_difficulties)
             elif question_ids[index] == question_id_2:
-                self.assertEqual([0.3], difficulty)
+                self.assertEqual(
+                    ['Skill Description 1'], link_object.skill_descriptions)
+                self.assertEqual(
+                    [0.3], link_object.skill_difficulties)
             else:
-                self.assertEqual([0.2], difficulty)
+                self.assertEqual(
+                    ['Skill Description 2'], link_object.skill_descriptions)
+                self.assertEqual(
+                    [0.2], link_object.skill_difficulties)
 
-        question_summaries, skill_descriptions, skill_difficulties, _ = (
+        question_summaries, merged_question_skill_links, _ = (
             question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_3'], ''))
         question_ids = [summary.id for summary in question_summaries]
@@ -304,13 +309,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, 'skill_1', 0.5)
 
-        question_summaries, skill_descriptions, skill_difficulties, _ = (
+        question_summaries, merged_question_skill_links, _ = (
             question_services.get_displayable_question_skill_link_details(
                 2, [], ''))
 
         self.assertEqual(question_summaries, [])
-        self.assertEqual(skill_descriptions, [])
-        self.assertEqual(skill_difficulties, [])
+        self.assertEqual(merged_question_skill_links, [])
 
     def test_get_question_skill_links_of_skill(self):
         # If the skill id doesnt exist at all, it returns an empty list.

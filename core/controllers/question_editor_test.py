@@ -301,16 +301,17 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 self.skill_id
             ))
         (
-            question_summaries, grouped_skill_descriptions,
-            grouped_difficulties, _) = (
+            question_summaries, merged_question_skill_links, _) = (
                 question_services.get_displayable_question_skill_link_details(
                     5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             question_summaries[0].id, self.question_id_2)
         self.assertEqual(
-            grouped_skill_descriptions[0], ['Skill Description'])
-        self.assertEqual(grouped_difficulties[0], [0.3])
+            merged_question_skill_links[0].skill_descriptions,
+            ['Skill Description'])
+        self.assertEqual(
+            merged_question_skill_links[0].skill_difficulties, [0.3])
         self.logout()
 
     def test_delete_with_topic_manager_email_allows_question_deletion(self):
@@ -325,16 +326,17 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 self.skill_id
             ))
         (
-            question_summaries, grouped_skill_descriptions,
-            grouped_difficulties, _) = (
+            question_summaries, merged_question_skill_links, _) = (
                 question_services.get_displayable_question_skill_link_details(
                     5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             question_summaries[0].id, self.question_id_2)
         self.assertEqual(
-            grouped_skill_descriptions[0], ['Skill Description'])
-        self.assertEqual(grouped_difficulties[0], [0.5])
+            merged_question_skill_links[0].skill_descriptions,
+            ['Skill Description'])
+        self.assertEqual(
+            merged_question_skill_links[0].skill_difficulties, [0.5])
         self.logout()
 
     def test_put_with_non_admin_or_topic_manager_disallows_access(self):
@@ -352,11 +354,12 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.5)
         (
-            question_summaries, _, grouped_difficulties, _) = (
+            question_summaries, merged_question_skill_links, _) = (
                 question_services.get_displayable_question_skill_link_details(
                     5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
-        self.assertEqual(grouped_difficulties[0], [0.5])
+        self.assertEqual(
+            merged_question_skill_links[0].skill_difficulties, [0.5])
 
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -366,11 +369,12 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 self.skill_id
             ), {'new_difficulty': 0.9}, csrf_token=csrf_token)
         (
-            question_summaries, _, grouped_difficulties, _) = (
+            question_summaries, merged_question_skill_links, _) = (
                 question_services.get_displayable_question_skill_link_details(
                     5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
-        self.assertEqual(grouped_difficulties[0], [0.9])
+        self.assertEqual(
+            merged_question_skill_links[0].skill_difficulties, [0.9])
         self.logout()
 
     def test_put_with_topic_manager_email_allows_updation(self):
@@ -385,11 +389,12 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 self.skill_id
             ), {'new_difficulty': 0.6}, csrf_token=csrf_token)
         (
-            question_summaries, _, grouped_difficulties, _) = (
+            question_summaries, merged_question_skill_links, _) = (
                 question_services.get_displayable_question_skill_link_details(
                     5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
-        self.assertEqual(grouped_difficulties[0], [0.6])
+        self.assertEqual(
+            merged_question_skill_links[0].skill_difficulties, [0.6])
         self.logout()
 
 

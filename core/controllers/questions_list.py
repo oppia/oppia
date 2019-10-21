@@ -49,7 +49,7 @@ class QuestionsListHandler(base.BaseHandler):
             raise self.PageNotFoundException(e)
 
         (
-            question_summaries, skill_descriptions_list, difficulties_list,
+            question_summaries, merged_question_skill_links,
             next_start_cursor) = (
                 question_services.get_displayable_question_skill_link_details(
                     constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
@@ -59,8 +59,10 @@ class QuestionsListHandler(base.BaseHandler):
             if summary is not None:
                 return_dicts.append({
                     'summary': summary.to_dict(),
-                    'skill_descriptions': skill_descriptions_list[index],
-                    'skill_difficulties': difficulties_list[index]
+                    'skill_descriptions': (
+                        merged_question_skill_links[index].skill_descriptions),
+                    'skill_difficulties': (
+                        merged_question_skill_links[index].skill_difficulties)
                 })
 
         self.values.update({
