@@ -1400,13 +1400,13 @@ class RecomputeStatisticsValidationCopyOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(state_stats['num_completions_v2'], 9)
 
 
-class TestMissingV2StatsModelRegenerationOneOffJob(OneOffJobTestBase):
+class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
     """Tests the regeneration of missing stats models."""
     ONE_OFF_JOB_CLASS = (
-        stats_jobs_one_off.MissingV2StatsModelRegenerationOneOffJob)
+        stats_jobs_one_off.RegenerateMissingV2StatsModelsOneOffJob)
 
     def setUp(self):
-        super(TestMissingV2StatsModelRegenerationOneOffJob, self).setUp()
+        super(RegenerateMissingV2StatsModelsOneOffJobTests, self).setUp()
         self.EXP_ID = 'EXP_ID'
         self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner_id')
         self.state_name = self.exp.init_state_name

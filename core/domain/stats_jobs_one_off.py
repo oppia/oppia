@@ -1239,7 +1239,7 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                         key, state_name, all_state_hit[state_name]),)
 
 
-class MissingV2StatsModelRegenerationOneOffJob(
+class RegenerateMissingV2StatsModelsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A one-off job to regenerate v2 stats models which were missing due to
     incorrect handling of exploration reverts. If a model is missing at version
