@@ -19,11 +19,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import contextlib
 import getpass
 import os
+import re
 import socket
 import subprocess
 
-import feconf
 import python_utils
+import release_constants
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -150,7 +151,7 @@ def is_current_branch_a_release_branch():
         bool. Whether the current branch is a release branch.
     """
     current_branch_name = get_current_branch_name()
-    return current_branch_name.startswith(RELEASE_BRANCH_NAME_PREFIX)
+    return bool(re.match(r'release-\d+\.\d+\.\d+$', current_branch_name))
 
 
 def verify_current_branch_name(expected_branch_name):
@@ -281,7 +282,7 @@ def ask_user_to_confirm(message):
         python_utils.PRINT(message)
         python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
         answer = python_utils.INPUT().lower()
-        if answer in feconf.AFFIRMATIVE_CONFIRMATIONS:
+        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
             return
 
 

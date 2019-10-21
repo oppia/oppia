@@ -353,6 +353,7 @@
 /core/templates/dev/head/services/contextual/DocumentAttributeCustomizationService.ts @YashJipkate
 /core/templates/dev/head/services/contextual/MetaTagCustomizationService.ts @YashJipkate
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @DubeySandeep
+/release_constants.py @ankita240796 @nithusha21 @DubeySandeep @seanlip
 
 
 # Miscellaneous.

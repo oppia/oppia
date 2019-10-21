@@ -21,6 +21,6 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 4
 CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
 
 INCOMING_EMAILS_DOMAIN_NAME = ''
-ADMIN_EMAIL_ADDRESS = 'admin@example.com'
-SYSTEM_EMAIL_ADDRESS = 'admin@example.com'
-NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
+ADMIN_EMAIL_ADDRESS = 'system@example.com'
+SYSTEM_EMAIL_ADDRESS = 'system@example.com'
+NOREPLY_EMAIL_ADDRESS = 'nosystem@example.com'

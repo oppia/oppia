@@ -25,8 +25,8 @@ import sys
 import tempfile
 
 from core.tests import test_utils
-import feconf
 import python_utils
+import release_constants
 
 from . import common
 from . import release_info
@@ -135,9 +135,10 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                     with self.assertRaisesRegexp(
                         Exception, (
                             'There are PRs for current release which do not '
-                            'have a \'PR: released\' label. Please ensure that '
+                            'have a \'%s\' label. Please ensure that '
                             'they are released before release summary '
-                            'generation.')):
+                            'generation.') % (
+                                release_constants.LABEL_FOR_RELEASED_PRS)):
                         release_info.main()
 
     def test_get_current_version_tag(self):
@@ -310,12 +311,26 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             'core/storage/user/gae_models.py']
         self.assertEqual(actual_storgae_models, expected_storage_models)
 
+    def test_closed_blocking_bugs_milestone_results_in_exception(self):
+        # pylint: disable=unused-argument
+        def mock_get_milestone(unused_self, number):
+            return github.Milestone.Milestone(
+                requester='', headers='',
+                attributes={'state': 'closed'}, completed='')
+        # pylint: enable=unused-argument
+        get_milestone_swap = self.swap(
+            github.Repository.Repository, 'get_milestone', mock_get_milestone)
+        with get_milestone_swap, self.assertRaisesRegexp(
+            Exception, 'The blocking bug milestone is closed.'):
+            release_info.get_blocking_bug_issue_count(
+                self.mock_repo)
+
     def test_get_blocking_bug_issue_count(self):
         # pylint: disable=unused-argument
         def mock_get_milestone(unused_self, number):
             return github.Milestone.Milestone(
                 requester='', headers='',
-                attributes={'open_issues': 10}, completed='')
+                attributes={'open_issues': 10, 'state': 'open'}, completed='')
         # pylint: enable=unused-argument
         with self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone):
@@ -329,17 +344,21 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             requester='', headers='',
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': 'PR: released'},
-                    {'name': 'PR: for current release'}]}, completed='')
+                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
         pull2 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': 'PR: released'},
-                    {'name': 'PR: for current release'}]}, completed='')
+                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
         label = github.Label.Label(
             requester='', headers='',
-            attributes={'name': 'PR: for current release'}, completed='')
+            attributes={
+                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+            completed='')
         # pylint: disable=unused-argument
         def mock_get_issues(unused_self, state, labels):
             return [pull1, pull2]
@@ -362,16 +381,20 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             requester='', headers='',
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': 'PR: for current release'}]}, completed='')
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
         pull2 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': 'PR: released'},
-                    {'name': 'PR: for current release'}]}, completed='')
+                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
         label = github.Label.Label(
             requester='', headers='',
-            attributes={'name': 'PR: for current release'}, completed='')
+            attributes={
+                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+            completed='')
         # pylint: disable=unused-argument
         def mock_get_issues(unused_self, state, labels):
             return [pull1, pull2]
@@ -467,7 +490,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
 
         tmp_file = tempfile.NamedTemporaryFile()
         release_summary_swap = self.swap(
-            feconf, 'RELEASE_SUMMARY_FILEPATH', tmp_file.name)
+            release_constants, 'RELEASE_SUMMARY_FILEPATH', tmp_file.name)
 
         with self.branch_name_swap, self.open_browser_swap:
             with self.get_organization_swap, self.get_repo_swap:

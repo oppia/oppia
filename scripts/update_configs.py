@@ -29,8 +29,8 @@ import os
 import re
 import sys
 
-import feconf
 import python_utils
+import release_constants
 
 from . import common
 
@@ -115,14 +115,15 @@ def check_updates_to_terms_of_service():
         'Are the terms of service changed? Check commits/changes made '
         'to the file: terms-page.mainpage.html. Enter y/ye/yes if they '
         'are changed else enter n/no.')
-    is_terms_of_service_changed = python_utils.INPUT().lower()
-    while is_terms_of_service_changed not in ['y', 'ye', 'yes', 'n', 'no']:
+    terms_of_service_are_changed = python_utils.INPUT().lower()
+    while terms_of_service_are_changed not in ['y', 'ye', 'yes', 'n', 'no']:
         python_utils.PRINT(
             'Invalid Input: %s. Please enter yes or no.' % (
-                is_terms_of_service_changed))
-        is_terms_of_service_changed = python_utils.INPUT().lower()
+                terms_of_service_are_changed))
+        terms_of_service_are_changed = python_utils.INPUT().lower()
 
-    if is_terms_of_service_changed in feconf.AFFIRMATIVE_CONFIRMATIONS:
+    if terms_of_service_are_changed in (
+            release_constants.AFFIRMATIVE_CONFIRMATIONS):
         python_utils.PRINT(
             'Enter sha of the commit which changed the terms of service.')
         commit_sha = python_utils.INPUT().lstrip().rstrip()
@@ -167,7 +168,7 @@ def main():
     """
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
-    assert common.get_current_branch_name().startswith('release-')
+    assert common.is_current_branch_a_release_branch()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
 
     try:
@@ -188,6 +189,6 @@ def main():
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when build.py is used as a script.
+# it will only be called when update_configs.py is used as a script.
 if __name__ == '__main__': # pragma: no cover
     main()

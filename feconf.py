@@ -29,25 +29,12 @@ from constants import constants
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
 ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 
-# Affirmative user confirmations.
-AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
-
-# PyGithub can fetch milestone only by using the milestone number. Milestones
-# are numbered sequentially as they are created and the number remains fixed.
-# The number for blocking_bugs milestone is 39 which is used to fetch this
-# milestone.
-BLOCKING_BUG_MILESTONE_NUMBER = 39
-
 # The values which a post_commit_status can have: public, private.
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
 
 # Whether to unconditionally log info messages.
 DEBUG = False
-
-# The path for generating release_summary.md file for the current release.
-RELEASE_SUMMARY_FILEPATH = os.path.join(
-    os.getcwd(), os.pardir, 'release_summary.md')
 
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the

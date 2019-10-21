@@ -24,8 +24,8 @@ import os
 import sys
 
 from core.tests import test_utils
-import feconf
 import python_utils
+import release_constants
 
 from . import common
 from . import update_changelog_and_credits
@@ -101,7 +101,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         self.branch_name_swap = self.swap(
             common, 'get_current_branch_name', mock_get_current_branch_name)
         self.release_summary_swap = self.swap(
-            feconf, 'RELEASE_SUMMARY_FILEPATH', MOCK_RELEASE_SUMMARY_FILEPATH)
+            release_constants, 'RELEASE_SUMMARY_FILEPATH',
+            MOCK_RELEASE_SUMMARY_FILEPATH)
         self.args_swap = self.swap(
             sys, 'argv', [
                 'update_changelog_and_credits.py',
@@ -259,7 +260,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
     def test_missing_release_summary_file(self):
         release_summary_swap = self.swap(
-            feconf, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
+            release_constants, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
         with self.branch_name_swap, release_summary_swap:
             with self.assertRaisesRegexp(
                 Exception, (

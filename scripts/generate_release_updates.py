@@ -20,10 +20,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
-import re
 
-import feconf
 import python_utils
+import release_constants
 
 from . import common
 
@@ -88,19 +87,51 @@ def validate_release_message():
                     ', '.join(extra_sections)))
 
 
+
+def get_new_authors_and_contributors_mail_ids():
+    """Returns the mail ids of new authors and contributors for the release.
+
+    Returns:
+        list(str). List of mail ids of new authors and contributors
+            for the release.
+    """
+    with python_utils.open_file(
+        release_constants.RELEASE_SUMMARY_FILEPATH, 'r') as f:
+        release_summary_lines = f.readlines()
+
+    new_authors_and_contributors_mail_ids = []
+    for line_text in ['### New Authors:\n', '### New Contributors:\n']:
+        start_index = release_summary_lines.index(line_text)
+        end_index = start_index
+        for index, line in enumerate(release_summary_lines[start_index + 1:]):
+            if line.startswith('###'):
+                end_index = end_index + index
+                break
+
+        new_details_list = release_summary_lines[start_index + 1: end_index]
+        new_authors_and_contributors_mail_ids.extend([
+            detail[detail.find('<') + 1: detail.find('>')] for detail in (
+                new_details_list)])
+
+    return sorted(list(set(new_authors_and_contributors_mail_ids)))
+
+
 def prompt_user_to_send_announcement_email():
     """Asks the user to send release announcement mail and check if
     it is in announcement category.
     """
+    new_contributors_mail_ids = (', ').join(
+        get_new_authors_and_contributors_mail_ids())
     common.open_new_tab_in_browser_if_possible(
         'https://www.gmail.com')
     common.ask_user_to_confirm(
         'Please copy the mail message from %s and send the email to:\n'
         '   TO: oppia-dev@googlegroups.com\n'
-        '   BCC: oppia@googlegroups.com\n'
-        '   BCC: oppia-announce@googlegroups.com\n'
-        '   BCC: each new contributor for this release\n' % (
-            RELEASE_MAIL_MESSAGE_FILEPATH))
+        '   BCC: oppia@googlegroups.com, '
+        'oppia-announce@googlegroups.com, %s\n'
+        'Please make sure to check that the mail ids of new authors '
+        'and contributors are correct.\n' % (
+            RELEASE_MAIL_MESSAGE_FILEPATH, new_contributors_mail_ids))
 
     common.open_new_tab_in_browser_if_possible(
         'https://groups.google.com/forum/#!categories/oppia/announcements')
@@ -110,16 +141,15 @@ def prompt_user_to_send_announcement_email():
 
 def main():
     """Performs task to generate message for release announcement."""
-    branch_name = common.get_current_branch_name()
-    if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
+    if not common.is_current_branch_a_release_branch():
         raise Exception(
             'This script should only be run from the latest release branch.')
 
-    if not os.path.exists(feconf.RELEASE_SUMMARY_FILEPATH):
+    if not os.path.exists(release_constants.RELEASE_SUMMARY_FILEPATH):
         raise Exception(
             'Release summary file %s is missing. Please run the '
             'release_info.py script and re-run this script.' % (
-                feconf.RELEASE_SUMMARY_FILEPATH))
+                release_constants.RELEASE_SUMMARY_FILEPATH))
 
     try:
         create_new_file_with_release_message_template()
@@ -132,6 +162,6 @@ def main():
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when build.py is used as a script.
+# it will only be called when generate_release_updates.py is used as a script.
 if __name__ == '__main__': # pragma: no cover
     main()

@@ -24,7 +24,7 @@ import os
 import sys
 
 from core.tests import test_utils
-import feconf
+import release_constants
 
 from . import common
 from . import wrap_release
@@ -66,7 +66,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
 
     def test_missing_release_summary_file(self):
         release_summary_swap = self.swap(
-            feconf, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
+            release_constants, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
         with self.branch_name_swap, release_summary_swap:
             with self.assertRaisesRegexp(
                 Exception, (
@@ -88,12 +88,26 @@ class WrapReleaseTests(test_utils.GenericTestBase):
                     'tokens and re-run the script')):
                 wrap_release.main()
 
+    def test_closed_blocking_bugs_milestone_results_in_exception(self):
+        # pylint: disable=unused-argument
+        def mock_get_milestone(unused_self, number):
+            return github.Milestone.Milestone(
+                requester='', headers='',
+                attributes={'state': 'closed'}, completed='')
+        # pylint: enable=unused-argument
+        get_milestone_swap = self.swap(
+            github.Repository.Repository, 'get_milestone', mock_get_milestone)
+        with get_milestone_swap, self.assertRaisesRegexp(
+            Exception, 'The blocking bug milestone is closed.'):
+            wrap_release.remove_blocking_bugs_milestone_from_issues(
+                self.mock_repo)
+
     def test_non_zero_blocking_bugs_count_results_in_exception(self):
         # pylint: disable=unused-argument
         def mock_get_milestone(unused_self, number):
             return github.Milestone.Milestone(
                 requester='', headers='',
-                attributes={'open_issues': 10}, completed='')
+                attributes={'open_issues': 10, 'state': 'open'}, completed='')
         # pylint: enable=unused-argument
         def mock_open_tab(unused_url):
             pass
@@ -109,7 +123,8 @@ class WrapReleaseTests(test_utils.GenericTestBase):
     def test_blocking_bugs_milestone_removal(self):
         blocking_bug_milestone = github.Milestone.Milestone(
             requester='', headers='',
-            attributes={'open_issues': 0, 'number': 1}, completed='')
+            attributes={'open_issues': 0, 'number': 1, 'state': 'open'},
+            completed='')
         issue = github.Issue.Issue(
             requester='', headers='',
             attributes={'milestone': blocking_bug_milestone}, completed='')
@@ -144,22 +159,26 @@ class WrapReleaseTests(test_utils.GenericTestBase):
     def test_unreleased_prs_result_in_exception(self):
         label_for_current_release_prs = github.Label.Label(
             requester='', headers='',
-            attributes={'name': 'PR: for current release'}, completed='')
+            attributes={
+                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+            completed='')
         label_for_released_prs = github.Label.Label(
             requester='', headers='',
-            attributes={'name': 'PR: released'}, completed='')
+            attributes={'name': release_constants.LABEL_FOR_RELEASED_PRS},
+            completed='')
         pr_for_current_release = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={'label': label_for_current_release_prs, 'number': 7567},
             completed='')
         def mock_get_label(unused_self, name):
-            if name == 'PR: released':
+            if name == release_constants.LABEL_FOR_RELEASED_PRS:
                 return label_for_released_prs
             else:
                 return label_for_current_release_prs
         # pylint: disable=unused-argument
         def mock_get_issues(unused_self, state, labels):
-            if labels[0].name == 'PR: for current release':
+            if labels[0].name == (
+                    release_constants.LABEL_FOR_CURRENT_RELEASE_PRS):
                 return [pr_for_current_release]
             else:
                 return []
@@ -178,10 +197,13 @@ class WrapReleaseTests(test_utils.GenericTestBase):
     def test_label_removal_from_prs(self):
         label_for_current_release_prs = github.Label.Label(
             requester='', headers='',
-            attributes={'name': 'PR: for current release'}, completed='')
+            attributes={
+                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+            completed='')
         label_for_released_prs = github.Label.Label(
             requester='', headers='',
-            attributes={'name': 'PR: released'}, completed='')
+            attributes={'name': release_constants.LABEL_FOR_RELEASED_PRS},
+            completed='')
         released_pr = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={'label': label_for_released_prs, 'number': 7567},
@@ -195,7 +217,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         }
 
         def mock_get_label(unused_self, name):
-            if name == 'PR: released':
+            if name == release_constants.LABEL_FOR_RELEASED_PRS:
                 return label_for_released_prs
             else:
                 return label_for_current_release_prs

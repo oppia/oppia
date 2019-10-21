@@ -28,11 +28,10 @@ import argparse
 import collections
 import datetime
 import os
-import re
 import sys
 
-import feconf
 import python_utils
+import release_constants
 
 from . import common
 
@@ -368,15 +367,15 @@ def create_branch(repo_fork, target_branch, github_username):
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
-    if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
+    if not common.is_current_branch_a_release_branch():
         raise Exception(
             'This script should only be run from the latest release branch.')
 
-    if not os.path.exists(feconf.RELEASE_SUMMARY_FILEPATH):
+    if not os.path.exists(release_constants.RELEASE_SUMMARY_FILEPATH):
         raise Exception(
             'Release summary file %s is missing. Please run the '
             'release_info.py script and re-run this script.' % (
-                feconf.RELEASE_SUMMARY_FILEPATH))
+                release_constants.RELEASE_SUMMARY_FILEPATH))
 
     parsed_args = _PARSER.parse_args()
     if parsed_args.github_username is None:
@@ -400,12 +399,13 @@ def main():
         'updating the CHANGELOG file\n- have a correct list of new '
         'authors and contributors to update AUTHORS, CONTRIBUTORS '
         'and developer_names section in about-page.directive.html\n' % (
-            feconf.RELEASE_SUMMARY_FILEPATH))
+            release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(message)
 
     release_summary_lines = []
     with python_utils.open_file(
-        feconf.RELEASE_SUMMARY_FILEPATH, 'r') as release_summary_file:
+        release_constants.RELEASE_SUMMARY_FILEPATH, 'r'
+        ) as release_summary_file:
         release_summary_lines = release_summary_file.readlines()
 
     check_ordering_of_sections(release_summary_lines)
@@ -427,6 +427,7 @@ def main():
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when build.py is used as a script.
+# it will only be called when update_changelog_and_credits.py is used as
+# a script.
 if __name__ == '__main__': # pragma: no cover
     main()

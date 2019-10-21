@@ -23,8 +23,8 @@ import os
 import tempfile
 
 from core.tests import test_utils
-import feconf
 import python_utils
+import release_constants
 
 from . import common
 from . import generate_release_updates
@@ -37,6 +37,8 @@ INVALID_RELEASE_MAIL_MESSAGE_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'invalid_release_mail_message.txt')
 VALID_RELEASE_MAIL_MESSAGE_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'valid_release_mail_message.txt')
+MOCK_RELEASE_SUMMARY_FILEPATH = os.path.join(
+    RELEASE_TEST_DIR, 'release_summary.md')
 
 
 class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
@@ -86,13 +88,46 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
             generate_release_updates.validate_release_message()
 
     def test_prompt_user_to_send_announcement_email(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_gets_called': False,
+            'get_new_authors_and_contributors_mail_ids_gets_called': False
+        }
+        expected_check_function_calls = {
+            'open_new_tab_in_browser_if_possible_gets_called': True,
+            'get_new_authors_and_contributors_mail_ids_gets_called': True
+        }
         def mock_open_new_tab_in_browser_if_possible(unused_url):
-            pass
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_gets_called'] = True
+        def mock_get_new_authors_and_contributors_mail_ids():
+            check_function_calls[
+                'get_new_authors_and_contributors_mail_ids_gets_called'] = True
+            return ['id1@email.com', 'id2@email.com']
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible',
             mock_open_new_tab_in_browser_if_possible)
+        get_new_authors_and_contributors_mail_ids_swap = self.swap(
+            generate_release_updates,
+            'get_new_authors_and_contributors_mail_ids',
+            mock_get_new_authors_and_contributors_mail_ids)
         with self.input_swap, open_tab_swap:
-            generate_release_updates.prompt_user_to_send_announcement_email()
+            with get_new_authors_and_contributors_mail_ids_swap:
+                (
+                    generate_release_updates
+                    .prompt_user_to_send_announcement_email())
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_get_new_authors_and_contributors_mail_ids(self):
+        with self.swap(
+            release_constants, 'RELEASE_SUMMARY_FILEPATH',
+            MOCK_RELEASE_SUMMARY_FILEPATH):
+            self.assertEqual(
+                (
+                    generate_release_updates
+                    .get_new_authors_and_contributors_mail_ids()),
+                [
+                    'alice@gmail.com', 'bob@gmail.com', 'casie@gmail.com',
+                    'qunet@outlook.com', 'zoe@gmail.com'])
 
     def test_invalid_branch_name(self):
         def mock_get_current_branch_name():
@@ -107,7 +142,7 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
 
     def test_missing_release_summary_file(self):
         release_summary_swap = self.swap(
-            feconf, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
+            release_constants, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
         with self.branch_name_swap, release_summary_swap:
             with self.assertRaisesRegexp(
                 Exception, (
@@ -141,7 +176,8 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
             pass
 
         release_summary_swap = self.swap(
-            feconf, 'RELEASE_SUMMARY_FILEPATH', MOCK_RELEASE_SUMMARY_FILEPATH)
+            release_constants, 'RELEASE_SUMMARY_FILEPATH',
+            MOCK_RELEASE_SUMMARY_FILEPATH)
         write_swap = self.swap(
             generate_release_updates,
             'create_new_file_with_release_message_template',

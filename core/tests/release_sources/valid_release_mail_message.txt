@@ -6,7 +6,7 @@ Please welcome Alice for whom this release marks their first contribution to Opp
 
 Thanks to Bob and Paul, our returning contributors who made this release possible.
 
-Finally, I\d like to thank Smith for their help with pre-release testing, bug-fixing and QA, as well as Tom for leading the QA team for this release.
+Finally, I'd like to thank Smith for their help with pre-release testing, bug-fixing and QA, as well as Tom for leading the QA team for this release.
 
 Thanks,
 Ruth
