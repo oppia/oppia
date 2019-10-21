@@ -16,16 +16,12 @@
  * @fileoverview Tests for CamelCaseToHyphens filter for Oppia.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 describe('Testing filters', () => {
   let camelCaseToHyphensPipe: CamelCaseToHyphensPipe ;
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [CamelCaseToHyphensPipe]
-    });
     camelCaseToHyphensPipe = new CamelCaseToHyphensPipe();
   });
 
