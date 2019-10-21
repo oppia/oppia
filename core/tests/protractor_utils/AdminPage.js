@@ -35,11 +35,11 @@ var AdminPage = function() {
   var statusMessage = element(by.css('[ng-if="$ctrl.statusMessage"]'));
 
   // Viewing roles can be done by two methods: 1. By roles 2. By username
-  var roleDropdown = element(by.css('.protractor-test-view-role-method'));
-  var roleValueOption = element(by.css('.protractor-test-view-role-value'));
+  var roleDropdown = element(by.css('.protractor-test-role-method'));
+  var roleValueOption = element(by.css('.protractor-test-role-value'));
   var roleUsernameOption = element(by.css(
-    '.protractor-test-view-username-value'));
-  var viewRoleButton = element(by.css('.protractor-test-view-role-success'));
+    '.protractor-test-username-value'));
+  var viewRoleButton = element(by.css('.protractor-test-role-success'));
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
