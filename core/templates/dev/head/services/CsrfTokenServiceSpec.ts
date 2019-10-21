@@ -56,7 +56,7 @@ describe('Csrf Token Service', function() {
   });
 
   it('should error if getTokenAsync is called before initialize', () => {
-    expect(csrfTokenService.getTokenAsync())
+    expect(csrfTokenService.getTokenAsync)
       .toThrowError('Token needs to be initialized');
   });
 });

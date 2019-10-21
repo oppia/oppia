@@ -19,9 +19,11 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { CsrfTokenService } from "./CsrfTokenService";
+import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from './contextual/WindowDimensionsService';
-import {CsrfTokenService} from "./CsrfTokenService";
+
 
 @Injectable({
   providedIn: 'root'
@@ -31,9 +33,10 @@ export class UpgradedServices {
   upgradedServices = {
     'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService(),
-    'CsrfTokenService': new CsrfTokenService()
+    'CsrfTokenService': new CsrfTokenService(),
+    'SidebarStatusService': new SidebarStatusService(
+      new WindowDimensionsService())
   };
-  /* eslint-enable quote-props */
 }
 
 angular.module('oppia').factory(
