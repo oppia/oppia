@@ -41,7 +41,6 @@ require('services/UserService.ts');
 require('services/PromoBarService.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 require('services/stateful/FocusManagerService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -63,7 +62,6 @@ require(
   'components/common-layout-directives/navigation-bars/' +
   'top-navigation-bar.directive.ts');
 
-require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
@@ -90,7 +88,6 @@ angular.module('oppia').config([
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
-
     // Set the AngularJS interpolators as <[ and ]>, to not conflict with
     // Jinja2 templates.
     $interpolateProvider.startSymbol('<[');

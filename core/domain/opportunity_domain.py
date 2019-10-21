@@ -198,3 +198,73 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                 'incomplete_translation, needs_voiceover and assigned_voiceover'
                 ' to be the same as the supported audio languages, '
                 'received %s' % list(expected_set_of_all_languages))
+
+
+class SkillOpportunity(python_utils.OBJECT):
+    """The domain object for skill opportunities."""
+
+    def __init__(
+            self, skill_id, skill_description, question_count):
+        """Constructs a SkillOpportunity domain object.
+
+        Args:
+            skill_id: str. The unique id of the skill.
+            skill_description: str. The title of the skill.
+            question_count: int. The total number of questions for the skill.
+        """
+        self.id = skill_id
+        self.skill_description = skill_description
+        self.question_count = question_count
+        self.validate()
+
+    def validate(self):
+        """Validates various properties of the object.
+
+        Raises:
+            ValidationError: One or more attributes of the object are invalid.
+        """
+        if not isinstance(self.skill_description, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected skill_description to be a string, received %s' %
+                self.skill_description)
+        if not isinstance(self.question_count, int):
+            raise utils.ValidationError(
+                'Expected question_count to be an integer, received %s' %
+                self.question_count)
+
+        if self.question_count < 0:
+            raise utils.ValidationError(
+                'Expected question_count to be a non-negative integer, '
+                'received %s' % self.question_count)
+
+    @classmethod
+    def from_dict(cls, skill_opportunity_dict):
+        """Return a SkillOpportunity domain object from a dict.
+
+        Args:
+            skill_opportunity_dict: dict. The dict representation
+                of a SkillOpportunity object.
+
+        Returns:
+            SkillOpportunity. The corresponding
+                SkillOpportunity domain object.
+        """
+        return cls(
+            skill_opportunity_dict['id'],
+            skill_opportunity_dict['skill_description'],
+            skill_opportunity_dict['question_count'])
+
+    def to_dict(self):
+        """Returns a copy of the object as a dictionary. It includes all
+        necessary information to represent an opportunity.
+
+        Returns:
+            dict. A dict mapping the fields of SkillOpportunity
+            instance which are required to represent the opportunity to a
+            contributor.
+        """
+        return {
+            'id': self.id,
+            'skill_description': self.skill_description,
+            'question_count': self.question_count
+        }
