@@ -475,6 +475,27 @@ def get_skill_opportunities(cursor):
     return opportunities, cursor, more
 
 
+def get_skill_opportunities_by_ids(ids):
+    """Returns a list of SkillOpportunity domain objects corresponding to the
+    given list of ids.
+
+    Args:
+        ids: list(str). A list of the opportunity ids.
+
+    Returns:
+        dict(str, SkillOpportunity). A dict with key as opportunity ID and value
+        as corresponding SkillOpportunity domain object.
+    """
+    skill_opportunity_models = (
+        opportunity_models.SkillOpportunityModel.get_multi(ids))
+    opportunities = {}
+    for skill_opportunity_model in skill_opportunity_models:
+        skill_opportunity = (
+            get_skill_opportunity_from_model(skill_opportunity_model))
+        opportunities[skill_opportunity.id] = skill_opportunity
+    return opportunities
+
+
 def create_skill_opportunity(skill_id, skill_description):
     """Creates a SkillOpportunityModel entity in the datastore.
 

@@ -50,6 +50,36 @@ def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
             'Invalid suggestion_type: %s' % suggestion_type)
 
 
+def _render_suggestions(self, target_type, suggestions):
+    target_ids = set([s.target_id for s in suggestions])
+    if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+        target_ids_to_opportunities = (
+            opportunity_services
+            .get_exploration_opportunity_summaries_by_ids(
+                list(target_ids)))
+        _render_suggestions_and_opportunities(
+            self, suggestions, target_ids_to_opportunities)
+    elif target_type == suggestion_models.TARGET_TYPE_SKILL:
+        target_ids_to_opportunities = (
+            opportunity_services.get_skill_opportunities_by_ids(
+                list(target_ids)))
+        _render_suggestions_and_opportunities(
+            self, suggestions, target_ids_to_opportunities)
+    else:
+        self.render_json({})
+
+
+def _render_suggestions_and_opportunities(
+        self, suggestions, target_ids_to_opportunities):
+    self.render_json({
+        'suggestions': [s.to_dict() for s in suggestions],
+        'target_ids_to_opportunity_dicts': {
+            t: d.to_dict() for (
+                t, d) in target_ids_to_opportunities.items()
+        }
+    })
+
+
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 
@@ -120,22 +150,22 @@ class ResubmitSuggestionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SuggestionToTopicActionHandler(base.BaseHandler):
-    """Handles actions performed on suggestions to topics."""
+class SuggestionToSkillActionHandler(base.BaseHandler):
+    """Handles actions performed on suggestions to skills."""
 
     @acl_decorators.get_decorator_for_accepting_suggestion(
-        acl_decorators.can_edit_topic)
+        acl_decorators.can_edit_skill)
     def put(self, target_id, suggestion_id):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_TOPIC:
+        if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_SKILL:
             raise self.InvalidInputException(
-                'This handler allows actions only on suggestions to topics.')
+                'This handler allows actions only on suggestions to skills.')
 
         if suggestion_id.split('.')[1] != target_id:
             raise self.InvalidInputException(
-                'The topic id provided does not match the topic id present as '
+                'The skill id provided does not match the skill id present as '
                 'part of the suggestion_id')
 
         action = self.payload.get('action')
@@ -174,25 +204,9 @@ class ReviewableSuggestionsHandler(base.BaseHandler):
         try:
             _require_valid_suggestion_and_target_types(
                 target_type, suggestion_type)
-
             suggestions = suggestion_services.get_reviewable_suggestions(
                 self.user_id, suggestion_type)
-
-            if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_ids = set([s.target_id for s in suggestions])
-                target_ids_to_opportunities = (
-                    opportunity_services
-                    .get_exploration_opportunity_summaries_by_ids(
-                        list(target_ids)))
-                self.render_json({
-                    'suggestions': [s.to_dict() for s in suggestions],
-                    'target_ids_to_opportunity_dicts': {
-                        t: d.to_dict() for (
-                            t, d) in target_ids_to_opportunities.items()
-                    }
-                })
-            else:
-                self.render_json({})
+            _render_suggestions(self, target_type, suggestions)
         except Exception as e:
             raise self.InvalidInputException(e)
 
@@ -210,25 +224,9 @@ class UserSubmittedSuggestionsHandler(base.BaseHandler):
         try:
             _require_valid_suggestion_and_target_types(
                 target_type, suggestion_type)
-
             suggestions = suggestion_services.get_submitted_suggestions(
                 self.user_id, suggestion_type)
-
-            if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_ids = set([s.target_id for s in suggestions])
-                target_ids_to_opportunities = (
-                    opportunity_services
-                    .get_exploration_opportunity_summaries_by_ids(
-                        list(target_ids)))
-                self.render_json({
-                    'suggestions': [s.to_dict() for s in suggestions],
-                    'target_ids_to_opportunity_dicts': {
-                        t: d.to_dict() for (
-                            t, d) in target_ids_to_opportunities.items()
-                    }
-                })
-            else:
-                self.render_json({})
+            _render_suggestions(self, target_type, suggestions)
         except Exception as e:
             raise self.InvalidInputException(e)
 
