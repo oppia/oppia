@@ -29,7 +29,8 @@ import { ClassifierObjectFactory } from
 import { EditabilityService } from 'services/EditabilityService';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
-import { ExplorationFeaturesService } from 'services/ExplorationFeaturesService';
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
