@@ -32,7 +32,7 @@ angular.module('oppia').directive('learnerDashboardIcons', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/domain/learner_dashboard/' +
-        'learner_dashboard_icons_directive.html'),
+        'learner-dashboard-icons.directive.html'),
       controller: [
         '$scope', 'LearnerDashboardIdsBackendApiService',
         'LearnerDashboardActivityIdsObjectFactory',
