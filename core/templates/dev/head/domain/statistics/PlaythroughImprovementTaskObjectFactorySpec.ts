@@ -92,7 +92,6 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
-  var ExplorationFeaturesService = null;
   var PlaythroughImprovementTaskObjectFactory = null;
   var playthroughIssueObjectFactory = null;
   var PlaythroughIssuesService = null;
@@ -113,8 +112,6 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
-    $provide.value(
-      'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
@@ -185,7 +182,6 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
-    ExplorationFeaturesService = _ExplorationFeaturesService_;
     PlaythroughImprovementTaskObjectFactory =
       _PlaythroughImprovementTaskObjectFactory_;
     playthroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
