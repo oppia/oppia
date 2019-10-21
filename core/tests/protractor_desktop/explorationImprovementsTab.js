@@ -34,7 +34,7 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
-fdescribe('Answer Details Improvements', function() {
+describe('Answer Details Improvements', function() {
   var EXPLORATION_TITLE = 'Check';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
@@ -104,7 +104,7 @@ fdescribe('Answer Details Improvements', function() {
     users.logout();
   });
 
-  fdescribe('checks solicit answer details feature', function() {
+  describe('checks solicit answer details feature', function() {
     beforeAll(function() {
       users.login('learner@user.com');
       libraryPage.get();
@@ -132,7 +132,7 @@ fdescribe('Answer Details Improvements', function() {
       users.logout();
     });
 
-    fit('is visible for guests', function() {
+    it('is visible for guests', function() {
       general.openEditor(this.expId);
       explorationEditorPage.navigateToImprovementsTab();
 
