@@ -269,15 +269,6 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
             is_valid: true,
           });
 
-        var earlyQuitTaskTitle =
-          PlaythroughIssuesService.renderIssueStatement(earlyQuitIssue);
-        var multipleIncorrectSubmissionsTaskTitle =
-          PlaythroughIssuesService.renderIssueStatement(
-            multipleIncorrectSubmissionsIssue);
-        var cyclicTransitionsTaskTitle =
-          PlaythroughIssuesService.renderIssueStatement(
-            cyclicTransitionsIssue);
-
         spyOn(PlaythroughIssuesService, 'getIssues').and.returnValue(
           $q.resolve([
             earlyQuitIssue,
@@ -286,12 +277,16 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           ]));
 
         PlaythroughImprovementTaskObjectFactory.fetchTasks()
-          .then(function(tasks) {
-            expect(tasks.length).toEqual(3);
-            expect(tasks[0].getTitle()).toEqual(earlyQuitTaskTitle);
-            expect(tasks[1].getTitle())
-              .toEqual(multipleIncorrectSubmissionsTaskTitle);
-            expect(tasks[2].getTitle()).toEqual(cyclicTransitionsTaskTitle);
+          .then(tasks => tasks.map(task => task.getTitle()))
+          .then(taskTitles => {
+            expect(taskTitles).toEqual([
+              PlaythroughIssuesService.renderIssueStatement(
+                earlyQuitIssue),
+              PlaythroughIssuesService.renderIssueStatement(
+                multipleIncorrectSubmissionsIssue),
+              PlaythroughIssuesService.renderIssueStatement(
+                cyclicTransitionsIssue)
+            ]);
           }).then(done, done.fail);
 
         this.scope.$digest(); // Forces all pending promises to evaluate.
@@ -336,8 +331,8 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
             is_valid: true,
           });
 
-        var getIssuesSpy = spyOn(PlaythroughIssuesService, 'getIssues')
-          .and.returnValue(
+        var getIssuesSpy =
+          spyOn(PlaythroughIssuesService, 'getIssues').and.returnValue(
             $q.resolve([
               earlyQuitIssue,
               multipleIncorrectSubmissionsIssue,
