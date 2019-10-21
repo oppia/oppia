@@ -790,7 +790,7 @@ class JobRegistryTests(test_utils.GenericTestBase):
                 test_only_get_realtime_datastore=True)
             self.assertTrue(any([
                 issubclass(klass.get_event_types_listened_to(
-                    test_only_get_batch_job_manager=True), superclass)  # pylint: disable=protected-access
+                    test_only_get_batch_job_manager=True), superclass)
                 for superclass in allowed_base_batch_job_classes]))
             self.assertTrue(issubclass(
                 rdc, jobs.BaseRealtimeDatastoreClassForContinuousComputations))
