@@ -26,11 +26,13 @@ angular.module('oppia').directive('opportunitiesList', [
     return {
       restrict: 'E',
       scope: {
-        isDataLoading: '&dataLoading',
+        opportunityDataIsLoading: '=',
         getOpportunities: '&opportunities',
         isMoreOpportunitiesAvailable: '&moreAvailable',
-        progressBarRequired: '@',
-        onLoadMoreOpportunities: '&'
+        isLabelRequired: '&labelRequired',
+        isProgressBarRequired: '&progressBarRequired',
+        onLoadMoreOpportunities: '&',
+        onClickActionButton: '='
       },
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

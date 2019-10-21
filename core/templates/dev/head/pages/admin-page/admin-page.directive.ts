@@ -60,11 +60,21 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
           ctrl.inDevMode = DEV_MODE;
 
           ctrl.statusMessage = '';
-          ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
-          ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
-          ctrl.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
-          ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
-          ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
+          ctrl.isActivitiesTabOpen = function() {
+            return AdminRouterService.isActivitiesTabOpen();
+          };
+          ctrl.isJobsTabOpen = function() {
+            return AdminRouterService.isJobsTabOpen();
+          };
+          ctrl.isConfigTabOpen = function() {
+            return AdminRouterService.isConfigTabOpen();
+          };
+          ctrl.isRolesTabOpen = function() {
+            return AdminRouterService.isRolesTabOpen();
+          };
+          ctrl.isMiscTabOpen = function() {
+            return AdminRouterService.isMiscTabOpen();
+          };
 
           CsrfTokenService.initializeToken();
 

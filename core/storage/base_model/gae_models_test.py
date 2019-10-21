@@ -32,16 +32,16 @@ import python_utils
 class BaseModelUnitTests(test_utils.GenericTestBase):
     """Test the generic base model."""
 
-    def test_get_deletion_policy(self):
-        with self.assertRaises(NotImplementedError):
-            base_models.BaseModel.get_deletion_policy()
-
     def tearDown(self):
         """Deletes all model entities."""
         for entity in base_models.BaseModel.get_all():
             entity.delete()
 
         super(BaseModelUnitTests, self).tearDown()
+
+    def test_get_deletion_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_deletion_policy()
 
     def test_has_reference_to_user_id(self):
         with self.assertRaises(NotImplementedError):

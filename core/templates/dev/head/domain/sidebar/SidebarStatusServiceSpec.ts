@@ -16,42 +16,43 @@
  * @fileoverview Tests for SidebarStatusService.
  */
 
-require('domain/sidebar/SidebarStatusService.ts');
+import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
+import { TestBed } from '@angular/core/testing';
+import { WindowRef } from 'services/contextual/WindowRefService';
 
-describe('SidebarStatusService', function() {
-  var SidebarStatusService, $window;
+describe('SidebarStatusService', () => {
+  let sss, $window;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, _$window_) {
-    $window = _$window_;
-    $window.innerWidth = 600;
-    SidebarStatusService = $injector.get('SidebarStatusService');
-  }));
-
-  it('should open the sidebar if its not open', function() {
-    SidebarStatusService.openSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
+  beforeEach(() => {
+    $window = TestBed.get(WindowRef);
+    $window.nativeWindow.innerWidth = 600;
+    sss = TestBed.get(SidebarStatusService);
   });
 
-  it('should close the sidebar when its open', function() {
-    SidebarStatusService.openSidebar();
-    SidebarStatusService.closeSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(false);
+  it('should open the sidebar if its not open', () => {
+    sss.openSidebar();
+    expect(sss.isSidebarShown()).toBe(true);
   });
 
-  it('should toggle the sidebar to open and then close', function() {
-    SidebarStatusService.toggleSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
-    SidebarStatusService.toggleSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(false);
+  it('should close the sidebar when its open', () => {
+    sss.openSidebar();
+    sss.closeSidebar();
+    expect(sss.isSidebarShown()).toBe(false);
+  });
+
+  it('should toggle the sidebar to open and then close', () => {
+    sss.toggleSidebar();
+    expect(sss.isSidebarShown()).toBe(true);
+    sss.toggleSidebar();
+    expect(sss.isSidebarShown()).toBe(false);
   });
 
 
-  it('should falsify pendingSidebarClick on document click', function() {
-    SidebarStatusService.openSidebar();
-    SidebarStatusService.onDocumentClick();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
-    SidebarStatusService.onDocumentClick();
-    expect(SidebarStatusService.isSidebarShown()).toBe(false);
+  it('should falsify pendingSidebarClick on document click', () => {
+    sss.openSidebar();
+    sss.onDocumentClick();
+    expect(sss.isSidebarShown()).toBe(true);
+    sss.onDocumentClick();
+    expect(sss.isSidebarShown()).toBe(false);
   });
 });
