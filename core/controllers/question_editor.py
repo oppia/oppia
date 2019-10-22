@@ -115,19 +115,15 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     """A handler for linking and unlinking questions to or from a skill."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self, question_id, skill_id):
-        """Links a question to a skill."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
-        if skill is None:
-            raise self.PageNotFoundException(
-                'The skill with the given id doesn\'t exist.')
+    def put(self, question_id, skill_id):
+        """Updates the difficulty of the question with respect to the given
+        skill.
+        """
+        new_difficulty = float(self.payload.get('new_difficulty'))
 
-        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
-        # with a value passed from the frontend.
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id, skill_id,
-            constants.DEFAULT_SKILL_DIFFICULTY)
+        question_services.update_question_skill_link_difficulty(
+            question_id, skill_id, new_difficulty)
+
         self.render_json(self.values)
 
     @acl_decorators.can_manage_question_skill_status

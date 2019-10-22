@@ -104,14 +104,14 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       });
     };
 
-    var _addQuestionSkillLink = function(
+    var _deleteQuestionFromSkill = function(
         questionId, skillId, successCallback, errorCallback) {
-      var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
+      var deleteQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
           question_id: questionId,
           skill_id: skillId
         });
-      $http.post(addQuestionSkillLinkUrl).then(function(response) {
+      $http['delete'](deleteQuestionSkillLinkUrl).then(function(response) {
         if (successCallback) {
           successCallback();
         }
@@ -122,14 +122,17 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       });
     };
 
-    var _deleteQuestionFromSkill = function(
-        questionId, skillId, successCallback, errorCallback) {
-      var deleteQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
+    var _changeDifficulty = function(
+        questionId, skillId, newDifficulty, successCallback, errorCallback) {
+      var changeDifficultyUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
           question_id: questionId,
           skill_id: skillId
         });
-      $http['delete'](deleteQuestionSkillLinkUrl).then(function(response) {
+      var putData = {
+        new_difficulty: newDifficulty
+      };
+      $http.put(changeDifficultyUrl, putData).then(function(response) {
         if (successCallback) {
           successCallback();
         }
@@ -160,6 +163,13 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
         });
       },
 
+      changeDifficulty: function(questionId, skillId, newDifficulty) {
+        return $q(function(resolve, reject) {
+          _changeDifficulty(
+            questionId, skillId, newDifficulty, resolve, reject);
+        });
+      },
+
       /**
        * Updates a question in the backend with the provided question ID.
        * The changes only apply to the question of the given version and the
@@ -176,13 +186,6 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
           _updateQuestion(
             questionId, questionVersion, commitMessage, changeList,
             resolve, reject);
-        });
-      },
-
-      addQuestionSkillLink: function(
-          questionId, skillId) {
-        return $q(function(resolve, reject) {
-          _addQuestionSkillLink(questionId, skillId, resolve, reject);
         });
       }
     };

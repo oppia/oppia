@@ -122,6 +122,30 @@ def create_new_question_skill_link(
             question.linked_skill_ids)
 
 
+def update_question_skill_link_difficulty(
+        question_id, skill_id, new_difficulty):
+    """Updates the difficulty value of question skill link.
+
+    Args:
+        question_id: str. ID of the question.
+        skill_id: str. ID of the skill.
+        new_difficulty: float. New difficulty value.
+
+    Raises:
+        Exception. Given question and skill are not linked.
+    """
+    question_skill_link_id = (
+        question_models.QuestionSkillLinkModel.get_model_id(
+            question_id, skill_id))
+    question_skill_link_model = question_models.QuestionSkillLinkModel.get(
+        question_skill_link_id, strict=False)
+
+    if question_skill_link_model is None:
+        raise Exception('The given question and skill are not linked.')
+    question_skill_link_model.skill_difficulty = new_difficulty
+    question_skill_link_model.put()
+
+
 def _update_linked_skill_ids_of_question(
         user_id, question_id, new_linked_skill_ids, old_linked_skill_ids):
     """Updates the question linked_skill ids in the Question model.
@@ -384,7 +408,7 @@ def replace_skill_id_for_all_questions(
     question_models.QuestionModel.put_multi_questions(new_questions)
 
 
-def get_question_summaries_and_skill_descriptions(
+def get_displayable_question_skill_link_details(
         question_count, skill_ids, start_cursor):
     """Returns the list of question summaries and corresponding skill
     descriptions linked to all the skills given by skill_ids.
@@ -401,11 +425,11 @@ def get_question_summaries_and_skill_descriptions(
         a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), list(list(str)), str|None. The list of question
-            linked to the given skill ids, the list of skill summaries grouped
-            by each question, and the next cursor value to be used for the next
-            batch of questions (or None if no more pages are left). The returned
-            next cursor value is urlsafe.
+        list(QuestionSummary), list(MergedQuestionSkillLink), str|None.
+            The list of questions linked to the given skill ids, the list of
+            MergedQuestionSkillLink objects, keyed by question ID and the next
+            cursor value to be used for the next batch of questions (or None if
+            no more pages are left). The returned next cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
         return [], [], None
@@ -422,21 +446,29 @@ def get_question_summaries_and_skill_descriptions(
     # the same question.
     question_ids = []
     grouped_skill_ids = []
-    grouped_skill_descriptions = []
+    grouped_difficulties = []
     for question_skill_link in question_skill_link_models:
         if question_skill_link.question_id not in question_ids:
             question_ids.append(question_skill_link.question_id)
             grouped_skill_ids.append([question_skill_link.skill_id])
+            grouped_difficulties.append([question_skill_link.skill_difficulty])
         else:
             grouped_skill_ids[-1].append(question_skill_link.skill_id)
+            grouped_difficulties[-1].append(
+                question_skill_link.skill_difficulty)
 
-    for skill_ids_list in grouped_skill_ids:
+    merged_question_skill_links = []
+    for ind, skill_ids_list in enumerate(grouped_skill_ids):
         skills = skill_models.SkillModel.get_multi(skill_ids_list)
-        grouped_skill_descriptions.append(
-            [skill.description if skill else None for skill in skills])
+        merged_question_skill_links.append(
+            question_domain.MergedQuestionSkillLink(
+                question_ids[ind], skill_ids_list,
+                [skill.description if skill else None for skill in skills],
+                grouped_difficulties[ind]))
 
     question_summaries = get_question_summaries_by_ids(question_ids)
-    return question_summaries, grouped_skill_descriptions, next_cursor
+    return (
+        question_summaries, merged_question_skill_links, next_cursor)
 
 
 def get_question_summaries_by_ids(question_ids):
