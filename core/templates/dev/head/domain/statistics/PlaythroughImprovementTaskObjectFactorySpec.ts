@@ -173,8 +173,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           .then(allTasks => {
             expect(allTasks).toEqual([]);
             expect(getIssuesSpy).not.toHaveBeenCalled();
-          })
-          .then(done, done.fail);
+          }).then(done, done.fail);
 
         // Force all pending promises to evaluate.
         this.scope.$digest();
