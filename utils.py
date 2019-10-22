@@ -425,7 +425,7 @@ def get_human_readable_time_string(time_msec):
     time string for the admin dashboard.
 
     Args:
-        time_msec: float. Passing time in milliseconds.
+        time_msec: float. Passing time in milliseconds since the epoch.
 
     Returns:
         str. Time in human readable format.
