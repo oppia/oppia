@@ -91,7 +91,6 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   var $rootScope = null;
   var $uibModal = null;
   var PlaythroughImprovementTaskObjectFactory = null;
-  var playthroughIssueObjectFactory = null;
   var PlaythroughIssuesService = null;
   var UserService = null;
   var PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = null;
@@ -173,31 +172,33 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     }
   }));
 
+  beforeEach(angular.mock.inject(function(PlaythroughIssueObjectFactory) {
+    this.PlaythroughIssueObjectFactory = PlaythroughIssueObjectFactory;
+  }));
+
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
-      _PlaythroughImprovementTaskObjectFactory_,
-      _PlaythroughIssueObjectFactory_, _PlaythroughIssuesService_,
+      _PlaythroughImprovementTaskObjectFactory_, _PlaythroughIssuesService_,
       _UserService_, _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
     PlaythroughImprovementTaskObjectFactory =
       _PlaythroughImprovementTaskObjectFactory_;
-    playthroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
     UserService = _UserService_;
     PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_;
 
-    PlaythroughIssuesService.initSession(expId, expVersion);
+    this.expId = '7';
+    this.expVersion = 1;
+    PlaythroughIssuesService.initSession(this.expId, this.expVersion);
 
-    var expId = '7';
-    var expVersion = 1;
     this.scope = $rootScope.$new();
   }));
 
   describe('.createNew', function() {
     it('retrieves data from passed issue', function() {
-      var issue = playthroughIssueObjectFactory.createFromBackendDict({
+      var issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
         issue_customization_args: {
           state_name: {value: 'Hola'},
@@ -210,23 +211,22 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
 
       var task = PlaythroughImprovementTaskObjectFactory.createNew(issue);
 
-      expect(task.getTitle()).toEqual(
-        PlaythroughIssuesService.renderIssueStatement(issue));
+      expect(task.getTitle())
+        .toEqual(PlaythroughIssuesService.renderIssueStatement(issue));
       expect(task.getDirectiveData()).toEqual({
         title: PlaythroughIssuesService.renderIssueStatement(issue),
-        suggestions:
-          PlaythroughIssuesService.renderIssueSuggestions(issue),
+        suggestions: PlaythroughIssuesService.renderIssueSuggestions(issue),
         playthroughIds: ['1', '2'],
       });
-      expect(task.getDirectiveType()).toEqual(
-        PLAYTHROUGH_IMPROVEMENT_TASK_TYPE);
+      expect(task.getDirectiveType())
+        .toEqual(PLAYTHROUGH_IMPROVEMENT_TASK_TYPE);
     });
   });
 
   describe('.fetchTasks', function() {
     it('returns a task for each existing issue', function(done) {
       var earlyQuitIssue =
-        playthroughIssueObjectFactory.createFromBackendDict({
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -240,7 +240,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         PlaythroughIssuesService.renderIssueStatement(earlyQuitIssue);
 
       var multipleIncorrectSubmissionsIssue =
-        playthroughIssueObjectFactory.createFromBackendDict({
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'MultipleIncorrectSubmissions',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -255,7 +255,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           multipleIncorrectSubmissionsIssue);
 
       var cyclicTransitionsIssue =
-        playthroughIssueObjectFactory.createFromBackendDict({
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'CyclicTransitions',
           issue_customization_args: {
             state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
@@ -290,7 +290,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
 
   describe('PlaythroughImprovementTask', function() {
     beforeEach(function() {
-      this.issue = playthroughIssueObjectFactory.createFromBackendDict({
+      this.issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
         issue_customization_args: {
           state_name: {value: 'Hola'},
