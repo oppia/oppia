@@ -16,75 +16,9 @@
  * @fileoverview Unit tests for the ImprovementTaskService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// ImprovementTaskService.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
-import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService';
-import { FeedbackThreadObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { PlaythroughObjectFactory } from
-  'domain/statistics/PlaythroughObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { SuggestionModalService } from 'services/SuggestionModalService';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
-/* eslint-disable max-len */
-import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-/* eslint-enable max-len */
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { LearnerAnswerDetailsObjectFactory } from
-  'domain/statistics/LearnerAnswerDetailsObjectFactory';
-import { LearnerAnswerInfoObjectFactory } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
+// TODO(#7222): Remove the following unnnecessary import once
+// PlaythroughImprovementTaskObjectFactory.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
 require('domain/statistics/AnswerDetailsImprovementTaskObjectFactory.ts');
 require('domain/statistics/FeedbackImprovementTaskObjectFactory.ts');
@@ -102,84 +36,14 @@ describe('ImprovementTaskService', function() {
   var SuggestionImprovementTaskObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-    $provide.value('EditabilityService', new EditabilityService());
-    $provide.value(
-      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
-    $provide.value(
-      'ExplorationFeaturesService', new ExplorationFeaturesService());
-    $provide.value(
-      'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'ImprovementActionButtonObjectFactory',
-      new ImprovementActionButtonObjectFactory());
-    $provide.value(
-      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value(
-      'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
-    $provide.value(
-      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
-        new LearnerActionObjectFactory()));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-    $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService(
-        new ClassifierObjectFactory()));
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('SuggestionModalService', new SuggestionModalService());
-    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
-    $provide.value(
-      'ThreadStatusDisplayService', new ThreadStatusDisplayService());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-    $provide.value(
-      'LearnerAnswerDetailsObjectFactory',
-      new LearnerAnswerDetailsObjectFactory());
-    $provide.value(
-      'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
+    var upgradedServices = new UpgradedServices().upgradedServices;
+    for (let [name, service] of Object.entries(upgradedServices)) {
+      $provide.value(name, service);
     }
   }));
+
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _ImprovementTaskService_,
       _AnswerDetailsImprovementTaskObjectFactory_,
@@ -204,6 +68,8 @@ describe('ImprovementTaskService', function() {
       PlaythroughImprovementTaskObjectFactory,
       SuggestionImprovementTaskObjectFactory,
     ];
+
+    this.scope = $rootScope.$new();
   }));
 
   describe('.getImprovementTaskObjectFactoryRegistry', function() {
@@ -223,32 +89,20 @@ describe('ImprovementTaskService', function() {
   });
 
   describe('.fetchTasks', function() {
-    // Each individual factory should test their own fetchTasks function.
+    // NOTE: Each individual factory should test their own fetchTasks function.
 
-    describe('from factories which all return empty tasks', function() {
-      beforeEach(function() {
-        this.expectedFactories.forEach(function(factory) {
-          spyOn(factory, 'fetchTasks').and.callFake(function() {
-            return $q.resolve([]);
-          });
-        });
+    it('returns empty list when each factory returns no tasks', function(done) {
+      this.expectedFactories.forEach(factory => {
+        spyOn(factory, 'fetchTasks').and.returnValue($q.resolve([]));
       });
 
-      it('returns an empty list', function(done) {
-        var onSuccess = function(tasks) {
-          expect(tasks).toEqual([]);
-          done();
-        };
-        var onFailure = function(error) {
-          done.fail(error);
-        };
+      ImprovementTaskService.fetchTasks()
+        .then(allTasks => expect(allTasks).toEqual([]))
+        .then(done, done.fail);
 
-        ImprovementTaskService.fetchTasks().then(onSuccess, onFailure);
-
-        // $q Promises need to be forcibly resolved through a JavaScript digest,
-        // which is what $apply helps kick-start.
-        $rootScope.$apply();
-      });
+      // Force all pending promises to evaluate.
+      this.scope.$digest();
     });
+  );
   });
 });
