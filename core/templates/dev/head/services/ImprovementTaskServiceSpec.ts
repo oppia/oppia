@@ -29,6 +29,8 @@ import { ClassifierObjectFactory } from
 import { EditabilityService } from 'services/EditabilityService';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -113,6 +115,8 @@ describe('ImprovementTaskService', function() {
     $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value(
+      'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());

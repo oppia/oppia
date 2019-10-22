@@ -24,14 +24,15 @@ require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
 require('services/PlaythroughIssuesService.ts');
+require('services/ExplorationFeaturesService.ts');
 
 angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
-  'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
-  'PlaythroughIssuesService', 'UserService',
+  '$q', 'ExplorationFeaturesService', 'ImprovementActionButtonObjectFactory',
+  'ImprovementModalService', 'PlaythroughIssuesService', 'UserService',
   'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE', 'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
-      ImprovementActionButtonObjectFactory, ImprovementModalService,
-      PlaythroughIssuesService, UserService,
+      $q, ExplorationFeaturesService, ImprovementActionButtonObjectFactory,
+      ImprovementModalService, PlaythroughIssuesService, UserService,
       PLAYTHROUGH_IMPROVEMENT_TASK_TYPE, STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
     /**
      * @constructor
@@ -123,6 +124,11 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
        *    playthrough issues associated to the current exploration.
        */
       fetchTasks: function() {
+        // TODO(#7816): Remove this branch once all explorations maintain an
+        // ExplorationIssuesModel.
+        if (!ExplorationFeaturesService.isPlaythroughRecordingEnabled()) {
+          return $q.resolve([]);
+        }
         return PlaythroughIssuesService.getIssues().then(function(issues) {
           return issues.map(function(issue) {
             return new PlaythroughImprovementTask(issue);

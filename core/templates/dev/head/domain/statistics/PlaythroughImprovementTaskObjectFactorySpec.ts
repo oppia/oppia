@@ -29,6 +29,8 @@ import { ClassifierObjectFactory } from
 import { EditabilityService } from 'services/EditabilityService';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -111,6 +113,8 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
+      'ExplorationFeaturesService', new ExplorationFeaturesService());
+    $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
@@ -172,7 +176,9 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function(PlaythroughIssueObjectFactory) {
+  beforeEach(angular.mock.inject(function(
+      ExplorationFeaturesService, PlaythroughIssueObjectFactory) {
+    this.ExplorationFeaturesService = ExplorationFeaturesService;
     this.PlaythroughIssueObjectFactory = PlaythroughIssueObjectFactory;
   }));
 
@@ -224,68 +230,122 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   });
 
   describe('.fetchTasks', function() {
-    it('returns a task for each existing issue', function(done) {
-      var earlyQuitIssue =
-        this.PlaythroughIssueObjectFactory.createFromBackendDict({
-          issue_type: 'EarlyQuit',
-          issue_customization_args: {
-            state_name: {value: 'Hola'},
-            time_spent_in_exp_in_msecs: {value: 5000},
-          },
-          playthrough_ids: [],
-          schema_version: 1,
-          is_valid: true,
-        });
-      var earlyQuitTaskTitle =
-        PlaythroughIssuesService.renderIssueStatement(earlyQuitIssue);
+    it(
+      'returns a task for each existing issue when exploration is whitelisted',
+      function(done) {
+        spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
+          .and.returnValue(true);
 
-      var multipleIncorrectSubmissionsIssue =
-        this.PlaythroughIssueObjectFactory.createFromBackendDict({
-          issue_type: 'MultipleIncorrectSubmissions',
-          issue_customization_args: {
-            state_name: {value: 'Hola'},
-            num_times_answered_incorrectly: {value: 4},
-          },
-          playthrough_ids: [],
-          schema_version: 1,
-          is_valid: true,
-        });
-      var multipleIncorrectSubmissionsTaskTitle =
-        PlaythroughIssuesService.renderIssueStatement(
-          multipleIncorrectSubmissionsIssue);
+        var earlyQuitIssue =
+          this.PlaythroughIssueObjectFactory.createFromBackendDict({
+            issue_type: 'EarlyQuit',
+            issue_customization_args: {
+              state_name: {value: 'Hola'},
+              time_spent_in_exp_in_msecs: {value: 5000},
+            },
+            playthrough_ids: [],
+            schema_version: 1,
+            is_valid: true,
+          });
+        var multipleIncorrectSubmissionsIssue =
+          this.PlaythroughIssueObjectFactory.createFromBackendDict({
+            issue_type: 'MultipleIncorrectSubmissions',
+            issue_customization_args: {
+              state_name: {value: 'Hola'},
+              num_times_answered_incorrectly: {value: 4},
+            },
+            playthrough_ids: [],
+            schema_version: 1,
+            is_valid: true,
+          });
+        var cyclicTransitionsIssue =
+          this.PlaythroughIssueObjectFactory.createFromBackendDict({
+            issue_type: 'CyclicTransitions',
+            issue_customization_args: {
+              state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
+            },
+            playthrough_ids: [],
+            schema_version: 1,
+            is_valid: true,
+          });
 
-      var cyclicTransitionsIssue =
-        this.PlaythroughIssueObjectFactory.createFromBackendDict({
-          issue_type: 'CyclicTransitions',
-          issue_customization_args: {
-            state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
-          },
-          playthrough_ids: [],
-          schema_version: 1,
-          is_valid: true,
-        });
-      var cyclicTransitionsTaskTitle =
-        PlaythroughIssuesService.renderIssueStatement(
-          cyclicTransitionsIssue);
+        spyOn(PlaythroughIssuesService, 'getIssues').and.returnValue(
+          $q.resolve([
+            earlyQuitIssue,
+            multipleIncorrectSubmissionsIssue,
+            cyclicTransitionsIssue,
+          ]));
 
-      spyOn(PlaythroughIssuesService, 'getIssues').and.returnValue(
-        $q.resolve([
-          earlyQuitIssue,
-          multipleIncorrectSubmissionsIssue,
-          cyclicTransitionsIssue,
-        ]));
+        PlaythroughImprovementTaskObjectFactory.fetchTasks()
+          .then(tasks => tasks.map(task => task.getTitle()))
+          .then(taskTitles => {
+            expect(taskTitles).toEqual([
+              PlaythroughIssuesService.renderIssueStatement(
+                earlyQuitIssue),
+              PlaythroughIssuesService.renderIssueStatement(
+                multipleIncorrectSubmissionsIssue),
+              PlaythroughIssuesService.renderIssueStatement(
+                cyclicTransitionsIssue)
+            ]);
+          }).then(done, done.fail);
 
-      PlaythroughImprovementTaskObjectFactory.fetchTasks()
-        .then(function(tasks) {
-          expect(tasks.length).toEqual(3);
-          expect(tasks[0].getTitle()).toEqual(earlyQuitTaskTitle);
-          expect(tasks[1].getTitle())
-            .toEqual(multipleIncorrectSubmissionsTaskTitle);
-          expect(tasks[2].getTitle()).toEqual(cyclicTransitionsTaskTitle);
+        this.scope.$digest(); // Forces all pending promises to evaluate.
+      });
+
+    it(
+      'returns nothing when playthrough recording is disabled',
+      function(done) {
+        spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
+          .and.returnValue(false);
+
+        var earlyQuitIssue =
+          this.PlaythroughIssueObjectFactory.createFromBackendDict({
+            issue_type: 'EarlyQuit',
+            issue_customization_args: {
+              state_name: {value: 'Hola'},
+              time_spent_in_exp_in_msecs: {value: 5000},
+            },
+            playthrough_ids: [],
+            schema_version: 1,
+            is_valid: true,
+          });
+        var multipleIncorrectSubmissionsIssue =
+          this.PlaythroughIssueObjectFactory.createFromBackendDict({
+            issue_type: 'MultipleIncorrectSubmissions',
+            issue_customization_args: {
+              state_name: {value: 'Hola'},
+              num_times_answered_incorrectly: {value: 4},
+            },
+            playthrough_ids: [],
+            schema_version: 1,
+            is_valid: true,
+          });
+        var cyclicTransitionsIssue =
+          this.PlaythroughIssueObjectFactory.createFromBackendDict({
+            issue_type: 'CyclicTransitions',
+            issue_customization_args: {
+              state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
+            },
+            playthrough_ids: [],
+            schema_version: 1,
+            is_valid: true,
+          });
+
+        var getIssuesSpy =
+          spyOn(PlaythroughIssuesService, 'getIssues').and.returnValue(
+            $q.resolve([
+              earlyQuitIssue,
+              multipleIncorrectSubmissionsIssue,
+              cyclicTransitionsIssue,
+            ]));
+
+        PlaythroughImprovementTaskObjectFactory.fetchTasks().then(tasks => {
+          expect(tasks).toEqual([]);
+          expect(getIssuesSpy).not.toHaveBeenCalled();
         }).then(done, done.fail);
 
-      this.scope.$digest(); // Forces all pending promises to evaluate.
-    });
+        this.scope.$digest(); // Forces all pending promises to evaluate.
+      });
   });
 
   describe('PlaythroughImprovementTask', function() {
