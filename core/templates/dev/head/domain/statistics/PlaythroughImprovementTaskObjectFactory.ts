@@ -27,12 +27,12 @@ require('services/PlaythroughIssuesService.ts');
 
 angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
   'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
-  'PlaythroughIssuesService', 'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE',
-  'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
+  'PlaythroughIssuesService', 'UserService',
+  'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE', 'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
       ImprovementActionButtonObjectFactory, ImprovementModalService,
-      PlaythroughIssuesService, PLAYTHROUGH_IMPROVEMENT_TASK_TYPE,
-      STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
+      PlaythroughIssuesService, UserService,
+      PLAYTHROUGH_IMPROVEMENT_TASK_TYPE, STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
     /**
      * @constructor
      * @param {PlaythroughIssue} issue - The issue this task is referring to.
@@ -50,16 +50,23 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
               'Mark as Resolved', 'btn-danger')
               .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
               .then(() => this._isObsolete = true);
-          }),
+          },
+          () => this._isEnabled),
       ];
       /** @type {boolean} */
       this._isObsolete = false;
+      /** @type {boolean} */
+      this._isEnabled = false;
       /** @type {Object} */
       this._directiveData = {
         title: this._title,
         suggestions: PlaythroughIssuesService.renderIssueSuggestions(issue),
         playthroughIds: issue.playthroughIds,
       };
+
+      UserService.getUserInfoAsync().then(userInfo => {
+        this._isEnabled = userInfo.isLoggedIn();
+      });
     };
 
     /** @returns {string} - The actionable status of this task. */

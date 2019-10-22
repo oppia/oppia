@@ -93,6 +93,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   var PlaythroughImprovementTaskObjectFactory = null;
   var playthroughIssueObjectFactory = null;
   var PlaythroughIssuesService = null;
+  var UserService = null;
   var PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -176,7 +177,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       _$q_, _$rootScope_, _$uibModal_,
       _PlaythroughImprovementTaskObjectFactory_,
       _PlaythroughIssueObjectFactory_, _PlaythroughIssuesService_,
-      _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_) {
+      _UserService_, _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
@@ -184,6 +185,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       _PlaythroughImprovementTaskObjectFactory_;
     playthroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
+    UserService = _UserService_;
     PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_;
 
     PlaythroughIssuesService.initSession(expId, expVersion);
@@ -298,52 +300,87 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         schema_version: 1,
         is_valid: true,
       });
-      this.task = PlaythroughImprovementTaskObjectFactory.createNew(this.issue);
     });
 
     describe('.getActionButtons', function() {
       it('contains a specific sequence of buttons', function() {
-        expect(this.task.getActionButtons().length).toEqual(1);
-        expect(this.task.getActionButtons()[0].getText())
+        var task = PlaythroughImprovementTaskObjectFactory.createNew(
+          this.issue);
+        expect(task.getActionButtons().length).toEqual(1);
+        expect(task.getActionButtons()[0].getText())
           .toEqual('Mark as Resolved');
       });
     });
 
     describe('Mark as Resolved Action Button', function() {
+      it('is disabled when no user is logged in', function() {
+        spyOn(UserService, 'getUserInfoAsync')
+          .and.returnValue($q.resolve({isLoggedIn: () => false}));
+
+        var task = PlaythroughImprovementTaskObjectFactory.createNew(
+          this.issue);
+
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
+
+        expect(task.getActionButtons()[0].isEnabled()).toBe(false);
+      });
+
+      it('is enabled when a user is logged in', function() {
+        spyOn(UserService, 'getUserInfoAsync')
+          .and.returnValue($q.resolve({isLoggedIn: () => true}));
+
+        var task = PlaythroughImprovementTaskObjectFactory.createNew(
+          this.issue);
+
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
+
+        expect(task.getActionButtons()[0].isEnabled()).toBe(true);
+      });
+
       it('marks the task as resolved after confirmation', function() {
-        var task = this.task;
-        var issue = this.issue;
+        spyOn(UserService, 'getUserInfoAsync')
+          .and.returnValue($q.resolve({isLoggedIn: () => true}));
+
+        var task = PlaythroughImprovementTaskObjectFactory.createNew(
+          this.issue);
+
+        expect(task.getStatus()).toEqual('open');
+
         var resolveActionButton = task.getActionButtons()[0];
         var resolveIssueSpy =
           spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
 
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve(), // Returned when confirm button is pressed.
-        });
+        // Mock confirmation by returning a resolved promise.
+        spyOn($uibModal, 'open').and.returnValue({result: $q.resolve()});
 
-        expect(task.getStatus()).toEqual('open');
         resolveActionButton.execute();
 
-        this.scope.$digest(); // Forces all pending promises to evaluate.
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
 
-        expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
+        expect(resolveIssueSpy).toHaveBeenCalledWith(this.issue);
         expect(task.getStatus()).not.toEqual('open');
       });
 
       it('keeps the task after cancel', function() {
-        var task = this.task;
-        var issue = this.issue;
+        var task = PlaythroughImprovementTaskObjectFactory.createNew(
+          this.issue);
+
+        expect(task.getStatus()).toEqual('open');
+
         var resolveActionButton = task.getActionButtons()[0];
         var resolveIssueSpy =
           spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
 
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject(), // Returned when cancel button is pressed.
-        });
+        // Mock cancellation by returning a rejected promise.
+        spyOn($uibModal, 'open').and.returnValue({result: $q.reject()});
 
-        expect(task.getStatus()).toEqual('open');
         resolveActionButton.execute();
-        this.scope.$digest(); // Forces all pending promises to evaluate.
+
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
 
         expect(resolveIssueSpy).not.toHaveBeenCalled();
         expect(task.getStatus()).toEqual('open');
