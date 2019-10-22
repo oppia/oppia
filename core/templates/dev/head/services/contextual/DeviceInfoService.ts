@@ -17,23 +17,36 @@
  */
 
 // See: https://stackoverflow.com/a/11381730
-angular.module('oppia').factory('DeviceInfoService', [
-  '$window', function($window) {
-    return {
-      isMobileDevice: function() {
-        return Boolean(navigator.userAgent.match(/Android/i) ||
-          navigator.userAgent.match(/webOS/i) ||
-          navigator.userAgent.match(/iPhone/i) ||
-          navigator.userAgent.match(/iPad/i) ||
-          navigator.userAgent.match(/iPod/i) ||
-          navigator.userAgent.match(/BlackBerry/i) ||
-          navigator.userAgent.match(/Windows Phone/i));
-      },
-      isMobileUserAgent: function() {
-        return /Mobi/.test(navigator.userAgent);
-      },
-      hasTouchEvents: function() {
-        return 'ontouchstart' in $window;
-      }
-    };
-  }]);
+
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { WindowRef } from './WindowRefService';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DeviceInfoService {
+  constructor(private window: WindowRef) {}
+
+  isMobileDevice() {
+    return Boolean(navigator.userAgent.match(/Android/i) ||
+        navigator.userAgent.match(/webOS/i) ||
+        navigator.userAgent.match(/iPhone/i) ||
+        navigator.userAgent.match(/iPad/i) ||
+        navigator.userAgent.match(/iPod/i) ||
+        navigator.userAgent.match(/BlackBerry/i) ||
+        navigator.userAgent.match(/Windows Phone/i));
+  }
+
+  isMobileUserAgent() {
+    return /Mobi/.test(navigator.userAgent);
+  }
+
+  hasTouchEvents() {
+    return 'ontouchstart' in this.window.nativeWindow;
+  }
+}
+
+angular.module('oppia').factory(
+  'DeviceInfoService',
+  downgradeInjectable(DeviceInfoService));
