@@ -64,9 +64,8 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
         playthroughIds: issue.playthroughIds,
       };
 
-      UserService.getUserInfoAsync().then(userInfo => {
-        this._isEnabled = userInfo.isLoggedIn();
-      });
+      UserService.getUserInfoAsync()
+        .then(userInfo => this._isEnabled = userInfo.isLoggedIn());
     };
 
     /** @returns {string} - The actionable status of this task. */
