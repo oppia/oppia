@@ -16,75 +16,9 @@
  * @fileoverview Unit tests for the PlaythroughImprovementTaskObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following unnnecessary import once
 // PlaythroughImprovementTaskObjectFactory.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
-import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService';
-import { FeedbackThreadObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
-import { PlaythroughObjectFactory } from
-  'domain/statistics/PlaythroughObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-/* eslint-enable max-len */
-import { SuggestionModalService } from 'services/SuggestionModalService';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
-/* eslint-disable max-len */
-import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-/* eslint-enable max-len */
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { LearnerAnswerDetailsObjectFactory } from
-  'domain/statistics/LearnerAnswerDetailsObjectFactory';
-import { LearnerAnswerInfoObjectFactory } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
 require('domain/statistics/PlaythroughImprovementTaskObjectFactory');
 
@@ -98,94 +32,21 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   var PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
-    $provide.value(
-      'AnswerGroupObjectFactory',
-      new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-    $provide.value('EditabilityService', new EditabilityService());
-    $provide.value(
-      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
-    $provide.value(
-      'ExplorationFeaturesService', new ExplorationFeaturesService());
-    $provide.value(
-      'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory',
-      new HintObjectFactory(new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'ImprovementActionButtonObjectFactory',
-      new ImprovementActionButtonObjectFactory());
-    $provide.value(
-      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
-    $provide.value(
-      'OutcomeObjectFactory',
-      new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()));
-    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value(
-      'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
-    $provide.value(
-      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
-        new LearnerActionObjectFactory()));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-    $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService(
-        new ClassifierObjectFactory()));
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('SuggestionModalService', new SuggestionModalService());
-    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
-    $provide.value(
-      'ThreadStatusDisplayService', new ThreadStatusDisplayService());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory', new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-    $provide.value(
-      'LearnerAnswerDetailsObjectFactory',
-      new LearnerAnswerDetailsObjectFactory());
-    $provide.value(
-      'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
 
-  beforeEach(angular.mock.inject(function(
-      ExplorationFeaturesService, PlaythroughIssueObjectFactory) {
-    this.ExplorationFeaturesService = ExplorationFeaturesService;
-    this.PlaythroughIssueObjectFactory = PlaythroughIssueObjectFactory;
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var upgradedServices = new UpgradedServices().upgradedServices;
+    for (let [name, service] of Object.entries(upgradedServices)) {
+      $provide.value(name, service);
+    }
   }));
 
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
       _PlaythroughImprovementTaskObjectFactory_, _PlaythroughIssuesService_,
-      _UserService_, _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_) {
+      _UserService_, _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_,
+      // TODO(#7222): Import these normally after
+      // PlaythroughImprovementTaskObjectFactory is upgraded to Angular 8.
+      ExplorationFeaturesService, PlaythroughIssueObjectFactory) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
@@ -194,6 +55,11 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     PlaythroughIssuesService = _PlaythroughIssuesService_;
     UserService = _UserService_;
     PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_;
+
+    // TODO(#7222): Use these normally after
+    // PlaythroughImprovementTaskObjectFactory is upgraded to Angular 8.
+    this.ExplorationFeaturesService = ExplorationFeaturesService;
+    this.PlaythroughIssueObjectFactory = PlaythroughIssueObjectFactory;
 
     this.expId = '7';
     this.expVersion = 1;
@@ -230,121 +96,88 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   });
 
   describe('.fetchTasks', function() {
+    beforeEach(function() {
+      this.earlyQuitIssue =
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
+          issue_type: 'EarlyQuit',
+          issue_customization_args: {
+            state_name: {value: 'Hola'},
+            time_spent_in_exp_in_msecs: {value: 5000},
+          },
+          playthrough_ids: [],
+          schema_version: 1,
+          is_valid: true,
+        });
+      this.multipleIncorrectSubmissionsIssue =
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
+          issue_type: 'MultipleIncorrectSubmissions',
+          issue_customization_args: {
+            state_name: {value: 'Hola'},
+            num_times_answered_incorrectly: {value: 4},
+          },
+          playthrough_ids: [],
+          schema_version: 1,
+          is_valid: true,
+        });
+      this.cyclicTransitionsIssue =
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
+          issue_type: 'CyclicTransitions',
+          issue_customization_args: {
+            state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
+          },
+          playthrough_ids: [],
+          schema_version: 1,
+          is_valid: true,
+        });
+    });
+
     it(
-      'returns a task for each existing issue when exploration is whitelisted',
+      'returns a task for each issue when playthrough recording is enabled',
       function(done) {
         spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
           .and.returnValue(true);
 
-        var earlyQuitIssue =
-          this.PlaythroughIssueObjectFactory.createFromBackendDict({
-            issue_type: 'EarlyQuit',
-            issue_customization_args: {
-              state_name: {value: 'Hola'},
-              time_spent_in_exp_in_msecs: {value: 5000},
-            },
-            playthrough_ids: [],
-            schema_version: 1,
-            is_valid: true,
-          });
-        var multipleIncorrectSubmissionsIssue =
-          this.PlaythroughIssueObjectFactory.createFromBackendDict({
-            issue_type: 'MultipleIncorrectSubmissions',
-            issue_customization_args: {
-              state_name: {value: 'Hola'},
-              num_times_answered_incorrectly: {value: 4},
-            },
-            playthrough_ids: [],
-            schema_version: 1,
-            is_valid: true,
-          });
-        var cyclicTransitionsIssue =
-          this.PlaythroughIssueObjectFactory.createFromBackendDict({
-            issue_type: 'CyclicTransitions',
-            issue_customization_args: {
-              state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
-            },
-            playthrough_ids: [],
-            schema_version: 1,
-            is_valid: true,
-          });
-
         spyOn(PlaythroughIssuesService, 'getIssues').and.returnValue(
           $q.resolve([
-            earlyQuitIssue,
-            multipleIncorrectSubmissionsIssue,
-            cyclicTransitionsIssue,
+            this.earlyQuitIssue,
+            this.multipleIncorrectSubmissionsIssue,
+            this.cyclicTransitionsIssue,
           ]));
 
         PlaythroughImprovementTaskObjectFactory.fetchTasks()
-          .then(tasks => tasks.map(task => task.getTitle()))
-          .then(taskTitles => {
-            expect(taskTitles).toEqual([
+          .then(allTasks => allTasks.map(task => task.getTitle()))
+          .then(allTaskTitles => {
+            expect(allTaskTitles).toEqual([
               PlaythroughIssuesService.renderIssueStatement(
-                earlyQuitIssue),
+                this.earlyQuitIssue),
               PlaythroughIssuesService.renderIssueStatement(
-                multipleIncorrectSubmissionsIssue),
+                this.multipleIncorrectSubmissionsIssue),
               PlaythroughIssuesService.renderIssueStatement(
-                cyclicTransitionsIssue)
+                this.cyclicTransitionsIssue),
             ]);
           }).then(done, done.fail);
 
-        this.scope.$digest(); // Forces all pending promises to evaluate.
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
       });
 
     it(
-      'returns nothing when playthrough recording is disabled',
-      function(done) {
+      'returns nothing when playthrough recording is disabled', function(done) {
         spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
           .and.returnValue(false);
 
-        var earlyQuitIssue =
-          this.PlaythroughIssueObjectFactory.createFromBackendDict({
-            issue_type: 'EarlyQuit',
-            issue_customization_args: {
-              state_name: {value: 'Hola'},
-              time_spent_in_exp_in_msecs: {value: 5000},
-            },
-            playthrough_ids: [],
-            schema_version: 1,
-            is_valid: true,
-          });
-        var multipleIncorrectSubmissionsIssue =
-          this.PlaythroughIssueObjectFactory.createFromBackendDict({
-            issue_type: 'MultipleIncorrectSubmissions',
-            issue_customization_args: {
-              state_name: {value: 'Hola'},
-              num_times_answered_incorrectly: {value: 4},
-            },
-            playthrough_ids: [],
-            schema_version: 1,
-            is_valid: true,
-          });
-        var cyclicTransitionsIssue =
-          this.PlaythroughIssueObjectFactory.createFromBackendDict({
-            issue_type: 'CyclicTransitions',
-            issue_customization_args: {
-              state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
-            },
-            playthrough_ids: [],
-            schema_version: 1,
-            is_valid: true,
-          });
-
         var getIssuesSpy =
-          spyOn(PlaythroughIssuesService, 'getIssues').and.returnValue(
-            $q.resolve([
-              earlyQuitIssue,
-              multipleIncorrectSubmissionsIssue,
-              cyclicTransitionsIssue,
-            ]));
+          spyOn(PlaythroughIssuesService, 'getIssues').and.stub();
 
-        PlaythroughImprovementTaskObjectFactory.fetchTasks().then(tasks => {
-          expect(tasks).toEqual([]);
-          expect(getIssuesSpy).not.toHaveBeenCalled();
-        }).then(done, done.fail);
+        PlaythroughImprovementTaskObjectFactory.fetchTasks()
+          .then(allTasks => {
+            expect(allTasks).toEqual([]);
+            expect(getIssuesSpy).not.toHaveBeenCalled();
+          })
+          .then(done, done.fail);
 
-        this.scope.$digest(); // Forces all pending promises to evaluate.
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
       });
   });
 
@@ -366,9 +199,9 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       it('contains a specific sequence of buttons', function() {
         var task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
-        expect(task.getActionButtons().length).toEqual(1);
-        expect(task.getActionButtons()[0].getText())
-          .toEqual('Mark as Resolved');
+
+        expect(task.getActionButtons().map(button => button.getText()))
+          .toEqual(['Mark as Resolved']);
       });
     });
 
@@ -400,9 +233,6 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       });
 
       it('marks the task as resolved after confirmation', function() {
-        spyOn(UserService, 'getUserInfoAsync')
-          .and.returnValue($q.resolve({isLoggedIn: () => true}));
-
         var task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
 
