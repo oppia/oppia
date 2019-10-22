@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for CollectionRightsBackendApiService.
  */
 
-
 require('domain/collection/collection-rights-backend-api.service.ts');
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
