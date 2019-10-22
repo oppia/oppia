@@ -35,8 +35,6 @@ describe('ImprovementTaskService', function() {
   var PlaythroughImprovementTaskObjectFactory = null;
   var SuggestionImprovementTaskObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
   beforeEach(angular.mock.module('oppia', function($provide) {
     var upgradedServices = new UpgradedServices().upgradedServices;
     for (let [name, service] of Object.entries(upgradedServices)) {

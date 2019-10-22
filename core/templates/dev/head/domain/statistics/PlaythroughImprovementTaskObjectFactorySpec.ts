@@ -31,8 +31,6 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   var UserService = null;
   var PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
   beforeEach(angular.mock.module('oppia', function($provide) {
     var upgradedServices = new UpgradedServices().upgradedServices;
     for (let [name, service] of Object.entries(upgradedServices)) {
