@@ -251,8 +251,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Base method to handle GET requests.
 
         Raises:
-            PageNotFoundException: Page not found error 
-                or error code 404.
+            PageNotFoundException: Page not found error.
         """
         raise self.PageNotFoundException
 
@@ -268,7 +267,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Base method to handle PUT requests.
 
         Raises:
-            PageNotFoundException: Page not found error.        
+            PageNotFoundException: Page not found error.
         """
         raise self.PageNotFoundException
 
@@ -276,7 +275,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Base method to handle DELETE requests.
 
         Raises:
-            PageNotFoundException: Page not found error.        
+            PageNotFoundException: Page not found error.
         """
         raise self.PageNotFoundException
 
@@ -301,10 +300,10 @@ class BaseHandler(webapp2.RequestHandler):
         """Prepares downloadable content to be sent to the client.
 
         Args:
-            values: dict. The key-value pairs to encode in the downloadable 
-                file response.
-            filename: str. The name of the file to be downloaded
-            content_type: str.  The type of content to be downnloaded.
+            values: dict. The key-value pairs to encode
+                in the downloadable file response.
+            filename: str. Name of file to be given.
+            content_type: str. Type of content to be passed.
         """
         self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
             content_type)

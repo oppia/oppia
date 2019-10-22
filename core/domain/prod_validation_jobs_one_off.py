@@ -204,8 +204,8 @@ class BaseModelValidator(python_utils.OBJECT):
             that consist of the external model class and list of keys to fetch.
 
         Raises:
-            NotImplementedError: Method or function hasn't been
-                implemented in the subclass..
+            NotImplementedError: Method or function hasn't
+                been implemented yet.
         """
         raise NotImplementedError
 
@@ -287,7 +287,7 @@ class BaseModelValidator(python_utils.OBJECT):
         model instance to validate.
 
         Returns:
-            list. The list of custom validation functions to run.
+            Returns the list of custom validation functions to run.
         """
         return []
 
@@ -328,8 +328,8 @@ class BaseSummaryModelValidator(BaseModelValidator):
                 model and value as property name in external model.
 
         Raises:
-            NotImplementedError: Method or function hasn't been
-                implemented yet.
+            NotImplementedError: Method or function hasn't
+                been implemented yet.
         """
         raise NotImplementedError
 
@@ -491,8 +491,8 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
                 changes made by commit commands of the model.
 
         Raises:
-            NotImplementedError: Method or function hasn't been
-                implemented yet.
+            NotImplementedError: Method or function
+                hasn't been implemented yet.
         """
         raise NotImplementedError
 
