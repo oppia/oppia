@@ -415,7 +415,7 @@ def get_current_time_in_millisecs():
     """Returns time in milliseconds since the Epoch.
 
     Returns:
-       float. Returns time in millisecond.
+       float. Time in milliseconds since the Epoch.
     """
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
@@ -428,7 +428,7 @@ def get_human_readable_time_string(time_msec):
         time_msec: float. Passing time in milliseconds.
 
     Returns:
-        str. Time in human readable format.
+        str. A string representing time in a human readable format.
     """
     return time.strftime(
         '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
@@ -443,7 +443,7 @@ def are_datetimes_close(later_datetime, earlier_datetime):
         earlier_datetime: datetime. Earlier date and time.
 
     Returns:
-        datetime. Whether they are seprated by less than
+        int. Whether they are seprated by less than
                  feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     """
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
@@ -479,7 +479,7 @@ def vfs_construct_path(base_path, *path_components):
         path_components: tuple. Mentioned path components.
 
     Returns:
-        str. Returns the constructed path.
+        str. The resulted constructed path.
     """
     path = base_path
     for component in path_components:
@@ -499,7 +499,7 @@ def vfs_normpath(path):
         path: str. Path of the file to be processed.
 
     Returns:
-        str. Returning normlized path.
+        str. The resulting normlized path.
     """
     # Preserve unicode (if path is unicode).
     slash, dot = (u'/', u'.') if isinstance(path, python_utils.UNICODE) else (
@@ -647,7 +647,7 @@ def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent.
 
     Args:
-        escaped_string: str. Passing escaped string 
+        escaped_string: str. Passing escaped string
             with encodeURIComponent.
 
     Returns:
@@ -661,7 +661,7 @@ def get_asset_dir_prefix():
     It is used as a prefix in urls for images, css and script files.
 
     Returns:
-        str. Returning asset directory prefix.
+        str. The asset directory prefix.
     """
     asset_dir_prefix = ''
     if not constants.DEV_MODE:
