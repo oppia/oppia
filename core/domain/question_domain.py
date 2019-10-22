@@ -538,7 +538,6 @@ class MergedQuestionSkillLink(python_utils.OBJECT):
 
         Args:
             question_id: str. The ID of the question.
-            question_id: str. The ID of the question.
             skill_ids: list(str). The skill IDs of the linked skills.
             skill_descriptions: list(str). The descriptions of the skills to
                 which the question is linked.
