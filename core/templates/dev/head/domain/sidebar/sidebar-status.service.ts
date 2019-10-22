@@ -17,7 +17,6 @@
  * hamburger-menu sidebar.
  */
 
-require('services/contextual/WindowDimensionsService.ts');
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowDimensionsService } from
