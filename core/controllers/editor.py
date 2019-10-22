@@ -567,7 +567,7 @@ class ResolveIssueHandler(EditorHandler):
     instances are deleted.
     """
 
-    @acl_decorators.can_view_exploration_stats
+    @acl_decorators.can_edit_exploration
     def post(self, exp_id):
         """Handles POST requests."""
         exp_issue_dict = self.payload.get('exp_issue_dict')
