@@ -167,12 +167,14 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         self.assertIn('not found as a reference', output[0])
 
 
-class RegenerateMissingStatsModelsOneOffJobTests(OneOffJobTestBase):
-    ONE_OFF_JOB_CLASS = stats_jobs_one_off.RegenerateMissingStatsModelsOneOffJob
+class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
+    """Unit tests for RegenerateMissingV1StatsModelsOneOffJob."""
+    ONE_OFF_JOB_CLASS = (
+        stats_jobs_one_off.RegenerateMissingV1StatsModelsOneOffJob)
     EXP_ID = 'EXP_ID1'
 
     def setUp(self):
-        super(RegenerateMissingStatsModelsOneOffJobTests, self).setUp()
+        super(RegenerateMissingV1StatsModelsOneOffJobTests, self).setUp()
 
         self.exp1 = self.save_new_valid_exploration(self.EXP_ID, 'owner')
 
@@ -1398,13 +1400,13 @@ class RecomputeStatisticsValidationCopyOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(state_stats['num_completions_v2'], 9)
 
 
-class TestMissingStatsModelRegenerationOneOffJob(OneOffJobTestBase):
+class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
     """Tests the regeneration of missing stats models."""
     ONE_OFF_JOB_CLASS = (
-        stats_jobs_one_off.MissingStatsModelRegenerationOneOffJob)
+        stats_jobs_one_off.RegenerateMissingV2StatsModelsOneOffJob)
 
     def setUp(self):
-        super(TestMissingStatsModelRegenerationOneOffJob, self).setUp()
+        super(RegenerateMissingV2StatsModelsOneOffJobTests, self).setUp()
         self.EXP_ID = 'EXP_ID'
         self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner_id')
         self.state_name = self.exp.init_state_name
