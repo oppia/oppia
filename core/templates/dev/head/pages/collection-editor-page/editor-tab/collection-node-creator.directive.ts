@@ -19,7 +19,7 @@
 require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/collection/collection-update.service.ts');
 require('domain/collection/search-explorations-backend-api.service.ts');
-require('domain/summary/ExplorationSummaryBackendApiService.ts');
+require('domain/summary/exploration-summary-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require(

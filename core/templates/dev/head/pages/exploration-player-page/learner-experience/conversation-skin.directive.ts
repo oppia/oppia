@@ -47,7 +47,7 @@ require('domain/skill/concept-card-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
-require('domain/story_viewer/StoryViewerBackendApiService.ts');
+require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/' +

@@ -19,7 +19,7 @@
 
 require('components/button-directives/hint-and-solution-buttons.directive.ts');
 
-require('domain/summary/ExplorationSummaryBackendApiService.ts');
+require('domain/summary/exploration-summary-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');

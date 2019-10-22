@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/story/editable-story-backend-api.service.ts');
 require('services/CsrfTokenService.ts');
 
 describe('Editable story backend API service', function() {

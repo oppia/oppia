@@ -19,7 +19,7 @@
  */
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/story/editable-story-backend-api.service.ts');
 require('domain/story/StorySummaryObjectFactory.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');

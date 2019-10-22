@@ -21,7 +21,7 @@ require(
   'loading-dots.directive.ts');
 require('domain/editor/undo_redo/base-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/summary/ExplorationSummaryBackendApiService.ts');
+require('domain/summary/exploration-summary-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/AlertsService.ts');

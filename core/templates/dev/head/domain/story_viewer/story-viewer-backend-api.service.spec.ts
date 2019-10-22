@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/story_viewer/StoryViewerBackendApiService.ts');
+require('domain/story_viewer/story-viewer-backend-api.service.ts');
 
 describe('Story viewer backend API service', function() {
   var StoryViewerBackendApiService = null;
