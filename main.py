@@ -114,7 +114,7 @@ def get_redirect_route(regex_route, handler, defaults=None):
     """Returns a route that redirects /foo/ to /foo.
 
     Args:
-        regex_route: str. For regex for routing
+        regex_route: str. Use for regex routing.
         handler: function. Handler function for the admin page.
         defaults: dict. Will be passed in the redirect if there is any.
 
