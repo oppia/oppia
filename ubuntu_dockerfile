@@ -176,7 +176,7 @@ FROM ubuntu:latest
 
 # To bypass tzdata configuration. 
 ENV DEBIAN_FRONTEND noninteractive
-ENV TZ "America/New_York"
+ENV TZ "UTC"
 
 # Install packages needed in Dockerfile
 RUN apt-get update && \
