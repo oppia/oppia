@@ -20,7 +20,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { WindowRef } from './WindowRefService';
+import { WindowRef } from 'services/contextual/WindowRefService';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +28,7 @@ import { WindowRef } from './WindowRefService';
 export class DeviceInfoService {
   constructor(private window: WindowRef) {}
 
-  isMobileDevice() {
+  isMobileDevice(): boolean {
     return Boolean(navigator.userAgent.match(/Android/i) ||
         navigator.userAgent.match(/webOS/i) ||
         navigator.userAgent.match(/iPhone/i) ||
@@ -38,11 +38,11 @@ export class DeviceInfoService {
         navigator.userAgent.match(/Windows Phone/i));
   }
 
-  isMobileUserAgent() {
+  isMobileUserAgent(): boolean {
     return /Mobi/.test(navigator.userAgent);
   }
 
-  hasTouchEvents() {
+  hasTouchEvents(): any {
     return 'ontouchstart' in this.window.nativeWindow;
   }
 }
