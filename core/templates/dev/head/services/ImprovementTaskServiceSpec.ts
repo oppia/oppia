@@ -80,8 +80,8 @@ describe('ImprovementTaskService', function() {
 
       // Ordering isn't important, so allow the checks to be flexible.
       expect(actualFactories.length).toEqual(this.expectedFactories.length);
-      this.expectedFactories.forEach(function(expectedFactory) {
-        expect(actualFactories).toContain(expectedFactory);
+      this.expectedFactories.forEach(factory => {
+        expect(actualFactories).toContain(factory);
       });
     });
   });
