@@ -961,7 +961,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
         self.EXP_ID = 'exp1'
-         # Needs to be 12 characters long.
+        # Needs to be 12 characters long.
         self.SKILL_ID = 'skill1234567'
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -1133,7 +1133,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
         self.EXP_ID = 'exp1'
-         # Needs to be 12 characters long.
+        # Needs to be 12 characters long.
         self.SKILL_ID = 'skill1234567'
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = exp_domain.Exploration.create_default_exploration(
