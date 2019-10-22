@@ -103,6 +103,5 @@ describe('ImprovementTaskService', function() {
       // Force all pending promises to evaluate.
       this.scope.$digest();
     });
-  );
   });
 });
