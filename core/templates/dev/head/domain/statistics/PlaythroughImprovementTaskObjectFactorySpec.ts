@@ -178,7 +178,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       _$q_, _$rootScope_, _$uibModal_,
       _PlaythroughImprovementTaskObjectFactory_, _PlaythroughIssuesService_,
       _UserService_, _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_,
-      // TODO(#7222): Import these normally after
+      // TODO(#7222): Import these as done above after
       // PlaythroughImprovementTaskObjectFactory is upgraded to Angular 8.
       ExplorationFeaturesService, PlaythroughIssueObjectFactory) {
     $q = _$q_;
