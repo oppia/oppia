@@ -572,13 +572,14 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_by_creator_id(cls, creator_id):
-        """Gets QuestionSummaryModel by creator_id.
+        """Get QuestionSummaryModels created by user.
 
         Args:
-            creator_id: str. The user ID of the creator of the question.
+            creator_id: str. The user ID of the creator of the questions.
 
         Returns:
-            list(QuestionSummaryModel). The summary model of the question.
+            list(QuestionSummaryModel). The list of summary model of the
+            question.
         """
         return QuestionSummaryModel.query().filter(
             cls.creator_id == creator_id).fetch()
