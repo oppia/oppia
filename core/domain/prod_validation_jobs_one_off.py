@@ -286,7 +286,7 @@ class BaseModelValidator(python_utils.OBJECT):
         model instance to validate.
 
         Returns:
-            Returns the list of custom validation functions to run.
+            list. The list of custom validation functions to run.
         """
         return []
 

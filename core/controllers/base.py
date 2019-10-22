@@ -300,8 +300,8 @@ class BaseHandler(webapp2.RequestHandler):
         """Prepares downloadable content to be sent to the client.
 
         Args:
-            values: dict. The key-value pairs to encode in the downloadable
-            file response.
+            values: dict. The key-value pairs to encode in the
+            downloadable file response.
             filename: str. The name of the file to be downloaded.
             content_type: str. Type of content to be passed.
         """
