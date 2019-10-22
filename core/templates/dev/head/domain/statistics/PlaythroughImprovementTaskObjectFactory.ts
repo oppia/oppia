@@ -23,8 +23,8 @@ require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
-require('services/PlaythroughIssuesService.ts');
 require('services/ExplorationFeaturesService.ts');
+require('services/PlaythroughIssuesService.ts');
 
 angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
   '$q', 'ExplorationFeaturesService', 'ImprovementActionButtonObjectFactory',
