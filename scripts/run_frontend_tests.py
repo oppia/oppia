@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import os
 import subprocess
+import sys
 
 import python_utils
 
@@ -65,9 +66,13 @@ def main(args=None):
 
     build.main(args=[])
 
-    subprocess.call([
+    cmd = [
         os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-        'start', os.path.join('core', 'tests', 'karma.conf.ts')])
+        'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+
+    task = subprocess.Popen(cmd)
+    task.communicate()
+    task.wait()
 
     if parsed_args.run_minified_tests is True:
         python_utils.PRINT('Running test in production environment')
@@ -80,6 +85,7 @@ def main(args=None):
             '--prodEnv'])
 
     python_utils.PRINT('Done!')
+    sys.exit(task.returncode)
 
 
 if __name__ == '__main__':
