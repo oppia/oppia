@@ -1041,29 +1041,41 @@ def record_user_logged_in(user_id):
     _save_user_settings(user_settings)
 
 
-def record_user_edited_an_exploration(user_id):
+def record_user_edited_an_exploration(
+        user_id, test_last_exploration_activity=False):
     """Updates last_edited_an_exploration to the current datetime for
     the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
+        test_last_exploration_activity: bool. For testing exploration activity.
     """
     user_settings = get_user_settings(user_id)
     if user_settings:
-        user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
+        if test_last_exploration_activity:
+            user_settings.last_edited_an_exploration = None
+        else:
+            user_settings.last_edited_an_exploration = (
+                datetime.datetime.utcnow())
         _save_user_settings(user_settings)
 
 
-def record_user_created_an_exploration(user_id):
+def record_user_created_an_exploration(
+        user_id, test_last_exploration_activity=False):
     """Updates last_created_an_exploration to the current datetime for
     the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
+        test_last_exploration_activity: bool. For testing exploration activity.
     """
     user_settings = get_user_settings(user_id)
     if user_settings:
-        user_settings.last_created_an_exploration = datetime.datetime.utcnow()
+        if test_last_exploration_activity:
+            user_settings.last_created_an_exploration = None
+        else:
+            user_settings.last_created_an_exploration = (
+                datetime.datetime.utcnow())
         _save_user_settings(user_settings)
 
 
