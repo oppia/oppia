@@ -51,6 +51,7 @@ def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
 
 
 def _render_suggestions(self, target_type, suggestions):
+    """Renders retrieved suggestions for a handler."""
     target_ids = set([s.target_id for s in suggestions])
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         target_ids_to_opportunities = (
@@ -71,6 +72,7 @@ def _render_suggestions(self, target_type, suggestions):
 
 def _render_suggestions_and_opportunities(
         self, suggestions, target_ids_to_opportunities):
+    """Renders suggestions and opportunities for a handler."""
     self.render_json({
         'suggestions': [s.to_dict() for s in suggestions],
         'target_ids_to_opportunity_dicts': {
