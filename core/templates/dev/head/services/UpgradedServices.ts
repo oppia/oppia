@@ -19,11 +19,11 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { ComputeGraphService } from 'services/ComputeGraphService';
 import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from
   'services/contextual/WindowDimensionsService';
-import { ComputeGraphService } from 'services/ComputeGraphService';
 
 @Injectable({
   providedIn: 'root'
