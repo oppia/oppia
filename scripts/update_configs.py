@@ -32,6 +32,8 @@ import sys
 import python_utils
 import release_constants
 
+import requests
+
 from . import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -50,6 +52,9 @@ LOCAL_FECONF_PATH = os.path.join(os.getcwd(), 'feconf.py')
 LOCAL_CONSTANTS_PATH = os.path.join(os.getcwd(), 'assets', 'constants.ts')
 FECONF_REGEX = '^([A-Z_]+ = ).*$'
 CONSTANTS_REGEX = '^(  "[A-Z_]+": ).*$'
+TERMS_PAGE_URL = (
+    'https://github.com/oppia/oppia/commits/develop/core/'
+    'templates/dev/head/pages/terms-page/terms-page.mainpage.html')
 
 
 def apply_changes_based_on_config(
@@ -108,9 +113,7 @@ def check_updates_to_terms_of_service():
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
-    common.open_new_tab_in_browser_if_possible(
-        'https://github.com/oppia/oppia/commits/develop/core/'
-        'templates/dev/head/pages/terms-page/terms-page.mainpage.html')
+    common.open_new_tab_in_browser_if_possible(TERMS_PAGE_URL)
     python_utils.PRINT(
         'Are the terms of service changed? Check commits/changes made '
         'to the file: terms-page.mainpage.html. Enter y/ye/yes if they '
@@ -156,9 +159,12 @@ def add_mailgun_api_key():
     with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
         feconf_lines = f.readlines()
 
-    feconf_lines.append('MAILGUN_API_KEY = \'%s\'\n' % mailgun_api_key)
+    assert 'MAILGUN_API_KEY = None\n' in feconf_lines
+
     with python_utils.open_file(LOCAL_FECONF_PATH, 'w') as f:
         for line in feconf_lines:
+            if line == 'MAILGUN_API_KEY = None\n':
+                line = line.replace('None', '\'%s\'' % mailgun_api_key)
             f.write(line)
 
 
@@ -170,6 +176,8 @@ def main():
     common.require_cwd_to_be_oppia()
     assert common.is_current_branch_a_release_branch()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
+    if requests.get(TERMS_PAGE_URL).status_code != 200:
+        raise Exception('Terms mainpage does not exist on Github.')
 
     try:
         check_updates_to_terms_of_service()
@@ -180,8 +188,8 @@ def main():
         apply_changes_based_on_config(
             LOCAL_CONSTANTS_PATH, CONSTANTS_CONFIG_PATH, CONSTANTS_REGEX)
     except Exception as e:
-        common.run_cmd(('git checkout -- %s %s' % (
-            LOCAL_FECONF_PATH, LOCAL_CONSTANTS_PATH)).split(' '))
+        common.run_cmd([
+            'git', 'checkout', '--', LOCAL_FECONF_PATH, LOCAL_CONSTANTS_PATH])
         raise Exception(e)
 
     python_utils.PRINT(

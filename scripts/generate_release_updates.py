@@ -87,7 +87,6 @@ def validate_release_message():
                     ', '.join(extra_sections)))
 
 
-
 def get_new_authors_and_contributors_mail_ids():
     """Returns the mail ids of new authors and contributors for the release.
 
@@ -110,8 +109,8 @@ def get_new_authors_and_contributors_mail_ids():
 
         new_details_list = release_summary_lines[start_index + 1: end_index]
         new_authors_and_contributors_mail_ids.extend([
-            detail[detail.find('<') + 1: detail.find('>')] for detail in (
-                new_details_list)])
+            detail[detail.find('<') + 1: detail.find('>')]
+            for detail in new_details_list])
 
     return sorted(list(set(new_authors_and_contributors_mail_ids)))
 

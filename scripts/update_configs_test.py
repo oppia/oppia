@@ -27,6 +27,8 @@ import tempfile
 from core.tests import test_utils
 import python_utils
 
+import requests
+
 from . import common
 from . import update_configs
 
@@ -73,6 +75,10 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         def mock_getpass(prompt):
             return 'test-token'
         # pylint: enable=unused-argument
+        def mock_get(unused_url):
+            res = requests.models.Response()
+            res.status_code = 200
+            return res
 
         self.release_scripts_exist_swap = self.swap(
             common, 'ensure_release_scripts_folder_exists_and_is_up_to_date',
@@ -89,6 +95,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         self.feconf_swap = self.swap(
             update_configs, 'LOCAL_FECONF_PATH',
             MOCK_LOCAL_FECONF_PATH)
+        self.get_swap = self.swap(requests, 'get', mock_get)
 
     def test_invalid_branch_name(self):
         def mock_get_current_branch_name():
@@ -97,6 +104,15 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             common, 'get_current_branch_name', mock_get_current_branch_name)
         with branch_name_swap, self.assertRaises(AssertionError):
             update_configs.main()
+
+    def test_missing_terms_page(self):
+        terms_page_swap = self.swap(
+            update_configs, 'TERMS_PAGE_URL',
+            '%s-invalid' % update_configs.TERMS_PAGE_URL)
+        with self.branch_name_swap, self.release_scripts_exist_swap:
+            with terms_page_swap, self.assertRaisesRegexp(
+                Exception, 'Terms mainpage does not exist on Github.'):
+                update_configs.main()
 
     def test_missing_personal_access_token(self):
         # pylint: disable=unused-argument
@@ -175,7 +191,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             Exception, 'Invalid mailgun api key.'):
             update_configs.add_mailgun_api_key()
 
-    def test_addition_of_mailgun_api_key(self):
+    def test_missing_mailgun_api_key_line(self):
         # pylint: disable=unused-argument
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
         def mock_getpass(prompt):
@@ -193,8 +209,34 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        expected_feconf_text = '%sMAILGUN_API_KEY = \'%s\'\n' % (
-            feconf_text, mailgun_api_key)
+        with python_utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+        feconf_swap = self.swap(
+            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
+        with getpass_swap, feconf_swap, self.assertRaises(AssertionError):
+            update_configs.add_mailgun_api_key()
+
+    def test_addition_of_mailgun_api_key(self):
+        # pylint: disable=unused-argument
+        mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
+        def mock_getpass(prompt):
+            return mailgun_api_key
+        # pylint: enable=unused-argument
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'MAILGUN_API_KEY = None\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
+        expected_feconf_text = feconf_text.replace('None', '\'%s\'' % (
+            mailgun_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         feconf_swap = self.swap(
@@ -267,9 +309,9 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             mock_check_updates)
         run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         with self.branch_name_swap, self.release_scripts_exist_swap:
-            with check_updates_swap, run_cmd_swap, self.assertRaisesRegexp(
-                Exception, 'Testing'):
-                update_configs.main()
+            with self.get_swap, check_updates_swap, run_cmd_swap:
+                with self.assertRaisesRegexp(Exception, 'Testing'):
+                    update_configs.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls(self):
@@ -302,7 +344,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
         with self.branch_name_swap, self.release_scripts_exist_swap:
-            with check_updates_swap, add_mailgun_api_key_swap:
+            with self.get_swap, check_updates_swap, add_mailgun_api_key_swap:
                 with apply_changes_swap:
                     update_configs.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
