@@ -17,20 +17,27 @@
  * visible.
  */
 
-angular.module('oppia').factory('BackgroundMaskService', [
-  function() {
-    var maskIsActive = false;
 
-    return {
-      isMaskActive: function() {
-        return maskIsActive;
-      },
-      activateMask: function() {
-        maskIsActive = true;
-      },
-      deactivateMask: function() {
-        maskIsActive = false;
-      }
-    };
-  }]
-);
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class BackgroundMaskService {
+  maskIsActive: boolean = false;
+
+  isMaskActive() {
+    return this.maskIsActive;
+  }
+  activateMask() {
+    this.maskIsActive = true;
+  }
+  deactivateMask() {
+    this.maskIsActive = false;
+  }
+}
+
+angular.module('oppia').factory(
+  'BackgroundMaskService',
+  downgradeInjectable(BackgroundMaskService));
