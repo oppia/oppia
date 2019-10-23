@@ -51,6 +51,11 @@ angular.module('oppia').directive('storyNodeEditor', [
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
+            var linearNodesList =
+              $scope.story.getStoryContents().getLinearNodesList();
+            var linearNodeIds = linearNodesList.map(function(node) {
+              return node.getId();
+            });
             for (var i = 0; i < $scope.storyNodeIds.length; i++) {
               if ($scope.storyNodeIds[i] === $scope.getId()) {
                 continue;
@@ -60,10 +65,12 @@ angular.module('oppia').directive('storyNodeEditor', [
                   $scope.storyNodeIds[i]) !== -1) {
                 continue;
               }
-              $scope.availableNodes.push({
-                id: $scope.storyNodeIds[i],
-                text: $scope.nodeIdToTitleMap[$scope.storyNodeIds[i]]
-              });
+              if (linearNodeIds.indexOf($scope.storyNodeIds[i]) === -1) {
+                $scope.availableNodes.push({
+                  id: $scope.storyNodeIds[i],
+                  text: $scope.nodeIdToTitleMap[$scope.storyNodeIds[i]]
+                });
+              }
             }
           };
           var _init = function() {
@@ -213,6 +220,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.story, $scope.getId(), nextNodeId);
               _init();
               _recalculateAvailableNodes();
+              $rootScope.$broadcast(
+                'storyGraphUpdated', $scope.story.getStoryContents());
             });
           };
 
@@ -224,6 +233,13 @@ angular.module('oppia').directive('storyNodeEditor', [
               AlertsService.addInfoMessage(
                 'A chapter cannot lead to itself.', 3000);
               return;
+            }
+            var nodes = $scope.story.getStoryContents().getNodes();
+            for (var i = 0; i < nodes.length; i++) {
+              if (nodes[i].getDestinationNodeIds().indexOf(nodeId) !== -1) {
+                StoryUpdateService.removeDestinationNodeIdFromNode(
+                  $scope.story, nodes[i].getId(), nodeId);
+              }
             }
             try {
               StoryUpdateService.addDestinationNodeIdToNode(
@@ -270,6 +286,7 @@ angular.module('oppia').directive('storyNodeEditor', [
 
           $scope.$on(EVENT_STORY_INITIALIZED, _init);
           $scope.$on(EVENT_STORY_REINITIALIZED, _init);
+          $scope.$on('recalculateAvailableNodes', _recalculateAvailableNodes);
 
           _init();
         }
