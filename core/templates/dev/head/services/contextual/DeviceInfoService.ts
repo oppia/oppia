@@ -41,7 +41,7 @@ export class DeviceInfoService {
   isMobileUserAgent(): boolean {
     return /Mobi/.test(navigator.userAgent);
   }
-
+  // TODO(#7176): Replace 'any' with the exact type.
   hasTouchEvents(): any {
     return 'ontouchstart' in this.window.nativeWindow;
   }
