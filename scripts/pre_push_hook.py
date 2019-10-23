@@ -407,7 +407,7 @@ def main(args=None):
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
-                sys.exit(1)
+                # Sys.exit(1).
     return
 
 
