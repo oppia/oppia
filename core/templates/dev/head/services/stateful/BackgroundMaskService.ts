@@ -27,13 +27,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class BackgroundMaskService {
   maskIsActive: boolean = false;
 
-  isMaskActive() {
+  isMaskActive(): boolean {
     return this.maskIsActive;
   }
-  activateMask() {
+  activateMask(): void {
     this.maskIsActive = true;
   }
-  deactivateMask() {
+  deactivateMask(): void {
     this.maskIsActive = false;
   }
 }
