@@ -19,6 +19,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { DateTimeFormatService } from 'services/DateTimeFormatService';
+import { FormatTimerPipe } from
+  'filters/string-utility-filters/format-timer.pipe';
 import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from './contextual/WindowDimensionsService';
@@ -32,9 +35,9 @@ export class UpgradedServices {
     'UtilsService': new UtilsService(),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
-    'WindowDimensionsService': new WindowDimensionsService()
+    'WindowDimensionsService': new WindowDimensionsService(),
+    'DateTimeFormatService': new DateTimeFormatService(new FormatTimerPipe())
   };
-  /* eslint-enable quote-props */
 }
 
 angular.module('oppia').factory(

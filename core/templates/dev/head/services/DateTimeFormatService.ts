@@ -17,36 +17,48 @@
  * since the Epoch to human-readable dates.
  */
 
-angular.module('oppia').factory('DateTimeFormatService', [
-  '$filter', function($filter) {
-    return {
-      // Returns just the time if the local datetime representation has the
-      // same date as the current date. Otherwise, returns just the date if the
-      // local datetime representation has the same year as the current date.
-      // Otherwise, returns the full date (with the year abbreviated).
-      getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
-        var date = new Date(millisSinceEpoch);
-        if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-          return date.toLocaleTimeString([], {
-            hour: 'numeric',
-            minute: 'numeric',
-            hour12: true
-          });
-        } else if (date.getFullYear() === new Date().getFullYear()) {
-          return $filter('date')(date, 'MMM d');
-        } else {
-          return $filter('date')(date, 'shortDate');
-        }
-      },
-      // Returns just the date.
-      getLocaleDateString: function(millisSinceEpoch) {
-        var date = new Date(millisSinceEpoch);
-        return date.toLocaleDateString();
-      },
-      // Returns whether the date is at most one week before the current date.
-      isRecent: function(millisSinceEpoch) {
-        var ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
-        return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
-      }
-    };
-  }]);
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { FormatTimerPipe } from
+  'filters/string-utility-filters/format-timer.pipe';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DateTimeFormatService {
+  constructor(private formatTimerPipe: FormatTimerPipe) {}
+
+  // Returns just the time if the local datetime representation has the
+  // same date as the current date. Otherwise, returns just the date if the
+  // local datetime representation has the same year as the current date.
+  // Otherwise, returns the full date (with the year abbreviated).
+  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): any {
+    let date = new Date(millisSinceEpoch);
+    if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
+      return date.toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true
+      });
+    } else if (date.getFullYear() === new Date().getFullYear()) {
+      return this.formatTimerPipe.transform('date')(date, 'MMM d');
+    } else {
+      return this.formatTimerPipe.transform('date')(date, 'shortDate');
+    }
+  }
+
+  // Returns just the date.
+  getLocaleDateString(millisSinceEpoch: number): string {
+    let date = new Date(millisSinceEpoch);
+    return date.toLocaleDateString();
+  }
+  // Returns whether the date is at most one week before the current date.
+  isRecent(millisSinceEpoch: number): boolean {
+    let ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
+    return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
+  }
+}
+
+angular.module('oppia').factory(
+  'DateTimeFormatService', downgradeInjectable(DateTimeFormatService));
