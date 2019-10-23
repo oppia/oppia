@@ -492,6 +492,7 @@ angular.module('oppia').directive('questionsList', [
             }
             var oldLinkedSkillWithDifficulty = angular.copy(
               linkedSkillsWithDifficulty);
+            var skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/modal-templates/' +
@@ -503,6 +504,7 @@ angular.module('oppia').directive('questionsList', [
                   var init = function() {
                     $scope.linkedSkillsWithDifficulty =
                       linkedSkillsWithDifficulty;
+                    $scope.skillIdToRubricsObject = skillIdToRubricsObject;
                   };
 
                   $scope.cancelModal = function() {
