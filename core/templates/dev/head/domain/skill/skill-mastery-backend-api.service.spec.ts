@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for SkillMasteryBackendApiService.
  */
- 
+
 require('domain/skill/skills-mastery-backend-api-service.ts');
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
