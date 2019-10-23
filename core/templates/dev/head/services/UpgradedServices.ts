@@ -21,7 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
 import { UtilsService } from 'services/UtilsService';
-import { WindowDimensionsService } from './contextual/WindowDimensionsService';
+import { WindowDimensionsService } from
+  'services/contextual/WindowDimensionsService';
+import { ComputeGraphService } from 'services/ComputeGraphService';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +34,8 @@ export class UpgradedServices {
     'UtilsService': new UtilsService(),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
-    'WindowDimensionsService': new WindowDimensionsService()
+    'WindowDimensionsService': new WindowDimensionsService(),
+    'ComputeGraphService': new ComputeGraphService()
   };
   /* eslint-enable quote-props */
 }
