@@ -16,30 +16,14 @@
  * @fileoverview Unit tests for GenerateContentIdService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-require('services/GenerateContentIdService.ts');
+import { GenerateContentIdService } from 'services/GenerateContentIdService';
 
 describe('GenerateContentIdService', function() {
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('COMPONENT_NAME_FEEDBACK', 'feedback');
-    $provide.value('COMPONENT_NAME_HINT', 'hint');
-    $provide.value('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-  var gcis = null;
+  let gcis: GenerateContentIdService;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    gcis = $injector.get('GenerateContentIdService');
-  }));
+  beforeEach(() => {
+    gcis = new GenerateContentIdService();
+  });
 
   it('should generate content id for new feedbacks', function() {
     expect(
@@ -60,6 +44,7 @@ describe('GenerateContentIdService', function() {
 
   it('should throw error for unknown content id', function() {
     expect(function() {
+      // @ts-ignore
       gcis.getNextId('xyz');
     }).toThrowError('Unknown component name provided.');
   });
