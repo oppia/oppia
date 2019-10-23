@@ -16,15 +16,14 @@
  * @fileoverview Unit tests for HTML serialization and escaping services.
  */
 
-import { ErrorHandler } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/HtmlEscaperService';
-import { LoggerService } from 'services/LoggerService';
 
 describe('HTML escaper service', () => {
   let ohe: HtmlEscaperService;
 
   beforeEach(() => {
-    ohe = new HtmlEscaperService(new LoggerService(new ErrorHandler()));
+    ohe = TestBed.get(HtmlEscaperService);
   });
 
   it('should correctly translate between escaped and unescaped strings',
