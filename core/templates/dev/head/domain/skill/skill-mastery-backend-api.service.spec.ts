@@ -22,7 +22,6 @@ require('domain/skill/skill-mastery-backend-api.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-
 describe('Skill mastery backend API service', function() {
   var SkillMasteryBackendApiService = null;
   var $httpBackend = null;

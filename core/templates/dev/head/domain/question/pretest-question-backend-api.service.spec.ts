@@ -22,7 +22,6 @@ require('domain/question/pretest-question-backend-api.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-
 describe('Pretest question backend API service', function() {
   var PretestQuestionBackendApiService = null;
   var sampleDataResults = null;

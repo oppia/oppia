@@ -22,7 +22,6 @@ require('domain/collection/read-only-collection-backend-api.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-
 describe('Read only collection backend API service', function() {
   var ReadOnlyCollectionBackendApiService = null;
   var sampleDataResults = null;

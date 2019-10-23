@@ -22,7 +22,6 @@ require('domain/classroom/classroom-backend-api.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-
 describe('Classroom backend API service', function() {
   var ClassroomBackendApiService = null;
   var sampleDataResults = null;

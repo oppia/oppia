@@ -24,7 +24,6 @@ require('services/CsrfTokenService.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-
 describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
   var $httpBackend = null;

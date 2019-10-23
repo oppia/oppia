@@ -24,7 +24,6 @@ require('services/CsrfTokenService.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-
 describe('Editable collection backend API service', function() {
   var EditableCollectionBackendApiService = null;
   var sampleDataResults = null;
