@@ -55,7 +55,7 @@ export class StoryContents {
   getLinearNodesList(): string {
     var linearList = [];
     var currentIndex = this.getNodeIndex(this._initialNodeId);
-    while(true) {
+    while (true) {
       var node = this._nodes[currentIndex];
       linearList.push(node);
       if (node.getDestinationNodeIds().length === 0) {
