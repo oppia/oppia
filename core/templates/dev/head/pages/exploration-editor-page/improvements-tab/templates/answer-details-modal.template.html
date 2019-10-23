@@ -18,7 +18,7 @@
       <tr ng-repeat="learnerAnswerInfo in getLearnerAnswerInfos()" class="oppia-feedback-tab-row">
         <th scope="row">
           <input type="checkbox" ng-change="selectLearnerAnswerInfo(learnerAnswerInfo)"
-                 ng-model="myVal" ng-disabled="!isUserLoggedIn">
+                 ng-model="myVal" ng-if="isUserLoggedIn">
         </th>
         <td ng-click="changeView(learnerAnswerInfo)">
           <angular-html-bind html-data="getLearnerAnswerHtml(learnerAnswerInfo)">
@@ -44,7 +44,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button ng-disabled="!isUserLoggedIn || !selectedLearnerAnswerInfo.length"
+    <button ng-if="isUserLoggedIn" ng-disabled="!selectedLearnerAnswerInfo.length"
             ng-click="deleteSelectedLearnerAnswerInfo()"
             class="btn btn-danger modal-button oppia-delete-select">
       Delete selected items
