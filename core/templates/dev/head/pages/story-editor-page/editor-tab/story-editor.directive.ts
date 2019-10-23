@@ -55,7 +55,9 @@ angular.module('oppia').directive('storyEditor', [
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyContents = $scope.story.getStoryContents();
             $scope.disconnectedNodes = [];
-            if ($scope.storyContents) {
+            $scope.linearNodesList = [];
+            if ($scope.storyContents &&
+                $scope.storyContents.getNodes().length > 0) {
               $scope.linearNodesList =
                 $scope.storyContents.getLinearNodesList();
               $scope.disconnectedNodes =
