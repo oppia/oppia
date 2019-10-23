@@ -42,22 +42,9 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
       /** @type {string} */
       this._title = PlaythroughIssuesService.renderIssueStatement(issue);
       /** @type {ImprovementActionButton[]} */
-      this._actionButtons = [
-        ImprovementActionButtonObjectFactory.createNew(
-          'Mark as Resolved', 'btn-primary', () => {
-            ImprovementModalService.openConfirmationModal(
-              'Marking this action as resolved will discard the playthrough ' +
-              'forever. Are you sure you want to proceed?',
-              'Mark as Resolved', 'btn-danger')
-              .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
-              .then(() => this._isObsolete = true);
-          },
-          () => this._isEnabled),
-      ];
+      this._actionButtons = [];
       /** @type {boolean} */
       this._isObsolete = false;
-      /** @type {boolean} */
-      this._isEnabled = false;
       /** @type {Object} */
       this._directiveData = {
         title: this._title,
@@ -65,8 +52,21 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
         playthroughIds: issue.playthroughIds,
       };
 
-      UserService.getUserInfoAsync()
-        .then(userInfo => this._isEnabled = userInfo.isLoggedIn());
+      UserService.getUserInfoAsync().then(userInfo => {
+        if (!userInfo.isLoggedIn()) {
+          return;
+        }
+        this._actionButtons.push(
+          ImprovementActionButtonObjectFactory.createNew(
+            'Mark as Resolved', 'btn-primary', () => {
+              ImprovementModalService.openConfirmationModal(
+                'Marking this action as resolved will discard the ' +
+                'playthrough forever. Are you sure you want to proceed?',
+                'Mark as Resolved', 'btn-danger')
+                .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
+                .then(() => this._isObsolete = true);
+            }));
+      });
     };
 
     /** @returns {string} - The actionable status of this task. */
