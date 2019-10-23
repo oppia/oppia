@@ -52,7 +52,7 @@ export class StoryContents {
     return this._initialNodeId;
   }
 
-  getLinearNodesList(): string {
+  getLinearNodesList(): StoryNode[] {
     var linearList = [];
     var currentIndex = this.getNodeIndex(this._initialNodeId);
     while (true) {
@@ -67,7 +67,7 @@ export class StoryContents {
     return linearList;
   }
 
-  getDisconnectedNodes(): string[] {
+  getDisconnectedNodes(): StoryNode[] {
     return this._disconnectedNodes;
   }
 
