@@ -18,19 +18,18 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-answer-details-data.service.ts is upgraded to Angular 8.
+import { EditabilityService } from
+  'services/EditabilityService';
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
-import { UserInfoObjectFactory } from
-  'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/' +
   'learner-answer-details-data.service.ts');
 require('services/CsrfTokenService.ts');
-require('services/UserService.ts');
 
 describe('Learner answer details service', function() {
   var expId = '12345';
@@ -38,8 +37,7 @@ describe('Learner answer details service', function() {
   var sampleDataResults = null;
   var $httpBackend = null;
   var CsrfService = null;
-  var UserService = null;
-  var $q = null;
+  var eds = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -53,7 +51,7 @@ describe('Learner answer details service', function() {
       $provide.value(
         'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
       $provide.value(
-        'UserInfoObjectFactory', new UserInfoObjectFactory());
+        'EditabilityService', new EditabilityService());
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -68,7 +66,7 @@ describe('Learner answer details service', function() {
       'LearnerAnswerDetailsDataService');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
-    UserService = $injector.get('UserService');
+    eds = $injector.get('EditabilityService');
 
     sampleDataResults = {
       learner_answer_info_data: [{
@@ -89,10 +87,6 @@ describe('Learner answer details service', function() {
     });
   }));
 
-  beforeEach(angular.mock.inject(function(_$q_) {
-    $q = _$q_;
-  }));
-
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
@@ -104,12 +98,8 @@ describe('Learner answer details service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
-      return $q.resolve({
-        isLoggedIn: function() {
-          return true;
-        }
-      });
+    spyOn(eds, 'isEditable').and.callFake(function() {
+      return true;
     });
     $httpBackend.expect('GET', '/learneranswerinfohandler/' +
       'learner_answer_details/exploration/12345').respond(sampleDataResults);
@@ -127,13 +117,6 @@ describe('Learner answer details service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
-      return $q.resolve({
-        isLoggedIn: function() {
-          return false;
-        }
-      });
-    });
     LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
       successHandler, failHandler);
     expect(successHandler).toHaveBeenCalledWith({

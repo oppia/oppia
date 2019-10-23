@@ -21,14 +21,17 @@ require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/statistics/LearnerAnswerInfoObjectFactory.ts');
 require('domain/statistics/LearnerAnswerDetailsObjectFactory.ts');
-require('services/UserService.ts');
+require('services/EditabilityService.ts');
 
 angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
-  '$http', '$q', 'ExplorationDataService', 'LearnerAnswerDetailsObjectFactory',
-  'LearnerAnswerInfoObjectFactory', 'UrlInterpolationService', 'UserService',
+  '$http', '$q', 'EditabilityService', 'ExplorationDataService',
+  'LearnerAnswerDetailsObjectFactory', 'LearnerAnswerInfoObjectFactory',
+  'UrlInterpolationService',
   function(
-      $http, $q, ExplorationDataService, LearnerAnswerDetailsObjectFactory,
-      LearnerAnswerInfoObjectFactory, UrlInterpolationService, UserService) {
+      $http, $q, EditabilityService, ExplorationDataService,
+      LearnerAnswerDetailsObjectFactory, LearnerAnswerInfoObjectFactory,
+      UrlInterpolationService
+  ) {
     var _expId = ExplorationDataService.explorationId;
     var _data = [];
     var learnerAnswerInfoData = null;
@@ -37,17 +40,15 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
       '<entity_id>');
 
     var _fetchLearnerAnswerInfoData = function() {
-      return UserService.getUserInfoAsync().then(function(userInfo) {
-        if (userInfo.isLoggedIn()) {
-          var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
-            LEARNER_ANSWER_INFO_DATA_URL, {
-              entity_type: 'exploration',
-              entity_id: _expId});
-          return $http.get(learnerAnswerInfoDataUrl);
-        } else {
-          return {data: {learner_answer_info_data: []}};
-        }
-      });
+      if (EditabilityService.isEditable()) {
+        var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
+          LEARNER_ANSWER_INFO_DATA_URL, {
+            entity_type: 'exploration',
+            entity_id: _expId});
+        return $http.get(learnerAnswerInfoDataUrl);
+      } else {
+        return $q.resolve({learner_answer_info_data: []});
+      }
     };
 
     var _deleteLearnerAnswerInfo = function(
