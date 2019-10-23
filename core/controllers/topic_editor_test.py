@@ -408,17 +408,33 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         }
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
-        json_response = self.put_json(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-            change_cmd, csrf_token=csrf_token)
-        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
-        self.assertEqual('A new name', json_response['topic_dict']['name'])
-        self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
-        self.assertEqual(
-            'Skill Description',
-            json_response['skill_id_to_description_dict'][self.skill_id])
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                change_cmd, csrf_token=csrf_token)
+            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertEqual('A new name', json_response['topic_dict']['name'])
+            self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
+            self.assertEqual(
+                'Skill Description',
+                json_response['skill_id_to_description_dict'][self.skill_id])
+
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: %s are still'
+                ' present in topic with id %s' % (
+                    self.skill_id_2, self.topic_id))
+            self.assertEqual(len(messages), 1)
+            self.assertIn(
+                expected_email_html_body,
+                messages[0].html.decode())
 
         # Test if the corresponding subtopic pages were created.
         json_response = self.get_json(
