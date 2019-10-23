@@ -19,7 +19,9 @@
 import { ErrorHandler, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class LoggerService {
   constructor(private errorHandler: ErrorHandler) {}
 
