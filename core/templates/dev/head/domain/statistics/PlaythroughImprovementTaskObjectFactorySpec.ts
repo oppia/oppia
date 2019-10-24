@@ -194,13 +194,15 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     // PlaythroughImprovementTaskObjectFactory is upgraded to Angular 8.
     this.ExplorationFeaturesService = ExplorationFeaturesService;
     this.PlaythroughIssueObjectFactory = PlaythroughIssueObjectFactory;
+  }));
 
+  beforeEach(function() {
     this.expId = '7';
     this.expVersion = 1;
     PlaythroughIssuesService.initSession(this.expId, this.expVersion);
 
     this.scope = $rootScope.$new();
-  }));
+  });
 
   describe('.createNew', function() {
     beforeEach(function() {
@@ -305,8 +307,9 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         .and.returnValue(false);
 
       PlaythroughImprovementTaskObjectFactory.fetchTasks()
-        .then(allTasks => {
-          expect(allTasks).toEqual([]);
+        .then(allTasks => allTasks.map(task => task.getTitle()))
+        .then(allTaskTitles => {
+          expect(allTaskTitles).toEqual([]);
           expect(this.getIssuesSpy).not.toHaveBeenCalled();
         }).then(done, done.fail);
 
@@ -357,7 +360,8 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           // Force all pending promises to evaluate.
           this.scope.$digest();
 
-          expect(task.getActionButtons()).toEqual([]);
+          expect(task.getActionButtons().map(button => button.getText()))
+            .toEqual([]);
         });
       });
     });

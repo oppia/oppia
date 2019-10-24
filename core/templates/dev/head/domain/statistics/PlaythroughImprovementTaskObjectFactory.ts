@@ -68,8 +68,7 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
                 'Marking this action as resolved will discard the ' +
                 'playthrough forever. Are you sure you want to proceed?',
                 'Mark as Resolved', 'btn-danger')
-                .result.then(
-                  () => PlaythroughIssuesService.resolveIssue(issue))
+                .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
                 .then(() => this._isObsolete = true);
             }));
       });
