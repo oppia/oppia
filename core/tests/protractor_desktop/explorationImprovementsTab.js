@@ -405,7 +405,7 @@ describe('Suggestions Improvements', function() {
   });
 });
 
-fdescribe('Playthrough Improvements', function() {
+describe('Playthrough Improvements', function() {
   var EXPLORATION_TITLE = 'Exploration with Early Quit Playthroughs';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
@@ -527,7 +527,7 @@ fdescribe('Playthrough Improvements', function() {
       });
     });
 
-    fdescribe('viewing the task', function() {
+    describe('viewing the task', function() {
       beforeAll(function() {
         users.login(LEARNER_EMAIL);
         libraryPage.get();
