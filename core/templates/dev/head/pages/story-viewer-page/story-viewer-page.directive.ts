@@ -27,7 +27,7 @@ require(
   'story-viewer-chapters-list.directive.ts');
 
 require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
-require('domain/story_viewer/StoryViewerBackendApiService.ts');
+require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');

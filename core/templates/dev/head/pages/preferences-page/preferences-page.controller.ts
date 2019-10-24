@@ -26,7 +26,7 @@ require(
 require('filters/string-utility-filters/truncate.filter.ts');
 
 require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/UtilsService.ts');

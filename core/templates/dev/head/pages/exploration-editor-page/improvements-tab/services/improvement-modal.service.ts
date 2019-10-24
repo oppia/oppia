@@ -27,7 +27,7 @@ require(
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
 angular.module('oppia').factory('ImprovementModalService', [
