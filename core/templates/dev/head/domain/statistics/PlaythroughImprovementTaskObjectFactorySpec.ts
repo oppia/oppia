@@ -328,16 +328,6 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       });
     });
 
-    describe('.getActionButtons', function() {
-      it('contains a specific sequence of buttons', function() {
-        var task = PlaythroughImprovementTaskObjectFactory.createNew(
-          this.issue);
-
-        expect(task.getActionButtons().map(button => button.getText()))
-          .toEqual(['Mark as Resolved']);
-      });
-    });
-
     describe('Mark as Resolved Action Button', function() {
       it('is disabled when no user is logged in', function() {
         spyOn(UserService, 'getUserInfoAsync')
@@ -349,7 +339,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         // Force all pending promises to evaluate.
         this.scope.$digest();
 
-        expect(task.getActionButtons()[0].isEnabled()).toBe(false);
+        expect(task.getActionButtons()).toEqual([]);
       });
 
       it('is enabled when a user is logged in', function() {
@@ -362,10 +352,14 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         // Force all pending promises to evaluate.
         this.scope.$digest();
 
-        expect(task.getActionButtons()[0].isEnabled()).toBe(true);
+        expect(task.getActionButtons().map(button => button.getText()))
+          .toEqual(['Mark as Resolved']);
       });
 
       it('marks the task as resolved after confirmation', function() {
+        spyOn(UserService, 'getUserInfoAsync')
+          .and.returnValue($q.resolve({isLoggedIn: () => true}));
+
         var task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
 
@@ -388,6 +382,9 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       });
 
       it('keeps the task after cancel', function() {
+        spyOn(UserService, 'getUserInfoAsync')
+          .and.returnValue($q.resolve({isLoggedIn: () => true}));
+
         var task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
 
