@@ -31,8 +31,8 @@ import re
 import subprocess
 import sys
 
-import feconf
 import python_utils
+import release_constants
 
 from . import common
 
@@ -169,7 +169,7 @@ def _execute_branch_cut():
         python_utils.PRINT(
             'Please confirm: are Travis checks passing on develop? (y/n) ')
         answer = python_utils.INPUT().lower()
-        if answer in feconf.AFFIRMATIVE_CONFIRMATIONS:
+        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
             break
         elif answer:
             python_utils.PRINT(

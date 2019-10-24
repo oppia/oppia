@@ -235,8 +235,9 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        expected_feconf_text = feconf_text.replace('None', '\'%s\'' % (
-            mailgun_api_key))
+        expected_feconf_text = feconf_text.replace(
+            'MAILGUN_API_KEY = None\n',
+            'MAILGUN_API_KEY = \'%s\'\n' % mailgun_api_key)
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         feconf_swap = self.swap(

@@ -169,8 +169,8 @@ def add_mailgun_api_key():
 
 
 def main():
-    """Updates the LOCAL_FECONF_PATH and 'constants.ts' files after doing the
-    prerequisite checks.
+    """Updates the files corresponding to LOCAL_FECONF_PATH and
+    LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
     """
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
