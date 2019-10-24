@@ -30,7 +30,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/collection/CollectionRightsObjectFactory.ts');
-require('domain/collection/CollectionUpdateService.ts');
+require('domain/collection/collection-update.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 

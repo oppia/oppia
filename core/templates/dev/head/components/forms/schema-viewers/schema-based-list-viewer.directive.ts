@@ -18,7 +18,7 @@
 
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
 angular.module('oppia').directive('schemaBasedListViewer', [
