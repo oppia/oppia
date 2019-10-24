@@ -33,7 +33,7 @@ require(
   'pages/exploration-editor-page/editor-tab/unresolved-answers-overview/' +
   'unresolved-answers-overview.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-correctness-feedback.service.ts');

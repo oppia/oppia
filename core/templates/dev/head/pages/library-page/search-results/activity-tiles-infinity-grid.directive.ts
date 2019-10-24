@@ -16,7 +16,7 @@
  * @fileoverview Directive for an infinitely-scrollable view of activity tiles
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/SearchService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 

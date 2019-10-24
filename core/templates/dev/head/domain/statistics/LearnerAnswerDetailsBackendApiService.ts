@@ -16,7 +16,7 @@
  * @fileoverview Service to record learner answer info.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('domain/statistics/statistics-domain.constants.ajs.ts');
 

@@ -17,7 +17,7 @@
  * modal.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/CsrfTokenService.ts');
 require('services/SiteAnalyticsService.ts');
