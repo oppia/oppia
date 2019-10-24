@@ -232,7 +232,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.signup('user1@example.com', 'user1')
 
     def _assert_validation_error(self, expected_error_substring):
-        """Checks that the story passes validation."""
+        """Checks that the story passes validation.
+
+        Args:
+        expected_error_substring: string. String that should be a substring of the expected error message.
+        """
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             self.story.validate()
