@@ -203,6 +203,11 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   }));
 
   describe('.createNew', function() {
+    beforeEach(function() {
+      spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({can_edit: true}));
+    });
+
     it('retrieves data from passed issue', function() {
       var issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
