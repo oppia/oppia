@@ -38,7 +38,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/SkillUpdateService.ts');
+require('domain/skill/skill-update.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 describe('Skill editor state service', function() {
