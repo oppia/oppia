@@ -21,7 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
 import { UtilsService } from 'services/UtilsService';
-import { WindowDimensionsService } from './contextual/WindowDimensionsService';
+import { UrlService } from 'services/contextual/UrlService';
+import { WindowDimensionsService } from 'services/contextual/WindowDimensionsService';
+import { WindowRef } from 'services/contextual/WindowRefService';
 
 @Injectable({
   providedIn: 'root'
@@ -32,9 +34,9 @@ export class UpgradedServices {
     'UtilsService': new UtilsService(),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
-    'WindowDimensionsService': new WindowDimensionsService()
+    'WindowDimensionsService': new WindowDimensionsService(),
+    'UrlService': new UrlService(new WindowRef())
   };
-  /* eslint-enable quote-props */
 }
 
 angular.module('oppia').factory(
