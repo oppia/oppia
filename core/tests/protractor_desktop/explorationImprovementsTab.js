@@ -243,7 +243,6 @@ describe('Feedback Improvements', function() {
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    creatorDashboardPage.get();
     users.logout();
 
     // Learner plays the exploration and submits a feedback.
@@ -290,7 +289,7 @@ describe('Feedback Improvements', function() {
 });
 
 
-describe('Suggestions on Explorations', function() {
+describe('Suggestions Improvements', function() {
   var EXPLORATION_TITLE = 'Exploration with Suggestion';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
@@ -403,5 +402,155 @@ describe('Suggestions on Explorations', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
+  });
+});
+
+fdescribe('Playthrough Improvements', function() {
+  var EXPLORATION_TITLE = 'Exploration with Early Quit Playthroughs';
+  var EXPLORATION_CATEGORY = 'Algorithms';
+  var EXPLORATION_OBJECTIVE = 'To explore something new';
+  var EXPLORATION_LANGUAGE = 'English';
+  var CREATOR_EMAIL = 'creator@ExplorationEarlyQuit.com';
+  var LEARNER_EMAIL = 'learner@ExplorationEarlyQuit.com';
+
+  var adminPage = null;
+  var creatorDashboardPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
+  var explorationPlayerPage = null;
+  var libraryPage = null;
+  var oppiaLogo = $('.protractor-test-oppia-main-logo');
+
+  var improvementsTab = null;
+
+  beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    libraryPage = new LibraryPage.LibraryPage();
+
+    improvementsTab = explorationEditorPage.getImprovementsTab();
+
+    users.createUser(LEARNER_EMAIL, 'learnerEarlyQuit');
+    users.createAndLoginAdminUser(CREATOR_EMAIL, 'creatorEarlyQuit');
+
+    workflow.createExplorationAsAdmin();
+    explorationEditorMainTab.exitTutorial();
+
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
+    explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
+    explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
+    explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
+
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.setStateName('One');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 1 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'Two', true, 'Equals',
+      'One');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('Two');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 2 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'Three', true, 'Equals',
+      'Two');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('Three');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 3 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
+      'Three');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Try 2 again'), 'Two', false, 'Equals',
+      'Two');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+    general.getExplorationIdFromEditor().then(expId => this.expId = expId);
+
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor.',
+      'Boolean', element => element.setValue(true));
+    adminPage.editConfigProperty(
+      'The set of exploration IDs for recording playthrough issues',
+      'List', element => element.addItem('Unicode').setValue(this.expId));
+    adminPage.editConfigProperty(
+      'The probability of recording playthroughs',
+      'Real', element => element.setValue(1.0));
+  });
+
+  describe('Early Quit playthroughs', function() {
+    describe('resolving the task', function() {
+      it('disappears from the improvements tab', function() {
+        users.login(LEARNER_EMAIL);
+        libraryPage.get();
+        libraryPage.findExploration(EXPLORATION_TITLE);
+        libraryPage.playExploration(EXPLORATION_TITLE);
+
+        explorationPlayerPage.submitAnswer('TextInput', 'One');
+        explorationPlayerPage.clickThroughToNextCard();
+        explorationPlayerPage.expectExplorationToNotBeOver();
+        oppiaLogo.click();
+        general.acceptAlert();
+        users.logout();
+
+        users.login(CREATOR_EMAIL);
+        creatorDashboardPage.get();
+        creatorDashboardPage.navigateToExplorationEditor();
+        explorationEditorPage.navigateToImprovementsTab();
+
+        var task = improvementsTab.getPlaythroughTask(
+          'learners exited the exploration in less than a minute');
+        improvementsTab.clickTaskActionButton(task, 'Mark as Resolved');
+        improvementsTab.confirmAction();
+
+        expect(improvementsTab.getTasks().count()).toEqual(0);
+      });
+    });
+
+    fdescribe('viewing the task', function() {
+      beforeAll(function() {
+        users.login(LEARNER_EMAIL);
+        libraryPage.get();
+        libraryPage.findExploration(EXPLORATION_TITLE);
+        libraryPage.playExploration(EXPLORATION_TITLE);
+
+        explorationPlayerPage.submitAnswer('TextInput', 'One');
+        explorationPlayerPage.clickThroughToNextCard();
+        explorationPlayerPage.expectExplorationToNotBeOver();
+        oppiaLogo.click();
+        general.acceptAlert();
+        users.logout();
+      });
+
+      it('hides the mark as resolve button from guests', function() {
+        users.logout();
+        general.openEditor(this.expId);
+        explorationEditorPage.navigateToImprovementsTab();
+        var task = improvementsTab.getPlaythroughTask(
+          'learners exited the exploration in less than a minute');
+
+        expect(improvementsTab.getTaskActionButtons(task).count()).toEqual(0);
+      });
+    });
   });
 });
