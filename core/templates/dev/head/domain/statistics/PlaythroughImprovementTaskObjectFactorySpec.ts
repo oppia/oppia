@@ -190,7 +190,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     UserExplorationPermissionsService = _UserExplorationPermissionsService_;
     PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_;
 
-    // TODO(#7222): Use these normally after
+    // TODO(#7222): Use these as done above after
     // PlaythroughImprovementTaskObjectFactory is upgraded to Angular 8.
     this.ExplorationFeaturesService = ExplorationFeaturesService;
     this.PlaythroughIssueObjectFactory = PlaythroughIssueObjectFactory;
