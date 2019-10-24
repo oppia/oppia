@@ -26,7 +26,7 @@ require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/subtopic_viewer/SubtopicViewerBackendApiService.ts');
+require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
