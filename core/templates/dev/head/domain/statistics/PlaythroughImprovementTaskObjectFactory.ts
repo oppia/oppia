@@ -21,11 +21,11 @@ require('domain/statistics/statistics-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require(
-  'pages/exploration-editor-page/services/' +
-  'user-exploration-permissions.service.ts');
-require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/PlaythroughIssuesService.ts');
 

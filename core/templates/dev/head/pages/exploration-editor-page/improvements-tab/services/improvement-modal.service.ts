@@ -25,6 +25,9 @@ require(
   'pages/exploration-editor-page/services/' +
   'learner-answer-details-data.service.ts');
 require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
+require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
