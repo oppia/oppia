@@ -269,7 +269,7 @@ var ExplorationEditorTranslationTab = function() {
 
         closeAudioUploaderModal.click();
         return { uploaded: false };
-      }).catch(function(error) {
+      }).catch(function() {
         return { uploaded: true };
       });
   };
@@ -285,7 +285,12 @@ var ExplorationEditorTranslationTab = function() {
   this.isAudioPlaying = function() {
     return audioMaterialSliderDiv.getAttribute('aria-valuenow')
       .then(function(firstValue) {
-        browser.sleep(2000);
+        return new Promise(function(resolve, reject) {
+          setTimeout(function() {
+            resolve(firstValue);
+          }, 2000);
+        });
+      }).then(function(firstValue) {
         return audioMaterialSliderDiv.getAttribute('aria-valuenow')
           .then(function(secondValue) {
             return +firstValue !== +secondValue;
