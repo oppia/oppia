@@ -263,55 +263,51 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
+      this.getIssuesSpy = spyOn(PlaythroughIssuesService, 'getIssues')
+        .and.returnValue($q.resolve([
+          this.earlyQuitIssue,
+          this.multipleIncorrectSubmissionsIssue,
+          this.cyclicTransitionsIssue,
+        ]));
+
+      spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({can_edit: true}));
     });
 
-    it(
-      'returns a task for each issue when playthrough recording is enabled',
-      function(done) {
-        spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
-          .and.returnValue(true);
+    it('returns task for each issue if recording is enabled', function(done) {
+      spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
+        .and.returnValue(true);
 
-        spyOn(PlaythroughIssuesService, 'getIssues').and.returnValue(
-          $q.resolve([
-            this.earlyQuitIssue,
-            this.multipleIncorrectSubmissionsIssue,
-            this.cyclicTransitionsIssue,
-          ]));
+      PlaythroughImprovementTaskObjectFactory.fetchTasks()
+        .then(allTasks => allTasks.map(task => task.getTitle()))
+        .then(allTaskTitles => {
+          expect(allTaskTitles).toEqual([
+            PlaythroughIssuesService.renderIssueStatement(
+              this.earlyQuitIssue),
+            PlaythroughIssuesService.renderIssueStatement(
+              this.multipleIncorrectSubmissionsIssue),
+            PlaythroughIssuesService.renderIssueStatement(
+              this.cyclicTransitionsIssue),
+          ]);
+        }).then(done, done.fail);
 
-        PlaythroughImprovementTaskObjectFactory.fetchTasks()
-          .then(allTasks => allTasks.map(task => task.getTitle()))
-          .then(allTaskTitles => {
-            expect(allTaskTitles).toEqual([
-              PlaythroughIssuesService.renderIssueStatement(
-                this.earlyQuitIssue),
-              PlaythroughIssuesService.renderIssueStatement(
-                this.multipleIncorrectSubmissionsIssue),
-              PlaythroughIssuesService.renderIssueStatement(
-                this.cyclicTransitionsIssue),
-            ]);
-          }).then(done, done.fail);
+      // Force all pending promises to evaluate.
+      this.scope.$digest();
+    });
 
-        // Force all pending promises to evaluate.
-        this.scope.$digest();
-      });
+    it('returns nothing if recording is disabled', function(done) {
+      spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
+        .and.returnValue(false);
 
-    it(
-      'returns nothing when playthrough recording is disabled', function(done) {
-        spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
-          .and.returnValue(false);
+      PlaythroughImprovementTaskObjectFactory.fetchTasks()
+        .then(allTasks => {
+          expect(allTasks).toEqual([]);
+          expect(this.getIssuesSpy).not.toHaveBeenCalled();
+        }).then(done, done.fail);
 
-        var getIssuesSpy =
-          spyOn(PlaythroughIssuesService, 'getIssues').and.stub();
-
-        PlaythroughImprovementTaskObjectFactory.fetchTasks()
-          .then(allTasks => {
-            expect(allTasks).toEqual([]);
-            expect(getIssuesSpy).not.toHaveBeenCalled();
-          }).then(done, done.fail);
-
-        // Force all pending promises to evaluate.
-        this.scope.$digest();
-      });
+      // Force all pending promises to evaluate.
+      this.scope.$digest();
+    });
   });
 
   describe('PlaythroughImprovementTask', function() {
@@ -328,86 +324,82 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       });
     });
 
-    describe('Mark as Resolved Action Button', function() {
-      it('is missing without edit permissions', function() {
-        spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
-          .and.returnValue($q.resolve({can_edit: false}));
+    describe('.getActionButtons', function() {
+      describe('for a user with edit permissions', function() {
+        it('has the mark as resolved button', function() {
+          spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+            .and.returnValue($q.resolve({can_edit: true}));
 
-        var task = PlaythroughImprovementTaskObjectFactory.createNew(
-          this.issue);
+          var task = PlaythroughImprovementTaskObjectFactory.createNew(
+            this.issue);
 
-        // Force all pending promises to evaluate.
-        this.scope.$digest();
+          // Force all pending promises to evaluate.
+          this.scope.$digest();
 
-        expect(task.getActionButtons()).toEqual([]);
+          expect(task.getActionButtons().map(button => button.getText()))
+            .toEqual(['Mark as Resolved']);
+        });
       });
 
-      it('is present with edit permissions', function() {
+      describe('for a user without edit permissions', function() {
+        it('has no buttons', function() {
+          spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+            .and.returnValue($q.resolve({can_edit: false}));
+
+          var task = PlaythroughImprovementTaskObjectFactory.createNew(
+            this.issue);
+
+          // Force all pending promises to evaluate.
+          this.scope.$digest();
+
+          expect(task.getActionButtons()).toEqual([]);
+        });
+      });
+    });
+
+    describe('Mark as Resolved Action Button', function() {
+      beforeEach(function() {
         spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
           .and.returnValue($q.resolve({can_edit: true}));
 
-        var task = PlaythroughImprovementTaskObjectFactory.createNew(
+        this.task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
-
         // Force all pending promises to evaluate.
         this.scope.$digest();
+        this.resolveActionButton = this.task.getActionButtons()[0];
 
-        expect(task.getActionButtons().map(button => button.getText()))
-          .toEqual(['Mark as Resolved']);
+        this.resolveIssueSpy =
+          spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
       });
 
       it('marks the task as resolved after confirmation', function() {
-        spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
-          .and.returnValue($q.resolve({can_edit: true}));
-
-        var task = PlaythroughImprovementTaskObjectFactory.createNew(
-          this.issue);
-        // Force all pending promises to evaluate.
-        this.scope.$digest();
-
-        expect(task.getStatus()).toEqual('open');
-
-        var resolveActionButton = task.getActionButtons()[0];
-        var resolveIssueSpy =
-          spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
+        expect(this.task.getStatus()).toEqual('open');
 
         // Mock confirmation by returning a resolved promise.
         spyOn($uibModal, 'open').and.returnValue({result: $q.resolve()});
 
-        resolveActionButton.execute();
+        this.resolveActionButton.execute();
 
         // Force all pending promises to evaluate.
         this.scope.$digest();
 
-        expect(resolveIssueSpy).toHaveBeenCalledWith(this.issue);
-        expect(task.getStatus()).not.toEqual('open');
+        expect(this.resolveIssueSpy).toHaveBeenCalledWith(this.issue);
+        expect(this.task.getStatus()).not.toEqual('open');
       });
 
       it('keeps the task after cancel', function() {
-        spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
-          .and.returnValue($q.resolve({can_edit: true}));
-
-        var task = PlaythroughImprovementTaskObjectFactory.createNew(
-          this.issue);
-        // Force all pending promises to evaluate.
-        this.scope.$digest();
-
-        expect(task.getStatus()).toEqual('open');
-
-        var resolveActionButton = task.getActionButtons()[0];
-        var resolveIssueSpy =
-          spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
+        expect(this.task.getStatus()).toEqual('open');
 
         // Mock cancellation by returning a rejected promise.
         spyOn($uibModal, 'open').and.returnValue({result: $q.reject()});
 
-        resolveActionButton.execute();
+        this.resolveActionButton.execute();
 
         // Force all pending promises to evaluate.
         this.scope.$digest();
 
-        expect(resolveIssueSpy).not.toHaveBeenCalled();
-        expect(task.getStatus()).toEqual('open');
+        expect(this.resolveIssueSpy).not.toHaveBeenCalled();
+        expect(this.task.getStatus()).toEqual('open');
       });
     });
   });
