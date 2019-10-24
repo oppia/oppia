@@ -235,7 +235,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """Checks that the story passes validation.
 
         Args:
-            expected_error_substring: string. String that should be a substring of the expected error message.
+            expected_error_substring: string. String that should be a substring
+                of the expected error message.
         """
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
@@ -245,7 +246,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """Checks that the story id is valid.
 
         Args:
-            expected_error_substring: string. String that should be a substring of the expected error message.
+            expected_error_substring: string. String that should be a substring
+                of the expected error message.
             story_id: string. The story ID to validate.
         """
         with self.assertRaisesRegexp(
