@@ -21,6 +21,9 @@ require('domain/statistics/statistics-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
+require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
 require('services/ExplorationFeaturesService.ts');
@@ -28,12 +31,14 @@ require('services/PlaythroughIssuesService.ts');
 
 angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
   '$q', 'ExplorationFeaturesService', 'ImprovementActionButtonObjectFactory',
-  'ImprovementModalService', 'PlaythroughIssuesService', 'UserService',
-  'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE', 'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
+  'ImprovementModalService', 'PlaythroughIssuesService',
+  'UserExplorationPermissionsService', 'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE',
+  'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
       $q, ExplorationFeaturesService, ImprovementActionButtonObjectFactory,
-      ImprovementModalService, PlaythroughIssuesService, UserService,
-      PLAYTHROUGH_IMPROVEMENT_TASK_TYPE, STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
+      ImprovementModalService, PlaythroughIssuesService,
+      UserExplorationPermissionsService, PLAYTHROUGH_IMPROVEMENT_TASK_TYPE,
+      STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
     /**
      * @constructor
      * @param {PlaythroughIssue} issue - The issue this task is referring to.
@@ -52,8 +57,8 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
         playthroughIds: issue.playthroughIds,
       };
 
-      UserService.getUserInfoAsync().then(userInfo => {
-        if (!userInfo.isLoggedIn()) {
+      UserExplorationPermissionsService.getPermissionsAsync().then(perms => {
+        if (!perms.can_edit) {
           return;
         }
         this._actionButtons.push(
@@ -63,7 +68,8 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
                 'Marking this action as resolved will discard the ' +
                 'playthrough forever. Are you sure you want to proceed?',
                 'Mark as Resolved', 'btn-danger')
-                .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
+                .result.then(
+                  () => PlaythroughIssuesService.resolveIssue(issue))
                 .then(() => this._isObsolete = true);
             }));
       });

@@ -94,7 +94,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   var $uibModal = null;
   var PlaythroughImprovementTaskObjectFactory = null;
   var PlaythroughIssuesService = null;
-  var UserService = null;
+  var UserExplorationPermissionsService = null;
   var PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -177,7 +177,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
       _PlaythroughImprovementTaskObjectFactory_, _PlaythroughIssuesService_,
-      _UserService_, _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_,
+      _UserExplorationPermissionsService_, _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_,
       // TODO(#7222): Import these as done above after
       // PlaythroughImprovementTaskObjectFactory is upgraded to Angular 8.
       ExplorationFeaturesService, PlaythroughIssueObjectFactory) {
@@ -187,7 +187,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     PlaythroughImprovementTaskObjectFactory =
       _PlaythroughImprovementTaskObjectFactory_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
-    UserService = _UserService_;
+    UserExplorationPermissionsService = _UserExplorationPermissionsService_;
     PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_;
 
     // TODO(#7222): Use these normally after
@@ -329,9 +329,9 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     });
 
     describe('Mark as Resolved Action Button', function() {
-      it('is disabled when no user is logged in', function() {
-        spyOn(UserService, 'getUserInfoAsync')
-          .and.returnValue($q.resolve({isLoggedIn: () => false}));
+      it('is missing without edit permissions', function() {
+        spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+          .and.returnValue($q.resolve({can_edit: false}));
 
         var task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
@@ -342,9 +342,9 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         expect(task.getActionButtons()).toEqual([]);
       });
 
-      it('is enabled when a user is logged in', function() {
-        spyOn(UserService, 'getUserInfoAsync')
-          .and.returnValue($q.resolve({isLoggedIn: () => true}));
+      it('is present with edit permissions', function() {
+        spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+          .and.returnValue($q.resolve({can_edit: true}));
 
         var task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
@@ -357,8 +357,8 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       });
 
       it('marks the task as resolved after confirmation', function() {
-        spyOn(UserService, 'getUserInfoAsync')
-          .and.returnValue($q.resolve({isLoggedIn: () => true}));
+        spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+          .and.returnValue($q.resolve({can_edit: true}));
 
         var task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
@@ -384,8 +384,8 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       });
 
       it('keeps the task after cancel', function() {
-        spyOn(UserService, 'getUserInfoAsync')
-          .and.returnValue($q.resolve({isLoggedIn: () => true}));
+        spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+          .and.returnValue($q.resolve({can_edit: true}));
 
         var task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
