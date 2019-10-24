@@ -1218,7 +1218,6 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_settings = user_services.get_user_settings(self.owner_id)
         user_settings.last_created_an_exploration = None
-        user_settings.validate()
         user_models.UserSettingsModel(
             id=user_settings.user_id,
             email=user_settings.email,
