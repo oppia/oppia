@@ -242,16 +242,16 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.pageToFullyLoad();
 
     return this.openUploadTranslationAudioModal(filePath);
-  }
+  };
 
   this.reuploadAudioTranslationFile = function(filePath) {
     waitFor.elementToBeClickable(
       translationTabReuploadReacordingAccessibility,
       'Translation tab reupload is taking too long to appear');
-      translationTabReuploadReacordingAccessibility.click();
-      waitFor.pageToFullyLoad();
+    translationTabReuploadReacordingAccessibility.click();
+    waitFor.pageToFullyLoad();
 
-      return this.openUploadTranslationAudioModal(filePath);
+    return this.openUploadTranslationAudioModal(filePath);
   };
 
   this.openUploadTranslationAudioModal = function(filePath) {
@@ -269,7 +269,7 @@ var ExplorationEditorTranslationTab = function() {
 
         closeAudioUploaderModal.click();
         return { uploaded: false };
-      }).catch(function() {
+      }).catch(function(error) {
         return { uploaded: true };
       });
   };
@@ -293,7 +293,7 @@ var ExplorationEditorTranslationTab = function() {
       }).then(function(isPlaying) {
         return isPlaying;
       });
-  }
+  };
 
   this.expectTranslationToMatch = function(richTextInstructions) {
     forms.expectRichText(translationDisplay).toMatch(richTextInstructions);

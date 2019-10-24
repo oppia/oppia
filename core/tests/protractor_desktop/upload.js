@@ -25,80 +25,82 @@ var ExplorationEditorPage =
     require('../protractor_utils/ExplorationEditorPage.js');
 
 describe('Exploration tab', function() {
+  var TEST_USERNAME = 'uploadUser';
+  var TEST_EMAIL = TEST_USERNAME + '@example.com';
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorTranslationTab = null;
+  var explorationEditorSettingsTab = null;
 
-    var TEST_USERNAME = 'uploadUser';
-    var TEST_EMAIL = TEST_USERNAME + '@example.com';
-    var explorationEditorPage = null;
-    var explorationEditorMainTab = null;
-    var explorationEditorTranslationTab = null;
-    var explorationEditorSettingsTab = null;
+  beforeAll(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab =
+      explorationEditorPage.getMainTab();
+    explorationEditorTranslationTab =
+      explorationEditorPage.getTranslationTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
-    beforeAll(function() {
-        explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-        explorationEditorMainTab = explorationEditorPage.getMainTab();
-        explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
-        explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+    users.login(TEST_EMAIL);
+    workflow.createExploration();
 
-        users.createUser(TEST_EMAIL, TEST_USERNAME);
-        users.login(TEST_EMAIL);
-        workflow.createExploration();
+    explorationEditorMainTab.setStateName('Uploading translation file');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'This is the first card.'
+    ));
+    explorationEditorMainTab.setInteraction('EndExploration');
+  });
 
-        explorationEditorMainTab.setStateName('Uploading translation file');
-        explorationEditorMainTab.setContent(forms.toRichText(
-            'This is the first card.'
-        ));
-        explorationEditorMainTab.setInteraction('EndExploration');
-    });
+  it('should upload an audio file', function() {
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab
+      .exitTutorial();
+    explorationEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
+      'Upload voiceovered file');
 
-    it('should upload an audio file', function() {
-        explorationEditorPage.navigateToTranslationTab();
-        explorationEditorTranslationTab.exitTutorial();
-        explorationEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
-            'Upload voiceovered file');
+    explorationEditorTranslationTab.uploadAudioTranslationFile(
+      '../data/cafe.mp3')
+      .then(function(response) {
+        expect(response.uploaded).toBe(true);
+      });
+  });
 
-        explorationEditorTranslationTab.uploadAudioTranslationFile(
-            '../data/cafe.mp3').then(function(response) {
-                expect(response.uploaded).toBe(true);
-            });
-    });
+  it('should play an uploaded audio file', function() {
+    explorationEditorTranslationTab.playOrPauseAudioFile()
+      .then(function(isPlaying) {
+        expect(isPlaying).toBe(true);
+      });
+  });
 
-    it('should play an uploaded audio file', function() {
-        explorationEditorTranslationTab.playOrPauseAudioFile()
-            .then(function(isPlaying) {
-                expect(isPlaying).toBe(true);
-            });
-    });
+  it('should pause an uploaded audio file', function() {
+    explorationEditorTranslationTab.playOrPauseAudioFile()
+      .then(function(isPlaying) {
+        expect(isPlaying).toBe(false);
+      });
+  });
 
-    it('should pause an uploaded audio file', function() {
-        explorationEditorTranslationTab.playOrPauseAudioFile()
-            .then(function(isPlaying) {
-                expect(isPlaying).toBe(false);
-            });
-    });
+  it('should not let upload a five minutes longer video', function() {
+    explorationEditorTranslationTab.reuploadAudioTranslationFile(
+      '../data/cafe-over-five-minutes.mp3')
+      .then(function(response) {
+        expect(response.uploaded).toBe(false);
+      });
+  });
 
-    it('should not let upload a five minutes longer video', function() {
-        explorationEditorTranslationTab.reuploadAudioTranslationFile(
-            '../data/cafe-over-five-minutes.mp3').then(function(response) {
-                expect(response.uploaded).toBe(false);
-            });
-    });
+  afterAll(function() {
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle('Upload audio file');
+    explorationEditorSettingsTab.setCategory('Languages');
+    explorationEditorSettingsTab.setLanguage('English');
+    explorationEditorSettingsTab
+      .setObjective('Upload an translation audio file.');
+    explorationEditorPage.saveChanges('Adds audio file in translation tab.');
+    workflow.publishExploration();
+  });
 
-    afterAll(function() {
-        browser.sleep(20000);
-        explorationEditorPage.navigateToSettingsTab();
-        explorationEditorSettingsTab.setTitle('Upload audio file');
-        explorationEditorSettingsTab.setCategory('Languages');
-        explorationEditorSettingsTab.setLanguage('English');
-        explorationEditorSettingsTab.setObjective(
-        'Upload an translation audio file.');
-        explorationEditorPage.saveChanges('Adds audio file in translation tab.');
-        workflow.publishExploration();
-    });
-
-    afterEach(function() {
-        general.checkForConsoleErrors([
-            'Failed to load resource: the server responded with a status of 400'
-        ]);
-    });
-
+  afterEach(function() {
+    general.checkForConsoleErrors([
+      'Failed to load resource: the server responded with a status of 400'
+    ]);
+  });
 });
