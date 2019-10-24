@@ -560,26 +560,27 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether QuestionSummaryModel exist for user.
+        """Check whether any existing QuestionSummaryModel refers to the given
+        user_id.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            bool. Whether any models refer to the given user ID.
+            bool. Whether any models refer to the given user_id.
         """
         return cls.query(cls.creator_id == user_id).get() is not None
 
     @classmethod
     def get_by_creator_id(cls, creator_id):
-        """Get QuestionSummaryModels created by user.
+        """Get QuestionSummaryModels created by the given user.
 
         Args:
             creator_id: str. The user ID of the creator of the questions.
 
         Returns:
-            list(QuestionSummaryModel). The list of summary model of the
-            question.
+            list(QuestionSummaryModel). The list of summary models of the
+            questions.
         """
         return QuestionSummaryModel.query().filter(
             cls.creator_id == creator_id).fetch()
