@@ -234,10 +234,18 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# NOTE TO DEVELOPERS: This format should not be changed, '
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        expected_feconf_text = feconf_text.replace(
-            'MAILGUN_API_KEY = None\n',
-            'MAILGUN_API_KEY = \'%s\'\n' % mailgun_api_key)
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+        expected_feconf_text = (
+            'MAILGUN_API_KEY = \'%s\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                mailgun_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         feconf_swap = self.swap(
