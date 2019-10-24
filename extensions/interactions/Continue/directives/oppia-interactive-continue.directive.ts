@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('interactions/Continue/directives/continue-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');

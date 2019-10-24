@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 
-require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/collection/read-only-collection-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/contextual/UrlService.ts');

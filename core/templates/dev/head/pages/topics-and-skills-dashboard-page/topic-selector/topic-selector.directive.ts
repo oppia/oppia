@@ -16,7 +16,7 @@
  * @fileoverview Controller for the select topics viewer.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('selectTopics', [
   'UrlInterpolationService', function(UrlInterpolationService) {

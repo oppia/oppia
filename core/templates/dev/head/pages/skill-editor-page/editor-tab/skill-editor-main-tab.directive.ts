@@ -30,7 +30,7 @@ require(
   'skill-rubrics-editor.directive.ts');
 
 require('components/rubrics-editor/rubrics-editor.directive.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 angular.module('oppia').directive('skillEditorMainTab', [
