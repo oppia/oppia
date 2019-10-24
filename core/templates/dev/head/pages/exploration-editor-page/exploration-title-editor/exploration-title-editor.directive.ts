@@ -16,7 +16,7 @@
  * @fileoverview Directive for the exploration title field in forms.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('explorationTitleEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

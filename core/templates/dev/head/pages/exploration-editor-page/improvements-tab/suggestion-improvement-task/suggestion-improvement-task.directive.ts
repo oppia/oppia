@@ -16,7 +16,7 @@
  * @fileoverview Suggestion Improvement task directive.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('suggestionImprovementTask', [
   'UrlInterpolationService', function(UrlInterpolationService) {
