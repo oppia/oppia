@@ -16,12 +16,23 @@
  * @fileoverview Service to add custom attributes to the <html> element.
  */
 
-angular.module('oppia').factory('DocumentAttributeCustomizationService', [
-  '$window', function($window) {
-    return {
-      addAttribute: function(attribute, value) {
-        $window.document.documentElement.setAttribute(attribute, value);
-      }
-    };
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { WindowRef } from './WindowRefService';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DocumentAttributeCustomizationService {
+  constructor(private windowRef: WindowRef) {}
+
+  addAttribute(attribute: string, value: string): void {
+    this.windowRef.nativeWindow.document.documentElement.setAttribute(
+      attribute, value);
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'DocumentAttributeCustomizationService',
+  downgradeInjectable(DocumentAttributeCustomizationService));
+
