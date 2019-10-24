@@ -129,13 +129,13 @@ describe('Answer Details Improvements', function() {
       users.logout();
     });
 
-    it('is visible for guests', function() {
+    it('is visible for guests as read-only', function() {
       general.openEditor(this.expId);
       explorationEditorPage.navigateToImprovementsTab();
 
       var task = improvementsTab.getAnswerDetailsTask('One');
       improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
-      improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
+      improvementsTab.verifyReadOnlyAnswerDetails('I liked this choi...', 1);
       improvementsTab.closeModal();
     });
   });
