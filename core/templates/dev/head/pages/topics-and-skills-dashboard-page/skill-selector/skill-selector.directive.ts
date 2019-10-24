@@ -16,7 +16,7 @@
  * @fileoverview Controller for the select skill viewer.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('selectSkill', [
   'UrlInterpolationService', function(UrlInterpolationService) {
