@@ -44,7 +44,8 @@ export class UpgradedServices {
       new HtmlEscaperService(new LoggerService(new ErrorHandler())),
       new CamelCaseToHyphensPipe()),
     'SidebarStatusService': new SidebarStatusService(
-      new WindowDimensionsService())
+      new WindowDimensionsService()),
+    'WindowDimensionsService': new WindowDimensionsService()
   };
 }
 

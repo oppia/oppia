@@ -22,7 +22,7 @@ require(
   'training-panel.directive.ts');
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/angular-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
