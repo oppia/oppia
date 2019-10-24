@@ -63,7 +63,7 @@ require(
   'top-navigation-bar.directive.ts');
 
 require('domain/user/UserInfoObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('app.constants.ajs.ts');
 
