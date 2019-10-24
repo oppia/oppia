@@ -35,13 +35,15 @@ angular.module('oppia').factory('ImprovementModalService', [
   'EditabilityService', 'ExplorationHtmlFormatterService',
   'ExplorationStatesService', 'LearnerAnswerDetailsDataService',
   'SuggestionModalForExplorationEditorService', 'ThreadDataService',
-  'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
+  'ThreadStatusDisplayService', 'UrlInterpolationService',
+  'UserExplorationPermissionsService', 'UserService',
   function(
       $uibModal, AlertsService, ChangeListService, DateTimeFormatService,
       EditabilityService, ExplorationHtmlFormatterService,
       ExplorationStatesService, LearnerAnswerDetailsDataService,
       SuggestionModalForExplorationEditorService, ThreadDataService,
-      ThreadStatusDisplayService, UrlInterpolationService, UserService) {
+      ThreadStatusDisplayService, UrlInterpolationService,
+      UserExplorationPermissionsService, UserService) {
     return {
       openLearnerAnswerDetails: function(learnerAnswerDetails) {
         return $uibModal.open({
@@ -49,16 +51,15 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'answer-details-modal.template.html'),
           resolve: {
-            isUserLoggedIn: function() {
-              return UserService.getUserInfoAsync().then(function(userInfo) {
-                return userInfo.isLoggedIn();
-              });
+            isEditable: function() {
+              return UserExplorationPermissionsService.getPermissionsAsync()
+                .then(permissions => permissions.can_edit);
             },
           },
           controller: [
-            '$scope', '$uibModalInstance', 'isUserLoggedIn',
-            function($scope, $uibModalInstance, isUserLoggedIn) {
-              $scope.isUserLoggedIn = isUserLoggedIn;
+            '$scope', '$uibModalInstance', 'isEditable',
+            function($scope, $uibModalInstance, isEditable) {
+              $scope.isEditable = isEditable;
               $scope.selectedLearnerAnswerInfo = [];
               $scope.learnerAnswerDetails = learnerAnswerDetails;
               $scope.currentLearnerAnswerInfo = null;
