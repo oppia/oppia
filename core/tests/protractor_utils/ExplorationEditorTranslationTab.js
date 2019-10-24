@@ -20,6 +20,8 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
+var path = require('path');
+
 var ExplorationEditorTranslationTab = function() {
   var dismissWelcomeModalButton = element(
     by.css('.protractor-test-translation-tab-dismiss-welcome-modal'));
@@ -159,6 +161,9 @@ var ExplorationEditorTranslationTab = function() {
   var translationTabUploadRecordingAccessibility = element(
     by.css('.protractor-test-accessibility-translation-upload-audio'));
 
+  var translationTabReuploadReacordingAccessibility = element(
+    by.css('.protractor-test-accessibility-translation-reupload-audio'));
+
   var translationTabPlayRecordingAccessibility = element(
     by.css('.protractor-test-accessibility-translation-play-recorded-audio'));
 
@@ -194,6 +199,19 @@ var ExplorationEditorTranslationTab = function() {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
 
+  var audioUploadButton = element(
+    by.css('.protractor-test-audio-upload-input'));
+  var saveAudioFileButton = element(
+    by.css('.protractor-test-save-audio-file'));
+  var playPauseAudioButton = element(
+    by.css('.protractor-test-play-pause-audio-button'));
+  var audioMaterialSliderDiv = element(
+    by.css('.md-slider-wrapper'));
+  var uploadAudioFileError = element(
+    by.css('.protractor-test-upload-audio-file-error'));
+  var closeAudioUploaderModal = element(
+    by.css('.protractor-test-close-audio-upload-modal'));
+
   this.setTranslation = function(richTextInstructions) {
     waitFor.elementToBeClickable(
       editTranslationButtton,
@@ -215,6 +233,67 @@ var ExplorationEditorTranslationTab = function() {
       saveTranslationButton,
       'State translation editor takes too long to disappear');
   };
+
+  this.uploadAudioTranslationFile = function(filePath) {
+    waitFor.elementToBeClickable(
+      translationTabUploadRecordingAccessibility,
+      'Translation tab upload is taking too long to appear');
+    translationTabUploadRecordingAccessibility.click();
+    waitFor.pageToFullyLoad();
+
+    return this.openUploadTranslationAudioModal(filePath);
+  }
+
+  this.reuploadAudioTranslationFile = function(filePath) {
+    waitFor.elementToBeClickable(
+      translationTabReuploadReacordingAccessibility,
+      'Translation tab reupload is taking too long to appear');
+      translationTabReuploadReacordingAccessibility.click();
+      waitFor.pageToFullyLoad();
+
+      return this.openUploadTranslationAudioModal(filePath);
+  };
+
+  this.openUploadTranslationAudioModal = function(filePath) {
+    waitFor.elementToBeClickable(
+      audioUploadButton,
+      'Audio upload button is taking too long to appear');
+    var absolutePath = path.resolve(__dirname, filePath);
+    return audioUploadButton.sendKeys(absolutePath)
+      .then(function() {
+        saveAudioFileButton.click();
+      }).then(function() {
+        waitFor.visibilityOf(
+          uploadAudioFileError,
+          'Upload audio file error message is not visible');
+
+        closeAudioUploaderModal.click();
+        return { uploaded: false };
+      }).catch(function() {
+        return { uploaded: true };
+      });
+  };
+
+  this.playOrPauseAudioFile = function() {
+    waitFor.visibilityOf(
+      playPauseAudioButton,
+      'Play or pause audio button is taking too long to appear');
+    playPauseAudioButton.click();
+    return this.isAudioPlaying();
+  };
+
+  this.isAudioPlaying = function() {
+    return audioMaterialSliderDiv.getAttribute('aria-valuenow')
+      .then(function(firstValue) {
+        browser.sleep(2000);
+        return audioMaterialSliderDiv.getAttribute('aria-valuenow')
+          .then(function(secondValue) {
+            return +firstValue !== +secondValue;
+          });
+      }).then(function(isPlaying) {
+        return isPlaying;
+      });
+  }
 
   this.expectTranslationToMatch = function(richTextInstructions) {
     forms.expectRichText(translationDisplay).toMatch(richTextInstructions);
