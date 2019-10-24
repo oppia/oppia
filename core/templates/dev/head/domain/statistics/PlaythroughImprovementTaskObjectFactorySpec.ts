@@ -362,6 +362,8 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
 
         var task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
 
         expect(task.getStatus()).toEqual('open');
 
@@ -387,6 +389,8 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
 
         var task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
 
         expect(task.getStatus()).toEqual('open');
 
