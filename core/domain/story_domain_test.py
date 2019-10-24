@@ -242,7 +242,12 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.validate()
 
     def _assert_valid_story_id(self, expected_error_substring, story_id):
-        """Checks that the story id is valid."""
+        """Checks that the story id is valid.
+
+        Args:
+        expected_error_substring: string. String that should be a substring of the expected error message.
+        story_id: string. The story ID to validate. 
+        """
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             story_domain.Story.require_valid_story_id(story_id)
