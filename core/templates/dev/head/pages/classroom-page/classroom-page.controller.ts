@@ -22,7 +22,7 @@ require(
   'background-banner.directive.ts');
 require('components/summary-tile/topic-summary-tile.directive.ts');
 
-require('domain/classroom/ClassroomBackendApiService.ts');
+require('domain/classroom/classroom-backend-api.service.ts');
 require('domain/topic/TopicSummaryObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');

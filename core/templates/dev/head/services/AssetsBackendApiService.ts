@@ -20,7 +20,7 @@
 require('domain/utilities/AudioFileObjectFactory.ts');
 require('domain/utilities/FileDownloadRequestObjectFactory.ts');
 require('domain/utilities/ImageFileObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/CsrfTokenService.ts');
 
 angular.module('oppia').factory('AssetsBackendApiService', [

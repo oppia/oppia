@@ -16,7 +16,7 @@
  * @fileoverview Service to compare versions of explorations.
  */
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/state/StateObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');

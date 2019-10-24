@@ -16,7 +16,7 @@
  * @fileoverview Component for a subtopic tile.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('subtopicSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {

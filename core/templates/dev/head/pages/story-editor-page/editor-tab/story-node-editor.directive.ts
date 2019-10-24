@@ -16,8 +16,8 @@
  * @fileoverview Controller for the story node editor.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/story/StoryUpdateService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/AlertsService.ts');
 

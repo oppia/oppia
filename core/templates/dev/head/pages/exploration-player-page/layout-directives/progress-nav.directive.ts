@@ -20,7 +20,7 @@ require(
   'pages/exploration-player-page/learner-experience/' +
   'continue-button.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');

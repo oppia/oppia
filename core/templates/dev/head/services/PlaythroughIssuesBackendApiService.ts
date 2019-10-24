@@ -17,7 +17,7 @@
  */
 require('domain/statistics/PlaythroughObjectFactory.ts');
 require('domain/statistics/PlaythroughIssueObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('services/services.constants.ajs.ts');
 

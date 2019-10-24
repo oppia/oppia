@@ -16,8 +16,8 @@
  * @fileoverview Directive for the worked example editor.
  */
 
-require('domain/skill/SkillUpdateService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/skill/skill-update.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 angular.module('oppia').directive('workedExampleEditor', [

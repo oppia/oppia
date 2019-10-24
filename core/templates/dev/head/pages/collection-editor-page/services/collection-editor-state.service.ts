@@ -19,10 +19,10 @@
  */
 
 require('domain/collection/CollectionObjectFactory.ts');
-require('domain/collection/CollectionRightsBackendApiService.ts');
+require('domain/collection/collection-rights-backend-api.service.ts');
 require('domain/collection/CollectionRightsObjectFactory.ts');
-require('domain/collection/EditableCollectionBackendApiService.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/collection/editable-collection-backend-api.service.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('services/AlertsService.ts');
 
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');

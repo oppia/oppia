@@ -17,9 +17,9 @@
  * editor page.
  */
 
-require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ParamChangeObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-category.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');

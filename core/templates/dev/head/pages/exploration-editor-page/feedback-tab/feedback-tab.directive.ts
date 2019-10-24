@@ -16,7 +16,7 @@
  * @fileoverview Directive for the exploration editor feedback tab.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(

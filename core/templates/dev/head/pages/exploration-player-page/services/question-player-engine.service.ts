@@ -16,7 +16,7 @@
  * @fileoverview Utility service for the question player for an exploration.
  */
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('expressions/expression-interpolation.service.ts');

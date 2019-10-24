@@ -20,7 +20,7 @@ require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
   'state-graph-visualization.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require(

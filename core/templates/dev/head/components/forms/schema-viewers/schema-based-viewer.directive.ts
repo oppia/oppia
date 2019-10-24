@@ -29,7 +29,7 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('schemaBasedViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {

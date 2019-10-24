@@ -17,7 +17,7 @@
  */
 
 require('directives/angular-html-bind.directive.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 // This directive allows user to put html into select's options.
 // 'options' should be an array of objects containing attributes 'id' and 'val'

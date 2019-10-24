@@ -16,7 +16,7 @@
  * @fileoverview Displays circled images with linking (when available).
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('circularImage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

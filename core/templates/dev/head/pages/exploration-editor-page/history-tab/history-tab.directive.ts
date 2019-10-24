@@ -21,7 +21,7 @@ require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require(
   'pages/exploration-editor-page/history-tab/services/' +

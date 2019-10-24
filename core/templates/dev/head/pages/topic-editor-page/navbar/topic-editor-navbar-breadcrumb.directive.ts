@@ -16,7 +16,7 @@
  * @fileoverview Controller for the navbar breadcrumb of the topic editor.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/stateful/FocusManagerService.ts');
 

@@ -17,7 +17,7 @@
  */
 
 require('components/graph-services/graph-layout.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require(

@@ -17,7 +17,7 @@
  * questions list in editors.
  */
 
-require('domain/question/QuestionBackendApiService.ts');
+require('domain/question/question-backend-api.service.ts');
 require('services/ContextService.ts');
 require('services/services.constants.ajs.ts');
 

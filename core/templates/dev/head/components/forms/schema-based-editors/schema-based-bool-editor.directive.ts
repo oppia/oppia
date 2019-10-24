@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for booleans.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('schemaBasedBoolEditor', [
   'UrlInterpolationService',

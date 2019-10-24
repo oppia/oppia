@@ -16,7 +16,7 @@
  * @fileoverview Directive for the DragAndDropSortInput interaction.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/DragAndDropSortInput/directives/' +
   'drag-and-drop-sort-input-rules.service.ts');

@@ -22,7 +22,7 @@ require(
   'pages/exploration-editor-page/editor-tab/test-interaction-panel/' +
   'test-interaction-panel.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/angular-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(

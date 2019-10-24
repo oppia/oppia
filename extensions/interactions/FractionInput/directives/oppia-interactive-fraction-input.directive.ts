@@ -17,7 +17,7 @@
  */
 
 require('domain/objects/FractionObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/FractionInput/directives/' +
   'fraction-input-rules.service.ts');

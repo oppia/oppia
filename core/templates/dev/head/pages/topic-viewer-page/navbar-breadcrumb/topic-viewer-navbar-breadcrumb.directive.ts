@@ -16,7 +16,7 @@
  * @fileoverview Directive for the navbar breadcrumb of the topic viewer.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/UrlService.ts');
 
 angular.module('oppia').directive('topicViewerNavbarBreadcrumb', [

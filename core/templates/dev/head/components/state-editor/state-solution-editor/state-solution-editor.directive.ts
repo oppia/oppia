@@ -23,7 +23,7 @@ require(
   'components/state-directives/solution-editor/solution-editor.directive.ts');
 
 require('domain/exploration/SolutionObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');

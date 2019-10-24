@@ -20,9 +20,9 @@ require(
   'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 
 require('components/entity-creation-services/story-creation.service.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/TopicUpdateService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
 angular.module('oppia').directive('topicEditorTab', [

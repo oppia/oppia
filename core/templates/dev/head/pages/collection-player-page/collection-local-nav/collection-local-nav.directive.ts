@@ -16,7 +16,7 @@
  * @fileoverview Directive for the local navigation in the collection view.
  */
 
-require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('domain/collection/read-only-collection-backend-api.service.ts');
 require('services/contextual/UrlService.ts');
 
 angular.module('oppia').directive('collectionLocalNav', [

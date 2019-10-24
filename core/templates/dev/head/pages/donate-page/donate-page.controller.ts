@@ -18,7 +18,7 @@
 
 require('base-components/base-content.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 

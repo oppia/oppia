@@ -22,7 +22,7 @@ require(
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 
 require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/UserService.ts');

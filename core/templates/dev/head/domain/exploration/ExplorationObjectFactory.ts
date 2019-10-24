@@ -20,7 +20,7 @@
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('ExplorationObjectFactory', [
   '$log', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',

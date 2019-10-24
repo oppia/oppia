@@ -22,7 +22,7 @@ require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 
 require('filters/convert-unicode-with-params-to-html.filter.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/DeviceInfoService.ts');
 
 angular.module('oppia').directive('schemaBasedUnicodeEditor', [

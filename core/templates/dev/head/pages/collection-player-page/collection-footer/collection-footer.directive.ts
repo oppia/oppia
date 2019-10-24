@@ -21,7 +21,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/UrlService.ts');
 
 angular.module('oppia').directive('collectionFooter', [

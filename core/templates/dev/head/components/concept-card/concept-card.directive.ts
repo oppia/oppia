@@ -16,7 +16,7 @@
  * @fileoverview Directive for the concept cards viewer.
  */
 
-require('domain/skill/ConceptCardBackendApiService.ts');
+require('domain/skill/concept-card-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('filters/format-rte-preview.filter.ts');
 

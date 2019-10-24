@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for expressions.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('schemaBasedExpressionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

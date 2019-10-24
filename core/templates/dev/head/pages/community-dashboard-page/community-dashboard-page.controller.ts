@@ -34,7 +34,7 @@ require(
   'voiceover-opportunities.directive.ts');
 
 require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/LocalStorageService.ts');
 require('services/UserService.ts');
 

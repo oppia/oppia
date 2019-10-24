@@ -17,11 +17,11 @@
  * in the skill editor.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/question/QuestionBackendApiService.ts');
-require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/question/question-backend-api.service.ts');
+require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/SkillRightsBackendApiService.ts');
+require('domain/skill/skill-rights-backend-api.service.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/QuestionsListService.ts');

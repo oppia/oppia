@@ -43,7 +43,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('App.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
 

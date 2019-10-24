@@ -16,7 +16,7 @@
  * @fileoverview Directive for the background banner.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('backgroundBanner', [
   'UrlInterpolationService', function(UrlInterpolationService) {

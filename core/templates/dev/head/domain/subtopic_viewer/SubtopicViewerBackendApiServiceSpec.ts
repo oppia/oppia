@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/subtopic_viewer/SubtopicViewerBackendApiService.ts');
+require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
 
 describe('Subtopic viewer backend API service', function() {
   var SubtopicViewerBackendApiService = null;

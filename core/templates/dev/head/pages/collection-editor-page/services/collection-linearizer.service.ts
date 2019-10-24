@@ -18,7 +18,7 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
-require('domain/collection/CollectionUpdateService.ts');
+require('domain/collection/collection-update.service.ts');
 
 angular.module('oppia').factory('CollectionLinearizerService', [
   'CollectionUpdateService',

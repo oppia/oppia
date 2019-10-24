@@ -26,13 +26,13 @@ require(
   'questions-list.constants.ajs.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');

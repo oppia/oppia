@@ -25,7 +25,7 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'TopicsAndSkillsDashboardBackendApiService.ts'
 );
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 describe('Topics and Skills Dashboard backend API service', function() {
   var TopicsAndSkillsDashboardBackendApiService = null;

@@ -16,7 +16,7 @@
  * @fileoverview Directive for the exploration objective/goal field in forms.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-objective.service.ts');
 

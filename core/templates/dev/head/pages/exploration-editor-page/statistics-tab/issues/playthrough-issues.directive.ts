@@ -26,7 +26,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'cyclic-transitions-issue.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/PlaythroughIssuesService.ts');
 
 angular.module('oppia').directive('playthroughIssues', [

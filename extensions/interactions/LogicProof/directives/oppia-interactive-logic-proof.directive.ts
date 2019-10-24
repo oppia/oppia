@@ -18,7 +18,7 @@
 
 require('interactions/codemirrorRequires.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');

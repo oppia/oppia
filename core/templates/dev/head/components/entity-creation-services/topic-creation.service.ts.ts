@@ -16,7 +16,7 @@
  * @fileoverview Modal and functionality for the create topic button.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 
 angular.module('oppia').factory('TopicCreationService', [

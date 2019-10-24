@@ -18,7 +18,7 @@
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require('domain/statistics/statistics-domain.constants.ajs.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +

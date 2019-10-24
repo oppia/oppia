@@ -16,7 +16,7 @@
  * @fileoverview Service for showing the hint and solution modals.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-manager.service.ts');

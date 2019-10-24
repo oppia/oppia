@@ -16,7 +16,7 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 

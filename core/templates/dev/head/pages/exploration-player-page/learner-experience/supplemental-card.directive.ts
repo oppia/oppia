@@ -17,7 +17,7 @@
  */
 require('directives/angular-html-bind.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-manager.service.ts');

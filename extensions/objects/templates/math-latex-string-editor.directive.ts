@@ -18,7 +18,7 @@
 
 require('directives/mathjax-bind.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed

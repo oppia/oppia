@@ -16,7 +16,7 @@
  * @fileoverview Service for detecting spamming behavior from the learner.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('FatigueDetectionService', [
   '$uibModal', 'UrlInterpolationService',

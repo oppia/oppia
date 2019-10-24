@@ -16,7 +16,7 @@
  * @fileoverview Directive for the footer.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('oppiaFooter', [
   'UrlInterpolationService', function(

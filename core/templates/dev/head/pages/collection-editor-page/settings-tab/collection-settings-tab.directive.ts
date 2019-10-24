@@ -23,7 +23,7 @@ require(
   'pages/collection-editor-page/settings-tab/' +
   'collection-permissions-card.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('collectionSettingsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
