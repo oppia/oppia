@@ -72,7 +72,6 @@
                 ng-options="node.getId() as node.getTitle() for node in nodes"
                 style="width: 300px; margin-bottom: 10px;"
                 ng-click="markAsInitialNode(initialNodeId)">
-          <option value="">Select the initial chapter</option>
         </select>
       </div>
     </div>
@@ -117,7 +116,7 @@
         </div>
       </div>
       <div class="node-editor">
-        <div ng-repeat="node in linearNodesList">
+        <div ng-repeat="node in nodes">
           <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
                              node-id="node.getId()"
                              outline="node.getOutline()"
