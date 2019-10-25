@@ -58,11 +58,9 @@ describe('Exploration tab', function() {
     explorationEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
       'Upload voiceovered file');
 
-    explorationEditorTranslationTab.uploadAudioTranslationFile(
-      '../data/cafe.mp3')
-      .then(function(response) {
-        expect(response.uploaded).toBe(true);
-      });
+    explorationEditorTranslationTab.openUploadAudioModal();
+    explorationEditorTranslationTab.uploadAudio(
+      '../data/cafe.mp3');
   });
 
   it('should play an uploaded audio file', function() {
@@ -79,12 +77,20 @@ describe('Exploration tab', function() {
       });
   });
 
+  it('should not let upload a non audio file', function() {
+    explorationEditorTranslationTab.openUploadAudioModal();
+    explorationEditorTranslationTab.expectWrongFileType(
+      '../data/img.png');
+    explorationEditorTranslationTab.expectSaveUploadedAudioButtonToBeDisabled();
+    explorationEditorTranslationTab.closeUploadAudioModal();
+  });
+
   it('should not let upload a five minutes longer video', function() {
-    explorationEditorTranslationTab.reuploadAudioTranslationFile(
-      '../data/cafe-over-five-minutes.mp3')
-      .then(function(response) {
-        expect(response.uploaded).toBe(false);
-      });
+    explorationEditorTranslationTab.openUploadAudioModal();
+    explorationEditorTranslationTab.expectAudioOverFiveMinutes(
+      '../data/cafe-over-five-minutes.mp3');
+    explorationEditorTranslationTab.expectSaveUploadedAudioButtonToBeDisabled();
+    explorationEditorTranslationTab.closeUploadAudioModal();
   });
 
   afterAll(function() {
@@ -100,7 +106,9 @@ describe('Exploration tab', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([
-      'Failed to load resource: the server responded with a status of 400'
-    ]);
+      'Failed to load resource: the server responded with a status of 400' +
+      '(Bad Request)', {status_code: 400,
+        error: 'Audio files must be under 300 seconds in length.' +
+       ' The uploaded file is 301.87 seconds long.'}]);
   });
 });

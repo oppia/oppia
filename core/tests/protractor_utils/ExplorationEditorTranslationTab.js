@@ -199,16 +199,18 @@ var ExplorationEditorTranslationTab = function() {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
 
-  var audioUploadButton = element(
-    by.css('.protractor-test-audio-upload-input'));
-  var saveAudioFileButton = element(
-    by.css('.protractor-test-save-audio-file'));
+  var audioUploadInputElem = element(
+    by.css('.protractor-test-upload-audio'));
+  var audioOverFiveMinutesErrorMessageElement = element(
+    by.css('.protractor-test-audio-file-upload-field-error-message'));
+  var uploadAudioButton = element.all(
+    by.css('.protractor-test-upload-audio-button')).last();
+  var saveUploadedAudioButton = element(
+    by.css('.protractor-test-save-uploaded-audio-button'));
   var playPauseAudioButton = element(
     by.css('.protractor-test-play-pause-audio-button'));
   var audioMaterialSliderDiv = element(
     by.css('.md-slider-wrapper'));
-  var uploadAudioFileError = element(
-    by.css('.protractor-test-upload-audio-file-error'));
   var closeAudioUploaderModal = element(
     by.css('.protractor-test-close-audio-upload-modal'));
 
@@ -234,44 +236,52 @@ var ExplorationEditorTranslationTab = function() {
       'State translation editor takes too long to disappear');
   };
 
-  this.uploadAudioTranslationFile = function(filePath) {
-    waitFor.elementToBeClickable(
-      translationTabUploadRecordingAccessibility,
-      'Translation tab upload is taking too long to appear');
-    translationTabUploadRecordingAccessibility.click();
-    waitFor.pageToFullyLoad();
-
-    return this.openUploadTranslationAudioModal(filePath);
+  this.expectSaveUploadedAudioButtonToBeDisabled = function() {
+    expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
   };
 
-  this.reuploadAudioTranslationFile = function(filePath) {
+  this.uploadAudio = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElem.sendKeys(audioAbsolutePath);
     waitFor.elementToBeClickable(
-      translationTabReuploadReacordingAccessibility,
-      'Translation tab reupload is taking too long to appear');
-    translationTabReuploadReacordingAccessibility.click();
-    waitFor.pageToFullyLoad();
-
-    return this.openUploadTranslationAudioModal(filePath);
+      saveUploadedAudioButton, 'Save button is not clickable');
+    saveUploadedAudioButton.click();
+    waitFor.invisibilityOf(saveUploadedAudioButton,
+      'Upload Audio modal takes too long to disappear');
   };
 
-  this.openUploadTranslationAudioModal = function(filePath) {
-    waitFor.elementToBeClickable(
-      audioUploadButton,
-      'Audio upload button is taking too long to appear');
-    var absolutePath = path.resolve(__dirname, filePath);
-    return audioUploadButton.sendKeys(absolutePath)
-      .then(function() {
-        saveAudioFileButton.click();
-      }).then(function() {
-        waitFor.visibilityOf(
-          uploadAudioFileError,
-          'Upload audio file error message is not visible');
+  this.expectWrongFileType = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElem.sendKeys(audioAbsolutePath);
+    expect(element(by.css('div.error-message')).getText())
+      .toContain('This file is not recognized as an audio file.');
+  };
 
-        closeAudioUploaderModal.click();
-        return { uploaded: false };
-      }).catch(function() {
-        return { uploaded: true };
-      });
+  this.expectAudioOverFiveMinutes = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElem.sendKeys(audioAbsolutePath);
+    waitFor.elementToBeClickable(
+      saveUploadedAudioButton, 'Save button is not clickable');
+    saveUploadedAudioButton.click();
+    waitFor.visibilityOf(audioOverFiveMinutesErrorMessageElement,
+      'Error element is not visible');
+    expect(audioOverFiveMinutesErrorMessageElement.getText()).toContain(
+      'Audio files must be under 300 seconds in length.');
+  };
+
+  this.openUploadAudioModal = function() {
+    waitFor.elementToBeClickable(
+      uploadAudioButton, 'Upload Audio button is not clickable');
+    uploadAudioButton.click();
+  };
+
+  this.closeUploadAudioModal = function() {
+    waitFor.elementToBeClickable(
+      closeAudioUploaderModal, 'Close audio uploader modal is not clickable');
+    closeAudioUploaderModal.click();
   };
 
   this.playOrPauseAudioFile = function() {
