@@ -16,7 +16,7 @@
  * @fileoverview Directive for visualizing early quit issue.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/PlaythroughIssuesService.ts');
 

@@ -30,33 +30,29 @@
     <button type="submit" class="btn btn-success btn-sm" ng-disabled="!canSaveExpId || (explorationId === currentExplorationId)">Save</button>
   </form>
   <label style="padding-top: 2em;" class="form-heading"> Prerequisite Skill IDs </label>
-  <form class="form-horizontal" role="form" ng-submit="addPrerequisiteSkillId(prerequisiteSkillId)">
-    <input type="text" ng-model="prerequisiteSkillId" style="margin-bottom: 1em;">
-    <button type="submit" class="btn btn-success btn-sm">Add</button>
-    <md-card class="destination-node-id"
-             ng-repeat="skillId in getPrerequisiteSkillIds()">
-      <div class="repeating-card-wrapper">
-        <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillId]></a>
+  <div>
+    <md-card class="destination-node-id" ng-repeat="skillId in getPrerequisiteSkillIds()">
+      <div class="skill-description-card">
         <span style="float: right;" ng-click="removePrerequisiteSkillId(skillId)" aria-hidden="true">
           <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
         </span>
+        <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
       </div>
     </md-card>
-  </form>
+    <button class="btn btn-success btn-sm" ng-click="addPrerequisiteSkillId()">Add Prerequisite Skill</button>
+  </div>
   <label style="padding-top: 2em;" class="form-heading"> Acquired Skill IDs </label>
-  <form class="form-horizontal" role="form" ng-submit="addAcquiredSkillId(acquiredSkillId)">
-    <input type="text" ng-model="acquiredSkillId" style="margin-bottom: 1em;">
-    <button type="submit" class="btn btn-success btn-sm">Add</button>
-    <md-card class="destination-node-id"
-             ng-repeat="skillId in getAcquiredSkillIds()">
-      <div class="repeating-card-wrapper">
-        <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillId]></a>
+  <div>
+    <md-card class="destination-node-id" ng-repeat="skillId in getAcquiredSkillIds()">
+      <div class="skill-description-card">
         <span style="float: right;" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
           <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
         </span>
+        <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
       </div>
     </md-card>
-  </form>
+    <button class="btn btn-success btn-sm" ng-click="addAcquiredSkillId()">Add Acquired Skill</button>
+  </div>
   <div class="node-field">
     <div ng-if="getDestinationNodeIds().length > 0">
       <label class="form-heading"> Next Chapter </label>
@@ -104,6 +100,11 @@
   story-editor .node-field {
     margin-top: 3%;
     height: auto;
+  }
+  story-editor .skill-description-card {
+    height: 2.5em;
+    padding-left: 10px;
+    padding-top: 10px;
   }
   story-editor .node-field label {
     margin-bottom: 3%;

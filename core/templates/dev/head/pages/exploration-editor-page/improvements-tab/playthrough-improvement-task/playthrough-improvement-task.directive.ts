@@ -16,7 +16,7 @@
  * @fileoverview Playthrough Improvement task directive.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/PlaythroughIssuesService.ts');
 
 angular.module('oppia').directive('playthroughImprovementTask', [
