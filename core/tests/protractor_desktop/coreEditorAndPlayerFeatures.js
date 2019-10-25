@@ -25,7 +25,6 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
@@ -51,14 +50,20 @@ describe('Enable correctness feedback and set correctness', function() {
     ['NumericInput', 3]
   ];
 
-
   var applyCommonSettings = function() {
     explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle(explorationTitle);
-    explorationEditorSettingsTab.setCategory('Algorithm');
-    explorationEditorSettingsTab.setObjective('Learn more about Oppia');
-    explorationEditorSettingsTab.setLanguage('English');
     explorationEditorSettingsTab.enableCorrectnessFeedback();
+  };
+
+  var testEnableCorrectnessInPlayerPage = function() {
+    libraryPage.get();
+    libraryPage.findExploration(explorationTitle);
+    libraryPage.playExploration(explorationTitle);
+    explorationPlayerPage.submitAnswer.apply(
+      null, correctOptions[currentExplorationIndex]);
+    explorationPlayerPage.expectCorrectFeedback();
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
   };
 
   beforeAll(function() {
@@ -75,6 +80,12 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle(explorationTitle);
+    explorationEditorSettingsTab.setCategory('Algorithm');
+    explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    explorationEditorSettingsTab.setLanguage('English');
+    explorationEditorPage.navigateToMainTab();
   });
 
   it('should allow selecting correct feedback from the response editor ' +
@@ -105,6 +116,8 @@ describe('Enable correctness feedback and set correctness', function() {
     responseEditor.markAsCorrect();
     explorationEditorMainTab.expectTickMarkIsDisplayed();
     explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+    testEnableCorrectnessInPlayerPage();
   });
 
   it('should allow selecting correct feedback from the response editor ' +
@@ -118,7 +131,7 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorMainTab.setContent(forms.toRichText(
       'Select the right option.'));
 
-    // Create interaction without close the add response modal. Set
+    // Create interaction without closing the add response modal. Set
     // correctness in the modal.
     explorationEditorMainTab.setInteractionWithoutCloseAddResponse('TextInput');
     responseEditor = explorationEditorMainTab.getResponseEditor('pop');
@@ -135,6 +148,8 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorMainTab.moveToState('End');
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+    testEnableCorrectnessInPlayerPage();
   });
 
   it('should allow selecting correct feedback from the default response editor',
@@ -159,18 +174,11 @@ describe('Enable correctness feedback and set correctness', function() {
       explorationEditorMainTab.moveToState('End');
       explorationEditorMainTab.setInteraction('EndExploration');
       explorationEditorPage.saveChanges();
+      workflow.publishExploration();
+      testEnableCorrectnessInPlayerPage();
     });
 
   afterEach(function() {
-    workflow.publishExploration();
-    libraryPage.get();
-    libraryPage.findExploration(explorationTitle);
-    libraryPage.playExploration(explorationTitle);
-    explorationPlayerPage.submitAnswer.apply(
-      null, correctOptions[currentExplorationIndex]);
-    explorationPlayerPage.expectCorrectFeedback();
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
     libraryPage.get();
     currentExplorationIndex += 1;
   });
