@@ -213,7 +213,7 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen && userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'stats'}"
+  <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'stats'}"
       class="nav-item d-none d-lg-block">
     <a  href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-stats-tab">
