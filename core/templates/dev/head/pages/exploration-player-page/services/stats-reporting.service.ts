@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/StopwatchObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/ContextService.ts');
