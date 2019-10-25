@@ -29,6 +29,8 @@ import { ClassifierObjectFactory } from
 import { EditabilityService } from 'services/EditabilityService';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -94,7 +96,6 @@ describe('ImprovementTaskService', function() {
   var PlaythroughImprovementTaskObjectFactory = null;
   var SuggestionImprovementTaskObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
@@ -108,6 +109,8 @@ describe('ImprovementTaskService', function() {
     $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value(
+      'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
@@ -160,6 +163,7 @@ describe('ImprovementTaskService', function() {
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
   }));
+
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _ImprovementTaskService_,
       _AnswerDetailsImprovementTaskObjectFactory_,
@@ -184,6 +188,8 @@ describe('ImprovementTaskService', function() {
       PlaythroughImprovementTaskObjectFactory,
       SuggestionImprovementTaskObjectFactory,
     ];
+
+    this.scope = $rootScope.$new();
   }));
 
   describe('.getImprovementTaskObjectFactoryRegistry', function() {
@@ -196,39 +202,26 @@ describe('ImprovementTaskService', function() {
 
       // Ordering isn't important, so allow the checks to be flexible.
       expect(actualFactories.length).toEqual(this.expectedFactories.length);
-      this.expectedFactories.forEach(function(expectedFactory) {
-        expect(actualFactories).toContain(expectedFactory);
+      this.expectedFactories.forEach(factory => {
+        expect(actualFactories).toContain(factory);
       });
     });
   });
 
   describe('.fetchTasks', function() {
-    // Each individual factory should test their own fetchTasks function.
+    // NOTE: Each individual factory should test their own fetchTasks function.
 
-    describe('from factories which all return empty tasks', function() {
-      beforeEach(function() {
-        this.expectedFactories.forEach(function(factory) {
-          spyOn(factory, 'fetchTasks').and.callFake(function() {
-            return $q.resolve([]);
-          });
-        });
+    it('returns empty list when each factory returns no tasks', function(done) {
+      this.expectedFactories.forEach(factory => {
+        spyOn(factory, 'fetchTasks').and.returnValue($q.resolve([]));
       });
 
-      it('returns an empty list', function(done) {
-        var onSuccess = function(tasks) {
-          expect(tasks).toEqual([]);
-          done();
-        };
-        var onFailure = function(error) {
-          done.fail(error);
-        };
+      ImprovementTaskService.fetchTasks()
+        .then(allTasks => expect(allTasks).toEqual([]))
+        .then(done, done.fail);
 
-        ImprovementTaskService.fetchTasks().then(onSuccess, onFailure);
-
-        // $q Promises need to be forcibly resolved through a JavaScript digest,
-        // which is what $apply helps kick-start.
-        $rootScope.$apply();
-      });
+      // Force all pending promises to evaluate.
+      this.scope.$digest();
     });
   });
 });
