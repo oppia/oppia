@@ -17,11 +17,14 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
+import getpass
 import os
+import re
 import socket
 import subprocess
 
 import python_utils
+import release_constants
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -148,7 +151,7 @@ def is_current_branch_a_release_branch():
         bool. Whether the current branch is a release branch.
     """
     current_branch_name = get_current_branch_name()
-    return current_branch_name.startswith(RELEASE_BRANCH_NAME_PREFIX)
+    return bool(re.match(r'release-\d+\.\d+\.\d+$', current_branch_name))
 
 
 def verify_current_branch_name(expected_branch_name):
@@ -264,6 +267,45 @@ def install_npm_library(library_name, version, path):
         python_utils.PRINT('Installing %s' % library_name)
         subprocess.call([
             'yarn', 'add', '%s@%s' % (library_name, version)])
+
+
+def ask_user_to_confirm(message):
+    """Asks user to perform a task and confirm once they are done.
+
+    Args:
+        message: str. The message which specifies the task user has
+            to do.
+    """
+    while True:
+        python_utils.PRINT(
+            '******************************************************')
+        python_utils.PRINT(message)
+        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
+        answer = python_utils.INPUT().lower()
+        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+            return
+
+
+def get_personal_access_token():
+    """"Returns the personal access token for the GitHub id of user.
+
+    Returns:
+        str. The personal access token for the GitHub id of user.
+
+    Raises:
+        Exception: Personal access token is None.
+    """
+    personal_access_token = getpass.getpass(
+        prompt=(
+            'Please provide personal access token for your github ID. '
+            'You can create one at https://github.com/settings/tokens: '))
+
+    if personal_access_token is None:
+        raise Exception(
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script')
+    return personal_access_token
 
 
 class CD(python_utils.OBJECT):

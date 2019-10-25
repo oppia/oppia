@@ -19,6 +19,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
+import getpass
 import http.server
 import os
 import shutil
@@ -347,3 +348,30 @@ class CommonTests(test_utils.GenericTestBase):
 
         with self.swap(subprocess, 'call', _mock_subprocess_call):
             common.install_npm_library('library_name', 'version', 'path')
+
+    def test_ask_user_to_confirm(self):
+        def mock_input():
+            return 'Y'
+        with self.swap(python_utils, 'INPUT', mock_input):
+            common.ask_user_to_confirm('Testing')
+
+    def test_get_personal_access_token_with_valid_token(self):
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return 'token'
+        # pylint: enable=unused-argument
+        with self.swap(getpass, 'getpass', mock_getpass):
+            self.assertEqual(common.get_personal_access_token(), 'token')
+
+    def test_get_personal_access_token_with_token_as_none(self):
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return None
+        # pylint: enable=unused-argument
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+        with getpass_swap, self.assertRaisesRegexp(
+            Exception,
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script'):
+            common.get_personal_access_token()

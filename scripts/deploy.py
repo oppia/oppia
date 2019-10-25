@@ -48,6 +48,7 @@ import string
 import subprocess
 
 import python_utils
+import release_constants
 
 from . import common
 from . import gcloud_adapter
@@ -189,7 +190,7 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
             'PLEASE CONFIRM: %s See %s '
             '(y/n)' % (msg_to_confirm, url_to_check))
         answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
+        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
             return True
         elif answer:
             return False

@@ -20,19 +20,18 @@ using release_summary.md.
 This script should only be run after release_info.py script is run
 successfully.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import collections
 import datetime
-import getpass
 import os
-import re
 import sys
 
-import feconf
 import python_utils
+import release_constants
 
 from . import common
 
@@ -111,7 +110,7 @@ def check_ordering_of_sections(release_summary_lines):
             ../release_summary.md.
 
     Raises:
-        Exception: If expected ordering does not match the ordering
+        Exception: The expected ordering does not match the ordering
             in release_summary.md.
     """
     sections = [
@@ -365,35 +364,18 @@ def create_branch(repo_fork, target_branch, github_username):
         'Please create a pull request from the %s branch' % target_branch)
 
 
-def ask_user_to_confirm(message):
-    """Asks user to perform a task and confirm once they are done.
-
-    Args:
-        message: str. The message which specifies the task user has
-            to do.
-    """
-    while True:
-        python_utils.PRINT(
-            '******************************************************')
-        python_utils.PRINT(message)
-        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
-        answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
-            return
-
-
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
-    if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
+    if not common.is_current_branch_a_release_branch():
         raise Exception(
             'This script should only be run from the latest release branch.')
 
-    if not os.path.exists(feconf.RELEASE_SUMMARY_FILEPATH):
+    if not os.path.exists(release_constants.RELEASE_SUMMARY_FILEPATH):
         raise Exception(
             'Release summary file %s is missing. Please run the '
             'release_info.py script and re-run this script.' % (
-                feconf.RELEASE_SUMMARY_FILEPATH))
+                release_constants.RELEASE_SUMMARY_FILEPATH))
 
     parsed_args = _PARSER.parse_args()
     if parsed_args.github_username is None:
@@ -402,16 +384,7 @@ def main():
             'script specifying a username using --username=<Your username>')
     github_username = parsed_args.github_username
 
-    personal_access_token = getpass.getpass(
-        prompt=(
-            'Please provide personal access token for your github ID. '
-            'You can create one at https://github.com/settings/tokens: '))
-
-    if personal_access_token is None:
-        raise Exception(
-            'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and re-run '
-            'the script')
+    personal_access_token = common.get_personal_access_token()
     g = github.Github(personal_access_token)
     repo_fork = g.get_repo('%s/oppia' % github_username)
 
@@ -426,12 +399,13 @@ def main():
         'updating the CHANGELOG file\n- have a correct list of new '
         'authors and contributors to update AUTHORS, CONTRIBUTORS '
         'and developer_names section in about-page.directive.html\n' % (
-            feconf.RELEASE_SUMMARY_FILEPATH))
-    ask_user_to_confirm(message)
+            release_constants.RELEASE_SUMMARY_FILEPATH))
+    common.ask_user_to_confirm(message)
 
     release_summary_lines = []
     with python_utils.open_file(
-        feconf.RELEASE_SUMMARY_FILEPATH, 'r') as release_summary_file:
+        release_constants.RELEASE_SUMMARY_FILEPATH, 'r'
+        ) as release_summary_file:
         release_summary_lines = release_summary_file.readlines()
 
     check_ordering_of_sections(release_summary_lines)
@@ -447,12 +421,13 @@ def main():
         'following files:\n1. %s\n2. %s\n3. %s\n4. %s\n' % (
             CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
             ABOUT_PAGE_FILEPATH))
-    ask_user_to_confirm(message)
+    common.ask_user_to_confirm(message)
 
     create_branch(repo_fork, target_branch, github_username)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when build.py is used as a script.
+# it will only be called when update_changelog_and_credits.py is used as
+# a script.
 if __name__ == '__main__': # pragma: no cover
     main()
