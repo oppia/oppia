@@ -6,9 +6,23 @@
     <div class="list-group-item"  ng-repeat="skillWithDifficulty in linkedSkillsWithDifficulty track by $index">
       <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty.getDescription()]></label>
       <md-radio-group ng-model="skillWithDifficulty._difficulty">
-        <md-radio-button value="0.3">Easy</md-radio-button>
-        <md-radio-button value="0.6">Medium</md-radio-button>
-        <md-radio-button value="0.9">Hard</md-radio-button>
+        <md-radio-button value="0.3">
+          Easy:
+          <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][0].getExplanation()">
+          </angular-html-bind>
+        </md-radio-button>
+
+        <md-radio-button value="0.6">
+          Medium:
+          <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][1].getExplanation()">
+          </angular-html-bind>
+        </md-radio-button>
+
+        <md-radio-button value="0.9">
+          Hard:
+          <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][2].getExplanation()">
+          </angular-html-bind>
+        </md-radio-button>
       </md-radio-group>
     </div>
   </div>

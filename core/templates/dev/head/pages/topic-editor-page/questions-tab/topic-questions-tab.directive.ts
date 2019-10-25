@@ -72,6 +72,8 @@ angular.module('oppia').directive('questionsTab', [
             $scope.skillId = null;
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
+            $scope.skillIdToRubricsObject =
+              TopicEditorStateService.getSkillIdToRubricsObject();
             $scope.allSkillSummaries = [];
             $scope.allSkillSummaries = $scope.allSkillSummaries.concat(
               $scope.topic.getUncategorizedSkillSummaries());

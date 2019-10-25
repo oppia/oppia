@@ -16,9 +16,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import email_manager
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
@@ -78,8 +81,21 @@ class TopicPageDataHandler(base.BaseHandler):
         subtopics = topic.get_all_subtopics()
 
         assigned_skill_ids = topic.get_all_skill_ids()
-        skill_descriptions = skill_services.get_skill_descriptions_by_ids(
-            topic.id, assigned_skill_ids)
+        skill_descriptions, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(
+                assigned_skill_ids))
+
+        if deleted_skill_ids:
+            deleted_skills_string = ', '.join(deleted_skill_ids)
+            logging.error(
+                'The deleted skills: %s are still present in topic with id %s'
+                % (deleted_skills_string, topic.id)
+            )
+            if feconf.CAN_SEND_EMAILS:
+                email_manager.send_mail_to_admin(
+                    'Deleted skills present in topic',
+                    'The deleted skills: %s are still present in topic with '
+                    'id %s' % (deleted_skills_string, topic.id))
 
         if self.user_id:
             degrees_of_mastery = skill_services.get_multi_user_skill_mastery(

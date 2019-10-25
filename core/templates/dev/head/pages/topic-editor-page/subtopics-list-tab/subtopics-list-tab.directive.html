@@ -57,14 +57,16 @@
                dnd-effect-allowed="move"
                dnd-dragstart="startMoveSkill(null, skillSummary)"
                dnd-disable-if="isSkillDeleted(skillSummary)">
-        <a ng-if="!isSkillDeleted(skillSummary)"
-           ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-          <[skillSummary.getDescription()]>
-        </a>
-        <span class="fas fa-trash-alt delete-icon" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></span>
-        <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
-          Skill Deleted
-        </span>
+        <div class="skill-card">
+          <a ng-if="!isSkillDeleted(skillSummary)"
+             ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+            <[skillSummary.getDescription()]>
+          </a>
+          <span class="fas fa-trash-alt delete-icon" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></span>
+          <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
+            Skill Deleted
+          </span>
+        </div>
       </md-card>
       <p class="intro-card-message" ng-if="uncategorizedSkillSummaries.length === 0" style="padding-top: 6px;">
         There are no pending skills in the topic. To add skills to the topic, go to the skills list in the
@@ -74,6 +76,12 @@
   </md-card>
 </div>
 <style>
+  subtopics-list-tab .skill-card {
+    height: 2.5em;
+    padding-right: 10px;
+    padding-top: 10px;
+  }
+
   subtopics-list-tab .uncategorized-skill-ids .delete-icon {
     float: right;
   }

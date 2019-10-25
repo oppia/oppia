@@ -236,45 +236,6 @@ describe('Topic update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
-  it('should add/remove an uncategorized skill id to/from a topic',
-    function() {
-      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
-        _firstSkillSummary
-      ]);
-      TopicUpdateService.addUncategorizedSkill(
-        _sampleTopic, _thirdSkillSummary);
-      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
-        _firstSkillSummary, _thirdSkillSummary
-      ]);
-
-      UndoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
-        _firstSkillSummary
-      ]);
-    }
-  );
-
-  it('should create a proper backend change dict for adding an uncategorized ' +
-    'skill id',
-  function() {
-    TopicUpdateService.addUncategorizedSkill(
-      _sampleTopic, _thirdSkillSummary);
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-      cmd: 'add_uncategorized_skill_id',
-      new_uncategorized_skill_id: 'skill_3'
-    }]);
-  });
-
-  it('should not create a backend change dict for adding an uncategorized ' +
-    'skill id when an error is encountered',
-  function() {
-    expect(function() {
-      TopicUpdateService.addUncategorizedSkill(
-        _sampleTopic, _firstSkillSummary);
-    }).toThrow();
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
-  });
-
   it('should remove/add an uncategorized skill id from/to a topic',
     function() {
       expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([

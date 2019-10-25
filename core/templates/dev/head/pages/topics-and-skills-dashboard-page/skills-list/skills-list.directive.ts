@@ -17,8 +17,7 @@
  */
 
 require(
-  'pages/topics-and-skills-dashboard-page/skill-selector/' +
-  'skill-selector.directive.ts');
+  'components/skill-selector/skill-selector.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');

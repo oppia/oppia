@@ -24,7 +24,8 @@ from core.domain import topic_domain
 from core.platform import models
 import feconf
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(skill_models, topic_models,) = models.Registry.import_models([
+    models.NAMES.skill, models.NAMES.topic])
 memcache_services = models.Registry.import_memcache_services()
 
 

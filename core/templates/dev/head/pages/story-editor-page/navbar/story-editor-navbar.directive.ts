@@ -72,8 +72,8 @@ angular.module('oppia').directive('storyEditorNavbar', [
           };
 
           var _validateStory = function() {
-            _validateExplorations();
             $scope.validationIssues = $scope.story.validate();
+            _validateExplorations();
           };
 
           var _validateExplorations = function() {
@@ -84,6 +84,9 @@ angular.module('oppia').directive('storyEditorNavbar', [
                 nodes[i].getExplorationId() !== null &&
                 nodes[i].getExplorationId() !== '') {
                 explorationIds.push(nodes[i].getExplorationId());
+              } else {
+                $scope.validationIssues.push(
+                  'Some chapters don\'t have exploration IDs provided.');
               }
             }
 

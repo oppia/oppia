@@ -18,6 +18,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -62,6 +63,9 @@ class EditableStoryDataHandler(base.BaseHandler):
         story = story_fetchers.get_story_by_id(story_id, strict=False)
         topic_id = story.corresponding_topic_id
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        skill_ids = topic.get_all_skill_ids()
+        skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
+        skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
 
         for story_reference in topic.canonical_story_references:
             if story_reference.story_id == story_id:
@@ -70,7 +74,8 @@ class EditableStoryDataHandler(base.BaseHandler):
         self.values.update({
             'story': story.to_dict(),
             'topic_name': topic.name,
-            'story_is_published': story_is_published
+            'story_is_published': story_is_published,
+            'skill_summaries': skill_summary_dicts
         })
 
         self.render_json(self.values)
