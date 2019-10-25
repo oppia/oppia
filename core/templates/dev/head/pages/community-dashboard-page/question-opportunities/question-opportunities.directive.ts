@@ -49,7 +49,7 @@ angular.module('oppia').directive('questionOpportunities', [
               var subheading = opportunity.skill_description;
               var progressPercentage = (
                 (opportunity.question_count / MAX_QUESTIONS_PER_SKILL) * 100)
-                  .toFixed(2);
+                .toFixed(2);
               ctrl.opportunities.push({
                 heading: heading,
                 subheading: subheading,
