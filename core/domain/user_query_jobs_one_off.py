@@ -18,7 +18,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import datetime
 
 from core import jobs
@@ -102,7 +101,6 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     query_model.edited_fewer_than_n_exps):
                 return
 
-        print(query_id, user_id)
         yield (query_id, user_id)
 
     @staticmethod

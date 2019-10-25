@@ -30,7 +30,6 @@ from core.domain import question_services
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
-from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -2280,7 +2279,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
 
     def test_get_state_reference_for_exp_raises_error_for_fake_exp_id(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.get_user_id_from_email(self.OWNER_EMAIL)
         with self.assertRaisesRegexp(
             Exception, 'Entity .* not found'):
             stats_services.get_state_reference_for_exploration(
