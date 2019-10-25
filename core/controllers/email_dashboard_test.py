@@ -175,10 +175,10 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(EmailDashboardResultTests, self).setUp()
-        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         # User A has one created exploration.
         # User B has one created exploration.
         # Submitter and new_submitter are submitter of query.
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(
             self.USER_A_EMAIL)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)

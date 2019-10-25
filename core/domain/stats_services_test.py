@@ -1310,9 +1310,8 @@ class RecordAnswerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RecordAnswerTests, self).setUp()
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
 
@@ -1635,9 +1634,8 @@ class SampleAnswerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SampleAnswerTests, self).setUp()
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
 
@@ -1855,9 +1853,8 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AnswerVisualizationsTests, self).setUp()
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(
             self.TEXT_INPUT_EXP_ID, self.owner_id, end_state_name='End')
         self.save_new_valid_exploration(
@@ -2158,9 +2155,8 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(StateAnswersStatisticsTest, self).setUp()
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_linear_exp_with_state_names_and_interactions(
             self.EXP_ID, self.owner_id, self.STATE_NAMES, ['TextInput'])
 
@@ -2283,9 +2279,8 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
                 feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION, 0))
 
     def test_get_state_reference_for_exp_raises_error_for_fake_exp_id(self):
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         with self.assertRaisesRegexp(
             Exception, 'Entity .* not found'):
             stats_services.get_state_reference_for_exploration(
@@ -2293,9 +2288,8 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
 
     def test_get_state_reference_for_exp_raises_error_for_invalid_state_name(
             self):
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
         self.assertEqual(list(exploration.states.keys()), ['Introduction'])
@@ -2306,9 +2300,8 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
                 self.exp_id, 'state_name')
 
     def test_get_state_reference_for_exp_for_valid_exp_id_and_state_name(self):
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
         self.assertEqual(list(exploration.states.keys()), ['Introduction'])

@@ -39,9 +39,8 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ExplorationRetrievalTests, self).setUp()
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_retrieval_of_explorations(self):
         """Test the get_exploration_by_id() method."""
@@ -241,8 +240,8 @@ title: Old Title
         super(ExplorationConversionPipelineTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
 
         # Create exploration that uses a states schema version of 0 and ensure
         # it is properly converted.
