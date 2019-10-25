@@ -10,15 +10,15 @@
   <div class="modal-body" style="margin-left:0.5rem; margin-right: 0.5rem;">
     <table class="table table-hover">
       <tr ng-if="getLearnerAnswerInfos().length > 0">
-        <th scope="col">Select</th>
+        <th scope="col" ng-if="isEditable">Select</th>
         <th scope="col">Answer</th>
         <th scope="col">Answer details</th>
         <th scope="col">Created on</th>
       </tr>
       <tr ng-repeat="learnerAnswerInfo in getLearnerAnswerInfos()" class="oppia-feedback-tab-row">
-        <th scope="row">
+        <th scope="row" ng-if="isEditable">
           <input type="checkbox" ng-change="selectLearnerAnswerInfo(learnerAnswerInfo)"
-                 ng-model="myVal">
+                 ng-model="myVal" class="protractor-test-select-answer-detail">
         </th>
         <td ng-click="changeView(learnerAnswerInfo)">
           <angular-html-bind html-data="getLearnerAnswerHtml(learnerAnswerInfo)">
@@ -44,9 +44,9 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button ng-disabled="!selectedLearnerAnswerInfo.length"
+    <button ng-if="isEditable" ng-disabled="!selectedLearnerAnswerInfo.length"
             ng-click="deleteSelectedLearnerAnswerInfo()"
-            class="btn btn-danger modal-button oppia-delete-select">
+            class="btn btn-danger modal-button oppia-delete-select protractor-test-delete-items">
       Delete selected items
     </button>
     <button ng-click="close()"

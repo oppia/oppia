@@ -567,7 +567,7 @@ class ResolveIssueHandler(EditorHandler):
     instances are deleted.
     """
 
-    @acl_decorators.can_view_exploration_stats
+    @acl_decorators.can_edit_exploration
     def post(self, exp_id):
         """Handles POST requests."""
         exp_issue_dict = self.payload.get('exp_issue_dict')
@@ -781,7 +781,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_entity
+    @acl_decorators.can_play_entity
     def get(self, entity_type, entity_id):
         """Handles the GET requests for learner answer info for an
         exploration state.
