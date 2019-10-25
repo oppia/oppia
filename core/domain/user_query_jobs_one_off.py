@@ -102,16 +102,14 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     query_model.edited_fewer_than_n_exps):
                 return
 
+        print(query_id, user_id)
         yield (query_id, user_id)
 
     @staticmethod
     def reduce(query_model_id, stringified_user_ids):
         query_model = user_models.UserQueryModel.get(query_model_id)
-        user_ids = [ast.literal_eval(v) for v in stringified_user_ids]
-        # We are casting UNICODE here as literal_eval appends a 'l' to the
-        # output.
         query_model.user_ids = [
-            python_utils.UNICODE(user_id) for user_id in user_ids]
+            python_utils.UNICODE(user_id) for user_id in stringified_user_ids]
         query_model.put()
 
     @classmethod
