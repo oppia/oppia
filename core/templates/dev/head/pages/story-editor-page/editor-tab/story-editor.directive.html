@@ -64,7 +64,17 @@
     </div>
     <div class="story-nodes-title">
       <label for="storyNodes" class="form-heading">Chapters</label>
-      <span ng-if="linearNodesList.length > 0"> <i> (Click on check box to mark it as the first chapter.)</i> </span>
+      <div ng-if="nodes.length > 0">
+        Select Initial Chapter
+        <select class="form-control"
+                ng-model="initialNodeId"
+                ng-if="nodes.length > 0"
+                ng-options="node.getId() as node.getTitle() for node in nodes"
+                style="width: 300px; margin-bottom: 10px;"
+                ng-click="markAsInitialNode(initialNodeId)">
+          <option value="">Select the initial chapter</option>
+        </select>
+      </div>
     </div>
     <div class="story-node-editor" ng-if="linearNodesList.length > 0">
       <div class="story-nodes-container">
@@ -75,12 +85,6 @@
             <div class="story-editor-node-title">
               <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
             </div>
-            <span class="story-editor-initial-node">
-              <span ng-click="markAsInitialNode(node.getId())" aria-hidden="true">
-                <i ng-if="!isInitialNode(node.getId())" class="material-icons md-18">check_box_outline_blank</i>
-                <i ng-if="isInitialNode(node.getId())" class="material-icons md-18">check_box</i>
-              </span>
-            </span>
             <span class="story-editor-delete-node">
               <span class="protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())" aria-hidden="true">
                 <i class="material-icons md-18">&#xE14C;</i>
@@ -94,19 +98,16 @@
         <h3 ng-if="disconnectedNodes.length > 0">
           The following chapters are disconnected from the graph
         </h3>
-        <div ng-repeat="node in disconnectedNodes" style="padding-bottom: 2vh;">
+        <em ng-if="disconnectedNodes.length > 0">
+          (Please fix this before saving changes)
+        </em>
+        <div ng-repeat="node in disconnectedNodes" style="padding-top: 2vh;">
           <md-card class="story-editor-node"
                    ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
                    ng-click="setNodeToEdit(node.getId())">
             <div class="story-editor-node-title">
               <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
             </div>
-            <span class="story-editor-initial-node">
-              <span ng-click="markAsInitialNode(node.getId())" aria-hidden="true">
-                <i ng-if="!isInitialNode(node.getId())" class="material-icons md-18">check_box_outline_blank</i>
-                <i ng-if="isInitialNode(node.getId())" class="material-icons md-18">check_box</i>
-              </span>
-            </span>
             <span class="story-editor-delete-node">
               <span class="protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())" aria-hidden="true">
                 <i class="material-icons md-18">&#xE14C;</i>

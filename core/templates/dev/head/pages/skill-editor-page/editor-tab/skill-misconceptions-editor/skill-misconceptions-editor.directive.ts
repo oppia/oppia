@@ -43,9 +43,11 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
       controller: [
         '$scope', '$filter', '$uibModal', '$rootScope',
         'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED',
+        'MISCONCEPTION_NAME_CHAR_LIMIT',
         function(
             $scope, $filter, $uibModal, $rootScope,
-            MisconceptionObjectFactory, EVENT_SKILL_REINITIALIZED) {
+            MisconceptionObjectFactory, EVENT_SKILL_REINITIALIZED,
+            MISCONCEPTION_NAME_CHAR_LIMIT) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.misconceptions = $scope.skill.getMisconceptions();
 
@@ -103,9 +105,12 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                 'add-misconception-modal.directive.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$scope', '$uibModalInstance', 'MISCONCEPTION_NAME_CHAR_LIMIT',
+                function(
+                    $scope, $uibModalInstance, MISCONCEPTION_NAME_CHAR_LIMIT) {
                   $scope.skill = SkillEditorStateService.getSkill();
+                  $scope.MISCONCEPTION_NAME_CHAR_LIMIT =
+                    MISCONCEPTION_NAME_CHAR_LIMIT;
                   $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {
