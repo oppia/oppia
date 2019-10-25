@@ -35,11 +35,6 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     USERNAME = 'username'
     ROLE = 'role'
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            audit_models.RoleQueryAuditModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
-
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(RoleQueryAuditModelUnitTests, self).setUp()
@@ -51,6 +46,11 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             role=self.ROLE,
             username=self.USERNAME
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            audit_models.RoleQueryAuditModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
