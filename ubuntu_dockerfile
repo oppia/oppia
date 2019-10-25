@@ -90,6 +90,7 @@
 # “NAMES” column of the output of “docker ps”.
 #
 # If this does not output a container, move on to step 2.
+# Otherwise, move on to step 3.
 #
 # STEP 2
 # Run:
