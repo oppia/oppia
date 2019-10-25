@@ -30,16 +30,16 @@ require(
   'music-phrase-player.service.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
-
+require('services/AlertsService.ts');
 require('interactions/interactions-extension.constants.ajs.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
-  'CurrentInteractionService', 'HtmlEscaperService',
+  'AlertsService', 'CurrentInteractionService', 'HtmlEscaperService',
   'MusicNotesInputRulesService', 'MusicPhrasePlayerService',
   'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE', 'NOTE_NAMES_TO_MIDI_VALUES',
   function(
-      CurrentInteractionService, HtmlEscaperService,
+      AlertsService, CurrentInteractionService, HtmlEscaperService,
       MusicNotesInputRulesService, MusicPhrasePlayerService,
       UrlInterpolationService,
       EVENT_NEW_CARD_AVAILABLE, NOTE_NAMES_TO_MIDI_VALUES) {
@@ -780,18 +780,23 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // is treated like a chord and all its values are played back
         // simultaneously.
         var playSequence = function(midiSequence) {
-          var notes = [];
-          for (var i = 0; i < midiSequence.length; i++) {
-            for (var j = 0; j < midiSequence[i].length; j++) {
-              notes.push({
-                midiValue: midiSequence[i][j],
-                duration: 1.0,
-                start: getNoteStart(i)
-              });
+          if (window.AudioContext || window.Audio) {
+            var notes = [];
+            for (var i = 0; i < midiSequence.length; i++) {
+              for (var j = 0; j < midiSequence[i].length; j++) {
+                notes.push({
+                  midiValue: midiSequence[i][j],
+                  duration: 1.0,
+                  start: getNoteStart(i)
+                });
+              }
             }
-          }
 
-          MusicPhrasePlayerService.playMusicPhrase(notes);
+            MusicPhrasePlayerService.playMusicPhrase(notes);
+          } else {
+            AlertsService.addWarning(
+              'MIDI audio is not supported in your browser.');
+          }
         };
 
         // A MIDI pitch is the baseNoteMidiNumber of the note plus the offset.
