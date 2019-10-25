@@ -965,11 +965,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
     """
 
     def __init__(self, voiceovers_mapping):
-        """Initializes a RecordedVoiceovers domain object.
-
-        Args:
-            voiceovers_mapping: Voiceovers. Voiceovers domain object.
-        """
+        """Initializes a RecordedVoiceovers domain object."""
         self.voiceovers_mapping = voiceovers_mapping
 
     def to_dict(self):
