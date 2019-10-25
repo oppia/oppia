@@ -218,8 +218,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         commit = exploration_models.ExplorationCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'username', 'msg',
             'create', [{}],
-            constants.ACTIVITY_STATUS_PUBLIC, False
-        )
+            constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.exploration_id = 'b'
         commit.put()
         self.assertTrue(

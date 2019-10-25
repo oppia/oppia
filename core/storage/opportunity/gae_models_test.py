@@ -35,12 +35,6 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            opportunity_models.ExplorationOpportunitySummaryModel
-            .has_reference_to_user_id('any_id')
-        )
-
     def setUp(self):
         super(ExplorationOpportunitySummaryModelUnitTest, self).setUp()
 

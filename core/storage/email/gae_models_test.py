@@ -50,23 +50,6 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(mock_generate_hash, email_models.SentEmailModel))
 
-    def test_has_reference_to_user_id(self):
-        with self.generate_constant_hash_ctx:
-            email_models.SentEmailModel.create(
-                'recip_id', 'recipient@email.com', 'send_id',
-                'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
-                'Email Subject', 'Email Body', datetime.datetime.utcnow())
-
-            self.assertTrue(
-                email_models.SentEmailModel.has_reference_to_user_id('recip_id')
-            )
-            self.assertTrue(
-                email_models.SentEmailModel.has_reference_to_user_id('send_id')
-            )
-            self.assertFalse(
-                email_models.SentEmailModel.has_reference_to_user_id('id_x')
-            )
-
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
@@ -194,19 +177,6 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
             email_models.BulkEmailModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
-    def test_has_reference_to_user_id(self):
-        email_models.BulkEmailModel.create(
-            'instance_id', ['recipient_1_id', 'recipient_2_id'],
-            'sender_id', 'sender@email.com', feconf.BULK_EMAIL_INTENT_MARKETING,
-            'Email Subject', 'Email Body', datetime.datetime.utcnow())
-
-        self.assertTrue(
-            email_models.BulkEmailModel.has_reference_to_user_id('sender_id')
-        )
-        self.assertFalse(
-            email_models.BulkEmailModel.has_reference_to_user_id('id_x')
-        )
-
 
 class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackEmailReplyToIdModel class."""
@@ -226,12 +196,10 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
         ).put()
         self.assertTrue(
             email_models.GeneralFeedbackEmailReplyToIdModel
-            .has_reference_to_user_id('user_id_1')
-        )
+            .has_reference_to_user_id('user_id_1'))
         self.assertFalse(
             email_models.GeneralFeedbackEmailReplyToIdModel
-            .has_reference_to_user_id('id_x')
-        )
+            .has_reference_to_user_id('id_x'))
 
     def test_put_function(self):
         email_reply_model = email_models.GeneralFeedbackEmailReplyToIdModel(

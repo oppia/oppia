@@ -142,11 +142,6 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            question_models.QuestionSkillLinkModel
-            .has_reference_to_user_id('id_x'))
-
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
         skill_id = 'A Test Skill Id'
@@ -503,8 +498,7 @@ class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
         commit = question_models.QuestionCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'username', 'msg',
             'create', [{}],
-            constants.ACTIVITY_STATUS_PUBLIC, False
-        )
+            constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.question_id = 'b'
         commit.put()
         self.assertTrue(
@@ -567,8 +561,7 @@ class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
         question_rights.commit(
             'commiter_id',
             'Update question rights',
-            [{'cmd': question_domain.CMD_CREATE_NEW}]
-        )
+            [{'cmd': question_domain.CMD_CREATE_NEW}])
         self.assertTrue(
             question_models.QuestionRightsModel
             .has_reference_to_user_id('owner_id'))

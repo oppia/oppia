@@ -241,8 +241,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 cls.voice_artist_ids == user_id,
                 cls.viewer_ids == user_id
             )).get() is not None
-            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
-        )
+            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration

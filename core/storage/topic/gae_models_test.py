@@ -115,8 +115,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         commit = topic_models.TopicCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
-            constants.ACTIVITY_STATUS_PUBLIC, False
-        )
+            constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.topic_id = 'b'
         commit.put()
         self.assertTrue(
@@ -156,11 +155,6 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
             topic_models.TopicSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            topic_models.TopicCommitLogEntryModel
-            .has_reference_to_user_id('x_id'))
-
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageModel class."""
@@ -177,13 +171,11 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
             topic_id='topic_id',
             page_contents={},
             page_contents_schema_version=1,
-            language_code=constants.DEFAULT_LANGUAGE_CODE
-        )
+            language_code=constants.DEFAULT_LANGUAGE_CODE)
         subtopic_page_model.commit(
             committer_id='committer_id',
             commit_message='Created new subtopic page',
-            commit_cmds=[{'cmd': subtopic_page_domain.CMD_CREATE_NEW}]
-        )
+            commit_cmds=[{'cmd': subtopic_page_domain.CMD_CREATE_NEW}])
         self.assertTrue(
             topic_models.SubtopicPageModel
             .has_reference_to_user_id('committer_id'))
@@ -233,8 +225,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         commit = topic_models.SubtopicPageCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
-            constants.ACTIVITY_STATUS_PUBLIC, False
-        )
+            constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.subtopic_page_id = 'b'
         commit.put()
         self.assertTrue(
@@ -280,8 +271,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
         topic_rights.commit(
             'committer_id',
             'New topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
         self.assertTrue(
             topic_models.TopicRightsModel
             .has_reference_to_user_id('manager_id'))

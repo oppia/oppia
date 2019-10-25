@@ -210,8 +210,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         commit = collection_models.CollectionCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
-            constants.ACTIVITY_STATUS_PUBLIC, False
-        )
+            constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.collection_id = 'b'
         commit.put()
         self.assertTrue(

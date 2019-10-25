@@ -61,9 +61,10 @@ class StorageModelsTest(test_utils.GenericTestBase):
         'VersionedModel',
     )
 
-    def _get_child_model_classes(self):
-        """Get all child model classes, these are classes that are used directly
-        for saving data and not just inherited from.
+    def _get_base_or_versioned_model_child_classes(self):
+        """Get child model classes that inherit directly from BaseModel or
+        VersionedModel, these are classes that are used directly for saving data
+        and not just inherited from.
         """
 
         for clazz in self._get_model_classes():
@@ -92,8 +93,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
             len(set(names_of_ndb_model_subclasses)),
             len(names_of_ndb_model_subclasses))
 
-    def test_all_child_models_have_get_deletion_policy(self):
-        for clazz in self._get_child_model_classes():
+    def test_base_or_versioned_child_classes_have_get_deletion_policy(self):
+        for clazz in self._get_base_or_versioned_model_child_classes():
             try:
                 self.assertIn(
                     clazz.get_deletion_policy(),
@@ -102,17 +103,17 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 self.fail(msg='get_deletion_policy is not defined for %s' % (
                     clazz.__name__))
 
-    def test_all_base_models_do_not_have_get_deletion_policy(self):
+    def test_base_models_do_not_have_get_deletion_policy(self):
         for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
                 with self.assertRaises(NotImplementedError):
                     clazz.get_deletion_policy()
 
     @unittest.skip(
-        'has_reference_to_user_id is not yet implemented on all models'
-    )
-    def test_all_child_models_have_has_reference_to_user_id(self):
-        for clazz in self._get_child_model_classes():
+        'has_reference_to_user_id is not yet implemented on all models')
+    def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
+            self):
+        for clazz in self._get_base_or_versioned_model_child_classes():
             try:
                 self.assertIsNotNone(clazz.has_reference_to_user_id('any_id'))
             except NotImplementedError:
@@ -120,7 +121,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     msg='has_reference_to_user_id is not defined for %s' % (
                         clazz.__name__))
 
-    def test_all_base_models_do_not_have_has_reference_to_user_id(self):
+    def test_base_models_do_not_have_method_has_reference_to_user_id(self):
         for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
                 with self.assertRaises(NotImplementedError):

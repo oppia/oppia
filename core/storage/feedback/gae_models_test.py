@@ -72,12 +72,10 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             feedback_models.GeneralFeedbackThreadModel
-            .has_reference_to_user_id(self.USER_ID)
-        )
+            .has_reference_to_user_id(self.USER_ID))
         self.assertFalse(
             feedback_models.GeneralFeedbackThreadModel
-            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
-        )
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
     def test_raise_exception_by_mocking_collision(self):
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
@@ -151,12 +149,10 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         ).put()
         self.assertTrue(
             feedback_models.GeneralFeedbackMessageModel
-            .has_reference_to_user_id('user_id')
-        )
+            .has_reference_to_user_id('user_id'))
         self.assertFalse(
             feedback_models.GeneralFeedbackMessageModel
-            .has_reference_to_user_id('id_x')
-        )
+            .has_reference_to_user_id('id_x'))
 
     def test_raise_exception_by_mocking_collision(self):
         with self.assertRaisesRegexp(
@@ -319,12 +315,10 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         ).put()
         self.assertTrue(
             feedback_models.GeneralFeedbackThreadUserModel
-            .has_reference_to_user_id('user_id')
-        )
+            .has_reference_to_user_id('user_id'))
         self.assertFalse(
             feedback_models.GeneralFeedbackThreadUserModel
-            .has_reference_to_user_id('id_x')
-        )
+            .has_reference_to_user_id('id_x'))
 
     def test_put_function(self):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadUserModel(
@@ -453,8 +447,7 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             feedback_models.FeedbackAnalyticsModel
-            .has_reference_to_user_id('id_x')
-        )
+            .has_reference_to_user_id('id_x'))
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
@@ -466,17 +459,13 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
-        feedback_models.UnsentFeedbackEmailModel(
-            id='user_id',
-        ).put()
+        feedback_models.UnsentFeedbackEmailModel(id='user_id').put()
         self.assertTrue(
             feedback_models.UnsentFeedbackEmailModel
-            .has_reference_to_user_id('user_id')
-        )
+            .has_reference_to_user_id('user_id'))
         self.assertFalse(
             feedback_models.UnsentFeedbackEmailModel
-            .has_reference_to_user_id('id_x')
-        )
+            .has_reference_to_user_id('id_x'))
 
     def test_new_instances_stores_correct_data(self):
         user_id = 'A'

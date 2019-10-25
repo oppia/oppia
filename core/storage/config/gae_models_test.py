@@ -34,11 +34,6 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
             config_models.ConfigPropertyModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            config_models.ConfigPropertyModel.has_reference_to_user_id('id_x')
-        )
-
     def test_create_model(self):
         config_model = config_models.ConfigPropertyModel(
             value='b')
