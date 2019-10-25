@@ -13,27 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for skill opportunities.
+ * @fileoverview Directive for question opportunities.
  */
 
+require('assets/constants.ts');
 require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
-
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 
 angular.module('oppia').directive(
-  'skillOpportunities', ['UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'questionOpportunities', ['UrlInterpolationService',
+      'MAX_QUESTIONS_PER_SKILL', function(
+      UrlInterpolationService, MAX_QUESTIONS_PER_SKILL) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/community-dashboard-page/skill-opportunities/' +
-      'skill-opportunities.directive.html'),
+        '/pages/community-dashboard-page/question-opportunities/' +
+      'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'ContributionOpportunitiesService',
@@ -48,7 +49,8 @@ angular.module('oppia').directive(
               var heading = opportunity.topic_name;
               var subheading = opportunity.skill_description;
               var progressPercentage = (
-                (opportunity.question_count / 50) * 100).toFixed(2);
+                (opportunity.question_count / MAX_QUESTIONS_PER_SKILL) * 100)
+                  .toFixed(2);
               ctrl.opportunities.push({
                 heading: heading,
                 subheading: subheading,
