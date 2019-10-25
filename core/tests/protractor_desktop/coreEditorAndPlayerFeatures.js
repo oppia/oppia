@@ -50,7 +50,7 @@ describe('Enable correctness feedback and set correctness', function() {
     ['NumericInput', 3]
   ];
 
-  var applyCommonSettings = function() {
+  var enableMarkCorrectness = function() {
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.enableCorrectnessFeedback();
   };
@@ -107,7 +107,7 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorMainTab.moveToState('End');
     explorationEditorMainTab.setInteraction('EndExploration');
     // Turn on correctness feedback.
-    applyCommonSettings();
+    enableMarkCorrectness();
 
     // Go back to mark the solution as correct.
     explorationEditorPage.navigateToMainTab();
@@ -123,7 +123,7 @@ describe('Enable correctness feedback and set correctness', function() {
   it('should allow selecting correct feedback from the response editor ' +
      'during set the interaction', function() {
     // Turn on correctness feedback first.
-    applyCommonSettings();
+    enableMarkCorrectness();
 
     // Go to main tab to create interactions.
     explorationEditorPage.navigateToMainTab();
@@ -155,7 +155,7 @@ describe('Enable correctness feedback and set correctness', function() {
   it('should allow selecting correct feedback from the default response editor',
     function() {
       // Turn on correctness feedback first.
-      applyCommonSettings();
+      enableMarkCorrectness();
 
       // Go back to main tab to create interactions.
       explorationEditorPage.navigateToMainTab();
