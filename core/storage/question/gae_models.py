@@ -537,7 +537,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     The key of each instance is the question id.
     """
     # The user ID of the creator of the question.
-    creator_id = ndb.StringProperty(required=True)
+    creator_id = ndb.StringProperty(required=True, indexed=True)
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
@@ -559,14 +559,28 @@ class QuestionSummaryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def get_by_creator_id(cls, creator_id):
-        """Gets QuestionSummaryModel by creator_id.
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether any existing QuestionSummaryModel refers to the given
+        user_id.
 
         Args:
-            creator_id: str. The user ID of the creator of the question.
+            user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            QuestionSummaryModel. The summary model of the question.
+            bool. Whether any models refer to the given user_id.
+        """
+        return cls.query(cls.creator_id == user_id).get() is not None
+
+    @classmethod
+    def get_by_creator_id(cls, creator_id):
+        """Get QuestionSummaryModels created by the given user.
+
+        Args:
+            creator_id: str. The user ID of the creator of the questions.
+
+        Returns:
+            list(QuestionSummaryModel). The list of summary models of the
+            questions.
         """
         return QuestionSummaryModel.query().filter(
             cls.creator_id == creator_id).fetch()
