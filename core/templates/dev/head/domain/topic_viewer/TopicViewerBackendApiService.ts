@@ -16,7 +16,7 @@
  * @fileoverview Service to get topic data.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 
