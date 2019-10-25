@@ -24,57 +24,56 @@ require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 
-angular.module('oppia').directive(
-  'questionOpportunities', ['UrlInterpolationService',
-      'MAX_QUESTIONS_PER_SKILL', function(
-      UrlInterpolationService, MAX_QUESTIONS_PER_SKILL) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/community-dashboard-page/question-opportunities/' +
-      'question-opportunities.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        'ContributionOpportunitiesService',
-        function(ContributionOpportunitiesService) {
-          var ctrl = this;
-          ctrl.opportunities = [];
-          ctrl.opportunitiesAreLoading = true;
-          ctrl.moreOpportunitiesAvailable = true;
-          var updateWithNewOpportunities = function(opportunities, more) {
-            for (var index in opportunities) {
-              var opportunity = opportunities[index];
-              var heading = opportunity.topic_name;
-              var subheading = opportunity.skill_description;
-              var progressPercentage = (
-                (opportunity.question_count / MAX_QUESTIONS_PER_SKILL) * 100)
-                  .toFixed(2);
-              ctrl.opportunities.push({
-                heading: heading,
-                subheading: subheading,
-                progressPercentage: progressPercentage,
-                actionButtonTitle: 'Suggest Question'
-              });
-            }
-            ctrl.moreOpportunitiesAvailable = more;
-            ctrl.opportunitiesAreLoading = false;
-          };
+angular.module('oppia').directive('questionOpportunities', [
+  'UrlInterpolationService','MAX_QUESTIONS_PER_SKILL',
+    function(UrlInterpolationService, MAX_QUESTIONS_PER_SKILL) {
+      return {
+        restrict: 'E',
+        scope: {},
+        bindToController: {},
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/community-dashboard-page/question-opportunities/' +
+        'question-opportunities.directive.html'),
+        controllerAs: '$ctrl',
+        controller: [
+          'ContributionOpportunitiesService',
+          function(ContributionOpportunitiesService) {
+            var ctrl = this;
+            ctrl.opportunities = [];
+            ctrl.opportunitiesAreLoading = true;
+            ctrl.moreOpportunitiesAvailable = true;
+            var updateWithNewOpportunities = function(opportunities, more) {
+              for (var index in opportunities) {
+                var opportunity = opportunities[index];
+                var heading = opportunity.topic_name;
+                var subheading = opportunity.skill_description;
+                var progressPercentage = (
+                  (opportunity.question_count / MAX_QUESTIONS_PER_SKILL) * 100)
+                    .toFixed(2);
+                ctrl.opportunities.push({
+                  heading: heading,
+                  subheading: subheading,
+                  progressPercentage: progressPercentage,
+                  actionButtonTitle: 'Suggest Question'
+                });
+              }
+              ctrl.moreOpportunitiesAvailable = more;
+              ctrl.opportunitiesAreLoading = false;
+            };
 
-          ctrl.onLoadMoreOpportunities = function() {
-            if (
-              !ctrl.opportunitiesAreLoading &&
-                ctrl.moreOpportunitiesAvailable) {
-              ctrl.opportunitiesAreLoading = true;
-              ContributionOpportunitiesService.getMoreSkillOpportunities(
-                updateWithNewOpportunities);
-            }
-          };
+            ctrl.onLoadMoreOpportunities = function() {
+              if (
+                !ctrl.opportunitiesAreLoading &&
+                  ctrl.moreOpportunitiesAvailable) {
+                ctrl.opportunitiesAreLoading = true;
+                ContributionOpportunitiesService.getMoreSkillOpportunities(
+                  updateWithNewOpportunities);
+              }
+            };
 
-          ContributionOpportunitiesService.getSkillOpportunities(
-            updateWithNewOpportunities);
-        }
-      ]
-    };
+            ContributionOpportunitiesService.getSkillOpportunities(
+              updateWithNewOpportunities);
+          }
+        ]
+      };
   }]);
