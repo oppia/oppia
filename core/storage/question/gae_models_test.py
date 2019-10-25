@@ -479,6 +479,23 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
+    def test_has_reference_to_user_id(self):
+        question_summary_model = question_models.QuestionSummaryModel(
+            id='question',
+            creator_id='user_id',
+            question_content='Question',
+            question_model_created_on=datetime.datetime.utcnow(),
+            question_model_last_updated=datetime.datetime.utcnow()
+        )
+        question_summary_model.put()
+
+        self.assertTrue(
+            question_models.QuestionSummaryModel
+            .has_reference_to_user_id('user_id'))
+        self.assertFalse(
+            question_models.QuestionSummaryModel
+            .has_reference_to_user_id('user_id_x'))
+
     def test_get_by_creator_id(self):
         question_summary_model_1 = question_models.QuestionSummaryModel(
             id='question_1',
