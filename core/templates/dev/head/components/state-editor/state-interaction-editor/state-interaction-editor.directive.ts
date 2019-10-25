@@ -20,7 +20,7 @@
 require('directives/angular-html-bind.directive.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require(

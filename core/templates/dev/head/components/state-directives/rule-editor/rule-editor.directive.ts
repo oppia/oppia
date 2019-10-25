@@ -23,7 +23,7 @@ require(
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(

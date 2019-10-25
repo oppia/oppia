@@ -16,7 +16,7 @@
  * @fileoverview Directive for the solution explanation editor.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
