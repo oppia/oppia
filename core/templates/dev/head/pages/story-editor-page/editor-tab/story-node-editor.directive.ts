@@ -15,6 +15,8 @@
 /**
  * @fileoverview Controller for the story node editor.
  */
+require(
+  'components/skill-selector/skill-selector.directive.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
@@ -73,6 +75,12 @@ angular.module('oppia').directive('storyNodeEditor', [
               $scope.story.getStoryContents().getNodeIdsToTitleMap(
                 $scope.storyNodeIds);
             _recalculateAvailableNodes();
+            $scope.skillIdToSummaryMap = {};
+            var skillSummaries = StoryEditorStateService.getSkillSummaries();
+            for (var idx in skillSummaries) {
+              $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
+                skillSummaries[idx].description;
+            }
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
             $scope.oldOutline = $scope.getOutline();
@@ -124,37 +132,77 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.currentExplorationId = explorationId;
           };
 
-          $scope.addPrerequisiteSkillId = function(skillId) {
-            if (!skillId) {
-              return;
-            }
-            try {
-              StoryUpdateService.addPrerequisiteSkillIdToNode(
-                $scope.story, $scope.getId(), skillId);
-            } catch (err) {
-              AlertsService.addWarning(
-                'Given skill is already a prerequisite skill');
-            }
-            $scope.prerequisiteSkillId = null;
-          };
-
           $scope.removePrerequisiteSkillId = function(skillId) {
             StoryUpdateService.removePrerequisiteSkillIdFromNode(
               $scope.story, $scope.getId(), skillId);
           };
 
-          $scope.addAcquiredSkillId = function(skillId) {
-            if (!skillId) {
-              return;
-            }
-            try {
-              StoryUpdateService.addAcquiredSkillIdToNode(
-                $scope.story, $scope.getId(), skillId);
-            } catch (err) {
-              AlertsService.addWarning(
-                'Given skill is already an acquired skill');
-            }
-            $scope.acquiredSkillId = null;
+          $scope.addPrerequisiteSkillId = function() {
+            var skillSummaries =
+              StoryEditorStateService.getSkillSummaries();
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/story-editor-page/modal-templates/' +
+                'select-skill-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.skillSummaries = skillSummaries;
+                  $scope.selectedSkillId = null;
+                  $scope.save = function() {
+                    $uibModalInstance.close($scope.selectedSkillId);
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(skillId) {
+              try {
+                StoryUpdateService.addPrerequisiteSkillIdToNode(
+                  $scope.story, $scope.getId(), skillId);
+              } catch (err) {
+                AlertsService.addInfoMessage(
+                  'Given skill is already a prerequisite skill', 5000);
+              }
+            });
+          };
+
+          $scope.addAcquiredSkillId = function() {
+            var skillSummaries =
+              StoryEditorStateService.getSkillSummaries();
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/story-editor-page/modal-templates/' +
+                'select-skill-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.skillSummaries = skillSummaries;
+                  $scope.selectedSkillId = null;
+                  $scope.save = function() {
+                    $uibModalInstance.close($scope.selectedSkillId);
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(skillId) {
+              try {
+                StoryUpdateService.addAcquiredSkillIdToNode(
+                  $scope.story, $scope.getId(), skillId);
+              } catch (err) {
+                AlertsService.addInfoMessage(
+                  'Given skill is already an acquired skill', 5000);
+              }
+            });
           };
 
           $scope.removeAcquiredSkillId = function(skillId) {
