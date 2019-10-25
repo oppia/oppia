@@ -394,9 +394,8 @@ def get_users_settings(user_ids):
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     result = []
-    for ind, model in enumerate(user_settings_models):
-        user_id = user_settings_models[ind]
-        result.append(_transform_user_settings(model, user_id=user_id))
+    for i, model in enumerate(user_settings_models):
+        result.append(_transform_user_settings(model, user_id=user_ids[i]))
     return result
 
 
