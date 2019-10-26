@@ -32,6 +32,7 @@ from . import common
 from . import deploy
 from . import gcloud_adapter
 from . import install_third_party_libs
+from . import update_configs
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
@@ -83,6 +84,8 @@ class DeployTests(test_utils.GenericTestBase):
             return '1.2.3'
         def mock_input():
             return 'y'
+        def mock_run_cmd(unused_cmd_tokens):
+            pass
 
         self.install_swap = self.swap(
             install_third_party_libs, 'main', mock_main)
@@ -112,6 +115,7 @@ class DeployTests(test_utils.GenericTestBase):
             gcloud_adapter, 'get_currently_served_version',
             mock_get_currently_served_version)
         self.input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        self.run_swap = self.swap(common, 'run_cmd', mock_run_cmd)
 
     def test_invalid_app_name(self):
         args_swap = self.swap(
@@ -159,23 +163,28 @@ class DeployTests(test_utils.GenericTestBase):
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
         feconf_swap = self.swap(
             deploy, 'FECONF_PATH', MOCK_FECONF_FILEPATH)
+        def mock_main():
+            pass
+        config_swap = self.swap(update_configs, 'main', mock_main)
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with args_swap, feconf_swap, self.assertRaisesRegexp(
-                    Exception,
-                    'The mailgun API key must be added before deployment.'):
-                    deploy.execute_deployment()
+                with self.run_swap, config_swap:
+                    with args_swap, feconf_swap, self.assertRaisesRegexp(
+                        Exception,
+                        'The mailgun API key must be added before deployment.'):
+                        deploy.execute_deployment()
 
     def test_missing_third_party_dir(self):
         third_party_swap = self.swap(deploy, 'THIRD_PARTY_DIR', 'INVALID_DIR')
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.args_swap, third_party_swap, self.assertRaisesRegexp(
-                    Exception,
-                    'Could not find third_party directory at INVALID_DIR. '
-                    'Please run install_third_party_libs.py prior to running '
-                    'this script.'):
-                    deploy.execute_deployment()
+                with self.run_swap, self.args_swap:
+                    with third_party_swap, self.assertRaisesRegexp(
+                        Exception,
+                        'Could not find third_party directory at INVALID_DIR. '
+                        'Please run install_third_party_libs.py prior to '
+                        'running this script.'):
+                        deploy.execute_deployment()
 
     def test_invalid_dir_access(self):
         def mock_getcwd():
@@ -185,11 +194,12 @@ class DeployTests(test_utils.GenericTestBase):
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
-                        with getcwd_swap, self.assertRaisesRegexp(
-                            Exception,
-                            'Invalid directory accessed '
-                            'during deployment: invalid'):
-                            deploy.execute_deployment()
+                        with self.run_swap, getcwd_swap:
+                            with self.assertRaisesRegexp(
+                                Exception,
+                                'Invalid directory accessed '
+                                'during deployment: invalid'):
+                                deploy.execute_deployment()
 
     def test_function_calls(self):
         check_function_calls = {
@@ -233,7 +243,7 @@ class DeployTests(test_utils.GenericTestBase):
                 unused_app_name, unused_current_release_version):
             check_function_calls['check_breakage_gets_called'] = True
 
-        getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
+        cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         preprocess_swap = self.swap(
             deploy, 'preprocess_release', mock_preprocess_release)
         update_swap = self.swap(
@@ -242,9 +252,9 @@ class DeployTests(test_utils.GenericTestBase):
         deploy_swap = self.swap(
             deploy, 'deploy_application_and_write_log_entry',
             mock_deploy_application_and_write_log_entry)
-        switch_version_swap = self.swap(
+        switch_swap = self.swap(
             deploy, 'switch_version', mock_switch_version)
-        flush_memcache_swap = self.swap(
+        memcache_swap = self.swap(
             deploy, 'flush_memcache', mock_flush_memcache)
         check_breakage_swap = self.swap(
             deploy, 'check_breakage', mock_check_breakage)
@@ -253,9 +263,9 @@ class DeployTests(test_utils.GenericTestBase):
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
-                        with getcwd_swap, preprocess_swap, update_swap:
-                            with build_swap, deploy_swap, switch_version_swap:
-                                with flush_memcache_swap, check_breakage_swap:
+                        with cwd_swap, preprocess_swap, update_swap, build_swap:
+                            with deploy_swap, switch_swap, self.run_swap:
+                                with memcache_swap, check_breakage_swap:
                                     deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

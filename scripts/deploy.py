@@ -51,6 +51,7 @@ import release_constants
 from . import common
 from . import gcloud_adapter
 from . import install_third_party_libs
+from . import update_configs
 # pylint: enable=wrong-import-order
 
 _PARSER = argparse.ArgumentParser()
@@ -378,57 +379,66 @@ def execute_deployment():
     common.require_cwd_to_be_oppia()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
     gcloud_adapter.require_gcloud_to_be_available()
-    if app_name == APP_NAME_OPPIASERVER:
-        with python_utils.open_file(FECONF_PATH, 'r') as f:
-            feconf_contents = f.read()
-            if ('MAILGUN_API_KEY' not in feconf_contents or
-                    'MAILGUN_API_KEY = None' in feconf_contents):
-                raise Exception(
-                    'The mailgun API key must be added before deployment.')
-    if not os.path.exists(THIRD_PARTY_DIR):
-        raise Exception(
-            'Could not find third_party directory at %s. Please run '
-            'install_third_party_libs.py prior to running this script.'
-            % THIRD_PARTY_DIR)
-
-    current_git_revision = subprocess.check_output(
-        ['git', 'rev-parse', 'HEAD']).strip()
-
-    # Create a folder in which to save the release candidate.
-    python_utils.PRINT('Ensuring that the release directory parent exists')
-    common.ensure_directory_exists(os.path.dirname(release_dir_path))
-
-    # Copy files to the release directory. Omits the .git subfolder.
-    python_utils.PRINT('Copying files to the release directory')
-    shutil.copytree(
-        os.getcwd(), release_dir_path, ignore=shutil.ignore_patterns('.git'))
-
-    # Change the current directory to the release candidate folder.
-    with common.CD(release_dir_path):
-        if not os.getcwd().endswith(release_dir_name):
+    try:
+        if app_name == APP_NAME_OPPIASERVER:
+            update_configs.main()
+            with python_utils.open_file(FECONF_PATH, 'r') as f:
+                feconf_contents = f.read()
+                if ('MAILGUN_API_KEY' not in feconf_contents or
+                        'MAILGUN_API_KEY = None' in feconf_contents):
+                    raise Exception(
+                        'The mailgun API key must be added before deployment.')
+        if not os.path.exists(THIRD_PARTY_DIR):
             raise Exception(
-                'Invalid directory accessed during deployment: %s'
-                % os.getcwd())
+                'Could not find third_party directory at %s. Please run '
+                'install_third_party_libs.py prior to running this script.'
+                % THIRD_PARTY_DIR)
 
-        python_utils.PRINT('Changing directory to %s' % os.getcwd())
+        current_git_revision = subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD']).strip()
 
-        python_utils.PRINT('Preprocessing release...')
-        preprocess_release(app_name, deploy_data_path)
+        # Create a folder in which to save the release candidate.
+        python_utils.PRINT('Ensuring that the release directory parent exists')
+        common.ensure_directory_exists(os.path.dirname(release_dir_path))
 
-        update_and_check_indexes(app_name)
-        build_scripts()
-        deploy_application_and_write_log_entry(
-            app_name, (
-                custom_version if custom_version else current_release_version),
-            current_git_revision)
+        # Copy files to the release directory. Omits the .git subfolder.
+        python_utils.PRINT('Copying files to the release directory')
+        shutil.copytree(
+            os.getcwd(), release_dir_path,
+            ignore=shutil.ignore_patterns('.git'))
 
-        python_utils.PRINT('Returning to oppia/ root directory.')
+        # Change the current directory to the release candidate folder.
+        with common.CD(release_dir_path):
+            if not os.getcwd().endswith(release_dir_name):
+                raise Exception(
+                    'Invalid directory accessed during deployment: %s'
+                    % os.getcwd())
 
-    switch_version(app_name, current_release_version)
-    flush_memcache(app_name)
-    check_breakage(app_name, current_release_version)
+            python_utils.PRINT('Changing directory to %s' % os.getcwd())
 
-    python_utils.PRINT('Done!')
+            python_utils.PRINT('Preprocessing release...')
+            preprocess_release(app_name, deploy_data_path)
+
+            update_and_check_indexes(app_name)
+            build_scripts()
+            deploy_application_and_write_log_entry(
+                app_name, (
+                    custom_version
+                    if custom_version else current_release_version),
+                current_git_revision)
+
+            python_utils.PRINT('Returning to oppia/ root directory.')
+
+        switch_version(app_name, current_release_version)
+        flush_memcache(app_name)
+        check_breakage(app_name, current_release_version)
+
+        python_utils.PRINT('Done!')
+    finally:
+        common.run_cmd([
+            'git', 'checkout', '--',
+            update_configs.LOCAL_FECONF_PATH,
+            update_configs.LOCAL_CONSTANTS_PATH])
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
