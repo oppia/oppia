@@ -22,14 +22,13 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 require('domain/story/StorySummaryObjectFactory.ts');
-require('domain/topic/EditableTopicBackendApiService.ts');
+require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
-require('domain/topic/TopicRightsBackendApiService.ts');
+require('domain/topic/topic-rights-backend-api.service.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/QuestionsListService.ts');
-
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicEditorStateService', [

@@ -25,7 +25,6 @@ import { StoryReferenceObjectFactory } from
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-
 require('domain/topic/TopicObjectFactory.ts');
 
 describe('Topic object factory', function() {

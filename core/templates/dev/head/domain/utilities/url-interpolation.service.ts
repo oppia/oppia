@@ -20,7 +20,6 @@
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/UtilsService.ts');
-
 require('app.constants.ajs.ts');
 
 const hashes = require('hashes.json');

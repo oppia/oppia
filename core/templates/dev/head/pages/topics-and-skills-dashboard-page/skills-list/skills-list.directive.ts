@@ -23,7 +23,7 @@ require(
   'topic-selector.directive.ts');
 
 require('domain/skill/editable-skill-backend-api.service.ts');
-require('domain/topic/EditableTopicBackendApiService.ts');
+require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 

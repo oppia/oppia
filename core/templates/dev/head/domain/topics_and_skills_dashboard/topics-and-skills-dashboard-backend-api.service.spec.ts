@@ -20,11 +20,9 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-
 require(
   'domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardBackendApiService.ts'
-);
+  'topics-and-skills-dashboard-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 describe('Topics and Skills Dashboard backend API service', function() {

@@ -17,7 +17,6 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-
 require('domain/topic/topic-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('EditableTopicBackendApiService', [
