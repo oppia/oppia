@@ -68,6 +68,7 @@ describe('Skill object factory', function() {
   describe('SkillObjectFactory', function() {
     var SkillObjectFactory = null;
     var MisconceptionObjectFactory = null;
+    var SubtitledHtmlObjectFactory = null;
     var RubricObjectFactory = null;
     var ConceptCardObjectFactory = null;
     var misconceptionDict1 = null;
@@ -82,6 +83,7 @@ describe('Skill object factory', function() {
       MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       RubricObjectFactory = $injector.get('RubricObjectFactory');
       ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
+      SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
       skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
 
       misconceptionDict1 = {
@@ -170,7 +172,8 @@ describe('Skill object factory', function() {
 
     it('should throw validation errors', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-      skill.getConceptCard().setExplanation('');
+      skill.getConceptCard().setExplanation(
+        SubtitledHtmlObjectFactory.createDefault('', 'review_material'));
       expect(skill.getValidationIssues()).toEqual([
         'There should be review material in the concept card.',
         'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +

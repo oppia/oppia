@@ -54,37 +54,45 @@
     <button class="btn btn-success btn-sm" ng-click="addAcquiredSkillId()">Add Acquired Skill</button>
   </div>
   <div class="node-field">
-    <label class="form-heading"> Next Chapters </label>
-    <div ng-if="getDestinationNodeIds().length === 0">
-      This chapter doesn't lead to any other chapters yet.
+    <div ng-if="getDestinationNodeIds().length > 0">
+      <label class="form-heading"> Next Chapter </label>
+      <md-card class="destination-node-id"
+               ng-repeat="nodeId in getDestinationNodeIds()"
+               ng-click="viewNodeEditor(nodeId)">
+        <div class="repeating-card-wrapper">
+          <[nodeIdToTitleMap[nodeId]]>
+          <span style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
+            <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+          </span>
+        </div>
+      </md-card>
     </div>
-    <md-card class="destination-node-id"
-             ng-repeat="nodeId in getDestinationNodeIds()"
-             ng-click="viewNodeEditor(nodeId)">
-      <[nodeIdToTitleMap[nodeId]]>
-      <span style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
-        <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
-      </span>
-    </md-card>
-    <div style="margin-top: 1em;">
-      <label> Add a destination chapter </label>
+    <div style="margin-top: 1em;" ng-if="getDestinationNodeIds().length === 0">
+      <label> Select destination chapter </label>
+      <div>
+        <select class="form-control"
+                ng-model="newNodeId"
+                ng-if="availableNodes.length > 0"
+                ng-options="node.id as node.text for node in availableNodes"
+                style="width: 300px; margin-bottom: 10px;"
+                ng-click="addDestinationNode(newNodeId)">
+          <option value="">Pick an already existing chapter</option>
+        </select>
+        <button class="btn btn-success protractor-test-add-destination-chapter-button"
+                ng-click="addNewDestinationNode()"> Add a new Destination Chapter
+        </button>
+      </div>
     </div>
-    <span>
-      <select class="form-control"
-              ng-model="newNodeId"
-              ng-options="node.id as node.text for node in availableNodes"
-              style="width: 300px; margin-bottom: 10px;"
-              ng-click="addDestinationNode(newNodeId)">
-        <option value="">Pick an already existing chapter</option>
-      </select>
-      <button class="btn btn-success protractor-test-add-destination-chapter-button"
-              ng-click="addNewDestinationNode()"> Add a new Destination Chapter
-      </button>
-    </span>
   </div>
 </div>
 
 <style>
+  story-editor .repeating-card-wrapper {
+      height: 2.5em;
+      padding-top: 0.5em;
+      padding-left: 0.5em;
+  }
+
   story-editor .story-node-title {
     margin-bottom: 3%;
   }

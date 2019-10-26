@@ -31,9 +31,9 @@
     <div ng-if="isEditable() && nameEditorIsOpen">
       <div class="oppia-rule-details-header">
         <strong>Misconception Name</strong>
-        <input class="form-control" type="text" ng-model="container.misconceptionName" maxlength="30">
-        <span ng-if="container.misconceptionName.length === 30" class="form-text" style="color: red; font-size: smaller">
-          <em>Please use at most 30 characters.</em>
+        <input class="form-control" type="text" ng-model="container.misconceptionName" maxlength="<[MISCONCEPTION_NAME_CHAR_LIMIT]>">
+        <span ng-if="container.misconceptionName.length === MISCONCEPTION_NAME_CHAR_LIMIT" class="form-text" style="color: red; font-size: smaller">
+          <em>Please use at most <[MISCONCEPTION_NAME_CHAR_LIMIT]> characters.</em>
         </span>
       </div>
 

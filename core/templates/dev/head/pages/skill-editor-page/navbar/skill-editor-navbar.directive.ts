@@ -35,13 +35,13 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
+        '$scope', '$uibModal', '$window', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
         'SkillRightsBackendApiService', 'SkillEditorRoutingService',
         'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $uibModal, AlertsService,
+            $scope, $uibModal, $window, AlertsService,
             UndoRedoService, SkillEditorStateService,
             SkillRightsBackendApiService, SkillEditorRoutingService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
@@ -123,7 +123,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
                 $scope.skillRights.setPublic();
                 SkillEditorStateService.setSkillRights(
                   $scope.skillRights);
-                AlertsService.addSuccessMessage('Skill Published.');
+                $window.location = '/topics_and_skills_dashboard';
+                AlertsService.addSuccessMessage(
+                  'Published Skill.', 1000);
               });
           };
 
