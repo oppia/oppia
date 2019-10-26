@@ -96,7 +96,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_ids = []
         for gae_uid, email, name in python_utils.ZIP(
                 gae_user_ids, user_emails, usernames):
-            if gae_uid != feconf.SYSTEM_COMMITTER_GAE_ID:
+            if gae_uid is not None:
                 user_id = user_services.create_new_user(gae_uid, email).user_id
                 user_services.set_username(user_id, name)
                 user_ids.append(user_id)

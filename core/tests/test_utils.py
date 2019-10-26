@@ -75,7 +75,7 @@ def empty_environ():
     os.environ['HTTP_HOST'] = 'localhost'
     os.environ['SERVER_PORT'] = '8080'
     os.environ['USER_EMAIL'] = ''
-    os.environ['USER_ID'] = ''
+    os.environ['GAE_ID'] = ''
     os.environ['USER_IS_ADMIN'] = '0'
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
@@ -576,13 +576,13 @@ tags: []
             is_super_admin: bool. Whether the user is a super admin.
        """
         os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = self.get_gae_user_id_from_email(email)
+        os.environ['GAE_ID'] = self.get_gae_user_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
         """Simulates a logout by resetting the environment variables."""
         os.environ['USER_EMAIL'] = ''
-        os.environ['USER_ID'] = ''
+        os.environ['GAE_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
 
     # pylint: disable=invalid-name
@@ -1802,7 +1802,7 @@ tags: []
         """
         initial_user_env = {
             'USER_EMAIL': os.environ['USER_EMAIL'],
-            'USER_ID': os.environ['USER_ID'],
+            'GAE_ID': os.environ['GAE_ID'],
             'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
         }
         self.login(email, is_super_admin=is_super_admin)

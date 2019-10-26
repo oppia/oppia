@@ -395,7 +395,17 @@ def get_users_settings(user_ids):
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     result = []
     for i, model in enumerate(user_settings_models):
-        result.append(_transform_user_settings(model, user_id=user_ids[i]))
+        if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
+            result.append(UserSettings(
+                user_id=feconf.SYSTEM_COMMITTER_ID,
+                gae_user_id=None,
+                email=feconf.SYSTEM_EMAIL_ADDRESS,
+                role=feconf.ROLE_ID_ADMIN,
+                username='admin',
+                last_agreed_to_terms=datetime.datetime.utcnow()
+            ))
+        else:
+            result.append(_transform_user_settings(model))
     return result
 
 
@@ -481,18 +491,28 @@ def get_user_settings(user_id, strict=False):
     return user_settings
 
 
-def get_user_settings_by_gae_user_id(gae_user_id):
+def get_user_settings_by_gae_user_id(gae_user_id, strict=False):
     """Return the user settings for a single user.
 
     Args:
         gae_user_id: str. The GAE user ID of the user.
+        strict: bool. Whether to fail noisily if no user with the given
+            id exists in the datastore. Defaults to False.
 
     Returns:
-        UserSettings or None. If the given gae_user_id does not exist
-        returns None.
+        UserSettings or None. If the given gae_user_id does not exist and strict
+        is False, returns None. Otherwise, returns the corresponding
+        UserSettings domain object.
+
+    Raises:
+        Exception: strict is True and given gae_user_id does not exist.
     """
-    return _transform_user_settings(
+    user_settings = _transform_user_settings(
         user_models.UserSettingsModel.get_by_gae_user_id(gae_user_id))
+    if strict and user_settings is None:
+        logging.error('Could not find user with id %s' % gae_user_id)
+        raise Exception('User not found.')
+    return user_settings
 
 
 def get_user_role_from_id(user_id):
@@ -626,26 +646,16 @@ def _save_user_settings(user_settings):
     ).put()
 
 
-def _transform_user_settings(user_settings_model, user_id=None):
+def _transform_user_settings(user_settings_model):
     """Transform user settings storage model to domain object.
 
     Args:
         user_settings_model: UserSettingsModel.
-        user_id: str. Optional user_id to generate admin UserSettings.
 
     Returns:
          UserSettings. Domain object for user settings.
     """
-    if user_id == feconf.SYSTEM_COMMITTER_ID:
-        return UserSettings(
-            user_id=feconf.SYSTEM_COMMITTER_ID,
-            gae_user_id=feconf.SYSTEM_COMMITTER_GAE_ID,
-            email=feconf.SYSTEM_EMAIL_ADDRESS,
-            role=feconf.ROLE_ID_ADMIN,
-            username='admin',
-            last_agreed_to_terms=datetime.datetime.utcnow()
-        )
-    elif user_settings_model:
+    if user_settings_model:
         return UserSettings(
             user_id=user_settings_model.id,
             gae_user_id=user_settings_model.gae_user_id,
@@ -745,6 +755,7 @@ def create_new_user(gae_user_id, email):
     if user_settings is not None:
         raise Exception('User %s already exists.' % gae_user_id)
 
+    # TODO(#7848): Generate user_id together with the migration.
     user_id = gae_user_id
     user_settings = UserSettings(
         user_id, gae_user_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
