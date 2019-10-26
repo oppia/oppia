@@ -77,6 +77,10 @@ angular.module('oppia').factory('QuestionsListService', [
           return [];
         }
 
+        if (skillIds[0] === null) {
+          return [];
+        }
+
         if ((index + 1) * num > _questionSummaries.length &&
             _nextCursorForQuestions !== null && fetchMore) {
           QuestionBackendApiService.fetchQuestionSummaries(

@@ -52,7 +52,8 @@ angular.module('oppia').directive('questionsTab', [
         'QuestionObjectFactory', 'QuestionsListService',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
         'QuestionUndoRedoService', 'UndoRedoService',
-        'NUM_QUESTIONS_PER_PAGE', function(
+        'NUM_QUESTIONS_PER_PAGE', 'EVENT_TOPIC_INITIALIZED',
+        'EVENT_TOPIC_REINITIALIZED', function(
             $scope, $q, $uibModal, $window,
             AlertsService, TopicEditorStateService, QuestionCreationService,
             UrlService, EditableQuestionBackendApiService,
@@ -60,13 +61,14 @@ angular.module('oppia').directive('questionsTab', [
             QuestionObjectFactory, QuestionsListService,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
             QuestionUndoRedoService, UndoRedoService,
-            NUM_QUESTIONS_PER_PAGE) {
+            NUM_QUESTIONS_PER_PAGE, EVENT_TOPIC_INITIALIZED,
+            EVENT_TOPIC_REINITIALIZED) {
           $scope.currentPage = 0;
           $scope.getQuestionSummariesAsync =
             QuestionsListService.getQuestionSummariesAsync;
           $scope.isLastQuestionBatch =
             QuestionsListService.isLastQuestionBatch;
-
+          $scope.selectedSkillId = null;
           var _initTab = function() {
             $scope.question = null;
             $scope.skillId = null;
@@ -89,6 +91,11 @@ angular.module('oppia').directive('questionsTab', [
             $scope.emptyMisconceptionsList = [];
           };
 
+          $scope.reinitializeQuestionsList = function(skillId) {
+            $scope.$broadcast('changeSelectedSkill', skillId);
+          };
+          $scope.$on(EVENT_TOPIC_INITIALIZED, _initTab);
+          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initTab);
           _initTab();
         }
       ]

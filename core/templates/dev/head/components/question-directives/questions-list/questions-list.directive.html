@@ -22,13 +22,13 @@
       <p> Difficulty</p>
     </th>
     <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
-      <p> Linked Skills And Corresponding Difficulty</p>
+      <p> Difficulty corresponding to selected skill </p>
     </th>
     <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
       <p> Edit Question Difficulty </p>
     </th>
     <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
-      <p> Edit question difficulty with respect to each skill </p>
+      <p> Edit question difficulty with respect to selected skill </p>
     </th>
     <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
       <p> Unlink questions from skill(s) </p>
@@ -43,8 +43,7 @@
       ng-click="$ctrl.editQuestion(questionSummary.summary)">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
     <td> <[$ctrl.truncatedQuestionSummaries[$index]]> </td>
-    <td ng-if="!$ctrl.skillDescriptionsAreShown()"> <[$ctrl.getDifficultyString(questionSummary.skill_difficulties[0])]> </td>
-    <td ng-if="$ctrl.skillDescriptionsAreShown()"> <[$ctrl.getSkillDescriptionAndDifficulty(questionSummary.skill_descriptions, questionSummary.skill_difficulties)]> </td>
+    <td> <[$ctrl.getDifficultyString(questionSummary.skill_difficulties[0])]> </td>
     <td class="edit-icon" ng-click="$event.stopPropagation()">
       <span ng-click="$ctrl.changeDifficulty(questionSummary.summary.id, questionSummary.skill_descriptions, questionSummary.skill_difficulties)"
             class="list-summary">
