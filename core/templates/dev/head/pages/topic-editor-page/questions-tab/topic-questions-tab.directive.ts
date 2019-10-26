@@ -92,7 +92,7 @@ angular.module('oppia').directive('questionsTab', [
           };
 
           $scope.reinitializeQuestionsList = function(skillId) {
-            $scope.$broadcast('changeSelectedSkill', skillId);
+            $scope.$broadcast('onSelectedSkillChanged', skillId);
           };
           $scope.$on(EVENT_TOPIC_INITIALIZED, _initTab);
           $scope.$on(EVENT_TOPIC_REINITIALIZED, _initTab);

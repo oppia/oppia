@@ -633,7 +633,7 @@ angular.module('oppia').directive('questionsList', [
           $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
             _initTab(false);
           });
-          $scope.$on('changeSelectedSkill', function(ev, skillId) {
+          $scope.$on('onSelectedSkillChanged', function(ev, skillId) {
             ctrl.selectedSkillId = skillId;
             _initTab(true);
           });

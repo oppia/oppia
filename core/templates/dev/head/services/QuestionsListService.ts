@@ -73,11 +73,8 @@ angular.module('oppia').factory('QuestionsListService', [
 
         var num = NUM_QUESTIONS_PER_PAGE;
 
-        if (skillIds === undefined || skillIds.length === 0) {
-          return [];
-        }
-
-        if (skillIds[0] === null) {
+        if (skillIds === undefined || skillIds.length === 0 ||
+            skillIds[0] === null) {
           return [];
         }
 
