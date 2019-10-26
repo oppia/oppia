@@ -147,7 +147,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         if self.gae_user_id:
             user_settings = user_services.get_user_settings_by_gae_user_id(
-                self.gae_user_id)
+                self.gae_user_id, strict=False)
             if user_settings is None:
                 email = current_user_services.get_current_user_email()
                 user_settings = user_services.create_new_user(
