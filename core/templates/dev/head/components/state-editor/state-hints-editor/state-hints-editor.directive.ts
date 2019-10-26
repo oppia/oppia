@@ -22,7 +22,7 @@ require(
   'components/state-directives/response-header/response-header.directive.ts');
 
 require('domain/exploration/HintObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -286,6 +286,8 @@ angular.module('oppia').directive('stateHintsEditor', [
             StateHintsService.saveDisplayedValue();
             $scope.onSaveHints(StateHintsService.displayed);
           };
+
+          StateEditorService.updateStateHintsEditorInitialised();
         }
       ]
     };

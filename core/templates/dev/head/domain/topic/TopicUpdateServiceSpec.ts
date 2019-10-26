@@ -39,10 +39,11 @@ import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('App.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
 
@@ -92,6 +93,12 @@ describe('Topic update service', function() {
           new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
           new SubtitledHtmlObjectFactory())));
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -225,45 +232,6 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.removeCanonicalStory(_sampleTopic, 'story_10');
-    }).toThrow();
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
-  });
-
-  it('should add/remove an uncategorized skill id to/from a topic',
-    function() {
-      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
-        _firstSkillSummary
-      ]);
-      TopicUpdateService.addUncategorizedSkill(
-        _sampleTopic, _thirdSkillSummary);
-      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
-        _firstSkillSummary, _thirdSkillSummary
-      ]);
-
-      UndoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
-        _firstSkillSummary
-      ]);
-    }
-  );
-
-  it('should create a proper backend change dict for adding an uncategorized ' +
-    'skill id',
-  function() {
-    TopicUpdateService.addUncategorizedSkill(
-      _sampleTopic, _thirdSkillSummary);
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-      cmd: 'add_uncategorized_skill_id',
-      new_uncategorized_skill_id: 'skill_3'
-    }]);
-  });
-
-  it('should not create a backend change dict for adding an uncategorized ' +
-    'skill id when an error is encountered',
-  function() {
-    expect(function() {
-      TopicUpdateService.addUncategorizedSkill(
-        _sampleTopic, _firstSkillSummary);
     }).toThrow();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });

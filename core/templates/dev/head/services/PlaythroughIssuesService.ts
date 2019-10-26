@@ -16,7 +16,7 @@
  * @fileoverview Service for retrieving issues and playthroughs.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/PlaythroughIssuesBackendApiService.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +

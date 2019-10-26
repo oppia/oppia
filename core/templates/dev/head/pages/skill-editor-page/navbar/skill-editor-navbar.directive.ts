@@ -20,8 +20,8 @@ require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/AlertsService.ts');
@@ -35,13 +35,13 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
+        '$scope', '$uibModal', '$window', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
         'SkillRightsBackendApiService', 'SkillEditorRoutingService',
         'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $uibModal, AlertsService,
+            $scope, $uibModal, $window, AlertsService,
             UndoRedoService, SkillEditorStateService,
             SkillRightsBackendApiService, SkillEditorRoutingService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
@@ -123,7 +123,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
                 $scope.skillRights.setPublic();
                 SkillEditorStateService.setSkillRights(
                   $scope.skillRights);
-                AlertsService.addSuccessMessage('Skill Published.');
+                $window.location = '/topics_and_skills_dashboard';
+                AlertsService.addSuccessMessage(
+                  'Published Skill.', 1000);
               });
           };
 

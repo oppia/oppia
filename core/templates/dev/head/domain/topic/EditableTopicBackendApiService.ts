@@ -16,7 +16,7 @@
  * @fileoverview Service to send changes to a topic to the backend.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('domain/topic/topic-domain.constants.ajs.ts');
 
@@ -44,7 +44,9 @@ angular.module('oppia').factory('EditableTopicBackendApiService', [
           successCallback({
             topicDict: angular.copy(response.data.topic_dict),
             skillIdToDescriptionDict: angular.copy(
-              response.data.skill_id_to_description_dict)
+              response.data.skill_id_to_description_dict),
+            skillIdToRubricsDict: angular.copy(
+              response.data.skill_id_to_rubrics_dict)
           });
         }
       }, function(errorResponse) {
@@ -131,7 +133,9 @@ angular.module('oppia').factory('EditableTopicBackendApiService', [
           successCallback({
             topicDict: angular.copy(response.data.topic_dict),
             skillIdToDescriptionDict: angular.copy(
-              response.data.skill_id_to_description_dict)
+              response.data.skill_id_to_description_dict),
+            skillIdToRubricsDict: angular.copy(
+              response.data.skill_id_to_rubrics_dict)
           });
         }
       }, function(errorResponse) {

@@ -486,6 +486,7 @@ class QuestionSkillLink(python_utils.OBJECT):
         skill_id: str. The ID of the skill to which the
             question is linked.
         skill_description: str. The description of the corresponding skill.
+        skill_difficulty: float. The difficulty between [0, 1] of the skill.
     """
 
     def __init__(
@@ -514,6 +515,51 @@ class QuestionSkillLink(python_utils.OBJECT):
             'skill_id': self.skill_id,
             'skill_description': self.skill_description,
             'skill_difficulty': self.skill_difficulty,
+        }
+
+
+class MergedQuestionSkillLink(python_utils.OBJECT):
+    """Domain object for the Merged Question Skill Link object, returned to the
+    editors.
+
+    Attributes:
+        question_id: str. The ID of the question.
+        skill_ids: list(str). The skill IDs of the linked skills.
+        skill_descriptions: list(str). The descriptions of the skills to which
+            the question is linked.
+        skill_difficulties: list(float). The difficulties between [0, 1] of the
+            skills.
+    """
+
+    def __init__(
+            self, question_id, skill_ids, skill_descriptions,
+            skill_difficulties):
+        """Constructs a Merged Question Skill Link domain object.
+
+        Args:
+            question_id: str. The ID of the question.
+            skill_ids: list(str). The skill IDs of the linked skills.
+            skill_descriptions: list(str). The descriptions of the skills to
+                which the question is linked.
+            skill_difficulties: list(float). The difficulties between [0, 1] of
+                the skills.
+        """
+        self.question_id = question_id
+        self.skill_ids = skill_ids
+        self.skill_descriptions = skill_descriptions
+        self.skill_difficulties = skill_difficulties
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this MergedQuestionSkillLink object.
+        """
+        return {
+            'question_id': self.question_id,
+            'skill_ids': self.skill_ids,
+            'skill_descriptions': self.skill_descriptions,
+            'skill_difficulties': self.skill_difficulties,
         }
 
 

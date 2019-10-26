@@ -24,9 +24,10 @@ import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AssetsBackendApiService.ts');
 
 describe('Assets Backend API Service', function() {
@@ -45,6 +46,12 @@ describe('Assets Backend API Service', function() {
       'FileDownloadRequestObjectFactory',
       new FileDownloadRequestObjectFactory());
     $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

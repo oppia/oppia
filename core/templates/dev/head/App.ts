@@ -16,6 +16,11 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('directives/focus-on.directive.ts');
 
 require('pages/Base.ts');
@@ -24,7 +29,6 @@ require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/CsrfTokenService.ts');
 require('services/NavigationService.ts');
-require('services/UtilsService.ts');
 require('services/DebouncerService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/IdGenerationService.ts');
@@ -37,7 +41,6 @@ require('services/UserService.ts');
 require('services/PromoBarService.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 require('services/stateful/FocusManagerService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -59,9 +62,8 @@ require(
   'components/common-layout-directives/navigation-bars/' +
   'top-navigation-bar.directive.ts');
 
-require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('app.constants.ajs.ts');
 
@@ -75,14 +77,17 @@ const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider',
+  '$interpolateProvider', '$locationProvider', '$provide',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider) {
+      $interpolateProvider, $locationProvider, $provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
-
     // Set the AngularJS interpolators as <[ and ]>, to not conflict with
     // Jinja2 templates.
     $interpolateProvider.startSymbol('<[');
@@ -96,7 +101,6 @@ angular.module('oppia').config([
 
     // Prevent storing duplicate cookies for translation language.
     $cookiesProvider.defaults.path = '/';
-
     // Set default headers for POST and PUT requests.
     $httpProvider.defaults.headers.post = {
       'Content-Type': 'application/x-www-form-urlencoded'
