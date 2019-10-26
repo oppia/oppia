@@ -182,7 +182,7 @@ class UserSettings(python_utils.OBJECT):
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
 
-        if (self.gae_user_id is not None or
+        if (self.gae_user_id is not None and
                 not isinstance(self.gae_user_id, python_utils.BASESTRING)):
             raise utils.ValidationError(
                 'Expected gae_user_id to be a string, received %s' %
