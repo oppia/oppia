@@ -19,6 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 
@@ -29,6 +30,8 @@ export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
     'UtilsService': new UtilsService(),
+    'SidebarStatusService': new SidebarStatusService(
+      new WindowDimensionsService()),
     'WindowDimensionsService': new WindowDimensionsService()
   };
   /* eslint-enable quote-props */

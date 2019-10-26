@@ -62,9 +62,8 @@ require(
   'components/common-layout-directives/navigation-bars/' +
   'top-navigation-bar.directive.ts');
 
-require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('app.constants.ajs.ts');
 

@@ -46,6 +46,7 @@ import shutil
 import subprocess
 
 import python_utils
+import release_constants
 
 from . import common
 from . import gcloud_adapter
@@ -96,6 +97,11 @@ def preprocess_release(app_name, deploy_data_path):
     Args:
         app_name: str. Name of the app to deploy.
         deploy_data_path: str. Path for deploy data directory.
+
+    Raises:
+        Exception: Could not find deploy data directory.
+        Exception: Could not find source path.
+        Exception: Could not find destination path.
     """
     if not os.path.exists(deploy_data_path):
         raise Exception(
@@ -167,7 +173,7 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
             'PLEASE CONFIRM: %s See %s '
             '(y/n)' % (msg_to_confirm, url_to_check))
         answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
+        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
             return True
         elif answer:
             return False
@@ -321,7 +327,15 @@ def check_breakage(app_name, current_release_version):
 
 
 def execute_deployment():
-    """Executes the deployment process after doing the prerequisite checks."""
+    """Executes the deployment process after doing the prerequisite checks.
+
+    Raises:
+        Exception: The deployment script is not run from a release branch.
+        Exception: Current release version has '.' character.
+        Exception: The mailgun API key is not added before deployment.
+        Exception: Could not find third party directory.
+        Exception: Invalid directory accessed during deployment.
+    """
     parsed_args = _PARSER.parse_args()
     if parsed_args.app_name:
         app_name = parsed_args.app_name

@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('services/CsrfTokenService.ts');
 
@@ -81,6 +81,9 @@ describe('Editable topic backend API service', function() {
       skill_id_to_description_dict: {
         skill_id_1: 'Description 1'
       },
+      skill_id_to_rubrics_dict: {
+        skill_id_1: []
+      },
       subtopic_page: {
         id: 'topicId-1',
         topicId: 'topicId',
@@ -118,7 +121,9 @@ describe('Editable topic backend API service', function() {
 
       expect(successHandler).toHaveBeenCalledWith({
         topicDict: sampleDataResults.topic_dict,
-        skillIdToDescriptionDict: sampleDataResults.skill_id_to_description_dict
+        skillIdToDescriptionDict:
+          sampleDataResults.skill_id_to_description_dict,
+        skillIdToRubricsDict: sampleDataResults.skill_id_to_rubrics_dict
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
@@ -180,7 +185,8 @@ describe('Editable topic backend API service', function() {
         topic_dict: topic,
         skill_id_to_description_dict: {
           skill_id_1: 'Description 1'
-        }
+        },
+        skill_id_to_rubrics_dict: []
       };
 
       $httpBackend.expect('PUT', '/topic_editor_handler/data/0').respond(
@@ -194,7 +200,8 @@ describe('Editable topic backend API service', function() {
 
       expect(successHandler).toHaveBeenCalledWith({
         topicDict: topic,
-        skillIdToDescriptionDict: sampleDataResults.skill_id_to_description_dict
+        skillIdToDescriptionDict: topicWrapper.skill_id_to_description_dict,
+        skillIdToRubricsDict: topicWrapper.skill_id_to_rubrics_dict
       });
       expect(failHandler).not.toHaveBeenCalled();
     }

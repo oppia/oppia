@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('interactions/GraphInput/directives/graph-detail.service.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/stateful/FocusManagerService.ts');
