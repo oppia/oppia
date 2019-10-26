@@ -21,17 +21,17 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('interactions/interactions-extension.constants.ajs.ts');
 require(
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service.ts');
 require(
   'interactions/MusicNotesInput/directives/' +
   'music-phrase-player.service.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/AlertsService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
-require('services/AlertsService.ts');
-require('interactions/interactions-extension.constants.ajs.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
   'AlertsService', 'CurrentInteractionService', 'HtmlEscaperService',
