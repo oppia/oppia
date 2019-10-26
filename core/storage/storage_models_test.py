@@ -53,7 +53,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
     # defined because they're not used directly but only as a base classes for
     # the other models.
     BASE_CLASSES = (
-        'BaseCommitLogEntryModel',
         'BaseMapReduceBatchResultsModel',
         'BaseModel',
         'BaseSnapshotContentModel',
