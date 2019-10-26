@@ -75,7 +75,7 @@
     <ul class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
         <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
-           class="oppia-exploration-editor-tabs-dropdown-element protractor-test-main-tab">
+           class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE254;</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Editor</span>
         </a>
@@ -99,35 +99,35 @@
       </li>
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="userIsLoggedIn" id="tutorialTranslationTab" ng-class="{'active': getActiveTabName() === 'translation'}">
         <a href="#" uib-tooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" tooltip-placement="bottom" ng-click="selectTranslationTab()"
-           class="oppia-exploration-editor-tabs-dropdown-element protractor-test-translation-tab">
+           class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE029;</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
         </a>
       </li>
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="userIsLoggedIn" id="tutorialPreviewTab" ng-class="{'active': getActiveTabName() === 'preview'}">
         <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
-           class="oppia-exploration-editor-tabs-dropdown-element protractor-test-preview-tab">
+           class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE037;</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Preview</span>
         </a>
       </li>
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'settings'}">
         <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
-           class="oppia-exploration-editor-tabs-dropdown-element protractor-test-settings-tab">
+           class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE8B8;</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Settings</span>
         </a>
       </li>
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'stats'}">
         <a href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
-           class="oppia-exploration-editor-tabs-dropdown-element protractor-test-stats-tab">
+           class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE24B;</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
         </a>
       </li>
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
         <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
-           class="oppia-exploration-editor-tabs-dropdown-element protractor-test-improvements-tab">
+           class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
         </a>
@@ -135,14 +135,14 @@
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'history'}">
         <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
            disabled="ExplorationRightsService.isCloned()"
-           class="oppia-exploration-editor-tabs-dropdown-element protractor-test-history-tab">
+           class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE192;</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">History</span>
         </a>
       </li>
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="isFeedbackTabEnabled()" ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
         <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
-           class="oppia-exploration-editor-tabs-dropdown-element protractor-test-feedback-tab">
+           class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE87F;</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Feedback</span>
         </a>
