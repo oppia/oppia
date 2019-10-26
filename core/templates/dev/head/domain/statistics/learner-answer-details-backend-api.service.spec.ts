@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/statistics/LearnerAnswerDetailsBackendApiService.ts');
+require('domain/statistics/learner-answer-details-backend-api.service.ts');
 require('services/CsrfTokenService.ts');
 
 describe('Learner answer info backend Api service', function() {
