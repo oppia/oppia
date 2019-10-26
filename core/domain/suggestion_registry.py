@@ -636,21 +636,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 
 
 class BaseVoiceoverApplication(python_utils.OBJECT):
-    """Base class for a suggestion.
-
-    Attributes:
-        voiceover_application_id: str. The ID of the voiceover application.
-        target_type: str. The type of target entity.
-        target_id: str. The ID of the target entity.
-        status: str. The status of the suggestion.
-        author_id: str. The ID of the user who submitted the voiceover
-            application.
-        final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
-            the voiceover application.
-        score_category: str. The scoring category for the suggestion.
-        last_updated: datetime.datetime. Date and time when the suggestion
-            was last updated.
-    """
+    """Base class for a voiceover application."""
 
     def __init__(self):
         """Initializes a Suggestion object."""
@@ -658,10 +644,10 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
             'Subclasses of BaseVoiceoverApplication should implement __init__.')
 
     def to_dict(self):
-        """Returns a dict representation of a suggestion object.
+        """Returns a dict representation of a voiceover application object.
 
         Returns:
-            dict. A dict representation of a suggestion object.
+            dict. A dict representation of a voiceover application object.
         """
         return {
             'voiceover_application_id': self.suggestion_id,
@@ -773,7 +759,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
 
     @property
     def is_handled(self):
-        """Returns if the voiceover application has either been accepted or
+        """Returns true if the voiceover application has either been accepted or
         rejected.
 
         Returns:

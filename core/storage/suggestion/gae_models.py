@@ -392,9 +392,9 @@ class ReviewerRotationTrackingModel(base_models.BaseModel):
 
 
 class GeneralVoiceoverApplicationModel(base_models.BaseModel):
-    """A general model for voiceover application in for an entity.
+    """A general model for voiceover application of an entity.
 
-    The ID of the voiceover application. The ID will be a random hashed value.
+    The ID of the voiceover application will be a random hashed value.
     """
     # The type of entity to which the user will be assigned as a voice artist
     # once the application will get approved.
