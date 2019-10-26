@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
-require('domain/statistics/LearnerAnswerDetailsBackendApiService.ts');
+require('domain/statistics/learner-answer-details-backend-api.service.ts');
 
 angular.module('oppia').factory('LearnerAnswerInfoService', [
   'AnswerClassificationService', 'LearnerAnswerDetailsBackendApiService',

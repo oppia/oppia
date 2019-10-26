@@ -21,7 +21,6 @@
 
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
-
 require('domain/story/story-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('StoryUpdateService', [
