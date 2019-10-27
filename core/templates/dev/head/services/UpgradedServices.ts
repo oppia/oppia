@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
-import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from
   'services/contextual/WindowDimensionsService';
@@ -32,11 +32,11 @@ import { WindowRef } from 'services/contextual/WindowRefService';
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
-    'UtilsService': new UtilsService(),
+    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
-    'WindowDimensionsService': new WindowDimensionsService(),
-    'DeviceInfoService': new DeviceInfoService(new WindowRef())
+    'UtilsService': new UtilsService(),
+    'WindowDimensionsService': new WindowDimensionsService()
   };
 }
 
