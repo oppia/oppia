@@ -3062,6 +3062,59 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
+    def test_updated_exploration_is_added_correctly_to_index(self):
+        exp_id = 'id0'
+        exp_title = 'title 0'
+        exp_category = 'cat0'
+        actual_docs = []
+        initial_exp_doc = {
+            'category': 'cat0',
+            'id': 'id0',
+            'language_code': 'en',
+            'objective': 'An objective',
+            'rank': 20,
+            'tags': [],
+            'title': 'title 0'}
+        updated_exp_doc = {
+            'category': 'cat1',
+            'id': 'id0',
+            'language_code': 'en',
+            'objective': 'An objective',
+            'rank': 20,
+            'tags': [],
+            'title': 'title 0'
+        }
+
+        def mock_add_documents_to_index(docs, index):
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            actual_docs.extend(docs)
+
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
+        add_docs_swap = self.swap(
+            search_services,
+            'add_documents_to_index',
+            add_docs_counter)
+
+        with add_docs_swap:
+            self.save_new_valid_exploration(
+                exp_id, self.owner_id, title=exp_title, category=exp_category,
+                end_state_name='End')
+
+            rights_manager.publish_exploration(self.owner, exp_id)
+            self.assertEqual(actual_docs, [initial_exp_doc])
+            self.assertEqual(add_docs_counter.times_called, 2)
+
+            actual_docs = []
+            exp_services.update_exploration(
+                self.owner_id, exp_id, [
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'category',
+                        'new_value': 'cat1'})], 'update category')
+            self.assertEqual(actual_docs, [updated_exp_doc])
+            self.assertEqual(add_docs_counter.times_called, 3)
+
+
     def test_get_number_of_ratings(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
