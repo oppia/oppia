@@ -273,11 +273,11 @@ angular.module('oppia').directive('stateResponses', [
           $scope.isLinearWithNoFeedback = function(outcome) {
             // Returns false if current interaction is linear and has no
             // feedback
-            if (!outcome) {
-              return false;
+            if (outcome) {
+              return $scope.isCurrentInteractionLinear() &&
+                !outcome.hasNonemptyFeedback();;
             }
-            return $scope.isCurrentInteractionLinear() &&
-              !outcome.hasNonemptyFeedback();
+            return false;
           };
 
           $scope.getOutcomeTooltip = function(outcome) {
