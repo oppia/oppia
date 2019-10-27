@@ -193,7 +193,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             self.url, {
                 'description': 'Skill Description',
                 'rubrics': rubrics,
-                'explanation': state_domain.SubtitledHtml(
+                'explanation_dict': state_domain.SubtitledHtml(
                     '1', '<p>Explanation</p>').to_dict()
             },
             csrf_token=csrf_token)
@@ -210,7 +210,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': ['topic'],
             'rubrics': [],
-            'explanation': state_domain.SubtitledHtml(
+            'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict()
         }
         json_response = self.post_json(
@@ -240,7 +240,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': [],
-            'explanation': 'explanation'
+            'explanation_dict': 'explanation'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -251,7 +251,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': [],
-            'explanation': {
+            'explanation_dict': {
                 'explanation': 'Explanation'
             }
         }
@@ -278,7 +278,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': rubrics,
-            'explanation': state_domain.SubtitledHtml(
+            'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict()
         }
         json_response = self.post_json(
