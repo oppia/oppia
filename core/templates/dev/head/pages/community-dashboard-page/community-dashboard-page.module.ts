@@ -32,9 +32,9 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants';
+import { AppConstants } from '../../app.constants';
 import { CommunityDashboardConstants } from
-  'pages/community-dashboard-page/community-dashboard-page.constants';
+  './community-dashboard-page.constants';
 
 @NgModule({
   imports: [

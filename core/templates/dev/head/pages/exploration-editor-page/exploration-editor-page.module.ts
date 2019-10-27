@@ -32,26 +32,26 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants';
+import { AppConstants } from '../../app.constants';
 import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants';
+  '../../../../../../extensions/classifiers/classifiers-extension.constants';
 import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants';
+  '../../components/summary-tile/collection-summary-tile.constants';
 import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants';
+  '../../domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
+  '../../../../../../extensions/interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+  '../../domain/objects/objects-domain.constants';
 import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
+  '../../domain/question/question-domain.constants';
+import { ServicesConstants } from '../../services/services.constants';
 import { StateEditorConstants } from
-  'components/state-editor/state-editor.constants';
+  '../../components/state-editor/state-editor.constants';
 import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants';
+  '../../domain/statistics/statistics-domain.constants';
 import { ExplorationEditorPageConstants } from
-  'pages/exploration-editor-page/exploration-editor-page.constants';
+  '../../pages/exploration-editor-page/exploration-editor-page.constants';
 
 @NgModule({
   imports: [
