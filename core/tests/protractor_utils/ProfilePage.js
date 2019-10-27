@@ -32,7 +32,7 @@ var ProfilePage = function() {
   var allExplorationCardElements = element.all(
     by.css('.protractor-test-exploration-dashboard-card'));
   var createdExplorationStat = element.all(
-    by.css('.protractor-test-profile-Created-stat'));
+    by.css('.protractor-test-profile-created-stat'));
 
   this.get = function(userName) {
     browser.get('/profile/' + userName);
