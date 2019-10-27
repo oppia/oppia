@@ -61,6 +61,8 @@ angular.module('oppia').directive('reviewMaterialEditor', [
           ctrl.conceptCardExplanationEditorIsShown = false;
 
           ctrl.openConceptCardExplanationEditor = function() {
+            ctrl.editableExplanation =
+              ctrl.getBindableDict().displayedConceptCardExplanation;
             explanationMemento = ctrl.editableExplanation;
             ctrl.conceptCardExplanationEditorIsShown = true;
           };
