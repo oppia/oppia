@@ -24,6 +24,7 @@ from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -149,9 +150,21 @@ class NewSkillHandler(base.BaseHandler):
     def post(self):
         description = self.payload.get('description')
         linked_topic_ids = self.payload.get('linked_topic_ids')
+        explanation = self.payload.get('explanation')
         rubrics = self.payload.get('rubrics')
         if not isinstance(rubrics, list):
             raise self.InvalidInputException('Rubrics should be a list.')
+
+        if not isinstance(explanation, dict):
+            raise self.InvalidInputException(
+                'Review material should be an object.')
+
+        try:
+            _ = state_domain.SubtitledHtml.from_dict(
+                explanation)
+        except:
+            raise self.InvalidInputException(
+                'Review material should be a valid SubtitledHtml object.')
 
         rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
@@ -167,7 +180,9 @@ class NewSkillHandler(base.BaseHandler):
 
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description, rubrics)
+        skill.update_explanation(explanation)
         skill_services.save_new_skill(self.user_id, skill)
+        skill_services.publish_skill(skill.id, self.user_id)
 
         self.render_json({
             'skillId': new_skill_id

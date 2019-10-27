@@ -69,6 +69,10 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-merge-skills-button'));
   var confirmSkillsMergeButton = element(
     by.css('.protractor-test-confirm-skills-merge-button'));
+  var editConceptCardExplanationButton = element(
+    by.css('.protractor-test-edit-concept-card'));
+  var saveConceptCardExplanationButton = element(
+    by.css('.protractor-test-save-concept-card'));
 
   this.get = function() {
     browser.get(DASHBOARD_URL);
@@ -145,13 +149,29 @@ var TopicsAndSkillsDashboardPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.createSkillWithDescription = function(description) {
+  this.createSkillWithDescriptionAndExplanation = function(
+      description, reviewMaterial) {
     waitFor.elementToBeClickable(
       createSkillButton,
       'Create Skill button takes too long to be clickable');
     createSkillButton.click();
 
     skillNameField.sendKeys(description);
+    editConceptCardExplanationButton.click();
+
+    var editor = element(by.css('.protractor-test-concept-card-text'));
+    waitFor.visibilityOf(
+      editor, 'Explanation Editor takes too long to appear');
+
+    browser.switchTo().activeElement().sendKeys(reviewMaterial);
+
+    waitFor.elementToBeClickable(
+      saveConceptCardExplanationButton,
+      'Save Concept Card Explanation button takes too long to be clickable');
+    saveConceptCardExplanationButton.click();
+    waitFor.invisibilityOf(
+      editor, 'Explanation Editor takes too long to close');
+
     for (var i = 0; i < 3; i++) {
       skillEditorPage.editRubricExplanationWithIndex(i, 'Explanation ' + i);
     }
