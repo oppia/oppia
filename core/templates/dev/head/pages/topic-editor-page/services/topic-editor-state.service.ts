@@ -29,6 +29,7 @@ require('domain/topic/topic-rights-backend-api.service.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/QuestionsListService.ts');
+
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicEditorStateService', [

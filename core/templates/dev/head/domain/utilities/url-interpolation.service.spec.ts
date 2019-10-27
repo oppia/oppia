@@ -20,6 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+
 require('domain/utilities/url-interpolation.service.ts');
 
 describe('URL Interpolation Service', function() {

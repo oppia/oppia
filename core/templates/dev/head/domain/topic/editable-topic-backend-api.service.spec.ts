@@ -20,6 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('services/CsrfTokenService.ts');
