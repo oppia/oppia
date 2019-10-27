@@ -32,21 +32,21 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants';
+import { AppConstants } from '../../app.constants';
 import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants';
+  '../../domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
+'../../../../../../extensions/interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+  '../../domain/objects/objects-domain.constants';
 import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants';
+  '../../domain/question/question-domain.constants';
 import { QuestionsListConstants } from
-  'components/question-directives/questions-list/questions-list.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+  '../../components/question-directives/questions-list/questions-list.constants';
+import { ServicesConstants } from '../../services/services.constants';
+import { SkillDomainConstants } from '../../domain/skill/skill-domain.constants';
 import { SkillEditorPageConstants } from
-  'pages/skill-editor-page/skill-editor-page.constants';
+  '../../pages/skill-editor-page/skill-editor-page.constants';
 
 @NgModule({
   imports: [

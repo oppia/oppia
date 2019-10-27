@@ -32,13 +32,13 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants';
+import { AppConstants } from '../../app.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
+  '../../../../../../extensions/interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+  '../../domain/objects/objects-domain.constants';
 import { TopicViewerDomainConstants } from
-  'domain/topic_viewer/topic-viewer-domain.constants';
+  '../../domain/topic_viewer/topic-viewer-domain.constants';
 
 @NgModule({
   imports: [
