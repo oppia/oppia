@@ -140,18 +140,18 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.gae_user_id = current_user_services.get_current_gae_user_id()
+        self.gae_id = current_user_services.get_current_gae_id()
         self.user_id = None
         self.username = None
         self.partially_logged_in = False
 
-        if self.gae_user_id:
-            user_settings = user_services.get_user_settings_by_gae_user_id(
-                self.gae_user_id, strict=False)
+        if self.gae_id:
+            user_settings = user_services.get_user_settings_by_gae_id(
+                self.gae_id, strict=False)
             if user_settings is None:
                 email = current_user_services.get_current_user_email()
                 user_settings = user_services.create_new_user(
-                    self.gae_user_id, email)
+                    self.gae_id, email)
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
 

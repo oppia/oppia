@@ -89,7 +89,7 @@ def get_user_id_from_email(email):
     return python_utils.convert_to_bytes(user_id) if user_id else None
 
 
-def get_current_gae_user_id():
+def get_current_gae_id():
     """Gets the user_id of current user.
 
     Returns:

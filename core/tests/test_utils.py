@@ -576,7 +576,7 @@ tags: []
             is_super_admin: bool. Whether the user is a super admin.
        """
         os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = self.get_gae_user_id_from_email(email)
+        os.environ['USER_ID'] = self.get_gae_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
@@ -927,8 +927,8 @@ tags: []
         # immediately once the signup is complete. This is done to avoid
         # external  calls being made to Gravatar when running the backend
         # tests.
-        gae_user_id = self.get_gae_user_id_from_email(email)
-        user_services.create_new_user(gae_user_id, email)
+        gae_id = self.get_gae_id_from_email(email)
+        user_services.create_new_user(gae_id, email)
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
@@ -1029,11 +1029,11 @@ tags: []
         Returns:
             str. ID of the user possessing the given email.
         """
-        gae_user_id = self.get_gae_user_id_from_email(email)
+        gae_id = self.get_gae_id_from_email(email)
         return (
-            user_services.get_user_settings_by_gae_user_id(gae_user_id).user_id)
+            user_services.get_user_settings_by_gae_id(gae_id).user_id)
 
-    def get_gae_user_id_from_email(self, email):
+    def get_gae_id_from_email(self, email):
         """Gets the GAE user ID corresponding to the given email.
 
         Args:

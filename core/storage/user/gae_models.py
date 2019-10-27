@@ -36,7 +36,7 @@ class UserSettingsModel(base_models.BaseModel):
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
     # TODO(#7659): Set required to True.
-    gae_user_id = ndb.StringProperty(required=False, indexed=True)
+    gae_id = ndb.StringProperty(required=False, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
     # User role. Required for authorization. User gets a default role of
@@ -169,17 +169,17 @@ class UserSettingsModel(base_models.BaseModel):
             cls.normalized_username == normalized_username).get())
 
     @classmethod
-    def get_by_gae_user_id(cls, gae_user_id):
+    def get_by_gae_id(cls, gae_id):
         """Returns a user model with given GAE user ID.
 
         Args:
-            gae_user_id: str. The GAE user ID that is being queried for.
+            gae_id: str. The GAE user ID that is being queried for.
 
         Returns:
             UserSettingsModel. The UserSettingsModel instance which has the same
             GAE user ID.
         """
-        return cls.get_all().filter(cls.gae_user_id == gae_user_id).get()
+        return cls.get_all().filter(cls.gae_id == gae_id).get()
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):

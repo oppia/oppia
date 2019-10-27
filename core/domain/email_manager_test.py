@@ -2312,14 +2312,14 @@ class BulkEmailsTests(test_utils.GenericTestBase):
 class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_can_users_receive_thread_email(self):
-        gae_user_ids = ('someUser1', 'someUser2')
+        gae_ids = ('someUser1', 'someUser2')
         exp_id = 'someExploration'
         usernames = ('username1', 'username2')
         emails = ('user1@example.com', 'user2@example.com')
 
         user_ids = []
         for user_id, username, user_email in python_utils.ZIP(
-                gae_user_ids, usernames, emails):
+                gae_ids, usernames, emails):
             user_settings = user_services.create_new_user(user_id, user_email)
             user_ids.append(user_settings.user_id)
             user_services.set_username(user_settings.user_id, username)
