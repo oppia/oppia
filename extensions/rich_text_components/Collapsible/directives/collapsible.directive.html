@@ -11,3 +11,50 @@
     </div>
   </div>
 </uib-accordion>
+
+<!-- TODO(ankita240796): This styling is required since ui-bootstrap does not work correctly with bootstrap 4. We need to switch from ui-bootstrap to ng-bootstrap once we have upgraded the collapsible component to Angular 8.-->
+<style>
+  .panel {
+    margin-bottom: 20px;
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  }
+  .panel-heading {
+    padding: 10px 15px;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+  .panel-group {
+    margin-bottom: 20px;
+  }
+  .panel-title {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 16px;
+    color: inherit;
+  }
+  .panel-title>a,
+  .panel-title>small,
+  .panel-title>.small,
+  .panel-title>small>a,
+  .panel-title>.small>a {
+    color: inherit;
+  }
+  .panel-group .panel-heading {
+    border-bottom: 0;
+  }
+  .panel-group .panel {
+    margin-bottom: 0;
+    border-radius: 4px;
+  }
+  .collapse {
+    display: none;
+  }
+  .collapse.in {
+    display: block;
+  }
+</style>
