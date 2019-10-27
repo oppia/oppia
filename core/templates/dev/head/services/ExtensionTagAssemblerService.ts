@@ -18,9 +18,10 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/HtmlEscaperService';
+
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { HtmlEscaperService } from 'services/HtmlEscaperService';
 
 // Service for assembling extension tags (for interactions).
 
@@ -43,4 +44,3 @@ export class ExtensionTagAssemblerService {
 angular.module('oppia').factory(
   'ExtensionTagAssemblerService',
   downgradeInjectable(ExtensionTagAssemblerService));
-

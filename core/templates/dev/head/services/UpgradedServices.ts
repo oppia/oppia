@@ -25,7 +25,7 @@ import { ExtensionTagAssemblerService }
   from 'services/ExtensionTagAssemblerService';
 import { HtmlEscaperService } from 'services/HtmlEscaperService';
 import { LoggerService } from 'services/LoggerService';
-import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from
   'services/contextual/WindowDimensionsService';
@@ -36,15 +36,14 @@ import { WindowDimensionsService } from
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
-    'UtilsService': new UtilsService(),
-    'WindowDimensionsService': new WindowDimensionsService(),
-    'HtmlEscaperService': new HtmlEscaperService(
-      new LoggerService(new ErrorHandler())),
     'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
       new HtmlEscaperService(new LoggerService(new ErrorHandler())),
       new CamelCaseToHyphensPipe()),
+    'HtmlEscaperService': new HtmlEscaperService(
+      new LoggerService(new ErrorHandler())),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService()
   };
 }
