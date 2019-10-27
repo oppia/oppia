@@ -20,7 +20,7 @@ import { DateTimeFormatService } from 'services/DateTimeFormatService';
 import { FormatTimerPipe } from
   'filters/string-utility-filters/format-timer.pipe';
 
-describe('datetimeformatter', function() {
+describe('datetimeformatter', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
   let NOW_MILLIS = 1416563100000;
   let df: DateTimeFormatService;
@@ -36,7 +36,7 @@ describe('datetimeformatter', function() {
     });
   });
 
-  it('should correctly indicate recency', function() {
+  it('should correctly indicate recency', () => {
     // 1 second ago is recent.
     expect(df.isRecent(NOW_MILLIS - 1)).toBe(true);
     // 72 hours ago is recent.
