@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ComputeGraphService } from 'services/ComputeGraphService';
-import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from
   'services/contextual/WindowDimensionsService';
@@ -31,13 +31,12 @@ import { WindowDimensionsService } from
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
-    'UtilsService': new UtilsService(),
+    'ComputeGraphService': new ComputeGraphService(),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
-    'WindowDimensionsService': new WindowDimensionsService(),
-    'ComputeGraphService': new ComputeGraphService()
+    'UtilsService': new UtilsService(),
+    'WindowDimensionsService': new WindowDimensionsService()
   };
-  /* eslint-enable quote-props */
 }
 
 angular.module('oppia').factory(

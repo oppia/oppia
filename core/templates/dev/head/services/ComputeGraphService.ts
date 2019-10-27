@@ -24,6 +24,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ComputeGraphService {
+  // TODO(#7176): Replace 'any' with the exact type.
   _computeGraphData(initStateId: any, states: any): any {
     let nodes = {};
     let links = [];
@@ -57,7 +58,7 @@ export class ComputeGraphService {
       nodes: nodes
     };
   }
-
+  // TODO(#7176): Replace 'any' with the exact type.
   _computeBfsTraversalOfStates(initStateId: any, states: any,
       sourceStateName: any): Array<any> {
     let stateGraph = this._computeGraphData(initStateId, states);
@@ -80,11 +81,11 @@ export class ComputeGraphService {
     }
     return stateNamesInBfsOrder;
   }
-
+  // TODO(#7176): Replace 'any' with the exact type.
   compute(initStateId: any, states: any): Object {
     return this._computeGraphData(initStateId, states);
   }
-
+  // TODO(#7176): Replace 'any' with the exact type.
   computeBfsTraversalOfStates(initStateId: any, states: any,
       sourceStateName: any): Array<any> {
     return this._computeBfsTraversalOfStates(
