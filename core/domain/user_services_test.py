@@ -88,20 +88,21 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_username(feconf.MIGRATION_BOT_USER_ID))
 
     def test_get_usernames(self):
-        gae_user_ids = ['test1', feconf.SYSTEM_COMMITTER_ID, 'test2']
-        usernames = ['name1', feconf.SYSTEM_COMMITTER_ID, 'name2']
-        user_emails = [
-            'test1@email.com', feconf.SYSTEM_EMAIL_ADDRESS, 'test2@email.com']
+        gae_user_ids = ['test1', 'test2']
+        usernames = ['name1', 'name2']
+        user_emails = ['test1@email.com', 'test2@email.com']
 
         user_ids = []
         for gae_uid, email, name in python_utils.ZIP(
                 gae_user_ids, user_emails, usernames):
-            if gae_uid is not None:
-                user_id = user_services.create_new_user(gae_uid, email).user_id
-                user_services.set_username(user_id, name)
-                user_ids.append(user_id)
-            else:
-                user_ids.append(feconf.SYSTEM_COMMITTER_ID)
+            user_id = user_services.create_new_user(gae_uid, email).user_id
+            user_services.set_username(user_id, name)
+            user_ids.append(user_id)
+
+        # Check that system admin has correct username.
+        user_ids.append(feconf.SYSTEM_COMMITTER_ID)
+        usernames.append(feconf.SYSTEM_COMMITTER_ID)
+
         # Handle usernames that exists.
         self.assertEqual(usernames, user_services.get_usernames(user_ids))
 
