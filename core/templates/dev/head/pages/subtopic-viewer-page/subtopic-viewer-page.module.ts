@@ -33,7 +33,7 @@ import { HttpClientModule } from '@angular/common/http';
 export class ServiceBootstrapComponent {}
 
 import { SubtopicViewerDomainConstants } from
-  'domain/subtopic_viewer/subtopic-viewer-domain.constants';
+  '../../domain/subtopic_viewer/subtopic-viewer-domain.constants';
 
 @NgModule({
   imports: [

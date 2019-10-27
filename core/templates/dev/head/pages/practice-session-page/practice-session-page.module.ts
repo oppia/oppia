@@ -32,16 +32,16 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants';
+import { AppConstants } from '../../app.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
+  '../../../../../../extensions/interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+  '../../domain/objects/objects-domain.constants';
 import { QuestionPlayerConstants } from
-  'components/question-directives/question-player/question-player.constants';
-import { ServicesConstants } from 'services/services.constants';
+  '../../components/question-directives/question-player/question-player.constants';
+import { ServicesConstants } from '../../services/services.constants';
 import { PracticeSessionPageConstants } from
-  'pages/practice-session-page/practice-session-page.constants';
+  '../../pages/practice-session-page/practice-session-page.constants';
 
 @NgModule({
   imports: [
