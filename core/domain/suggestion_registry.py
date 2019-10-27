@@ -757,6 +757,13 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
         raise NotImplementedError(
             'Subclasses of BaseVoiceoverApplication should implement accept.')
 
+    def reject(self):
+        """Rejects the voiceover application. Each subclass must implement this
+        function.
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseVoiceoverApplication should implement reject.')
+
     @property
     def is_handled(self):
         """Returns true if the voiceover application has either been accepted or
@@ -803,9 +810,33 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
         self.content = content
         self.rejection_message = rejection_message
 
+    def accept(self, reviewer_id):
+        """Accepts the voiceover application and updates the final_reviewer_id.
+
+        Args:
+            reviewer_id: str. The user ID of the reviewer.
+        """
+        self.final_reviewer_id = reviewer_id
+        self.status = suggestion_models.STATUS_ACCEPTED
+        self.validate()
+
+    def reject(self, reviewer_id, rejection_message):
+        """Rejects the voiceover application, updates the final_reviewer_id and
+        adds rejection message.
+
+        Args:
+            reviewer_id: str. The user ID of the reviewer.
+            rejection_message: str. The rejection message submitted by the
+                reviewer.
+        """
+        self.status = suggestion_models.STATUS_REJECTED
+        self.final_reviewer_id = reviewer_id
+        self.rejection_message = rejection_message
+        self.validate()
+
 
 VOICEOVER_APPLICATION_TYPE_TO_DOMAIN_CLASSES = {
-    suggestion_models.VOICEOVER_APPLICATION_TO_EXPLORATION: (
+    suggestion_models.TARGET_TYPE_EXPLORATION: (
         ExplorationVoiceoverApplication)
 }
 
