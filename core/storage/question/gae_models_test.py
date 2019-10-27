@@ -555,11 +555,13 @@ class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(
             question_models.QuestionRightsModel
             .has_reference_to_user_id('owner_id'))
-        # Change creator_id so we can test separate occurrences.
+        # The question_rights.creator_id is by default the same as committer_id,
+        # we change it to different value so that we really check all
+        # separate fields.
         question_rights = question_models.QuestionRightsModel.get('question_id')
         question_rights.creator_id = 'creator_id'
         question_rights.commit(
-            'commiter_id',
+            'committer_id',
             'Update question rights',
             [{'cmd': question_domain.CMD_CREATE_NEW}])
         self.assertTrue(
@@ -570,7 +572,7 @@ class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
             .has_reference_to_user_id('creator_id'))
         self.assertTrue(
             question_models.QuestionRightsModel
-            .has_reference_to_user_id('commiter_id'))
+            .has_reference_to_user_id('committer_id'))
         self.assertFalse(
             question_models.QuestionRightsModel
             .has_reference_to_user_id('x_id'))

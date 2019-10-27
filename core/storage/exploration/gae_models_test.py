@@ -43,10 +43,10 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
-        exp_services.save_new_exploration('commiter_id', exploration)
+        exp_services.save_new_exploration('committer_id', exploration)
         self.assertTrue(
             exploration_models.ExplorationModel
-            .has_reference_to_user_id('commiter_id'))
+            .has_reference_to_user_id('committer_id'))
         self.assertFalse(
             exploration_models.ExplorationModel
             .has_reference_to_user_id('x_id'))
@@ -74,7 +74,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'  # Related to all three explorations
     USER_ID_2 = 'id_2'  # Related to a subset of the three explorations
     USER_ID_3 = 'id_3'  # Related to no explorations
-    USER_ID_COMMITER = 'id_4'  # User id used in commits
+    USER_ID_COMMITTER = 'id_4'  # User id used in commits
 
     def setUp(self):
         super(ExplorationRightsModelUnitTest, self).setUp()
@@ -89,7 +89,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            self.USER_ID_COMMITER, 'Created new exploration right',
+            self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         exploration_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_2,
@@ -102,7 +102,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            self.USER_ID_COMMITER, 'Created new exploration right',
+            self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         exploration_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_3,
@@ -115,7 +115,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            self.USER_ID_COMMITER, 'Created new exploration right',
+            self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_get_deletion_policy(self):
@@ -132,7 +132,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.USER_ID_1))
         self.assertTrue(
             exploration_models.ExplorationRightsModel
-            .has_reference_to_user_id(self.USER_ID_COMMITER))
+            .has_reference_to_user_id(self.USER_ID_COMMITTER))
         self.assertFalse(
             exploration_models.ExplorationRightsModel
             .has_reference_to_user_id(self.USER_ID_3))
@@ -231,12 +231,12 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test_get_all_non_private_commits(self):
         private_commit = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'commiter_id', 'username', 'msg',
+                'a', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         public_commit = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'b', 1, 'commiter_id', 'username', 'msg',
+                'b', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         private_commit.exploration_id = 'a'
@@ -266,12 +266,12 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test_get_multi(self):
         commit1 = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'commiter_id', 'username', 'msg',
+                'a', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         commit2 = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 2, 'commiter_id', 'username', 'msg',
+                'a', 2, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         commit1.exploration_id = 'a'

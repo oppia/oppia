@@ -92,28 +92,28 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
             creator_id='janet_id',
             skill_is_private=True
         ).commit(
-            'janet_commit_id', 'Created new skill rights',
+            'janet_committer_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         skill_models.SkillRightsModel(
             id='id_2',
             creator_id='janet_id',
             skill_is_private=True
         ).commit(
-            'janet_commit_id', 'Edited skill rights',
+            'janet_committer_id', 'Edited skill rights',
             [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
         skill_models.SkillRightsModel(
             id='id_3',
             creator_id='joe_id',
             skill_is_private=False
         ).commit(
-            'joe_commit_id', 'Created new skill rights',
+            'joe_committer_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         skill_models.SkillRightsModel(
             id='id_4',
             creator_id='joe_id',
             skill_is_private=True
         ).commit(
-            'joe_commit_id', 'Created new skill rights',
+            'joe_committer_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_has_reference_to_user_id(self):
@@ -122,13 +122,13 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
             .has_reference_to_user_id('janet_id'))
         self.assertTrue(
             skill_models.SkillRightsModel
-            .has_reference_to_user_id('janet_commit_id'))
+            .has_reference_to_user_id('janet_committer_id'))
         self.assertTrue(
             skill_models.SkillRightsModel
             .has_reference_to_user_id('joe_id'))
         self.assertTrue(
             skill_models.SkillRightsModel
-            .has_reference_to_user_id('joe_commit_id'))
+            .has_reference_to_user_id('joe_committer_id'))
         self.assertFalse(
             skill_models.SkillRightsModel
             .has_reference_to_user_id('x_id'))

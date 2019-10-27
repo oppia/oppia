@@ -43,10 +43,10 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
-        collection_services.save_new_collection('commiter_id', collection)
+        collection_services.save_new_collection('committer_id', collection)
         self.assertTrue(
             collection_models.CollectionModel
-            .has_reference_to_user_id('commiter_id'))
+            .has_reference_to_user_id('committer_id'))
         self.assertFalse(
             collection_models.CollectionModel
             .has_reference_to_user_id('x_id'))
@@ -70,7 +70,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'  # Related to all three collections
     USER_ID_2 = 'id_2'  # Related to a subset of the three collections
     USER_ID_3 = 'id_3'  # Related to no collections
-    USER_ID_COMMITER = 'id_4'  # User id used in commits
+    USER_ID_COMMITTER = 'id_4'  # User id used in commits
 
     def setUp(self):
         super(CollectionRightsModelUnitTest, self).setUp()
@@ -85,7 +85,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            self.USER_ID_COMMITER, 'Created new collection right',
+            self.USER_ID_COMMITTER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_2,
@@ -98,7 +98,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            self.USER_ID_COMMITER, 'Created new collection right',
+            self.USER_ID_COMMITTER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_3,
@@ -111,7 +111,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            self.USER_ID_COMMITER, 'Created new collection right',
+            self.USER_ID_COMMITTER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_get_deletion_policy(self):
@@ -128,7 +128,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.USER_ID_1))
         self.assertTrue(
             collection_models.CollectionRightsModel
-            .has_reference_to_user_id(self.USER_ID_COMMITER))
+            .has_reference_to_user_id(self.USER_ID_COMMITTER))
         self.assertFalse(
             collection_models.CollectionRightsModel
             .has_reference_to_user_id(self.USER_ID_3))
@@ -144,7 +144,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0
-            ).save(self.USER_ID_COMMITER, 'Created new collection',
+            ).save(self.USER_ID_COMMITTER, 'Created new collection',
                    [{'cmd': rights_manager.CMD_CREATE_NEW}])
         collection_model = collection_models.CollectionRightsModel.get('id')
         self.assertEqual('id', collection_model.id)

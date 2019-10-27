@@ -49,7 +49,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     if 'Model' in all_base_classes:
                         yield clazz
 
-    # List of model classes that can't have Wipeout related class methods
+    # List of model classes that don't have Wipeout related class methods
     # defined because they're not used directly but only as a base classes for
     # the other models.
     BASE_CLASSES = (

@@ -934,7 +934,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     """
 
     # The id of the user who committed this revision.
-    committer_id = ndb.StringProperty(indexed=True, required=True)
+    committer_id = ndb.StringProperty(required=True)
     # The type of the commit associated with this snapshot.
     commit_type = ndb.StringProperty(
         required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES)
@@ -946,7 +946,7 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @classmethod
     def exists_for_user_id(cls, user_id):
-        """Check whether BaseSnapshotMetadataModel reference user.
+        """Check whether BaseSnapshotMetadataModel references the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
