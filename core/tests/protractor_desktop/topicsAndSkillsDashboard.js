@@ -103,7 +103,8 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
     topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
     topicEditorPage.moveToQuestionsTab();
-    topicEditorPage.expectNumberOfQuestionsToBe(1);
+    topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+      1, 'Skill 2');
   });
 
   it('should remove a skill from list once deleted', function() {

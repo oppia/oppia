@@ -109,33 +109,37 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 1', 'Concept card explanation');
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    browser.getCurrentUrl().then(function(url) {
+      skillId = url.split('/')[4];
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+      topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
 
-    topicEditorPage.get(topicId);
-    topicEditorPage.moveToQuestionsTab();
-    topicEditorPage.createQuestionForSkillWithIndex(0);
-    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Correct Answer'), null, false,
-      'FuzzyEquals', 'correct');
-    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-    explorationEditorMainTab.addHint('Hint 1');
-    explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'correct',
-      explanation: 'It is correct'
+      topicEditorPage.get(topicId);
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.createQuestionForSkillWithIndex(0);
+      explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
+      explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
+      explorationEditorMainTab.addResponse(
+        'TextInput', forms.toRichText('Correct Answer'), null, false,
+        'FuzzyEquals', 'correct');
+      explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
+      explorationEditorMainTab.addHint('Hint 1');
+      explorationEditorMainTab.addSolution('TextInput', {
+        correctAnswer: 'correct',
+        explanation: 'It is correct'
+      });
+      topicEditorPage.saveQuestion();
+
+      topicEditorPage.get(topicId);
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+        1, 'Skill 1');
+
+      skillEditorPage.get(skillId);
+      skillEditorPage.moveToQuestionsTab();
+      skillEditorPage.expectNumberOfQuestionsToBe(1);
     });
-    topicEditorPage.saveQuestion();
-
-    topicEditorPage.get(topicId);
-    topicEditorPage.moveToQuestionsTab();
-    topicEditorPage.expectNumberOfQuestionsToBe(1);
-
-    skillEditorPage.get(skillId);
-    skillEditorPage.moveToQuestionsTab();
-    skillEditorPage.expectNumberOfQuestionsToBe(1);
   });
 
   it('should add a canonical story to topic correctly', function() {
