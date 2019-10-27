@@ -32,8 +32,6 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
 
 describe('Enable correctness feedback and set correctness', function() {
   var explorationEditorPage = null;
@@ -50,7 +48,7 @@ describe('Enable correctness feedback and set correctness', function() {
     ['NumericInput', 3]
   ];
 
-  var enableMarkCorrectness = function() {
+  var enableCorrectnessFeedbackSetting = function() {
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.enableCorrectnessFeedback();
   };
@@ -107,7 +105,7 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorMainTab.moveToState('End');
     explorationEditorMainTab.setInteraction('EndExploration');
     // Turn on correctness feedback.
-    enableMarkCorrectness();
+    enableCorrectnessFeedbackSetting();
 
     // Go back to mark the solution as correct.
     explorationEditorPage.navigateToMainTab();
@@ -123,7 +121,7 @@ describe('Enable correctness feedback and set correctness', function() {
   it('should allow selecting correct feedback from the response editor ' +
      'during set the interaction', function() {
     // Turn on correctness feedback first.
-    enableMarkCorrectness();
+    enableCorrectnessFeedbackSetting();
 
     // Go to main tab to create interactions.
     explorationEditorPage.navigateToMainTab();
@@ -155,7 +153,7 @@ describe('Enable correctness feedback and set correctness', function() {
   it('should allow selecting correct feedback from the default response editor',
     function() {
       // Turn on correctness feedback first.
-      enableMarkCorrectness();
+      enableCorrectnessFeedbackSetting();
 
       // Go back to main tab to create interactions.
       explorationEditorPage.navigateToMainTab();
@@ -181,6 +179,7 @@ describe('Enable correctness feedback and set correctness', function() {
   afterEach(function() {
     libraryPage.get();
     currentExplorationIndex += 1;
+    general.checkForConsoleErrors([]);
   });
 });
 
