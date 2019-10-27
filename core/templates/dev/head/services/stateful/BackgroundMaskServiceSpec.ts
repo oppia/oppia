@@ -18,19 +18,19 @@
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 
-describe('Background Mask Service', function() {
+describe('Background Mask Service', () => {
   let backgroundMaskService;
 
   beforeEach(() => {
     backgroundMaskService = new BackgroundMaskService();
   });
 
-  it('should activate mask', function() {
+  it('should activate mask', () => {
     backgroundMaskService.activateMask();
     expect(backgroundMaskService.isMaskActive()).toBe(true);
   });
 
-  it('should deactivate mask', function() {
+  it('should deactivate mask', () => {
     backgroundMaskService.deactivateMask();
     expect(backgroundMaskService.isMaskActive()).toBe(false);
   });

@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
-import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 
@@ -30,11 +30,11 @@ import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
+    'BackgroundMaskService': new BackgroundMaskService(),
     'UtilsService': new UtilsService(),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'WindowDimensionsService': new WindowDimensionsService(),
-    'BackgroundMaskService': new BackgroundMaskService()
   };
 }
 
