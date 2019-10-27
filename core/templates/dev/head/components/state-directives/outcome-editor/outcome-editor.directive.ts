@@ -132,7 +132,8 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.isSelfLoopWithNoFeedback = function(outcome) {
-            if (outcome) {
+            if (typeof outcome === 'object' &&
+              outcome.constructor.name === 'Outcome') {
               return ctrl.isSelfLoop(outcome) &&
                 !outcome.hasNonemptyFeedback();
             }
