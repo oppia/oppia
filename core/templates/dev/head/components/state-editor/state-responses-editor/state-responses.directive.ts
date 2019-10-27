@@ -226,7 +226,7 @@ angular.module('oppia').directive('stateResponses', [
           };
 
           $scope.isSelfLoopWithNoFeedback = function(outcome) {
-            if (typeof outcome === 'object' &&
+            if (outcome && typeof outcome === 'object' &&
               outcome.constructor.name === 'Outcome') {
               return outcome.isConfusing($scope.stateName);
             }
@@ -274,7 +274,7 @@ angular.module('oppia').directive('stateResponses', [
           $scope.isLinearWithNoFeedback = function(outcome) {
             // Returns false if current interaction is linear and has no
             // feedback
-            if (typeof outcome === 'object' &&
+            if (outcome && typeof outcome === 'object' &&
               outcome.constructor.name === 'Outcome') {
               return $scope.isCurrentInteractionLinear() &&
                 !outcome.hasNonemptyFeedback();
