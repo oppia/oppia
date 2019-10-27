@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { DebouncerService } from 'services/DebouncerService';
-import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from
   'services/contextual/WindowDimensionsService';
@@ -31,11 +31,11 @@ import { WindowDimensionsService } from
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
-    'UtilsService': new UtilsService(),
+    'DebouncerService': new DebouncerService(),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService(),
-    'DebouncerService': new DebouncerService()
   };
 }
 
