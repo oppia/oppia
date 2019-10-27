@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the rubric editor for skills.
+ * @fileoverview Directive for the skill review material editor.
  */
 
 require(
@@ -36,8 +36,6 @@ angular.module('oppia').directive('reviewMaterialEditor', [
     return {
       restrict: 'E',
       scope: {},
-      // The rubrics parameter passed in should have the 3 difficulties
-      // initialized.
       bindToController: {
         getBindableDict: '&bindableDict',
         onSaveExplanation: '='
