@@ -108,6 +108,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 with self.assertRaises(NotImplementedError):
                     clazz.get_deletion_policy()
 
+    # TODO(#7858): Remove this after has_reference_to_user_id is implemented
+    # where needed.
     @unittest.skip(
         'has_reference_to_user_id is not yet implemented on all models')
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
