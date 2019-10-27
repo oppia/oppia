@@ -30,7 +30,6 @@ from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import python_utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
@@ -40,6 +39,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     """Provides testing of the voiceover services."""
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
+
     def setUp(self):
         super(VoiceoverApplicationServicesUnitTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -141,8 +141,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW)
 
         voiceover_services.accept_voiceover_application(
-                user_voiceover_applications[0].voiceover_application_id,
-                self.admin_id)
+            user_voiceover_applications[0].voiceover_application_id,
+            self.admin_id)
 
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(
@@ -177,8 +177,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(more)
 
         voiceover_services.accept_voiceover_application(
-                user_voiceover_applications[0].voiceover_application_id,
-                self.admin_id)
+            user_voiceover_applications[0].voiceover_application_id,
+            self.admin_id)
 
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(
@@ -212,8 +212,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(more)
 
         voiceover_services.reject_voiceover_application(
-                user_voiceover_applications[0].voiceover_application_id,
-                self.admin_id, 'Rejection message')
+            user_voiceover_applications[0].voiceover_application_id,
+            self.admin_id, 'Rejection message')
 
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(

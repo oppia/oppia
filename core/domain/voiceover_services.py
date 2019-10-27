@@ -18,7 +18,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import email_manager
 from core.domain import exp_fetchers
-from core.domain import feedback_services
 from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import suggestion_registry
@@ -73,6 +72,7 @@ def _get_voiceover_application_model(voiceover_application):
         content=voiceover_application.content,
         rejection_message=voiceover_application.rejection_message)
 
+
 def _get_voiceover_application_from_model(voiceover_application_model):
     """Returns the BaseVoiceoverApplication object for the give
     voiceover application model object.
@@ -86,7 +86,7 @@ def _get_voiceover_application_from_model(voiceover_application_model):
         application model object.
     """
     voiceover_application_class = _get_voiceover_application_class(
-            voiceover_application_model.target_type)
+        voiceover_application_model.target_type)
     return voiceover_application_class(
         voiceover_application_model.id,
         voiceover_application_model.target_id,
@@ -112,6 +112,7 @@ def _save_voiceover_application(voiceover_application):
 
     voiceover_application_model.put()
 
+
 def get_voiceover_application_by_id(voiceover_application_id):
     """Returns voiceover application model corresponding to give id.
 
@@ -127,37 +128,6 @@ def get_voiceover_application_by_id(voiceover_application_id):
             voiceover_application_id))
     return _get_voiceover_application_from_model(voiceover_application_model)
 
-
-def can_submit_new_voiceover_application(user_id):
-    """Checks whether a given user can submit a new voiceover application.
-
-    Args:
-        user_id: str. The id of the user.
-
-    returns:
-        bool. Whether the given user can submit a new voiceover application.
-    """
-    voiceover_application_models = get_user_submitted_voiceover_applications(
-        user_id)
-
-    models_in_review = [model for model in voiceover_application_models if (
-        model.status == suggestion_models.STATUS_IN_REVIEW)]
-    models_accepted = [model for model in voiceover_application_models if (
-        model.status == suggestion_models.STATUS_IN_REVIEW)]
-    if len(models_in_review) == 0 and len(models_accepted) == 0:
-        return True
-    elif len(models_in_review) > 0:
-        return False
-    elif len(models_accepted) == 1:
-        if suggestion_models.TARGET_TYPE_EXPLORATION == (
-                models_accepted[0].target_type):
-            exploration = exp_fetchers.get_by_id(models_accepted[0].target_id)
-            # TODOOO
-
-
-
-    if len(models_accepted) > 1:
-        return False
 
 def get_reviewable_voiceover_applications():
     """Returns a list of voiceover applications which needs review.
@@ -183,8 +153,9 @@ def get_user_submitted_voiceover_applications(user_id, status=None):
         user_id: str. The id of the user.
         status: str|None. The status of the voiceover application.
 
-    Returns:BaseVoiceoverApplication). A list of voiceover application which
-        are submitted by the given user.
+    Returns:
+        BaseVoiceoverApplication). A list of voiceover application which are
+        submitted by the given user.
     """
     voiceover_application_models = (
         suggestion_models.GeneralVoiceoverApplicationModel
@@ -230,8 +201,8 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
         email_manager.send_accepted_voiceover_application_email(
             voiceover_application.author_id, opportunity['0'].chapter_title,
             voiceover_application.language_code)
-    # TODO: Need to reject all other voiceover application for the same entity.
-    # TODO: Add notification?
+    # Need to reject all other voiceover application for the same entity?
+    # Add notification?
 
 
 def reject_voiceover_application(
@@ -270,9 +241,9 @@ def create_new_voiceover_application(
         target_type: str. The string representing the type of the target entity.
         target_id: str. The ID of the target entity.
         language_code: str. The language code for the voiceover application.
-        filename: str. The filename of the voiceover audio.
         content: str. The html content which is voiceover in the
             application.
+        filename: str. The filename of the voiceover audio.
         author_id: str. The ID of the user who submitted the voiceover
             application.
     """
@@ -294,6 +265,9 @@ def get_text_to_create_voiceover_application(
         target_type: str. The string representing the type of the target entity.
         target_id: str. The ID of the target entity.
         language_code: str. The language code for the content.
+
+    Returns:
+        str. The text which can be voiceover for a voiceover application.
     """
     if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
