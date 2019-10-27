@@ -275,7 +275,7 @@ angular.module('oppia').directive('stateResponses', [
             // feedback
             if (outcome) {
               return $scope.isCurrentInteractionLinear() &&
-                !outcome.hasNonemptyFeedback();;
+                !outcome.hasNonemptyFeedback();
             }
             return false;
           };
