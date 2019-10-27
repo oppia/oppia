@@ -22,7 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { DateTimeFormatService } from 'services/DateTimeFormatService';
 import { FormatTimerPipe } from
   'filters/string-utility-filters/format-timer.pipe';
-import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 
@@ -32,11 +32,11 @@ import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
-    'UtilsService': new UtilsService(),
+    'DateTimeFormatService': new DateTimeFormatService(new FormatTimerPipe()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService(),
-    'DateTimeFormatService': new DateTimeFormatService(new FormatTimerPipe())
   };
 }
 
