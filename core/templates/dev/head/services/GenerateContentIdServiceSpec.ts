@@ -18,31 +18,34 @@
 
 import { GenerateContentIdService } from 'services/GenerateContentIdService';
 
-describe('GenerateContentIdService', function() {
+describe('GenerateContentIdService', () => {
   let gcis: GenerateContentIdService;
 
   beforeEach(() => {
     gcis = new GenerateContentIdService();
   });
 
-  it('should generate content id for new feedbacks', function() {
+  it('should generate content id for new feedbacks', () => {
     expect(
       gcis.getNextId(['feedback_1'], 'feedback')).toEqual(
       'feedback_2');
   });
 
-  it('should generate content id for new hint', function() {
+  it('should generate content id for new hint', () => {
     expect(
       gcis.getNextId(['hint_1'], 'hint')).toEqual(
       'hint_2');
   });
 
-  it('should generate content id for new worked example', function() {
+  it('should generate content id for new worked example', () => {
     expect(gcis.getNextId(['worked_example_1'], 'worked_example')).toEqual(
       'worked_example_2');
   });
 
-  it('should throw error for unknown content id', function() {
+  // This is intentional since we are explicitly passing a single parameter
+  // whereas the functions expects two parameters. We want this
+  // function to throw an error.
+  it('should throw error for unknown content id', () => {
     expect(function() {
       // @ts-ignore
       gcis.getNextId('xyz');

@@ -19,12 +19,14 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { AppConstants } from '../app.constants';
+
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GenerateContentIdService {
+  // TODO(#7176): Replace 'any' with the exact type.
   generateIdForComponent(existingComponentIds: any,
       componentName: string): any {
     let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
@@ -42,7 +44,7 @@ export class GenerateContentIdService {
     }
     return (searchKey + String(count + 1));
   }
-
+  // TODO(#7176): Replace 'any' with the exact type.
   _getNextId(existingComponentIds: any, componentName: string): any {
     if (componentName === AppConstants.COMPONENT_NAME_FEEDBACK ||
         componentName === AppConstants.COMPONENT_NAME_HINT ||
@@ -52,13 +54,11 @@ export class GenerateContentIdService {
       throw Error('Unknown component name provided.');
     }
   }
-
+  // TODO(#7176): Replace 'any' with the exact type.
   getNextId(existingComponentIds: any, componentName: string): any {
     return this._getNextId(existingComponentIds, componentName);
   }
 }
 
-
 angular.module('oppia').factory(
   'GenerateContentIdService', downgradeInjectable(GenerateContentIdService));
-
