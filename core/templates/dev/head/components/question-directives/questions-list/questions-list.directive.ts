@@ -70,6 +70,7 @@ angular.module('oppia').directive('questionsList', [
         'DEFAULT_SKILL_DIFFICULTY', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
         'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL', 'SKILL_DIFFICULTIES',
         'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
+        'QuestionsListService',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
             AlertsService, QuestionCreationService, UrlService,
@@ -78,56 +79,58 @@ angular.module('oppia').directive('questionsList', [
             QuestionObjectFactory, SkillDifficultyObjectFactory,
             DEFAULT_SKILL_DIFFICULTY, EVENT_QUESTION_SUMMARIES_INITIALIZED,
             MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL, SKILL_DIFFICULTIES,
-            StateEditorService, QuestionUndoRedoService, UndoRedoService) {
+            StateEditorService, QuestionUndoRedoService, UndoRedoService,
+            QuestionsListService) {
           var ctrl = this;
-          ctrl.currentPage = 0;
           ctrl.skillIds = [];
+          ctrl.selectedSkillIds = [];
           ctrl.selectedSkillId = ctrl.getSelectedSkillId();
+          ctrl.getQuestionSummaries =
+            QuestionsListService.getCachedQuestionSummaries;
+          ctrl.getCurrentPageNumber = QuestionsListService.getCurrentPageNumber;
+
+          var _reInitializeSelectedSkillIds = function() {
+            ctrl.selectedSkillId = ctrl.getSelectedSkillId();
+            if (ctrl.selectedSkillId !== null) {
+              ctrl.selectedSkillIds = [ctrl.selectedSkillId];
+            } else {
+              ctrl.selectedSkillIds = [];
+            }
+          };
 
           var _initTab = function(resetHistoryAndFetch) {
             ctrl.skillIds = ctrl.getSkillIds();
             ctrl.questionEditorIsShown = false;
             ctrl.question = null;
-            ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
-              ctrl.currentPage, [ctrl.selectedSkillId], resetHistoryAndFetch,
+            _reInitializeSelectedSkillIds();
+            ctrl.getQuestionSummariesAsync(
+              ctrl.selectedSkillIds, resetHistoryAndFetch,
               resetHistoryAndFetch
             );
-            ctrl.truncatedQuestionSummaries = [];
-            ctrl.populateTruncatedQuestionSummaries();
             ctrl.questionIsBeingUpdated = false;
             ctrl.misconceptionsBySkill = {};
           };
 
           ctrl.getQuestionIndex = function(index) {
-            return ctrl.currentPage * NUM_QUESTIONS_PER_PAGE + index + 1;
+            return (
+              QuestionsListService.getCurrentPageNumber() *
+              NUM_QUESTIONS_PER_PAGE + index + 1);
           };
 
           ctrl.goToNextPage = function() {
-            ctrl.currentPage++;
-            ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
-              ctrl.currentPage, [ctrl.selectedSkillId], true, false
+            _reInitializeSelectedSkillIds();
+            QuestionsListService.incrementPageNumber();
+            ctrl.getQuestionSummariesAsync(
+              ctrl.selectedSkillIds, true, false
             );
-            ctrl.populateTruncatedQuestionSummaries();
           };
 
           ctrl.goToPreviousPage = function() {
-            ctrl.currentPage--;
-            ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
-              ctrl.currentPage, [ctrl.selectedSkillId], false, false
+            _reInitializeSelectedSkillIds();
+            QuestionsListService.decrementPageNumber();
+            ctrl.getQuestionSummariesAsync(
+              ctrl.selectedSkillIds, false, false
             );
-            ctrl.populateTruncatedQuestionSummaries();
-          };
-
-          ctrl.populateTruncatedQuestionSummaries = function() {
-            if (ctrl.questionSummaries) {
-              ctrl.truncatedQuestionSummaries =
-                ctrl.questionSummaries.map(function(question) {
-                  var summary = $filter(
-                    'formatRtePreview')(question.summary.question_content);
-                  summary = $filter('truncate')(summary, 100);
-                  return summary;
-                });
-            }
           };
 
           ctrl.getDifficultyString = function(difficulty) {
@@ -147,16 +150,17 @@ angular.module('oppia').directive('questionsList', [
               AlertsService.addWarning(validationErrors);
               return;
             }
+            _reInitializeSelectedSkillIds();
             if (!ctrl.questionIsBeingUpdated) {
               EditableQuestionBackendApiService.createQuestion(
                 ctrl.newQuestionSkillIds, ctrl.newQuestionSkillDifficulties,
                 ctrl.question.toBackendDict(true)
               ).then(function() {
-                ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
-                  0, [ctrl.selectedSkillId], true, true
+                QuestionsListService.resetPageNumber();
+                ctrl.getQuestionSummariesAsync(
+                  ctrl.selectedSkillIds, true, true
                 );
                 ctrl.questionIsBeingSaved = false;
-                ctrl.currentPage = 0;
               });
             } else {
               if (QuestionUndoRedoService.hasChanges()) {
@@ -168,8 +172,8 @@ angular.module('oppia').directive('questionsList', [
                   function() {
                     QuestionUndoRedoService.clearChanges();
                     ctrl.questionIsBeingSaved = false;
-                    ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
-                      ctrl.currentPage, [ctrl.selectedSkillId], true, true
+                    ctrl.getQuestionSummariesAsync(
+                      ctrl.selectedSkillIds, true, true
                     );
                   }, function(error) {
                     AlertsService.addWarning(
@@ -340,16 +344,17 @@ angular.module('oppia').directive('questionsList', [
                 'User does not have enough rights to delete the question');
               return;
             }
+            _reInitializeSelectedSkillIds();
             if (skillDescriptions.length === 1) {
               var skillId = null;
               ctrl.getAllSkillSummaries().forEach(function(summary) {
                 if (summary.getDescription() === skillDescriptions[0]) {
                   EditableQuestionBackendApiService.deleteQuestionFromSkill(
                     questionId, summary.getId()).then(function() {
-                    ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
-                      0, [ctrl.selectedSkillId], true, true
+                    QuestionsListService.resetPageNumber();
+                    ctrl.getQuestionSummariesAsync(
+                      ctrl.selectedSkillIds, true, true
                     );
-                    ctrl.currentPage = 0;
                     AlertsService.addSuccessMessage('Deleted Question');
                   });
                 }
@@ -358,10 +363,10 @@ angular.module('oppia').directive('questionsList', [
               if (ctrl.getAllSkillSummaries().length === 0) {
                 EditableQuestionBackendApiService.deleteQuestionFromSkill(
                   questionId, ctrl.selectedSkillId).then(function() {
-                  ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
-                    0, [ctrl.selectedSkillId], true, true
+                  QuestionsListService.resetPageNumber();
+                  ctrl.getQuestionSummariesAsync(
+                    ctrl.selectedSkillIds, true, true
                   );
-                  ctrl.currentPage = 0;
                   AlertsService.addSuccessMessage('Deleted Question');
                 });
               }
@@ -418,6 +423,7 @@ angular.module('oppia').directive('questionsList', [
               });
 
               modalInstance.result.then(function(selectedSkillIds) {
+                _reInitializeSelectedSkillIds();
                 var deletedQuestionSkillLinksCount = 0;
                 selectedSkillIds.forEach(function(skillId) {
                   EditableQuestionBackendApiService.deleteQuestionFromSkill(
@@ -436,11 +442,10 @@ angular.module('oppia').directive('questionsList', [
                         called.
                       */
                       $timeout(function() {
-                        ctrl.questionSummaries =
-                          ctrl.getQuestionSummariesAsync(
-                            0, [ctrl.selectedSkillId], true, true
-                          );
-                        ctrl.currentPage = 0;
+                        QuestionsListService.resetPageNumber();
+                        ctrl.getQuestionSummariesAsync(
+                          ctrl.selectedSkillIds, true, true
+                        );
                         AlertsService.addSuccessMessage('Deleted Links');
                       }, 100 * selectedSkillIds.length);
                     }
@@ -514,6 +519,7 @@ angular.module('oppia').directive('questionsList', [
 
             modalInstance.result.then(function(linkedSkillsWithDifficulty) {
               var changedDifficultyCount = 0, count = 0;
+              _reInitializeSelectedSkillIds();
               for (var idx in linkedSkillsWithDifficulty) {
                 var object = linkedSkillsWithDifficulty[idx];
                 if (
@@ -533,11 +539,10 @@ angular.module('oppia').directive('questionsList', [
                       count++;
                       if (count === changedDifficultyCount) {
                         $timeout(function() {
-                          ctrl.questionSummaries =
-                            ctrl.getQuestionSummariesAsync(
-                              0, [ctrl.selectedSkillId], true, true
-                            );
-                          ctrl.currentPage = 0;
+                          QuestionsListService.resetPageNumber();
+                          ctrl.getQuestionSummariesAsync(
+                            ctrl.selectedSkillIds, true, true
+                          );
                           AlertsService.addSuccessMessage('Updated Difficulty');
                         }, 100 * count);
                       }
@@ -633,12 +638,8 @@ angular.module('oppia').directive('questionsList', [
           $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
             _initTab(false);
           });
-          $scope.$on('onSelectedSkillChanged', function(ev, skillId) {
-            ctrl.selectedSkillId = skillId;
-            _initTab(true);
-          });
 
-          _initTab(false);
+          _initTab(true);
         }
       ]
     };

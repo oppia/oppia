@@ -1,7 +1,7 @@
 <md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown && !activeQuestion">
   <div class="questions">
     <h3 class="form-heading"> Questions included in this topic linked to selected skill </h3>
-    <select class="form-control"
+    <select class="form-control protractor-test-select-skill-dropdown"
             ng-model="selectedSkillId"
             ng-if="allSkillSummaries.length > 0"
             ng-change="reinitializeQuestionsList(selectedSkillId)"
