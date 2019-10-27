@@ -220,6 +220,41 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
+    def test_get_user_settings_by_gae_id(self):
+        gae_id = 'gae_id'
+        user_models.UserSettingsModel(
+            id='user_id',
+            gae_id=gae_id,
+            email='user@example.com',
+            username='username',
+        ).put()
+        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
+            gae_id)
+        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+        self.assertEqual(user_settings_model.id, user_settings.user_id)
+        self.assertEqual(user_settings_model.email, user_settings.email)
+        self.assertEqual(user_settings_model.username, user_settings.username)
+        self.assertIsNone(user_services.get_user_settings_by_gae_id('id_x'))
+
+    def test_get_user_settings_by_gae_id_strict(self):
+        gae_id = 'gae_id'
+        user_models.UserSettingsModel(
+            id='user_id',
+            gae_id=gae_id,
+            email='user@example.com',
+            username='username',
+        ).put()
+        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
+            gae_id)
+        user_settings = user_services.get_user_settings_by_gae_id(
+            gae_id, strict=True)
+        self.assertEqual(user_settings_model.id, user_settings.user_id)
+        self.assertEqual(user_settings_model.email, user_settings.email)
+        self.assertEqual(user_settings_model.username, user_settings.username)
+
+        with self.assertRaises(Exception):
+            user_services.get_user_settings_by_gae_id('id_x', strict=True)
+
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
         expected_gravatar_filepath = os.path.join(
