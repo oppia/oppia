@@ -72,7 +72,7 @@ angular.module('oppia').directive('reviewMaterialEditor', [
 
           ctrl.saveConceptCardExplanation = function() {
             ctrl.conceptCardExplanationEditorIsShown = false;
-            explanationObject = SubtitledHtmlObjectFactory.createDefault(
+            var explanationObject = SubtitledHtmlObjectFactory.createDefault(
               ctrl.editableExplanation, COMPONENT_NAME_EXPLANATION);
             ctrl.onSaveExplanation(explanationObject);
           };

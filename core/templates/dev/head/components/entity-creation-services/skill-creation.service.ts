@@ -44,7 +44,7 @@ angular.module('oppia').factory('SkillCreationService', [
         $http.post('/skill_editor_handler/create_new', {
           description: description,
           linked_topic_ids: linkedTopicIds,
-          explanation: explanation,
+          explanation_dict: explanation,
           rubrics: rubrics
         }).then(function(response) {
           $timeout(function() {
