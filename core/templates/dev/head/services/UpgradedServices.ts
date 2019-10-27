@@ -16,12 +16,19 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
+import { DocumentAttributeCustomizationService } from
+  'services/contextual/DocumentAttributeCustomizationService';
+import { MetaTagCustomizationService } from
+  'services/contextual/MetaTagCustomizationService';
 import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
 import { UtilsService } from 'services/UtilsService';
-import { WindowDimensionsService } from './contextual/WindowDimensionsService';
+import { WindowDimensionsService } from
+  'services/contextual/WindowDimensionsService';
+import { WindowRef } from 'services/contextual/WindowRefService';
+
 
 @Injectable({
   providedIn: 'root'
@@ -29,12 +36,15 @@ import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
-    'UtilsService': new UtilsService(),
+    'DocumentAttributeCustomizationService':
+        new DocumentAttributeCustomizationService(new WindowRef()),
+    'MetaTagCustomizationService': new MetaTagCustomizationService(
+      new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService()
   };
-  /* eslint-enable quote-props */
 }
 
 angular.module('oppia').factory(
