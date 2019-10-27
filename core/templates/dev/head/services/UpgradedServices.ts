@@ -23,12 +23,11 @@ import { DocumentAttributeCustomizationService } from
   'services/contextual/DocumentAttributeCustomizationService';
 import { MetaTagCustomizationService } from
   'services/contextual/MetaTagCustomizationService';
-import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from
   'services/contextual/WindowDimensionsService';
 import { WindowRef } from 'services/contextual/WindowRefService';
-
 
 @Injectable({
   providedIn: 'root'

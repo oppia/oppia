@@ -23,7 +23,7 @@ require(
 require(
   'components/version-diff-visualization/codemirror-mergeview.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('versionDiffVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {

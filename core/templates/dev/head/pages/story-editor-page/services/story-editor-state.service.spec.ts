@@ -28,7 +28,7 @@ import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/story/StoryUpdateService.ts');
+require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 
 describe('Story editor state service', function() {
@@ -56,7 +56,11 @@ describe('Story editor state service', function() {
           resolve({
             story: self.newBackendStoryObject,
             topicName: 'Topic Name',
-            storyIsPublished: false
+            storyIsPublished: false,
+            skillSummaries: [{
+              id: 'Skill 1',
+              description: 'Skill Description'
+            }]
           });
         } else {
           reject();
