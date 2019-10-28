@@ -22,8 +22,20 @@ from core import jobs
 from core.domain import search_services
 from core.platform import models
 
-(exp_models, collection_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.collection])
+(collection_models,
+ config_models,
+ exploration_models,
+ question_models,
+ skill_models,
+ story_models,
+ topic_models) = models.Registry.import_models([
+    models.NAMES.config,
+    models.NAMES.exploration,
+    models.NAMES.collection,
+    models.NAMES.question,
+    models.NAMES.skill,
+    models.NAMES.story,
+    models.NAMES.topic])
 
 
 class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
@@ -33,16 +45,47 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExpSummaryModel,
+        return [exploration_models.ExpSummaryModel,
                 collection_models.CollectionSummaryModel]
 
     @staticmethod
     def map(item):
         if not item.deleted:
-            if isinstance(item, exp_models.ExpSummaryModel):
+            if isinstance(item, exploration_models.ExpSummaryModel):
                 search_services.index_exploration_summaries([item])
             else:
                 search_services.index_collection_summaries([item])
+
+    @staticmethod
+    def reduce(key, values):
+        pass
+
+
+class SnapshotMetadataModelsIndexesJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that indexes all explorations and collections and compute their
+    ranks.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionSnapshotMetadataModel,
+                collection_models.CollectionRightsSnapshotMetadataModel,
+                config_models.ConfigPropertySnapshotMetadataModel,
+                exploration_models.ExplorationSnapshotMetadataModel,
+                exploration_models.ExplorationRightsSnapshotMetadataModel,
+                question_models.QuestionSnapshotMetadataModel,
+                question_models.QuestionRightsSnapshotMetadataModel,
+                skill_models.SkillSnapshotMetadataModel,
+                skill_models.SkillRightsSnapshotMetadataModel,
+                story_models.StorySnapshotMetadataModel,
+                topic_models.TopicSnapshotMetadataModel,
+                topic_models.SubtopicPageSnapshotMetadataModel,
+                topic_models.TopicRightsSnapshotMetadataModel]
+
+    @staticmethod
+    def map(model_instance):
+        model_instance.put(update_last_updated_time=False)
+        yield ('SUCCESS', model_instance.id)
 
     @staticmethod
     def reduce(key, values):
