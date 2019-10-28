@@ -99,20 +99,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.set_username(user_id, name)
             user_ids.append(user_id)
 
-        # Check that system admin has correct username.
-        user_ids.append(feconf.SYSTEM_COMMITTER_ID)
-        usernames.append(feconf.SYSTEM_COMMITTER_ID)
-
         # Handle usernames that exists.
         self.assertEqual(usernames, user_services.get_usernames(user_ids))
-
-        # Return empty list when no user id passed.
-        self.assertEqual([], user_services.get_usernames([]))
 
         # Return None for usernames that don't exists.
         self.assertEqual(
             [None, 'name1'],
             user_services.get_usernames(['fakeUser', 'test1']))
+
+    def test_get_usernames_empty_list(self):
+        # Return empty list when no user id passed.
+        self.assertEqual([], user_services.get_usernames([]))
+
+    def test_get_usernames_system_admin(self):
+        # Check that system admin has correct username.
+        self.assertEqual(
+            [feconf.SYSTEM_COMMITTER_ID],
+            user_services.get_usernames([feconf.SYSTEM_COMMITTER_ID]))
 
     def test_get_username_for_nonexistent_user(self):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
