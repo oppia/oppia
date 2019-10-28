@@ -19,6 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { DateTimeFormatService } from 'services/DateTimeFormatService';
 import { FormatTimerPipe } from
   'filters/string-utility-filters/format-timer.pipe';
@@ -32,11 +33,12 @@ import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
+    'BackgroundMaskService': new BackgroundMaskService(),
     'DateTimeFormatService': new DateTimeFormatService(new FormatTimerPipe()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'UtilsService': new UtilsService(),
-    'WindowDimensionsService': new WindowDimensionsService(),
+    'WindowDimensionsService': new WindowDimensionsService()
   };
 }
 
