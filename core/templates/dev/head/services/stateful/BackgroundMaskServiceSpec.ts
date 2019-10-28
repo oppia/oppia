@@ -16,34 +16,22 @@
  * @fileoverview Unit tests for the BackgroundMaskService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 
-require('services/stateful/BackgroundMaskService.ts');
+describe('Background Mask Service', () => {
+  let backgroundMaskService;
 
-describe('Background Mask Service', function() {
-  var BackgroundMaskService;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    BackgroundMaskService = $injector.get('BackgroundMaskService');
-  }));
-
-  it('should activate mask', function() {
-    BackgroundMaskService.activateMask();
-    expect(BackgroundMaskService.isMaskActive()).toBe(true);
+  beforeEach(() => {
+    backgroundMaskService = new BackgroundMaskService();
   });
 
-  it('should deactivate mask', function() {
-    BackgroundMaskService.deactivateMask();
-    expect(BackgroundMaskService.isMaskActive()).toBe(false);
+  it('should activate mask', () => {
+    backgroundMaskService.activateMask();
+    expect(backgroundMaskService.isMaskActive()).toBe(true);
+  });
+
+  it('should deactivate mask', () => {
+    backgroundMaskService.deactivateMask();
+    expect(backgroundMaskService.isMaskActive()).toBe(false);
   });
 });
