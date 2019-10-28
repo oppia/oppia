@@ -34,8 +34,12 @@ angular.module('oppia').directive('misconceptionEditor', [
         'misconception-editor.directive.html'),
       controller: [
         '$scope', 'SkillUpdateService', 'SkillEditorStateService',
-        function($scope, SkillUpdateService, SkillEditorStateService) {
+        'MISCONCEPTION_NAME_CHAR_LIMIT',
+        function(
+            $scope, SkillUpdateService, SkillEditorStateService,
+            MISCONCEPTION_NAME_CHAR_LIMIT) {
           $scope.skill = SkillEditorStateService.getSkill();
+          $scope.MISCONCEPTION_NAME_CHAR_LIMIT = MISCONCEPTION_NAME_CHAR_LIMIT;
 
           var nameMemento = null;
           var notesMemento = null;
