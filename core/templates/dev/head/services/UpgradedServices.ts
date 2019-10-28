@@ -22,7 +22,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { UrlService } from 'services/contextual/UrlService';
-import { WindowDimensionsService } from 'services/contextual/WindowDimensionsService';
+import { WindowDimensionsService } from
+  'services/contextual/WindowDimensionsService';
 import { WindowRef } from 'services/contextual/WindowRefService';
 
 @Injectable({
@@ -34,8 +35,8 @@ export class UpgradedServices {
     'UtilsService': new UtilsService(),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'UrlService': new UrlService(new WindowRef()),
     'WindowDimensionsService': new WindowDimensionsService(),
-    'UrlService': new UrlService(new WindowRef())
   };
 }
 

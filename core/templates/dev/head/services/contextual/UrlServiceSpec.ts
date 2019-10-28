@@ -284,7 +284,7 @@ describe('Url Service', () => {
     }).toThrowError('Invalid collection URL');
   });
 
-  it('should correctly retrieve collection id from editor url', () =>s {
+  it('should correctly retrieve collection id from editor url', () => {
     mockLocation.pathname = '/collection_editor/create/abcdefgijklm';
     expect(urlService.getCollectionIdFromEditorUrl()).toBe('abcdefgijklm');
 
