@@ -46,9 +46,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'CMD_DELETE_SUBTOPIC', TopicDomainConstants.CMD_DELETE_SUBTOPIC);
 angular.module('oppia').constant(
-  'CMD_ADD_UNCATEGORIZED_SKILL_ID',
-  TopicDomainConstants.CMD_ADD_UNCATEGORIZED_SKILL_ID);
-angular.module('oppia').constant(
   'CMD_REMOVE_UNCATEGORIZED_SKILL_ID',
   TopicDomainConstants.CMD_REMOVE_UNCATEGORIZED_SKILL_ID);
 angular.module('oppia').constant(

@@ -165,3 +165,5 @@ angular.module('oppia').constant(
   'COLLECTION_DATA_URL_TEMPLATE', AppConstants.COLLECTION_DATA_URL_TEMPLATE);
 
 angular.module('oppia').constant('ENTITY_TYPE', AppConstants.ENTITY_TYPE);
+angular.module('oppia').constant(
+  'MISCONCEPTION_NAME_CHAR_LIMIT', AppConstants.MISCONCEPTION_NAME_CHAR_LIMIT);

@@ -38,17 +38,17 @@ require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
-require('domain/collection/GuestCollectionProgressService.ts');
-require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
-require('domain/exploration/EditableExplorationBackendApiService.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
-require('domain/question/PretestQuestionBackendApiService.ts');
-require('domain/skill/ConceptCardBackendApiService.ts');
+require('domain/collection/guest-collection-progress.service.ts');
+require('domain/collection/read-only-collection-backend-api.service.ts');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('domain/question/pretest-question-backend-api.service.ts');
+require('domain/skill/concept-card-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
-require('domain/story_viewer/StoryViewerBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/story_viewer/story-viewer-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-manager.service.ts');

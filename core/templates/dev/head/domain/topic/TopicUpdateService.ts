@@ -23,13 +23,13 @@
  */
 
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
 
 require('domain/topic/topic-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
-  'CMD_ADD_SUBTOPIC', 'CMD_ADD_UNCATEGORIZED_SKILL_ID',
+  'CMD_ADD_SUBTOPIC',
   'CMD_DELETE_ADDITIONAL_STORY', 'CMD_DELETE_CANONICAL_STORY',
   'CMD_DELETE_SUBTOPIC', 'CMD_MOVE_SKILL_ID_TO_SUBTOPIC',
   'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC', 'CMD_REMOVE_UNCATEGORIZED_SKILL_ID',
@@ -39,7 +39,7 @@ angular.module('oppia').factory('TopicUpdateService', [
   'TOPIC_PROPERTY_DESCRIPTION', 'TOPIC_PROPERTY_LANGUAGE_CODE',
   'TOPIC_PROPERTY_NAME', function(
       ChangeObjectFactory, UndoRedoService,
-      CMD_ADD_SUBTOPIC, CMD_ADD_UNCATEGORIZED_SKILL_ID,
+      CMD_ADD_SUBTOPIC,
       CMD_DELETE_ADDITIONAL_STORY, CMD_DELETE_CANONICAL_STORY,
       CMD_DELETE_SUBTOPIC, CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
       CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC, CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
@@ -445,27 +445,6 @@ angular.module('oppia').factory('TopicUpdateService', [
         }, function(changeDict, topic) {
           // Undo.
           topic.addCanonicalStory(storyId);
-        });
-      },
-
-      /**
-       * Adds an uncategorized skill to a topic and records the change
-       * in the undo/redo service.
-       */
-      addUncategorizedSkill: function(topic, skillSummary) {
-        _applyChange(topic, CMD_ADD_UNCATEGORIZED_SKILL_ID, {
-          new_uncategorized_skill_id: skillSummary.getId()
-        }, function(changeDict, topic) {
-          // Apply.
-          var newSkillId = _getParameterFromChangeDict(
-            changeDict, 'new_uncategorized_skill_id');
-          topic.addUncategorizedSkill(
-            newSkillId, skillSummary.getDescription());
-        }, function(changeDict, topic) {
-          // Undo.
-          var newSkillId = _getParameterFromChangeDict(
-            changeDict, 'new_uncategorized_skill_id');
-          topic.removeUncategorizedSkill(newSkillId);
         });
       },
 

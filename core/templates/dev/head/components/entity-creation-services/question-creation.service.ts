@@ -16,7 +16,7 @@
  * @fileoverview Service to create the question.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('QuestionCreationService', [
   '$http', '$q',

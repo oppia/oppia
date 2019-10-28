@@ -26,13 +26,13 @@ require(
   'questions-list.constants.ajs.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
@@ -55,6 +55,7 @@ angular.module('oppia').directive('questionsList', [
         isLastPage: '=isLastQuestionBatch',
         getAllSkillSummaries: '&allSkillSummaries',
         canEditQuestion: '&',
+        getSkillIdToRubricsObject: '&skillIdToRubricsObject'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/question-directives/questions-list/' +
@@ -200,6 +201,7 @@ angular.module('oppia').directive('questionsList', [
           ctrl.createQuestion = function() {
             ctrl.newQuestionSkillIds = [];
             var currentMode = MODE_SELECT_SKILL;
+            var skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
             if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
               currentMode = MODE_SELECT_DIFFICULTY;
@@ -218,7 +220,7 @@ angular.module('oppia').directive('questionsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
-                'select-skill-modal.template.html'),
+                'select-skill-and-difficulty-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -230,6 +232,7 @@ angular.module('oppia').directive('questionsList', [
                     $scope.linkedSkillsWithDifficulty =
                       linkedSkillsWithDifficulty;
                     $scope.skillSummaries = allSkillSummaries;
+                    $scope.skillIdToRubricsObject = skillIdToRubricsObject;
                   };
 
                   $scope.selectOrDeselectSkill = function(skillId, index) {
@@ -382,7 +385,7 @@ angular.module('oppia').directive('questionsList', [
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/topic-editor-page/modal-templates/' +
-                  'select-skill-modal.template.html'),
+                  'select-skill-and-difficulty-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',
@@ -489,6 +492,7 @@ angular.module('oppia').directive('questionsList', [
             }
             var oldLinkedSkillWithDifficulty = angular.copy(
               linkedSkillsWithDifficulty);
+            var skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/modal-templates/' +
@@ -500,6 +504,7 @@ angular.module('oppia').directive('questionsList', [
                   var init = function() {
                     $scope.linkedSkillsWithDifficulty =
                       linkedSkillsWithDifficulty;
+                    $scope.skillIdToRubricsObject = skillIdToRubricsObject;
                   };
 
                   $scope.cancelModal = function() {
