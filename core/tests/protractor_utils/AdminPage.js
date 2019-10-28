@@ -157,7 +157,6 @@ var AdminPage = function() {
     waitFor.textToBePresentInElement(
       statusMessage, 'successfully updated to',
       'Could not set role successfully');
-    return true;
   };
 
   this.getUsersAsssignedToRole = function(role) {
