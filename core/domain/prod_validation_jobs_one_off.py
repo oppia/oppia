@@ -3390,6 +3390,31 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
             cls._validate_final_reveiwer_id]
 
 
+class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
+    """Class for validating GeneralVoiceoverApplicationModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        """Returns a domain object instance created from the model.
+
+        Args:
+            item: GeneralVoiceoverApplicationModel. Entity to validate.
+
+        Returns:
+            *: A domain object to validate.
+        """
+        return suggestion_services.get_voiceover_application_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        external_instance_details = {}
+        if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
+            external_instance_details['%s_ids' % item.target_type] = (
+                TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
+                [item.target_id])
+        return external_instance_details
+
+
 class ReviewerRotationTrackingModelValidator(BaseModelValidator):
     """Class for validating ReviewerRotationTrackingModels."""
 
@@ -5158,6 +5183,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         StoryCommitLogEntryModelValidator),
     story_models.StorySummaryModel: StorySummaryModelValidator,
     suggestion_models.GeneralSuggestionModel: GeneralSuggestionModelValidator,
+    suggestion_models.GeneralVoiceoverApplicationModel: (
+        GeneralVoiceoverApplicationModelValidator),
     suggestion_models.ReviewerRotationTrackingModel: (
         ReviewerRotationTrackingModelValidator),
     topic_models.TopicModel: TopicModelValidator,
@@ -5796,6 +5823,15 @@ class GeneralSuggestionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [suggestion_models.GeneralSuggestionModel]
+
+
+class GeneralVoiceoverApplicationModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates GeneralVoiceoverApplicationModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralVoiceoverApplicationModel]
 
 
 class ReviewerRotationTrackingModelAuditOneOffJob(ProdValidationAuditOneOffJob):
