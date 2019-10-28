@@ -44,6 +44,7 @@ export class GenerateContentIdService {
     }
     return (searchKey + String(count + 1));
   }
+
   // TODO(#7176): Replace 'any' with the exact type.
   _getNextId(existingComponentIds: any, componentName: string): any {
     if (componentName === AppConstants.COMPONENT_NAME_FEEDBACK ||
@@ -54,6 +55,7 @@ export class GenerateContentIdService {
       throw Error('Unknown component name provided.');
     }
   }
+
   // TODO(#7176): Replace 'any' with the exact type.
   getNextId(existingComponentIds: any, componentName: string): any {
     return this._getNextId(existingComponentIds, componentName);
