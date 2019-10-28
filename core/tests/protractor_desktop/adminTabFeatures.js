@@ -35,20 +35,20 @@ describe('Admin Tab', function() {
     adminPage.get();
     adminPage.updateRole('moderator1', 'moderator');
     adminPage.viewRolesbyUsername('moderator1');
-    adminPage.expectUsers(['moderator1']);
+    adminPage.expectUsernamesToMatch(['moderator1']);
 
     adminPage.get();
     adminPage.updateRole('moderator2', 'moderator');
     adminPage.viewRolesbyUsername('moderator2');
-    adminPage.expectUsers(['moderator2']);
+    adminPage.expectUsernamesToMatch(['moderator2']);
 
-    adminPage.viewRolesbyRole('moderator');
-    adminPage.expectUsers(['moderator1', 'moderator2']);
+    adminPage.getUsersAsssignedToRole('moderator');
+    adminPage.expectUsernamesToMatch(['moderator1', 'moderator2']);
 
     adminPage.get();
     adminPage.updateRole('collectionEditor1', 'collection editor');
-    adminPage.viewRolesbyRole('collection editor');
-    adminPage.expectUsers(['collectionEditor1']);
+    adminPage.getUsersAsssignedToRole('collection editor');
+    adminPage.expectUsernamesToMatch(['collectionEditor1']);
   });
 
   afterEach(function() {

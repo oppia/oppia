@@ -160,7 +160,7 @@ var AdminPage = function() {
     return true;
   };
 
-  this.viewRolesbyRole = function(role) {
+  this.getUsersAsssignedToRole = function(role) {
     waitFor.visibilityOf(roleDropdown,
       'View role dropdown taking too long to be visible');
     roleDropdown.sendKeys('By Role');
@@ -169,7 +169,6 @@ var AdminPage = function() {
     roleValueOption.sendKeys(role);
 
     viewRoleButton.click();
-    return true;
   };
 
   this.viewRolesbyUsername = function(username) {
@@ -181,10 +180,9 @@ var AdminPage = function() {
     roleUsernameOption.sendKeys(username);
 
     viewRoleButton.click();
-    return true;
   };
 
-  this.expectUsers = function(expectedUsersArray) {
+  this.expectUsernamesToMatch = function(expectedUsernamesArray) {
     var foundUsersArray = [];
     element.all(by.css('.protractor-test-roles-result-rows'))
       .map(function(elm) {
@@ -194,12 +192,12 @@ var AdminPage = function() {
         texts.forEach(function(name) {
           foundUsersArray.push(name);
         });
-        expect(foundUsersArray.length).toEqual(expectedUsersArray.length);
+        expect(foundUsersArray.length).toEqual(expectedUsernamesArray.length);
 
-        expectedUsersArray.sort();
+        expectedUsernamesArray.sort();
         foundUsersArray.sort();
         foundUsersArray.forEach(function(name, ind) {
-          expect(name).toEqual(expectedUsersArray[ind]);
+          expect(name).toEqual(expectedUsernamesArray[ind]);
         });
       });
   };
