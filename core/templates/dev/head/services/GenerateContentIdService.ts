@@ -26,9 +26,8 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class GenerateContentIdService {
-  // TODO(#7176): Replace 'any' with the exact type.
-  generateIdForComponent(existingComponentIds: any,
-      componentName: string): any {
+  generateIdForComponent(existingComponentIds: Object,
+      componentName: string): string {
     let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
     let searchKey = componentName + '_';
     let count = 0;
@@ -45,8 +44,7 @@ export class GenerateContentIdService {
     return (searchKey + String(count + 1));
   }
 
-  // TODO(#7176): Replace 'any' with the exact type.
-  _getNextId(existingComponentIds: any, componentName: string): any {
+  _getNextId(existingComponentIds: Object, componentName: string): string {
     if (componentName === AppConstants.COMPONENT_NAME_FEEDBACK ||
         componentName === AppConstants.COMPONENT_NAME_HINT ||
         componentName === AppConstants.COMPONENT_NAME_WORKED_EXAMPLE) {
@@ -56,8 +54,7 @@ export class GenerateContentIdService {
     }
   }
 
-  // TODO(#7176): Replace 'any' with the exact type.
-  getNextId(existingComponentIds: any, componentName: string): any {
+  getNextId(existingComponentIds: Object, componentName: string): string {
     return this._getNextId(existingComponentIds, componentName);
   }
 }
