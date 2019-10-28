@@ -71,7 +71,7 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether QuestionModel snapshots reference user.
+        """Check whether QuestionModel snapshots references the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -624,7 +624,8 @@ class QuestionRightsModel(base_models.VersionedModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether QuestionRightsModel or its snapshots reference user.
+        """Check whether QuestionRightsModel or its snapshots references the
+        given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
