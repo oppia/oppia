@@ -62,7 +62,7 @@ UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES = frozenset([
 ])
 
 
-class _HashableAnswer(python_utils.OBJECT):
+class HashableAnswer(python_utils.OBJECT):
     """Wraps answer with object that can be placed into sets and dicts."""
 
     def __init__(self, answer):
@@ -73,7 +73,7 @@ class _HashableAnswer(python_utils.OBJECT):
         return hash(self.hashable_answer)
 
     def __eq__(self, other):
-        if isinstance(other, _HashableAnswer):
+        if isinstance(other, HashableAnswer):
             return self.hashable_answer == other.hashable_answer
         return False
 
@@ -92,7 +92,7 @@ def _get_top_answers_by_frequency(answers, limit=None):
     Returns:
         stats_domain.AnswerFrequencyList. A list of the top "limit" answers.
     """
-    answer_counter = utils.OrderedCounter(_HashableAnswer(a) for a in answers)
+    answer_counter = utils.OrderedCounter(HashableAnswer(a) for a in answers)
     return stats_domain.AnswerFrequencyList([
         stats_domain.AnswerOccurrence(hashable_answer.answer, frequency)
         for hashable_answer, frequency in answer_counter.most_common(n=limit)
@@ -125,10 +125,10 @@ def _get_top_unresolved_answers_by_frequency(
     # classification categorization of each answer.
     for ans in answers_with_classification:
         frequency = 0
-        if _HashableAnswer(ans['answer']) in classification_results_dict:
-            frequency = classification_results_dict[_HashableAnswer(
+        if HashableAnswer(ans['answer']) in classification_results_dict:
+            frequency = classification_results_dict[HashableAnswer(
                 ans['answer'])]['frequency']
-        classification_results_dict[_HashableAnswer(ans['answer'])] = {
+        classification_results_dict[HashableAnswer(ans['answer'])] = {
             'classification_categorization': (
                 ans['classification_categorization']),
             'frequency': frequency + 1
