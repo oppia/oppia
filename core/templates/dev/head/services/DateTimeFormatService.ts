@@ -34,7 +34,7 @@ export class DateTimeFormatService {
   // same date as the current date. Otherwise, returns just the date if the
   // local datetime representation has the same year as the current date.
   // Otherwise, returns the full date (with the year abbreviated).
-  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): any {
+  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
       return date.toLocaleTimeString([], {
