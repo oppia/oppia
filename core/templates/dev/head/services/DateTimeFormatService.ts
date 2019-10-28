@@ -19,6 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import moment from 'moment';
 
 import { FormatTimerPipe } from
   'filters/string-utility-filters/format-timer.pipe';
@@ -43,9 +44,13 @@ export class DateTimeFormatService {
         hour12: true
       });
     } else if (date.getFullYear() === new Date().getFullYear()) {
-      return this.formatTimerPipe.transform('date')(date, 'MMM d');
+      let transformedDate = this.formatTimerPipe.transform(date);
+      // moment will return Oct 10
+      return moment(transformedDate).format('MMM d');
     } else {
-      return this.formatTimerPipe.transform('date')(date, 'shortDate');
+      let transformedDate = this.formatTimerPipe.transform(date);
+      // moment will return 10/22/35(shortDate)
+      return moment(transformedDate).format('MM/DD/YY');
     }
   }
 
