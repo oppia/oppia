@@ -16,7 +16,7 @@
  * @fileoverview Service to check if user is on a mobile device.
  */
 
-// See: https://stackoverflow.com/a/11381730
+
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
@@ -26,6 +26,7 @@ import { WindowRef } from 'services/contextual/WindowRefService';
 @Injectable({
   providedIn: 'root'
 })
+// See: https://stackoverflow.com/a/11381730
 export class DeviceInfoService {
   constructor(private window: WindowRef) {}
 
@@ -42,8 +43,8 @@ export class DeviceInfoService {
   isMobileUserAgent(): boolean {
     return /Mobi/.test(navigator.userAgent);
   }
-  // TODO(#7176): Replace 'any' with the exact type.
-  hasTouchEvents(): any {
+
+  hasTouchEvents(): boolean {
     return 'ontouchstart' in this.window.nativeWindow;
   }
 }
