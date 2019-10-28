@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for HTML serialization and escaping services.
  */
 
-
 import { TestBed } from '@angular/core/testing';
+
 import { HtmlEscaperService } from 'services/HtmlEscaperService';
 
 describe('HTML escaper service', () => {
