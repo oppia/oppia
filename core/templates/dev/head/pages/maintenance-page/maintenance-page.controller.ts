@@ -16,7 +16,7 @@
  * @fileoverview The controller for the maintenance page.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/DocumentAttributeCustomizationService.ts');
 
 angular.module('oppia').controller('Maintenance', [

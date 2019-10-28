@@ -16,7 +16,7 @@
  * @fileoverview Directive for the correctness footer in the exploration player.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('correctnessFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
