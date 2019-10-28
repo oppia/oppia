@@ -899,7 +899,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             return 'Email Hash'
 
         self.generate_hash_ctx = self.swap(
-            email_models.SentEmailModel, '_generate_hash',
+            email_models.SentEmailModel, 'generate_hash',
             types.MethodType(
                 _generate_hash_for_tests,
                 email_models.SentEmailModel))

@@ -42,7 +42,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             return 'Email Hash'
 
         self.generate_constant_hash_ctx = self.swap(
-            email_models.SentEmailModel, '_generate_hash',
+            email_models.SentEmailModel, 'generate_hash',
             types.MethodType(mock_generate_hash, email_models.SentEmailModel))
 
     def test_get_deletion_policy(self):
@@ -303,32 +303,32 @@ class GenerateHashTests(test_utils.GenericTestBase):
 
     def test_same_inputs_always_gives_same_hashes(self):
         # pylint: disable=protected-access
-        email_hash1 = email_models.SentEmailModel._generate_hash(
+        email_hash1 = email_models.SentEmailModel.generate_hash(
             'recipient_id', 'email_subject', 'email_html_body')
 
-        email_hash2 = email_models.SentEmailModel._generate_hash(
+        email_hash2 = email_models.SentEmailModel.generate_hash(
             'recipient_id', 'email_subject', 'email_html_body')
         self.assertEqual(email_hash1, email_hash2)
         # pylint: enable=protected-access
 
     def test_different_inputs_give_different_hashes(self):
         # pylint: disable=protected-access
-        email_hash1 = email_models.SentEmailModel._generate_hash(
+        email_hash1 = email_models.SentEmailModel.generate_hash(
             'recipient_id', 'email_subject', 'email_html_body')
 
-        email_hash2 = email_models.SentEmailModel._generate_hash(
+        email_hash2 = email_models.SentEmailModel.generate_hash(
             'recipient_id', 'email_subject', 'email_html_body2')
         self.assertNotEqual(email_hash1, email_hash2)
 
-        email_hash2 = email_models.SentEmailModel._generate_hash(
+        email_hash2 = email_models.SentEmailModel.generate_hash(
             'recipient_id2', 'email_subject', 'email_html_body')
         self.assertNotEqual(email_hash1, email_hash2)
 
-        email_hash2 = email_models.SentEmailModel._generate_hash(
+        email_hash2 = email_models.SentEmailModel.generate_hash(
             'recipient_id', 'email_subject2', 'email_html_body')
         self.assertNotEqual(email_hash1, email_hash2)
 
-        email_hash2 = email_models.SentEmailModel._generate_hash(
+        email_hash2 = email_models.SentEmailModel.generate_hash(
             'recipient_id2', 'email_subject2', 'email_html_body2')
         self.assertNotEqual(email_hash1, email_hash2)
         # pylint: enable=protected-access
