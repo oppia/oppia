@@ -27,8 +27,7 @@ angular.module('oppia').directive('selectSkill', [
         selectedSkillId: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics-and-skills-dashboard-page/skill-selector/' +
-        'skill-selector.directive.html'),
+        '/components/skill-selector/skill-selector.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope',
         function(

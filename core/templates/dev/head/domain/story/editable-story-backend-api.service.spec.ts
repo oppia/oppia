@@ -83,7 +83,11 @@ describe('Editable story backend API service', function() {
         language_code: 'en'
       },
       topic_name: 'Topic Name',
-      story_is_published: true
+      story_is_published: true,
+      skill_summaries: [{
+        id: 'skill_1',
+        description: 'Skill Description'
+      }]
     };
   }));
 
@@ -107,7 +111,8 @@ describe('Editable story backend API service', function() {
       expect(successHandler).toHaveBeenCalledWith({
         story: sampleDataResults.story,
         topicName: sampleDataResults.topic_name,
-        storyIsPublished: true
+        storyIsPublished: true,
+        skillSummaries: sampleDataResults.skill_summaries
       });
       expect(failHandler).not.toHaveBeenCalled();
     }

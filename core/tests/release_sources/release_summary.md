@@ -32,6 +32,7 @@ This indicates that a migration may be needed
 ### New Authors:
 * Alice <alice@gmail.com>
 * Bob <bob@gmail.com>
+* Casie <casie@gmail.com>
 * Quent <qunet@outlook.com>
 * Zoe <zoe@gmail.com>
 

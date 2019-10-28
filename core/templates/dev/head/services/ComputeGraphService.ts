@@ -24,8 +24,10 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ComputeGraphService {
-  // TODO(#7176): Replace 'any' with the exact type.
-  _computeGraphData(initStateId: any, states: any): any {
+  // TODO(#7176): Replace 'any' with exact type.As states.getFinalStateNames()
+  // is being called hence we can't just set the states type to Object
+  // since it will cause the typescript compilation to fail
+  _computeGraphData(initStateId: string, states: any): any {
     let nodes = {};
     let links = [];
     let finalStateIds = states.getFinalStateNames();
@@ -59,8 +61,8 @@ export class ComputeGraphService {
     };
   }
   // TODO(#7176): Replace 'any' with the exact type.
-  _computeBfsTraversalOfStates(initStateId: any, states: any,
-      sourceStateName: any): Array<any> {
+  _computeBfsTraversalOfStates(initStateId: string, states: any,
+      sourceStateName: string): Array<any> {
     let stateGraph = this._computeGraphData(initStateId, states);
     let stateNamesInBfsOrder = [];
     let queue = [];
@@ -82,11 +84,11 @@ export class ComputeGraphService {
     return stateNamesInBfsOrder;
   }
   // TODO(#7176): Replace 'any' with the exact type.
-  compute(initStateId: any, states: any): Object {
+  compute(initStateId: string, states: any): Object {
     return this._computeGraphData(initStateId, states);
   }
   // TODO(#7176): Replace 'any' with the exact type.
-  computeBfsTraversalOfStates(initStateId: any, states: any,
+  computeBfsTraversalOfStates(initStateId: string, states: any,
       sourceStateName: any): Array<any> {
     return this._computeBfsTraversalOfStates(
       initStateId, states, sourceStateName);
