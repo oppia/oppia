@@ -29,9 +29,9 @@ from core.platform import models
  skill_models,
  story_models,
  topic_models) = models.Registry.import_models([
+    models.NAMES.collection,
     models.NAMES.config,
     models.NAMES.exploration,
-    models.NAMES.collection,
     models.NAMES.question,
     models.NAMES.skill,
     models.NAMES.story,
@@ -70,7 +70,7 @@ class SnapshotMetadataModelsIndexesJob(jobs.BaseMapReduceOneOffJobManager):
     def entity_classes_to_map_over(cls):
         return [collection_models.CollectionSnapshotMetadataModel,
                 collection_models.CollectionRightsSnapshotMetadataModel,
-                config_models.ConfigPropertySnapshotMetadataModel,
+                #config_models.ConfigPropertySnapshotMetadataModel,
                 exploration_models.ExplorationSnapshotMetadataModel,
                 exploration_models.ExplorationRightsSnapshotMetadataModel,
                 question_models.QuestionSnapshotMetadataModel,
@@ -84,9 +84,10 @@ class SnapshotMetadataModelsIndexesJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(model_instance):
+        print(model_instance)
         model_instance.put(update_last_updated_time=False)
         yield ('SUCCESS', model_instance.id)
 
     @staticmethod
     def reduce(key, values):
-        pass
+        yield (key, len(values))

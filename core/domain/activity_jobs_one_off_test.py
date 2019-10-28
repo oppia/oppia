@@ -18,6 +18,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
+import datetime
+
 from core.domain import activity_jobs_one_off
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -32,6 +35,21 @@ from core.tests import test_utils
 import python_utils
 
 gae_search_services = models.Registry.import_search_services()
+
+(collection_models,
+ config_models,
+ exploration_models,
+ question_models,
+ skill_models,
+ story_models,
+ topic_models) = models.Registry.import_models([
+    models.NAMES.collection,
+    models.NAMES.config,
+    models.NAMES.exploration,
+    models.NAMES.question,
+    models.NAMES.skill,
+    models.NAMES.story,
+    models.NAMES.topic])
 
 
 class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
@@ -100,3 +118,85 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
         self.assertIsNone(
             activity_jobs_one_off.IndexAllActivitiesJobManager.reduce(
                 'key', 'value'))
+
+
+class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
+    """Tests for QuestionSummaryModel migration."""
+
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        activity_jobs_one_off.SnapshotMetadataModelsIndexesJob]
+
+    TESTED_MODEL_TYPES = [
+        collection_models.CollectionSnapshotMetadataModel,
+        collection_models.CollectionRightsSnapshotMetadataModel,
+        #config_models.ConfigPropertySnapshotMetadataModel,
+        exploration_models.ExplorationSnapshotMetadataModel,
+        exploration_models.ExplorationRightsSnapshotMetadataModel,
+        question_models.QuestionSnapshotMetadataModel,
+        question_models.QuestionRightsSnapshotMetadataModel,
+        skill_models.SkillSnapshotMetadataModel,
+        skill_models.SkillRightsSnapshotMetadataModel,
+        story_models.StorySnapshotMetadataModel,
+        topic_models.TopicSnapshotMetadataModel,
+        topic_models.SubtopicPageSnapshotMetadataModel,
+        topic_models.TopicRightsSnapshotMetadataModel
+    ]
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off.SnapshotMetadataModelsIndexesJob.create_new())
+        activity_jobs_one_off.SnapshotMetadataModelsIndexesJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            activity_jobs_one_off.SnapshotMetadataModelsIndexesJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item)
+                       for stringified_item in stringified_output]
+        output = [(eval_item[0], int(eval_item[1]))
+                  for eval_item in eval_output]
+        return output
+
+    def _check_model_validity(self, original_model, migrated_model):
+        """Checks if the model was migrated correctly."""
+        self.assertEqual(
+            migrated_model.committer_id,
+            original_model.committer_id)
+        self.assertEqual(
+            migrated_model.commit_type,
+            original_model.commit_type)
+
+    def test_successful_migration(self):
+        for model_type in self.TESTED_MODEL_TYPES:
+            instance_id = 'id_1'
+            model = model_type(
+                id=instance_id,
+                committer_id='committer_id',
+                commit_type='create')
+            model.put()
+
+            output = self._run_one_off_job()
+            self.assertEqual(output, [(u'SUCCESS', 1)])
+            migrated_model = model_type.get_by_id(instance_id)
+            self._check_model_validity(model, migrated_model)
+
+            model.delete()
+
+    def test_successful_migration(self):
+        for model_type in self.TESTED_MODEL_TYPES:
+            instance_id = 'id_1'
+            model = model_type(
+                id=instance_id,
+                committer_id='committer_id',
+                commit_type='create')
+            model.put()
+
+            output = self._run_one_off_job()
+            self.assertEqual(output, [(u'SUCCESS', 1)])
+            migrated_model = model_type.get_by_id(instance_id)
+            self._check_model_validity(model, migrated_model)
+
+            model.delete()
