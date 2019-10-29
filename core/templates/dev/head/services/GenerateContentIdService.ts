@@ -26,7 +26,7 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class GenerateContentIdService {
-  generateIdForComponent(existingComponentIds: Object,
+  generateIdForComponent(existingComponentIds: Array<string>,
       componentName: string): string {
     let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
     let searchKey = componentName + '_';
@@ -44,7 +44,8 @@ export class GenerateContentIdService {
     return (searchKey + String(count + 1));
   }
 
-  _getNextId(existingComponentIds: Object, componentName: string): string {
+  _getNextId(existingComponentIds: Array<string>,
+      componentName: string): string {
     if (componentName === AppConstants.COMPONENT_NAME_FEEDBACK ||
         componentName === AppConstants.COMPONENT_NAME_HINT ||
         componentName === AppConstants.COMPONENT_NAME_WORKED_EXAMPLE) {
@@ -54,7 +55,8 @@ export class GenerateContentIdService {
     }
   }
 
-  getNextId(existingComponentIds: Object, componentName: string): string {
+  getNextId(existingComponentIds: Array<string>,
+      componentName: string): string {
     return this._getNextId(existingComponentIds, componentName);
   }
 }

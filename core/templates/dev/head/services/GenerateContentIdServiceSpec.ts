@@ -42,13 +42,9 @@ describe('GenerateContentIdService', () => {
       'worked_example_2');
   });
 
-  // This is intentional since we are explicitly passing a single parameter
-  // whereas the functions expects two parameters. We want this
-  // function to throw an error.
   it('should throw error for unknown content id', () => {
     expect(function() {
-      // @ts-ignore
-      gcis.getNextId('xyz');
+      gcis.getNextId(['xyz'],'random_component_name');
     }).toThrowError('Unknown component name provided.');
   });
 });
