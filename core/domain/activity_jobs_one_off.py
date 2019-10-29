@@ -70,7 +70,7 @@ class SnapshotMetadataModelsIndexesJob(jobs.BaseMapReduceOneOffJobManager):
     def entity_classes_to_map_over(cls):
         return [collection_models.CollectionSnapshotMetadataModel,
                 collection_models.CollectionRightsSnapshotMetadataModel,
-                #config_models.ConfigPropertySnapshotMetadataModel,
+                config_models.ConfigPropertySnapshotMetadataModel,
                 exploration_models.ExplorationSnapshotMetadataModel,
                 exploration_models.ExplorationRightsSnapshotMetadataModel,
                 question_models.QuestionSnapshotMetadataModel,

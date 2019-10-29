@@ -19,8 +19,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import datetime
+import types
 
+from core.controllers import base
 from core.domain import activity_jobs_one_off
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -129,7 +130,7 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
     TESTED_MODEL_TYPES = [
         collection_models.CollectionSnapshotMetadataModel,
         collection_models.CollectionRightsSnapshotMetadataModel,
-        #config_models.ConfigPropertySnapshotMetadataModel,
+        config_models.ConfigPropertySnapshotMetadataModel,
         exploration_models.ExplorationSnapshotMetadataModel,
         exploration_models.ExplorationRightsSnapshotMetadataModel,
         question_models.QuestionSnapshotMetadataModel,
@@ -141,6 +142,16 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
         topic_models.SubtopicPageSnapshotMetadataModel,
         topic_models.TopicRightsSnapshotMetadataModel
     ]
+
+    def setUp(self):
+        def empty(*_):
+            pass
+
+        # We don't want to add ConfigPropertySnapshotMetadataModel for CSRF
+        # secret, so we need to skip the csrf token init.
+        with self.swap(base.CsrfTokenManager, 'init_csrf_secret',
+                       types.MethodType(empty, base.CsrfTokenManager)):
+            super(SnapshotMetadataModelsIndexesJobTest, self).setUp()
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -169,7 +180,7 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
             migrated_model.commit_type,
             original_model.commit_type)
 
-    def test_successful_migration(self):
+    def test_successful_migration_all_model_types(self):
         for model_type in self.TESTED_MODEL_TYPES:
             instance_id = 'id_1'
             model = model_type(
@@ -185,18 +196,39 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
 
             model.delete()
 
-    def test_successful_migration(self):
-        for model_type in self.TESTED_MODEL_TYPES:
-            instance_id = 'id_1'
-            model = model_type(
-                id=instance_id,
-                committer_id='committer_id',
-                commit_type='create')
-            model.put()
+    def test_successful_migration_multiple_models(self):
+        instance_id_1 = 'id_1'
+        instance_id_2 = 'id_2'
+        instance_id_3 = 'id_3'
+        collection_model = collection_models.CollectionSnapshotMetadataModel(
+            id=instance_id_1,
+            committer_id='committer_id',
+            commit_type='create')
+        collection_model.put()
+        exploration_model = exploration_models.ExplorationSnapshotMetadataModel(
+            id=instance_id_2,
+            committer_id='committer_id',
+            commit_type='create')
+        exploration_model.put()
+        skill_model = skill_models.SkillRightsSnapshotMetadataModel(
+            id=instance_id_3,
+            committer_id='committer_id',
+            commit_type='create')
+        skill_model.put()
 
-            output = self._run_one_off_job()
-            self.assertEqual(output, [(u'SUCCESS', 1)])
-            migrated_model = model_type.get_by_id(instance_id)
-            self._check_model_validity(model, migrated_model)
+        output = self._run_one_off_job()
+        self.assertEqual(output, [(u'SUCCESS', 3)])
 
-            model.delete()
+        migrated_collection_model = (
+            collection_models.CollectionSnapshotMetadataModel.get_by_id(
+                instance_id_1))
+        self._check_model_validity(collection_model, migrated_collection_model)
+        migrated_exploration_model = (
+            exploration_models.ExplorationSnapshotMetadataModel.get_by_id(
+                instance_id_2))
+        self._check_model_validity(
+            exploration_model, migrated_exploration_model)
+        migrated_skill_model = (
+            skill_models.SkillRightsSnapshotMetadataModel.get_by_id(
+                instance_id_3))
+        self._check_model_validity(skill_model, migrated_skill_model)
