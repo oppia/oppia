@@ -16,8 +16,8 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { ErrorHandler, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { ErrorHandler, Injectable } from '@angular/core';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { CamelCaseToHyphensPipe } from
