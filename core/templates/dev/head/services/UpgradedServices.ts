@@ -21,11 +21,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { DateTimeFormatService } from 'services/DateTimeFormatService';
+import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from
   'services/contextual/WindowDimensionsService';
+import { WindowRef } from 'services/contextual/WindowRefService';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +37,7 @@ export class UpgradedServices {
   upgradedServices = {
     'BackgroundMaskService': new BackgroundMaskService(),
     'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
+    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'UtilsService': new UtilsService(),
