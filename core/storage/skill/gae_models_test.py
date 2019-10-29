@@ -87,48 +87,51 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillRightsModelUnitTest, self).setUp()
 
+        # The user_ids in commits differ from creator_ids because we need to
+        # be able to detect these ids separately both in the rights model and
+        # in the commits to the rights model.
         skill_models.SkillRightsModel(
             id='id_1',
-            creator_id='janet_id',
+            creator_id='user_1_id',
             skill_is_private=True
         ).commit(
-            'janet_committer_id', 'Created new skill rights',
+            'user_3_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         skill_models.SkillRightsModel(
             id='id_2',
-            creator_id='janet_id',
+            creator_id='user_1_id',
             skill_is_private=True
         ).commit(
-            'janet_committer_id', 'Edited skill rights',
+            'user_3_id', 'Edited skill rights',
             [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
         skill_models.SkillRightsModel(
             id='id_3',
-            creator_id='joe_id',
+            creator_id='user_2_id',
             skill_is_private=False
         ).commit(
-            'joe_committer_id', 'Created new skill rights',
+            'user_4_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         skill_models.SkillRightsModel(
             id='id_4',
-            creator_id='joe_id',
+            creator_id='user_2_id',
             skill_is_private=True
         ).commit(
-            'joe_committer_id', 'Created new skill rights',
+            'user_4_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             skill_models.SkillRightsModel
-            .has_reference_to_user_id('janet_id'))
+            .has_reference_to_user_id('user_1_id'))
         self.assertTrue(
             skill_models.SkillRightsModel
-            .has_reference_to_user_id('janet_committer_id'))
+            .has_reference_to_user_id('user_2_id'))
         self.assertTrue(
             skill_models.SkillRightsModel
-            .has_reference_to_user_id('joe_id'))
+            .has_reference_to_user_id('user_3_id'))
         self.assertTrue(
             skill_models.SkillRightsModel
-            .has_reference_to_user_id('joe_committer_id'))
+            .has_reference_to_user_id('user_4_id'))
         self.assertFalse(
             skill_models.SkillRightsModel
             .has_reference_to_user_id('x_id'))
@@ -136,13 +139,13 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
     def test_get_unpublished_by_creator_id(self):
         results = (
             skill_models.SkillRightsModel
-            .get_unpublished_by_creator_id('janet_id').fetch(2))
+            .get_unpublished_by_creator_id('user_1_id').fetch(2))
         self.assertEqual(len(results), 2)
 
     def test_get_unpublished_by_creator_id_should_ignore_public_skills(self):
         results = (
             skill_models.SkillRightsModel
-            .get_unpublished_by_creator_id('joe_id').fetch(2))
+            .get_unpublished_by_creator_id('user_2_id').fetch(2))
         self.assertEqual(len(results), 1)
 
     def test_get_unpublished_fetches_all_unpublished_skills(self):

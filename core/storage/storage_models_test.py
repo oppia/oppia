@@ -51,9 +51,11 @@ class StorageModelsTest(test_utils.GenericTestBase):
 
     # List of model classes that don't have Wipeout related class methods
     # defined because they're not used directly but only as a base classes for
-    # the other models. BaseCommitLogEntryModel is not included in this list
-    # because we implement has_reference_to_user_id inside it, the reason behind
-    # this is that the children models don't differ that much.
+    # the other models.
+    #
+    # BaseCommitLogEntryModel is not included in this list because we implement
+    # has_reference_to_user_id inside it, since the children models don't differ
+    # that much.
     BASE_CLASSES = (
         'BaseMapReduceBatchResultsModel',
         'BaseModel',
