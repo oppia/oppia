@@ -88,8 +88,8 @@ class BaseModel(ndb.Model):
         """
         raise NotImplementedError
 
-    @staticmethod
-    def has_reference_to_user_id(user_id):
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
         """This method should be implemented by subclasses.
 
         Args:
