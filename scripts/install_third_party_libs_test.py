@@ -72,12 +72,14 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         uname_swap = self.swap(os, 'uname', mock_uname)
 
         import pip
-        sys.modules['pip'] = None
-        with uname_swap, self.print_swap, self.check_call_swap:
-            with self.assertRaises(Exception):
-                install_third_party_libs.pip_install(
-                    'package', 'version', 'path')
-        sys.modules['pip'] = pip
+        try:
+            sys.modules['pip'] = None
+            with uname_swap, self.print_swap, self.check_call_swap:
+                with self.assertRaises(Exception):
+                    install_third_party_libs.pip_install(
+                        'package', 'version', 'path')
+        finally:
+            sys.modules['pip'] = pip
         self.assertTrue(
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
             'OS%29' in self.print_arr)
@@ -89,12 +91,14 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         uname_swap = self.swap(os, 'uname', mock_uname)
 
         import pip
-        sys.modules['pip'] = None
-        with uname_swap, self.print_swap, self.check_call_swap:
-            with self.assertRaises(Exception):
-                install_third_party_libs.pip_install(
-                    'package', 'version', 'path')
-        sys.modules['pip'] = pip
+        try:
+            sys.modules['pip'] = None
+            with uname_swap, self.print_swap, self.check_call_swap:
+                with self.assertRaises(Exception):
+                    install_third_party_libs.pip_install(
+                        'package', 'version', 'path')
+        finally:
+            sys.modules['pip'] = pip
         self.assertTrue(
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
             '%29' in self.print_arr)
@@ -104,14 +108,15 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_uname():
             return ['Windows']
         uname_swap = self.swap(os, 'uname', mock_uname)
-
         import pip
-        sys.modules['pip'] = None
-        with uname_swap, self.print_swap, self.check_call_swap:
-            with self.assertRaises(Exception):
-                install_third_party_libs.pip_install(
-                    'package', 'version', 'path')
-        sys.modules['pip'] = pip
+        try:
+            sys.modules['pip'] = None
+            with uname_swap, self.print_swap, self.check_call_swap:
+                with self.assertRaises(Exception):
+                    install_third_party_libs.pip_install(
+                        'package', 'version', 'path')
+        finally:
+            sys.modules['pip'] = pip
         self.assertTrue(
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
             'Windows%29' in self.print_arr)
