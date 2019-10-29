@@ -16,16 +16,14 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { DebouncerService } from 'services/DebouncerService';
 import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
-import { WindowDimensionsService } from
-  'services/contextual/WindowDimensionsService';
 import { WindowDimensionsService } from
   'services/contextual/WindowDimensionsService';
 import { WindowRef } from 'services/contextual/WindowRefService';
