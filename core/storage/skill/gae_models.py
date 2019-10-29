@@ -82,6 +82,18 @@ class SkillModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SkillModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
+    @classmethod
     def get_merged_skills(cls):
         """Returns the skill models which have been merged.
 
@@ -147,6 +159,13 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
     # The id of the skill being edited.
     skill_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Skill commit log is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def _get_instance_id(cls, skill_id, version):
@@ -229,6 +248,20 @@ class SkillRightsModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Skill rights should be kept if associated skill is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SkillRightsModel or its snapshots references the given
+        user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return (cls.query(cls.creator_id == user_id).get() is not None or
+                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

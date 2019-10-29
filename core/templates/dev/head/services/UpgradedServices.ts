@@ -20,6 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
+import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/DocumentAttributeCustomizationService';
 import { MetaTagCustomizationService } from
@@ -37,6 +38,7 @@ export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
     'BackgroundMaskService': new BackgroundMaskService(),
+    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
     'MetaTagCustomizationService': new MetaTagCustomizationService(
