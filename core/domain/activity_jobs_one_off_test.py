@@ -37,20 +37,16 @@ import python_utils
 
 gae_search_services = models.Registry.import_search_services()
 
-(collection_models,
- config_models,
- exploration_models,
- question_models,
- skill_models,
- story_models,
- topic_models) = models.Registry.import_models([
-    models.NAMES.collection,
-    models.NAMES.config,
-    models.NAMES.exploration,
-    models.NAMES.question,
-    models.NAMES.skill,
-    models.NAMES.story,
-    models.NAMES.topic])
+(
+    collection_models, config_models,
+    exploration_models, question_models,
+    skill_models, story_models,
+    topic_models) = (
+        models.Registry.import_models([
+            models.NAMES.collection, models.NAMES.config,
+            models.NAMES.exploration, models.NAMES.question,
+            models.NAMES.skill, models.NAMES.story,
+            models.NAMES.topic]))
 
 
 class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
@@ -145,12 +141,15 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
 
     def setUp(self):
         def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
             pass
 
         # We don't want to add ConfigPropertySnapshotMetadataModel for CSRF
         # secret, so we need to skip the csrf token init.
-        with self.swap(base.CsrfTokenManager, 'init_csrf_secret',
-                       types.MethodType(empty, base.CsrfTokenManager)):
+        with self.swap(
+            base.CsrfTokenManager, 'init_csrf_secret',
+            types.MethodType(empty, base.CsrfTokenManager)
+        ):
             super(SnapshotMetadataModelsIndexesJobTest, self).setUp()
 
     def _run_one_off_job(self):

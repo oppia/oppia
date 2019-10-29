@@ -22,21 +22,16 @@ from core import jobs
 from core.domain import search_services
 from core.platform import models
 
-(collection_models,
- config_models,
- exploration_models,
- question_models,
- skill_models,
- story_models,
- topic_models) = models.Registry.import_models([
-    models.NAMES.collection,
-    models.NAMES.config,
-    models.NAMES.exploration,
-    models.NAMES.question,
-    models.NAMES.skill,
-    models.NAMES.story,
-    models.NAMES.topic])
-
+(
+    collection_models, config_models,
+    exploration_models, question_models,
+    skill_models, story_models,
+    topic_models) = (
+        models.Registry.import_models([
+            models.NAMES.collection, models.NAMES.config,
+            models.NAMES.exploration, models.NAMES.question,
+            models.NAMES.skill, models.NAMES.story,
+            models.NAMES.topic]))
 
 class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
     """Job that indexes all explorations and collections and compute their
@@ -84,7 +79,6 @@ class SnapshotMetadataModelsIndexesJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(model_instance):
-        print(model_instance)
         model_instance.put(update_last_updated_time=False)
         yield ('SUCCESS', model_instance.id)
 
