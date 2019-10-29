@@ -16,8 +16,8 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
