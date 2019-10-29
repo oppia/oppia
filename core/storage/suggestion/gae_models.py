@@ -54,7 +54,7 @@ SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
 SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
 SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
 
-# Constants to define voiceover application type.
+# Constants to define voiceover application target type.
 VOICEOVER_APPLICATION_TO_EXPLORATION = 'voiceover_exploration'
 
 SUGGESTION_TYPE_CHOICES = [

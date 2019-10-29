@@ -639,7 +639,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
     """Base class for a voiceover application."""
 
     def __init__(self):
-        """Initializes a Suggestion object."""
+        """Initializes a GeneralVoiceoverApplication object."""
         raise NotImplementedError(
             'Subclasses of BaseVoiceoverApplication should implement __init__.')
 
@@ -681,8 +681,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
         return user_services.get_username(self.final_reviewer_id)
 
     def validate(self):
-        """Validates the BaseVoiceoverApplication object. Each subclass must
-        implement this function.
+        """Validates the BaseVoiceoverApplication object.
 
         Raises:
             ValidationError: One or more attributes of the
@@ -787,7 +786,7 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
         Args:
             voiceover_application_id: str. The ID of the voiceover application.
             target_id: str. The ID of the target entity.
-            status: str. The status of the suggestion.
+            status: str. The status of the voiceover application.
             author_id: str. The ID of the user who submitted the voiceover
                 application.
             final_reviewer_id: str|None. The ID of the reviewer who has
@@ -835,7 +834,7 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
         self.validate()
 
 
-VOICEOVER_APPLICATION_TYPE_TO_DOMAIN_CLASSES = {
+VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES = {
     suggestion_models.TARGET_TYPE_EXPLORATION: (
         ExplorationVoiceoverApplication)
 }

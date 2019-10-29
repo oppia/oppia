@@ -3407,11 +3407,16 @@ class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        external_instance_details = {}
+        external_instance_details = {
+            'author_ids': (user_models.UserSettingsModel, [item.author_id]),
+        }
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
             external_instance_details['%s_ids' % item.target_type] = (
                 TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
                 [item.target_id])
+        if item.final_reviewer_id is not None:
+            external_instance_details['final_reviewer_ids'] = (
+                user_models.UserSettingsModel, [item.final_reviewer_id])
         return external_instance_details
 
 

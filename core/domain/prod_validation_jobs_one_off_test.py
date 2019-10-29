@@ -10395,9 +10395,9 @@ class GeneralVoiceoverApplicationModelValidatorTests(
             id='valid_id',
             target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
             target_id='0',
-            status=suggestion_models.STATUS_IN_REVIEW,
+            status=suggestion_models.STATUS_ACCEPTED,
             author_id=self.owner_id,
-            final_reviewer_id=None,
+            final_reviewer_id=self.admin_id,
             language_code='en',
             filename='audio.mp3',
             content='<p>Text to voiceover</p>',
@@ -10453,6 +10453,30 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '0, expect model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_author_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for author_ids field '
+                'check of GeneralVoiceoverApplicationModel\', '
+                '[u"Entity id %s: based on field author_ids having value '
+                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
+                'exist"]]') % (
+                    self.model_instance.id, self.owner_id, self.owner_id)]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_reviewer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final_reviewer_ids field '
+                'check of GeneralVoiceoverApplicationModel\', '
+                '[u"Entity id %s: based on field final_reviewer_ids having '
+                'value %s, expect model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
+                    self.model_instance.id, self.admin_id, self.admin_id)]
         run_job_and_check_output(self, expected_output, sort=True)
 
 
