@@ -554,8 +554,8 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
         """FeedbackAnalyticsModel doesn't reference any user_id directly.
 
         Args:
@@ -620,6 +620,6 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            bool. Whether any models refer to the given user ID.
+            bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None

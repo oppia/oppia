@@ -79,33 +79,35 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralSuggestionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_has_reference_to_user_id_author(self):
+    def test_has_reference_to_user_id(self):
         self.assertTrue(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('author_1'))
+            .has_reference_to_user_id('author_1')
+        )
         self.assertTrue(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('author_2'))
+            .has_reference_to_user_id('author_2')
+        )
         self.assertTrue(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('author_3'))
+            .has_reference_to_user_id('author_3')
+        )
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_1')
+        )
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_2')
+        )
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_3')
+        )
         self.assertFalse(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('id_x'))
-
-    def test_has_reference_to_user_id_reviewer(self):
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('reviewer_1'))
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('reviewer_2'))
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('reviewer_3'))
-        self.assertFalse(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('id_x'))
+            .has_reference_to_user_id('id_x')
+        )
 
     def test_score_type_contains_delimiter(self):
         for score_type in suggestion_models.SCORE_TYPE_CHOICES:
@@ -451,7 +453,8 @@ class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_models.ReviewerRotationTrackingModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
 
     def test_create_and_update_model(self):
         suggestion_models.ReviewerRotationTrackingModel.create(
