@@ -33,6 +33,11 @@ import utils
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.SentEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
     def setUp(self):
         super(SentEmailModelUnitTests, self).setUp()
 
@@ -44,11 +49,6 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         self.generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(mock_generate_hash, email_models.SentEmailModel))
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            email_models.SentEmailModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
 
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:
@@ -206,7 +206,8 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
             id='user_id_1.exploration.exp_id.thread_id',
             user_id='user_id_1',
             thread_id='exploration.exp_id.thread_id',
-            reply_to_id='reply_id')
+            reply_to_id='reply_id'
+        )
 
         email_reply_model.put()
 

@@ -585,19 +585,6 @@ tags: []
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
 
-    # pylint: disable=invalid-name
-    def assertStaticMethod(self, clazz, method_name):
-        """Check if method is static in class.
-
-        Args:
-            clazz: class. The class in which the method belongs.
-            method_name: str. Name of the method that we need to check.
-
-        Returns:
-            bool. Whether method is static.
-        """
-        self.assertTrue(isinstance(clazz.__dict__[method_name], staticmethod))
-
     # pylint: enable=invalid-name
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
