@@ -650,7 +650,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
             dict. A dict representation of a voiceover application object.
         """
         return {
-            'voiceover_application_id': self.suggestion_id,
+            'voiceover_application_id': self.voiceover_application_id,
             'target_type': self.target_type,
             'target_id': self.target_id,
             'status': self.status,
@@ -678,7 +678,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
         Returns:
             str. The username of the reviewer of the voiceover application.
         """
-        return user_services.get_username(self.author_id)
+        return user_services.get_username(self.final_reviewer_id)
 
     def validate(self):
         """Validates the BaseVoiceoverApplication object. Each subclass must

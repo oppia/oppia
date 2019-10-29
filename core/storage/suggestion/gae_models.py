@@ -398,8 +398,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     """
     # The type of entity to which the user will be assigned as a voice artist
     # once the application will get approved.
-    target_type = ndb.StringProperty(
-        required=True, indexed=True, choices=TARGET_TYPE_CHOICES)
+    target_type = ndb.StringProperty(required=True, indexed=True)
     # The ID of the entity to which the application belongs.
     target_id = ndb.StringProperty(required=True, indexed=True)
     # The language code for the voiceover audio.

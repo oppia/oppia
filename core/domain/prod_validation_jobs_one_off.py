@@ -3403,7 +3403,7 @@ class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
         Returns:
             *: A domain object to validate.
         """
-        return suggestion_services.get_voiceover_application_from_model(item)
+        return suggestion_services.get_voiceover_application(item.id)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

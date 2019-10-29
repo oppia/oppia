@@ -594,21 +594,24 @@ def _get_voiceover_application_class(target_type):
     if target_type in target_type_to_classes:
         return target_type_to_classes[target_type]
     else:
-        raise Exception('Invalid target type for voiceover application.')
+        raise Exception(
+            'Invalid target type for voiceover application: %s' % target_type)
 
 
-def get_voiceover_application_from_model(voiceover_application_model):
+def get_voiceover_application(voiceover_application_id):
     """Returns the BaseVoiceoverApplication object for the give
     voiceover application model object.
 
     Args:
-        voiceover_application_model: GeneralVoiceoverApplicationModel. The
-            voiceover application model object.
+        voiceover_application_id: str. The ID of the voiceover application.
 
     Returns:
         BaseVoiceoverApplication. The domain object out of the given voiceover
         application model object.
     """
+    voiceover_application_model = (
+        suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+            voiceover_application_id))
     voiceover_application_class = _get_voiceover_application_class(
         voiceover_application_model.target_type)
     return voiceover_application_class(

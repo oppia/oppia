@@ -1467,16 +1467,28 @@ class BaseVoiceoverApplicationUnitTests(test_utils.GenericTestBase):
             'Subclasses of BaseVoiceoverApplication should implement accept.'):
             self.base_voiceover_application.accept()
 
+    def test_base_class_reject_raises_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseVoiceoverApplication should implement reject.'):
+            self.base_voiceover_application.reject()
+
 
 class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
     """Tests for the ExplorationVoiceoverApplication class."""
 
     def setUp(self):
         super(ExplorationVoiceoverApplicationUnitTest, self).setUp()
+        self.signup('author@example.com', 'author')
+        self.author_id = self.get_user_id_from_email('author@example.com')
+
+        self.signup('reviewer@example.com', 'reviewer')
+        self.reviewer_id = self.get_user_id_from_email('reviewer@example.com')
+
         self.voiceover_application = (
             suggestion_registry.ExplorationVoiceoverApplication(
                 'application_id', 'exp_id', suggestion_models.STATUS_IN_REVIEW,
-                'author_id', None, 'en', 'audio_file.mp3', '<p>Content</p>',
+                self.author_id, None, 'en', 'audio_file.mp3', '<p>Content</p>',
                 None))
 
     def test_validation_with_invalid_target_type_rasie_exception(self):
@@ -1602,3 +1614,49 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected content to be a string'):
             self.voiceover_application.validate()
+
+    def test_to_dict_returns_correct_dict(self):
+        self.voiceover_application.accept(self.reviewer_id)
+        expected_dict = {
+            'voiceover_application_id': 'application_id',
+            'target_type': 'exploration',
+            'target_id': 'exp_id',
+            'status': 'accepted',
+            'author_name': 'author',
+            'final_reviewer_name': 'reviewer',
+            'language_code': 'en',
+            'content': '<p>Content</p>',
+            'filename': 'audio_file.mp3',
+            'rejection_message': None
+        }
+        self.assertEqual(
+            self.voiceover_application.to_dict(), expected_dict)
+
+    def test_is_handled_property_returns_correct_value(self):
+        self.assertFalse(self.voiceover_application.is_handled)
+
+        self.voiceover_application.accept(self.reviewer_id)
+
+        self.assertTrue(self.voiceover_application.is_handled)
+
+    def test_accept_voiceover_application(self):
+        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
+        self.assertEqual(self.voiceover_application.status, 'review')
+
+        self.voiceover_application.accept(self.reviewer_id)
+
+        self.assertEqual(
+            self.voiceover_application.final_reviewer_id, self.reviewer_id)
+        self.assertEqual(self.voiceover_application.status, 'accepted')
+
+    def test_reject_voiceover_application(self):
+        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
+        self.assertEqual(self.voiceover_application.status, 'review')
+
+        self.voiceover_application.reject(self.reviewer_id, 'rejection message')
+
+        self.assertEqual(
+            self.voiceover_application.final_reviewer_id, self.reviewer_id)
+        self.assertEqual(self.voiceover_application.status, 'rejected')
+        self.assertEqual(
+            self.voiceover_application.rejection_message, 'rejection message')
