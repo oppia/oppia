@@ -45,6 +45,7 @@ import datetime
 import os
 import shutil
 import subprocess
+import sys
 
 import python_utils
 import release_constants
@@ -54,6 +55,14 @@ from . import gcloud_adapter
 from . import install_third_party_libs
 from . import update_configs
 # pylint: enable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -382,6 +391,11 @@ def execute_deployment():
     gcloud_adapter.require_gcloud_to_be_available()
     try:
         if app_name == APP_NAME_OPPIASERVER:
+            personal_access_token = common.get_personal_access_token()
+            g = github.Github(personal_access_token)
+            repo = g.get_organization('oppia').get_repo('oppia')
+            common.check_blocking_bug_issue_count(repo)
+            common.check_prs_for_current_release_are_released(repo)
             update_configs.main()
             with python_utils.open_file(FECONF_PATH, 'r') as f:
                 feconf_contents = f.read()

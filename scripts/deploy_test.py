@@ -35,6 +35,14 @@ from . import gcloud_adapter
 from . import install_third_party_libs
 from . import update_configs
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
+
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
 MOCK_FECONF_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
@@ -166,14 +174,39 @@ class DeployTests(test_utils.GenericTestBase):
             deploy, 'FECONF_PATH', MOCK_FECONF_FILEPATH)
         def mock_main():
             pass
+        def mock_get_personal_access_token():
+            return 'test'
+        def mock_get_organization(unused_self, unused_name):
+            return github.Organization.Organization(
+                requester='', headers='', attributes={}, completed='')
+        def mock_get_repo(unused_self, unused_org):
+            return 'repo'
+        def mock_check_blocking_bug_issue_count(unused_repo):
+            pass
+        def mock_check_prs_for_current_release_are_released(unused_repo):
+            pass
         config_swap = self.swap(update_configs, 'main', mock_main)
+        get_token_swap = self.swap(
+            common, 'get_personal_access_token', mock_get_personal_access_token)
+        get_org_swap = self.swap(
+            github.Github, 'get_organization', mock_get_organization)
+        get_repo_swap = self.swap(
+            github.Organization.Organization, 'get_repo', mock_get_repo)
+        bug_check_swap = self.swap(
+            common, 'check_blocking_bug_issue_count',
+            mock_check_blocking_bug_issue_count)
+        pr_check_swap = self.swap(
+            common, 'check_prs_for_current_release_are_released',
+            mock_check_prs_for_current_release_are_released)
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, config_swap:
-                    with args_swap, feconf_swap, self.assertRaisesRegexp(
-                        Exception,
-                        'The mailgun API key must be added before deployment.'):
-                        deploy.execute_deployment()
+                with self.run_swap, config_swap, get_token_swap, get_org_swap:
+                    with get_repo_swap, bug_check_swap, pr_check_swap:
+                        with args_swap, feconf_swap, self.assertRaisesRegexp(
+                            Exception,
+                            'The mailgun API key must be added before '
+                            'deployment.'):
+                            deploy.execute_deployment()
 
     def test_missing_third_party_dir(self):
         third_party_swap = self.swap(deploy, 'THIRD_PARTY_DIR', 'INVALID_DIR')
