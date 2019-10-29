@@ -26,7 +26,6 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class GenerateContentIdService {
-
   generateIdForComponent(existingComponentIds: Object,
       componentName: string): string {
     let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
