@@ -50,6 +50,15 @@ def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
             'Invalid suggestion_type: %s' % suggestion_type)
 
 
+def _target_id_to_opportunity_dict(suggestions):
+    """Returns a dict of target_id to exploration opportunity summary dict."""
+    target_ids = set([s.target_id for s in suggestions])
+    opportunities = (
+        opportunity_services.get_exploration_opportunity_summaries_by_ids(
+            list(target_ids)))
+    return {opp.target_id: opp.to_dict() for opp in opportunities}
+
+
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 

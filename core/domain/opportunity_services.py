@@ -328,7 +328,8 @@ def get_translation_opportunities(language_code, cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(ExplorationOpportunitySummary). A list of
+                ExplorationOpportunitySummary domain objects.
             cursor: str or None. A query cursor pointing to the next batch of
                 results. If there are no more results, this might be None.
             more: bool. If True, there are (probably) more results after this
@@ -344,7 +345,7 @@ def get_translation_opportunities(language_code, cursor):
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary.to_dict())
+        opportunities.append(exp_opportunity_summary)
     return opportunities, cursor, more
 
 
@@ -361,7 +362,8 @@ def get_voiceover_opportunities(language_code, cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(ExplorationOpportunitySummary). A list of
+                ExplorationOpportunitySummary domain objects.
             cursor: str or None. A query cursor pointing to the next
                 batch of results. If there are no more results, this might
                 be None.
@@ -378,7 +380,7 @@ def get_voiceover_opportunities(language_code, cursor):
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary.to_dict())
+        opportunities.append(exp_opportunity_summary)
     return opportunities, cursor, more
 
 
@@ -387,21 +389,21 @@ def get_exploration_opportunity_summaries_by_ids(ids):
     the given list of ids.
 
     Args:
-        ids: list(str). A list of the opportunity ids.
+        ids: list(str). A list of opportunity ids.
 
     Returns:
-        dict(str, ExplorationOpportunitySummary). A dict with key as an ID and
-        value as corresponding ExplorationOpportunitySummary object.
+        list(ExplorationOpportunitySummary). A list of
+            ExplorationOpportunitySummary domain objects corresponding to the
+            supplied ids.
     """
     exp_opportunity_summary_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
-    opportunities = {}
+    opportunities = []
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities[exp_opportunity_summary.id] = exp_opportunity_summary
-
+        opportunities.append(exp_opportunity_summary)
     return opportunities
 
 
@@ -444,42 +446,6 @@ def get_skill_opportunity_from_model(model):
         model.id, model.skill_description, model.question_count)
 
 
-def get_skill_opportunities_with_topic(cursor):
-    """Returns a list of skill opportunities available for questions with topic
-    information.
-
-    Args:
-        cursor: str or None. If provided, the list of returned entities
-            starts from this datastore cursor. Otherwise, the returned
-            entities start from the beginning of the full list of entities.
-
-    Returns:
-        3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
-            cursor: str or None. A query cursor pointing to the next
-                batch of results. If there are no more results, this might
-                be None.
-            more: bool. If True, there are (probably) more results after
-                this batch. If False, there are no further results after
-                this batch.
-    """
-    topics_with_skills = topic_fetchers.get_all_topics_with_skills()
-    skill_opportunities, cursor, more = get_skill_opportunities(cursor)
-    id_to_skill_opportunity = _skill_id_to_skill_opportunity_dict(
-        skill_opportunities)
-    opportunities = []
-    for topic in topics_with_skills:
-        for skill_id in topic.get_all_skill_ids():
-            if len(opportunities) == feconf.OPPORTUNITIES_PAGE_SIZE:
-                break
-            if skill_id in id_to_skill_opportunity:
-                skill_opportunity = id_to_skill_opportunity[skill_id]
-                skill_opportunity_with_topic = skill_opportunity.copy()
-                skill_opportunity_with_topic['topic_name'] = topic.name
-                opportunities.append(skill_opportunity_with_topic)
-    return opportunities, cursor, more
-
-
 def get_skill_opportunities(cursor):
     """Returns a list of skill opportunities available for questions.
 
@@ -490,7 +456,8 @@ def get_skill_opportunities(cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(SkillOpportunity). A list of SkillOpportunity
+                domain objects.
             cursor: str or None. A query cursor pointing to the next
                 batch of results. If there are no more results, this might
                 be None.
@@ -505,9 +472,8 @@ def get_skill_opportunities(cursor):
     opportunities = []
     for skill_opportunity_model in skill_opportunity_models:
         skill_opportunity = (
-            get_skill_opportunity_from_model(
-                skill_opportunity_model))
-        opportunities.append(skill_opportunity.to_dict())
+            get_skill_opportunity_from_model(skill_opportunity_model))
+        opportunities.append(skill_opportunity)
     return opportunities, cursor, more
 
 
@@ -673,24 +639,6 @@ def _get_skill_opportunity_with_updated_question_count(skill_ids, delta):
             skill_opportunity.question_count += delta
             updated_skill_opportunities.append(skill_opportunity)
     return updated_skill_opportunities
-
-
-def _skill_id_to_skill_opportunity_dict(skill_opportunities):
-    """Returns a dictionary of skill_id to corresponding SkillOpportunity dict.
-
-    Args:
-        skill_opportunities: iterable(dict). The SkillOpportunity dicts from
-            which to construct the mapping.
-
-    Returns:
-        id_to_skill_opportunity_dict. dict(str -> dict), Dictionary
-        of skill_id to dict of SkillOpportunity details.
-    """
-    id_to_skill_opportunity_dict = {}
-    for skill_opportunity in skill_opportunities:
-        skill_id = skill_opportunity['id']
-        id_to_skill_opportunity_dict[skill_id] = skill_opportunity
-    return id_to_skill_opportunity_dict
 
 
 def regenerate_opportunities_related_to_topic(
