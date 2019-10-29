@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { DateTimeFormatService } from 'services/DateTimeFormatService';
-import { FormatTimerPipe } from
+import { FormatTimePipe } from
   'filters/string-utility-filters/format-timer.pipe';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
@@ -34,7 +34,7 @@ export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
     'BackgroundMaskService': new BackgroundMaskService(),
-    'DateTimeFormatService': new DateTimeFormatService(new FormatTimerPipe()),
+    'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'UtilsService': new UtilsService(),
