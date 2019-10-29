@@ -17,8 +17,7 @@
  */
 
 import { DateTimeFormatService } from 'services/DateTimeFormatService';
-import { FormatTimePipe } from
-  'filters/string-utility-filters/format-timer.pipe';
+import { FormatTimePipe } from 'filters/format-timer.pipe';
 
 describe('datetimeformatter', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.

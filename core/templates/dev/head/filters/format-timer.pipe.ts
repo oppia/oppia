@@ -18,7 +18,7 @@
 
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({name: 'formatTimer'})
+@Pipe({name: 'formatTime'})
 export class FormatTimePipe implements PipeTransform {
   transform(input: any): string {
     let formatNum = function(n) {

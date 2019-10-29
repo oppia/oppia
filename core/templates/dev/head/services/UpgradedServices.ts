@@ -21,11 +21,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { DateTimeFormatService } from 'services/DateTimeFormatService';
-import { FormatTimePipe } from
-  'filters/string-utility-filters/format-timer.pipe';
+import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
-import { WindowDimensionsService } from './contextual/WindowDimensionsService';
+import { WindowDimensionsService } from
+  'services/contextual/WindowDimensionsService';
 
 @Injectable({
   providedIn: 'root'

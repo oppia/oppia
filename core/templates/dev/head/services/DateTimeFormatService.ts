@@ -21,8 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import moment from 'moment';
 
-import { FormatTimePipe } from
-  'filters/string-utility-filters/format-timer.pipe';
+import { FormatTimePipe } from 'filters/format-timer.pipe';
 
 
 @Injectable({
