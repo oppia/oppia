@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
 import { UrlService } from 'services/contextual/UrlService';
 
 describe('Url Service', () => {

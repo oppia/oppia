@@ -19,6 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+
 import { WindowRef } from 'services/contextual/WindowRefService';
 
 @Injectable({
@@ -27,7 +28,6 @@ import { WindowRef } from 'services/contextual/WindowRefService';
 export class UrlService {
   constructor(private windowRef: WindowRef) {}
 
-  // This function is for testing purposes (to mock $window.location)
   getCurrentLocation(): Location {
     return this.windowRef.nativeWindow.location;
   }
@@ -58,7 +58,7 @@ export class UrlService {
     return this.getCurrentLocation().pathname;
   }
 
-  getTopicIdFromUrl(): string | Error {
+  getTopicIdFromUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/topic_editor\/(\w|-){12}/g)) {
       return pathname.split('/')[2];
@@ -66,7 +66,7 @@ export class UrlService {
     throw Error('Invalid topic id url');
   }
 
-  getTopicNameFromLearnerUrl(): string | Error {
+  getTopicNameFromLearnerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(story|topic|subtopic|practice_session)/g)) {
       return decodeURIComponent(pathname.split('/')[2]);
@@ -74,7 +74,7 @@ export class UrlService {
     throw Error('Invalid URL for topic');
   }
 
-  getClassroomNameFromUrl(): string | Error {
+  getClassroomNameFromUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/classroom/g)) {
       return decodeURIComponent(pathname.split('/')[2]);
@@ -82,7 +82,7 @@ export class UrlService {
     throw Error('Invalid URL for classroom');
   }
 
-  getSubtopicIdFromUrl(): string | Error {
+  getSubtopicIdFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
     if (pathname.match(/\/subtopic/g) && argumentsArray.length === 4) {
@@ -91,7 +91,7 @@ export class UrlService {
     throw Error('Invalid URL for subtopic');
   }
 
-  getStoryIdFromUrl(): string | Error {
+  getStoryIdFromUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(story_editor|review_test)\/(\w|-){12}/g)) {
       return pathname.split('/')[2];
@@ -99,7 +99,7 @@ export class UrlService {
     throw Error('Invalid story id url');
   }
 
-  getStoryIdFromViewerUrl(): string | Error {
+  getStoryIdFromViewerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/story\/(\w|-){12}/g)) {
       return pathname.split('/')[2];
@@ -119,7 +119,7 @@ export class UrlService {
     return null;
   }
 
-  getSkillIdFromUrl(): string | Error {
+  getSkillIdFromUrl(): string {
     let pathname = this.getPathname();
     let skillId = pathname.split('/')[2];
     if (skillId.length !== 12) {
@@ -162,7 +162,7 @@ export class UrlService {
     return this.getCurrentLocation().origin;
   }
 
-  getCollectionIdFromExplorationUrl(): any {
+  getCollectionIdFromExplorationUrl(): string | null {
     let urlParams: any = this.getUrlParams();
     if (urlParams.hasOwnProperty('parent')) {
       return null;
@@ -173,7 +173,7 @@ export class UrlService {
     return null;
   }
 
-  getUsernameFromProfileUrl(): string | Error {
+  getUsernameFromProfileUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(profile)/g)) {
       return decodeURIComponent(pathname.split('/')[2]);
@@ -181,7 +181,7 @@ export class UrlService {
     throw Error('Invalid profile URL');
   }
 
-  getCollectionIdFromUrl(): string | Error {
+  getCollectionIdFromUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(collection)/g)) {
       return decodeURIComponent(pathname.split('/')[2]);
@@ -189,7 +189,7 @@ export class UrlService {
     throw Error('Invalid collection URL');
   }
 
-  getCollectionIdFromEditorUrl(): string | Error {
+  getCollectionIdFromEditorUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(collection_editor\/create)/g)) {
       return decodeURIComponent(pathname.split('/')[3]);
