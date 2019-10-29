@@ -22,6 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
 import { ExtensionTagAssemblerService }
   from 'services/ExtensionTagAssemblerService';
 import { HtmlEscaperService } from 'services/HtmlEscaperService';
@@ -30,6 +31,7 @@ import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from
   'services/contextual/WindowDimensionsService';
+import { WindowRef } from 'services/contextual/WindowRefService';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +40,7 @@ export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
     'BackgroundMaskService': new BackgroundMaskService(),
+    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
       new HtmlEscaperService(new LoggerService(new ErrorHandler())),
       new CamelCaseToHyphensPipe()),
