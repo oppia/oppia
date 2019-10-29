@@ -25,6 +25,7 @@ This hook works only on Unix like systems as of now.
 On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -38,7 +39,7 @@ sys.path.append(os.getcwd())
 import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 
-def _install_hook():
+def install_hook():
     """Installs the pre_commit_hook script and makes it executable.
     It ensures that oppia/ is the root folder.
 
@@ -61,7 +62,7 @@ def _install_hook():
             python_utils.PRINT('Copied file to .git/hooks directory')
 
     python_utils.PRINT('Making pre-commit hook file executable ...')
-    _, err_chmod_cmd = _start_subprocess_for_result(chmod_cmd)
+    _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
     if not err_chmod_cmd:
         python_utils.PRINT('pre-commit hook file is now executable!')
@@ -69,7 +70,7 @@ def _install_hook():
         raise ValueError(err_chmod_cmd)
 
 
-def _start_subprocess_for_result(cmd):
+def start_subprocess_for_result(cmd):
     """Starts subprocess and returns (stdout, stderr)."""
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
@@ -77,7 +78,7 @@ def _start_subprocess_for_result(cmd):
     return out, err
 
 
-def _does_diff_include_package_lock_file():
+def does_diff_include_package_lock_file():
     """Checks whether the diff includes package-lock.json.
 
     Returns:
@@ -88,7 +89,7 @@ def _does_diff_include_package_lock_file():
     """
 
     git_cmd = ['git', 'diff', '--name-only', '--cached']
-    out, err = _start_subprocess_for_result(git_cmd)
+    out, err = start_subprocess_for_result(git_cmd)
 
     if not err:
         files_changed = out.split('\n')
@@ -97,7 +98,7 @@ def _does_diff_include_package_lock_file():
         raise ValueError(err)
 
 
-def _does_current_folder_contain_have_package_lock_file():
+def does_current_folder_contain_have_package_lock_file():
     """Checks whether package-lock.json exists in the current folder.
 
     Returns:
@@ -115,12 +116,12 @@ def main(args=None):
                         help='Install pre_commit_hook to the .git/hooks dir')
     args = parser.parse_args(args=args)
     if args.install:
-        _install_hook()
+        install_hook()
         return
 
     python_utils.PRINT('Running pre-commit check for package-lock.json ...')
-    if _does_diff_include_package_lock_file() and (
-            _does_current_folder_contain_have_package_lock_file()):
+    if does_diff_include_package_lock_file() and (
+            does_current_folder_contain_have_package_lock_file()):
         # The following message is necessary since there git commit aborts
         # quietly when the status is non-zero.
         python_utils.PRINT('-----------COMMIT ABORTED-----------')
@@ -134,5 +135,7 @@ def main(args=None):
     return
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when pre_commit_hook.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()
