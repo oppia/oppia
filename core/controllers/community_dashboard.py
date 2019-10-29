@@ -121,11 +121,12 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         return opportunities, cursor, more
 
     def _skill_id_to_skill_opportunity_dict(self, skill_opportunities):
-        """Returns a dictionary of skill_id to corresponding SkillOpportunity dict.
+        """Returns a dictionary of skill_id to corresponding SkillOpportunity
+        dict.
 
         Args:
-            skill_opportunities: iterable(dict). The SkillOpportunity domain objects
-                from which to construct the mapping.
+            skill_opportunities: iterable(dict). The SkillOpportunity domain
+                objects from which to construct the mapping.
 
         Returns:
             id_to_skill_opportunity_dict. dict(str -> dict), Dictionary
