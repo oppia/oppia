@@ -1,7 +1,7 @@
 {
   "parser": "@typescript-eslint/parser",
   "extends": [
-    "eslint:recommended",
+    "eslint:recommended"
   ],
   "plugins": [
     "angular",
@@ -18,7 +18,7 @@
   "rules": {
     "angular/di": [
       "error",
-      "array",
+      "array"
     ],
     "angular/di-order": "error",
     "angular/di-unused": "error",
@@ -104,8 +104,10 @@
     ],
     "max-len": [
       "error",
+      {
       "code": 80,
       "ignoreUrls": true
+      }
     ],
     "no-compare-neg": "off",
     "no-console": [
@@ -185,7 +187,7 @@
       {
         "anonymous": "never",
         "asyncArrow": "never",
-        "named": "never",
+        "named": "never"
       }
     ],
     "spaced-comment": [
@@ -199,12 +201,14 @@
       "error",
       {
         "words": true,
-        "nonwords": false,
+        "nonwords": false
       }
     ],
     "wrap-iife": [
       "error",
       "any"
     ]
-  }
+  },
+  "noInlineConfig": true,
+  "reportUnusedDisableDirectives": true
 }
