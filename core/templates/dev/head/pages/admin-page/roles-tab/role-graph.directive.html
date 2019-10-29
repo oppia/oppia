@@ -19,7 +19,7 @@
               Select Method
             </label>
             <div class="col-md-8 ml-auto">
-              <select ng-model="$ctrl.viewFormValues.method" class="form-control">
+              <select ng-model="$ctrl.viewFormValues.method" class="form-control protractor-test-role-method">
                 <option value="role">By Role</option>
                 <option value="username">By Username</option>
               </select>
@@ -28,7 +28,7 @@
           <div class="d-xl-inline-flex form-group" ng-if="$ctrl.viewFormValues.method==='role'">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="roleName as roleString for (roleName, roleString) in $ctrl.VIEWABLE_ROLES" ng-model="$ctrl.viewFormValues.role" class="form-control">
+              <select ng-options="roleName as roleString for (roleName, roleString) in $ctrl.VIEWABLE_ROLES" ng-model="$ctrl.viewFormValues.role" class="form-control protractor-test-role-value">
               </select>
             </div>
           </div>
@@ -36,11 +36,11 @@
           <div class="d-xl-inline-flex form-group" ng-if="$ctrl.viewFormValues.method==='username'">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.viewFormValues.username" class="form-control">
+              <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.viewFormValues.username" class="form-control protractor-test-username-value">
             </div>
           </div>
 
-          <button type="submit" class="btn btn-success"
+          <button type="submit" class="btn btn-success protractor-test-role-success"
                   ng-disabled="($ctrl.viewFormValues.method==='role' && !$ctrl.viewFormValues.role) || ($ctrl.viewFormValues.method==='username' && !$ctrl.viewFormValues.username)"
                   value="view role">
             View Role
@@ -57,7 +57,7 @@
             </thead>
             <tbody>
               <tr ng-repeat="(name, role) in $ctrl.result">
-                <td><[name]></td>
+                <td class="protractor-test-roles-result-rows"><[name]></td>
                 <td><[role]></td>
               </tr>
             </tbody>
