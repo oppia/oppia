@@ -332,5 +332,7 @@ def main(args=None):
     download_manifest_files(MANIFEST_FILE_PATH)
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when install_third_party.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

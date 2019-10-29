@@ -77,5 +77,7 @@ def main(args=None):
     python_utils.PRINT('Temporary and installed files deleted')
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when clean.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()
