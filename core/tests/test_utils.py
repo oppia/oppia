@@ -1042,7 +1042,7 @@ tags: []
         Returns:
             str. GAE ID of the user possessing the given email.
         """
-        return current_user_services.get_user_id_from_email(email)
+        return current_user_services.get_gae_id_from_email(email)
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
