@@ -27,11 +27,15 @@ require(
   'state-tutorial-first-time.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvements-display.service.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
+require('services/ImprovementTaskService.ts');
 
 angular.module('oppia').directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -43,15 +47,30 @@ angular.module('oppia').directive('editorNavigation', [
       controller: [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
-        'ExplorationWarningsService', 'RouterService',
+        'ExplorationWarningsService', 'ImprovementTaskService',
+        'ImprovementsDisplayService', 'RouterService',
         'SiteAnalyticsService', 'StateTutorialFirstTimeService',
         'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
-            ExplorationWarningsService, RouterService,
+            ExplorationWarningsService, ImprovementTaskService,
+            ImprovementsDisplayService, RouterService,
             SiteAnalyticsService, StateTutorialFirstTimeService,
             ThreadDataService, UserService, WindowDimensionsService) {
+          var fetchedTasks = [];
+          ImprovementTaskService.fetchTasks().then(function(tasks) {
+            fetchedTasks = tasks;
+          });
+
+          $scope.isTaskOpen = function(task) {
+            return ImprovementsDisplayService.isOpen(task.getStatus());
+          };
+
+          $scope.getOpenTaskCount = function() {
+            return fetchedTasks.filter($scope.isTaskOpen).length;
+          };
+
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
