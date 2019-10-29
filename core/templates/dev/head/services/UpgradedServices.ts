@@ -20,6 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
+import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UrlService } from 'services/contextual/UrlService';
 import { UtilsService } from 'services/UtilsService';
@@ -34,6 +35,7 @@ export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
     'BackgroundMaskService': new BackgroundMaskService(),
+    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'UrlService': new UrlService(new WindowRef()),

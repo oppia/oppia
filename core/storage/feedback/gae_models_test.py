@@ -47,6 +47,11 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     SUMMARY = 'This is a great summary.'
     MESSAGE_COUNT = 0
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            feedback_models.GeneralFeedbackThreadModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(FeedbackThreadModelTest, self).setUp()
@@ -63,11 +68,6 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             message_count=self.MESSAGE_COUNT
         )
         self.feedback_thread_model.put()
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            feedback_models.GeneralFeedbackThreadModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -445,8 +445,6 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        self.assertStaticMethod(
-            feedback_models.FeedbackAnalyticsModel, 'has_reference_to_user_id')
         self.assertFalse(
             feedback_models.FeedbackAnalyticsModel
             .has_reference_to_user_id('id_x'))
