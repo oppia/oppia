@@ -33,6 +33,7 @@ from core.platform import models
             models.NAMES.skill, models.NAMES.story,
             models.NAMES.topic]))
 
+
 class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
     """Job that indexes all explorations and collections and compute their
     ranks.
