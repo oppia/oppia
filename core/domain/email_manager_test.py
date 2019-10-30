@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for methods relating to sending emails."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import types
@@ -26,6 +28,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
@@ -70,6 +73,42 @@ class FailedMLTest(test_utils.GenericTestBase):
                 to='moderator@example.com')
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject.decode(), expected_subject)
+
+
+class EmailToAdminTest(test_utils.GenericTestBase):
+    """Test that emails are correctly sent to the admin."""
+
+    def test_email_to_admin_is_sent_correctly(self):
+        dummy_system_name = 'DUMMY_SYSTEM_NAME'
+        dummy_system_address = 'dummy@system.com'
+        dummy_admin_address = 'admin@system.com'
+
+        send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        system_name_ctx = self.swap(
+            feconf, 'SYSTEM_EMAIL_NAME', dummy_system_name)
+        system_email_ctx = self.swap(
+            feconf, 'SYSTEM_EMAIL_ADDRESS', dummy_system_address)
+        admin_email_ctx = self.swap(
+            feconf, 'ADMIN_EMAIL_ADDRESS', dummy_admin_address)
+
+        with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+
+            # Send an email to the admin.
+            email_manager.send_mail_to_admin('Dummy Subject', 'Dummy Body')
+
+            # Make sure emails are sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
+            self.assertEqual(messages[0].to, 'admin@system.com')
+            self.assertEqual(messages[0].subject.decode(), 'Dummy Subject')
+            self.assertIn('Dummy Body', messages[0].html.decode())
 
 
 class EmailRightsTest(test_utils.GenericTestBase):
@@ -166,9 +205,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             self.login(self.EDITOR_EMAIL)
 
-            response = self.get_html_response('%s/%s' % (
-                feconf.EDITOR_URL_PREFIX, self.exploration.id))
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             self.put_json('%s/%s' % (
                 feconf.EXPLORATION_RIGHTS_PREFIX, self.exploration.id), {
                     'version': self.exploration.version,
@@ -360,18 +397,18 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 messages[0].body.decode(),
                 expected_email_text_body)
 
-    def test_correct_rights_are_written_in_translator_role_email_body(self):
+    def test_correct_rights_are_written_in_voice_artist_role_email_body(self):
         expected_email_html_body = (
             'Hi newuser,<br>'
             '<br>'
-            '<b>editor</b> has granted you translator rights to their '
+            '<b>editor</b> has granted you voice artist rights to their '
             'exploration, '
             '"<a href="https://www.oppia.org/create/A">Title</a>"'
             ', on Oppia.org.<br>'
             '<br>'
             'This allows you to:<br>'
             '<ul>'
-            '<li>Translate the exploration</li><br>'
+            '<li>Voiceover the exploration</li><br>'
             '<li>View and playtest the exploration</li><br>'
             '</ul>'
             'You can find the exploration '
@@ -388,11 +425,11 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi newuser,\n'
             '\n'
-            'editor has granted you translator rights to their '
+            'editor has granted you voice artist rights to their '
             'exploration, "Title", on Oppia.org.\n'
             '\n'
             'This allows you to:\n'
-            '- Translate the exploration\n'
+            '- Voiceover the exploration\n'
             '- View and playtest the exploration\n'
             'You can find the exploration here.\n'
             '\n'
@@ -404,10 +441,10 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
-            # Check that correct email content is sent for Translator.
+            # Check that correct email content is sent for Voice Artist.
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id,
-                rights_manager.ROLE_TRANSLATOR, self.exploration.id,
+                rights_manager.ROLE_VOICE_ARTIST, self.exploration.id,
                 self.exploration.title)
 
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
@@ -535,8 +572,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.get_html_response(feconf.SIGNUP_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
@@ -566,8 +602,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.get_html_response(feconf.SIGNUP_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             # No user-facing error should surface.
             self.post_json(
@@ -614,8 +649,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.get_html_response(feconf.SIGNUP_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             # No user-facing error should surface.
             self.post_json(
@@ -660,8 +694,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.get_html_response(feconf.SIGNUP_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             # No user-facing error should surface.
             self.post_json(
@@ -692,8 +725,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 'Email Sender')
 
             self.login(self.EDITOR_EMAIL)
-            response = self.get_html_response(feconf.SIGNUP_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
@@ -725,8 +757,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.get_html_response(feconf.SIGNUP_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
@@ -759,8 +790,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.get_html_response(feconf.SIGNUP_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 feconf.SIGNUP_DATA_URL,
@@ -801,8 +831,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.get_html_response(feconf.SIGNUP_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
@@ -2290,7 +2319,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         usernames = ('username1', 'username2')
         emails = ('user1@example.com', 'user2@example.com')
 
-        for user_id, username, user_email in zip(user_ids, usernames, emails):
+        for user_id, username, user_email in python_utils.ZIP(
+                user_ids, usernames, emails):
             user_services.create_new_user(user_id, user_email)
             user_services.set_username(user_id, username)
 

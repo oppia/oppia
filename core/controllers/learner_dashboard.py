@@ -13,10 +13,12 @@
 # limitations under the License.
 
 """Controllers for the learner dashboard."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import subscription_services
@@ -24,6 +26,7 @@ from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import user_services
 import feconf
+import python_utils
 import utils
 
 
@@ -33,7 +36,7 @@ class LearnerDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/learner_dashboard.html')
+        self.render_template('learner-dashboard-page.mainpage.html')
 
 
 class LearnerDashboardHandler(base.BaseHandler):
@@ -161,7 +164,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         if suggestion:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_fetchers.get_exploration_by_id(exploration_id)
             current_content_html = (
                 exploration.states[
                     suggestion.change.state_name].content.html)
@@ -177,7 +180,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             messages.pop(0)
             authors_settings.pop(0)
 
-        for m, author_settings in zip(messages, authors_settings):
+        for m, author_settings in python_utils.ZIP(messages, authors_settings):
 
             if author_settings is None:
                 author_username = None

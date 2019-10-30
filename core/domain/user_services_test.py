@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Unit tests for core.domain.user_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -28,11 +30,15 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_jobs_continuous
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 from google.appengine.api import urlfetch
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class MockUserStatsAggregator(
@@ -85,7 +91,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_emails = [
             'test1@email.com', feconf.SYSTEM_EMAIL_ADDRESS, 'test2@email.com']
 
-        for uid, email, name in zip(user_ids, user_emails, usernames):
+        for uid, email, name in python_utils.ZIP(
+                user_ids, user_emails, usernames):
             if uid != feconf.SYSTEM_COMMITTER_ID:
                 user_services.create_new_user(uid, email)
                 user_services.set_username(uid, name)
@@ -129,7 +136,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = 'someUser'
         user_services.create_new_user(user_id, 'user@example.com')
         bad_usernames = [
-            ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020']
+            ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020',
+            'AbcOppiaMigrationBotXyz', 'OppiaMigrATIONBOTXyz',
+            'AbcOppiaSuggestionBotXyz', 'AAAOPPIASuggestionBotBBB',
+            'xyzOppia', 'oppiaXyz', 'abcOppiaXyz']
         for username in bad_usernames:
             with self.assertRaises(utils.ValidationError):
                 user_services.set_username(user_id, username)
@@ -150,7 +160,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
             user_settings = user_services.create_new_user(
-                str(ind), actual_email)
+                python_utils.convert_to_bytes(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_email_from_username(self):
@@ -200,7 +210,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        with open(expected_gravatar_filepath, 'r') as f:
+        with python_utils.open_file(
+            expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()
         with self.urlfetch_mock(content=gravatar):
             profile_picture = user_services.fetch_gravatar(user_email)
@@ -258,8 +269,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         identicon_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'user_blue_72px.png')
-        identicon_data_url = utils.convert_png_to_data_url(
-            identicon_filepath)
+        identicon_data_url = utils.convert_png_to_data_url(identicon_filepath)
         self.assertEqual(
             identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
 
@@ -382,7 +392,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
-        for uid, email, name in zip(user_ids, user_emails, usernames):
+        for uid, email, name in python_utils.ZIP(
+                user_ids, user_emails, usernames):
             user_services.create_new_user(uid, email)
             user_services.set_username(uid, name)
 
@@ -407,7 +418,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
-        for uid, email, name in zip(user_ids, user_emails, usernames):
+        for uid, email, name in python_utils.ZIP(
+                user_ids, user_emails, usernames):
             user_services.create_new_user(uid, email)
             user_services.set_username(uid, name)
 
@@ -987,17 +999,17 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
                 """
                 return isinstance(other, original_datetime_type)
 
-        class MockDatetime11Hours(datetime.datetime):
-            __metaclass__ = PatchedDatetimeType
-
+        class MockDatetime11Hours( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
             @classmethod
             def utcnow(cls):
                 """Returns the current date and time 11 hours ahead of UTC."""
                 return current_datetime + datetime.timedelta(hours=11)
 
-        class MockDatetime13Hours(datetime.datetime):
-            __metaclass__ = PatchedDatetimeType
-
+        class MockDatetime13Hours( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
             @classmethod
             def utcnow(cls):
                 """Returns the current date and time 13 hours ahead of UTC."""
@@ -1150,3 +1162,229 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         self.assertGreater(
             (owner_settings.last_created_an_exploration),
             previous_last_created_an_exploration)
+
+
+class UserSettingsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UserSettingsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        self.user_settings = user_services.get_user_settings(self.owner_id)
+        self.user_settings.validate()
+        self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+    def test_gae_user_id_is_user_id(self):
+        self.assertEqual(
+            self.user_settings.user_id, self.user_settings.gae_user_id
+        )
+
+    def test_validate_non_str_user_id(self):
+        self.user_settings.user_id = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected user_id to be a string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_non_str_gae_user_id(self):
+        self.user_settings.gae_user_id = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected gae_user_id to be a string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_empty_user_id(self):
+        self.user_settings.user_id = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'No user id specified.'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_non_str_role(self):
+        self.user_settings.role = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected role to be a string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_role(self):
+        self.user_settings.role = 'invalid_role'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Role invalid_role does not exist.'):
+            self.user_settings.validate()
+
+    def test_validate_non_str_creator_dashboard_display_pref(self):
+        self.user_settings.creator_dashboard_display_pref = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected dashboard display preference to be a string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_creator_dashboard_display_pref(self):
+        self.user_settings.creator_dashboard_display_pref = (
+            'invalid_creator_dashboard_display_pref')
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'invalid_creator_dashboard_display_pref is not a valid '
+            'value for the dashboard display preferences.'
+        ):
+            self.user_settings.validate()
+
+    def test_guest_has_not_fully_registered(self):
+        self.assertFalse(user_services.has_fully_registered(None))
+
+    def test_cannot_create_new_user_with_existing_user_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'User %s already exists.' % self.owner_id
+        ):
+            user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+
+    def test_cannot_set_existing_username(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Sorry, the username \"%s\" is already taken! Please pick '
+            'a different one.' % self.OWNER_USERNAME
+        ):
+            user_services.set_username(self.owner_id, self.OWNER_USERNAME)
+
+    def test_cannot_update_user_role_with_invalid_role(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Role invalid_role does not exist.'
+        ):
+            user_services.update_user_role(self.owner_id, 'invalid_role')
+
+    def test_cannot_get_human_readable_user_ids_with_invalid_user_ids(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        assert_raises_user_not_found = self.assertRaisesRegexp(
+            Exception, 'User not found.')
+
+        with logging_swap, assert_raises_user_not_found:
+            user_services.get_human_readable_user_ids(['invalid_user_id'])
+
+        self.assertEqual(
+            observed_log_messages,
+            [
+                'User id invalid_user_id not known in list of user_ids '
+                '[u\'invalid_user_id\']'
+            ])
+
+    def test_get_human_readable_user_ids(self):
+        # Create an unregistered user who has no username.
+        user_models.UserSettingsModel(
+            id='unregistered_user_id', email='user@example.com',
+            username='').put()
+
+        user_ids = user_services.get_human_readable_user_ids(
+            [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'])
+        expected_user_ids = [
+            'owner', 'admin',
+            '[Awaiting user registration: u..@example.com]']
+
+        self.assertEqual(user_ids, expected_user_ids)
+
+
+class UserContributionsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UserContributionsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_contributions = user_services.get_user_contributions(
+            self.owner_id)
+        self.user_contributions.validate()
+
+    def test_validate_non_str_user_id(self):
+        self.user_contributions.user_id = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected user_id to be a string'):
+            self.user_contributions.validate()
+
+    def test_validate_user_id(self):
+        self.user_contributions.user_id = ''
+        with self.assertRaisesRegexp(Exception, 'No user id specified.'):
+            self.user_contributions.validate()
+
+    def test_validate_non_list_created_exploration_ids(self):
+        self.user_contributions.created_exploration_ids = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected created_exploration_ids to be a list'):
+            self.user_contributions.validate()
+
+    def test_validate_created_exploration_ids(self):
+        self.user_contributions.created_exploration_ids = [0]
+        with self.assertRaisesRegexp(
+            Exception, 'Expected exploration_id in created_exploration_ids '
+            'to be a string'):
+            self.user_contributions.validate()
+
+    def test_validate_non_list_edited_exploration_ids(self):
+        self.user_contributions.edited_exploration_ids = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected edited_exploration_ids to be a list'):
+            self.user_contributions.validate()
+
+    def test_validate_edited_exploration_ids(self):
+        self.user_contributions.edited_exploration_ids = [0]
+        with self.assertRaisesRegexp(
+            Exception, 'Expected exploration_id in edited_exploration_ids '
+            'to be a string'):
+            self.user_contributions.validate()
+
+    def test_cannot_create_user_contributions_with_existing_user_id(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'User contributions model for user %s already exists.'
+            % self.owner_id):
+            user_services.create_user_contributions(self.owner_id, [], [])
+
+    def test_cannot_update_user_contributions_with_invalid_user_id(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'User contributions model for user invalid_user_id does not exist'):
+            user_services.update_user_contributions('invalid_user_id', [], [])
+
+    def test_cannot_update_dashboard_stats_log_with_invalid_schema_version(
+            self):
+        model = user_models.UserStatsModel.get_or_create(self.owner_id)
+        model.schema_version = 0
+        model.put()
+
+        self.assertIsNone(user_services.get_user_impact_score(self.owner_id))
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v%d dashboard stats schemas at '
+            'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
+            user_services.update_dashboard_stats_log(self.owner_id)
+
+    def test_flush_migration_bot_contributions_model(self):
+        created_exploration_ids = ['exp_1', 'exp_2']
+        edited_exploration_ids = ['exp_3', 'exp_4']
+        user_services.create_user_contributions(
+            feconf.MIGRATION_BOT_USER_ID, created_exploration_ids,
+            edited_exploration_ids)
+
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertEqual(
+            migration_bot_contributions_model.created_exploration_ids,
+            created_exploration_ids)
+        self.assertEqual(
+            migration_bot_contributions_model.edited_exploration_ids,
+            edited_exploration_ids)
+
+        user_services.flush_migration_bot_contributions_model()
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertEqual(
+            migration_bot_contributions_model.created_exploration_ids, [])
+        self.assertEqual(
+            migration_bot_contributions_model.edited_exploration_ids, [])

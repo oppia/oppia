@@ -16,16 +16,19 @@
  * @fileoverview Tests for SubtopicObjectFactory.
  */
 
-require('domain/topic/SubtopicObjectFactory.ts');
+import { TestBed } from '@angular/core/testing';
 
-describe('Subtopic object factory', function() {
-  var SubtopicObjectFactory = null;
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+
+describe('Subtopic object factory', () => {
+  let subtopicObjectFactory: SubtopicObjectFactory = null;
   var _sampleSubtopic = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [SubtopicObjectFactory]
+    });
+    subtopicObjectFactory = TestBed.get(SubtopicObjectFactory);
 
     var sampleSubtopicBackendObject = {
       id: 1,
@@ -36,15 +39,15 @@ describe('Subtopic object factory', function() {
       skill_1: 'Description 1',
       skill_2: 'Description 2'
     };
-    _sampleSubtopic = SubtopicObjectFactory.create(
+    _sampleSubtopic = subtopicObjectFactory.create(
       sampleSubtopicBackendObject, sampleSkillIdToDesriptionMap);
-  }));
+  });
 
-  it('should not find issues with a valid subtopic', function() {
+  it('should not find issues with a valid subtopic', () => {
     expect(_sampleSubtopic.validate()).toEqual([]);
   });
 
-  it('should validate the subtopic', function() {
+  it('should validate the subtopic', () => {
     _sampleSubtopic.setTitle('');
 
     expect(
@@ -53,18 +56,18 @@ describe('Subtopic object factory', function() {
   });
 
   it('should be able to create a subtopic object with given title and id',
-    function() {
-      var subtopic = SubtopicObjectFactory.createFromTitle(2, 'Title2');
+    () => {
+      var subtopic = subtopicObjectFactory.createFromTitle(2, 'Title2');
       expect(subtopic.getId()).toBe(2);
       expect(subtopic.getTitle()).toBe('Title2');
       expect(subtopic.getSkillSummaries()).toEqual([]);
     });
 
-  it('should not add duplicate elements to skill ids list', function() {
+  it('should not add duplicate elements to skill ids list', () => {
     expect(_sampleSubtopic.addSkill('skill_1', 'Description 1')).toEqual(false);
   });
 
-  it('should correctly remove a skill id', function() {
+  it('should correctly remove a skill id', () => {
     _sampleSubtopic.removeSkill('skill_1');
     expect(_sampleSubtopic.getSkillSummaries().length).toEqual(1);
     expect(_sampleSubtopic.getSkillSummaries()[0].getId()).toEqual('skill_2');

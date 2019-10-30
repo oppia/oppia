@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Models for topics and related constructs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -51,12 +53,16 @@ class TopicModel(base_models.VersionedModel):
     canonical_name = ndb.StringProperty(required=True, indexed=True)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
-    # This consists of the list of canonical story ids that are part of
-    # this topic.
-    canonical_story_ids = ndb.StringProperty(repeated=True, indexed=True)
-    # This consists of the list of additional (non-canonical) story ids that
+    # This consists of the list of objects referencing canonical stories that
     # are part of this topic.
-    additional_story_ids = ndb.StringProperty(repeated=True, indexed=True)
+    canonical_story_references = ndb.JsonProperty(repeated=True, indexed=False)
+    # This consists of the list of objects referencing additional stories that
+    # are part of this topic.
+    additional_story_references = ndb.JsonProperty(repeated=True, indexed=False)
+    # The schema version for the story reference object on each of the above 2
+    # lists.
+    story_reference_schema_version = ndb.IntegerProperty(
+        required=True, indexed=True)
     # This consists of the list of uncategorized skill ids that are not part of
     # any subtopic.
     uncategorized_skill_ids = ndb.StringProperty(repeated=True, indexed=True)
@@ -68,6 +74,11 @@ class TopicModel(base_models.VersionedModel):
     next_subtopic_id = ndb.IntegerProperty(required=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Topic should be kept if it is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -196,6 +207,11 @@ class TopicSummaryModel(base_models.BaseModel):
     subtopic_count = ndb.IntegerProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Topic summary should be kept if associated topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
@@ -219,13 +235,18 @@ class SubtopicPageModel(base_models.VersionedModel):
     # The topic id that this subtopic is a part of.
     topic_id = ndb.StringProperty(required=True, indexed=True)
     # The json data of the subtopic consisting of subtitled_html,
-    # content_ids_to_audio_translations and written_translations fields.
+    # recorded_voiceovers and written_translations fields.
     page_contents = ndb.JsonProperty(required=True)
     # The schema version for the page_contents field.
     page_contents_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
     # The ISO 639-1 code for the language this subtopic page is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Subtopic should be kept if associated topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -315,6 +336,11 @@ class TopicRightsModel(base_models.VersionedModel):
     # Whether this topic is published.
     topic_is_published = ndb.BooleanProperty(
         indexed=True, required=True, default=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Topic rights should be kept if associated topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def get_by_user(cls, user_id):

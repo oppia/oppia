@@ -21,17 +21,14 @@ require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 
-oppia.constant('QUESTION_PROPERTY_LANGUAGE_CODE', 'language_code');
-oppia.constant('QUESTION_PROPERTY_QUESTION_STATE_DATA', 'question_state_data');
+require('domain/question/question-domain.constants.ajs.ts');
 
-oppia.constant('CMD_UPDATE_QUESTION_PROPERTY', 'update_question_property');
-
-oppia.factory('QuestionUpdateService', [
-  'ChangeObjectFactory', 'QuestionObjectFactory', 'QuestionUndoRedoService',
+angular.module('oppia').factory('QuestionUpdateService', [
+  'ChangeObjectFactory', 'QuestionUndoRedoService',
   'CMD_UPDATE_QUESTION_PROPERTY', 'QUESTION_PROPERTY_LANGUAGE_CODE',
   'QUESTION_PROPERTY_QUESTION_STATE_DATA',
   function(
-      ChangeObjectFactory, QuestionObjectFactory, QuestionUndoRedoService,
+      ChangeObjectFactory, QuestionUndoRedoService,
       CMD_UPDATE_QUESTION_PROPERTY, QUESTION_PROPERTY_LANGUAGE_CODE,
       QUESTION_PROPERTY_QUESTION_STATE_DATA) {
     var _applyChange = function(question, command, params, apply, reverse) {

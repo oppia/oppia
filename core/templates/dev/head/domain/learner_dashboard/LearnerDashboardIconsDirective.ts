@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.directive('learnerDashboardIcons', [
+angular.module('oppia').directive('learnerDashboardIcons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -36,11 +36,13 @@ oppia.directive('learnerDashboardIcons', [
       controller: [
         '$scope', 'LearnerDashboardIdsBackendApiService',
         'LearnerDashboardActivityIdsObjectFactory',
-        'LearnerPlaylistService',
+        'LearnerPlaylistService', 'ACTIVITY_TYPE_COLLECTION',
+        'ACTIVITY_TYPE_EXPLORATION',
         function(
             $scope, LearnerDashboardIdsBackendApiService,
             LearnerDashboardActivityIdsObjectFactory,
-            LearnerPlaylistService) {
+            LearnerPlaylistService, ACTIVITY_TYPE_COLLECTION,
+            ACTIVITY_TYPE_EXPLORATION) {
           $scope.activityIsCurrentlyHoveredOver = true;
           $scope.playlistTooltipIsEnabled = false;
           $scope.enablePlaylistTooltip = function() {
@@ -59,7 +61,7 @@ oppia.directive('learnerDashboardIcons', [
             function(response) {
               $scope.learnerDashboardActivityIds = (
                 LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
-                  response.data.learner_dashboard_activity_ids));
+                  response.learner_dashboard_activity_ids));
             }
           );
 
@@ -86,11 +88,11 @@ oppia.directive('learnerDashboardIcons', [
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
               /* eslint-disable max-len */
-              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+              if (activityType === ACTIVITY_TYPE_EXPLORATION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToExplorationPlaylist(
                     $scope.getActivityId()));
-              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+              } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToCollectionPlaylist(
                     $scope.getActivityId()));
@@ -103,11 +105,11 @@ oppia.directive('learnerDashboardIcons', [
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
               /* eslint-disable max-len */
-              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+              if (activityType === ACTIVITY_TYPE_EXPLORATION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToCompletedExplorations(
                     $scope.getActivityId()));
-              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+              } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToCompletedCollections(
                     $scope.getActivityId()));
@@ -120,11 +122,11 @@ oppia.directive('learnerDashboardIcons', [
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
               /* eslint-disable max-len */
-              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+              if (activityType === ACTIVITY_TYPE_EXPLORATION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToIncompleteExplorations(
                     $scope.getActivityId()));
-              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+              } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
                 return (
                   $scope.learnerDashboardActivityIds.belongsToIncompleteCollections(
                     $scope.getActivityId()));
@@ -138,12 +140,12 @@ oppia.directive('learnerDashboardIcons', [
               LearnerPlaylistService.addToLearnerPlaylist(
                 activityId, activityType));
             if (isSuccessfullyAdded) {
-              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+              if (activityType === ACTIVITY_TYPE_EXPLORATION) {
                 /* eslint-disable max-len */
                 $scope.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
                   activityId);
                 /* eslint-enable max-len */
-              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+              } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
                 /* eslint-disable max-len */
                 $scope.learnerDashboardActivityIds.addToCollectionLearnerPlaylist(
                   activityId);

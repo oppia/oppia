@@ -13,10 +13,16 @@
 # limitations under the License.
 
 """Models for storing the question data models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import math
 
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
+import feconf
+import python_utils
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -41,7 +47,7 @@ class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.
 
     The ID of instances of this class has the form
-    {{random_hash_of_16_chars}}
+    {{random_hash_of_12_chars}}
     """
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
@@ -54,11 +60,19 @@ class QuestionModel(base_models.VersionedModel):
         required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The skill ids linked to this question.
+    linked_skill_ids = ndb.StringProperty(
+        indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Question should be kept but the creator should be anonymized."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def _get_new_id(cls):
         """Generates a unique ID for the question of the form
-        {{random_hash_of_16_chars}}
+        {{random_hash_of_12_chars}}
 
         Returns:
            new_id: int. ID of the new QuestionModel instance.
@@ -68,9 +82,10 @@ class QuestionModel(base_models.VersionedModel):
             producing too many collisions.
         """
 
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
+                python_utils.UNICODE(
+                    utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             if not cls.get_by_id(new_id):
                 return new_id
@@ -116,7 +131,7 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-            cls, question_state_data, language_code, version):
+            cls, question_state_data, language_code, version, linked_skill_ids):
         """Creates a new QuestionModel entry.
 
         Args:
@@ -125,6 +140,7 @@ class QuestionModel(base_models.VersionedModel):
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
             version: str. The version of the question.
+            linked_skill_ids: list(str). The skill ids linked to the question.
 
         Returns:
             QuestionModel. Instance of the new QuestionModel entry.
@@ -137,9 +153,20 @@ class QuestionModel(base_models.VersionedModel):
             id=instance_id,
             question_state_data=question_state_data,
             language_code=language_code,
-            version=version)
+            version=version,
+            linked_skill_ids=linked_skill_ids)
 
         return question_model_instance
+
+    @classmethod
+    def put_multi_questions(cls, questions):
+        """Puts multiple question models into the datastore.
+
+        Args:
+            questions: list(Question). The list of question objects
+            to put into the datastore.
+        """
+        cls.put_multi(questions)
 
 
 class QuestionSkillLinkModel(base_models.BaseModel):
@@ -155,6 +182,13 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     skill_id = ndb.StringProperty(required=True, indexed=True)
     # The difficulty of the skill.
     skill_difficulty = ndb.FloatProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Question-skill link should be kept since questions are only
+        anonymized and are not deleted whe user is deleted.
+        """
+        return base_models.DELETION_POLICY.KEEP
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -199,7 +233,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
-    def get_question_skill_links_and_skill_descriptions(
+    def get_question_skill_links_by_skill_ids(
             cls, question_count, skill_ids, start_cursor):
         """Fetches the list of QuestionSkillLinkModels linked to the skill in
         batches.
@@ -212,12 +246,15 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 questions are to be returned. This value should be urlsafe.
 
         Returns:
-            list(QuestionSkillLinkModel), list(str), str|None. The
-                QuestionSkillLinkModels corresponding to given skill_ids, the
-                corresponding skill descriptions and the next cursor value to be
+            list(QuestionSkillLinkModel), str|None. The QuestionSkillLinkModels
+                corresponding to given skill_ids, the next cursor value to be
                 used for the next page (or None if no more pages are left). The
                 returned next cursor value is urlsafe.
         """
+        question_skill_count = min(
+            len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
+        ) * question_count
+
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
             question_skill_link_models, next_cursor, more = cls.query(
@@ -226,23 +263,166 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # resolve conflicts, if any.
                 # Reference SO link: https://stackoverflow.com/q/12449197
             ).order(-cls.last_updated, cls.key).fetch_page(
-                question_count,
+                question_skill_count,
                 start_cursor=cursor
             )
         else:
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(-cls.last_updated, cls.key).fetch_page(
-                question_count
+                question_skill_count
             )
-
-        skill_ids = [model.skill_id for model in question_skill_link_models]
-        skills = skill_models.SkillModel.get_multi(skill_ids)
-        skill_descriptions = [skill.description for skill in skills]
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
-        return question_skill_link_models, skill_descriptions, next_cursor_str
+        return question_skill_link_models, next_cursor_str
+
+    @classmethod
+    def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
+            cls, total_question_count, skill_ids, difficulty_requested):
+        """Fetches the list of constant number of QuestionSkillLinkModels
+        linked to the skills, sorted by the absolute value of the difference
+        between skill difficulty and the requested difficulty.
+
+        Args:
+            total_question_count: int. The number of questions expected.
+            skill_ids: list(str). The ids of skills for which the linked
+                question ids are to be retrieved.
+            difficulty_requested: float. The skill difficulty of the questions
+                requested to be fetched.
+
+        Returns:
+            list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
+                corresponding to given skill_ids, with
+                total_question_count/len(skill_ids) number of questions for
+                each skill. If not evenly divisible, it will be rounded up.
+                If not enough questions for a skill, just return all questions
+                it links to. The order of questions will follow the order of
+                given skill ids, and the order of questions for the same skill
+                follows the absolute value of the difference between skill
+                difficulty and the requested difficulty.
+        """
+        if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
+            raise Exception('Please keep the number of skill IDs below 20.')
+
+        question_count_per_skill = int(
+            math.ceil(python_utils.divide(
+                float(total_question_count), float(len(skill_ids)))))
+
+        question_skill_link_mapping = {}
+
+        for skill_id in skill_ids:
+            query = cls.query(cls.skill_id == skill_id)
+
+            equal_questions_query = query.filter(
+                cls.skill_difficulty == difficulty_requested)
+            # We fetch more questions here in order to try and ensure that the
+            # eventual number of returned questions is sufficient to meet the
+            # number requested, even after deduplication.
+            new_question_skill_link_models = (
+                equal_questions_query.fetch(question_count_per_skill * 2))
+            for model in new_question_skill_link_models:
+                if model.question_id in question_skill_link_mapping:
+                    new_question_skill_link_models.remove(model)
+
+            if len(new_question_skill_link_models) < question_count_per_skill:
+                # Fetch QuestionSkillLinkModels with difficulty smaller than
+                # requested difficulty and sort them by decreasing difficulty.
+                easier_questions_query = query.filter(
+                    cls.skill_difficulty < difficulty_requested)
+                easier_questions_query = easier_questions_query.order(
+                    -cls.skill_difficulty)
+                easier_question_skill_link_models = (
+                    easier_questions_query.fetch(question_count_per_skill))
+                for model in easier_question_skill_link_models:
+                    if model.question_id in question_skill_link_mapping:
+                        easier_question_skill_link_models.remove(model)
+                new_question_skill_link_models.extend(
+                    easier_question_skill_link_models)
+
+                if (len(new_question_skill_link_models) <
+                        question_count_per_skill):
+                    # Fetch QuestionSkillLinkModels with difficulty larger than
+                    # requested difficulty and sort them by increasing
+                    # difficulty.
+                    harder_questions_query = query.filter(
+                        cls.skill_difficulty > difficulty_requested)
+                    harder_questions_query = harder_questions_query.order(
+                        cls.skill_difficulty)
+                    harder_question_skill_link_models = (
+                        harder_questions_query.fetch(question_count_per_skill))
+                    for model in harder_question_skill_link_models:
+                        if model.question_id in question_skill_link_mapping:
+                            harder_question_skill_link_models.remove(model)
+                    new_question_skill_link_models.extend(
+                        harder_question_skill_link_models)
+
+                # Sort QuestionSkillLinkModels by the difference between their
+                # difficulty and requested difficulty.
+                new_question_skill_link_models = sorted(
+                    new_question_skill_link_models,
+                    key=lambda model: abs(
+                        model.skill_difficulty - difficulty_requested)
+                )
+            new_question_skill_link_models = (
+                new_question_skill_link_models[:question_count_per_skill])
+
+            for model in new_question_skill_link_models:
+                if model.question_id not in question_skill_link_mapping:
+                    question_skill_link_mapping[model.question_id] = model
+
+        return list(question_skill_link_mapping.values())
+
+    @classmethod
+    def get_question_skill_links_equidistributed_by_skill(
+            cls, total_question_count, skill_ids):
+        """Fetches the list of constant number of QuestionSkillLinkModels
+        linked to the skills.
+
+        Args:
+            total_question_count: int. The number of questions expected.
+            skill_ids: list(str). The ids of skills for which the linked
+                question ids are to be retrieved.
+
+        Returns:
+            list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
+                corresponding to given skill_ids, with
+                total_question_count/len(skill_ids) number of questions for
+                each skill. If not evenly divisible, it will be rounded up.
+                If not enough questions for a skill, just return all questions
+                it links to. The order of questions will follow the order of
+                given skill ids, but the order of questions for the same skill
+                is random.
+        """
+        if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
+            raise Exception('Please keep the number of skill IDs below 20.')
+
+        question_count_per_skill = int(
+            math.ceil(
+                python_utils.divide(
+                    float(total_question_count), float(len(skill_ids)))))
+        question_skill_link_models = []
+        existing_question_ids = []
+
+        for skill_id in skill_ids:
+            query = cls.query(cls.skill_id == skill_id)
+            # We fetch more questions here in order to try and ensure that the
+            # eventual number of returned questions is sufficient to meet the
+            # number requested, even after deduplication.
+            new_question_skill_link_models = query.fetch(
+                question_count_per_skill * 2)
+
+            # Deduplicate if the same question is linked to multiple skills.
+            for model in new_question_skill_link_models:
+                if model.question_id in existing_question_ids:
+                    new_question_skill_link_models.remove(model)
+
+            question_skill_link_models.extend(
+                new_question_skill_link_models[:question_count_per_skill])
+            existing_question_ids.extend(
+                [model.question_id for model in new_question_skill_link_models])
+
+        return question_skill_link_models
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(cls, skill_id):
@@ -371,6 +551,13 @@ class QuestionSummaryModel(base_models.BaseModel):
     # The html content for the question.
     question_content = ndb.TextProperty(indexed=False, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question summary should be kept but the creator should be
+        anonymized.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     @classmethod
     def get_by_creator_id(cls, creator_id):
         """Gets QuestionSummaryModel by creator_id.
@@ -408,3 +595,10 @@ class QuestionRightsModel(base_models.VersionedModel):
 
     # The user ID of the creator of the question.
     creator_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Question rights should be kept but the creator should be
+        anonymized.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE

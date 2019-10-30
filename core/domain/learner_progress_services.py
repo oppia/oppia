@@ -15,10 +15,12 @@
 # limitations under the License.
 
 """Services for tracking the progress of the learner."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import collection_services
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_domain
 from core.domain import subscription_services
@@ -428,26 +430,6 @@ def _remove_activity_ids_from_playlist(
             learner_playlist.remove_collection_id(collection_id)
 
         learner_playlist_services.save_learner_playlist(learner_playlist)
-
-
-def remove_exp_from_completed_list(user_id, exploration_id):
-    """Removes the exploration from the completed list of the user
-    (if present).
-
-    Args:
-        user_id: str. The id of the user.
-        exploration_id: str. The id of the exploration to be removed.
-    """
-    completed_activities_model = (
-        user_models.CompletedActivitiesModel.get(
-            user_id, strict=False))
-
-    if completed_activities_model:
-        activities_completed = _get_completed_activities_from_model(
-            completed_activities_model)
-        if exploration_id in activities_completed.exploration_ids:
-            activities_completed.remove_exploration_id(exploration_id)
-            _save_completed_activities(activities_completed)
 
 
 def remove_collection_from_completed_list(user_id, collection_id):
@@ -1028,19 +1010,19 @@ def get_activity_progress(user_id):
     collection_playlist_models = activity_models[5]
 
     incomplete_exp_summaries = (
-        [exp_services.get_exploration_summary_from_model(model)
+        [exp_fetchers.get_exploration_summary_from_model(model)
          if model else None for model in incomplete_exploration_models])
     incomplete_collection_summaries = (
         [collection_services.get_collection_summary_from_model(model)
          if model else None for model in incomplete_collection_models])
     completed_exp_summaries = (
-        [exp_services.get_exploration_summary_from_model(model)
+        [exp_fetchers.get_exploration_summary_from_model(model)
          if model else None for model in completed_exploration_models])
     completed_collection_summaries = (
         [collection_services.get_collection_summary_from_model(model)
          if model else None for model in completed_collection_models])
     exploration_playlist_summaries = (
-        [exp_services.get_exploration_summary_from_model(model)
+        [exp_fetchers.get_exploration_summary_from_model(model)
          if model else None for model in exploration_playlist_models])
     collection_playlist_summaries = (
         [collection_services.get_collection_summary_from_model(model)

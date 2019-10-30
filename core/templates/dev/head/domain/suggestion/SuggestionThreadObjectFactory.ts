@@ -17,12 +17,10 @@
    thread domain objects.
  */
 
-require('domain/suggestion/QuestionSuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');
 
-oppia.factory('SuggestionThreadObjectFactory', [
-  'QuestionSuggestionObjectFactory', 'SuggestionObjectFactory',
-  function(QuestionSuggestionObjectFactory, SuggestionObjectFactory) {
+angular.module('oppia').factory('SuggestionThreadObjectFactory', [
+  'SuggestionObjectFactory', function(SuggestionObjectFactory) {
     var SuggestionThread = function(
         status, subject, summary, originalAuthorName, lastUpdated, messageCount,
         threadId, suggestion) {
@@ -37,16 +35,13 @@ oppia.factory('SuggestionThreadObjectFactory', [
       this.messages = [];
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SuggestionThread['createFromBackendDicts'] = function(
     /* eslint-enable dot-notation */
         suggestionThreadBackendDict, suggestionBackendDict) {
       var suggestion;
-      if (suggestionBackendDict.suggestion_type === 'add_question') {
-        suggestion = QuestionSuggestionObjectFactory.createFromBackendDict(
-          suggestionBackendDict);
-      } else if (suggestionBackendDict.suggestion_type ===
+      if (suggestionBackendDict.suggestion_type ===
           'edit_exploration_state_content') {
         suggestion = SuggestionObjectFactory.createFromBackendDict(
           suggestionBackendDict);

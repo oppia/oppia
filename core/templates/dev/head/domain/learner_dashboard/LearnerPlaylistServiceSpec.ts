@@ -16,34 +16,55 @@
  * @fileoverview Tests for LearnerPlaylistService.js.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/learner_dashboard/LearnerPlaylistService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
   var $httpBackend = null;
   var $rootScope = null;
-  var activityType = constants.ACTIVITY_TYPE_EXPLORATION;
+  var activityType = null;
   var UrlInterpolationService = null;
   var activityId = '1';
   var addToLearnerPlaylistUrl = '';
   var AlertsService = null;
+  var CsrfService = null;
   var spyInfoMessage = null;
   var spySuccessMessage = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     $httpBackend = $injector.get('$httpBackend');
     LearnerPlaylistService = $injector.get(
       'LearnerPlaylistService');
     $rootScope = $injector.get('$rootScope');
+    activityType = $injector.get('ACTIVITY_TYPE_EXPLORATION');
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     AlertsService = $injector.get('AlertsService');
     spyOn(AlertsService, 'addInfoMessage').and.callThrough();
     spyOn(AlertsService, 'addSuccessMessage').and.callThrough();
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
   }));
 
   beforeEach(function() {

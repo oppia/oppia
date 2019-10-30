@@ -16,22 +16,43 @@
  * @fileoverview Unit tests for EditableSkillBackendApiService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Editable skill backend API service', function() {
   var EditableSkillBackendApiService = null;
   var UndoRedoService = null;
   var $httpBackend = null;
   var sampleResponse = null;
+  var CsrfService = null;
+  var sampleResponse2 = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     EditableSkillBackendApiService = $injector.get(
       'EditableSkillBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
     $httpBackend = $injector.get('$httpBackend');
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
 
     var misconceptionDict1 = {
       id: '2',
@@ -61,8 +82,21 @@ describe('Editable skill backend API service', function() {
       version: 3
     };
 
+    var skillDict2 = {
+      id: '2',
+      description: 'test description 2',
+      misconceptions: [misconceptionDict1],
+      skill_contents: skillContentsDict,
+      language_code: 'en',
+      version: 2
+    };
+
     sampleResponse = {
       skill: skillDict
+    };
+
+    sampleResponse2 = {
+      skills: [skillDict, skillDict2]
     };
   }));
 
@@ -117,10 +151,9 @@ describe('Editable skill backend API service', function() {
         });
       $httpBackend.flush();
 
-      $httpBackend.expect('PUT', '/skill_editor_handler/data/1')
-        .respond({
-          skill: skillDict
-        });
+      $httpBackend.expect('PUT', '/skill_editor_handler/data/1').respond({
+        skill: skillDict
+      });
 
       EditableSkillBackendApiService.updateSkill(
         skillDict.id, skillDict.version, 'commit message', []
@@ -128,6 +161,21 @@ describe('Editable skill backend API service', function() {
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(skillDict);
+      expect(failHandler).not.toHaveBeenCalled();
+    });
+
+  it('should succesfully fetch multiple existing skills from the backend',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      var skillDataUrl = '/skill_data_handler/' + encodeURIComponent('1,2');
+      $httpBackend.expect('GET', skillDataUrl).respond(sampleResponse2);
+      EditableSkillBackendApiService.fetchMultiSkills(['1', '2']).then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalledWith(sampleResponse2.skills);
       expect(failHandler).not.toHaveBeenCalled();
     });
 });

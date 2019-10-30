@@ -17,7 +17,7 @@
  * SubtitledHtml domain objects.
  */
 
-oppia.factory('GenerateContentIdService', [
+angular.module('oppia').factory('GenerateContentIdService', [
   'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
   'COMPONENT_NAME_WORKED_EXAMPLE', function(
       COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,

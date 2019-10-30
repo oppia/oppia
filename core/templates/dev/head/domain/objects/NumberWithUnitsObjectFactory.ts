@@ -20,15 +20,7 @@
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/objects/UnitsObjectFactory.ts');
 
-oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
-  INVALID_VALUE:
-    'Please ensure that value is either a fraction or a number',
-  INVALID_CURRENCY:
-    'Please enter a valid currency (e.g., $5 or Rs 5)',
-  INVALID_CURRENCY_FORMAT: 'Please write currency units at the beginning',
-  INVALID_UNIT_CHARS:
-    'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, /, -'
-});
+require('domain/objects/objects-domain.constants.ajs.ts');
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
@@ -42,34 +34,8 @@ oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
       (like- $, Rs, ₹). Keep it an empty list if no symbol is needed.
     base_unit: Define the unit in terms of base unit only if the defined custom
       unit is a sub unit else assign it 'null' value.*/
-oppia.constant('CURRENCY_UNITS', {
-  dollar: {
-    name: 'dollar',
-    aliases: ['$', 'dollars', 'Dollars', 'Dollar', 'USD'],
-    front_units: ['$'],
-    base_unit: null
-  },
-  rupee: {
-    name: 'rupee',
-    aliases: ['Rs', 'rupees', '₹', 'Rupees', 'Rupee'],
-    front_units: ['Rs ', '₹'],
-    base_unit: null
-  },
-  cent: {
-    name: 'cent',
-    aliases: ['cents', 'Cents', 'Cent'],
-    front_units: [],
-    base_unit: '0.01 dollar'
-  },
-  paise: {
-    name: 'paise',
-    aliases: ['paisa', 'Paise', 'Paisa'],
-    front_units: [],
-    base_unit: '0.01 rupee'
-  }
-});
 
-oppia.factory('NumberWithUnitsObjectFactory', [
+angular.module('oppia').factory('NumberWithUnitsObjectFactory', [
   'FractionObjectFactory', 'UnitsObjectFactory', 'CURRENCY_UNITS',
   'NUMBER_WITH_UNITS_PARSING_ERRORS', function(
       FractionObjectFactory, UnitsObjectFactory, CURRENCY_UNITS,
@@ -133,7 +99,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       };
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['createCurrencyUnits'] = function() {
     /* eslint-enable dot-notation */
@@ -142,7 +108,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       } catch (parsingError) {}
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['fromRawInputString'] = function(rawInput) {
     /* eslint-enable dot-notation */
@@ -251,7 +217,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       return new NumberWithUnits(type, real, fractionObj, unitsObj);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['fromDict'] = function(numberWithUnitsDict) {
     /* eslint-enable dot-notation */

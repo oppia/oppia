@@ -16,16 +16,84 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// QuestionObjectFactory.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { MisconceptionObjectFactory } from
+  'domain/skill/MisconceptionObjectFactory';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
-  var MisconceptionObjectFactory = null;
+  var misconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+        new ParamChangeObjectFactory()));
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(function() {
     angular.mock.module(function($provide) {
@@ -39,7 +107,14 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+    // The injector is required because this service is directly used in this
+    // spec, therefore even though MisconceptionObjectFactory is upgraded to
+    // Angular, it cannot be used just by instantiating it by its class but
+    // instead needs to be injected. Note that 'misconceptionObjectFactory' is
+    // the injected service instance whereas 'MisconceptionObjectFactory' is the
+    // service class itself. Therefore, use the instance instead of the class in
+    // the specs.
+    misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
     _sampleQuestionBackendDict = {
       id: 'question_id',
@@ -114,7 +189,8 @@ describe('Question object factory', function() {
             content_4: {},
             content_5: {}
           }
-        }
+        },
+        solicit_answer_details: false
       },
       language_code: 'en',
       version: 1
@@ -148,16 +224,22 @@ describe('Question object factory', function() {
 
   it('should correctly validate question', function() {
     var interaction = _sampleQuestion.getStateData().interaction;
-    var misconception1 = MisconceptionObjectFactory.create(
+    var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback');
-    var misconception2 = MisconceptionObjectFactory.create(
+    var misconception2 = misconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
+    var misconception3 = misconceptionObjectFactory.create(
+      'id_3', 'name_3', 'notes', 'feedback');
+    var misconceptionsDict = {
+      skillId1: [misconception1],
+      skillId2: [misconception2, misconception3]
+    };
     expect(
-      _sampleQuestion.validate([misconception1, misconception2])).toEqual(
-      'The following misconceptions should also be caught: name, name_2.' +
-      ' Click on (or create) an answer that is neither marked correct nor ' +
-      'is a default answer (marked above as [All other answers]) to tag a ' +
-      'misconception to that answer group.');
+      _sampleQuestion.validate(misconceptionsDict)).toEqual(
+      'The following misconceptions should also be caught: name, name_2, ' +
+      'name_3. Click on (or create) an answer that is neither marked correct ' +
+      'nor is a default answer (marked above as [All other answers]) to tag ' +
+      'a misconception to that answer group.');
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     expect(_sampleQuestion.validate([])).toEqual(

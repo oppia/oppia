@@ -17,14 +17,16 @@
  * card domain objects used in the exploration player.
  */
 
-require('pages/exploration_player/AudioTranslationLanguageService.ts');
+require(
+  'pages/exploration-player-page/services/' +
+  'audio-translation-language.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
-oppia.factory('StateCardObjectFactory', [
-  'AudioTranslationLanguageService', 'ExplorationHtmlFormatterService',
+angular.module('oppia').factory('StateCardObjectFactory', [
+  'AudioTranslationLanguageService',
   'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
   function(
-      AudioTranslationLanguageService, ExplorationHtmlFormatterService,
+      AudioTranslationLanguageService,
       INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
     var StateCard = function(
         stateName, contentHtml, interactionHtml, interaction,
@@ -170,8 +172,18 @@ oppia.factory('StateCardObjectFactory', [
     };
 
     StateCard.prototype.setLastOppiaResponse = function(response) {
-      this._inputResponsePairs[
-        this._inputResponsePairs.length - 1].oppiaResponse = response;
+      // This check is added here to ensure that this._inputReponsePairs is
+      // accessed only if there is atleast one input response pair present.
+      // In the editor preview tab if a user clicks on restart from beginning
+      // option just after submitting an answer for a card while the response
+      // is still loading, this function is called after
+      // this._inputResponsePairs is set to null as we are starting from the
+      // first card again. Adding a check here makes sure that element at index
+      // -1 is not accessed even in the above case.
+      if (this._inputResponsePairs.length >= 1) {
+        this._inputResponsePairs[
+          this._inputResponsePairs.length - 1].oppiaResponse = response;
+      }
     };
 
     StateCard.prototype.setInteractionHtml = function(interactionHtml) {
@@ -187,7 +199,7 @@ oppia.factory('StateCardObjectFactory', [
      * @param {Interaction} interaction - An interaction object that stores all
      *        the properties of the card's interaction.
      */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     StateCard['createNewCard'] = function(
     /* eslint-enable dot-notation */

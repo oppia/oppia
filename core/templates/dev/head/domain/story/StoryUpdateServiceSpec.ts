@@ -16,21 +16,48 @@
  * @fileoverview Tests for Story update service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// StoryUpdateService.ts is upgraded to Angular 8.
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory';
+import { StoryContentsObjectFactory } from
+  'domain/story/StoryContentsObjectFactory';
+import { StoryNodeObjectFactory } from
+  'domain/story/StoryNodeObjectFactory';
+import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/story/StoryObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
 
 describe('Story update service', function() {
   var StoryUpdateService = null;
-  var StoryObjectFactory = null;
+  var storyObjectFactory = null;
   var UndoRedoService = null;
   var _sampleStory = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value(
+      'StoryContentsObjectFactory', new StoryContentsObjectFactory(
+        new StoryNodeObjectFactory()));
+    $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
+    $provide.value(
+      'StoryObjectFactory', new StoryObjectFactory(
+        new StoryContentsObjectFactory(new StoryNodeObjectFactory())));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     StoryUpdateService = $injector.get('StoryUpdateService');
-    StoryObjectFactory = $injector.get('StoryObjectFactory');
+    storyObjectFactory = $injector.get('StoryObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
 
     var sampleStoryBackendObject = {
@@ -39,6 +66,7 @@ describe('Story update service', function() {
       description: 'Story description',
       notes: 'Story notes',
       version: 1,
+      corresponding_topic_id: 'topic_id',
       story_contents: {
         initial_node_id: 'node_2',
         nodes: [
@@ -65,7 +93,7 @@ describe('Story update service', function() {
       },
       language_code: 'en'
     };
-    _sampleStory = StoryObjectFactory.createFromBackendDict(
+    _sampleStory = storyObjectFactory.createFromBackendDict(
       sampleStoryBackendObject);
   }));
 

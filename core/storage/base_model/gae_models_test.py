@@ -15,11 +15,16 @@
 # limitations under the License.
 
 """Tests for core.storage.base_model.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import types
 
 from constants import constants
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -27,12 +32,20 @@ import feconf
 class BaseModelUnitTests(test_utils.GenericTestBase):
     """Test the generic base model."""
 
+    def test_get_deletion_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_deletion_policy()
+
     def tearDown(self):
         """Deletes all model entities."""
         for entity in base_models.BaseModel.get_all():
             entity.delete()
 
         super(BaseModelUnitTests, self).tearDown()
+
+    def test_has_reference_to_user_id(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.has_reference_to_user_id('user_id')
 
     def test_error_cases_for_get_method(self):
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
@@ -42,6 +55,14 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         self.assertIsNone(
             base_models.BaseModel.get('Invalid id', strict=False))
+
+    def test_base_model_export_data_raises_not_implemented_error(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.export_data('user_id')
+
+    def test_export_data(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.export_data('user_id')
 
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
@@ -107,7 +128,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])
-        for _ in range(100):
+        for _ in python_utils.RANGE(100):
             new_id = base_models.BaseModel.get_new_id('')
             self.assertNotIn(new_id, ids)
 
@@ -117,6 +138,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_get_new_id_method_does_not_fail_with_bad_names(self):
         base_models.BaseModel.get_new_id(None)
         base_models.BaseModel.get_new_id('¡Hola!')
+        base_models.BaseModel.get_new_id(u'¡Hola!')
         base_models.BaseModel.get_new_id(12345)
         base_models.BaseModel.get_new_id({'a': 'b'})
 
@@ -135,6 +157,43 @@ class TestVersionedModel(base_models.VersionedModel):
     """Model that inherits the VersionedModel for testing."""
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
+
+
+class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
+
+    def test_base_class_get_instance_id_raises_not_implemented_error(self):
+        # Raise NotImplementedError as _get_instance_id is to be overwritten
+        # in child classes of BaseCommitLogEntryModel.
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseCommitLogEntryModel.get_commit('id', 1)
+
+
+class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
+
+    def test_get_version_string(self):
+        model1 = base_models.BaseSnapshotMetadataModel(
+            id='model_id-1', committer_id='committer_id', commit_type='create')
+        model1.put()
+        self.assertEqual(model1.get_version_string(), '1')
+
+    def test_get_unversioned_instance_id(self):
+        model1 = base_models.BaseSnapshotMetadataModel(
+            id='model_id-1', committer_id='committer_id', commit_type='create')
+        model1.put()
+        self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
+
+
+class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_version_string(self):
+        model1 = base_models.BaseSnapshotContentModel(id='model_id-1')
+        model1.put()
+        self.assertEqual(model1.get_version_string(), '1')
+
+    def test_get_unversioned_instance_id(self):
+        model1 = base_models.BaseSnapshotContentModel(id='model_id-1')
+        model1.put()
+        self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
 
 
 class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -209,6 +268,76 @@ class VersionedModelTests(test_utils.GenericTestBase):
             TestVersionedModel.get_multi_versions(
                 'fake_id', [1, 2, 3])
 
+    def test_commit_with_model_instance_deleted_raises_error(self):
+        model1 = TestVersionedModel(id='model_id1')
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        model1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+
+        with self.assertRaisesRegexp(
+            Exception, 'This model instance has been deleted.'):
+            model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+    def test_trusted_commit_with_no_snapshot_metadata_raises_error(self):
+        model1 = TestVersionedModel(id='model_id1')
+        model1.SNAPSHOT_METADATA_CLASS = None
+        with self.assertRaisesRegexp(
+            Exception, 'No snapshot metadata class defined.'):
+            model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        model1 = TestVersionedModel(id='model_id1')
+        model1.SNAPSHOT_CONTENT_CLASS = None
+        with self.assertRaisesRegexp(
+            Exception, 'No snapshot content class defined.'):
+            model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        model1 = TestVersionedModel(id='model_id1')
+        with self.assertRaisesRegexp(
+            Exception, 'Expected commit_cmds to be a list of dicts, received'):
+            model1.commit(feconf.SYSTEM_COMMITTER_ID, '', {})
+
+        model1 = TestVersionedModel(id='model_id1')
+        with self.assertRaisesRegexp(
+            Exception, 'Expected commit_cmds to be a list of dicts, received'):
+            model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [[]])
+
+    def test_put_raises_not_implemented_error_for_versioned_models(self):
+        model1 = TestVersionedModel(id='model_id1')
+
+        with self.assertRaises(NotImplementedError):
+            model1.put()
+
+    def test_commit_with_invalid_change_list_raises_error(self):
+        model1 = TestVersionedModel(id='model_id1')
+
+        # Test for invalid commit command.
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid commit_cmd:'):
+            model1.commit(
+                feconf.SYSTEM_COMMITTER_ID, '', [{'invalid_cmd': 'value'}])
+
+        # Test for invalid change list command.
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid change list command:'):
+            model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [{'cmd': 'AUTO'}])
+
+    def test_revert_raises_error_when_not_allowed(self):
+        model1 = TestVersionedModel(id='model_id1')
+        with self.assertRaisesRegexp(
+            Exception,
+            'Reverting objects of type TestVersionedModel is not allowed.'):
+            model1.revert(model1, feconf.SYSTEM_COMMITTER_ID, '', 1)
+
+    def test_get_snapshots_metadata_with_invalid_model_raises_error(self):
+
+        model1 = TestVersionedModel(id='model_id1')
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid version number 10 for model TestVersionedModel with id '
+            'model_id1'):
+            model1.get_snapshots_metadata('model_id1', [10])
+
     def test_get_multi_versions(self):
         model1 = TestVersionedModel(id='model_id1')
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
@@ -235,3 +364,26 @@ class VersionedModelTests(test_utils.GenericTestBase):
             ValueError,
             'At least one version number is invalid'):
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2])
+
+
+class TestBaseModel(base_models.BaseModel):
+    """Model that inherits BaseModel for testing. This is required as BaseModel
+    gets subclassed a lot in other tests and that can create unexpected errors.
+    """
+    pass
+
+
+class BaseModelTests(test_utils.GenericTestBase):
+
+    def test_create_raises_error_when_many_id_collisions_occur(self):
+
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            TestBaseModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, TestBaseModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            TestBaseModel.get_new_id('exploration')

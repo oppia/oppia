@@ -15,11 +15,16 @@
 # limitations under the License.
 
 """Tests for state domain objects and methods defined on them."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
+import logging
 import os
+import re
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import state_domain
@@ -35,6 +40,42 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
+
+    def test_get_all_html_content_strings(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'owner_id', end_state_name='END',
+            interaction_id='DragAndDropSortInput')
+
+        list_of_sets_of_html_strings = ['<p>list_of_sets_of_html_strings</p>']
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [list_of_sets_of_html_strings]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        exploration.init_state.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_group_dict)]
+
+        html_list = (
+            exploration.init_state.interaction.get_all_html_content_strings())
+        self.assertEqual(
+            html_list,
+            ['<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>', '', ''])
 
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""
@@ -75,6 +116,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'default_outcome': {}
                 }
             },
+            'solicit_answer_details': False,
             'written_translations': {
                 'translations_mapping': {
                     'content': {},
@@ -95,7 +137,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         state_with_training_data = exploration.states['Home']
         state_without_training_data = exploration.states['End']
 
@@ -118,7 +160,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         state = exploration.states['text']
 
         expected_training_data = [{
@@ -129,6 +171,157 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         observed_training_data = state.get_training_data()
 
         self.assertEqual(observed_training_data, expected_training_data)
+
+    def test_get_content_html_with_correct_state_name_returns_html(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>hint one</p>')
+
+        hints_list[0]['hint_content']['html'] = '<p>Changed hint one</p>'
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
+
+    def test_get_content_html_with_invalid_content_id_raise_error(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>hint one</p>')
+
+        with self.assertRaisesRegexp(
+            ValueError, 'Content ID Invalid id does not exist'):
+            init_state.get_content_html('Invalid id')
+
+    def test_get_content_id_mapping_needing_translations_with_existing_translations(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome_dict = {
+            'dest': 'Introduction',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': '<p>The default outcome.</p>'},
+            'labelled_as_correct': False,
+            'missing_prerequisite_skill_id': None,
+            'param_changes': [],
+            'refresher_exploration_id': None
+        }
+
+        init_state.update_interaction_default_outcome(default_outcome_dict)
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            },
+        }
+
+        init_state.update_interaction_solution(solution_dict)
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                },
+                'hint_1': {},
+                'default_outcome': {},
+                'solution': {},
+                'feedback_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        init_state.update_written_translations(written_translations)
+
+        self.assertEqual(
+            init_state.get_content_id_mapping_needing_translations('hi'), {
+                'hint_1': '<p>hint one</p>',
+                'solution': '<p>hello_world is a string</p>',
+                'feedback_1': '<p>Feedback</p>',
+                'default_outcome': '<p>The default outcome.</p>'
+            })
+
+    def test_add_translation_works_correctly(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+
+        self.assertEqual(init_state.get_translation_counts(), {})
+
+        init_state.add_translation('content', 'hi', '<p>Translated text</p>')
+
+        self.assertEqual(init_state.get_translation_counts(), {'hi': 1})
 
     def test_state_operations(self):
         """Test adding, updating and checking existence of states."""
@@ -212,6 +405,24 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
+    def test_update_solicit_answer_details(self):
+        """Test updating solicit_answer_details."""
+        state = state_domain.State.create_default_state('state_1')
+        self.assertEqual(state.solicit_answer_details, False)
+        state.update_solicit_answer_details(True)
+        self.assertEqual(state.solicit_answer_details, True)
+
+    def test_update_solicit_answer_details_with_non_bool_fails(self):
+        """Test updating solicit_answer_details with non bool value."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, False)
+        with self.assertRaisesRegexp(Exception, (
+            'Expected solicit_answer_details to be a boolean, received')):
+            init_state.update_solicit_answer_details('abc')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, False)
+
     def test_convert_html_fields_in_state(self):
         """Test conversion of html strings in state."""
         state_dict = {
@@ -220,6 +431,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -252,6 +464,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -284,6 +497,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -317,6 +531,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -369,9 +584,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     state_dict, add_dimensions_to_image_tags),
                 state_dict_with_image_dimensions)
 
-    def test_subtitled_html_validation(self):
-        """Test validation of subtitled HTML."""
-        subtitled_html = state_domain.SubtitledHtml('content_id', 'some html')
+    def test_subtitled_html_validation_with_invalid_html_type(self):
+        """Test validation of subtitled HTML with invalid html type."""
+        subtitled_html = state_domain.SubtitledHtml(
+            'content_id', '<p>some html</p>')
         subtitled_html.validate()
 
         with self.assertRaisesRegexp(
@@ -380,54 +596,59 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'html', 20):
                 subtitled_html.validate()
 
+    def test_subtitled_html_validation_with_invalid_content(self):
+        """Test validation of subtitled HTML with invalid content."""
+        subtitled_html = state_domain.SubtitledHtml(
+            'content_id', '<p>some html</p>')
+        subtitled_html.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected content id to be a string, ' +
             'received 20'):
             with self.swap(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
 
-    def test_audio_translation_validation(self):
-        """Test validation of audio translations."""
-        audio_translation = state_domain.AudioTranslation('a.mp3', 20, True)
-        audio_translation.validate()
+    def test_voiceover_validation(self):
+        """Test validation of voiceover."""
+        audio_voiceover = state_domain.Voiceover('a.mp3', 20, True)
+        audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected audio filename to be a string'
             ):
-            with self.swap(audio_translation, 'filename', 20):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', 20):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid audio filename'
             ):
-            with self.swap(audio_translation, 'filename', '.invalidext'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', '.invalidext'):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid audio filename'
             ):
-            with self.swap(audio_translation, 'filename', 'justanextension'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', 'justanextension'):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid audio filename'
             ):
-            with self.swap(audio_translation, 'filename', 'a.invalidext'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', 'a.invalidext'):
+                audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected file size to be an int'
             ):
-            with self.swap(audio_translation, 'file_size_bytes', 'abc'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'file_size_bytes', 'abc'):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid file size'
             ):
-            with self.swap(audio_translation, 'file_size_bytes', -3):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'file_size_bytes', -3):
+                audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected needs_update to be a bool'
             ):
-            with self.swap(audio_translation, 'needs_update', 'hello'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'needs_update', 'hello'):
+                audio_voiceover.validate()
 
     def test_written_translation_validation(self):
         """Test validation of translation script."""
@@ -457,7 +678,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_1',
-                'html': 'hint one'
+                'html': '<p>hint one</p>'
             },
         })
         init_state.update_interaction_hints(hints_list)
@@ -467,7 +688,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': '<p>hello_world is a string</p>'
             },
         }
 
@@ -477,19 +698,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_2',
-                'html': 'new hint'
+                'html': '<p>new hint</p>'
             }
         })
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
             init_state.interaction.hints[1].hint_content.html,
-            'new hint')
+            '<p>new hint</p>')
 
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_3',
-                'html': 'hint three'
+                'html': '<p>hint three</p>'
             }
         })
         init_state.update_interaction_hints(hints_list)
@@ -515,7 +736,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_1',
-                'html': {}
+                'html': ''
             },
         })
         init_state.update_interaction_hints(hints_list)
@@ -524,7 +745,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': [0, 0],
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': '<p>hello_world is a string</p>'
             }
         }
 
@@ -539,11 +760,629 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': '<p>hello_world is a string</p>'
             }
         }
         init_state.update_interaction_solution(solution)
         exploration.validate()
+
+    def test_validate_state_solicit_answer_details(self):
+        """Test validation of solicit_answer_details."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, False)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected solicit_answer_details to be ' +
+            'a boolean, received'):
+            with self.swap(init_state, 'solicit_answer_details', 'abc'):
+                exploration.validate()
+        self.assertEqual(init_state.solicit_answer_details, False)
+        init_state.update_interaction_id('Continue')
+        self.assertEqual(init_state.interaction.id, 'Continue')
+        exploration.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The Continue interaction does not ' +
+            'support soliciting answer details from learners.'):
+            with self.swap(init_state, 'solicit_answer_details', True):
+                exploration.validate()
+        init_state.update_interaction_id('TextInput')
+        self.assertEqual(init_state.interaction.id, 'TextInput')
+        self.assertEqual(init_state.solicit_answer_details, False)
+        exploration.validate()
+        init_state.solicit_answer_details = True
+        self.assertEqual(init_state.solicit_answer_details, True)
+        exploration.validate()
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, True)
+
+    def test_validate_solution_answer_is_exclusive(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+
+        # Solution should be set to None as default.
+        self.assertEqual(exploration.init_state.interaction.solution, None)
+
+        hints_list = []
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'hello_world!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            }
+        }
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': ''
+            },
+        })
+        exploration.init_state.update_interaction_hints(hints_list)
+        exploration.init_state.update_interaction_solution(solution)
+        exploration.validate()
+
+        solution = {
+            'answer_is_exclusive': 1,
+            'correct_answer': 'hello_world!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            }
+        }
+
+        exploration.init_state.update_interaction_solution(solution)
+        with self.assertRaisesRegexp(
+            Exception, 'Expected answer_is_exclusive to be bool, received 1'):
+            exploration.validate()
+
+    def test_validate_non_list_param_changes(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        exploration.init_state.param_changes = 0
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected state param_changes to be a list, received 0'):
+            exploration.init_state.validate(None, True)
+
+    def test_validate_duplicate_content_id_with_answer_groups(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        exploration.init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'feedback_1',
+                'html': '<p>Feedback</p>'
+            }))
+
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id feedback_1'):
+            exploration.init_state.validate(None, True)
+
+    def test_validate_duplicate_content_id_with_default_outcome(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        default_outcome_dict = {
+            'dest': 'Introduction',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': ''},
+            'labelled_as_correct': False,
+            'missing_prerequisite_skill_id': None,
+            'param_changes': [],
+            'refresher_exploration_id': None
+        }
+
+        exploration.init_state.update_interaction_default_outcome(
+            default_outcome_dict)
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'default_outcome',
+                'html': ''
+            }))
+
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id default_outcome'):
+            exploration.init_state.validate(None, True)
+
+    def test_validate_duplicate_content_id_with_hints(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>some html</p>'
+            }
+        }]
+
+        exploration.init_state.update_interaction_hints(hints_list)
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'hint_1',
+                'html': ''
+            }))
+
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id hint_1'):
+            exploration.init_state.validate(None, True)
+
+    def test_validate_duplicate_content_id_with_solution(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        subtitled_html = state_domain.SubtitledHtml('content_id', 'some html')
+
+        hints_list = [state_domain.Hint(subtitled_html)]
+
+        exploration.init_state.interaction.hints = hints_list
+        solution = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'hello_world!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            }
+        }
+
+        exploration.init_state.update_interaction_solution(solution)
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'solution',
+                'html': ''
+                }))
+
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id solution'):
+            exploration.init_state.validate(None, True)
+
+    def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'info', _mock_logging_function)
+        invalid_state_dict_assert_raises = self.assertRaisesRegexp(
+            Exception, 'Could not convert state dict to YAML')
+
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+
+        with logging_swap, invalid_state_dict_assert_raises:
+            exploration.init_state.convert_state_dict_to_yaml(
+                'invalid_state_dict', 10)
+
+        self.assertEqual(
+            observed_log_messages, ['Bad state dict: invalid_state_dict'])
+
+    def test_cannot_update_hints_with_content_id_not_in_written_translations(
+            self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        old_hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>Hello, this is html1 for state2</p>'
+            }
+        }]
+        new_hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_2',
+                'html': '<p>Hello, this is html2 for state2</p>'
+            }
+        }]
+
+        exploration.init_state.update_interaction_hints(old_hints_list)
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>Test!</p>',
+                        'needs_update': True
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+        written_translations = (
+            state_domain.WrittenTranslations.from_dict(
+                written_translations_dict))
+
+        exploration.init_state.update_written_translations(written_translations)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The content_id hint_1 does not exist in written_translations'):
+            exploration.init_state.update_interaction_hints(new_hints_list)
+
+    def test_cannot_update_hints_with_content_id_not_in_recorded_voiceovers(
+            self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        old_hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>Hello, this is html1 for state2</p>'
+            }
+        }]
+        new_hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_2',
+                'html': '<p>Hello, this is html2 for state2</p>'
+            }
+        }]
+
+        exploration.init_state.update_interaction_hints(old_hints_list)
+
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+        recorded_voiceovers = (
+            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
+
+        exploration.init_state.update_recorded_voiceovers(recorded_voiceovers)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The content_id hint_1 does not exist in recorded_voiceovers'):
+            exploration.init_state.update_interaction_hints(new_hints_list)
+
+    def test_cannot_update_hints_with_new_content_id_in_written_translations(
+            self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        old_hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>Hello, this is html1 for state2</p>'
+            }
+        }]
+        new_hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_2',
+                'html': '<p>Hello, this is html2 for state2</p>'
+            }
+        }]
+
+        exploration.init_state.update_interaction_hints(old_hints_list)
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'hint_2': {
+                    'hi': {
+                        'html': '<p>Test!</p>',
+                        'needs_update': True
+                    }
+                },
+                'hint_1': {
+                    'hi': {
+                        'html': '<p>Test1!</p>',
+                        'needs_update': True
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+        written_translations = (
+            state_domain.WrittenTranslations.from_dict(
+                written_translations_dict))
+
+        exploration.init_state.update_written_translations(written_translations)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The content_id hint_2 already exists in written_translations'):
+            exploration.init_state.update_interaction_hints(new_hints_list)
+
+    def test_cannot_update_hints_with_new_content_id_in_recorded_voiceovers(
+            self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        old_hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>Hello, this is html1 for state2</p>'
+            }
+        }]
+        new_hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_2',
+                'html': '<p>Hello, this is html2 for state2</p>'
+            }
+        }]
+
+        exploration.init_state.update_interaction_hints(old_hints_list)
+
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'hint_1': {
+                    'en': {
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False
+                    }
+                },
+                'hint_2': {
+                    'en': {
+                        'filename': 'filename4.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+        recorded_voiceovers = (
+            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
+
+        exploration.init_state.update_recorded_voiceovers(recorded_voiceovers)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The content_id hint_2 already exists in recorded_voiceovers'):
+            exploration.init_state.update_interaction_hints(new_hints_list)
+
+    def test_cannot_update_interaction_solution_with_non_dict_solution(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>Hello, this is html1 for state2</p>'
+            }
+        }]
+        solution = {
+            'answer_is_exclusive': True,
+            'correct_answer': u'hello_world!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': u'<p>hello_world is a string</p>'
+            }
+        }
+
+        exploration.init_state.update_interaction_hints(hints_list)
+        exploration.init_state.update_interaction_solution(solution)
+
+        self.assertEqual(
+            exploration.init_state.interaction.solution.to_dict(), solution)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected solution to be a dict'):
+            exploration.init_state.update_interaction_solution([])
+
+    def test_update_interaction_solution_with_no_solution(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>Hello, this is html1 for state2</p>'
+            }
+        }]
+
+        exploration.init_state.update_interaction_hints(hints_list)
+        exploration.init_state.update_interaction_solution(None)
+
+        self.assertIsNone(exploration.init_state.interaction.solution)
+
+    def test_cannot_update_interaction_hints_with_non_list_hints(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected hints_list to be a list'):
+            exploration.init_state.update_interaction_hints({})
+
+    def test_cannot_update_non_list_interaction_confirmed_unclassified_answers(
+            self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected confirmed_unclassified_answers to be a list'):
+            (
+                exploration.init_state
+                .update_interaction_confirmed_unclassified_answers({}))
+
+    def test_update_interaction_confirmed_unclassified_answers(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        answer_groups_list = [{
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        self.assertEqual(
+            exploration.init_state.interaction.confirmed_unclassified_answers,
+            [])
+
+        (
+            exploration.init_state
+            .update_interaction_confirmed_unclassified_answers(
+                answer_groups_list)
+        )
+
+        self.assertEqual(
+            exploration.init_state.interaction.confirmed_unclassified_answers,
+            answer_groups_list)
+
+    def test_cannot_update_non_dict_interaction_default_outcome(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected default_outcome_dict to be a dict'):
+            exploration.init_state.update_interaction_default_outcome(
+                'invalid_default_outcome')
+
+    def test_cannot_update_non_list_interaction_answer_groups(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected interaction_answer_groups to be a list'):
+            exploration.init_state.update_interaction_answer_groups(
+                'invalid_answer_groups')
+
+    def test_cannot_update_answer_groups_with_non_dict_rule_inputs(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        answer_groups_list = [{
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': [],
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected rule_inputs to be a dict'):
+            exploration.init_state.update_interaction_answer_groups(
+                answer_groups_list)
+
+    def test_cannot_update_answer_groups_with_non_list_rule_specs(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        answer_groups_list = [{
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': {},
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected answer group rule specs to be a list'):
+            exploration.init_state.update_interaction_answer_groups(
+                answer_groups_list)
+
+    def test_cannot_update_answer_groups_with_invalid_rule_input_value(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        answer_groups_list = [{
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': []
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape(
+                '[] has the wrong type. It should be a NormalizedString.')):
+            exploration.init_state.update_interaction_answer_groups(
+                answer_groups_list)
+
+    def test_validate_rule_spec(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
+
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        answer_groups = [{
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+        exploration.init_state.update_interaction_answer_groups(answer_groups)
+
+        with logging_swap, self.assertRaises(KeyError):
+            (
+                exploration.init_state.interaction.answer_groups[0]
+                .rule_specs[0].validate([], {})
+            )
+
+        self.assertEqual(
+            observed_log_messages,
+            [
+                'RuleSpec \'Contains\' has inputs which are not recognized '
+                'parameter names: set([u\'x\'])'
+            ]
+        )
 
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
@@ -702,6 +1541,16 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected content_id to be a string, '):
             written_translations.validate([123])
 
+    def test_validate_non_dict_language_code_to_written_translation(self):
+        written_translations = state_domain.WrittenTranslations({
+            'en': []
+        })
+
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape('Expected content_id value to be a dict, received []')):
+            written_translations.validate(None)
+
     def test_validation_with_invalid_type_langauge_code_raise_error(self):
         written_translations_dict = {
             'translations_mapping': {
@@ -738,6 +1587,81 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(Exception, 'Invalid language_code: ed'):
             written_translations.validate(['content'])
+
+    def test_validation_with_invalid_content_id_list(self):
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape(
+                'Expected state written_translations to match the listed '
+                'content ids [\'invalid_content\']')):
+            written_translations.validate([b'invalid_content'])
+
+    def test_get_content_ids_that_are_correctly_translated(self):
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {},
+                'hint_1': {}
+            }
+        }
+
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        self.assertEqual(
+            written_translations.get_content_ids_that_are_correctly_translated(
+                'hi'), [])
+
+    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations(self): # pylint: disable=line-too-long
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                },
+                'hint_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        self.assertEqual(
+            written_translations.get_content_ids_that_are_correctly_translated(
+                'hi'), ['content'])
+
+    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations_needs_update(self): # pylint: disable=line-too-long
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>hello!</p>',
+                        'needs_update': True
+                    }
+                },
+                'hint_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        self.assertEqual(
+            written_translations.get_content_ids_that_are_correctly_translated(
+                'hi'), [])
 
 
 class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
@@ -901,6 +1825,16 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected content_id to be a string, '):
             recorded_voiceovers.validate([123])
 
+    def test_validate_non_dict_language_code_to_voiceover(self):
+        recorded_voiceovers = state_domain.RecordedVoiceovers({
+            'en': []
+        })
+
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape('Expected content_id value to be a dict, received []')):
+            recorded_voiceovers.validate(None)
+
     def test_validation_with_invalid_type_langauge_code_raise_error(self):
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
@@ -939,3 +1873,77 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(Exception, 'Invalid language_code: ed'):
             recorded_voiceovers.validate(['content'])
+
+    def test_validation_with_invalid_content_id_list(self):
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape(
+                'Expected state recorded_voiceovers to match the listed '
+                'content ids [\'invalid_content\']')):
+            recorded_voiceovers.validate([b'invalid_content'])
+
+
+class VoiceoverDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(VoiceoverDomainTests, self).setUp()
+        self.voiceover = state_domain.Voiceover('filename.mp3', 10, False)
+
+    def test_validate_non_str_filename(self):
+        self.voiceover.validate()
+        self.voiceover.filename = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected audio filename to be a string'):
+            self.voiceover.validate()
+
+    def test_validate_filename(self):
+        self.voiceover.validate()
+        self.voiceover.filename = 'invalid_filename'
+        with self.assertRaisesRegexp(Exception, 'Invalid audio filename'):
+            self.voiceover.validate()
+
+    def test_validate_audio_extension(self):
+        self.voiceover.validate()
+        self.voiceover.filename = 'filename.png'
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape(
+                'Invalid audio filename: it should have one of the following '
+                'extensions: %s'
+                % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))):
+            self.voiceover.validate()
+
+    def test_validate_non_int_file_size_bytes(self):
+        self.voiceover.validate()
+        self.voiceover.file_size_bytes = 'file_size_bytes'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected file size to be an int'):
+            self.voiceover.validate()
+
+    def test_validate_negative_file_size_bytes(self):
+        self.voiceover.validate()
+        self.voiceover.file_size_bytes = -1
+        with self.assertRaisesRegexp(Exception, 'Invalid file size'):
+            self.voiceover.validate()
+
+    def test_validate_non_bool_needs_update(self):
+        self.voiceover.validate()
+        self.voiceover.needs_update = 'needs_update'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected needs_update to be a bool'):
+            self.voiceover.validate()

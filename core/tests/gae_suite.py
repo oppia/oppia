@@ -17,10 +17,12 @@
 In general, this script should not be run directly. Instead, invoke
 it from the command line by running
 
-    bash scripts/run_backend_tests.sh
+    python -m scripts.run_backend_tests
 
 from the oppia/ root folder.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
@@ -34,26 +36,29 @@ THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
         OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
-    os.path.join(OPPIA_TOOLS_DIR, 'webtest-1.4.2'),
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
     os.path.join(
         OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
         'lib', 'webob_0_9'),
-    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
-    os.path.join(OPPIA_TOOLS_DIR, 'selenium-3.14.1'),
-    os.path.join(OPPIA_TOOLS_DIR, 'PIL-1.1.7'),
+    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.8.0'),
+    os.path.join(OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
     CURR_DIR,
     os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
-    os.path.join(THIRD_PARTY_DIR, 'bleach-1.2.2'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.15.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.17.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.17.0'),
-    os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
-    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-0.95'),
-    os.path.join(THIRD_PARTY_DIR, 'requests-2.10.0'),
-    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.7.1'),
     os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
-    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.38'),
-    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.8'),
+    os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.0'),
+    os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
+    os.path.join(THIRD_PARTY_DIR, 'future-0.17.1'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
+    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
+    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.42.0'),
+    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.16.0'),
+    os.path.join(THIRD_PARTY_DIR, 'six-1.12.0'),
+    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
+    os.path.join(THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
 _PARSER = argparse.ArgumentParser()
@@ -72,22 +77,13 @@ def create_test_suites(test_target=None):
     return (
         [loader.loadTestsFromName(test_target)]
         if test_target else [loader.discover(
-            CURR_DIR, pattern='*_test.py', top_level_dir=CURR_DIR)])
+            CURR_DIR, pattern='[^core/tests/data]*_test.py',
+            top_level_dir=CURR_DIR)])
 
 
-def main():
+def main(args=None):
     """Runs the tests."""
-
-    def _iterate(test_suite_or_case):
-        """Iterate through all the test cases in `test_suite_or_case`."""
-        try:
-            suite = iter(test_suite_or_case)
-        except TypeError:
-            yield test_suite_or_case
-        else:
-            for test in suite:
-                for subtest in _iterate(test):
-                    yield subtest
+    parsed_args = _PARSER.parse_args(args=args)
 
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
@@ -97,22 +93,16 @@ def main():
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    parsed_args = _PARSER.parse_args()
     suites = create_test_suites(test_target=parsed_args.test_target)
 
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
                for suite in suites]
 
-    tests_run = 0
     for result in results:
-        tests_run += result.testsRun
         if result.errors or result.failures:
             raise Exception(
                 'Test suite failed: %s tests run, %s errors, %s failures.' % (
                     result.testsRun, len(result.errors), len(result.failures)))
-
-    if tests_run == 0:
-        raise Exception('No tests were run.')
 
 
 if __name__ == '__main__':

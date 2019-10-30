@@ -18,13 +18,15 @@ Please see original reference here:
 
 https://cloud.google.com/datastore/docs/schedule-export
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import httplib
+import http.client
 import json
 import logging
 
-import acl_decorators  # pylint: disable=relative-import
+from export import acl_decorators
 
 from google.appengine.api import app_identity
 from google.appengine.api import urlfetch
@@ -96,7 +98,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
                 method=urlfetch.POST,
                 deadline=60,
                 headers=headers)
-            if result.status_code == httplib.OK:
+            if result.status_code == http.client.OK:
                 logging.info(result.content)
             elif result.status_code >= 500:
                 logging.error(result.content)
@@ -105,7 +107,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
             self.response.status_int = result.status_code
         except urlfetch.Error:
             logging.exception('Failed to initiate export.')
-            self.response.status_int = httplib.INTERNAL_SERVER_ERROR
+            self.response.status_int = http.client.INTERNAL_SERVER_ERROR
 
 
 app = webapp2.WSGIApplication(  # pylint: disable=invalid-name

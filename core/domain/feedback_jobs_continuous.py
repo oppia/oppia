@@ -15,11 +15,14 @@
 # limitations under the License.
 
 """Continuous computation jobs for feedback system."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
 from core.domain import feedback_domain
 from core.platform import models
 import feconf
+import python_utils
 
 from google.appengine.ext import ndb
 
@@ -187,7 +190,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
              if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_total_threads
              if feedback_thread_analytics_models[i] is not None else 0)
-        ) for i in range(len(exploration_ids))]
+        ) for i in python_utils.RANGE(len(exploration_ids))]
 
     @classmethod
     def get_thread_analytics(cls, exploration_id):
@@ -241,17 +244,15 @@ class FeedbackAnalyticsMRJobManager(
         """Map function.
 
         Args:
-            item: FeedbackThreadModel. A feedback thread model instance.
+            item: GeneralFeedbackThreadModel. A general feedback thread model
+                instance.
 
         Yields:
             A tuple of two elements:
               - str. The exploration id associated to the feedback thread.
               - str. The feedback thread's status.
         """
-        if isinstance(item, feedback_models.GeneralFeedbackThreadModel):
-            yield (item.entity_id, item.status)
-        else:
-            yield (item.exploration_id, item.status)
+        yield (item.entity_id, item.status)
 
     @staticmethod
     def reduce(key, stringified_values):

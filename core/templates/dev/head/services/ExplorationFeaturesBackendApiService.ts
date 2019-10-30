@@ -17,10 +17,9 @@
  * configured to support.
  */
 
-oppia.constant(
-  'EXPLORATION_FEATURES_URL', '/explorehandler/features/<exploration_id>');
+require('services/services.constants.ajs.ts');
 
-oppia.factory('ExplorationFeaturesBackendApiService', [
+angular.module('oppia').factory('ExplorationFeaturesBackendApiService', [
   '$http', 'UrlInterpolationService', 'EXPLORATION_FEATURES_URL',
   function($http, UrlInterpolationService, EXPLORATION_FEATURES_URL) {
     return {

@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Python configuration for TextInput interaction."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
 
@@ -26,7 +28,7 @@ class TextInput(base.BaseInteraction):
     description = 'Allows learners to enter arbitrary text strings.'
     display_mode = base.DISPLAY_MODE_INLINE
     is_trainable = True
-    _dependency_ids = ['text_input_prediction']
+    _dependency_ids = []
     answer_type = 'NormalizedString'
     instructions = None
     narrow_instructions = None

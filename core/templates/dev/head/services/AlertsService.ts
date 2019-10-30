@@ -16,7 +16,7 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
-oppia.factory('AlertsService', ['$log', function($log) {
+angular.module('oppia').factory('AlertsService', ['$log', function($log) {
   var AlertsService = {
     /**
      * Each element in each of the arrays here is an object with two keys:

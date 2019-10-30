@@ -16,27 +16,28 @@
  * @fileoverview Unit tests for the PlaythroughIssueObjectFactory.
  */
 
-require('domain/statistics/PlaythroughIssueObjectFactory.ts');
+import { PlaythroughIssueObjectFactory, PlaythroughIssue } from
+  'domain/statistics/PlaythroughIssueObjectFactory';
 
-describe('Playthrough Issue Object Factory', function() {
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    this.piof = $injector.get('PlaythroughIssueObjectFactory');
-  }));
-
-  it('should create a new exploration issue', function() {
-    var explorationIssueObject = new this.piof('EarlyQuit', {}, [], 1, true);
-
-    expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
-    expect(explorationIssueObject.issueCustomizationArgs).toEqual({});
-    expect(explorationIssueObject.playthroughIds).toEqual([]);
-    expect(explorationIssueObject.schemaVersion).toEqual(1);
-    expect(explorationIssueObject.isValid).toEqual(true);
+describe('Playthrough Issue Object Factory', () => {
+  let piof: PlaythroughIssueObjectFactory;
+  let playthroughIssueObject: PlaythroughIssue;
+  beforeEach(() => {
+    piof = new PlaythroughIssueObjectFactory();
   });
 
-  it('should create a new exploration issue from a backend dict', function() {
-    var explorationIssueObject = this.piof.createFromBackendDict({
+  it('should create a new exploration issue', () => {
+    playthroughIssueObject = new PlaythroughIssue('EarlyQuit', {}, [], 1, true);
+
+    expect(playthroughIssueObject.issueType).toEqual('EarlyQuit');
+    expect(playthroughIssueObject.issueCustomizationArgs).toEqual({});
+    expect(playthroughIssueObject.playthroughIds).toEqual([]);
+    expect(playthroughIssueObject.schemaVersion).toEqual(1);
+    expect(playthroughIssueObject.isValid).toEqual(true);
+  });
+
+  it('should create a new exploration issue from a backend dict', () => {
+    var playthroughIssueObject = piof.createFromBackendDict({
       issue_type: 'EarlyQuit',
       issue_customization_args: {},
       playthrough_ids: [],
@@ -44,10 +45,10 @@ describe('Playthrough Issue Object Factory', function() {
       is_valid: true
     });
 
-    expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
-    expect(explorationIssueObject.issueCustomizationArgs).toEqual({});
-    expect(explorationIssueObject.playthroughIds).toEqual([]);
-    expect(explorationIssueObject.schemaVersion).toEqual(1);
-    expect(explorationIssueObject.isValid).toEqual(true);
+    expect(playthroughIssueObject.issueType).toEqual('EarlyQuit');
+    expect(playthroughIssueObject.issueCustomizationArgs).toEqual({});
+    expect(playthroughIssueObject.playthroughIds).toEqual([]);
+    expect(playthroughIssueObject.schemaVersion).toEqual(1);
+    expect(playthroughIssueObject.isValid).toEqual(true);
   });
 });

@@ -13,13 +13,17 @@
 # limitations under the License.
 
 """Domain objects relating to stories."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import re
 
 from constants import constants
+from core.domain import change_domain
 from core.domain import html_cleaner
 import feconf
+import python_utils
 import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -56,8 +60,6 @@ CMD_UPDATE_STORY_NODE_OUTLINE_STATUS = 'update_story_node_outline_status'
 CMD_CREATE_NEW = 'create_new'
 
 CMD_CHANGE_ROLE = 'change_role'
-CMD_PUBLISH_STORY = 'publish_story'
-CMD_UNPUBLISH_STORY = 'unpublish_story'
 
 ROLE_MANAGER = 'manager'
 ROLE_NONE = 'none'
@@ -65,109 +67,83 @@ ROLE_NONE = 'none'
 NODE_ID_PREFIX = 'node_'
 
 
-class StoryChange(object):
-    """Domain object for changes made to story object."""
+class StoryChange(change_domain.BaseChange):
+    """Domain object for changes made to story object.
+
+    The allowed commands, together with the attributes:
+        - 'add_story_node' (with node_id, title)
+        - 'delete_story_node' (with node_id)
+        - 'update_story_node_outline_status' (with node_id, old_value
+        and new_value)
+        - 'update_story_property' (with property_name, new_value
+        and old_value)
+        - 'update_story_node_property' (with property_name, new_value
+        and old_value)
+        - 'update_story_contents_property' (with property_name,
+        new_value and old_value)
+        - 'migrate_schema_to_latest_version' (with from_version and
+        to_version)
+        - 'create_new' (with title)
+    """
+
+    # The allowed list of story properties which can be used in
+    # update_story_property command.
     STORY_PROPERTIES = (
         STORY_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
         STORY_PROPERTY_NOTES, STORY_PROPERTY_LANGUAGE_CODE)
 
+    # The allowed list of story node properties which can be used in
+    # update_story_node_property command.
     STORY_NODE_PROPERTIES = (
         STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
         STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
         STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, STORY_NODE_PROPERTY_OUTLINE,
         STORY_NODE_PROPERTY_EXPLORATION_ID, STORY_NODE_PROPERTY_TITLE)
 
+    # The allowed list of story contente properties which can be used in
+    # update_story_contents_property command.
     STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID,)
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'node_id', 'from_version',
-        'to_version', 'title', 'finalized'
-    ]
-
-    def __init__(self, change_dict):
-        """Initialize a StoryChange object from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'add_story_node' (with node_id)
-                - 'delete_story_node' (with node_id)
-                - 'update_story_node_outline_status' (with node_id, old_value
-                and new_value)
-                - 'update_story_property' (with property_name, new_value
-                and old_value)
-                - 'update_story_node_property' (with property_name, new_value
-                and old_value)
-                - 'update_story_contents_property' (with property_name,
-                new_value and old_value)
-                - 'migrate_schema_to_latest_version' (with from_version and
-                to_version)
-                - 'create_new' (with title)
-
-        Raises:
-            Exception: The given change dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_ADD_STORY_NODE:
-            self.node_id = change_dict['node_id']
-            self.title = change_dict['title']
-        elif self.cmd == CMD_DELETE_STORY_NODE:
-            self.node_id = change_dict['node_id']
-        elif self.cmd == CMD_UPDATE_STORY_NODE_OUTLINE_STATUS:
-            self.node_id = change_dict['node_id']
-            self.old_value = change_dict['old_value']
-            self.new_value = change_dict['new_value']
-        elif self.cmd == CMD_UPDATE_STORY_NODE_PROPERTY:
-            if (change_dict['property_name'] not in
-                    self.STORY_NODE_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.node_id = change_dict['node_id']
-            self.property_name = change_dict['property_name']
-            self.new_value = copy.deepcopy(change_dict['new_value'])
-            self.old_value = copy.deepcopy(change_dict['old_value'])
-        elif self.cmd == CMD_UPDATE_STORY_PROPERTY:
-            if change_dict['property_name'] not in self.STORY_PROPERTIES:
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = copy.deepcopy(change_dict['new_value'])
-            self.old_value = copy.deepcopy(change_dict['old_value'])
-        elif self.cmd == CMD_UPDATE_STORY_CONTENTS_PROPERTY:
-            if change_dict['property_name'] not in (
-                    self.STORY_CONTENTS_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = copy.deepcopy(change_dict['new_value'])
-            self.old_value = copy.deepcopy(change_dict['old_value'])
-        elif self.cmd == CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
-        elif self.cmd == CMD_CREATE_NEW:
-            self.title = change_dict['title']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the StoryChange domain object.
-
-        Returns:
-            A dict, mapping all fields of StoryChange instance.
-        """
-        story_change_dict = {}
-        story_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                story_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return story_change_dict
+    ALLOWED_COMMANDS = [{
+        'name': CMD_UPDATE_STORY_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': STORY_PROPERTIES}
+    }, {
+        'name': CMD_UPDATE_STORY_NODE_PROPERTY,
+        'required_attribute_names': [
+            'node_id', 'property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': STORY_NODE_PROPERTIES}
+    }, {
+        'name': CMD_UPDATE_STORY_CONTENTS_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': STORY_CONTENTS_PROPERTIES}
+    }, {
+        'name': CMD_ADD_STORY_NODE,
+        'required_attribute_names': ['node_id', 'title'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_STORY_NODE,
+        'required_attribute_names': ['node_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
+        'required_attribute_names': ['node_id', 'old_value', 'new_value'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': ['title'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
+    }]
 
 
-class StoryNode(object):
+class StoryNode(python_utils.OBJECT):
     """Domain object describing a node in the exploration graph of a
     story.
     """
@@ -227,7 +203,8 @@ class StoryNode(object):
             str. The new next node id.
         """
         current_number = StoryNode.get_number_from_node_id(node_id)
-        incremented_node_id = NODE_ID_PREFIX + str(current_number + 1)
+        incremented_node_id = NODE_ID_PREFIX + python_utils.UNICODE(
+            current_number + 1)
         return incremented_node_id
 
     @classmethod
@@ -237,7 +214,7 @@ class StoryNode(object):
         Args:
             node_id: str. The node id to be validated.
         """
-        if not isinstance(node_id, basestring):
+        if not isinstance(node_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected node ID to be a string, received %s' %
                 node_id)
@@ -304,17 +281,17 @@ class StoryNode(object):
             invalid.
         """
         if self.exploration_id:
-            if not isinstance(self.exploration_id, basestring):
+            if not isinstance(self.exploration_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected exploration ID to be a string, received %s' %
                     self.exploration_id)
 
-        if not isinstance(self.outline, basestring):
+        if not isinstance(self.outline, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
                 self.outline)
 
-        if not isinstance(self.title, basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' %
                 self.title)
@@ -331,7 +308,7 @@ class StoryNode(object):
                 'Expected prerequisite skill ids to be a list, received %s' %
                 self.prerequisite_skill_ids)
         for skill_id in self.prerequisite_skill_ids:
-            if not isinstance(skill_id, basestring):
+            if not isinstance(skill_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each prerequisite skill id to be a string, '
                     'received %s' % skill_id)
@@ -346,7 +323,7 @@ class StoryNode(object):
                 'Expected acquired skill ids to be a list, received %s' %
                 self.acquired_skill_ids)
         for skill_id in self.acquired_skill_ids:
-            if not isinstance(skill_id, basestring):
+            if not isinstance(skill_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each acquired skill id to be a string, '
                     'received %s' % skill_id)
@@ -375,7 +352,7 @@ class StoryNode(object):
                     'The story node with ID %s points to itself.' % node_id)
 
 
-class StoryContents(object):
+class StoryContents(python_utils.OBJECT):
     """Domain object representing the story_contents dict."""
 
     def __init__(self, story_nodes, initial_node_id, next_node_id):
@@ -417,7 +394,7 @@ class StoryContents(object):
                     node)
             node.validate()
             for destination_node_id in node.destination_node_ids:
-                if next(
+                if python_utils.NEXT(
                         (node for node in self.nodes
                          if node.id == destination_node_id), None) is None:
                     raise utils.ValidationError(
@@ -513,6 +490,52 @@ class StoryContents(object):
                 return ind
         return None
 
+    def get_ordered_nodes(self):
+        """Returns a list of nodes ordered by how they would appear sequentially
+        to a learner.
+
+        NOTE: Currently, this function assumes only a linear arrangement of
+        nodes.
+
+        Returns:
+            list(StoryNode). The ordered list of nodes.
+        """
+        initial_index = self.get_node_index(self.initial_node_id)
+        current_node = self.nodes[initial_index]
+        ordered_nodes_list = [current_node]
+        while current_node.destination_node_ids:
+            next_node_id = current_node.destination_node_ids[0]
+            current_node = self.nodes[self.get_node_index(next_node_id)]
+            ordered_nodes_list.append(current_node)
+        return ordered_nodes_list
+
+    def get_all_linked_exp_ids(self):
+        """Returns a list of exploration id linked to each of the nodes of
+        story content.
+
+        Returns:
+            list(str). A list of exploration ids.
+        """
+        exp_ids = []
+        for node in self.nodes:
+            if node.exploration_id is not None:
+                exp_ids.append(node.exploration_id)
+        return exp_ids
+
+    def get_node_with_corresponding_exp_id(self, exp_id):
+        """Returns the node object which corresponds to a given exploration ids.
+
+        Returns:
+            StoryNode or None. The StoryNode object of the corresponding
+                exploration id if exist else None.
+        """
+        for node in self.nodes:
+            if node.exploration_id == exp_id:
+                return node
+
+        raise Exception('Unable to find the exploration id in any node: %s' % (
+            exp_id))
+
     def to_dict(self):
         """Returns a dict representing this StoryContents domain object.
 
@@ -549,13 +572,14 @@ class StoryContents(object):
         return story_contents
 
 
-class Story(object):
+class Story(python_utils.OBJECT):
     """Domain object for an Oppia Story."""
 
     def __init__(
             self, story_id, title, description, notes,
             story_contents, story_contents_schema_version, language_code,
-            version, created_on=None, last_updated=None):
+            corresponding_topic_id, version, created_on=None,
+            last_updated=None):
         """Constructs a Story domain object.
 
         Args:
@@ -571,6 +595,8 @@ class Story(object):
                 story contents object.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
             version: int. The version of the story.
             created_on: datetime.datetime. Date and time when the story is
                 created.
@@ -584,6 +610,7 @@ class Story(object):
         self.story_contents = story_contents
         self.story_contents_schema_version = story_contents_schema_version
         self.language_code = language_code
+        self.corresponding_topic_id = corresponding_topic_id
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
@@ -596,12 +623,12 @@ class Story(object):
         """
         self.require_valid_title(self.title)
 
-        if not isinstance(self.description, basestring):
+        if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
 
-        if not isinstance(self.notes, basestring):
+        if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected notes to be a string, received %s' % self.notes)
 
@@ -618,7 +645,7 @@ class Story(object):
                     feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
                     self.story_contents_schema_version))
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -626,6 +653,12 @@ class Story(object):
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(
+                self.corresponding_topic_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected corresponding_topic_id should be a string, received: '
+                '%s' % self.corresponding_topic_id)
 
         self.story_contents.validate()
 
@@ -636,7 +669,7 @@ class Story(object):
         Args:
             story_id: str. The story id to validate.
         """
-        if not isinstance(story_id, basestring):
+        if not isinstance(story_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Story id should be a string, received: %s' % story_id)
 
@@ -651,10 +684,30 @@ class Story(object):
             title: str. The title to validate.
         """
 
-        if not isinstance(title, basestring):
+        if not isinstance(title, python_utils.BASESTRING):
             raise utils.ValidationError('Title should be a string.')
         if title == '':
             raise utils.ValidationError('Title field should not be empty')
+
+    def get_acquired_skill_ids_for_node_ids(self, node_ids):
+        """Returns the acquired skill ids of the nodes having the given
+        node ids.
+
+        Args:
+            node_ids: list(str). The list of IDs of the nodes inside
+                the story.
+
+        Returns:
+            list(str). The union of the acquired skill IDs corresponding to
+                each of the node IDs.
+        """
+        acquired_skill_ids = []
+        for node in self.story_contents.nodes:
+            if node.id in node_ids:
+                for skill_id in node.acquired_skill_ids:
+                    if skill_id not in acquired_skill_ids:
+                        acquired_skill_ids.append(skill_id)
+        return acquired_skill_ids
 
     def get_prerequisite_skill_ids_for_exp_id(self, exp_id):
         """Returns the prerequisite skill ids of the node having the given
@@ -699,12 +752,13 @@ class Story(object):
             'notes': self.notes,
             'language_code': self.language_code,
             'story_contents_schema_version': self.story_contents_schema_version,
+            'corresponding_topic_id': self.corresponding_topic_id,
             'version': self.version,
             'story_contents': self.story_contents.to_dict()
         }
 
     @classmethod
-    def create_default_story(cls, story_id, title):
+    def create_default_story(cls, story_id, title, corresponding_topic_id):
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
@@ -712,6 +766,8 @@ class Story(object):
         Args:
             story_id: str. The unique id of the story.
             title: str. The title for the newly created story.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
 
         Returns:
             Story. The Story domain object with the default values.
@@ -723,7 +779,7 @@ class Story(object):
             story_id, title,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0)
+            constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)
 
     @classmethod
     def update_story_contents_from_model(
@@ -1004,7 +1060,7 @@ class Story(object):
         self.story_contents.initial_node_id = new_initial_node_id
 
 
-class StorySummary(object):
+class StorySummary(python_utils.OBJECT):
     """Domain object for Story Summary."""
 
     def __init__(
@@ -1033,6 +1089,44 @@ class StorySummary(object):
         self.node_count = node_count
         self.story_model_created_on = story_model_created_on
         self.story_model_last_updated = story_model_last_updated
+
+    def validate(self):
+        """Validates various properties of the story summary object.
+
+        Raises:
+            ValidationError: One or more attributes of story summary are
+                invalid.
+        """
+        if not isinstance(self.title, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected title to be a string, received %s' % self.title)
+
+        if self.title == '':
+            raise utils.ValidationError('Title field should not be empty')
+
+        if not isinstance(self.description, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
+
+        if not isinstance(self.node_count, int):
+            raise utils.ValidationError(
+                'Expected node_count to be an int, received \'%s\'' % (
+                    self.node_count))
+
+        if self.node_count < 0:
+            raise utils.ValidationError(
+                'Expected node_count to be non-negative, received \'%s\'' % (
+                    self.node_count))
+
+        if not isinstance(self.language_code, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+
+        if not utils.is_valid_language_code(self.language_code):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -1064,101 +1158,3 @@ class StorySummary(object):
             'title': self.title,
             'description': self.description
         }
-
-
-class StoryRights(object):
-    """Domain object for story rights."""
-
-    def __init__(self, story_id, manager_ids, story_is_published):
-        """Constructs a StoryRights domain object.
-
-        Args:
-            story_id: str. The id of the story.
-            manager_ids: list(str). The id of the users who have been assigned
-                as managers for the story.
-            story_is_published: bool. Whether the story is viewable by a
-                learner.
-        """
-        self.id = story_id
-        self.manager_ids = manager_ids
-        self.story_is_published = story_is_published
-
-    def to_dict(self):
-        """Returns a dict suitable for use by the frontend.
-
-        Returns:
-            dict. A dict version of StoryRights suitable for use by the
-                frontend.
-        """
-        return {
-            'story_id': self.id,
-            'manager_names': self.manager_ids,
-            'story_is_published': self.story_is_published
-        }
-
-    def is_manager(self, user_id):
-        """Checks whether given user is a manager of the story.
-
-        Args:
-            user_id: str or None. Id of the user.
-
-        Returns:
-            bool. Whether user is a manager of this story.
-        """
-        return bool(user_id in self.manager_ids)
-
-
-class StoryRightsChange(object):
-    """Domain object for changes made to a story rights object."""
-
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'assignee_id', 'new_role', 'old_role'
-    ]
-
-    def __init__(self, change_dict):
-        """Initialize a StoryRightsChange object from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'change_role' (with assignee_id, new_role and old_role)
-                - 'create_new'
-                - 'publish_story'
-                - 'unpublish_story'
-
-        Raises:
-            Exception: The given change dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_CHANGE_ROLE:
-            self.assignee_id = change_dict['assignee_id']
-            self.new_role = change_dict['new_role']
-            self.old_role = change_dict['old_role']
-        elif self.cmd == CMD_CREATE_NEW:
-            pass
-        elif self.cmd == CMD_PUBLISH_STORY:
-            pass
-        elif self.cmd == CMD_UNPUBLISH_STORY:
-            pass
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the StoryRightsChange domain object.
-
-        Returns:
-            A dict, mapping all fields of StoryRightsChange instance.
-        """
-        story_rights_change_dict = {}
-        story_rights_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                story_rights_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return story_rights_change_dict

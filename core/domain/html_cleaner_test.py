@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for the HTML sanitizer."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import html_cleaner
 from core.tests import test_utils
@@ -26,6 +28,20 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(HtmlCleanerUnitTests, self).setUp()
         self.longMessage = True
+
+    def test_whitelisted_tags(self):
+
+        self.assertTrue(
+            html_cleaner.filter_a('a', 'href', 'http://www.oppia.com'))
+
+        self.assertFalse(
+            html_cleaner.filter_a('a', 'href', '<code>http://www.oppia.com'))
+
+        self.assertTrue(
+            html_cleaner.filter_a('a', 'title', 'http://www.oppia.com'))
+
+        with self.assertRaises(Exception):
+            html_cleaner.filter_a('link', 'href', 'http://www.oppia.com')
 
     def test_good_tags_allowed(self):
         test_data = [(

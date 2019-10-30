@@ -16,10 +16,22 @@
  * @fileoverview Unit tests for Interaction object factory.
  */
 
-require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/exploration/HintObjectFactory.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// InteractionObjectFactory.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/InteractionObjectFactory.ts');
-require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 
 describe('Interaction object factory', function() {
@@ -36,6 +48,29 @@ describe('Interaction object factory', function() {
   var interactionDict = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     iof = $injector.get('InteractionObjectFactory');
@@ -68,7 +103,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 1
+      tagged_skill_misconception_id: 'skill_id-1'
     }];
     hintsDict = [
       {
@@ -132,7 +167,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 1
+      tagged_skill_misconception_id: 'skill_id-1'
     };
     expect(testInteraction.answerGroups).toEqual([agof.createFromBackendDict({
       rule_specs: [],
@@ -148,7 +183,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 1
+      tagged_skill_misconception_id: 'skill_id-1'
     })]);
     newAnswerGroup = agof.createFromBackendDict(newAnswerGroup);
     testInteraction.setAnswerGroups([newAnswerGroup]);
@@ -252,7 +287,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data_new'],
-      tagged_misconception_id: 2
+      tagged_skill_misconception_id: 'skill_id-2'
     }];
     var newDefaultOutcome = {
       dest: 'dest_default_new',

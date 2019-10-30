@@ -16,24 +16,44 @@
  * @fileoverview Unit tests for TopicRightsBackendApiService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/topic/TopicRightsBackendApiService.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Topic rights backend API service', function() {
   var TopicRightsBackendApiService = null;
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
+  var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     TopicRightsBackendApiService = $injector.get(
       'TopicRightsBackendApiService');
+    CsrfService = $injector.get('CsrfTokenService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
   }));
 
   afterEach(function() {

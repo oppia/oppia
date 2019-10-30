@@ -16,7 +16,9 @@
  * @fileoverview Service Promo bar.
  */
 
-oppia.factory('PromoBarService', [
+require('services/services.constants.ajs.ts');
+
+angular.module('oppia').factory('PromoBarService', [
   '$http', '$q', 'ENABLE_PROMO_BAR',
   function($http, $q, ENABLE_PROMO_BAR) {
     return {

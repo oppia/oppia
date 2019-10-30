@@ -141,6 +141,8 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-state-name-submit'));
   var answerCorrectnessToggle = element(
     by.css('.protractor-test-editor-correctness-toggle'));
+  var solicitAnswerDetailsCheckbox = element(
+    by.css('.protractor-test-solicit-answer-details-checkbox'));
 
   /*
    * Actions
@@ -615,6 +617,8 @@ var ExplorationEditorMainTab = function() {
     closeAddResponseModal();
     waitFor.invisibilityOf(
       addResponseHeader, 'Add Response modal takes too long to close');
+    waitFor.visibilityOf(
+      interaction, 'interaction takes too long to appear');
   };
 
   // This function should not usually be invoked directly; please consider
@@ -699,7 +703,7 @@ var ExplorationEditorMainTab = function() {
   // opposed to the preview tab, which uses the corresponding function in
   // ExplorationPlayerPage.js).
   this.expectInteractionToMatch = function(interactionId) {
-  // Convert additional arguments to an array to send on.
+    // Convert additional arguments to an array to send on.
     var args = [interaction];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
@@ -984,6 +988,13 @@ var ExplorationEditorMainTab = function() {
       stateNameContainer, name,
       'Current state name is:' + stateNameContainer.getAttribute(
         'textContent') + 'instead of expected ' + name);
+  };
+
+  this.setSolicitAnswerDetailsFeature = function() {
+    waitFor.elementToBeClickable(
+      solicitAnswerDetailsCheckbox,
+      'Solicit answer details checkbox takes too long to be clickable');
+    solicitAnswerDetailsCheckbox.click();
   };
 
   this.expectCurrentStateToBe = function(name) {

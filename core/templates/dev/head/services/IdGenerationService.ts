@@ -16,7 +16,7 @@
  * @fileoverview Service for generating random IDs.
  */
 
-oppia.factory('IdGenerationService', [function() {
+angular.module('oppia').factory('IdGenerationService', [function() {
   return {
     generateNewId: function() {
       // Generates random string using the last 10 digits of

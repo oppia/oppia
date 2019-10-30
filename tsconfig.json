@@ -1,25 +1,38 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "lib": ["es2017", "dom"],
+    "lib": ["es2017", "dom", "webworker"],
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js",
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es5",
     "typeRoots": ["./node_modules/@types"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "app.constants": ["core/templates/dev/head/app.constants"],
+      "components/*": ["core/templates/dev/head/components/*"],
+      "domain/*": ["core/templates/dev/head/domain/*"],
+      "pages/*": ["core/templates/dev/head/pages/*"],
+      "services/*": ["core/templates/dev/head/services/*"],
+      "classifiers/*": ["extensions/classifiers/*"],
+      "interactions/*": ["extensions/interactions/*"],
+      "filters/*": ["core/templates/dev/head/filters/*"]
+    }
   },
+  "files_explanation": "These files are included separately since we still do not have webpack in extensions folder and these files are still included through scripts tags, so they need to be compiled separately.",
   "files": [
-    "assets/constants.js", 
-    "assets/rich_text_components_definitions.js", 
-    "core/tests/karma-globals.ts", 
-    "core/tests/karma.conf.ts",
-    "core/templates/dev/head/AppInit.ts",
     "core/templates/dev/head/mathjaxConfig.ts",
-    "core/templates/dev/head/domain/classifier/PredictionResultObjectFactory.ts",
-    "core/templates/dev/head/expressions/ExpressionParserService.js",
-    "core/templates/dev/head/filters/ConvertToPlainTextFilter.ts",
-    "core/templates/dev/head/filters/TruncateAtFirstLineFilter.ts"
+    "core/templates/dev/head/expressions/expression-parser.service.js",
+    "core/tests/karma-globals.ts"
   ],
-  "include": ["extensions", "typings"]
+  "include_explanation": "The files in extensions/ckeditor_plugins are yet to be integrated into webpack (#6732).",
+  "include": [
+    "extensions/ckeditor_plugins",
+    "typings"
+  ]
 }

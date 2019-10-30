@@ -15,11 +15,14 @@
 # limitations under the License.
 
 """Models for the content of sent emails."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -72,6 +75,11 @@ class SentEmailModel(base_models.BaseModel):
     # The hash of the recipient id, email subject and message body.
     email_hash = ndb.StringProperty(indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Sent email should be kept for audit purposes."""
+        return base_models.DELETION_POLICY.KEEP
+
     @classmethod
     def _generate_id(cls, intent):
         """Generates an ID for a new SentEmailModel instance.
@@ -89,11 +97,12 @@ class SentEmailModel(base_models.BaseModel):
         """
         id_prefix = '%s.' % intent
 
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 id_prefix,
                 utils.convert_to_hash(
-                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    python_utils.UNICODE(utils.get_random_int(
+                        base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -261,6 +270,11 @@ class BulkEmailModel(base_models.BaseModel):
     # The datetime the email was sent, in UTC.
     sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Sent email should be kept for audit purposes."""
+        return base_models.DELETION_POLICY.KEEP
+
     @classmethod
     def create(
             cls, instance_id, recipient_ids, sender_id, sender_email,
@@ -296,8 +310,16 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     suggestion emails. The id/key of instances of this model has form of
     [USER_ID].[THREAD_ID]
     """
+
+    user_id = ndb.StringProperty(required=False, indexed=True)
+    thread_id = ndb.StringProperty(required=False, indexed=True)
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Feedback email reply to id should be deleted."""
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):
@@ -323,7 +345,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             str. The unique reply-to id if there are no collisions.
         """
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s' % (utils.get_random_int(base_models.RAND_RANGE)),
                 REPLY_TO_ID_LENGTH)
@@ -355,7 +377,14 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                             ' already exists.')
 
         reply_to_id = cls._generate_unique_reply_to_id()
-        return cls(id=instance_id, reply_to_id=reply_to_id)
+        feedback_email_reply_model_instance = cls(
+            id=instance_id,
+            user_id=user_id,
+            thread_id=thread_id,
+            reply_to_id=reply_to_id)
+
+        feedback_email_reply_model_instance.put()
+        return feedback_email_reply_model_instance
 
     @classmethod
     def get_by_reply_to_id(cls, reply_to_id):
@@ -410,6 +439,25 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """
         instance_ids = [cls._generate_id(user_id, thread_id)
                         for user_id in user_ids]
-        user_models = cls.get_multi(instance_ids)
+        retrieved_models = cls.get_multi(instance_ids)
         return {
-            user_id: model for user_id, model in zip(user_ids, user_models)}
+            user_id: model for user_id, model in python_utils.ZIP(
+                user_ids, retrieved_models)}
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export GeneralFeedbackEmailReplyToIdModel's user data.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict whose keys are IDs of threads the user is
+            involved in. The corresponding value is the reply_to_id of that
+            thread.
+        """
+        user_data = {}
+        email_reply_models = cls.get_all().filter(cls.user_id == user_id)
+        for model in email_reply_models:
+            user_data[model.thread_id] = model.reply_to_id
+        return user_data

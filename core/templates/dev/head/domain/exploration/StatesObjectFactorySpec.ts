@@ -16,27 +16,86 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
-require('domain/exploration/AudioTranslationObjectFactory.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// StatesObjectFactory.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/StatesObjectFactory.ts');
 
 require('domain/state/StateObjectFactory.ts');
 
 describe('States object factory', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+        new ParamChangeObjectFactory()));
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   var oldValueForNewStateTemplate = null;
 
   describe('StatesObjectFactory', function() {
     var scope, sof, ssof, statesDict, statesWithAudioDict, vof;
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ssof = $injector.get('StatesObjectFactory');
-      sof = $injector.get('StateObjectFactory');
-      vof = $injector.get('VoiceoverObjectFactory');
-
-      oldValueForNewStateTemplate = constants.NEW_STATE_TEMPLATE;
-
-      constants.NEW_STATE_TEMPLATE = {
+    beforeEach(angular.mock.module(function($provide) {
+      $provide.constant('NEW_STATE_TEMPLATE', {
         classifier_model_id: null,
         content: {
           content_id: 'content',
@@ -75,13 +134,20 @@ describe('States object factory', function() {
           id: 'TextInput'
         },
         param_changes: [],
+        solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},
             default_outcome: {}
           }
-        },
-      };
+        }
+      });
+    }));
+
+    beforeEach(angular.mock.inject(function($injector) {
+      ssof = $injector.get('StatesObjectFactory');
+      sof = $injector.get('StateObjectFactory');
+      vof = $injector.get('VoiceoverObjectFactory');
 
       statesDict = {
         'first state': {
@@ -129,6 +195,7 @@ describe('States object factory', function() {
             solution: null
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -243,6 +310,7 @@ describe('States object factory', function() {
             id: 'TextInput'
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -302,6 +370,7 @@ describe('States object factory', function() {
             id: 'TextInput'
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -310,10 +379,6 @@ describe('States object factory', function() {
           }
         }
       };
-    }));
-
-    afterEach(inject(function() {
-      constants.NEW_STATE_TEMPLATE = oldValueForNewStateTemplate;
     }));
 
     it('should create a new state given a state name', function() {
@@ -358,6 +423,7 @@ describe('States object factory', function() {
             id: 'TextInput'
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},

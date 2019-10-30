@@ -16,12 +16,36 @@
  * @fileoverview Unit tests for the issues backend api service.
  */
 
-require('domain/statistics/PlaythroughObjectFactory.ts');
-require('domain/statistics/PlaythroughIssueObjectFactory.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// PlaythroughIssuesBackendApiService.ts is upgraded to Angular 8.
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
+import { PlaythroughIssueObjectFactory } from
+  'domain/statistics/PlaythroughIssueObjectFactory';
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('services/PlaythroughIssuesBackendApiService.ts');
 
 describe('PlaythroughIssuesBackendApiService', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
+    $provide.value(
+      'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
+    $provide.value(
+      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
+        new LearnerActionObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     this.PlaythroughIssuesBackendApiService =

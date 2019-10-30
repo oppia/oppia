@@ -33,6 +33,14 @@ describe('Exploration history', function() {
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
   var explorationEditorMainTab = null;
+
+  // Constants for colors of nodes in history graph.
+  var COLOR_ADDED = 'rgb(78, 162, 78)';
+  var COLOR_DELETED = 'rgb(220, 20, 60)';
+  var COLOR_CHANGED = 'rgb(30, 144, 255)';
+  var COLOR_UNCHANGED = 'rgb(245, 245, 220)';
+  var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
+
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
@@ -44,13 +52,6 @@ describe('Exploration history', function() {
     users.createUser('user@historyTab.com', 'userHistoryTab');
     users.login('user@historyTab.com');
     workflow.createExploration();
-
-    // Constants for colors of nodes in history graph.
-    var COLOR_ADDED = 'rgb(78, 162, 78)';
-    var COLOR_DELETED = 'rgb(220, 20, 60)';
-    var COLOR_CHANGED = 'rgb(30, 144, 255)';
-    var COLOR_UNCHANGED = 'rgb(245, 245, 220)';
-    var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
 
     // Check renaming state, editing text, editing interactions and adding
     // state.
@@ -149,7 +150,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       20: {
-        text: '    tagged_misconception_id: null',
+        text: '    tagged_skill_misconception_id: null',
         highlighted: true
       },
       21: {
@@ -237,27 +238,31 @@ describe('Exploration history', function() {
         highlighted: true
       },
       42: {
-        text: 'written_translations:',
+        text: 'solicit_answer_details: false',
         highlighted: false
       },
       43: {
-        text: '  translations_mapping:',
+        text: 'written_translations:',
         highlighted: false
       },
       44: {
-        text: '    content: {}',
+        text: '  translations_mapping:',
         highlighted: false
       },
       45: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      46: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      46: {
+      47: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      47: {
-        text: ' ',
+      48: {
+        text: '',
         highlighted: false
       }
     };
@@ -366,23 +371,27 @@ describe('Exploration history', function() {
         highlighted: true
       },
       26: {
-        text: 'written_translations:',
+        text: 'solicit_answer_details: false',
         highlighted: false
       },
       27: {
-        text: '  translations_mapping:',
+        text: 'written_translations:',
         highlighted: false
       },
       28: {
-        text: '    content: {}',
+        text: '  translations_mapping:',
         highlighted: false
       },
       29: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      30: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      30: {
-        text: ' ',
+      31: {
+        text: '',
         highlighted: false
       }
     };
@@ -415,11 +424,12 @@ describe('Exploration history', function() {
       '  voiceovers_mapping:\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
+      'solicit_answer_details: false\n' +
       'written_translations:\n' +
       '  translations_mapping:\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
-      ' ';
+      '';
 
     var expectedHistoryStates = [{
       label: 'first (was: Introd...',
@@ -442,7 +452,7 @@ describe('Exploration history', function() {
     historyGraph.closeStateHistory();
 
     historyGraph.openStateHistory('second');
-    historyGraph.expectTextToMatch(STATE_2_STRING, ' ');
+    historyGraph.expectTextToMatch(STATE_2_STRING, '');
     historyGraph.closeStateHistory();
 
     // Reset all checkboxes.
@@ -477,7 +487,7 @@ describe('Exploration history', function() {
     historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
 
     historyGraph.openStateHistory('second');
-    historyGraph.expectTextToMatch(' ', STATE_2_STRING);
+    historyGraph.expectTextToMatch('', STATE_2_STRING);
     historyGraph.closeStateHistory();
 
     // Check renaming a state.
@@ -527,35 +537,93 @@ describe('Exploration history', function() {
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
-    // Check that reverting works.
-    explorationEditorHistoryTab.revertToVersion(2);
-    general.moveToPlayer();
-    explorationPlayerPage.expectContentToMatch(
-      forms.toRichText('enter 6 to continue'));
-    explorationPlayerPage.submitAnswer('NumericInput', 6);
-    explorationPlayerPage.expectExplorationToNotBeOver();
-    explorationPlayerPage.expectContentToMatch(
-      forms.toRichText('this is card 2'));
-    explorationPlayerPage.expectInteractionToMatch('Continue', 'CONTINUE');
-    explorationPlayerPage.submitAnswer('Continue', null);
-    explorationPlayerPage.expectExplorationToBeOver();
+    users.logout();
+  });
 
-    general.moveToEditor();
+  it('should revert to old exploration commit', function() {
+    users.createUser('user2@historyTab.com', 'user2HistoryTab');
+    users.login('user2@historyTab.com');
+    workflow.createExploration();
+
+    // Make changes for second commit.
+    // First card.
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'enter 6 to continue'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', null, 'second', true, 'Equals', 6);
+    // Second card.
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('card 2 second commit text'));
+    explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination('final card', true, null);
+    // Final card.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.moveToState('first');
+    explorationEditorPage.saveChanges();
+
+    // Create third commit.
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.moveToState('first');
+    explorationEditorMainTab.setStateName('third');
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('card 2 third commit text'));
+    explorationEditorPage.saveChanges();
     expectedHistoryStates = [{
-      label: 'first (was: third)',
-      color: COLOR_CHANGED
+      label: 'third (was: first)',
+      color: COLOR_RENAMED_UNCHANGED
     }, {
       label: 'second',
-      color: COLOR_ADDED
+      color: COLOR_CHANGED
     }, {
       label: 'final card',
       color: COLOR_UNCHANGED
     }];
     explorationEditorPage.navigateToHistoryTab();
     historyGraph = explorationEditorHistoryTab.getHistoryGraph();
-    historyGraph.selectTwoVersions(4, 6);
+    historyGraph.selectTwoVersions(2, 3);
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
-    historyGraph.expectNumberOfLinksToMatch(3, 2, 1);
+    historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
+
+    // Revert to version 2.
+    explorationEditorPage.navigateToHistoryTab();
+    explorationEditorHistoryTab.revertToVersion(2);
+
+    // Verify exploration is version 2.
+    general.moveToPlayer();
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('enter 6 to continue'));
+    explorationPlayerPage.submitAnswer('NumericInput', 6);
+    explorationPlayerPage.expectExplorationToNotBeOver();
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('card 2 second commit text'));
+    explorationPlayerPage.expectInteractionToMatch('Continue', 'CONTINUE');
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.expectExplorationToBeOver();
+
+    // Verify history states between original and reversion.
+    general.moveToEditor();
+    var expectedHistoryStates = [{
+      label: 'first',
+      color: COLOR_UNCHANGED
+    }, {
+      label: 'second',
+      color: COLOR_UNCHANGED
+    }, {
+      label: 'final card',
+      color: COLOR_UNCHANGED
+    }];
+    explorationEditorPage.navigateToHistoryTab();
+    historyGraph = explorationEditorHistoryTab.getHistoryGraph();
+    historyGraph.selectTwoVersions(2, 4);
+    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
+
     users.logout();
   });
 

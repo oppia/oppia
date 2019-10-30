@@ -17,15 +17,41 @@
 """Implements additional custom Pylint checkers to be used as part of
 presubmit checks.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
 import re
-import astroid
-import docstrings_checker  # pylint: disable=relative-import
+import sys
 
-from pylint import checkers
-from pylint import interfaces
-from pylint.checkers import typecheck
-from pylint.checkers import utils as checker_utils
+import python_utils
+from . import docstrings_checker
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
+sys.path.insert(0, _PYLINT_PATH)
+
+# pylint: disable=wrong-import-order
+# pylint: disable=wrong-import-position
+import astroid  # isort:skip
+from pylint import checkers  # isort:skip
+from pylint import interfaces  # isort:skip
+from pylint.checkers import typecheck  # isort:skip
+from pylint.checkers import utils as checker_utils  # isort:skip
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+
+
+def read_from_node(node):
+    """Returns the data read from the ast node in unicode form.
+
+    Args:
+        node: astroid.scoped_nodes.Function. Node to access module content.
+
+    Returns:
+        list(str). The data read from the ast node.
+    """
+    return list(node.stream().readlines())
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
@@ -69,9 +95,6 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
 
         # Build the set of keyword arguments and count the positional arguments.
         call_site = astroid.arguments.CallSite.from_call(node)
-        if call_site.has_invalid_arguments() or (
-                call_site.has_invalid_keywords()):
-            return
 
         num_positional_args = len(call_site.positional_arguments)
         keyword_args = list(call_site.keyword_arguments.keys())
@@ -107,10 +130,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         # been called explicitly.
         for [(name, defval), _] in parameters:
             if defval:
-                if name is None:
-                    display_name = '<tuple>'
-                else:
-                    display_name = repr(name)
+                display_name = repr(name)
 
                 if name not in keyword_args and (
                         num_positional_args_unused > (
@@ -122,10 +142,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                     try:
                         func_name = node.func.attrname
                     except AttributeError:
-                        try:
-                            func_name = node.func.name
-                        except AttributeError:
-                            func_name = node.func
+                        func_name = node.func.name
 
                     self.add_message(
                         'non-explicit-keyword-args', node=node,
@@ -162,32 +179,33 @@ class HangingIndentChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        file_content = node.stream().readlines()
+        file_content = read_from_node(node)
         file_length = len(file_content)
         exclude = False
-        for line_num in xrange(file_length):
+        for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].lstrip().rstrip()
-            if line.startswith('"""') and not line.endswith('"""'):
+            # The source files are read as bytes, hence the b' prefix.
+            if line.startswith(b'"""') and not line.endswith(b'"""'):
                 exclude = True
-            if line.endswith('"""'):
+            if line.endswith(b'"""'):
                 exclude = False
-            if line.startswith('#') or exclude:
+            if line.startswith(b'#') or exclude:
                 continue
             line_length = len(line)
             bracket_count = 0
-            for char_num in xrange(line_length):
+            for char_num in python_utils.RANGE(line_length):
                 char = line[char_num]
-                if char == '(':
+                if char == b'(':
                     if bracket_count == 0:
                         position = char_num
                     bracket_count += 1
-                elif char == ')' and bracket_count > 0:
+                elif char == b')' and bracket_count > 0:
                     bracket_count -= 1
             if bracket_count > 0 and position + 1 < line_length:
                 content = line[position + 1:]
-                if not len(content) or not ',' in content:
+                if not len(content) or not b',' in content:
                     continue
-                split_list = content.split(', ')
+                split_list = content.split(b', ')
                 if len(split_list) == 1 and not any(
                         char.isalpha() for char in split_list[0]):
                     continue
@@ -443,8 +461,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
             return
 
         func_node = node.frame()
-        if not isinstance(func_node, astroid.FunctionDef):
-            return
 
         doc = docstrings_checker.docstringify(func_node.doc)
         if not doc.is_valid() and self.config.accept_no_return_doc:
@@ -475,19 +491,13 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 method definition in the AST.
         """
         func_node = node.frame()
-        if not isinstance(func_node, astroid.FunctionDef):
-            return
 
         doc = docstrings_checker.docstringify(func_node.doc)
         if not doc.is_valid() and self.config.accept_no_yields_doc:
             return
 
-        if doc.supports_yields:
-            doc_has_yields = doc.has_yields()
-            doc_has_yields_type = doc.has_yields_type()
-        else:
-            doc_has_yields = doc.has_returns()
-            doc_has_yields_type = doc.has_rtype()
+        doc_has_yields = doc.has_yields()
+        doc_has_yields_type = doc.has_yields_type()
 
         if not doc_has_yields:
             self.add_message(
@@ -648,7 +658,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
     def _handle_no_raise_doc(self, excs, node):
         """Checks whether the raised exception in a function has been
         documented, add a message otherwise.
-
         Args:
             excs: list(str). A list of exception types.
             node: astroid.scoped_nodes.Function. Node to access module content.
@@ -722,8 +731,6 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
                     node=node,
                     args=(name, modname),
                 )
-            except astroid.AstroidBuildingException:
-                pass
 
 
 class BackslashContinuationChecker(checkers.BaseChecker):
@@ -750,12 +757,11 @@ class BackslashContinuationChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        with node.stream() as stream:
-            file_content = stream.readlines()
-            for (line_num, line) in enumerate(file_content):
-                if line.rstrip('\r\n').endswith('\\'):
-                    self.add_message(
-                        'backslash-continuation', line=line_num + 1)
+        file_content = read_from_node(node)
+        for (line_num, line) in enumerate(file_content):
+            if line.rstrip(b'\r\n').endswith(b'\\'):
+                self.add_message(
+                    'backslash-continuation', line=line_num + 1)
 
 
 class FunctionArgsOrderChecker(checkers.BaseChecker):
@@ -888,13 +894,71 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
-        file_content = node.stream().readlines()
+        file_content = read_from_node(node)
         file_length = len(file_content)
 
         if file_length == 1 and len(file_content[0]) == 1:
             self.add_message('only-one-character', line=file_length)
         if file_length >= 2 and not re.search(r'[^\n]\n', file_content[-1]):
             self.add_message('newline-at-eof', line=file_length)
+
+
+class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
+    """Checks if only one space is used after a yield statement
+    when applicable ('yield' is acceptable).
+    """
+    __implements__ = interfaces.IRawChecker
+
+    name = 'single-space-after-yield'
+    priority = -1
+    msgs = {
+        'C0010': (
+            'Not using \'yield\' or a single space after yield statement.',
+            'single-space-after-yield',
+            'Ensure a single space is used after yield statement.',
+        ),
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that yield keywords are followed by
+        exactly one space, so matching 'yield *' where * is not a
+        whitespace character. Note that 'yield' is also acceptable in
+        cases where the user wants to yield nothing.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module
+                content.
+        """
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        for (line_num, line) in enumerate(file_content):
+            bare_line = line.strip()
+
+            # Single multi-line comment, ignore it.
+            if bare_line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in bare_line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            # Whitespace to right of yield keyword is important for regex.
+            # Allows alphabet characters and underscore for cases where 'yield'
+            # is used at the start of a variable name.
+            source_line = line.lstrip()
+            if (source_line.startswith(b'yield') and
+                    not re.search(br'^(yield)( \S|$|\w)', source_line)):
+                self.add_message('single-space-after-yield', line=line_num + 1)
 
 
 def register(linter):
@@ -911,3 +975,4 @@ def register(linter):
     linter.register_checker(FunctionArgsOrderChecker(linter))
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
+    linter.register_checker(SingleSpaceAfterYieldChecker(linter))

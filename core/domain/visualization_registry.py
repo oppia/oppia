@@ -15,16 +15,16 @@
 # limitations under the License.
 
 """Registry for visualizations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import os
 
 from extensions.visualizations import models
-import feconf
-import utils
+import python_utils
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all visualizations."""
 
     # Dict mapping visualization class names to their classes.
@@ -43,23 +43,8 @@ class Registry(object):
 
             ancestor_names = [
                 base_class.__name__ for base_class in inspect.getmro(clazz)]
-            if 'BaseVisualization' not in ancestor_names:
-                continue
-
-            cls.visualizations_dict[clazz.__name__] = clazz
-
-    @classmethod
-    def get_full_html(cls):
-        """Returns the HTML bodies for all visualizations."""
-        js_directives = ''
-        for visualization_class in cls.get_all_visualization_ids():
-            filename = (
-                'OppiaVisualization%sDirective.js' % (visualization_class))
-            js_directives += (
-                utils.get_file_contents(os.path.join(
-                    feconf.VISUALIZATIONS_DIR_FOR_JS, filename)))
-
-        return '<script>%s</script>\n' % (js_directives)
+            if 'BaseVisualization' in ancestor_names:
+                cls.visualizations_dict[clazz.__name__] = clazz
 
     @classmethod
     def get_visualization_class(cls, visualization_id):
@@ -82,4 +67,4 @@ class Registry(object):
         """
         if not cls.visualizations_dict:
             cls._refresh_registry()
-        return cls.visualizations_dict.keys()
+        return list(cls.visualizations_dict.keys())

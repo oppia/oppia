@@ -15,14 +15,17 @@
 # limitations under the License.
 
 """Domain objects for user."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf
+import python_utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class UserGlobalPrefs(object):
+class UserGlobalPrefs(python_utils.OBJECT):
     """Domain object for user global email preferences.
 
     Attributes:
@@ -68,7 +71,7 @@ class UserGlobalPrefs(object):
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
 
-class UserExplorationPrefs(object):
+class UserExplorationPrefs(python_utils.OBJECT):
     """Domain object for user exploration email preferences.
 
     Attributes:
@@ -114,7 +117,7 @@ class UserExplorationPrefs(object):
         }
 
 
-class ExpUserLastPlaythrough(object):
+class ExpUserLastPlaythrough(python_utils.OBJECT):
     """Domain object for an exploration last playthrough model."""
 
     def __init__(
@@ -141,7 +144,7 @@ class ExpUserLastPlaythrough(object):
         self.last_played_state_name = last_played_state_name
 
 
-class IncompleteActivities(object):
+class IncompleteActivities(python_utils.OBJECT):
     """Domain object for the incomplete activities model."""
 
     def __init__(
@@ -171,7 +174,7 @@ class IncompleteActivities(object):
         self.collection_ids.remove(collection_id)
 
 
-class CompletedActivities(object):
+class CompletedActivities(python_utils.OBJECT):
     """Domain object for the activities completed by learner model."""
 
     def __init__(
@@ -201,7 +204,7 @@ class CompletedActivities(object):
         self.collection_ids.remove(collection_id)
 
 
-class LearnerPlaylist(object):
+class LearnerPlaylist(python_utils.OBJECT):
     """Domain object for the learner playlist model."""
 
     def __init__(
@@ -268,7 +271,7 @@ class LearnerPlaylist(object):
         self.collection_ids.remove(collection_id)
 
 
-class UserContributionScoring(object):
+class UserContributionScoring(python_utils.OBJECT):
     """Domain object for UserContributionScoringModel."""
 
     def __init__(self, user_id, score_category, score, has_email_been_sent):

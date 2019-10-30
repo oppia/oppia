@@ -71,6 +71,8 @@ var TopicEditorPage = function() {
   var skillItems = element.all(by.css('.protractor-test-skill-item'));
   var confirmSkillButton = element(
     by.css('.protractor-test-confirm-skill-button'));
+  var confirmSkillDifficultyButton = element(
+    by.css('.protractor-test-confirm-skill-difficulty-button'));
   var saveQuestionButton = element(
     by.css('.protractor-test-save-question-button'));
   var questionItems = element.all(
@@ -102,6 +104,7 @@ var TopicEditorPage = function() {
         confirmSkillButton,
         'Confirm Skill button takes too long to be clickable');
       confirmSkillButton.click();
+      confirmSkillDifficultyButton.click();
     });
   };
 
@@ -184,6 +187,15 @@ var TopicEditorPage = function() {
         elems[index].all(
           by.css('.protractor-test-story-title')).first().getText()
       ).toEqual(title);
+    });
+  };
+
+  this.expectStoryPublicationStatusToBe = function(status, index) {
+    storyListItems.then(function(elems) {
+      expect(
+        elems[index].all(
+          by.css('.protractor-test-story-publication-status')).first().getText()
+      ).toEqual(status);
     });
   };
 

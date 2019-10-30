@@ -15,6 +15,8 @@
 """Controllers for the topics and skills dashboard, from where topics and skills
 are created.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -23,6 +25,7 @@ from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
 
@@ -32,7 +35,8 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
-        self.render_template('dist/topics_and_skills_dashboard.html')
+        self.render_template(
+            'topics-and-skills-dashboard-page.mainpage.html')
 
 
 class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
@@ -145,9 +149,14 @@ class NewSkillHandler(base.BaseHandler):
     def post(self):
         description = self.payload.get('description')
         linked_topic_ids = self.payload.get('linked_topic_ids')
+        rubrics = self.payload.get('rubrics')
+        if not isinstance(rubrics, list):
+            raise self.InvalidInputException('Rubrics should be a list.')
+
+        rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
-            topics = topic_services.get_topics_by_ids(linked_topic_ids)
+            topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
             for topic in topics:
                 if topic is None:
                     raise self.InvalidInputException
@@ -157,7 +166,7 @@ class NewSkillHandler(base.BaseHandler):
         skill_domain.Skill.require_valid_description(description)
 
         skill = skill_domain.Skill.create_default_skill(
-            new_skill_id, description)
+            new_skill_id, description, rubrics)
         skill_services.save_new_skill(self.user_id, skill)
 
         self.render_json({
@@ -183,7 +192,7 @@ class MergeSkillHandler(base.BaseHandler):
         if old_skill is None:
             raise self.PageNotFoundException(
                 Exception('The old skill with the given id doesn\'t exist.'))
-        question_services.update_skill_ids_of_questions(
+        question_services.replace_skill_id_for_all_questions(
             old_skill_id, old_skill.description, new_skill_id)
         changelist = [
             skill_domain.SkillChange({

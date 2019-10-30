@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Models for Oppia suggestions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -49,10 +51,12 @@ STATUS_CHOICES = [
 
 # Constants defining various suggestion types.
 SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
 SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
 
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
@@ -133,6 +137,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """General suggestion needs to be pseudonymized for the user."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def create(
@@ -235,6 +244,42 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
+    def get_in_review_suggestions_of_suggestion_type(
+            cls, suggestion_type, user_id):
+        """Gets all suggestions of suggestion_type which are in review.
+
+        Args:
+            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+                As a user cannot review their own suggestions, suggestions
+                authored by the user will be excluded.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are of the given
+                type, which are in review, but not created by the given user.
+        """
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.suggestion_type == suggestion_type).filter(
+                cls.author_id != user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_user_created_suggestions_of_suggestion_type(
+            cls, suggestion_type, user_id):
+        """Gets all suggestions of suggestion_type which the user has created.
+
+        Args:
+            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are of the given
+                type, which the given user has created.
+        """
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.suggestion_type == suggestion_type).filter(
+                cls.author_id == user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
     def get_all_score_categories(cls):
         """Gets all the score categories for which suggestions have been
         created.
@@ -245,6 +290,37 @@ class GeneralSuggestionModel(base_models.BaseModel):
         query_set = cls.query(projection=['score_category'], distinct=True)
         return [data.score_category for data in query_set]
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Exports the data from GeneralSuggestionModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from GeneralSuggestionModel.
+        """
+
+        user_data = dict()
+        suggestion_models = (
+            cls.get_all()
+            .filter(cls.author_id == user_id).fetch())
+
+        for suggestion_model in suggestion_models:
+            user_data[suggestion_model.id] = {
+                'suggestion_type': suggestion_model.suggestion_type,
+                'target_type': suggestion_model.target_type,
+                'target_id': suggestion_model.target_id,
+                'target_version_at_submission': (
+                    suggestion_model
+                    .target_version_at_submission),
+                'status': suggestion_model.status,
+                'change_cmd': suggestion_model.change_cmd,
+            }
+
+        return user_data
+
 
 class ReviewerRotationTrackingModel(base_models.BaseModel):
     """Model to keep track of the position in the reviewer rotation. This model
@@ -254,6 +330,13 @@ class ReviewerRotationTrackingModel(base_models.BaseModel):
     # The ID of the user whose turn is just completed in the rotation.
     current_position_in_rotation = ndb.StringProperty(
         required=True, indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Reviewer rotation tracking is going to be reworked oon.
+        Thus, using using not applicable for now.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create(cls, score_category, user_id):

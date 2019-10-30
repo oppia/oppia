@@ -18,11 +18,9 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'PRETEST_QUESTIONS_URL_TEMPLATE',
-  '/pretest_handler/<exploration_id>?story_id=<story_id>&cursor=<cursor>');
+require('domain/question/question-domain.constants.ajs.ts');
 
-oppia.factory('PretestQuestionBackendApiService', [
+angular.module('oppia').factory('PretestQuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'PRETEST_QUESTIONS_URL_TEMPLATE',
   function(
       $http, $q, UrlInterpolationService, PRETEST_QUESTIONS_URL_TEMPLATE) {
@@ -30,7 +28,7 @@ oppia.factory('PretestQuestionBackendApiService', [
 
     var _fetchPretestQuestions = function(
         explorationId, storyId, successCallback, errorCallback) {
-      if (!storyId) {
+      if (!storyId || !storyId.match(/^[a-zA-Z0-9]+$/i)) {
         successCallback([]);
         return;
       }

@@ -18,12 +18,14 @@ ONLY RELEASE COORDINATORS SHOULD USE THIS SCRIPT.
 
 Make sure to run this script from the oppia/ root folder:
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
 
-import common  # pylint: disable=relative-import
-import gcloud_adapter  # pylint: disable=relative-import
+from . import common
+from . import gcloud_adapter
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(

@@ -18,6 +18,7 @@
  */
 
 var waitFor = require('./waitFor.js');
+var path = require('path');
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
@@ -37,6 +38,53 @@ var PreferencesPage = function() {
   var systemLanguageSelector = element.all(
     by.css('.protractor-test-system-language-selector')).first();
   var userBioElement = element(by.css('.protractor-test-user-bio'));
+  var userInterestsElement = element(
+    by.css('.protractor-test-interests-dropdown'));
+  var userInterestsInput = userInterestsElement.element(
+    by.css('.select2-search__field'));
+  var createrDashboardRadio = element(
+    by.css('.protractor-test-creator-dashboard-radio'));
+  var learnerDashboardRadio = element(
+    by.css('.protractor-test-learner-dashboard-radio'));
+  var profilePhotoClickable = element(
+    by.css('.protractor-test-photo-clickable'));
+  var profilePhotoUploadInput = element(
+    by.css('.protractor-test-photo-upload-input'));
+  var profilePhotoSubmitButton = element(
+    by.css('.protractor-test-photo-upload-submit'));
+  var customProfilePhoto = element(
+    by.css('.protractor-test-custom-photo'));
+  var profilePhotoCropper = element(
+    by.css('.protractor-test-photo-crop'));
+  var profilePhotoUploadError = element(
+    by.css('.protractor-test-upload-error'));
+
+  this.expectUploadError = function() {
+    expect(profilePhotoUploadError.isDisplayed()).toBe(true);
+  };
+
+  this.uploadProfilePhoto = function(imgPath) {
+    profilePhotoClickable.click();
+    absPath = path.resolve(__dirname, imgPath);
+    return profilePhotoUploadInput.sendKeys(absPath);
+  };
+
+  this.submitProfilePhoto = function(imgPath) {
+    return this.uploadProfilePhoto(imgPath).then(function() {
+      waitFor.visibilityOf(
+        profilePhotoCropper, 'Photo cropper is taking too long to appear');
+    }).then(function() {
+      profilePhotoSubmitButton.click();
+    }).then(function() {
+      return waitFor.invisibilityOf(
+        profilePhotoUploadInput,
+        'Photo uploader is taking too long to disappear');
+    });
+  };
+
+  this.getProfilePhotoSource = function() {
+    return customProfilePhoto.getAttribute('src');
+  };
 
   this.editUserBio = function(bio) {
     userBioElement.sendKeys(bio);
@@ -86,6 +134,14 @@ var PreferencesPage = function() {
     preferencesLink.click();
   };
 
+  this.setUserInterests = function(interests) {
+    userInterestsInput.click();
+    interests.forEach(function(interest) {
+      userInterestsInput.sendKeys(interest);
+      userInterestsInput.sendKeys(protractor.Key.RETURN);
+    });
+  };
+
   this.isFeedbackEmailsCheckboxSelected = function() {
     return feedbackMessageEmailsCheckbox.isSelected();
   };
@@ -132,6 +188,14 @@ var PreferencesPage = function() {
 
   this.expectUserBioToBe = function(bio) {
     expect(userBioElement.getAttribute('value')).toMatch(bio);
+  };
+
+  this.selectCreatorDashboard = function() {
+    createrDashboardRadio.click();
+  };
+
+  this.selectLearnerDashboard = function() {
+    learnerDashboardRadio.click();
   };
 };
 

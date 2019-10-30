@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for rich text components."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 import os
@@ -38,14 +40,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             a TypeError when validated.
         """
         for item in valid_items:
-            try:
-                rte_component_class.validate(item)
-            except Exception as e:
-                self.fail(
-                    msg=(
-                        'Unexpected exception %s raised during '
-                        'validation of %s' % (
-                            str(e), str(item))))
+            rte_component_class.validate(item)
 
         for item in invalid_items:
             with self.assertRaises(Exception):

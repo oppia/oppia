@@ -17,7 +17,7 @@
  * domain object.
  */
 
-oppia.factory('QuestionUndoRedoService', [
+angular.module('oppia').factory('QuestionUndoRedoService', [
   'BaseUndoRedoService', function(BaseUndoRedoService) {
     var child = Object.create(BaseUndoRedoService);
     child.init();

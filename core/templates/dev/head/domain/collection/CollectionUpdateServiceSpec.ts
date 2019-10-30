@@ -16,13 +16,23 @@
  * @fileoverview Tests for Collection update service.
  */
 
-require('domain/collection/CollectionObjectFactory.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// CollectionUpdateService.ts is upgraded to Angular 8.
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory';
+import { CollectionNodeObjectFactory } from
+  'domain/collection/CollectionNodeObjectFactory';
+import { CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 
 describe('Collection update service', function() {
   var CollectionUpdateService = null;
-  var CollectionObjectFactory = null;
+  var collectionObjectFactory = null;
   var UndoRedoService = null;
   var _sampleCollection = null;
   var _sampleExplorationSummaryBackendObject = {
@@ -31,10 +41,24 @@ describe('Collection update service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value(
+      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
+    $provide.value(
+      'CollectionObjectFactory', new CollectionObjectFactory(
+        new CollectionNodeObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionUpdateService = $injector.get('CollectionUpdateService');
-    CollectionObjectFactory = $injector.get('CollectionObjectFactory');
+    collectionObjectFactory = $injector.get('CollectionObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
 
     var sampleCollectionBackendObject = {
@@ -50,7 +74,7 @@ describe('Collection update service', function() {
         exploration: {}
       }]
     };
-    _sampleCollection = CollectionObjectFactory.create(
+    _sampleCollection = collectionObjectFactory.create(
       sampleCollectionBackendObject);
   }));
 

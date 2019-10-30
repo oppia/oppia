@@ -15,15 +15,19 @@
 # limitations under the License.
 
 """Unit tests for utils.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import base64
 import copy
 import datetime
+import os
 
-# pylint: disable=relative-import
+from constants import constants
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
-# pylint: enable=relative-import
 
 
 class UtilsTests(test_utils.GenericTestBase):
@@ -43,32 +47,32 @@ class UtilsTests(test_utils.GenericTestBase):
         alist = ['a', 'b', 'c', 'd']
         results = ['', 'a', 'a and b', 'a, b and c', 'a, b, c and d']
 
-        for i in range(len(alist) + 1):
+        for i in python_utils.RANGE(len(alist) + 1):
             comma_sep_string = utils.get_comma_sep_string_from_list(alist[:i])
             self.assertEqual(comma_sep_string, results[i])
 
     def test_to_ascii(self):
         """Test to_ascii method."""
         parsed_str = utils.to_ascii('abc')
-        self.assertEqual(parsed_str, 'abc')
+        self.assertEqual(parsed_str, b'abc')
 
         parsed_str = utils.to_ascii(u'¡Hola!')
-        self.assertEqual(parsed_str, 'Hola!')
+        self.assertEqual(parsed_str, b'Hola!')
 
         parsed_str = utils.to_ascii(
             u'Klüft skräms inför på fédéral électoral große')
         self.assertEqual(
-            parsed_str, 'Kluft skrams infor pa federal electoral groe')
+            parsed_str, b'Kluft skrams infor pa federal electoral groe')
 
         parsed_str = utils.to_ascii('')
-        self.assertEqual(parsed_str, '')
+        self.assertEqual(parsed_str, b'')
 
     def test_yaml_dict_conversion(self):
         """Test yaml_from_dict and dict_from_yaml methods."""
         test_dicts = [{}, {'a': 'b'}, {'a': 2}, {'a': ['b', 2, {'c': 3.5}]}]
 
         for adict in test_dicts:
-            yaml_str = utils.yaml_from_dict(adict)
+            yaml_str = python_utils.yaml_from_dict(adict)
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
@@ -182,6 +186,11 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, 'foo')
         p = utils.vfs_normpath('/foo//bar//baz//')
         self.assertEqual(p, '/foo/bar/baz')
+        p = utils.vfs_normpath('')
+        self.assertEqual(p, '.')
+        p = utils.vfs_normpath('//foo//bar//baz//')
+        self.assertEqual(p, '//foo/bar/baz')
+
 
     def test_capitalize_string(self):
         test_data = [
@@ -199,6 +208,12 @@ class UtilsTests(test_utils.GenericTestBase):
 
         for datum in test_data:
             self.assertEqual(utils.capitalize_string(datum[0]), datum[1])
+
+    def test_generate_random_string(self):
+        # Generate a random string of length 12.
+        random_string = utils.generate_random_string(12)
+        self.assertTrue(isinstance(random_string, python_utils.BASESTRING))
+        self.assertEqual(len(random_string), 12)
 
     def test_get_thumbnail_icon_url_for_category(self):
         self.assertEqual(
@@ -221,13 +236,6 @@ class UtilsTests(test_utils.GenericTestBase):
                 datetime.datetime(2016, 12, 1, 0, 0, 3),
                 initial_time))
 
-    def test_convert_to_str(self):
-        string1 = 'Home'
-        string2 = u'Лорем'
-        self.assertEqual(utils.convert_to_str(string1), string1)
-        self.assertEqual(
-            utils.convert_to_str(string2), string2.encode(encoding='utf-8'))
-
     def test_get_hashable_value(self):
         json1 = ['foo', 'bar', {'baz': 3}]
         json2 = ['fee', {'fie': ['foe', 'fum']}]
@@ -243,6 +251,67 @@ class UtilsTests(test_utils.GenericTestBase):
                 utils.get_hashable_value(json2_deepcopy),
             })
 
+    def test_is_supported_audio_language_code(self):
+        self.assertTrue(utils.is_supported_audio_language_code('hi-en'))
+        self.assertFalse(utils.is_supported_audio_language_code('unknown'))
+
     def test_is_valid_language_code(self):
         self.assertTrue(utils.is_valid_language_code('en'))
         self.assertFalse(utils.is_valid_language_code('unknown'))
+
+    def test_require_valid_name(self):
+        name = 'name'
+        utils.require_valid_name(name, 'name_type')
+
+        name = 0
+        with self.assertRaisesRegexp(Exception, '0 must be a string.'):
+            utils.require_valid_name(name, 'name_type')
+
+    def test_validate_convert_to_hash(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected string, received 1 of type %s' % type(1)):
+            utils.convert_to_hash(1, 10)
+
+    def test_convert_png_to_data_url_with_non_png_image_raises_error(self):
+        favicon_filepath = os.path.join(
+            self.get_static_asset_filepath(), 'assets', 'favicon.ico')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The given string does not represent a PNG image.'):
+            utils.convert_png_to_data_url(favicon_filepath)
+
+    def test_get_exploration_components_from_dir_with_invalid_path_raises_error(
+            self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Found invalid non-asset file .+'
+            'There should only be a single non-asset file, and it should have '
+            'a .yaml suffix.'):
+            utils.get_exploration_components_from_dir('core/tests/load_tests')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The only directory in . should be assets/'):
+            utils.get_exploration_components_from_dir('.')
+
+    def test_get_exploration_components_from_dir_with_multiple_yaml_files(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'More than one non-asset file specified for '
+            'core/tests/data/dummy_assets/assets'):
+            utils.get_exploration_components_from_dir(
+                'core/tests/data/dummy_assets/assets/')
+
+    def test_get_exploration_components_from_dir_with_no_yaml_file(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'No yaml file specifed for core/tests/data/dummy_assets'):
+            utils.get_exploration_components_from_dir(
+                'core/tests/data/dummy_assets/')
+
+    def test_get_asset_dir_prefix_with_prod_mode(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            self.assertEqual(utils.get_asset_dir_prefix(), '/build')
+
+    def test_base64_from_int(self):
+        base64_number = utils.base64_from_int(108)
+        self.assertEqual(base64.b64decode(base64_number), '[108]')

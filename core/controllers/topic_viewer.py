@@ -13,12 +13,15 @@
 # limitations under the License.
 
 """Controllers for the topic viewer page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import story_services
-from core.domain import topic_services
+from core.domain import skill_services
+from core.domain import story_fetchers
+from core.domain import topic_fetchers
 import feconf
 
 
@@ -32,7 +35,7 @@ class TopicViewerPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        self.render_template('dist/topic_viewer.html')
+        self.render_template('topic-viewer-page.mainpage.html')
 
 
 class TopicPageDataHandler(base.BaseHandler):
@@ -48,17 +51,20 @@ class TopicPageDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_name(topic_name)
-
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        canonical_story_ids = topic.get_canonical_story_ids(
+            include_only_published=True)
+        additional_story_ids = topic.get_additional_story_ids(
+            include_only_published=True)
         canonical_story_summaries = [
-            story_services.get_story_summary_by_id(
+            story_fetchers.get_story_summary_by_id(
                 canonical_story_id) for canonical_story_id
-            in topic.canonical_story_ids]
+            in canonical_story_ids]
 
         additional_story_summaries = [
-            story_services.get_story_summary_by_id(
+            story_fetchers.get_story_summary_by_id(
                 additional_story_id) for additional_story_id
-            in topic.additional_story_ids]
+            in additional_story_ids]
 
         canonical_story_dicts = [
             summary.to_human_readable_dict() for summary
@@ -71,11 +77,26 @@ class TopicPageDataHandler(base.BaseHandler):
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
         subtopics = topic.get_all_subtopics()
 
+        assigned_skill_ids = topic.get_all_skill_ids()
+        skill_descriptions = skill_services.get_skill_descriptions_by_ids(
+            topic.id, assigned_skill_ids)
+
+        if self.user_id:
+            degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
+                self.user_id, assigned_skill_ids)
+        else:
+            degrees_of_mastery = {}
+            for skill_id in assigned_skill_ids:
+                degrees_of_mastery[skill_id] = None
+
         self.values.update({
+            'topic_id': topic.id,
             'topic_name': topic.name,
             'canonical_story_dicts': canonical_story_dicts,
             'additional_story_dicts': additional_story_dicts,
             'uncategorized_skill_ids': uncategorized_skill_ids,
-            'subtopics': subtopics
+            'subtopics': subtopics,
+            'degrees_of_mastery': degrees_of_mastery,
+            'skill_descriptions': skill_descriptions
         })
         self.render_json(self.values)

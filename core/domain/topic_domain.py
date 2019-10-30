@@ -15,14 +15,18 @@
 # limitations under the License.]
 
 """Domain objects for topics, and related models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
 from constants import constants
+from core.domain import change_domain
 from core.domain import skill_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
@@ -39,14 +43,20 @@ ROLE_NONE = 'none'
 # compatibility with previous change dicts.
 TOPIC_PROPERTY_NAME = 'name'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
-TOPIC_PROPERTY_CANONICAL_STORY_IDS = 'canonical_story_ids'
-TOPIC_PROPERTY_ADDITIONAL_STORY_IDS = 'additional_story_ids'
+TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
+TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
+CMD_ADD_CANONICAL_STORY = 'add_canonical_story'
+CMD_DELETE_CANONICAL_STORY = 'delete_canonical_story'
+CMD_ADD_ADDITIONAL_STORY = 'add_additional_story'
+CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story'
+CMD_PUBLISH_STORY = 'publish_story'
+CMD_UNPUBLISH_STORY = 'unpublish_story'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
@@ -59,166 +69,219 @@ CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
 CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = 'migrate_subtopic_schema_to_latest_version' # pylint: disable=line-too-long
 
 
-class TopicChange(object):
-    """Domain object for changes made to topic object."""
+class TopicChange(change_domain.BaseChange):
+    """Domain object for changes made to topic object.
+
+    The allowed commands, together with the attributes:
+        - 'add_subtopic' (with title, subtopic_id)
+        - 'delete_subtopic' (with subtopic_id)
+        - 'add_uncategorized_skill_id' (with
+        new_uncategorized_skill_id)
+        - 'remove_uncategorized_skill_id' (with uncategorized_skill_id)
+        - 'move_skill_id_to_subtopic' (with old_subtopic_id,
+        new_subtopic_id and skill_id)
+        - 'remove_skill_id_from_subtopic' (with subtopic_id and
+        skill_id)
+        - 'update_topic_property' (with property_name, new_value
+        and old_value)
+        - 'update_subtopic_property' (with subtopic_id, property_name,
+        new_value and old_value)
+        - 'migrate_subtopic_schema_to_latest_version' (with
+        from_version and to_version)
+        - 'create_new' (with name)
+    """
+
+    # The allowed list of topic properties which can be used in
+    # update_topic_property command.
     TOPIC_PROPERTIES = (
         TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_DESCRIPTION,
-        TOPIC_PROPERTY_CANONICAL_STORY_IDS, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
+        TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES,
+        TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
         TOPIC_PROPERTY_LANGUAGE_CODE)
 
+    # The allowed list of subtopic properties which can be used in
+    # update_subtopic_property command.
     SUBTOPIC_PROPERTIES = (SUBTOPIC_PROPERTY_TITLE,)
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'name', 'id', 'title',
-        'old_subtopic_id', 'new_subtopic_id', 'subtopic_id', 'from_version',
-        'to_version'
-    ]
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': ['name'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_SUBTOPIC,
+        'required_attribute_names': ['title', 'subtopic_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_SUBTOPIC,
+        'required_attribute_names': ['subtopic_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_CANONICAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_CANONICAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_ADDITIONAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_ADDITIONAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_PUBLISH_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_UNPUBLISH_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_UNCATEGORIZED_SKILL_ID,
+        'required_attribute_names': ['new_uncategorized_skill_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
+        'required_attribute_names': ['uncategorized_skill_id'],
+        'optional_attribute_names': [],
+    }, {
+        'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+        'required_attribute_names': [
+            'old_subtopic_id', 'new_subtopic_id', 'skill_id'],
+        'optional_attribute_names': [],
+    }, {
+        'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+        'required_attribute_names': ['subtopic_id', 'skill_id'],
+        'optional_attribute_names': [],
+    }, {
+        'name': CMD_UPDATE_SUBTOPIC_PROPERTY,
+        'required_attribute_names': [
+            'subtopic_id', 'property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': SUBTOPIC_PROPERTIES}
+    }, {
+        'name': CMD_UPDATE_TOPIC_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': TOPIC_PROPERTIES}
+    }, {
+        'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
+    }]
 
-    def __init__(self, change_dict):
-        """Initialize a TopicChange object from a dict.
+
+class TopicRightsChange(change_domain.BaseChange):
+    """Domain object for changes made to a topic rights object.
+
+    The allowed commands, together with the attributes:
+        - 'change_role' (with assignee_id, new_role and old_role)
+        - 'create_new'
+        - 'publish_story'
+        - 'unpublish_story'.
+    """
+
+    # The allowed list of roles which can be used in change_role command.
+    ALLOWED_ROLES = [ROLE_NONE, ROLE_MANAGER]
+
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_CHANGE_ROLE,
+        'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
+        'optional_attribute_names': [],
+        'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
+    }, {
+        'name': CMD_REMOVE_MANAGER_ROLE,
+        'required_attribute_names': ['removed_user_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_PUBLISH_TOPIC,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_UNPUBLISH_TOPIC,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }]
+
+
+class StoryReference(python_utils.OBJECT):
+    """Domain object for a Story reference."""
+
+    def __init__(self, story_id, story_is_published):
+        """Constructs a StoryReference domain object.
 
         Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'add_subtopic' (with title)
-                - 'delete_subtopic' (with subtopic_id)
-                - 'add_uncategorized_skill_id' (with
-                new_uncategorized_skill_id)
-                - 'remove_uncategorized_skill_id' (with subtopic_id
-                and skill_id)
-                - 'move_skill_id_to_subtopic' (with old_subtopic_id,
-                new_subtopic_id and skill_id)
-                - 'remove_skill_id_from_subtopic' (with subtopic_id and
-                skill_id)
-                - 'update_topic_property' (with property_name, new_value
-                and old_value)
-                - 'update_subtopic_property' (with property_name, new_value
-                and old_value)
-                - 'migrate_subtopic_schema_to_latest_version' (with
-                from_version and to_version)
-                - 'create_new' (with name)
-
-        Raises:
-            Exception: The given change dict is not valid.
+            story_id: str. The ID of the story.
+            story_is_published: bool. Whether the story is published or not.
         """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_ADD_SUBTOPIC:
-            self.title = change_dict['title']
-            self.subtopic_id = change_dict['subtopic_id']
-        elif self.cmd == CMD_DELETE_SUBTOPIC:
-            self.id = change_dict['subtopic_id']
-        elif self.cmd == CMD_ADD_UNCATEGORIZED_SKILL_ID:
-            self.id = change_dict['new_uncategorized_skill_id']
-        elif self.cmd == CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
-            self.id = change_dict['uncategorized_skill_id']
-        elif self.cmd == CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
-            self.old_subtopic_id = change_dict['old_subtopic_id']
-            self.new_subtopic_id = change_dict['new_subtopic_id']
-            self.skill_id = change_dict['skill_id']
-        elif self.cmd == CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
-            self.subtopic_id = change_dict['subtopic_id']
-            self.skill_id = change_dict['skill_id']
-        elif self.cmd == CMD_UPDATE_TOPIC_PROPERTY:
-            if change_dict['property_name'] not in self.TOPIC_PROPERTIES:
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = copy.deepcopy(change_dict['new_value'])
-            self.old_value = copy.deepcopy(change_dict['old_value'])
-        elif self.cmd == CMD_UPDATE_SUBTOPIC_PROPERTY:
-            if change_dict['property_name'] not in self.SUBTOPIC_PROPERTIES:
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.id = change_dict['subtopic_id']
-            self.property_name = change_dict['property_name']
-            self.new_value = copy.deepcopy(change_dict['new_value'])
-            self.old_value = copy.deepcopy(change_dict['old_value'])
-        elif self.cmd == CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
-        elif self.cmd == CMD_CREATE_NEW:
-            self.name = change_dict['name']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.story_id = story_id
+        self.story_is_published = story_is_published
 
     def to_dict(self):
-        """Returns a dict representing the TopicChange domain object.
+        """Returns a dict representing this StoryReference domain object.
 
         Returns:
-            A dict, mapping all fields of TopicChange instance.
+            A dict, mapping all fields of StoryReference instance.
         """
-        topic_change_dict = {}
-        topic_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                topic_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
+        return {
+            'story_id': self.story_id,
+            'story_is_published': self.story_is_published
+        }
 
-        return topic_change_dict
-
-
-class TopicRightsChange(object):
-    """Domain object for changes made to a topic rights object."""
-
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'assignee_id', 'new_role', 'old_role', 'removed_user_id'
-    ]
-
-    def __init__(self, change_dict):
-        """Initialize a TopicRightsChange object from a dict.
+    @classmethod
+    def from_dict(cls, story_reference_dict):
+        """Returns a StoryReference domain object from a dict.
 
         Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'change_role' (with assignee_id, new_role and old_role)
-                - 'create_new'
-                - 'publish_topic'
-                - 'unpublish_topic'
-
-        Raises:
-            Exception: The given change dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_CHANGE_ROLE:
-            self.assignee_id = change_dict['assignee_id']
-            self.new_role = change_dict['new_role']
-            self.old_role = change_dict['old_role']
-        elif self.cmd == CMD_REMOVE_MANAGER_ROLE:
-            self.removed_user_id = change_dict['removed_user_id']
-        elif self.cmd == CMD_CREATE_NEW:
-            pass
-        elif self.cmd == CMD_PUBLISH_TOPIC:
-            pass
-        elif self.cmd == CMD_UNPUBLISH_TOPIC:
-            pass
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the TopicRightsChange domain object.
+            story_reference_dict: dict. The dict representation of
+                StoryReference object.
 
         Returns:
-            A dict, mapping all fields of TopicRightsChange instance.
+            StoryReference. The corresponding StoryReference domain object.
         """
-        topic_rights_change_dict = {}
-        topic_rights_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                topic_rights_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
+        story_reference = cls(
+            story_reference_dict['story_id'],
+            story_reference_dict['story_is_published'])
+        return story_reference
 
-        return topic_rights_change_dict
+    @classmethod
+    def create_default_story_reference(cls, story_id):
+        """Creates a StoryReference object with default values.
+
+        Args:
+            story_id: str. ID of the new story.
+
+        Returns:
+            StoryReference. A story reference object with given story_id and
+                'not published' status.
+        """
+        return cls(story_id, False)
+
+    def validate(self):
+        """Validates various properties of the StoryReference object.
+
+        Raises:
+            ValidationError: One or more attributes of the StoryReference are
+                invalid.
+        """
+        if not isinstance(self.story_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected story id to be a string, received %s' %
+                self.story_id)
+        if not isinstance(self.story_is_published, bool):
+            raise utils.ValidationError(
+                'Expected story_is_published to be a boolean, received %s' %
+                self.story_is_published)
 
 
-class Subtopic(object):
+class Subtopic(python_utils.OBJECT):
     """Domain object for a Subtopic."""
 
     def __init__(self, subtopic_id, title, skill_ids):
@@ -285,7 +348,7 @@ class Subtopic(object):
         if not isinstance(self.id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % self.id)
-        if not isinstance(self.title, basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected subtopic title to be a string, received %s' %
                 self.title)
@@ -295,7 +358,7 @@ class Subtopic(object):
                 self.skill_ids)
 
         for skill_id in self.skill_ids:
-            if not isinstance(skill_id, basestring):
+            if not isinstance(skill_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each skill id to be a string, received %s' %
                     skill_id)
@@ -305,24 +368,27 @@ class Subtopic(object):
                 'Expected all skill ids to be distinct.')
 
 
-class Topic(object):
+class Topic(python_utils.OBJECT):
     """Domain object for an Oppia Topic."""
 
     def __init__(
-            self, topic_id, name, description, canonical_story_ids,
-            additional_story_ids, uncategorized_skill_ids, subtopics,
+            self, topic_id, name, description, canonical_story_references,
+            additional_story_references, uncategorized_skill_ids, subtopics,
             subtopic_schema_version, next_subtopic_id, language_code, version,
-            created_on=None, last_updated=None):
+            story_reference_schema_version, created_on=None,
+            last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
             topic_id: str. The unique ID of the topic.
             name: str. The name of the topic.
             description: str. The description of the topic.
-            canonical_story_ids: list(str). A set of ids representing the
-                canonical stories that are part of this topic.
-            additional_story_ids: list(str). A set of ids representing the
-                additional stories that are part of this topic.
+            canonical_story_references: list(StoryReference). A set of story
+                reference objects representing the canonical stories that are
+                part of this topic.
+            additional_story_references: list(StoryReference). A set of story
+                reference object representing the additional stories that are
+                part of this topic.
             uncategorized_skill_ids: list(str). This consists of the list of
                 uncategorized skill ids that are not part of any subtopic.
             subtopics: list(Subtopic). The list of subtopics that are part of
@@ -333,6 +399,8 @@ class Topic(object):
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
             version: int. The version of the topic.
+            story_reference_schema_version: int. The schema version of the
+                story reference object.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -342,8 +410,8 @@ class Topic(object):
         self.name = name
         self.canonical_name = name.lower()
         self.description = description
-        self.canonical_story_ids = canonical_story_ids
-        self.additional_story_ids = additional_story_ids
+        self.canonical_story_references = canonical_story_references
+        self.additional_story_references = additional_story_references
         self.uncategorized_skill_ids = uncategorized_skill_ids
         self.subtopics = subtopics
         self.subtopic_schema_version = subtopic_schema_version
@@ -352,6 +420,7 @@ class Topic(object):
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+        self.story_reference_schema_version = story_reference_schema_version
 
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
@@ -363,8 +432,14 @@ class Topic(object):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'canonical_story_ids': self.canonical_story_ids,
-            'additional_story_ids': self.additional_story_ids,
+            'canonical_story_references': [
+                reference.to_dict()
+                for reference in self.canonical_story_references
+            ],
+            'additional_story_references': [
+                reference.to_dict()
+                for reference in self.additional_story_references
+            ],
             'uncategorized_skill_ids': self.uncategorized_skill_ids,
             'subtopics': [
                 subtopic.to_dict() for subtopic in self.subtopics
@@ -372,7 +447,9 @@ class Topic(object):
             'subtopic_schema_version': self.subtopic_schema_version,
             'next_subtopic_id': self.next_subtopic_id,
             'language_code': self.language_code,
-            'version': self.version
+            'version': self.version,
+            'story_reference_schema_version': (
+                self.story_reference_schema_version)
         }
 
     @classmethod
@@ -382,7 +459,7 @@ class Topic(object):
         Args:
             topic_id: str. The topic id to validate.
         """
-        if not isinstance(topic_id, basestring):
+        if not isinstance(topic_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Topic id should be a string, received: %s' % topic_id)
 
@@ -396,7 +473,7 @@ class Topic(object):
         Args:
             name: str. The name to validate.
         """
-        if not isinstance(name, basestring):
+        if not isinstance(name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
 
         if name == '':
@@ -414,6 +491,82 @@ class Topic(object):
             skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
         return skill_ids
 
+    def publish_story(self, story_id):
+        """Marks story with the given id as published.
+
+        Raises:
+            Exception. Story with given id doesn't exist in the topic.
+        """
+        for story_reference in self.canonical_story_references:
+            if story_reference.story_id == story_id:
+                story_reference.story_is_published = True
+                return
+
+        for story_reference in self.additional_story_references:
+            if story_reference.story_id == story_id:
+                story_reference.story_is_published = True
+                return
+        raise Exception('Story with given id doesn\'t exist in the topic')
+
+    def unpublish_story(self, story_id):
+        """Marks story with the given id as unpublished.
+
+        Raises:
+            Exception. Story with given id doesn't exist in the topic.
+        """
+        for story_reference in self.canonical_story_references:
+            if story_reference.story_id == story_id:
+                story_reference.story_is_published = False
+                return
+
+        for story_reference in self.additional_story_references:
+            if story_reference.story_id == story_id:
+                story_reference.story_is_published = False
+                return
+        raise Exception('Story with given id doesn\'t exist in the topic')
+
+    def get_canonical_story_ids(self, include_only_published=False):
+        """Returns a list of canonical story ids that are part of the topic.
+
+        Args:
+            include_only_published: bool. Only return IDs of stories that are
+                published.
+
+        Returns:
+            list(str). The list of canonical story ids.
+        """
+        story_ids = [
+            elem.story_id for elem in self.canonical_story_references
+            if (elem.story_is_published or not include_only_published)
+        ]
+        return story_ids
+
+    def get_all_story_references(self):
+        """Returns all the story references in the topic - both canonical and
+        additional.
+
+        Returns:
+            list(StoryReference). The list of StoryReference objects in topic.
+        """
+        return (
+            self.canonical_story_references + self.additional_story_references)
+
+    def get_additional_story_ids(self, include_only_published=False):
+        """Returns a list of additional story ids that are part of the topic.
+
+        Args:
+            include_only_published: bool. Only return IDs of stories that are
+                published.
+
+        Returns:
+            list(str). The list of additional story ids.
+        """
+        story_ids = [
+            elem.story_id for elem in self.additional_story_references
+            if (elem.story_is_published or not include_only_published)
+        ]
+        return story_ids
+
     def get_all_uncategorized_skill_ids(self):
         """Returns ids of all the uncategorized skills present in the topic.
 
@@ -423,33 +576,77 @@ class Topic(object):
         """
         return self.uncategorized_skill_ids
 
-    def delete_story(self, story_id):
-        """Removes a story from the canonical_story_ids list.
+    def delete_canonical_story(self, story_id):
+        """Removes a story from the canonical_story_references list.
 
         Args:
             story_id: str. The story id to remove from the list.
 
         Raises:
-            Exception. The story_id is not present in the canonical story ids
+            Exception. The story_id is not present in the canonical stories
                 list of the topic.
         """
-        if story_id not in self.canonical_story_ids:
+        deleted = False
+        for index, reference in enumerate(self.canonical_story_references):
+            if reference.story_id == story_id:
+                del self.canonical_story_references[index]
+                deleted = True
+                break
+        if not deleted:
             raise Exception(
                 'The story_id %s is not present in the canonical '
-                'story ids list of the topic.' % story_id)
-        self.canonical_story_ids.remove(story_id)
+                'story references list of the topic.' % story_id)
 
     def add_canonical_story(self, story_id):
-        """Adds a story to the canonical_story_ids list.
+        """Adds a story to the canonical_story_references list.
 
         Args:
             story_id: str. The story id to add to the list.
         """
-        if story_id in self.canonical_story_ids:
+        canonical_story_ids = self.get_canonical_story_ids()
+        if story_id in canonical_story_ids:
             raise Exception(
                 'The story_id %s is already present in the canonical '
-                'story ids list of the topic.' % story_id)
-        self.canonical_story_ids.append(story_id)
+                'story references list of the topic.' % story_id)
+        self.canonical_story_references.append(
+            StoryReference.create_default_story_reference(story_id)
+        )
+
+    def add_additional_story(self, story_id):
+        """Adds a story to the additional_story_references list.
+
+        Args:
+            story_id: str. The story id to add to the list.
+        """
+        additional_story_ids = self.get_additional_story_ids()
+        if story_id in additional_story_ids:
+            raise Exception(
+                'The story_id %s is already present in the additional '
+                'story references list of the topic.' % story_id)
+        self.additional_story_references.append(
+            StoryReference.create_default_story_reference(story_id)
+        )
+
+    def delete_additional_story(self, story_id):
+        """Removes a story from the additional_story_references list.
+
+        Args:
+            story_id: str. The story id to remove from the list.
+
+        Raises:
+            Exception. The story_id is not present in the additional stories
+                list of the topic.
+        """
+        deleted = False
+        for index, reference in enumerate(self.additional_story_references):
+            if reference.story_id == story_id:
+                del self.additional_story_references[index]
+                deleted = True
+                break
+        if not deleted:
+            raise Exception(
+                'The story_id %s is not present in the additional '
+                'story references list of the topic.' % story_id)
 
     def validate(self):
         """Validates all properties of this topic and its constituents.
@@ -459,7 +656,7 @@ class Topic(object):
                 valid.
         """
         self.require_valid_name(self.name)
-        if not isinstance(self.description, basestring):
+        if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -476,8 +673,13 @@ class Topic(object):
 
         if not isinstance(self.subtopic_schema_version, int):
             raise utils.ValidationError(
-                'Expected schema version to be an integer, received %s'
+                'Expected subtopic schema version to be an integer, received %s'
                 % self.subtopic_schema_version)
+
+        if not isinstance(self.story_reference_schema_version, int):
+            raise utils.ValidationError(
+                'Expected story reference schema version to be an integer, '
+                'received %s' % self.story_reference_schema_version)
 
         if (self.subtopic_schema_version !=
                 feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
@@ -499,7 +701,7 @@ class Topic(object):
                     'next_subtopic_id %s'
                     % (subtopic.id, self.next_subtopic_id))
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -507,28 +709,35 @@ class Topic(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        if not isinstance(self.canonical_story_ids, list):
+        if not isinstance(self.canonical_story_references, list):
             raise utils.ValidationError(
-                'Expected canonical story ids to be a list, received %s'
-                % self.canonical_story_ids)
-        if len(self.canonical_story_ids) > len(set(self.canonical_story_ids)):
+                'Expected canonical story references to be a list, received %s'
+                % self.canonical_story_references)
+
+        canonical_story_ids = self.get_canonical_story_ids()
+        if len(canonical_story_ids) > len(set(canonical_story_ids)):
             raise utils.ValidationError(
                 'Expected all canonical story ids to be distinct.')
 
-        if not isinstance(self.additional_story_ids, list):
+        if not isinstance(self.additional_story_references, list):
             raise utils.ValidationError(
-                'Expected additional story ids to be a list, received %s'
-                % self.additional_story_ids)
-        if len(self.additional_story_ids) > len(set(self.additional_story_ids)):
+                'Expected additional story references to be a list, received %s'
+                % self.additional_story_references)
+        additional_story_ids = self.get_additional_story_ids()
+        if len(additional_story_ids) > len(set(additional_story_ids)):
             raise utils.ValidationError(
                 'Expected all additional story ids to be distinct.')
 
-        for story_id in self.additional_story_ids:
-            if story_id in self.canonical_story_ids:
+        for story_id in additional_story_ids:
+            if story_id in canonical_story_ids:
                 raise utils.ValidationError(
                     'Expected additional story ids list and canonical story '
                     'ids list to be mutually exclusive. The story_id %s is '
                     'present in both lists' % story_id)
+
+        all_story_references = self.get_all_story_references()
+        for reference in all_story_references:
+            reference.validate()
 
         if not isinstance(self.uncategorized_skill_ids, list):
             raise utils.ValidationError(
@@ -550,24 +759,23 @@ class Topic(object):
         """
         return cls(
             topic_id, name,
-            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [], 1,
-            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0)
+            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
+            constants.DEFAULT_LANGUAGE_CODE, 0,
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
 
     @classmethod
-    def update_subtopics_from_model(
-            cls, versioned_subtopics, current_version):
+    def update_subtopics_from_model(cls, versioned_subtopics, current_version):
         """Converts the subtopics blob contained in the given
         versioned_subtopics dict from current_version to
         current_version + 1. Note that the versioned_subtopics being
         passed in is modified in-place.
-
         Args:
             versioned_subtopics: dict. A dict with two keys:
                 - schema_version: str. The schema version for the
                     subtopics dict.
                 - subtopics: list(dict). The list of dicts comprising the
-                    subtopics of the skill.
+                    subtopics of the topic.
             current_version: int. The current schema version of subtopics.
         """
         versioned_subtopics['schema_version'] = current_version + 1
@@ -581,6 +789,36 @@ class Topic(object):
             updated_subtopics.append(conversion_fn(subtopic))
 
         versioned_subtopics['subtopics'] = updated_subtopics
+
+    @classmethod
+    def update_story_references_from_model(
+            cls, versioned_story_references, current_version):
+        """Converts the story_references blob contained in the given
+        versioned_story_references dict from current_version to
+        current_version + 1. Note that the versioned_story_references being
+        passed in is modified in-place.
+
+        Args:
+            versioned_story_references: dict. A dict with two keys:
+                - schema_version: str. The schema version for the
+                    story_references dict.
+                - story_references: list(dict). The list of dicts comprising the
+                    story_references of the topic.
+            current_version: int. The current schema version of
+                story_references.
+        """
+        versioned_story_references['schema_version'] = current_version + 1
+
+        conversion_fn = getattr(
+            cls, '_convert_story_reference_v%s_dict_to_v%s_dict' % (
+                current_version, current_version + 1))
+
+        updated_story_references = []
+        for reference in versioned_story_references['story_references']:
+            updated_story_references.append(conversion_fn(reference))
+
+        versioned_story_references['story_references'] = (
+            updated_story_references)
 
     def update_name(self, new_name):
         """Updates the name of a topic object.
@@ -605,24 +843,6 @@ class Topic(object):
             new_language_code: str. The updated language code for the topic.
         """
         self.language_code = new_language_code
-
-    def update_canonical_story_ids(self, new_canonical_story_ids):
-        """Updates the canonical story id list of a topic object.
-
-        Args:
-            new_canonical_story_ids: list(str). The updated list of canonical
-                story ids.
-        """
-        self.canonical_story_ids = new_canonical_story_ids
-
-    def update_additional_story_ids(self, new_additional_story_ids):
-        """Updates the additional story id list of a topic object.
-
-        Args:
-            new_additional_story_ids: list(str). The updated list of additional
-                story ids.
-        """
-        self.additional_story_ids = new_additional_story_ids
 
     def add_uncategorized_skill_id(self, new_uncategorized_skill_id):
         """Updates the skill id list of a topic object.
@@ -830,7 +1050,7 @@ class Topic(object):
         self.uncategorized_skill_ids.append(skill_id)
 
 
-class TopicSummary(object):
+class TopicSummary(python_utils.OBJECT):
     """Domain object for Topic Summary."""
 
     def __init__(
@@ -873,6 +1093,88 @@ class TopicSummary(object):
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
 
+    def validate(self):
+        """Validates all properties of this topic summary.
+
+        Raises:
+            ValidationError: One or more attributes of the Topic summary
+                are not valid.
+        """
+        if not isinstance(self.name, python_utils.BASESTRING):
+            raise utils.ValidationError('Name should be a string.')
+        if self.name == '':
+            raise utils.ValidationError('Name field should not be empty')
+
+        if not isinstance(self.canonical_name, python_utils.BASESTRING):
+            raise utils.ValidationError('Canonical name should be a string.')
+        if self.canonical_name == '':
+            raise utils.ValidationError(
+                'Canonical name field should not be empty')
+
+        if not isinstance(self.language_code, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+        if not utils.is_valid_language_code(self.language_code):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.canonical_story_count, int):
+            raise utils.ValidationError(
+                'Expected canonical story count to be an integer, '
+                'received \'%s\'' % self.canonical_story_count)
+
+        if self.canonical_story_count < 0:
+            raise utils.ValidationError(
+                'Expected canonical_story_count to be non-negative, '
+                'received \'%s\'' % self.canonical_story_count)
+
+        if not isinstance(self.additional_story_count, int):
+            raise utils.ValidationError(
+                'Expected additional story count to be an integer, '
+                'received \'%s\'' % self.additional_story_count)
+
+        if self.additional_story_count < 0:
+            raise utils.ValidationError(
+                'Expected additional_story_count to be non-negative, '
+                'received \'%s\'' % self.additional_story_count)
+
+        if not isinstance(self.uncategorized_skill_count, int):
+            raise utils.ValidationError(
+                'Expected uncategorized skill count to be an integer, '
+                'received \'%s\'' % self.uncategorized_skill_count)
+
+        if self.uncategorized_skill_count < 0:
+            raise utils.ValidationError(
+                'Expected uncategorized_skill_count to be non-negative, '
+                'received \'%s\'' % self.uncategorized_skill_count)
+
+        if not isinstance(self.total_skill_count, int):
+            raise utils.ValidationError(
+                'Expected total skill count to be an integer, received \'%s\''
+                % self.total_skill_count)
+
+        if self.total_skill_count < 0:
+            raise utils.ValidationError(
+                'Expected total_skill_count to be non-negative, '
+                'received \'%s\'' % self.total_skill_count)
+
+        if self.total_skill_count < self.uncategorized_skill_count:
+            raise utils.ValidationError(
+                'Expected total_skill_count to be greater than or equal to '
+                'uncategorized_skill_count %s, received \'%s\'' % (
+                    self.uncategorized_skill_count, self.total_skill_count))
+
+        if not isinstance(self.subtopic_count, int):
+            raise utils.ValidationError(
+                'Expected subtopic count to be an integer, received \'%s\''
+                % self.subtopic_count)
+
+        if self.subtopic_count < 0:
+            raise utils.ValidationError(
+                'Expected subtopic_count to be non-negative, '
+                'received \'%s\'' % self.subtopic_count)
+
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
 
@@ -896,7 +1198,7 @@ class TopicSummary(object):
         }
 
 
-class TopicRights(object):
+class TopicRights(python_utils.OBJECT):
     """Domain object for topic rights."""
 
     def __init__(self, topic_id, manager_ids, topic_is_published):

@@ -17,7 +17,7 @@
  * visible.
  */
 
-oppia.factory('BackgroundMaskService', [
+angular.module('oppia').factory('BackgroundMaskService', [
   function() {
     var maskIsActive = false;
 

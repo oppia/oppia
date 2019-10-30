@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for user subscriptions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import subscription_services
 from core.platform import models
@@ -44,8 +46,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
         """Test handler for new subscriptions to creators."""
 
         self.login(self.USER_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         payload = {
             'creator_username': self.EDITOR_USERNAME
@@ -77,8 +78,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
         # Test another user subscription.
         self.login(self.USER2_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             feconf.SUBSCRIBE_URL_PREFIX, payload,
@@ -99,8 +99,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
         # Add one subscription to editor.
         self.login(self.USER_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SUBSCRIBE_URL_PREFIX, payload,
             csrf_token=csrf_token)
@@ -108,8 +107,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
         # Add another subscription.
         self.login(self.USER2_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SUBSCRIBE_URL_PREFIX, payload,
             csrf_token=csrf_token)
@@ -140,8 +138,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
         # Unsubscribing another user.
         self.login(self.USER_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.UNSUBSCRIBE_URL_PREFIX, payload,
             csrf_token=csrf_token)

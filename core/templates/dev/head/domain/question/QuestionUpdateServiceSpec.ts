@@ -16,20 +16,50 @@
  * @fileoverview Unit tests for question update service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// QuestionUpdateService.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('App.ts');
 require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/QuestionUpdateService.ts');
 require('domain/state/StateObjectFactory.ts');
-require('pages/question_editor/QuestionEditorDirective.ts');
+require(
+  'components/question-directives/question-editor/' +
+  'question-editor.directive.ts');
 
 describe('Question update service', function() {
   var QuestionUpdateService = null;
   var QuestionObjectFactory = null;
   var QuestionUndoRedoService = null;
   var StateObjectFactory = null;
-  var SubtitledHtmlObjectFactory = null;
+  var subtitledHtmlObjectFactory = null;
   var sampleQuestion = null;
   var sampleStateTwo = null;
   var sampleStateDict = null;
@@ -38,13 +68,51 @@ describe('Question update service', function() {
   var sampleQuestionBackendObject = null;
 
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
+    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+        new ParamChangeObjectFactory()));
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     QuestionUpdateService = $injector.get('QuestionUpdateService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
     StateObjectFactory = $injector.get('StateObjectFactory');
-    SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
+    subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
     sampleStateDict = {
       name: 'question',
@@ -83,6 +151,7 @@ describe('Question update service', function() {
           default_outcome: {}
         }
       },
+      solicit_answer_details: false,
       written_translations: {
         translations_mapping: {
           content: {},
@@ -128,6 +197,7 @@ describe('Question update service', function() {
           default_outcome: {}
         }
       },
+      solicit_answer_details: false,
       written_translations: {
         translations_mapping: {
           content: {},
@@ -161,7 +231,7 @@ describe('Question update service', function() {
     var oldStateData = angular.copy(sampleQuestion.getStateData());
     var updateFunction = function() {
       var stateData = sampleQuestion.getStateData();
-      stateData.content = SubtitledHtmlObjectFactory.createDefault(
+      stateData.content = subtitledHtmlObjectFactory.createDefault(
         'test content', 'content');
     };
     QuestionUpdateService.setQuestionStateData(

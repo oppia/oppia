@@ -36,6 +36,8 @@ calculation may look like this:
         'calculation_id': 'AnswerFrequencies',
     }]
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import itertools
@@ -44,6 +46,7 @@ import operator
 from core.domain import exp_domain
 from core.domain import stats_domain
 import feconf
+import python_utils
 import utils
 
 CLASSIFICATION_CATEGORIES = frozenset([
@@ -59,7 +62,7 @@ UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES = frozenset([
 ])
 
 
-class _HashableAnswer(object):
+class _HashableAnswer(python_utils.OBJECT):
     """Wraps answer with object that can be placed into sets and dicts."""
 
     def __init__(self, answer):
@@ -134,7 +137,7 @@ def _get_top_unresolved_answers_by_frequency(
     unresolved_answers_with_frequency_list = [{
         'answer': ans.answer,
         'frequency': val['frequency']
-    } for ans, val in classification_results_dict.iteritems() if val[
+    } for ans, val in classification_results_dict.items() if val[
         'classification_categorization'] in (
             UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES)]
 
@@ -147,7 +150,7 @@ def _get_top_unresolved_answers_by_frequency(
     ])
 
 
-class BaseCalculation(object):
+class BaseCalculation(python_utils.OBJECT):
     """Base calculation class.
 
     This is the superclass for all calculations used to generate interaction
@@ -289,7 +292,7 @@ class TopAnswersByCategorization(BaseCalculation):
             stats_domain.CategorizedAnswerFrequencyLists({
                 category: _get_top_answers_by_frequency(categorized_answers)
                 for category, categorized_answers in
-                submitted_answers_by_categorization.iteritems()}))
+                submitted_answers_by_categorization.items()}))
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],

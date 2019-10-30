@@ -20,50 +20,32 @@ require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/skill/SkillObjectFactory.ts');
 
-oppia.constant('SKILL_PROPERTY_DESCRIPTION', 'description');
-oppia.constant('SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
-oppia.constant('SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');
-oppia.constant('SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'worked_examples');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_NAME', 'name');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'notes');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK', 'feedback');
+require('domain/skill/skill-domain.constants.ajs.ts');
 
-oppia.constant('CMD_UPDATE_SKILL_PROPERTY',
-  'update_skill_property');
-oppia.constant('CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
-  'update_skill_contents_property');
-oppia.constant('CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
-  'update_skill_misconceptions_property');
-
-oppia.constant('CMD_ADD_SKILL_MISCONCEPTION',
-  'add_skill_misconception');
-oppia.constant('CMD_DELETE_SKILL_MISCONCEPTION',
-  'delete_skill_misconception');
-
-oppia.factory('SkillUpdateService', [
-  'ChangeObjectFactory', 'SkillObjectFactory',
+angular.module('oppia').factory('SkillUpdateService', [
+  'ChangeObjectFactory',
   'UndoRedoService', 'CMD_ADD_SKILL_MISCONCEPTION',
-  'CMD_DELETE_SKILL_MISCONCEPTION', 'CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
+  'CMD_DELETE_SKILL_MISCONCEPTION', 'CMD_UPDATE_RUBRICS',
+  'CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
   'CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
   'CMD_UPDATE_SKILL_PROPERTY',
   'SKILL_CONTENTS_PROPERTY_EXPLANATION',
-  'SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES',
+  'SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'SKILL_DIFFICULTIES',
   'SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK',
   'SKILL_MISCONCEPTIONS_PROPERTY_NAME',
   'SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'SKILL_PROPERTY_DESCRIPTION',
-  'SKILL_PROPERTY_LANGUAGE_CODE',
   function(
-      ChangeObjectFactory, SkillObjectFactory,
+      ChangeObjectFactory,
       UndoRedoService, CMD_ADD_SKILL_MISCONCEPTION,
-      CMD_DELETE_SKILL_MISCONCEPTION, CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+      CMD_DELETE_SKILL_MISCONCEPTION, CMD_UPDATE_RUBRICS,
+      CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
       CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
       CMD_UPDATE_SKILL_PROPERTY,
       SKILL_CONTENTS_PROPERTY_EXPLANATION,
-      SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+      SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES, SKILL_DIFFICULTIES,
       SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
       SKILL_MISCONCEPTIONS_PROPERTY_NAME,
-      SKILL_MISCONCEPTIONS_PROPERTY_NOTES, SKILL_PROPERTY_DESCRIPTION,
-      SKILL_PROPERTY_LANGUAGE_CODE) {
+      SKILL_MISCONCEPTIONS_PROPERTY_NOTES, SKILL_PROPERTY_DESCRIPTION) {
     var _applyChange = function(skill, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
@@ -87,7 +69,15 @@ oppia.factory('SkillUpdateService', [
         property_name: propertyName,
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue),
-        id: misconceptionId,
+        misconception_id: misconceptionId,
+      }, apply, reverse);
+    };
+
+    var _applyRubricPropertyChange = function(
+        skill, difficulty, explanation, apply, reverse) {
+      _applyChange(skill, CMD_UPDATE_RUBRICS, {
+        difficulty: angular.copy(difficulty),
+        explanation: angular.copy(explanation)
       }, apply, reverse);
     };
 
@@ -224,7 +214,7 @@ oppia.factory('SkillUpdateService', [
 
       deleteMisconception: function(skill, misconceptionId) {
         var params = {
-          id: misconceptionId
+          misconception_id: misconceptionId
         };
         var oldMisconception = skill.findMisconceptionById(misconceptionId);
         _applyChange(
@@ -279,6 +269,20 @@ oppia.factory('SkillUpdateService', [
               misconception.setFeedback(oldFeedback);
             });
         }
+      },
+
+      updateRubricForDifficulty: function(skill, difficulty, explanation) {
+        if (SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
+          throw Error('Invalid difficulty value passed');
+        }
+        var oldExplanation = skill.getRubricExplanation(difficulty);
+        _applyRubricPropertyChange(
+          skill, difficulty, explanation,
+          function(changeDict, skill) {
+            skill.updateRubricForDifficulty(difficulty, explanation);
+          }, function(changeDict, skill) {
+            skill.updateRubricForDifficulty(difficulty, oldExplanation);
+          });
       }
     };
   }

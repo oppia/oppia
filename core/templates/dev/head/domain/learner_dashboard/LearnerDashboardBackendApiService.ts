@@ -17,12 +17,27 @@
  * backend.
  */
 
-oppia.factory('LearnerDashboardBackendApiService', ['$http', function($http) {
-  var _fetchLearnerDashboardData = function() {
-    return $http.get('/learnerdashboardhandler/data');
-  };
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-  return {
-    fetchLearnerDashboardData: _fetchLearnerDashboardData
-  };
-}]);
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerDashboardBackendApiService {
+  constructor(private http: HttpClient) {}
+
+  _fetchLearnerDashboardData(): Promise<Object> {
+    // HttpClient returns an Observable, the toPromise converts it into a
+    // Promise.
+    return this.http.get('/learnerdashboardhandler/data').toPromise();
+  }
+
+  fetchLearnerDashboardData(): Promise<Object> {
+    return this._fetchLearnerDashboardData();
+  }
+}
+
+angular.module('oppia').factory(
+  'LearnerDashboardBackendApiService',
+  downgradeInjectable(LearnerDashboardBackendApiService));

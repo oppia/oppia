@@ -17,28 +17,29 @@
  * domain objects.
  */
 
-require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/InteractionObjectFactory.ts');
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/exploration/WrittenTranslationsObjectFactory.ts');
 
-oppia.factory('StateObjectFactory', [
+angular.module('oppia').factory('StateObjectFactory', [
   'InteractionObjectFactory', 'ParamChangesObjectFactory',
   'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',
-  'WrittenTranslationsObjectFactory', function(
+  'WrittenTranslationsObjectFactory', 'NEW_STATE_TEMPLATE', function(
       InteractionObjectFactory, ParamChangesObjectFactory,
       RecordedVoiceoversObjectFactory, SubtitledHtmlObjectFactory,
-      WrittenTranslationsObjectFactory) {
+      WrittenTranslationsObjectFactory, NEW_STATE_TEMPLATE) {
     var State = function(name, classifierModelId, content, interaction,
-        paramChanges, recordedVoiceovers, writtenTranslations) {
+        paramChanges, recordedVoiceovers, solicitAnswerDetails,
+        writtenTranslations) {
       this.name = name;
       this.classifierModelId = classifierModelId;
       this.content = content;
       this.interaction = interaction;
       this.paramChanges = paramChanges;
       this.recordedVoiceovers = recordedVoiceovers;
+      this.solicitAnswerDetails = solicitAnswerDetails;
       this.writtenTranslations = writtenTranslations;
     };
 
@@ -56,6 +57,7 @@ oppia.factory('StateObjectFactory', [
           return paramChange.toBackendDict();
         }),
         recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
+        solicit_answer_details: this.solicitAnswerDetails,
         written_translations: this.writtenTranslations.toBackendDict()
       };
     };
@@ -67,20 +69,22 @@ oppia.factory('StateObjectFactory', [
       this.interaction.copy(otherState.interaction);
       this.paramChanges = angular.copy(otherState.paramChanges);
       this.recordedVoiceovers = angular.copy(otherState.recordedVoiceovers);
+      this.solicitAnswerDetails = angular.copy(otherState.solicitAnswerDetails);
       this.writtenTranslations = angular.copy(otherState.writtenTranslations);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     State['createDefaultState'] = function(newStateName) {
     /* eslint-enable dot-notation */
-      var newStateTemplate = angular.copy(constants.NEW_STATE_TEMPLATE);
+      var newStateTemplate = angular.copy(NEW_STATE_TEMPLATE);
       var newState = this.createFromBackendDict(newStateName, {
         classifier_model_id: newStateTemplate.classifier_model_id,
         content: newStateTemplate.content,
         interaction: newStateTemplate.interaction,
         param_changes: newStateTemplate.param_changes,
         recorded_voiceovers: newStateTemplate.recorded_voiceovers,
+        solicit_answer_details: newStateTemplate.solicit_answer_details,
         written_translations: newStateTemplate.written_translations
       });
       newState.interaction.defaultOutcome.dest = newStateName;
@@ -89,7 +93,7 @@ oppia.factory('StateObjectFactory', [
 
     // Static class methods. Note that "this" is not available in
     // static contexts.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     State['createFromBackendDict'] = function(stateName, stateDict) {
     /* eslint-enable dot-notation */
@@ -102,6 +106,7 @@ oppia.factory('StateObjectFactory', [
           stateDict.param_changes),
         RecordedVoiceoversObjectFactory.createFromBackendDict(
           stateDict.recorded_voiceovers),
+        stateDict.solicit_answer_details,
         WrittenTranslationsObjectFactory.createFromBackendDict(
           stateDict.written_translations));
     };

@@ -15,11 +15,14 @@
 # limitations under the License.
 
 """Tests for typed object classes (mostly normalization)."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
 from core.tests import test_utils
 from extensions.objects.models import objects
+import python_utils
 import schema_utils_test
 
 
@@ -489,12 +492,36 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                 type_error_message = (
                     'Mismatched default value types for object class %s' %
                     member.__name__)
-                if isinstance(member.default_value, basestring):
+                if isinstance(member.default_value, python_utils.BASESTRING):
                     self.assertIsInstance(
-                        member.normalize(member.default_value), basestring,
+                        member.normalize(member.default_value),
+                        python_utils.BASESTRING,
                         msg=type_error_message)
                 else:
                     self.assertIsInstance(
                         member.normalize(member.default_value),
                         type(member.default_value),
                         msg=type_error_message)
+
+
+class NormalizedRectangleTests(test_utils.GenericTestBase):
+
+    def test_normalize(self):
+        normalized_rectangle = objects.NormalizedRectangle2D()
+        self.assertEqual(normalized_rectangle.normalize(
+            [[0, 1], [1, 0]]), [[0.0, 0.0], [0.0, 0.0]])
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Cannot convert to Normalized Rectangle '):
+            normalized_rectangle.normalize('')
+
+
+class CodeStringTests(test_utils.GenericTestBase):
+
+    def test_normalize(self):
+        code_string = objects.CodeString()
+        self.assertEqual(code_string.normalize(code_string.default_value), '')
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Unexpected tab characters in code string: \t'):
+            code_string.normalize('\t')

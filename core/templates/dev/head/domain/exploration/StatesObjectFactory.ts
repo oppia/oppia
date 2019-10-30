@@ -19,7 +19,7 @@
 
 require('domain/state/StateObjectFactory.ts');
 
-oppia.factory('StatesObjectFactory', [
+angular.module('oppia').factory('StatesObjectFactory', [
   'StateObjectFactory', 'INTERACTION_SPECS',
   function(StateObjectFactory, INTERACTION_SPECS) {
     var States = function(states) {
@@ -133,7 +133,7 @@ oppia.factory('StatesObjectFactory', [
       return allAudioTranslations;
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     States['createFromBackendDict'] = function(statesBackendDict) {
     /* eslint-enable dot-notation */

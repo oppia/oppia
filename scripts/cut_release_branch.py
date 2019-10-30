@@ -18,19 +18,22 @@ ONLY RELEASE COORDINATORS SHOULD USE THIS SCRIPT.
 
 Usage: Run this script from your oppia root folder:
 
-    python scripts/cut_release_branch.py --version="x.y.z"
+    python -m scripts.cut_release_branch --version="x.y.z"
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import json
 import re
 import subprocess
 import sys
-import urllib
 
-import common  # pylint: disable=relative-import
+import python_utils
+
+from . import common
 
 
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
@@ -114,7 +117,7 @@ def _verify_target_version_is_consistent_with_latest_released_version():
             minor version plus one.
         AssertionError: The current patch version is different than 0.
     """
-    response = urllib.urlopen(
+    response = python_utils.url_open(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
     if response.getcode() != 200:
         raise Exception(
@@ -162,30 +165,30 @@ def _execute_branch_cut():
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia#oppia---')
     while True:
-        print (
+        python_utils.PRINT(
             'Please confirm: are Travis checks passing on develop? (y/n) ')
-        answer = raw_input().lower()
+        answer = python_utils.INPUT().lower()
         if answer in ['y', 'ye', 'yes']:
             break
         elif answer:
-            print (
+            python_utils.PRINT(
                 'Tests should pass on develop before this script is run. '
                 'Exiting.')
             sys.exit()
 
     # Cut a new release branch.
-    print 'Cutting a new release branch: %s' % NEW_BRANCH_NAME
+    python_utils.PRINT('Cutting a new release branch: %s' % NEW_BRANCH_NAME)
     subprocess.call(['git', 'checkout', '-b', NEW_BRANCH_NAME])
 
     # Push the new release branch to GitHub.
-    print 'Pushing new release branch to GitHub.'
+    python_utils.PRINT('Pushing new release branch to GitHub.')
     subprocess.call(['git', 'push', remote_alias, NEW_BRANCH_NAME])
 
-    print ''
-    print (
+    python_utils.PRINT('')
+    python_utils.PRINT(
         'New release branch successfully cut. You are now on branch %s' %
         NEW_BRANCH_NAME)
-    print 'Done!'
+    python_utils.PRINT('Done!')
 
 
 if __name__ == '__main__':

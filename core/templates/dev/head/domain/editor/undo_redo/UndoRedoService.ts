@@ -18,7 +18,7 @@
 
 require('domain/editor/undo_redo/BaseUndoRedoService.ts');
 
-oppia.factory('UndoRedoService', [
+angular.module('oppia').factory('UndoRedoService', [
   'BaseUndoRedoService', function(BaseUndoRedoService) {
     var child = Object.create(BaseUndoRedoService);
     child.init();

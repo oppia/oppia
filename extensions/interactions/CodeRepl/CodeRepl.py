@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Python configuration for CodeRepl interaction."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
 
@@ -26,7 +28,7 @@ class CodeRepl(base.BaseInteraction):
     description = 'Allows learners to enter code and get it evaluated.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     is_trainable = True
-    _dependency_ids = ['skulpt', 'codemirror', 'code_repl_prediction']
+    _dependency_ids = ['skulpt', 'codemirror']
     answer_type = 'CodeEvaluation'
     instructions = 'Type code in the editor'
     narrow_instructions = 'Go to code editor'

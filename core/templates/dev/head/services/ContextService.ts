@@ -17,22 +17,13 @@
  * context.
  */
 
-oppia.constant('PAGE_CONTEXT', {
-  EXPLORATION_EDITOR: 'editor',
-  EXPLORATION_PLAYER: 'learner',
-  QUESTION_EDITOR: 'question_editor',
-  QUESTION_PLAYER: 'question_player',
-  OTHER: 'other'
-});
+require('services/services.constants.ajs.ts');
 
-oppia.constant('EXPLORATION_EDITOR_TAB_CONTEXT', {
-  EDITOR: 'editor',
-  PREVIEW: 'preview'
-});
-
-oppia.factory('ContextService', [
-  'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT', 'PAGE_CONTEXT',
-  function(UrlService, EXPLORATION_EDITOR_TAB_CONTEXT, PAGE_CONTEXT) {
+angular.module('oppia').factory('ContextService', [
+  'UrlService', 'ENTITY_TYPE', 'EXPLORATION_EDITOR_TAB_CONTEXT',
+  'PAGE_CONTEXT', function(
+      UrlService, ENTITY_TYPE, EXPLORATION_EDITOR_TAB_CONTEXT,
+      PAGE_CONTEXT) {
     var pageContext = null;
     var explorationId = null;
     var questionId = null;
@@ -84,9 +75,23 @@ oppia.factory('ContextService', [
             } else if (pathnameArray[i] === 'question_editor') {
               pageContext = PAGE_CONTEXT.QUESTION_EDITOR;
               return PAGE_CONTEXT.QUESTION_EDITOR;
-            } else if (pathnameArray[i] === 'practice_session') {
+            } else if (pathnameArray[i] === 'topic_editor') {
+              pageContext = PAGE_CONTEXT.TOPIC_EDITOR;
+              return PAGE_CONTEXT.TOPIC_EDITOR;
+            } else if (pathnameArray[i] === 'story_editor') {
+              pageContext = PAGE_CONTEXT.STORY_EDITOR;
+              return PAGE_CONTEXT.STORY_EDITOR;
+            } else if (pathnameArray[i] === 'skill_editor') {
+              pageContext = PAGE_CONTEXT.SKILL_EDITOR;
+              return PAGE_CONTEXT.SKILL_EDITOR;
+            } else if (
+              pathnameArray[i] === 'practice_session' ||
+                pathnameArray[i] === 'review_test') {
               pageContext = PAGE_CONTEXT.QUESTION_PLAYER;
               return PAGE_CONTEXT.QUESTION_PLAYER;
+            } else if (pathnameArray[i] === 'collection_editor') {
+              pageContext = PAGE_CONTEXT.COLLECTION_EDITOR;
+              return PAGE_CONTEXT.COLLECTION_EDITOR;
             }
           }
 
@@ -101,6 +106,39 @@ oppia.factory('ContextService', [
 
       isInQuestionContext: function() {
         return (this.getPageContext() === PAGE_CONTEXT.QUESTION_EDITOR);
+      },
+
+      getEntityId: function() {
+        var pathnameArray = UrlService.getPathname().split('/');
+        for (var i = 0; i < pathnameArray.length; i++) {
+          if (pathnameArray[i] === 'embed') {
+            return decodeURI(pathnameArray[i + 2]);
+          }
+        }
+        return decodeURI(pathnameArray[2]);
+      },
+
+      getEntityType: function() {
+        var pathnameArray = UrlService.getPathname().split('/');
+        for (var i = 0; i < pathnameArray.length; i++) {
+          if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore' ||
+            (pathnameArray[i] === 'embed' &&
+             pathnameArray[i + 1] === 'exploration')) {
+            return ENTITY_TYPE.EXPLORATION;
+          }
+          if (pathnameArray[i] === 'topic_editor') {
+            return ENTITY_TYPE.TOPIC;
+          }
+          if (pathnameArray[i] === 'subtopic') {
+            return ENTITY_TYPE.SUBTOPIC;
+          }
+          if (pathnameArray[i] === 'story_editor') {
+            return ENTITY_TYPE.STORY;
+          }
+          if (pathnameArray[i] === 'skill_editor') {
+            return ENTITY_TYPE.SKILL;
+          }
+        }
       },
 
       // Returns a string representing the explorationId (obtained from the

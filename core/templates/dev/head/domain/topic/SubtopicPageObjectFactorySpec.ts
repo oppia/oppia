@@ -16,21 +16,26 @@
  * @fileoverview Tests for SubtopicPageObjectFactory.
  */
 
-require('domain/topic/SubtopicPageObjectFactory.ts');
+import { TestBed } from '@angular/core/testing';
 
-describe('Subtopic page object factory', function() {
-  var SubtopicPageObjectFactory = null;
+import { SubtopicPageObjectFactory } from
+  'domain/topic/SubtopicPageObjectFactory';
+
+describe('Subtopic page object factory', () => {
+  let subtopicPageObjectFactory: SubtopicPageObjectFactory = null;
   var _sampleSubtopic = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [SubtopicPageObjectFactory]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-  }));
+    subtopicPageObjectFactory = TestBed.get(SubtopicPageObjectFactory);
+  });
 
   it('should be able to create a subtopic page object with given topic and ' +
-    'subtopic id', function() {
-    var subtopicPage = SubtopicPageObjectFactory.createDefault(
+    'subtopic id', () => {
+    var subtopicPage = subtopicPageObjectFactory.createDefault(
       'topic_id', 2);
     expect(subtopicPage.getId()).toBe('topic_id-2');
     expect(subtopicPage.getTopicId()).toBe('topic_id');
@@ -39,17 +44,17 @@ describe('Subtopic page object factory', function() {
   });
 
   it('should be able to create an interstitial subtopic page object',
-    function() {
+    () => {
       var subtopicPage =
-        SubtopicPageObjectFactory.createInterstitialSubtopicPage();
+        subtopicPageObjectFactory.createInterstitialSubtopicPage();
       expect(subtopicPage.getId()).toEqual(null);
       expect(subtopicPage.getTopicId()).toEqual(null);
       expect(subtopicPage.getPageContents()).toEqual(null);
       expect(subtopicPage.getLanguageCode()).toBe('en');
     });
 
-  it('should be able to copy from another subtopic page', function() {
-    var firstSubtopicPage = SubtopicPageObjectFactory.createFromBackendDict({
+  it('should be able to copy from another subtopic page', () => {
+    var firstSubtopicPage = subtopicPageObjectFactory.createFromBackendDict({
       id: 'topic_id-1',
       topic_id: 'topic_id',
       page_contents: {
@@ -57,14 +62,16 @@ describe('Subtopic page object factory', function() {
           html: '<p>Data</p>',
           content_id: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {}
+          }
         }
       },
       language_code: 'en'
     });
 
-    var secondSubtopicPage = SubtopicPageObjectFactory.createFromBackendDict({
+    var secondSubtopicPage = subtopicPageObjectFactory.createFromBackendDict({
       id: 'topic_id2-2',
       topic_id: 'topic_id2',
       page_contents: {
@@ -72,8 +79,10 @@ describe('Subtopic page object factory', function() {
           html: '<p>Data2</p>',
           content_id: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {}
+          }
         }
       },
       language_code: 'en'

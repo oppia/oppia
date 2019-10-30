@@ -18,66 +18,62 @@
  * @author milagro.teruel@gmail.com (Milagro Teruel)
  */
 
-// Translations of strings that are loaded in the front page. They are listed
-// here to be loaded synchronously with the script to prevent a FOUC or
-// Flash of Untranslated Content.
-// See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
-oppia.constant('DEFAULT_TRANSLATIONS', {
-  I18N_LIBRARY_PAGE_TITLE: 'Library',
-  I18N_LIBRARY_LOADING: 'Loading',
-  I18N_SIGNUP_PAGE_SUBTITLE: 'Registration',
-  I18N_SIGNUP_PAGE_TITLE: 'Oppia',
-  I18N_LIBRARY_SEARCH_PLACEHOLDER: 'What are you curious about?',
-  I18N_LIBRARY_ALL_LANGUAGES: 'All Languages',
-  I18N_LIBRARY_LANGUAGES_EN: 'English',
-  I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
-  I18N_TOPNAV_SIGN_IN: 'Sign in',
-  I18N_SPLASH_PAGE_TITLE: 'Oppia: Teach, Learn, Explore',
-  I18N_SIGNUP_REGISTRATION: 'Registration',
-  I18N_SIGNUP_LOADING: 'Loading'
-});
+require('services/TranslationFileHashLoaderService.ts');
 
-oppia.controller('I18nFooter', [
-  '$cookies', '$http', '$rootScope', '$scope', '$timeout', '$translate',
-  'UserService',
-  function(
-      $cookies, $http, $rootScope, $scope, $timeout, $translate,
-      UserService) {
-    // Changes the language of the translations.
-    var preferencesDataUrl = '/preferenceshandler/data';
-    var siteLanguageUrl = '/save_site_language';
-    $scope.supportedSiteLanguages = constants.SUPPORTED_SITE_LANGUAGES;
+angular.module('oppia').directive('i18nFooter', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/i18n-footer.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$http', '$timeout', '$translate', 'UserService',
+        'SUPPORTED_SITE_LANGUAGES',
+        function(
+            $http, $timeout, $translate, UserService,
+            SUPPORTED_SITE_LANGUAGES) {
+          var ctrl = this;
+          // Changes the language of the translations.
+          var preferencesDataUrl = '/preferenceshandler/data';
+          var siteLanguageUrl = '/save_site_language';
+          ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
 
-    // The $timeout seems to be necessary for the dropdown to show anything
-    // at the outset, if the default language is not English.
-    $timeout(function() {
-      // $translate.use() returns undefined until the language file is fully
-      // loaded, which causes a blank field in the dropdown, hence we use
-      // $translate.proposedLanguage() as suggested in
-      // http://stackoverflow.com/a/28903658
-      $scope.currentLanguageCode = $translate.use() ||
-        $translate.proposedLanguage();
-    }, 50);
+          // The $timeout seems to be necessary for the dropdown to show
+          // anything at the outset, if the default language is not English.
+          $timeout(function() {
+            // $translate.use() returns undefined until the language file is
+            // fully loaded, which causes a blank field in the dropdown, hence
+            // we use $translate.proposedLanguage() as suggested in
+            // http://stackoverflow.com/a/28903658
+            ctrl.currentLanguageCode = $translate.use() ||
+              $translate.proposedLanguage();
+          }, 50);
 
-    $scope.changeLanguage = function() {
-      $translate.use($scope.currentLanguageCode);
-      UserService.getUserInfoAsync().then(function(userInfo) {
-        if (userInfo.isLoggedIn()) {
-          $http.put(siteLanguageUrl, {
-            site_language_code: $scope.currentLanguageCode
-          });
+          ctrl.changeLanguage = function() {
+            $translate.use(ctrl.currentLanguageCode);
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              if (userInfo.isLoggedIn()) {
+                $http.put(siteLanguageUrl, {
+                  site_language_code: ctrl.currentLanguageCode
+                });
+              }
+            });
+          };
         }
-      });
+      ]
     };
-  }
-]);
+  }]);
 
-oppia.config([
-  '$translateProvider', 'DEFAULT_TRANSLATIONS',
-  function($translateProvider, DEFAULT_TRANSLATIONS) {
+
+angular.module('oppia').config([
+  '$translateProvider', 'DEFAULT_TRANSLATIONS', 'SUPPORTED_SITE_LANGUAGES',
+  function($translateProvider, DEFAULT_TRANSLATIONS, SUPPORTED_SITE_LANGUAGES) {
     var availableLanguageKeys = [];
     var availableLanguageKeysMap = {};
-    constants.SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
+    SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
       availableLanguageKeys.push(language.id);
       availableLanguageKeysMap[language.id + '*'] = language.id;
     });

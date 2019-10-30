@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.factory('SkillRightsBackendApiService', [
+angular.module('oppia').factory('SkillRightsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'SKILL_PUBLISH_URL_TEMPLATE', 'SKILL_RIGHTS_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService,

@@ -16,17 +16,37 @@
  * @fileoverview Unit tests for UrlInterpolationService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/utilities/UrlInterpolationService.ts');
 
 describe('URL Interpolation Service', function() {
+  var hashes = require('hashes.json');
   var uis = null;
-
+  var UrlService = null;
+  var mockLocation = null;
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.constant('DEV_MODE', false);
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
     uis = $injector.get('UrlInterpolationService');
+
+    mockLocation = {
+      origin: 'http://sample.com'
+    };
+
+    UrlService = $injector.get('UrlService');
+    spyOn(UrlService, 'getCurrentLocation').and.returnValue(mockLocation);
   }));
 
   it('should add hash to url if hash is set', function() {
@@ -277,6 +297,16 @@ describe('URL Interpolation Service', function() {
       '/build/assets/assets_test/hash_test.' +
       hashes['/assets_test/hash_test.json'] + '.json');
 
+    expect(uis.getFullStaticAssetUrl(
+      '/assets/msapplication-large.png')).toBe(
+      'http://sample.com/build/assets/msapplication-large.png');
+    expect(uis.getFullStaticAssetUrl(
+      '/assets/images/msapplication-large.png')).toBe(
+      'http://sample.com/build/assets/images/msapplication-large.png');
+    expect(uis.getFullStaticAssetUrl(
+      '/assets/images/path/msapplication-large.png')).toBe(
+      'http://sample.com/build/assets/images/path/msapplication-large.png');
+
     expect(uis.getExtensionResourceUrl('/test.html')).toBe(
       '/build/extensions/test.html');
     expect(uis.getExtensionResourceUrl('/test_url/test.html')).toBe(
@@ -284,18 +314,6 @@ describe('URL Interpolation Service', function() {
     expect(uis.getExtensionResourceUrl('/path_test/hash_test.html')).toBe(
       '/build/extensions/path_test/hash_test.' +
       hashes['/path_test/hash_test.html'] + '.html');
-  });
-
-  it('should interpolate URLs not requiring parameters', function() {
-    expect(uis.getStoryUrl('/storyId', {})).toBe('/story/storyId');
-    expect(uis.getStoryUrl('/storyId123', {})).toBe('/story/storyId123');
-    expect(uis.getStoryUrl('/story&Id', {})).toBe('/story/story&Id');
-    expect(function() {
-      uis.getStoryUrl('', {});
-    }).toThrowError('Empty path passed in method.');
-    expect(function() {
-      uis.getStoryUrl('storyId', {});
-    }).toThrowError('Path must start with \'/\': \'storyId\'.');
   });
 
   it('should throw an error for empty path', function() {

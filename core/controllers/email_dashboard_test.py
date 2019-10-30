@@ -13,7 +13,11 @@
 # limitations under the License.
 
 """Tests for email dashboard handler."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import user_query_jobs_one_off
+from core.domain import user_query_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -43,8 +47,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
     def test_that_handler_works_correctly(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -79,6 +82,41 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
+
+    def test_query_status_check_handler_with_invalid_query_id_raises_400(
+            self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        response = self.get_json(
+            '/querystatuscheck', params={'query_id': 'invalid_query_id'},
+            expected_status_int=400)
+        self.assertEqual(response['error'], '400 Invalid query id.')
+
+        self.logout()
+
+    def test_query_status_check_handler(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        query_data = self.get_json(
+            '/querystatuscheck', params={'query_id': query_id})['query']
+
+        self.assertEqual(query_data['id'], query_id)
+        self.assertEqual(
+            query_data['status'], feconf.USER_QUERY_STATUS_PROCESSING)
+        self.assertEqual(
+            query_data['submitter_username'], self.SUBMITTER_USERNAME)
+
+        self.logout()
+
     def test_that_page_is_accessible_to_authorised_users_only(self):
         # Make sure that only authorised users can access query pages.
         self.login(self.USER_A_EMAIL)
@@ -90,8 +128,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
     def test_that_exception_is_raised_for_invalid_input(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -112,6 +149,14 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'created_fewer_than_n_exps': 'None',
                     'edited_at_least_n_exps': None
                 }}, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_email_dashboard_page(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        response = self.get_html_response('/emaildashboard')
+        self.assertIn('{"title": "Email Dashboard - Oppia"})', response.body)
+
         self.logout()
 
 
@@ -152,10 +197,316 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         self.set_admins(
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
 
+    def test_email_dashboard_result_page(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        query_id = user_models.UserQueryModel.get_new_id('')
+        user_models.UserQueryModel(
+            id=query_id, inactive_in_last_n_days=10,
+            has_not_logged_in_for_n_days=30,
+            created_at_least_n_exps=5,
+            created_fewer_than_n_exps=None,
+            edited_at_least_n_exps=None,
+            edited_fewer_than_n_exps=None,
+            submitter_id=self.submitter_id,
+            query_status=feconf.USER_QUERY_STATUS_COMPLETED,
+            user_ids=[]).put()
+        response = self.get_html_response('/emaildashboardresult/%s' % query_id)
+
+        self.assertIn(
+            '{"title": "Email Dashboard Result - Oppia"})', response.body)
+
+        self.logout()
+
+    def test_handler_with_invalid_num_queries_to_fetch_raises_error_400(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        response = self.get_json(
+            '/emaildashboarddatahandler',
+            params={'num_queries_to_fetch': '-5'},
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], '400 Invalid input for query results.')
+
+        response = self.get_json(
+            '/emaildashboarddatahandler',
+            params={'num_queries_to_fetch': 'invalid_data'},
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], '400 Invalid input for query results.')
+
+        self.logout()
+
+    def test_email_dashboard_data_handler(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        response = self.get_json(
+            '/emaildashboarddatahandler',
+            params={'num_queries_to_fetch': 1})
+        self.assertEqual(response['recent_queries'], [])
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        response = self.get_json(
+            '/emaildashboarddatahandler',
+            params={'num_queries_to_fetch': 1})
+
+        self.assertEqual(len(response['recent_queries']), 1)
+
+        recent_query = response['recent_queries'][0]
+
+        self.assertEqual(recent_query['id'], query_id)
+        self.assertEqual(
+            recent_query['status'], feconf.USER_QUERY_STATUS_PROCESSING)
+
+        self.logout()
+
+    def test_email_dashboard_result_page_with_invalid_query_id_raises_400(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
+            job_id, additional_job_params={'query_id': query_id})
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            1)
+        # Complete execution of query.
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
+
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/emaildashboardresult/%s' % 'invalid_query_id', {},
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(response['error'], '400 Invalid query id.')
+        self.logout()
+
+    def test_email_dashboard_result_page_with_mismatch_of_query_id_raises_401(
+            self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        query_id_1 = user_query_services.save_new_query_model(
+            self.new_submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
+            job_id, additional_job_params={'query_id': query_id})
+
+        job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
+            job_id_1, additional_job_params={'query_id': query_id_1})
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            2)
+        # Complete execution of query.
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
+
+        csrf_token = self.get_new_csrf_token()
+
+        # Raises authorization error when passing a query id whose associated
+        # query model is not created by the logged in user.
+        response = self.post_json(
+            '/emaildashboardresult/%s' % query_id_1, {},
+            csrf_token=csrf_token, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            '%s is not an authorized user for this query.'
+            % (self.submitter_id))
+        self.logout()
+
+    def test_cancel_email_handler_with_invalid_query_id_raises_400(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
+            job_id, additional_job_params={'query_id': query_id})
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            1)
+        # Complete execution of query.
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
+
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/emaildashboardcancelresult/%s' % 'invalid_query_id', {},
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(response['error'], '400 Invalid query id.')
+        self.logout()
+
+    def test_cancel_email_handler_with_mismatch_of_query_id_raises_401(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        query_id_1 = user_query_services.save_new_query_model(
+            self.new_submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
+            job_id, additional_job_params={'query_id': query_id})
+
+        job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
+            job_id_1, additional_job_params={'query_id': query_id_1})
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            2)
+        # Complete execution of query.
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
+
+        csrf_token = self.get_new_csrf_token()
+        # Raises authorization error when passing a query id whose associated
+        # query model is not created by the logged in user.
+        response = self.post_json(
+            '/emaildashboardcancelresult/%s' % query_id_1, {},
+            csrf_token=csrf_token, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            '%s is not an authorized user for this query.'
+            % (self.submitter_id))
+        self.logout()
+
+    def test_bulk_email_handler_with_invalid_query_id_raises_400(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
+            job_id, additional_job_params={'query_id': query_id})
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            1)
+        # Complete execution of query.
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
+
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/emaildashboardtestbulkemailhandler/%s' % 'invalid_query_id', {},
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(response['error'], '400 Invalid query id.')
+        self.logout()
+
+    def test_bulk_email_handler_with_mismatch_of_query_id_raises_401(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        query_id_1 = user_query_services.save_new_query_model(
+            self.new_submitter_id, inactive_in_last_n_days=10,
+            created_at_least_n_exps=5,
+            has_not_logged_in_for_n_days=30)
+
+        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
+            job_id, additional_job_params={'query_id': query_id})
+
+        job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
+            job_id_1, additional_job_params={'query_id': query_id_1})
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            2)
+        # Complete execution of query.
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
+
+        csrf_token = self.get_new_csrf_token()
+
+        # Raises authorization error when passing a query id whose associated
+        # query model is not created by the logged in user.
+        response = self.post_json(
+            '/emaildashboardtestbulkemailhandler/%s' % query_id_1, {},
+            csrf_token=csrf_token, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            '%s is not an authorized user for this query.'
+            % (self.submitter_id))
+        self.logout()
+
     def test_that_correct_emails_are_sent_to_all_users(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -192,9 +543,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
             # Send email from email dashboard result page.
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_model.id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_model.id, {
                     'data': {
@@ -257,8 +606,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, '400 Bad Request'):
             self.get_html_response('/emaildashboardresult/%s' % 'q123')
 
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -279,10 +627,10 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 '/emaildashboardresult/%s' % query_models[0].id)
         self.logout()
 
-        # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
             query_models = user_models.UserQueryModel.query().fetch()
@@ -310,9 +658,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             # Send email from email dashboard result page.
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_models[0].id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_models[0].id, {
                     'data': {
@@ -334,8 +680,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
     def test_that_correct_emails_are_sent_to_max_n_recipients(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -358,9 +703,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
             # Send email from email dashboard result page.
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_models[0].id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_models[0].id, {
                     'data': {
@@ -382,8 +725,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
     def test_that_no_emails_are_sent_if_query_is_canceled(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -406,9 +748,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
             # Send email from email dashboard result page.
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_models[0].id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardcancelresult/%s' % query_models[0].id, {},
                 csrf_token=csrf_token)
@@ -422,8 +762,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
     def test_that_test_email_for_bulk_emails_is_sent(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -446,9 +785,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
             # Check that correct test email is sent.
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_models[0].id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardtestbulkemailhandler/%s' % query_models[0].id, {
                     'email_body': email_body,
@@ -486,8 +823,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
     def test_that_test_email_is_not_sent_to_query_recipients(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -506,9 +842,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_models[0].id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardtestbulkemailhandler/%s' % query_models[0].id, {
                     'email_body': 'email_body',

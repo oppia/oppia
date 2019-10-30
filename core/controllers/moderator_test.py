@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for the moderator page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import rights_manager
 from core.domain import user_services
@@ -69,8 +71,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
     def test_unpublished_activities_cannot_be_added_to_featured_list(self):
         self.login(self.MODERATOR_EMAIL)
-        response = self.get_html_response('/moderator')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # Posting a list that includes private activities results in an error.
         self.post_json(

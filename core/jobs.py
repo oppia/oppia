@@ -15,8 +15,9 @@
 # limitations under the License.
 
 """Common classes and methods for managing long running jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import collections
 import copy
 import datetime
@@ -25,6 +26,7 @@ import logging
 import traceback
 
 from core.platform import models
+import python_utils
 import utils
 
 from google.appengine.api import app_identity
@@ -33,7 +35,6 @@ from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
-from mapreduce import model as mapreduce_model
 from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
 from pipeline import pipeline
@@ -74,7 +75,7 @@ DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
 NUM_JOBS_IN_DASHBOARD_LIMIT = 100
 
 
-class BaseJobManager(object):
+class BaseJobManager(python_utils.OBJECT):
     """Base class for managing long-running jobs.
 
     These jobs are not transaction-safe, and multiple jobs of the same kind
@@ -214,7 +215,8 @@ class BaseJobManager(object):
             cls, output_list, test_only_max_output_len_chars=None):
         """Returns compressed list of strings within a max length of chars.
 
-        Ensures that the payload (i.e., [str(output) for output in output_list])
+        Ensures that the payload (i.e.,
+        [python_utils.UNICODE(output) for output in output_list])
         makes up at most max_output_chars of the final output data.
 
         Args:
@@ -237,10 +239,11 @@ class BaseJobManager(object):
             pass
 
         # Consolidate the lines of output since repeating them isn't useful.
-        counter = _OrderedCounter(str(output) for output in output_list)
+        counter = _OrderedCounter(
+            python_utils.UNICODE(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
-            for (output_str, count) in counter.iteritems()
+            for (output_str, count) in counter.items()
         ]
 
         # Truncate outputs to fit within given max length.
@@ -613,9 +616,11 @@ class BaseDeferredJobManager(BaseJobManager):
                 'Job %s failed at %s' %
                 (job_id, utils.get_current_time_in_millisecs()))
             cls.register_failure(
-                job_id, '%s\n%s' % (unicode(e), traceback.format_exc()))
+                job_id, '%s\n%s'
+                % (python_utils.UNICODE(e), traceback.format_exc()))
             raise taskqueue_services.PermanentTaskFailure(
-                'Task failed: %s\n%s' % (unicode(e), traceback.format_exc()))
+                'Task failed: %s\n%s'
+                % (python_utils.UNICODE(e), traceback.format_exc()))
 
         # Note that the job may have been canceled after it started and before
         # it reached this stage. This will result in an exception when the
@@ -706,7 +711,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                 (job_id, utils.get_current_time_in_millisecs()))
             job_class.register_failure(
                 job_id,
-                '%s\n%s' % (unicode(e), traceback.format_exc()))
+                '%s\n%s' % (python_utils.UNICODE(e), traceback.format_exc()))
 
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
@@ -724,7 +729,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
             data: *. Data to be serialized in JSON format.
         """
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
-            '%s\n' % json.dumps(data))
+            python_utils.convert_to_bytes('%s\n' % json.dumps(data)))
 
 
 class BaseMapReduceJobManager(BaseJobManager):
@@ -753,10 +758,6 @@ class BaseMapReduceJobManager(BaseJobManager):
         Raises:
             Exception: The parameter is not associated to this job type.
         """
-        mapper_params = context.get().mapreduce_spec.mapper.params
-        if param_name not in mapper_params:
-            raise Exception(
-                'Could not find %s in %s' % (param_name, mapper_params))
         return context.get().mapreduce_spec.mapper.params[param_name]
 
     @classmethod
@@ -846,7 +847,7 @@ class BaseMapReduceJobManager(BaseJobManager):
                 # strings. Also note that the value for this key is determined
                 # just before enqueue time, so it will be roughly equal to the
                 # actual enqueue time.
-                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: str(
+                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: python_utils.UNICODE(
                     utils.get_current_time_in_millisecs()),
             },
             'reducer_params': {
@@ -887,7 +888,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
     @staticmethod
-    def _entity_created_before_job_queued(entity):
+    def entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was
         queued.
 
@@ -1018,7 +1019,8 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         Returns:
             bool. Whether mapper spec and all mapper patterns are valid.
         """
-        return True  # TODO.
+        # TODO(seanlip): Actually implement the validation.
+        return True
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
@@ -1045,7 +1047,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
 
     @staticmethod
-    def _entity_created_before_job_queued(entity):
+    def entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was
         queued.
 
@@ -1194,7 +1196,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             realtime_layer. The realtime layer entity.
         """
         if (self.realtime_layer is None or
-                str(self.realtime_layer) != self.id[0]):
+                python_utils.UNICODE(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
                 (self.realtime_layer, self.id))
@@ -1203,7 +1205,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             BaseRealtimeDatastoreClassForContinuousComputations, self).put()
 
 
-class BaseContinuousComputationManager(object):
+class BaseContinuousComputationManager(python_utils.OBJECT):
     """This class represents a manager for a continuously-running computation.
 
     Such computations consist of two parts: a batch job to compute summary
@@ -1411,11 +1413,6 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _kickoff_batch_job(cls):
         """Create and enqueue a new batch job."""
-        if job_models.JobModel.do_unfinished_jobs_exist(cls.__name__):
-            logging.error(
-                'Tried to start a new batch job of type %s while an existing '
-                'job was still running ' % cls.__name__)
-            return
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
         job_manager.enqueue(
@@ -1792,97 +1789,6 @@ def get_continuous_computations_info(cc_classes):
         result.append(cc_dict)
 
     return result
-
-
-def get_stuck_jobs(recency_msecs):
-    """Returns a list of jobs which were last updated at most recency_msecs
-    milliseconds ago and have experienced more than one retry.
-
-    Returns:
-        list(job_models.JobModel). Jobs which have retried at least once and
-            haven't finished yet.
-    """
-    threshold_time = (
-        datetime.datetime.utcnow() -
-        datetime.timedelta(0, 0, 0, recency_msecs))
-    shard_state_model_class = mapreduce_model.ShardState
-
-    # TODO(sll): Clean up old jobs so that this query does not have to iterate
-    # over so many elements in a full table scan.
-    recent_job_models = shard_state_model_class.all()
-
-    stuck_jobs = []
-    for job_model in recent_job_models:
-        if job_model.update_time > threshold_time and job_model.retries > 0:
-            stuck_jobs.append(job_model)
-
-    return stuck_jobs
-
-
-class JobCleanupManager(BaseMapReduceOneOffJobManager):
-    """One-off job for cleaning up old auxiliary entities for MR jobs."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """The entity types this job will handle."""
-        return [
-            mapreduce_model.MapreduceState,
-            mapreduce_model.ShardState
-        ]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function which will clean up jobs that have not
-        finished.
-
-        Args:
-            item: mapreduce_model.MapreduceState or mapreduce_model.ShardState.
-                A shard or job which may still be running.
-        Yields:
-            tuple(str, int). Describes the action taken for the item, and the
-                number of items this action was applied to.
-        """
-        max_start_time_msec = JobCleanupManager.get_mapper_param(
-            MAPPER_PARAM_MAX_START_TIME_MSEC)
-
-        if isinstance(item, mapreduce_model.MapreduceState):
-            if (item.result_status == 'success' and
-                    utils.get_time_in_millisecs(item.start_time) <
-                    max_start_time_msec):
-                item.delete()
-                yield ('mr_state_deleted', 1)
-            else:
-                yield ('mr_state_remaining', 1)
-
-        if isinstance(item, mapreduce_model.ShardState):
-            if (item.result_status == 'success' and
-                    utils.get_time_in_millisecs(item.update_time) <
-                    max_start_time_msec):
-                item.delete()
-                yield ('shard_state_deleted', 1)
-            else:
-                yield ('shard_state_remaining', 1)
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        """Implements the reduce function which logs the results of the mapping
-        function.
-
-        Args:
-            key: str. Describes the action taken by a map call. One of:
-                'mr_state_deleted', 'mr_state_remaining', 'shard_state_deleted',
-                'shard_state_remaining'.
-            stringified_values: list(str). A list where each element is a
-                stringified number, counting the mapped items sharing the key.
-        """
-        values = [ast.literal_eval(v) for v in stringified_values]
-        if key.endswith('_deleted'):
-            logging.warning(
-                'Delete count: %s entities (%s)' % (sum(values), key))
-        else:
-            logging.warning(
-                'Entities remaining count: %s entities (%s)' %
-                (sum(values), key))
 
 
 ABSTRACT_BASE_CLASSES = frozenset([

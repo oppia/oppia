@@ -15,15 +15,30 @@
 # limitations under the License.
 
 """Stores various configuration options and constants for Oppia."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import datetime
 import os
 
-from constants import constants  # pylint: disable=relative-import
+from constants import constants
+
+# The datastore model ID for the list of featured activity references. This
+# value should not be changed.
+ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
+ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
+
+# The values which a post_commit_status can have: public, private.
+POST_COMMIT_STATUS_PUBLIC = 'public'
+POST_COMMIT_STATUS_PRIVATE = 'private'
 
 # Whether to unconditionally log info messages.
 DEBUG = False
+
+# The path for generating release_summary.md file for the current release.
+RELEASE_SUMMARY_FILEPATH = os.path.join(
+    os.getcwd(), os.pardir, 'release_summary.md')
 
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
@@ -38,6 +53,9 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
+# backend_prod_files contain processed JS and HTML files that are served by
+# Jinja, we are moving away from Jinja so this folder might not be needed later
+# (#6964)
 EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
@@ -45,20 +63,18 @@ ACTIONS_DIR = (
 ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
-    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
+    os.path.join('extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
-    os.path.join('assets', 'rich_text_components_definitions.js'))
+    os.path.join('assets', 'rich_text_components_definitions.ts'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
-if not constants.DEV_MODE:
-    FRONTEND_TEMPLATES_DIR = (
-        os.path.join('backend_prod_files', 'templates', 'head'))
-else:
-    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+FRONTEND_TEMPLATES_DIR = (
+    os.path.join('webpack_bundles') if constants.DEV_MODE else
+    os.path.join('backend_prod_files', 'webpack_bundles'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -114,6 +130,10 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
 
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
+ENTITY_TYPE_SKILL = 'skill'
+ENTITY_TYPE_STORY = 'story'
+ENTITY_TYPE_SUBTOPIC = 'subtopic'
+ENTITY_TYPE_QUESTION = 'question'
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -156,7 +176,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 28
+CURRENT_STATE_SCHEMA_VERSION = 30
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -173,8 +193,14 @@ CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 # The current version of misconceptions dict in the skill schema.
 CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 
+# The current version of rubric dict in the skill schema.
+CURRENT_RUBRIC_SCHEMA_VERSION = 1
+
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
+
+# The current version of story reference dict in the topic schema.
+CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
 CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
@@ -182,6 +208,10 @@ CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema of LearnerAnswerInfo
+# dict schema changes.
+CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -194,6 +224,9 @@ COMMIT_LIST_PAGE_SIZE = 50
 # The default number of items to show on a page in the exploration feedback
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
+
+# The default number of opportunities to show on community dashboard page.
+OPPORTUNITIES_PAGE_SIZE = 20
 
 # The maximum number of top unresolved answers which should be aggregated
 # from all of the submitted answers.
@@ -291,18 +324,10 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
-# A regular expression for tags.
-TAG_REGEX = r'^[a-z ]+$'
-
-# Invalid names for parameters used in expressions.
-AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']
-INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
-    'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
-    'pow', 'round', 'then']
 
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
-# TODO (Jacob) Refactor exp_services to remove this problem.
+# TODO(Jacob): Refactor exp_services to remove this problem.
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
@@ -386,6 +411,9 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
+# Whether community dashboard is ready to use for contributors.
+COMMUNITY_DASHBOARD_ENABLED = False
+
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
@@ -462,9 +490,19 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300
 
+# The maximum number of questions to be fetched at one time.
+MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
+
 # The minimum score required for a user to review suggestions of a particular
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
+
+# The number of medium question skill difficulty.
+MEDIUM_SKILL_DIFFICULTY = 0.6
+
+# The maximum number of skills to be requested at one time when fetching
+# questions.
+MAX_NUMBER_OF_SKILL_IDS = 20
 
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
@@ -577,6 +615,8 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+CLASSROOM_URL_PREFIX = '/classroom'
+CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
@@ -585,9 +625,12 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
+COMMUNITY_DASHBOARD_URL = '/community_dashboard'
+COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
+CSRF_HANDLER_URL = '/csrfhandler'
 CUSTOM_NONPROFITS_LANDING_PAGE_URL = '/nonprofits'
 CUSTOM_PARENTS_LANDING_PAGE_URL = '/parents'
 CUSTOM_PARTNERS_LANDING_PAGE_URL = '/partners'
@@ -598,9 +641,12 @@ EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
+EXPLORATION_LEARNER_ANSWER_DETAILS = (
+    '/learneranswerinfohandler/learner_answer_details')
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
+EXPLORATION_STATE_ANSWER_STATS_PREFIX = '/createhandler/state_answer_stats'
 EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
@@ -613,6 +659,9 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
+LEARNER_ANSWER_INFO_HANDLER_URL = (
+    '/learneranswerinfohandler/learner_answer_details')
+LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -641,23 +690,32 @@ PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
+QUESTIONS_LIST_URL_PREFIX = '/questions_list_handler'
 QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
+REVIEW_TEST_URL_PREFIX = '/review_test'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SKILL_DATA_URL_PREFIX = '/skill_data_handler'
 SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
-SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
+SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
+SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
+STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
+STORY_PUBLISH_HANDLER = '/story_publish_handler'
+STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
+SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
@@ -667,16 +725,15 @@ TOPIC_VIEWER_URL_PREFIX = '/topic'
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
-TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
 TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
 TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
-TRANSLATION_DATA_PREFIX = '/createhandler/translate'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
+USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 # Event types.
@@ -713,8 +770,6 @@ COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 # Max number of playthroughs for an issue.
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 
-# Unfinished features.
-SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 # Number of unresolved answers to be displayed in the dashboard for each
 # exploration.
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
@@ -783,52 +838,16 @@ DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
 # The following are all page descriptions for the meta tag.
-ABOUT_PAGE_DESCRIPTION = (
-    'Oppia is an open source learning platform that connects a community of '
-    'teachers and learners. You can use this site to create 1-1 learning '
-    'scenarios for others.')
-GET_STARTED_PAGE_DESCRIPTION = (
-    'Learn how to get started using Oppia.')
-CONTACT_PAGE_DESCRIPTION = (
-    'Contact the Oppia team, submit feedback, and learn how to get involved '
-    'with the Oppia project.')
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
 CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
-DONATE_PAGE_DESCRIPTION = (
-    'Donate to The Oppia Foundation.')
 LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
     'community.')
-LIBRARY_PAGE_DESCRIPTION = (
-    'Looking to learn something new? Find explorations created by professors, '
-    'teachers and Oppia users in a subject you\'re interested in, and start '
-    'exploring!')
-PREFERENCES_PAGE_DESCRIPTION = (
-    'Change your Oppia profile settings and preferences')
-SEARCH_PAGE_DESCRIPTION = (
-    'Discover a new exploration to learn from, or help improve an existing '
-    'one for the community.')
-SIGNUP_PAGE_DESCRIPTION = (
-    'Sign up for Oppia and begin exploring a new subject.')
-SPLASH_PAGE_DESCRIPTION = (
-    'Oppia is a free site for sharing knowledge via interactive lessons '
-    'called \'explorations\'. Learn from user-created explorations, or teach '
-    'and create your own.')
-TEACH_PAGE_DESCRIPTION = (
-    'The Oppia library is full of user-created lessons called \'explorations\'.'
-    ' Read about how to participate in the community and begin creating '
-    'explorations.')
-TERMS_PAGE_DESCRIPTION = (
-    'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
-    'platform. Learn about our terms and conditions for creating and '
-    'distributing learning material.')
-THANKS_PAGE_DESCRIPTION = (
-    'Thank you for donating to The Oppia Foundation.')
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
@@ -948,7 +967,7 @@ RTE_CONTENT_SPEC = {
 # of topics as the value.
 # Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
 # oppia constant defined in
-# core/templates/dev/head/pages/landing/TopicLandingPage.js file.
+# core/templates/dev/head/pages/landing-pages/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
-    'maths': ['fractions', 'ratios']
+    'maths': ['fractions', 'negative-numbers', 'ratios']
 }

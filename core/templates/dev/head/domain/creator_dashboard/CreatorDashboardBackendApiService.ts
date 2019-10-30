@@ -17,12 +17,27 @@
  * backend.
  */
 
-oppia.factory('CreatorDashboardBackendApiService', ['$http', function($http) {
-  var _fetchDashboardData = function() {
-    return $http.get('/creatordashboardhandler/data');
-  };
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-  return {
-    fetchDashboardData: _fetchDashboardData
-  };
-}]);
+@Injectable({
+  providedIn: 'root'
+})
+export class CreatorDashboardBackendApiService {
+  constructor(private http: HttpClient) {}
+
+  _fetchDashboardData(): Promise<Object> {
+    // HttpClient returns an Observable, the toPromise converts it into a
+    // Promise.
+    return this.http.get('/creatordashboardhandler/data').toPromise();
+  }
+
+  fetchDashboardData(): Promise<Object> {
+    return this._fetchDashboardData();
+  }
+}
+
+angular.module('oppia').factory(
+  'CreatorDashboardBackendApiService',
+  downgradeInjectable(CreatorDashboardBackendApiService));

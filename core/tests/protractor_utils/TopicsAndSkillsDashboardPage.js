@@ -19,9 +19,11 @@
 
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var SkillEditorPage = require('./SkillEditorPage.js');
 
 var TopicsAndSkillsDashboardPage = function() {
   var DASHBOARD_URL = '/topics_and_skills_dashboard';
+  var skillEditorPage = new SkillEditorPage.SkillEditorPage();
   var topicNames = element.all(by.css('.protractor-test-topic-name'));
   var skillDescriptions = element.all(
     by.css('.protractor-test-skill-description'));
@@ -150,6 +152,12 @@ var TopicsAndSkillsDashboardPage = function() {
     createSkillButton.click();
 
     skillNameField.sendKeys(description);
+    for (var i = 0; i < 3; i++) {
+      skillEditorPage.editRubricExplanationWithIndex(i, 'Explanation ' + i);
+    }
+    waitFor.elementToBeClickable(
+      confirmSkillCreationButton,
+      'Create skill button takes too long to be clickable');
     confirmSkillCreationButton.click();
     waitFor.pageToFullyLoad();
   };

@@ -19,9 +19,11 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 
-oppia.factory('LearnerPlaylistService', [
+angular.module('oppia').factory('LearnerPlaylistService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
-  function($http, $uibModal, AlertsService, UrlInterpolationService) {
+  'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
+  function($http, $uibModal, AlertsService, UrlInterpolationService,
+      ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION) {
     var _addToLearnerPlaylist = function(activityId, activityType) {
       var successfullyAdded = true;
       var addToLearnerPlaylistUrl = (
@@ -62,8 +64,8 @@ oppia.factory('LearnerPlaylistService', [
         activityId, activityTitle, activityType, learnerDashboardActivityIds) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/learner_dashboard/' +
-          'remove_activity_from_learner_dashboard_modal_directive.html'),
+          '/pages/learner-dashboard-page/modal-templates/' +
+          'remove-activity-from-learner-dashboard-modal.template.html'),
         backdrop: true,
         resolve: {
           activityId: function() {
@@ -97,10 +99,10 @@ oppia.factory('LearnerPlaylistService', [
           }
         ]
       }).result.then(function() {
-        if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+        if (activityType === ACTIVITY_TYPE_EXPLORATION) {
           learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
             activityId);
-        } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+        } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
           learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
             activityId);
         }

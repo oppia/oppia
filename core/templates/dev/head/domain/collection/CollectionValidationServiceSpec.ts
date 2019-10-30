@@ -16,28 +16,35 @@
  * @fileoverview Tests for CollectionValidationService.
  */
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
-require('domain/collection/CollectionObjectFactory.ts');
-require('domain/collection/CollectionValidationService.ts');
+import { TestBed } from '@angular/core/testing';
+
+import { CollectionNodeObjectFactory } from
+  'domain/collection/CollectionNodeObjectFactory';
+import { Collection, CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
+import { CollectionValidationService } from
+  'domain/collection/CollectionValidationService';
 
 describe('Collection validation service', function() {
-  var CollectionValidationService = null;
-  var CollectionObjectFactory = null;
-  var CollectionNodeObjectFactory = null;
-  var sampleCollectionBackendObject = null;
-  var _sampleCollection = null;
+  let collectionValidationService: CollectionValidationService = null;
+  let collectionObjectFactory: CollectionObjectFactory = null;
+  let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
+  let sampleCollectionBackendObject: any = null;
+  let _sampleCollection: Collection = null;
 
-  var EXISTS = true;
-  var DOES_NOT_EXIST = false;
-  var PUBLIC_STATUS = true;
-  var PRIVATE_STATUS = false;
+  let EXISTS: boolean = true;
+  let DOES_NOT_EXIST: boolean = false;
+  let PUBLIC_STATUS: boolean = true;
+  let PRIVATE_STATUS: boolean = false;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [CollectionValidationService]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    CollectionValidationService = $injector.get('CollectionValidationService');
-    CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-    CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    collectionValidationService = TestBed.get(CollectionValidationService);
+    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
+    collectionNodeObjectFactory = TestBed.get(CollectionNodeObjectFactory);
 
     sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -47,13 +54,13 @@ describe('Collection validation service', function() {
       version: '1',
       nodes: []
     };
-    _sampleCollection = CollectionObjectFactory.create(
+    _sampleCollection = collectionObjectFactory.create(
       sampleCollectionBackendObject);
     _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
-  }));
+  });
 
-  var _addCollectionNode = function(explorationId, exists, isPublic) {
-    var collectionNode = CollectionNodeObjectFactory.createFromExplorationId(
+  var _addCollectionNode = (explorationId, exists, isPublic) => {
+    var collectionNode = collectionNodeObjectFactory.createFromExplorationId(
       explorationId);
     if (exists) {
       collectionNode.setExplorationSummaryObject({
@@ -63,26 +70,26 @@ describe('Collection validation service', function() {
     return _sampleCollection.addCollectionNode(collectionNode);
   };
 
-  var _getCollectionNode = function(explorationId) {
+  var _getCollectionNode = (explorationId) => {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
   };
 
-  var _findPrivateValidationIssues = function() {
-    return CollectionValidationService.findValidationIssuesForPrivateCollection(
+  var _findPrivateValidationIssues = () => {
+    return collectionValidationService.findValidationIssuesForPrivateCollection(
       _sampleCollection);
   };
 
-  var _findPublicValidationIssues = function() {
-    return CollectionValidationService.findValidationIssuesForPublicCollection(
+  var _findPublicValidationIssues = () => {
+    return collectionValidationService.findValidationIssuesForPublicCollection(
       _sampleCollection);
   };
 
-  it('should not find issues with a collection with one node', function() {
+  it('should not find issues with a collection with one node', () => {
     var issues = _findPrivateValidationIssues();
     expect(issues).toEqual([]);
   });
 
-  it('should expect at least one collection node', function() {
+  it('should expect at least one collection node', () => {
     expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
     expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
 
@@ -91,7 +98,7 @@ describe('Collection validation service', function() {
       'There should be at least 1 exploration in the collection.']);
   });
 
-  it('should detect nonexistent/inaccessible explorations', function() {
+  it('should detect nonexistent/inaccessible explorations', () => {
     expect(_addCollectionNode(
       'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS)).toBe(true);
     var node0 = _getCollectionNode('exp_id0');
@@ -105,7 +112,7 @@ describe('Collection validation service', function() {
   });
 
   it('should allow private and public explorations in a private collection',
-    function() {
+    () => {
       expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
       expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBe(true);
       var node0 = _getCollectionNode('exp_id0');
@@ -118,7 +125,7 @@ describe('Collection validation service', function() {
   );
 
   it('should not allow private explorations in a public collection',
-    function() {
+    () => {
       expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
       var node1 = _getCollectionNode('exp_id1');
       var node0 = _getCollectionNode('exp_id0');
@@ -134,7 +141,7 @@ describe('Collection validation service', function() {
     }
   );
 
-  it('should be able to detect multiple validation issues', function() {
+  it('should be able to detect multiple validation issues', () => {
     expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
     expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
 
@@ -149,13 +156,13 @@ describe('Collection validation service', function() {
     ]);
   });
 
-  it('should return false if the tags are not valid', function() {
-    expect(CollectionValidationService.isTagValid(['test'])).toBe(true);
-    expect(CollectionValidationService.isTagValid(['test', 'math'])).toBe(true);
+  it('should return false if the tags are not valid', () => {
+    expect(collectionValidationService.isTagValid(['test'])).toBe(true);
+    expect(collectionValidationService.isTagValid(['test', 'math'])).toBe(true);
 
-    expect(CollectionValidationService.isTagValid(
+    expect(collectionValidationService.isTagValid(
       ['test', 'test'])).toBe(false);
-    expect(CollectionValidationService.isTagValid(
+    expect(collectionValidationService.isTagValid(
       ['test '])).toBe(false);
   });
 });

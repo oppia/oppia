@@ -16,15 +16,19 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
-require('I18nFooter.ts');
-require('directives/FocusOnDirective.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
+require('directives/focus-on.directive.ts');
 
 require('pages/Base.ts');
 
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
+require('services/CsrfTokenService.ts');
 require('services/NavigationService.ts');
-require('services/UtilsService.ts');
 require('services/DebouncerService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/IdGenerationService.ts');
@@ -42,116 +46,47 @@ require('services/stateful/BackgroundMaskService.ts');
 require('services/stateful/FocusManagerService.ts');
 require('services/SiteAnalyticsService.ts');
 
-require('components/alerts/AlertMessageDirective.ts');
-require('components/create_button/CreateActivityButtonDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'alert-message.directive.ts');
+require('components/button-directives/create-activity-button.directive.ts');
 
-require('components/forms/ObjectEditorDirective.ts');
-require('components/promo/PromoBarDirective.ts');
-require('components/side_navigation_bar/SideNavigationBarDirective.ts');
-require('components/social_buttons/SocialButtonsDirective.ts');
-require('components/top_navigation_bar/TopNavigationBarDirective.ts');
+require('components/forms/custom-forms-directives/object-editor.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'promo-bar.directive.ts');
+require(
+  'components/common-layout-directives/navigation-bars/' +
+  'side-navigation-bar.directive.ts');
+require('components/button-directives/social-buttons.directive.ts');
+require(
+  'components/common-layout-directives/navigation-bars/' +
+  'top-navigation-bar.directive.ts');
 
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
+require('app.constants.ajs.ts');
 
-oppia.constant('EXPLORATION_AND_SKILL_ID_PATTERN', /^[a-zA-Z0-9_-]+$/);
+require('google-analytics.initializer.ts');
 
-// We use a slash because this character is forbidden in a state name.
-oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
-oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
-oppia.constant('LOADING_INDICATOR_URL', '/activity/loadingIndicator.gif');
-oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
-// Feature still in development.
-// NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-oppia.constant('ENABLE_ML_CLASSIFIERS', false);
-// Feature still in development.
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
-  'The current solution does not lead to another card.');
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
-  'The current solution does not correspond to a correct answer.');
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
-  'The solution is now valid!');
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
-  'The current solution is no longer valid.');
-oppia.constant('PARAMETER_TYPES', {
-  REAL: 'Real',
-  UNICODE_STRING: 'UnicodeString'
-});
-oppia.constant('ACTION_ACCEPT_SUGGESTION', 'accept');
-oppia.constant('ACTION_REJECT_SUGGESTION', 'reject');
+// The following file uses constants in app.constants.ts and hence needs to be
+// loaded after app.constants.ts
+require('I18nFooter.ts');
 
-// The maximum number of nodes to show in a row of the state graph.
-oppia.constant('MAX_NODES_PER_ROW', 4);
-// The following variable must be at least 3. It represents the maximum length,
-// in characters, for the name of each node label in the state graph.
-oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
+const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
-// If an $http request fails with the following error codes, a warning is
-// displayed.
-oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
-
-// Do not modify these, for backwards-compatibility reasons.
-oppia.constant('COMPONENT_NAME_CONTENT', 'content');
-oppia.constant('COMPONENT_NAME_HINT', 'hint');
-oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
-oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
-oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
-oppia.constant('COMPONENT_NAME_EXPLANATION', 'explanation');
-oppia.constant('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
-
-// Enables recording playthroughs from learner sessions.
-oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
-oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
-oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);
-oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 3);
-oppia.constant('NUM_REPEATED_CYCLES_THRESHOLD', 3);
-oppia.constant('MAX_PLAYTHROUGHS_FOR_ISSUE', 5);
-
-oppia.constant('ACTION_TYPE_EXPLORATION_START', 'ExplorationStart');
-oppia.constant('ACTION_TYPE_ANSWER_SUBMIT', 'AnswerSubmit');
-oppia.constant('ACTION_TYPE_EXPLORATION_QUIT', 'ExplorationQuit');
-
-oppia.constant('ISSUE_TYPE_EARLY_QUIT', 'EarlyQuit');
-oppia.constant(
-  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS', 'MultipleIncorrectSubmissions');
-oppia.constant('ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'CyclicStateTransitions');
-oppia.constant('SITE_NAME', 'Oppia.org');
-
-oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
-oppia.constant('FEEDBACK_POPOVER_PATH',
-  '/pages/exploration_player/feedback_popup_container_directive.html');
-
-oppia.constant('LOGOUT_URL', '/logout');
-
-// Whether to enable the promo bar functionality. This does not actually turn on
-// the promo bar, as that is gated by a config value (see config_domain). This
-// merely avoids checking for whether the promo bar is enabled for every Oppia
-// page visited.
-oppia.constant('ENABLE_PROMO_BAR', true);
-
-// TODO(vojtechjelinek): Move these to separate file later, after we establish
-// process to follow for Angular constants (#6731).
-oppia.constant(
-  'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
-  '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');
-oppia.constant(
-  'TOPIC_RIGHTS_URL_TEMPLATE', '/rightshandler/get_topic_rights/<topic_id>');
-oppia.constant(
-  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
-  '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
-oppia.constant(
-  'EDITABLE_TOPIC_DATA_URL_TEMPLATE', '/topic_editor_handler/data/<topic_id>');
-
-oppia.config([
+angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider',
+  '$interpolateProvider', '$locationProvider', '$provide',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider) {
+      $interpolateProvider, $locationProvider, $provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
@@ -169,7 +104,6 @@ oppia.config([
 
     // Prevent storing duplicate cookies for translation language.
     $cookiesProvider.defaults.path = '/';
-
     // Set default headers for POST and PUT requests.
     $httpProvider.defaults.headers.post = {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -181,15 +115,22 @@ oppia.config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'AlertsService', function($q, $log, AlertsService) {
+      '$q', '$log', 'AlertsService', 'CsrfTokenService',
+      function($q, $log, AlertsService, CsrfTokenService) {
         return {
           request: function(config) {
             if (config.data) {
-              config.data = $.param({
-                csrf_token: GLOBALS.csrf_token,
-                payload: JSON.stringify(config.data),
-                source: document.URL
-              }, true);
+              return $q(function(resolve, reject) {
+                // Get CSRF token before sending the request.
+                CsrfTokenService.getTokenAsync().then(function(token) {
+                  config.data = $.param({
+                    csrf_token: token,
+                    payload: JSON.stringify(config.data),
+                    source: document.URL
+                  }, true);
+                  resolve(config);
+                });
+              });
             }
             return config;
           },
@@ -216,7 +157,7 @@ oppia.config([
   }
 ]);
 
-oppia.config(['$provide', function($provide) {
+angular.module('oppia').config(['$provide', function($provide) {
   $provide.decorator('$log', ['$delegate', 'DEV_MODE',
     function($delegate, DEV_MODE) {
       var _originalError = $delegate.error;
@@ -240,7 +181,7 @@ oppia.config(['$provide', function($provide) {
   ]);
 }]);
 
-oppia.config(['toastrConfig', function(toastrConfig) {
+angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
   angular.extend(toastrConfig, {
     allowHtml: false,
     iconClasses: {
@@ -257,61 +198,71 @@ oppia.config(['toastrConfig', function(toastrConfig) {
   });
 }]);
 
-oppia.config(['recorderServiceProvider', function(recorderServiceProvider) {
-  recorderServiceProvider.forceSwf(false);
-  recorderServiceProvider.withMp3Conversion(true, {
-    bitRate: 128
-  });
-}]);
-
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
-oppia.factory('$exceptionHandler', ['$log', function($log) {
-  var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
-  var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
+// NOTE: The line number logged in stack driver will not accurately
+// match the line number in the source code. This is because browsers
+// automatically remove empty lines and concatinate strings which are
+// spread over multiple lines. The errored file may be viewed on the
+// browser console where the line number should match.
+angular.module('oppia').factory('$exceptionHandler', [
+  '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
+    var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
+    var TPLOAD_STATUS_CODE_REGEX = (
+      new RegExp(/\[\$compile:tpload\].*p1=(.*?)&p2=/));
+    var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
-  return function(exception, cause) {
-    var messageAndSourceAndStackTrace = [
-      '',
-      'Cause: ' + cause,
-      exception.message,
-      String(exception.stack),
-      '    at URL: ' + window.location.href
-    ].join('\n');
-
-    // To prevent an overdose of errors, throttle to at most 1 error every
-    // MIN_TIME_BETWEEN_ERRORS_MSEC.
-    if (Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
-      // Catch all errors, to guard against infinite recursive loops.
-      try {
-        // We use jQuery here instead of Angular's $http, since the latter
-        // creates a circular dependency.
-        $.ajax({
-          type: 'POST',
-          url: '/frontend_errors',
-          data: $.param({
-            csrf_token: GLOBALS.csrf_token,
-            payload: JSON.stringify({
-              error: messageAndSourceAndStackTrace
-            }),
-            source: document.URL
-          }, true),
-          contentType: 'application/x-www-form-urlencoded',
-          dataType: 'text',
-          async: true
-        });
-
-        timeOfLastPostedError = Date.now();
-      } catch (loggingError) {
-        $log.warn('Error logging failed.');
+    return function(exception, cause) {
+      var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
+      // Suppress tpload errors which occur with p1 of -1 in the error URL
+      // because -1 is the status code for aborted requests.
+      if (tploadStatusCode !== null && tploadStatusCode[1] === '-1') {
+        return;
       }
-    }
+      sourceMappedStackTrace.mapStackTrace(
+        exception.stack, function(mappedStack) {
+          var messageAndSourceAndStackTrace = [
+            '',
+            'Cause: ' + cause,
+            exception.message,
+            mappedStack.join('\n'),
+            '    at URL: ' + window.location.href
+          ].join('\n');
+          // To prevent an overdose of errors, throttle to at most 1 error every
+          // MIN_TIME_BETWEEN_ERRORS_MSEC.
+          if (
+            Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+            // Catch all errors, to guard against infinite recursive loops.
+            try {
+              // We use jQuery here instead of Angular's $http, since the latter
+              // creates a circular dependency.
+              CsrfTokenService.getTokenAsync().then(function(token) {
+                $.ajax({
+                  type: 'POST',
+                  url: '/frontend_errors',
+                  data: $.param({
+                    csrf_token: token,
+                    payload: JSON.stringify({
+                      error: messageAndSourceAndStackTrace
+                    }),
+                    source: document.URL
+                  }, true),
+                  contentType: 'application/x-www-form-urlencoded',
+                  dataType: 'text',
+                  async: true
+                });
 
-    $log.error.apply($log, arguments);
-  };
-}]);
-
-oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
+                timeOfLastPostedError = Date.now();
+              });
+            } catch (loggingError) {
+              $log.warn('Error logging failed.');
+            }
+          }
+        });
+      $log.error.apply($log, arguments);
+    };
+  }
+]);
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {

@@ -18,10 +18,9 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'TOPIC_DATA_URL_TEMPLATE', '/topic_data_handler/<topic_name>');
+require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 
-oppia.factory('TopicViewerBackendApiService', [
+angular.module('oppia').factory('TopicViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'TOPIC_DATA_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService, TOPIC_DATA_URL_TEMPLATE) {
     var topicDataDict = null;

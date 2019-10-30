@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Models for Oppia recommendations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
@@ -35,6 +37,27 @@ class ExplorationRecommendationsModel(
     recommended_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration recommendations are deleted only if the corresponding
+        exploration is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def has_reference_to_user_id(unused_user_id):
+        """ExplorationRecommendationsModel doesn't reference any user_id
+        directly.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data
+            should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
 
 class TopicSimilaritiesModel(base_models.BaseModel):
     """This model stores the similarity between any two topics. The topic
@@ -49,3 +72,24 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     change in the future.
     """
     content = ndb.JsonProperty(required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """There is only a single TopicSimilaritiesModel in the entire
+        codebase.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def has_reference_to_user_id(unused_user_id):
+        """TopicSimilaritiesModel doesn't reference any user_id
+        directly.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data
+            should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False

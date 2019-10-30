@@ -16,7 +16,13 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/question/EditableQuestionBackendApiService.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Editable question backend API service', function() {
   var EditableQuestionBackendApiService = null;
@@ -24,17 +30,32 @@ describe('Editable question backend API service', function() {
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
+  var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
     'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
+
+  beforeEach(angular.mock.inject(function($injector, $q) {
     EditableQuestionBackendApiService = $injector.get(
       'EditableQuestionBackendApiService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
 
     // Sample question object returnable from the backend
     sampleDataResults = {
@@ -75,7 +96,8 @@ describe('Editable question backend API service', function() {
             },
             id: 'TextInput'
           },
-          param_changes: []
+          param_changes: [],
+          solicit_answer_details: false
         },
         language_code: 'en',
         version: 1
@@ -175,4 +197,34 @@ describe('Editable question backend API service', function() {
     expect(failHandler).toHaveBeenCalledWith(
       'Question with given id doesn\'t exist.');
   });
+
+  it('should add question skill link if skill exists', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('POST', '/manage_question_skill_link/0/1').respond();
+    EditableQuestionBackendApiService.addQuestionSkillLink('0', '1').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should fail to add question skill link if skill does not exist',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expect('POST', '/manage_question_skill_link/0/1').respond(
+        404, 'The skill with the given id doesn\'t exist.');
+
+      EditableQuestionBackendApiService.addQuestionSkillLink('0', '1').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'The skill with the given id doesn\'t exist.');
+    });
 });

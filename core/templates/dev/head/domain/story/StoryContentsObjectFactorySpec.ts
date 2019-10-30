@@ -16,17 +16,21 @@
  * @fileoverview Tests for StoryContentsObjectFactory.
  */
 
-require('domain/story/StoryContentsObjectFactory.ts');
+import { TestBed } from '@angular/core/testing';
 
-describe('Story contents object factory', function() {
-  var StoryContentsObjectFactory = null;
-  var _sampleSubtopic = null;
-  var _sampleStoryContents = null;
+import { StoryContents, StoryContentsObjectFactory } from
+  'domain/story/StoryContentsObjectFactory';
 
-  beforeEach(angular.mock.module('oppia'));
+describe('Story contents object factory', () => {
+  let storyContentsObjectFactory: StoryContentsObjectFactory = null;
+  let _sampleStoryContents: StoryContents = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    StoryContentsObjectFactory = $injector.get('StoryContentsObjectFactory');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [StoryContentsObjectFactory]
+    });
+
+    storyContentsObjectFactory = TestBed.get(StoryContentsObjectFactory);
 
     var sampleStoryContentsBackendDict = {
       initial_node_id: 'node_1',
@@ -52,18 +56,18 @@ describe('Story contents object factory', function() {
         }],
       next_node_id: 'node_3'
     };
-    _sampleStoryContents = StoryContentsObjectFactory.createFromBackendDict(
+    _sampleStoryContents = storyContentsObjectFactory.createFromBackendDict(
       sampleStoryContentsBackendDict);
-  }));
+  });
 
   it('should correctly return index of node (or -1, if not present) ' +
-     'based on id', function() {
+     'based on id', () => {
     expect(_sampleStoryContents.getNodeIndex('node_1')).toEqual(0);
     expect(_sampleStoryContents.getNodeIndex('node_10')).toEqual(-1);
   });
 
   it('should correctly correctly return the id to title map for story ' +
-    'nodes', function() {
+    'nodes', () => {
     expect(
       _sampleStoryContents.getNodeIdsToTitleMap(['node_1', 'node_2'])
     ).toEqual({
@@ -71,23 +75,23 @@ describe('Story contents object factory', function() {
       node_2: 'Title 2'
     });
 
-    expect(function() {
+    expect(() => {
       _sampleStoryContents.getNodeIdsToTitleMap(['node_1', 'node_2', 'node_3']);
     }).toThrow();
   });
 
-  it('should correctly correctly validate valid story contents', function() {
+  it('should correctly correctly validate valid story contents', () => {
     expect(_sampleStoryContents.validate()).toEqual([]);
   });
 
   it('should correctly set initial node id when first node is ' +
-    'created', function() {
+    'created', () => {
     var sampleStoryContentsBackendDict = {
       initial_node_id: null,
       nodes: [],
       next_node_id: 'node_1'
     };
-    var storyContents = StoryContentsObjectFactory.createFromBackendDict(
+    var storyContents = storyContentsObjectFactory.createFromBackendDict(
       sampleStoryContentsBackendDict);
     storyContents.addNode('Title 1');
     expect(storyContents.getInitialNodeId()).toEqual('node_1');
@@ -95,7 +99,7 @@ describe('Story contents object factory', function() {
   });
 
   it('should correctly correctly validate case where prerequisite skills ' +
-     'are not acquired by the user', function() {
+     'are not acquired by the user', () => {
     _sampleStoryContents.addNode('Title 2');
     _sampleStoryContents.addDestinationNodeIdToNode('node_1', 'node_3');
     _sampleStoryContents.addPrerequisiteSkillIdToNode('node_3', 'skill_3');
@@ -106,7 +110,7 @@ describe('Story contents object factory', function() {
   });
 
   it('should correctly correctly validate the case where the story graph ' +
-    'has loops', function() {
+    'has loops', () => {
     _sampleStoryContents.addNode('Title 2');
     _sampleStoryContents.addDestinationNodeIdToNode('node_2', 'node_3');
     _sampleStoryContents.addDestinationNodeIdToNode('node_3', 'node_1');
@@ -116,7 +120,7 @@ describe('Story contents object factory', function() {
   });
 
   it('should correctly correctly validate the case where the story graph is' +
-    ' disconnected.', function() {
+    ' disconnected.', () => {
     _sampleStoryContents.addNode('Title 3');
     expect(_sampleStoryContents.validate()).toEqual([
       'There is no way to get to the chapter with title Title 3 from any ' +
@@ -125,45 +129,45 @@ describe('Story contents object factory', function() {
   });
 
   it('should correctly throw error when node id is invalid for any function',
-    function() {
-      expect(function() {
+    () => {
+      expect(() => {
         _sampleStoryContents.setInitialNodeId('node_5');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.deleteNode('node_5');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.setNodeExplorationId('node_5', 'id');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.setNodeOutline('node_5', 'Outline');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.markNodeOutlineAsFinalized('node_5');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.markNodeOutlineAsNotFinalized('node_5');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.setNodeTitle('node_5', 'Title 3');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.addPrerequisiteSkillIdToNode('node_5', 'skill_1');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.removePrerequisiteSkillIdFromNode(
           'node_5', 'skill_1');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.addAcquiredSkillIdToNode('node_5', 'skill_1');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.removeAcquiredSkillIdFromNode('node_5', 'skill_1');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.addDestinationNodeIdToNode('node_5', 'node_1');
       }).toThrow();
-      expect(function() {
+      expect(() => {
         _sampleStoryContents.removeDestinationNodeIdFromNode(
           'node_5', 'node_1');
       }).toThrow();

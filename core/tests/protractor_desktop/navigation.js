@@ -18,6 +18,7 @@
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var ThanksPage = require('../protractor_utils/ThanksPage.js');
+var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
 describe('Oppia static pages tour', function() {
   var thanksPage = null;
@@ -94,15 +95,129 @@ describe('Oppia static pages tour', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([
-      // TODO (Jacob) Remove when
+      // TODO(Jacob): Remove when
       // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
       'cast_sender.js - Failed to load resource: net::ERR_FAILED',
       'Uncaught ReferenceError: ytcfg is not defined',
-      // TODO (@pranavsid98) This error is caused by the upgrade from Chrome 60
+      // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
       'Error parsing header X-XSS-Protection: 1; mode=block; ' +
       'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
     ]);
+  });
+});
+
+describe('Meta Tags', function() {
+  var EXPECTED_META_NAME = 'Personalized Online Learning from Oppia';
+  var EXPECTED_META_DESCRIPTION = 'Learn how to get started using Oppia.';
+  var getStartedPage = new GetStartedPage.GetStartedPage();
+
+  beforeEach(function() {
+    getStartedPage.get();
+  });
+
+  it('should set the correct itemprop meta tags', function() {
+    expect(getStartedPage.getMetaTagContent('name', 'itemprop')).toEqual(
+      EXPECTED_META_NAME);
+    expect(getStartedPage.getMetaTagContent('description', 'itemprop')).toEqual(
+      EXPECTED_META_DESCRIPTION);
+  });
+
+  it('should set the correct og meta tags', function() {
+    expect(getStartedPage.getMetaTagContent('title', 'og')).toEqual(
+      EXPECTED_META_NAME);
+    expect(getStartedPage.getMetaTagContent('description', 'og')).toEqual(
+      EXPECTED_META_DESCRIPTION);
+    expect(getStartedPage.getMetaTagContent('url', 'og')).toEqual(
+      'http://localhost:9001/get_started');
+  });
+
+  it('should set the correct application name', function() {
+    expect(getStartedPage.getMetaTagContent(
+      'application-name', 'name')).toEqual('Oppia.org');
+  });
+});
+
+describe('DEV MODE Test', function() {
+  it('should not show Dev Mode label in prod', function() {
+    browser.get('/splash');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-dev-mode')).isPresent())
+      .toBe(general.isInDevMode());
+  });
+});
+
+describe('Static Pages Tour', function() {
+  var getStartedPage = new GetStartedPage.GetStartedPage();
+  it('visits the Get started page', function() {
+    getStartedPage.get();
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Teach page', function() {
+    browser.get('/teach');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Splash page', function() {
+    browser.get('/splash');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the About page', function() {
+    browser.get('/about');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-about-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Contact page', function() {
+    browser.get('/contact');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-contact-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Donate page', function() {
+    browser.get('/donate');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-donate-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Privacy page', function() {
+    browser.get('/privacy');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-privacy-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Terms page', function() {
+    browser.get('/terms');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-terms-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Thanks page', function() {
+    browser.get('/thanks');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
+  });
+
+  it('shows the error page when an incorrect url is given', function() {
+    browser.get('/splashes');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-error-page')).isPresent()).toBe(true);
   });
 });

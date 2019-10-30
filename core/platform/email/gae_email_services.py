@@ -15,8 +15,11 @@
 # limitations under the License.
 
 """Provides email services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import feconf
+import python_utils
 
 from google.appengine.api import mail
 
@@ -43,7 +46,7 @@ def _is_email_valid(email_address):
     Returns:
         bool. Whether specified email address is valid.
     """
-    if not isinstance(email_address, basestring):
+    if not isinstance(email_address, python_utils.BASESTRING):
         return False
 
     stripped_address = email_address.strip()

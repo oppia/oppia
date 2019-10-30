@@ -23,13 +23,14 @@ follow the definitions given by the schemas.
 The objects that can be described by these schemas must be composable from the
 following Python types: bool, dict, float, int, list, unicode.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import numbers
 import re
-import urllib
-import urlparse
 
-from core.domain import html_cleaner  # pylint: disable=relative-import
+from core.domain import html_cleaner
+import python_utils
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
@@ -77,7 +78,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         # Importing this at the top of the file causes a circular dependency.
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
-        from core.domain import obj_services  # pylint: disable=relative-import
+        from core.domain import obj_services
         obj_class = obj_services.Registry.get_object_class_by_type(
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
@@ -111,10 +112,13 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
-        assert isinstance(obj, basestring), (
+        assert isinstance(obj, python_utils.BASESTRING), (
             'Expected unicode HTML string, received %s' % obj)
-        obj = unicode(obj)
-        assert isinstance(obj, unicode), (
+        if isinstance(obj, bytes):
+            obj = obj.decode('utf-8')
+        else:
+            obj = python_utils.UNICODE(obj)
+        assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
         normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
@@ -126,10 +130,13 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             normalize_against_schema(item, item_schema) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
-        assert isinstance(obj, basestring), (
+        assert isinstance(obj, python_utils.BASESTRING), (
             'Expected unicode string, received %s' % obj)
-        obj = unicode(obj)
-        assert isinstance(obj, unicode), (
+        if isinstance(obj, bytes):
+            obj = obj.decode('utf-8')
+        else:
+            obj = python_utils.UNICODE(obj)
+        assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     else:
@@ -177,7 +184,7 @@ def get_validator(validator_id):
     return _Validators.get(validator_id)
 
 
-class Normalizers(object):
+class Normalizers(python_utils.OBJECT):
     """Various normalizers.
 
     A normalizer is a function that takes an object, attempts to normalize
@@ -211,22 +218,11 @@ class Normalizers(object):
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
-
-    @staticmethod
-    def normalize_spaces(obj):
-        """Collapses multiple spaces into single spaces.
-
-        Args:
-            obj: a string.
-
-        Returns:
-            A string that is the same as `obj`, except that each block of
-            whitespace is collapsed into a single space character. If the
-            block of whitespace is at the front or end of obj, then it
-            is simply removed.
-        """
-        return ' '.join(obj.split())
-
+# TODO(ankita240796): The disable comment is required since the lint tests
+# fail on circleci with the multiple-statements error on the line even though
+# the line is empty. This is a temporary fix to unblock PRs.
+# Relevant issue: https://github.com/oppia/oppia/issues/7307.
+# pylint: disable=multiple-statements
     @staticmethod
     def sanitize_url(obj):
         """Takes a string representing a URL and sanitizes it.
@@ -245,19 +241,34 @@ class Normalizers(object):
         """
         if obj == '':
             return obj
-        url_components = urlparse.urlsplit(obj)
+        url_components = python_utils.url_split(obj)
         quoted_url_components = (
-            urllib.quote(component) for component in url_components)
-        raw = urlparse.urlunsplit(quoted_url_components)
+            python_utils.url_quote(component) for component in url_components)
+        raw = python_utils.url_unsplit(quoted_url_components)
 
-        acceptable = html_cleaner.filter_a('href', obj)
+        acceptable = html_cleaner.filter_a('a', 'href', obj)
         assert acceptable, (
             'Invalid URL: Sanitized URL should start with '
             '\'http://\' or \'https://\'; received %s' % raw)
         return raw
 
+    @staticmethod
+    def normalize_spaces(obj):
+        """Collapses multiple spaces into single spaces.
 
-class _Validators(object):
+        Args:
+            obj: a string.
+
+        Returns:
+            A string that is the same as `obj`, except that each block of
+            whitespace is collapsed into a single space character. If the
+            block of whitespace is at the front or end of obj, then it
+            is simply removed.
+        """
+        return ' '.join(obj.split())
+
+
+class _Validators(python_utils.OBJECT):
     """Various validators.
 
     A validator is a function that takes an object and returns True if it is

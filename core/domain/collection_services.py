@@ -21,6 +21,8 @@ stored in the database. In particular, the various query methods should
 delegate to the Collection model class. This will enable the collection
 storage model to be changed without affecting this module and others above it.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
@@ -30,12 +32,14 @@ import os
 from constants import constants
 from core.domain import activity_services
 from core.domain import collection_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (collection_models, user_models) = models.Registry.import_models([
@@ -221,7 +225,7 @@ def get_collection_summary_by_id(collection_id):
     """
     # TODO(msl): Maybe use memcache similarly to get_collection_by_id.
     collection_summary_model = collection_models.CollectionSummaryModel.get(
-        collection_id)
+        collection_id, strict=False)
     if collection_summary_model:
         collection_summary = get_collection_summary_from_model(
             collection_summary_model)
@@ -254,7 +258,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     memcache_keys = [_get_collection_memcache_key(i) for i in collection_ids]
     cache_result = memcache_services.get_multi(memcache_keys)
 
-    for collection_obj in cache_result.itervalues():
+    for collection_obj in cache_result.values():
         result[collection_obj.id] = collection_obj
 
     for _id in collection_ids:
@@ -281,7 +285,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             % '\n'.join(not_found))
 
     cache_update = {
-        cid: db_results_dict[cid] for cid in db_results_dict.iterkeys()
+        cid: db_results_dict[cid] for cid in db_results_dict
         if db_results_dict[cid] is not None
     }
 
@@ -374,7 +378,7 @@ def get_completed_exploration_ids(user_id, collection_id):
         collection_id: str. ID of the collection.
 
     Returns:
-        list(Exploration). A list of explorations that the user with the given
+        list(str). A list of exploration ids that the user with the given
         user id has completed within the context of the provided collection with
         the given collection id. The list is empty if the user has not yet
         completed any explorations within the collection, or if either the
@@ -548,35 +552,26 @@ def get_collection_ids_matching_query(query_string, cursor=None):
     returned_collection_ids = []
     search_cursor = cursor
 
-    for _ in range(MAX_ITERATIONS):
+    for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
         collection_ids, search_cursor = search_services.search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
 
-        invalid_collection_ids = []
-        for ind, model in enumerate(
+        # Collection model cannot be None as we are fetching the collection ids
+        # through query and there cannot be a collection id for which there is
+        # no collection.
+        for ind, _ in enumerate(
                 collection_models.CollectionSummaryModel.get_multi(
                     collection_ids)):
-            if model is not None:
-                returned_collection_ids.append(collection_ids[ind])
-            else:
-                invalid_collection_ids.append(collection_ids[ind])
+            returned_collection_ids.append(collection_ids[ind])
 
+        # The number of collections in a page is always lesser or equal to
+        # feconf.SEARCH_RESULTS_PAGE_SIZE.
         if len(returned_collection_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
                 search_cursor is None):
             break
-        else:
-            logging.error(
-                'Search index contains stale collection ids: %s' %
-                ', '.join(invalid_collection_ids))
-
-    if (len(returned_collection_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
-            and search_cursor is not None):
-        logging.error(
-            'Could not fulfill search request for query string %s; at least '
-            '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
     return (returned_collection_ids, search_cursor)
 
@@ -690,7 +685,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     # Validate that all explorations referenced by the collection exist.
     exp_ids = collection.exploration_ids
     exp_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exp_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exp_ids))
     exp_summaries_dict = {
         exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
     }
@@ -710,21 +705,21 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     if rights_manager.is_collection_public(collection.id):
         validate_exps_in_collection_are_public(collection)
 
+    # Collection model cannot be none as we are passing the collection as a
+    # parameter and also this function is called by update_collection which only
+    # works if the collection is put into the datastore.
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)
-    if collection_model is None:
-        collection_model = collection_models.CollectionModel(id=collection.id)
-    else:
-        if collection.version > collection_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of collection '
-                'from version %s. Please reload the page and try again.'
-                % (collection_model.version, collection.version))
-        elif collection.version < collection_model.version:
-            raise Exception(
-                'Trying to update version %s of collection from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (collection_model.version, collection.version))
+    if collection.version > collection_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of collection '
+            'from version %s. Please reload the page and try again.'
+            % (collection_model.version, collection.version))
+    elif collection.version < collection_model.version:
+        raise Exception(
+            'Trying to update version %s of collection from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (collection_model.version, collection.version))
 
     collection_model.category = collection.category
     collection_model.title = collection.title
@@ -855,7 +850,7 @@ def get_collection_snapshots_metadata(collection_id):
     """
     collection = get_collection_by_id(collection_id)
     current_version = collection.version
-    version_nums = range(1, current_version + 1)
+    version_nums = list(python_utils.RANGE(1, current_version + 1))
 
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)
@@ -1017,18 +1012,13 @@ def compute_collection_contributors_summary(collection_id):
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
-        is_revert = (snapshot_metadata['commit_type'] == 'revert')
-        if not is_revert and committer_id not in constants.SYSTEM_USER_IDS:
+        if committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
 
         if current_version == 1:
             break
 
-        if is_revert:
-            current_version = snapshot_metadata['commit_cmds'][0][
-                'version_number']
-        else:
-            current_version -= 1
+        current_version -= 1
     return contributors_summary
 
 
@@ -1132,17 +1122,11 @@ def load_demo(collection_id):
     """
     delete_demo(collection_id)
 
-    if not collection_domain.Collection.is_demo_collection_id(collection_id):
-        raise Exception('Invalid demo collection id %s' % collection_id)
-
     demo_filepath = os.path.join(
         feconf.SAMPLE_COLLECTIONS_DIR,
         feconf.DEMO_COLLECTIONS[collection_id])
 
-    if demo_filepath.endswith('yaml'):
-        yaml_content = utils.get_file_contents(demo_filepath)
-    else:
-        raise Exception('Unrecognized file path: %s' % demo_filepath)
+    yaml_content = utils.get_file_contents(demo_filepath)
 
     collection = save_new_collection_from_yaml(
         feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
@@ -1156,7 +1140,7 @@ def load_demo(collection_id):
     for collection_node in collection.nodes:
         exp_id = collection_node.exploration_id
         # Only load the demo exploration if it is not yet loaded.
-        if exp_services.get_exploration_by_id(exp_id, strict=False) is None:
+        if exp_fetchers.get_exploration_by_id(exp_id, strict=False) is None:
             exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)

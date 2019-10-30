@@ -15,6 +15,9 @@
 # limitations under the License.
 
 """Tests for Question-related one-off jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import ast
 
 from core.domain import question_jobs_one_off
@@ -23,6 +26,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+taskqueue_services = models.Registry.import_taskqueue_services()
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
@@ -40,10 +44,12 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.process_and_flush_pending_tasks()
+        self.skill_id = 'skill_id'
+        self.save_new_skill(self.skill_id, self.albert_id, 'Skill Description')
 
         self.question = self.save_new_question(
             self.QUESTION_ID, self.albert_id,
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
 
 
     def test_migration_job_does_not_convert_up_to_date_question(self):
@@ -115,10 +121,10 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         """
         # Generate question with old(v27) state data.
         self.save_new_question_with_state_data_schema_v27(
-            self.QUESTION_ID, self.albert_id)
+            self.QUESTION_ID, self.albert_id, [self.skill_id])
         question = (
             question_services.get_question_by_id(self.QUESTION_ID))
-        self.assertEqual(question.question_state_data_schema_version, 28)
+        self.assertEqual(question.question_state_data_schema_version, 30)
 
         # Start migration job.
         job_id = (
@@ -136,4 +142,35 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
         expected = [[u'question_migrated',
                      [u'1 questions successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_migration_job_fails_with_invalid_question(self):
+        question_services.delete_question(
+            self.albert_id, self.QUESTION_ID, force_deletion=True)
+        state = self._create_valid_question_data('ABC')
+        question_state_data = state.to_dict()
+        language_code = 'en'
+        version = 1
+        question_model = question_models.QuestionModel.create(
+            question_state_data, language_code, version, [])
+        question_model.question_state_data_schema_version = (
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        question_model.commit(self.albert_id, 'invalid question created', [])
+        question_id = question_model.id
+
+        # Start migration job.
+        job_id = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+
+        self.process_and_flush_pending_tasks()
+
+        output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(
+            job_id)
+        expected = [[u'validation_error',
+                     [u'Question %s failed validation: linked_skill_ids is '
+                      'either null or an empty list' % question_id]]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])

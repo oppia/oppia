@@ -15,9 +15,17 @@
 # limitations under the License.
 
 """Unit tests for scripts/docstrings_checker."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
+import contextlib
 import unittest
-import docstrings_checker # pylint: disable=relative-import
+
+from . import docstrings_checker  # isort:skip
+
+import astroid  # isort:skip
+from pylint.checkers import utils # isort:skip
 
 
 class ASTDocstringsCheckerTest(unittest.TestCase):
@@ -165,3 +173,90 @@ class ASTDocstringsCheckerTest(unittest.TestCase):
         expected_result = []
         result = docstring_checker.compare_arg_order(func_args, docstring_args)
         self.assertEqual(result, expected_result)
+
+    def test_space_indentation(self):
+        sample_string = '     This is a sample string.'
+        self.assertEqual(docstrings_checker.space_indentation(sample_string), 5)
+
+    def test_check_docstrings_arg_order(self):
+        docstring_checker = docstrings_checker.ASTDocStringChecker()
+
+        ast_file = ast.walk(ast.parse(
+            """
+def func(test_var_one, test_var_two): #@
+    \"\"\"Function to test docstring parameters.
+
+    Args:
+        test_var_one: int. First test variable.
+        test_var_two: str. Second test variable.
+
+    Returns:
+        int. The test result.
+    \"\"\"
+    result = test_var_one + test_var_two
+    return result"""))
+
+        func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
+        self.assertEqual(len(func_defs), 1)
+
+        func_result = docstring_checker.check_docstrings_arg_order(func_defs[0])
+        self.assertEqual(func_result, [])
+
+    def test_possible_exc_types_with_inference_error(self):
+
+        @contextlib.contextmanager
+        def swap(obj, attr, newvalue):
+            """Swap an object's attribute value within the context of a
+            'with' statement. The object can be anything that supports
+            getattr and setattr, such as class instances, modules, etc.
+            """
+            original = getattr(obj, attr)
+            setattr(obj, attr, newvalue)
+            try:
+                yield
+            finally:
+                setattr(obj, attr, original)
+
+        raise_node = astroid.extract_node("""
+        def func():
+            raise Exception('An exception.') #@
+        """)
+        node_ignores_exception_swap = swap(
+            utils, 'node_ignores_exception',
+            lambda _, __: (_ for _ in ()).throw(astroid.InferenceError()))
+
+        with node_ignores_exception_swap:
+            exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set([]))
+
+    def test_possible_exc_types_with_exception_message(self):
+        raise_node = astroid.extract_node("""
+        def func():
+            \"\"\"Function to test raising exceptions.\"\"\"
+            raise Exception('An exception.') #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set(['Exception']))
+
+    def test_possible_exc_types_with_no_exception(self):
+        raise_node = astroid.extract_node("""
+        def func():
+            \"\"\"Function to test raising exceptions.\"\"\"
+            raise #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set([]))
+
+    def test_possible_exc_types_with_exception_inside_function(self):
+        raise_node = astroid.extract_node("""
+        def func():
+            try:
+                raise Exception('An exception.')
+            except Exception:
+                raise #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set(['Exception']))

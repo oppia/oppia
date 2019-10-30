@@ -39,6 +39,8 @@ var ExplorationEditorFeedbackTab = function() {
     by.css('.protractor-test-suggestion-commit-message'));
   var suggestionReviewMessageInput = element(
     by.css('.protractor-test-suggestion-review-message'));
+  var feedbackStatusDropdown = element(
+    by.css('.protractor-test-oppia-feedback-status-menu'));
   /*
    * Buttons
    */
@@ -134,11 +136,40 @@ var ExplorationEditorFeedbackTab = function() {
     });
   };
 
+  this.selectLatestFeedbackThread = function() {
+    waitFor.visibilityOf(
+      element.all(by.css(suggestionRowClassName)).first(),
+      'No feedback messages are visible.');
+    element.all(by.css(suggestionRowClassName)).first().click();
+  };
+
   this.sendResponseToLatestFeedback = function(feedbackResponse) {
-    element.all(by.css('.protractor-test-oppia-feedback-tab-row')).
-      first().click();
+    this.selectLatestFeedbackThread();
     feedbackResponseTextArea.sendKeys(feedbackResponse);
     feedbackSendResponseButton.click();
+  };
+
+  this.changeFeedbackStatus = function(feedbackStatus, feedbackResponse) {
+    feedbackResponseTextArea.sendKeys(feedbackResponse);
+    feedbackStatusDropdown.click();
+    element(by.css('option[label="' + feedbackStatus + '"]')).click();
+    feedbackSendResponseButton.click();
+  };
+
+  this.readFeedbackMessagesFromThread = function() {
+    var feedbackMessages = element.all(
+      by.css('.protractor-test-exploration-feedback'));
+    waitFor.visibilityOf(
+      feedbackMessages.first(), 'Feedback message text is not visible');
+    return feedbackMessages;
+  };
+
+  this.expectFeedbackStatusNameToBe = function(feedbackStatus) {
+    var feedbackStatusElement = element(
+      by.css('.protractor-test-oppia-feedback-status-name'));
+    waitFor.visibilityOf(
+      feedbackStatusElement, 'Feedback status is not visible.');
+    expect(feedbackStatusElement.getText()).toEqual(feedbackStatus);
   };
 };
 

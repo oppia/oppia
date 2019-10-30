@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Commands for feedback thread and message operations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -26,6 +28,7 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (feedback_models, email_models, suggestion_models) = (
@@ -39,7 +42,7 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
-# TODO (nithesh): Once feedback threads are generalised, the below function
+# TODO(nithesh): Once feedback threads are generalised, the below function
 # needs to be edited to get id of a general entity. For the moment, the
 # function will return the exploration_id from a thread_id.
 def get_exp_id_from_thread_id(thread_id):
@@ -400,7 +403,7 @@ def _get_thread_from_model(thread_model):
     Returns:
         FeedbackThread. The corresponding FeedbackThread domain object.
     """
-    if thread_model.message_count is None:
+    if not thread_model.message_count:
         message_count = (
             feedback_models.GeneralFeedbackMessageModel.get_message_count(
                 thread_model.id))
@@ -435,9 +438,9 @@ def get_thread_summaries(user_id, thread_ids):
             - 'last_message_text': str. The text of the last message.
             - 'total_message_count': int. The total number of messages in the
                 thread.
-            - 'last_message_read': boolean. Whether the last message is read by
-                the user.
-            - 'second_last_message_read': boolean. Whether the second last
+            - 'last_message_is_read': boolean. Whether the last message is read
+                by the user.
+            - 'second_last_message_is_read': boolean. Whether the second last
                 message is read by the user,
             - 'author_last_message': str. The name of the author of the last
                 message.
@@ -475,7 +478,9 @@ def get_thread_summaries(user_id, thread_ids):
     messages = feedback_models.GeneralFeedbackMessageModel.get_multi(
         last_two_messages_ids)
 
-    last_two_messages = [messages[i:i + 2] for i in range(0, len(messages), 2)]
+    last_two_messages = [
+        messages[i:i + 2] for i in python_utils.RANGE(0, len(messages), 2)]
+    last_message_is_read = False
 
     thread_summaries = []
     number_of_unread_threads = 0
@@ -483,11 +488,9 @@ def get_thread_summaries(user_id, thread_ids):
         feedback_thread_user_model_exists = (
             feedback_thread_user_models[index] is not None)
         if feedback_thread_user_model_exists:
-            last_message_read = (
+            last_message_is_read = (
                 last_two_messages[index][0].message_id
                 in feedback_thread_user_models[index].message_ids_read_by_user)
-        else:
-            last_message_read = False
 
         if last_two_messages[index][0].author_id is None:
             author_last_message = None
@@ -495,34 +498,23 @@ def get_thread_summaries(user_id, thread_ids):
             author_last_message = user_services.get_username(
                 last_two_messages[index][0].author_id)
 
-        second_last_message_read = None
+        second_last_message_is_read = False
         author_second_last_message = None
 
         does_second_message_exist = (last_two_messages[index][1] is not None)
         if does_second_message_exist:
             if feedback_thread_user_model_exists:
-                second_last_message_read = (
+                second_last_message_is_read = (
                     last_two_messages[index][1].message_id
                     in feedback_thread_user_models[index].message_ids_read_by_user) # pylint: disable=line-too-long
-            else:
-                second_last_message_read = False
 
-            if last_two_messages[index][1].author_id is None:
-                author_second_last_message = None
-            else:
+            if last_two_messages[index][1].author_id is not None:
                 author_second_last_message = user_services.get_username(
                     last_two_messages[index][1].author_id)
-        if not last_message_read:
+        if not last_message_is_read:
             number_of_unread_threads += 1
 
-        if thread.message_count:
-            total_message_count = thread.message_count
-        # TODO(Arunabh): Remove else clause after each thread has a message
-        # count.
-        else:
-            total_message_count = (
-                feedback_models.GeneralFeedbackMessageModel
-                .get_message_count(thread_ids[index]))
+        total_message_count = thread.message_count
 
         thread_summary = {
             'status': thread.status,
@@ -530,8 +522,8 @@ def get_thread_summaries(user_id, thread_ids):
             'last_updated': utils.get_time_in_millisecs(thread.last_updated),
             'last_message_text': last_two_messages[index][0].text,
             'total_message_count': total_message_count,
-            'last_message_read': last_message_read,
-            'second_last_message_read': second_last_message_read,
+            'last_message_is_read': last_message_is_read,
+            'second_last_message_is_read': second_last_message_is_read,
             'author_last_message': author_last_message,
             'author_second_last_message': author_second_last_message,
             'exploration_title': explorations[index].title,
@@ -541,32 +533,6 @@ def get_thread_summaries(user_id, thread_ids):
 
         thread_summaries.append(thread_summary)
     return thread_summaries, number_of_unread_threads
-
-
-def get_most_recent_messages(entity_type, entity_id):
-    """Fetch the most recently updated feedback threads for a given entity,
-    and then get the latest feedback message out of each thread.
-
-    Args:
-        entity_type: str. The type of entity.
-        entity_id: str. The ID of the entity.
-
-    Returns:
-       A list of FeedbackMessage.
-    """
-    thread_models = (
-        feedback_models.GeneralFeedbackThreadModel.get_threads(
-            entity_type, entity_id, limit=feconf.OPEN_FEEDBACK_COUNT_DASHBOARD))
-
-    message_models = []
-    for thread_model in thread_models:
-        message_models.append(
-            feedback_models.GeneralFeedbackMessageModel.get_most_recent_message(
-                thread_model.thread_id))
-
-    return [
-        _get_message_from_model(message_model)
-        for message_model in message_models]
 
 
 def get_threads(entity_type, entity_id):
@@ -606,28 +572,6 @@ def get_thread_subject(thread_id):
         str. The subject of the thread.
     """
     return get_thread(thread_id).subject
-
-
-def get_open_threads(entity_type, entity_id, has_suggestion):
-    """Fetches all open threads for the given entity id.
-
-    Args:
-        entity_type: str. The type of entity the feedback thread is linked to.
-        entity_id: str. The id of the entity.
-        has_suggestion: bool. If it's True, return a list of all open threads
-            that have a suggestion, otherwise return a list of all open threads
-            that do not have a suggestion.
-
-    Returns:
-        list of FeedbackThread. The resulting FeedbackThread domain objects.
-    """
-    threads = get_threads(entity_type, entity_id)
-    open_threads = []
-    for thread in threads:
-        if (thread.has_suggestion == has_suggestion and
-                thread.status == feedback_models.STATUS_CHOICES_OPEN):
-            open_threads.append(thread)
-    return open_threads
 
 
 def get_closed_threads(entity_type, entity_id, has_suggestion):
@@ -734,23 +678,6 @@ def _enqueue_feedback_thread_status_change_email_task(
     }
     taskqueue_services.enqueue_email_task(
         feconf.TASK_URL_FEEDBACK_STATUS_EMAILS, payload, 0)
-
-
-def _enqueue_suggestion_email_task(exploration_id, thread_id):
-    """Adds a 'send suggestion email' task into the task queue.
-
-    Args:
-        exploration_id: str.
-        thread_id: str.
-    """
-
-    payload = {
-        'exploration_id': exploration_id,
-        'thread_id': thread_id
-    }
-    # Suggestion emails are sent immediately.
-    taskqueue_services.enqueue_email_task(
-        feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
 
 
 def get_feedback_message_references(user_id):
@@ -1006,10 +933,8 @@ def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
     # at most one user who does not have FeedbackEmailReplyToIdModel instance.
     for user_id in user_ids:
         if feedback_email_id_models[user_id] is None:
-            new_model = (
-                email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                    user_id, thread_id))
-            new_model.put()
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                user_id, thread_id)
 
 
 def _add_message_to_email_buffer(

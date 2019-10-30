@@ -16,12 +16,23 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('services/SearchService.ts');
 
 describe('Search service', function() {
   var SearchService;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     SearchService = $injector.get('SearchService');
   }));
@@ -217,7 +228,7 @@ describe('Search service', function() {
     }
   );
 
-  it('should only find empty string when ampersand is not escaped anywhere',
+  it('should only use correct fields when ampersand is not escaped anywhere',
     function() {
       var results = {
         categories: {
@@ -239,15 +250,18 @@ describe('Search service', function() {
       };
       var urlComponent = '?q=protractor&test&category=("Mathematics")' +
                          '&language_code=("en"%20OR%20"ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error(
-        'Invalid search query url: protractor&test&category=("Mathematics")' +
-        '&language_code=("en"%20OR%20"ar")'));
+      expect(
+        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+      ).toBe('protractor');
+      expect(results.languageCodes.selections).toEqual({
+        en: true,
+        ar: true
+      });
+      expect(results.categories.selections).toEqual({Mathematics: true});
     }
   );
 
-  it('should error when category selection url component is malformed',
+  it('should omit url component if it is malformed',
     function() {
       var results = {
         categories: {
@@ -267,67 +281,36 @@ describe('Search service', function() {
           summary: ''
         }
       };
-      var urlComponent = '?q=protractor%20test&category=(("Mathematics")' +
-                         '&language_code=("en"%20OR%20"ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'categories: category=(("Mathematics")'));
-      expect(results.languageCodes.selections).toEqual({});
-      expect(results.categories.selections).toEqual({});
-
-      var urlComponent = '?q=protractor%20test&category=("Mathematics"' +
-                         '&language_code=("en"%20OR%20"ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'categories: category=("Mathematics"'));
-      expect(results.languageCodes.selections).toEqual({});
-      expect(results.categories.selections).toEqual({});
-    }
-  );
-
-  it('should error when language selection url component is malformed',
-    function() {
-      var results = {
-        categories: {
-          description: '',
-          itemsName: 'categories',
-          masterList: [],
-          numSelections: 0,
-          selections: {},
-          summary: ''
-        },
-        languageCodes: {
-          description: '',
-          itemsName: 'languages',
-          masterList: [],
-          numSelections: 0,
-          selections: {},
-          summary: ''
-        }
-      };
-      var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
-                         '&language_code="en" OR "ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'languageCodes: language_code="en" OR "ar")'));
+      // In the two cases below, language_code param is not wrapped in
+      // parentheses. However, the category param is defined correctly.
+      // updateSearchFieldsBasedOnUrlQuery is expected to clean language_code.
+      var urlComponent = (
+        '?q=protractor%20test&category=("Mathematics")&' +
+        'language_code="en" OR "ar")');
+      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({
         Mathematics: true
       });
 
-      var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
-                         '&language_code="en" OR "ar"';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error('Invalid search query url fragment for ' +
-                           'languageCodes: language_code="en" OR "ar"'));
+      var urlComponent = (
+        '?q=protractor%20test&category=("Mathematics")&' +
+        'language_code="en" OR "ar"');
+      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({
         Mathematics: true
       });
+
+      // In this case, neither of the params are wrapped in parentheses.
+      // updateSearchFieldsBasedOnUrlQuery is expected to clean category and
+      // language_code.
+      var urlComponent = (
+        '?q=protractor%20test&category="Mathematics"&' +
+        'language_code="en" OR "ar"');
+      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+      expect(results.languageCodes.selections).toEqual({});
+      expect(results.categories.selections).toEqual({});
     }
   );
 });
