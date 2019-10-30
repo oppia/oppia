@@ -16,13 +16,17 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { DateTimeFormatService } from 'services/DateTimeFormatService';
 import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
+import { DocumentAttributeCustomizationService } from
+  'services/contextual/DocumentAttributeCustomizationService';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
+import { MetaTagCustomizationService } from
+  'services/contextual/MetaTagCustomizationService';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from
@@ -37,7 +41,11 @@ export class UpgradedServices {
   upgradedServices = {
     'BackgroundMaskService': new BackgroundMaskService(),
     'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
+    'DocumentAttributeCustomizationService':
+        new DocumentAttributeCustomizationService(new WindowRef()),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
+    'MetaTagCustomizationService': new MetaTagCustomizationService(
+      new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'UtilsService': new UtilsService(),
