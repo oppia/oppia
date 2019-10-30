@@ -305,6 +305,10 @@ export = {
     "description": "Dutch",
     "relatedLanguages": ["nl"]
   }, {
+    "id": "ee",
+    "description": "Ewe",
+    "relatedLanguages": ["ee"]
+  }, {
     "id": "tl",
     "description": "Filipino",
     "relatedLanguages": ["tl"]

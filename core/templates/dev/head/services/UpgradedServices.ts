@@ -16,11 +16,15 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
+import { DocumentAttributeCustomizationService } from
+  'services/contextual/DocumentAttributeCustomizationService';
+import { MetaTagCustomizationService } from
+  'services/contextual/MetaTagCustomizationService';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UrlService } from 'services/contextual/UrlService';
 import { UtilsService } from 'services/UtilsService';
@@ -36,6 +40,10 @@ export class UpgradedServices {
   upgradedServices = {
     'BackgroundMaskService': new BackgroundMaskService(),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
+    'DocumentAttributeCustomizationService':
+        new DocumentAttributeCustomizationService(new WindowRef()),
+    'MetaTagCustomizationService': new MetaTagCustomizationService(
+      new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'UrlService': new UrlService(new WindowRef()),
