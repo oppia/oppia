@@ -22,7 +22,7 @@
 
 require('interactions/uiLeafletRequires.ts');
 
-require('domain/utilities/BrowserCheckerService.ts');
+require('domain/utilities/browser-checker.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/InteractiveMap/directives/' +
