@@ -114,7 +114,7 @@
       </a>
     </div>
 
-    <div ng-if="$ctrl.collection" class="oppia-collection-table d-none d-md-none d-lg-none d-xl-none">
+    <div ng-if="$ctrl.collection" class="oppia-collection-table d-md-none d-lg-none d-xl-none">
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
       <div class="mobile-path-segment" ng-repeat="node in $ctrl.collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
         <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;text-align: center">
