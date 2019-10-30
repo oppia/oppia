@@ -170,7 +170,7 @@ export class SpeechSynthesisChunkerService {
     var elt = $('<div>' + html + '</div>');
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
-      .replaceWith(() => {
+      .replaceWith(function() {
         if ((<HTMLElement><any> this).attributes[
           'text-with-value'] !== undefined) {
           return (<HTMLElement><any> this).attributes[
@@ -178,13 +178,14 @@ export class SpeechSynthesisChunkerService {
         }
       });
 
+    var _this = this;
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
-      .replaceWith(() => {
+      .replaceWith(function() {
         if (
           (<HTMLElement><any> this).attributes[
             'raw_latex-with-value'] !== undefined) {
-          return this._formatLatexToSpeakableText(
+          return _this._formatLatexToSpeakableText(
             (<HTMLElement><any> this).attributes[
               'raw_latex-with-value'].textContent);
         }
