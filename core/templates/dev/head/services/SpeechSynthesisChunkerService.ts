@@ -178,7 +178,7 @@ export class SpeechSynthesisChunkerService {
         }
       });
 
-    _this = this;
+    var _this = this;
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
       .replaceWith(function() {
