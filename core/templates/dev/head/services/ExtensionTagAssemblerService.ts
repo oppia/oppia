@@ -18,13 +18,16 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HtmlEscaperService } from 'services/HtmlEscaperService';
 
 // Service for assembling extension tags (for interactions).
-
+@Injectable({
+  providedIn: 'root'
+})
 export class ExtensionTagAssemblerService {
   constructor(private htmlEscaperService: HtmlEscaperService,
               private camelCaseToHyphens: CamelCaseToHyphensPipe) {}

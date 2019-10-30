@@ -23,10 +23,14 @@ import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
+import { DocumentAttributeCustomizationService } from
+  'services/contextual/DocumentAttributeCustomizationService';
 import { ExtensionTagAssemblerService }
   from 'services/ExtensionTagAssemblerService';
 import { HtmlEscaperService } from 'services/HtmlEscaperService';
 import { LoggerService } from 'services/LoggerService';
+import { MetaTagCustomizationService } from
+  'services/contextual/MetaTagCustomizationService';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
 import { WindowDimensionsService } from
@@ -41,6 +45,10 @@ export class UpgradedServices {
   upgradedServices = {
     'BackgroundMaskService': new BackgroundMaskService(),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
+    'DocumentAttributeCustomizationService':
+        new DocumentAttributeCustomizationService(new WindowRef()),
+    'MetaTagCustomizationService': new MetaTagCustomizationService(
+      new WindowRef()),
     'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
       new HtmlEscaperService(new LoggerService(new ErrorHandler())),
       new CamelCaseToHyphensPipe()),
