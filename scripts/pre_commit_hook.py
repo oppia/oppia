@@ -31,12 +31,16 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
 
 sys.path.append(os.getcwd())
 import python_utils  # isort:skip  # pylint: disable=wrong-import-position
+
+FECONF_FILEPATH = os.path.join('.', 'feconf.py')
+CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
 
 
 def install_hook():
@@ -107,6 +111,44 @@ def does_current_folder_contain_have_package_lock_file():
     return os.path.isfile('package-lock.json')
 
 
+def check_changes_in_config():
+    """Checks whether feconf and assets have changes made for release
+    deployment.
+
+    Raises:
+        Exception: There are deployment changes in feconf or constants filepath.
+    """
+    with python_utils.open_file(FECONF_FILEPATH, 'r') as f:
+        lines = f.readlines()
+        invalid_commit = False
+        for line in lines:
+            if re.match('^MAILGUN_API_KEY = \'key-[a-z0-9]{32}\'\n$', line):
+                invalid_commit = True
+            if 'oppia.org' in line or 'Oppia.org' in line:
+                invalid_commit = True
+            if invalid_commit:
+                raise Exception(
+                    'Changes to %s made for deployment cannot be committed.' % (
+                        FECONF_FILEPATH))
+
+    with python_utils.open_file(CONSTANTS_FILEPATH, 'r') as f:
+        lines = f.readlines()
+        invalid_commit = False
+        for line in lines:
+            if 'ANALYTICS_ID' in line and line != '  "ANALYTICS_ID": "",\n':
+                invalid_commit = True
+            if 'SITE_FEEDBACK_FORM_URL' in line and (
+                    line != '  "SITE_FEEDBACK_FORM_URL": "",\n'):
+                invalid_commit = True
+            if '"SITE_NAME_FOR_ANALYTICS"' in line and (
+                    line != '  "SITE_NAME_FOR_ANALYTICS": "",\n'):
+                invalid_commit = True
+            if invalid_commit:
+                raise Exception(
+                    'Changes to %s made for deployment cannot be committed.' % (
+                        CONSTANTS_FILEPATH))
+
+
 def main(args=None):
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
@@ -119,6 +161,8 @@ def main(args=None):
         install_hook()
         return
 
+    python_utils.PRINT('Running pre-commit check for feconf and constants ...')
+    check_changes_in_config()
     python_utils.PRINT('Running pre-commit check for package-lock.json ...')
     if does_diff_include_package_lock_file() and (
             does_current_folder_contain_have_package_lock_file()):
