@@ -38,6 +38,11 @@ export class UrlService {
   /* As params[key] is overwritten, if query string has multiple fieldValues
      for same fieldName, use getQueryFieldValuesAsList(fieldName) to get it
      in array form. */
+
+  /* This function returns an object which has dynamic keys
+   since the keys generated depend on the URL being provided.
+  So exact type of this function can not be determined
+  https://github.com/oppia/oppia/pull/7834 */
   getUrlParams(): Object {
     let params = {};
     let parts = this.getCurrentQueryString().replace(
