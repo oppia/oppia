@@ -16,17 +16,27 @@
  * @fileoverview Service to add custom meta tags.
  */
 
-angular.module('oppia').factory('MetaTagCustomizationService', [
-  '$window', function($window) {
-    return {
-      addMetaTags: function(attrArray) {
-        attrArray.forEach(attr => {
-          var meta = $window.document.createElement('meta');
-          meta.setAttribute(attr.propertyType, attr.propertyValue);
-          meta.setAttribute('content', attr.content);
-          $window.document.head.appendChild(meta);
-        });
-      }
-    };
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { WindowRef } from 'services/contextual/WindowRefService';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MetaTagCustomizationService {
+  constructor(private windowRef: WindowRef) {}
+
+  addMetaTags(attrArray: Array<any>): void {
+    attrArray.forEach(attr => {
+      let meta = this.windowRef.nativeWindow.document.createElement('meta');
+      meta.setAttribute(attr.propertyType, attr.propertyValue);
+      meta.setAttribute('content', attr.content);
+      this.windowRef.nativeWindow.document.head.appendChild(meta);
+    });
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'MetaTagCustomizationService',
+  downgradeInjectable(MetaTagCustomizationService));
