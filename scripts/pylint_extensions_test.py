@@ -1046,3 +1046,40 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
             ),
         ):
             temp_file.close()
+
+
+class ExcessiveEmptyLinesCheckerTests(unittest.TestCase):
+
+    def test_checks_excessive_empty_lines(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.ExcessiveEmptyLinesChecker)
+        checker_test_object.setup_method()
+        node_excessive_empty_lines = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func1():
+                        returns_something
+
+
+
+                    def func2():
+                        returns_something
+                """)
+        node_excessive_empty_lines.file = filename
+        node_excessive_empty_lines.path = filename
+
+        checker_test_object.checker.process_module(node_excessive_empty_lines)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='excessive-new-lines',
+                line=6
+            ),
+        ):
+            temp_file.close()

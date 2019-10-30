@@ -961,6 +961,57 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
                 self.add_message('single-space-after-yield', line=line_num + 1)
 
 
+class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
+    """Checks if there are excessive newlines between function definations."""
+    __implements__ = interfaces.IRawChecker
+
+    name = 'excessive-new-lines'
+    priority = -1
+    msgs = {
+        'C0011': (
+            'Excessive new lines between function definations.',
+            'excessive-new-lines',
+            'Remove extra newlines.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            if line.startswith(b'def'):
+                if (file_content[line_num - 3] == b'\n' and (
+                        file_content[line_num - 2] == b'\n')):
+                    self.add_message('excessive-new-lines', line=line_num + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -976,3 +1027,4 @@ def register(linter):
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
     linter.register_checker(SingleSpaceAfterYieldChecker(linter))
+    linter.register_checker(ExcessiveEmptyLinesChecker(linter))
