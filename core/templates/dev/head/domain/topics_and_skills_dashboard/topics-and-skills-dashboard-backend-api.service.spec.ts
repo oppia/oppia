@@ -23,8 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require(
   'domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardBackendApiService.ts'
-);
+  'topics-and-skills-dashboard-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 describe('Topics and Skills Dashboard backend API service', function() {
