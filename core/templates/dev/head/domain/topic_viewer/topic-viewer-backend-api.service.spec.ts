@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/topic_viewer/TopicViewerBackendApiService.ts');
+require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
 
 describe('Topic viewer backend API service', function() {
   var TopicViewerBackendApiService = null;

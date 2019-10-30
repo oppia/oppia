@@ -34,7 +34,7 @@ require('components/rubrics-editor/rubrics-editor.directive.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardBackendApiService.ts'
+  'topics-and-skills-dashboard-backend-api.service.ts'
 );
 require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');

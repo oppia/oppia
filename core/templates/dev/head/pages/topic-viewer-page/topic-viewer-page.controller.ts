@@ -26,7 +26,7 @@ require(
   'topic-viewer-stories-list.directive.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
-require('domain/topic_viewer/TopicViewerBackendApiService.ts');
+require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');

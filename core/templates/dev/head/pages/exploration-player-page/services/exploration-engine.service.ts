@@ -21,7 +21,7 @@ require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
-require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('expressions/expression-interpolation.service.ts');
 require(

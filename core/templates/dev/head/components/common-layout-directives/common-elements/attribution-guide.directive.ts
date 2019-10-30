@@ -16,7 +16,7 @@
  * @fileoverview Directive for the attribution guide.
  */
 
-require('domain/utilities/BrowserCheckerService.ts');
+require('domain/utilities/browser-checker.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('attributionGuide', [

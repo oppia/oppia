@@ -44,7 +44,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/topic/TopicObjectFactory.ts');
-require('domain/topic/TopicUpdateService.ts');
+require('domain/topic/topic-update.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
 describe('Topic editor state service', function() {
