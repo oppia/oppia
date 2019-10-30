@@ -167,6 +167,20 @@ class DeployTests(test_utils.GenericTestBase):
                 'Current release version has \'.\' character.'):
                 deploy.execute_deployment()
 
+    def test_invalid_last_commit_msg(self):
+        args_swap = self.swap(
+            sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
+        def mock_check_output(unused_cmd_tokens):
+            return 'Invalid'
+        out_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
+            with self.release_script_exist_swap, self.gcloud_available_swap:
+                with self.run_swap, args_swap, out_swap:
+                    with self.assertRaisesRegexp(
+                        Exception, 'Invalid last commit message: Invalid.'):
+                        deploy.execute_deployment()
+
     def test_missing_mailgun_api(self):
         args_swap = self.swap(
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
@@ -185,6 +199,8 @@ class DeployTests(test_utils.GenericTestBase):
             pass
         def mock_check_prs_for_current_release_are_released(unused_repo):
             pass
+        def mock_check_output(unused_cmd_tokens):
+            return 'Update authors and changelog for v1.2.3'
         config_swap = self.swap(update_configs, 'main', mock_main)
         get_token_swap = self.swap(
             common, 'get_personal_access_token', mock_get_personal_access_token)
@@ -198,10 +214,12 @@ class DeployTests(test_utils.GenericTestBase):
         pr_check_swap = self.swap(
             common, 'check_prs_for_current_release_are_released',
             mock_check_prs_for_current_release_are_released)
+        out_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.run_swap, config_swap, get_token_swap, get_org_swap:
-                    with get_repo_swap, bug_check_swap, pr_check_swap:
+                    with get_repo_swap, bug_check_swap, pr_check_swap, out_swap:
                         with args_swap, feconf_swap, self.assertRaisesRegexp(
                             Exception,
                             'The mailgun API key must be added before '

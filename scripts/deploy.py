@@ -391,6 +391,14 @@ def execute_deployment():
     gcloud_adapter.require_gcloud_to_be_available()
     try:
         if app_name == APP_NAME_OPPIASERVER:
+            release_version = current_branch_name[len(
+                common.RELEASE_BRANCH_NAME_PREFIX):]
+            last_commit_message = subprocess.check_output(
+                'git log -1 --pretty=%B'.split())
+            if not last_commit_message.startswith(
+                    'Update authors and changelog for v%s' % release_version):
+                raise Exception(
+                    'Invalid last commit message: %s.' % last_commit_message)
             personal_access_token = common.get_personal_access_token()
             g = github.Github(personal_access_token)
             repo = g.get_organization('oppia').get_repo('oppia')
