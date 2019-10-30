@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for the functionality of the upload files
+ * @fileoverview End-to-end tests for the functionality of the upload files.
  */
 
 var forms = require('../protractor_utils/forms.js');
@@ -24,7 +24,7 @@ var workflow = require('../protractor_utils/workflow.js');
 var ExplorationEditorPage =
     require('../protractor_utils/ExplorationEditorPage.js');
 
-describe('Exploration tab', function() {
+describe('Voiceover upload features', function() {
   var TEST_USERNAME = 'uploadUser';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
   var explorationEditorPage = null;
@@ -34,8 +34,7 @@ describe('Exploration tab', function() {
 
   beforeAll(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorMainTab =
-      explorationEditorPage.getMainTab();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorTranslationTab =
       explorationEditorPage.getTranslationTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
