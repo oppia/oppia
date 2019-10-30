@@ -3,6 +3,8 @@ This file contains a summary of changes to the Oppia code base.
 v2.8.6 (28 Oct 2019)
 ------------------------
 Bug fixes
+* Fixes collection page. (#7878)
+* Fix #7873: Removes arrow function with function to resolve undefined `this` issue. (#7877)
 * Fix #7802: Fix indexing of explorations after update (#7853)
 * Fix #7663: Fixes collapsible block (#7850)
 * Reverts tests for Improvement tab added in #7719 (#7758)
