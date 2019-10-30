@@ -192,7 +192,8 @@ class ReviewableSuggestionsHandler(base.BaseHandler):
                     suggestions)
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
-                    'target_ids_to_opportunity_dicts': target_id_to_opportunity_dict
+                    'target_ids_to_opportunity_dicts':
+                        target_id_to_opportunity_dict
                 })
             else:
                 self.render_json({})
