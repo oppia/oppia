@@ -58,9 +58,7 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
 
 
 class SnapshotMetadataModelsIndexesJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that indexes all explorations and collections and compute their
-    ranks.
-    """
+    """Job that reindexes all children of BaseSnapshotMetadataModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):

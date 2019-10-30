@@ -145,7 +145,7 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
             pass
 
         # We don't want to add ConfigPropertySnapshotMetadataModel for CSRF
-        # secret, so we need to skip the csrf token init.
+        # secret, so we need to skip the CSRF token init.
         with self.swap(
             base.CsrfTokenManager, 'init_csrf_secret',
             types.MethodType(empty, base.CsrfTokenManager)
@@ -178,6 +178,15 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             migrated_model.commit_type,
             original_model.commit_type)
+        self.assertEqual(
+            migrated_model.commit_message,
+            original_model.commit_message)
+        self.assertEqual(
+            migrated_model.commit_cmds,
+            original_model.commit_cmds)
+        self.assertEqual(
+            migrated_model.last_updated,
+            original_model.last_updated)
 
     def test_successful_migration_all_model_types(self):
         for model_type in self.TESTED_MODEL_TYPES:
@@ -185,7 +194,9 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
             model = model_type(
                 id=instance_id,
                 committer_id='committer_id',
-                commit_type='create')
+                commit_type='create',
+                commit_message='commit message',
+                commit_cmds=[{'cmd': 'some_command'}])
             model.put()
 
             output = self._run_one_off_job()
@@ -202,17 +213,23 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
         collection_model = collection_models.CollectionSnapshotMetadataModel(
             id=instance_id_1,
             committer_id='committer_id',
-            commit_type='create')
+            commit_type='create',
+            commit_message='commit message 1',
+            commit_cmds=[{'cmd': 'some_command'}])
         collection_model.put()
         exploration_model = exploration_models.ExplorationSnapshotMetadataModel(
             id=instance_id_2,
             committer_id='committer_id',
-            commit_type='create')
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}])
         exploration_model.put()
         skill_model = skill_models.SkillRightsSnapshotMetadataModel(
             id=instance_id_3,
             committer_id='committer_id',
-            commit_type='create')
+            commit_type='create',
+            commit_message='commit message 3',
+            commit_cmds=[{'cmd': 'some_command'}])
         skill_model.put()
 
         output = self._run_one_off_job()
