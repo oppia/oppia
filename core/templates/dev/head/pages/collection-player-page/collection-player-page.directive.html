@@ -47,9 +47,8 @@
       <a ng-repeat="node in $ctrl.collection.getCollectionNodes()"
          ng-href="<[$ctrl.getExplorationUrl(node.getExplorationId())]>"
          ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
-
         <div ng-style="{width: '160px',position: 'absolute',left: '<[$ctrl.getExplorationTitlePosition($index)]>',color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '18px',bottom: '65%'}">
-          {{node._explorationSummaryObject.title}}
+          <[node.getExplorationTitle()]>
         </div>
 
         <svg class="protractor-test-collection-exploration"
@@ -114,11 +113,12 @@
       </a>
     </div>
 
-    <div ng-if="$ctrl.collection" class="oppia-collection-table d-none d-md-none d-lg-none d-xl-none">
+    <div ng-if="$ctrl.collection" class="oppia-collection-table d-md-none d-lg-none d-xl-none">
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
       <div class="mobile-path-segment" ng-repeat="node in $ctrl.collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
-        <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;text-align: center">
-          <div style="color:'#006553';'font-size':'20px';">{{node._explorationSummaryObject.title}}</div>
+        <a href=""
+           title-data="<[($index + 1) + '. ' + node.getExplorationTitle()]>"
+           class="oppia-collection-node-small-screen">
           <svg class="protractor-mobile-test-collection-exploration"
                width="100"
                height="150"
@@ -189,15 +189,6 @@
                     fill="url(#image0<[$index]>)"
                     stroke="#006553"
                     stroke-width="2"/>
-            <text x="50%"
-                  y="15"
-                  alignment-baseline="middle"
-                  font-family="Capriola, Roboto, Arial, sans-serif"
-                  font-size="20"
-                  fill="#006553"
-                  text-anchor="middle">
-              <[$index + 1]>
-            </text>
           </svg>
         </a>
         <img ng-src="<[$ctrl.getStaticImageUrl('/general/mobile_path_segment.svg')]>">
@@ -251,3 +242,24 @@
   </div>
 </div>
 <attribution-guide></attribution-guide>
+
+<style>
+  .oppia-collection-node-small-screen {
+    left: 50%;
+    position: absolute;
+    text-align: center;
+    transform: translate(-50%, 195px);
+    z-index: 1;
+  }
+  .oppia-collection-node-small-screen::before {
+    color: #3f7a68;
+    content: attr(title-data);
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 16px;
+    left: -60px;
+    position: absolute;
+    text-align: center;
+    top: -30px;
+    width: 220px;
+  }
+</style>
