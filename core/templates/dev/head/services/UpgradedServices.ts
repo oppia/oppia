@@ -31,6 +31,10 @@ import { UtilsService } from './utils.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+/* eslint-disable max-len */
+import { StateImprovementSuggestionService } from
+  'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
+/* eslint-enable max-len */
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +51,8 @@ export class UpgradedServices {
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'UtilsService': new UtilsService(),
-    'WindowDimensionsService': new WindowDimensionsService()
+    'WindowDimensionsService': new WindowDimensionsService(),
+    'StateImprovementSuggestionService': new StateImprovementSuggestionService()
   };
 }
 
