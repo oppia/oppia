@@ -342,7 +342,7 @@ if (!Array.prototype.fill) {
 }
 
 
-// Add outerHTML polyfill for SVGElement
+// Add SVGElement.prototype.outerHTML polyfill for IE
 if (!('outerHTML' in SVGElement.prototype)) {
   Object.defineProperty(SVGElement.prototype, 'outerHTML', {
     get: function () {
