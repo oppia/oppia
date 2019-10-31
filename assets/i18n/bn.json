@@ -4,6 +4,7 @@
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "প্রতিক্রিয়া পান",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT": "আপনার অন্বেষণ উন্নতি করতে।",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_HEADING": "Oppia সম্পর্কে",
+	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_1": "ওপিয়ার লক্ষ্য হল যে কাউকে একটি কার্যকর এবং উপভোগ্য উপায়ে তারা যা কিছু শিখতে চান তা শিখাতে সহায়তা করা।",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "প্রকাশ করুন &amp; বণ্টন করুন",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT": "সম্প্রদায়ের সাথে আপনার সৃষ্টিসমূহ।",
 	"I18N_ABOUT_PAGE_CREDITS_TAB_HEADING": "কৃতিত্ব",
@@ -65,6 +66,7 @@
 	"I18N_DASHBOARD_STATS_TOTAL_PLAYS": "মোট নাটকগুলি",
 	"I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS": "গ্রাহক",
 	"I18N_DASHBOARD_SUBSCRIBERS": "গ্রাহক",
+	"I18N_DASHBOARD_SUGGESTIONS": "পরামর্শসমূহ",
 	"I18N_DASHBOARD_TABLE_HEADING_EXPLORATION": "অন্বেষণ",
 	"I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED": "সর্বশেষ হালনাগাদ",
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "মূল্যায়ন",
@@ -141,6 +143,7 @@
 	"I18N_INTERACTIONS_MUSIC_CLEAR": "পরিষ্কার করুন",
 	"I18N_INTERACTIONS_MUSIC_PLAY": "চালান",
 	"I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "লক্ষ্য অনুক্রম চালান",
+	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "সম্ভাব্য এককের বিন্যাসন",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "আপনি কি নিশ্চিত যে আপনি আপনার কোড পুনঃস্থাপন করতে চান?",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "বাতিল",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "অনুমোদন প্রয়োজন",
@@ -333,6 +336,7 @@
 	"I18N_SIDEBAR_FORUM": "ফোরাম",
 	"I18N_SIDEBAR_GET_STARTED": "শুরু করুন",
 	"I18N_SIDEBAR_LIBRARY_LINK": "পাঠাগার",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "ওপিয়া ফাউন্ডেশন",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "Oppia দিয়ে শিখুন",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "এই লেখার বাঁদিকে উপস্থিত বাক্সে টিক দেয়ার মাধ্যমে, আপনি <a href=\"/terms\" target=\"_blank\">এখানে</a> থাকা <[sitename]> ব্যবহারের শর্তাবলী স্বীকার, একমত, এবং আবদ্ধ হতে গ্রহণ করছেন।",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "জমা দিন ও অবদান রাখা শুরু করুন",
@@ -378,6 +382,8 @@
 	"I18N_START_HERE": "শুরু করতে এখানে ক্লিক করুন!",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "সদস্যতা নিন",
 	"I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_HEADING": "সম্প্রদায়ের নির্দেশিকা",
+	"I18N_TEACH_PAGE_HEADING": "বিশ্বজুড়ে শিক্ষার্থীদের সহায়তা করুন",
+	"I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_HEADING": "আপনার অন্বেষণ প্রকাশনাযোগ্য করুন",
 	"I18N_TEACH_PAGE_PUBLICATION_POLICY_HEADING": "প্রকাশনা নীতি",
 	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "ওপিয়া দিয়ে শিখান",
 	"I18N_TOPNAV_ABOUT": "সম্পর্কে",
@@ -400,5 +406,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "গুগল দিয়ে প্রবেশ করুন",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia দিয়ে শিখান",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "আপনার মোট <[totalSubscribers]> জন গ্রাহক রয়েছে।",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "সদস্যতা ত্যাগ"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "সদস্যতা ত্যাগ",
+	"I18N_WORKED_EXAMPLE": "কাজের উদাহরণ"
 }

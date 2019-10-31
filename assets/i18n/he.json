@@ -221,5 +221,7 @@
 	"I18N_PREFERENCES_CANCEL_BUTTON": "ביטול",
 	"I18N_PREFERENCES_CHANGE_PICTURE": "החלפת תמונת פרופיל",
 	"I18N_PREFERENCES_EMAIL": "דוא״ל",
-	"I18N_START_HERE": "התחל כאן!"
+	"I18N_START_HERE": "התחל כאן!",
+	"I18N_TOPIC_VIEWER_PLAY": "הפעלה",
+	"I18N_TOPIC_VIEWER_REVIEW": "סקירה"
 }
