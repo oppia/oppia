@@ -18,17 +18,15 @@
  * and also delete the collection node represented by this directive.
  */
 
-require('domain/collection/CollectionUpdateService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/collection/collection-update.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require(
   'pages/collection-editor-page/services/collection-linearizer.service.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionNodeEditor', [
+angular.module('oppia').directive('collectionNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

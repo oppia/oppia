@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base_components/header.html', {"title": "Oppia: Teach, Learn, Explore"})
+    @require('../../base-components/header.template.html', {"title": "Oppia: Teach, Learn, Explore"})
     <link rel="prerender" href="/library">
   </head>
   <body>
-    <base-content>
-      <content>
-        <splash-page></splash-page>
-      </content>
-    </base-content>
+    <service-bootstrap></service-bootstrap>
+    <div ng-controller="Base">
+      <base-content>
+        <content>
+          <splash-page class="protractor-test-splash-page"></splash-page>
+        </content>
+      </base-content>
+    </div>
 
     <style>
       @media (min-width: 608px) {

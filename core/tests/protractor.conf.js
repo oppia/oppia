@@ -1,4 +1,4 @@
-var ScreenShotReporter = require('protractor-screenshot-reporter');
+var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob')
 var path = require('path')
 
@@ -17,8 +17,16 @@ var suites = {
       'protractor/accessibility.js'
     ],
 
-    additionalEditorAndPlayerFeatures: [
-      'protractor_desktop/additionalEditorAndPlayerFeatures.js'
+    additionalEditorFeatures: [
+      'protractor_desktop/additionalEditorFeatures.js'
+    ],
+
+    additionalPlayerFeatures: [
+      'protractor_desktop/additionalPlayerFeatures.js'
+    ],
+
+    adminPage: [
+      'protractor_desktop/adminTabFeatures.js'
     ],
 
     collections: [
@@ -27,6 +35,10 @@ var suites = {
 
     coreEditorAndPlayerFeatures: [
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
+    ],
+
+    creatorDashboard: [
+      'protractor_desktop/creatorDashboard.js'
     ],
 
     embedding: [
@@ -39,6 +51,10 @@ var suites = {
 
     explorationHistoryTab: [
       'protractor_desktop/explorationHistoryTab.js'
+    ],
+
+    explorationImprovementsTab: [
+      'protractor_desktop/explorationImprovementsTab.js'
     ],
 
     explorationStatisticsTab: [
@@ -239,15 +255,15 @@ exports.config = {
 
     if (_ADD_SCREENSHOT_REPORTER) {
       // This takes screenshots of failed tests. For more information see
-      // https://www.npmjs.com/package/protractor-screenshot-reporter
-      jasmine.getEnv().addReporter(new ScreenShotReporter({
+      // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
+      jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
         // Directory for screenshots
-        baseDirectory: '../protractor-screenshots',
+        dest: '../protractor-screenshots',
         // Function to build filenames of screenshots
-        pathBuilder: function(spec, descriptions, results, capabilities) {
+        filename: function(spec, descriptions, results, capabilities) {
           return descriptions[1] + ' ' + descriptions[0];
         },
-        takeScreenShotsOnlyForFailedSpecs: true
+        captureOnlyFailedSpecs: true
       }));
     }
 

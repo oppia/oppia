@@ -16,11 +16,9 @@
  * @fileoverview Service for detecting spamming behavior from the learner.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('FatigueDetectionService', [
+angular.module('oppia').factory('FatigueDetectionService', [
   '$uibModal', 'UrlInterpolationService',
   function($uibModal, UrlInterpolationService) {
     // 4 submissions in under 10 seconds triggers modal.

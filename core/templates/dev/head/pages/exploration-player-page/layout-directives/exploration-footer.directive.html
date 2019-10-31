@@ -52,10 +52,11 @@
     box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
     float: left;
     list-style-type: none;
-    margin:0 0 16px 0;
+    margin:0 0 8px 0;
   }
 
   .oppia-exploration-footer .author-profile-dropdown-menu li {
+    padding: 15px 0;
     color: #094142;
     float: none;
     text-overflow: clip;
@@ -75,7 +76,9 @@
 
   .oppia-exploration-footer .author-profile-text {
     cursor: default;
-    line-height: 0.6;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 12px 0 17px 0;
     padding-left: 6px;
     text-overflow: clip;
     white-space: nowrap;
@@ -196,7 +199,7 @@
       <hint-and-solution-buttons ng-if="windowIsNarrow"></hint-and-solution-buttons>
     </div>
     <div class="col-sm-7">
-      <div class="pull-right">
+      <div class="float-right">
         <hint-and-solution-buttons ng-if="!windowIsNarrow"></hint-and-solution-buttons>
       </div>
     </div>

@@ -22,7 +22,7 @@ require(
   'components/state-directives/response-header/response-header.directive.ts');
 
 require('domain/exploration/HintObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -35,13 +35,12 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
+require('filters/format-rte-preview.filter.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/GenerateContentIdService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('stateHintsEditor', [
+angular.module('oppia').directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -287,6 +286,8 @@ oppia.directive('stateHintsEditor', [
             StateHintsService.saveDisplayedValue();
             $scope.onSaveHints(StateHintsService.displayed);
           };
+
+          StateEditorService.updateStateHintsEditorInitialised();
         }
       ]
     };

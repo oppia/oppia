@@ -15,21 +15,24 @@
 # limitations under the License.
 
 """Domain object for states and their constituents."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import copy
 import logging
 
 from constants import constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
-from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
+import python_utils
 import utils
 
 
-class AnswerGroup(object):
+class AnswerGroup(python_utils.OBJECT):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
     rules are ORed together. Answer groups may also support a classifier
@@ -48,7 +51,7 @@ class AnswerGroup(object):
                            for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
             'training_data': self.training_data,
-            'tagged_misconception_id': self.tagged_misconception_id
+            'tagged_skill_misconception_id': self.tagged_skill_misconception_id
         }
 
     @classmethod
@@ -66,11 +69,12 @@ class AnswerGroup(object):
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
-            answer_group_dict['tagged_misconception_id']
+            answer_group_dict['tagged_skill_misconception_id']
         )
 
     def __init__(
-            self, outcome, rule_specs, training_data, tagged_misconception_id):
+            self, outcome, rule_specs, training_data,
+            tagged_skill_misconception_id):
         """Initializes a AnswerGroup domain object.
 
         Args:
@@ -78,9 +82,12 @@ class AnswerGroup(object):
             rule_specs: list(RuleSpec). List of rule specifications.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
-            tagged_misconception_id: int or None. The id of the tagged
-                misconception for the answer group, when a state is part of a
-                Question object that tests a particular skill.
+            tagged_skill_misconception_id: str or None. The format is
+                '<skill_id>-<misconception_id>', where skill_id is the skill ID
+                of the tagged misconception and misconception_id is the id of
+                the tagged misconception for the answer group. It is not None
+                only when a state is part of a Question object that
+                tests a particular skill.
         """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
@@ -88,7 +95,7 @@ class AnswerGroup(object):
 
         self.outcome = outcome
         self.training_data = training_data
-        self.tagged_misconception_id = tagged_misconception_id
+        self.tagged_skill_misconception_id = tagged_skill_misconception_id
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -111,11 +118,18 @@ class AnswerGroup(object):
                 'Expected answer group rules to be a list, received %s'
                 % self.rule_specs)
 
-        if self.tagged_misconception_id is not None:
-            if not isinstance(self.tagged_misconception_id, int):
+        if self.tagged_skill_misconception_id is not None:
+            if not isinstance(
+                    self.tagged_skill_misconception_id,
+                    python_utils.BASESTRING):
                 raise utils.ValidationError(
-                    'Expected tagged misconception id to be an int, '
-                    'received %s' % self.tagged_misconception_id)
+                    'Expected tagged skill misconception id to be a str, '
+                    'received %s' % self.tagged_skill_misconception_id)
+            if self.tagged_skill_misconception_id.count('-') != 1:
+                raise utils.ValidationError(
+                    'Expected the format of tagged skill misconception id '
+                    'to be <skill_id>-<misconception_id>, received %s'
+                    % self.tagged_skill_misconception_id)
 
         if len(self.rule_specs) == 0 and len(self.training_data) == 0:
             raise utils.ValidationError(
@@ -134,7 +148,7 @@ class AnswerGroup(object):
         self.outcome.validate()
 
 
-class Hint(object):
+class Hint(python_utils.OBJECT):
     """Value object representing a hint."""
 
     def __init__(self, hint_content):
@@ -173,7 +187,7 @@ class Hint(object):
         self.hint_content.validate()
 
 
-class Solution(object):
+class Solution(python_utils.OBJECT):
     """Value object representing a solution.
 
     A solution consists of answer_is_exclusive, correct_answer and an
@@ -254,7 +268,7 @@ class Solution(object):
         self.explanation.validate()
 
 
-class InteractionInstance(object):
+class InteractionInstance(python_utils.OBJECT):
     """Value object for an instance of an interaction."""
 
     # The default interaction used for a new state.
@@ -389,7 +403,7 @@ class InteractionInstance(object):
             ValidationError: One or more attributes of the InteractionInstance
             are invalid.
         """
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected interaction id to be a string, received %s' %
                 self.id)
@@ -510,7 +524,7 @@ class InteractionInstance(object):
         return html_list
 
 
-class Outcome(object):
+class Outcome(python_utils.OBJECT):
     """Value object representing an outcome of an interaction. An outcome
     consists of a destination state, feedback to show the user, and any
     parameter changes.
@@ -609,7 +623,9 @@ class Outcome(object):
                 '%s' % self.labelled_as_correct)
 
         if self.missing_prerequisite_skill_id is not None:
-            if not isinstance(self.missing_prerequisite_skill_id, basestring):
+            if not isinstance(
+                    self.missing_prerequisite_skill_id,
+                    python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected outcome missing_prerequisite_skill_id to be a '
                     'string, received %s' % self.missing_prerequisite_skill_id)
@@ -622,101 +638,14 @@ class Outcome(object):
             param_change.validate()
 
         if self.refresher_exploration_id is not None:
-            if not isinstance(self.refresher_exploration_id, basestring):
+            if not isinstance(
+                    self.refresher_exploration_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected outcome refresher_exploration_id to be a string, '
                     'received %s' % self.refresher_exploration_id)
 
 
-# TODO(DubeySandeep): Remove AudioTranslation class after removing
-# content_ids_to_audio_translations from Skill class.
-class AudioTranslation(object):
-    """Value object representing an audio translation."""
-
-    def to_dict(self):
-        """Returns a dict representing this AudioTranslation domain object.
-
-        Returns:
-            dict. A dict, mapping all fields of AudioTranslation instance.
-        """
-        return {
-            'filename': self.filename,
-            'file_size_bytes': self.file_size_bytes,
-            'needs_update': self.needs_update,
-        }
-
-    @classmethod
-    def from_dict(cls, audio_translation_dict):
-        """Return a AudioTranslation domain object from a dict.
-
-        Args:
-            audio_translation_dict: dict. The dict representation of
-                AudioTranslation object.
-
-        Returns:
-            AudioTranslation. The corresponding AudioTranslation domain object.
-        """
-        return cls(
-            audio_translation_dict['filename'],
-            audio_translation_dict['file_size_bytes'],
-            audio_translation_dict['needs_update'])
-
-    def __init__(self, filename, file_size_bytes, needs_update):
-        """Initializes a AudioTranslation domain object.
-
-        Args:
-            filename: str. The corresponding audio file path.
-            file_size_bytes: int. The file size, in bytes. Used to display
-                potential bandwidth usage to the learner before they download
-                the file.
-            needs_update: bool. Whether audio is marked for needing review.
-        """
-        # str. The corresponding audio file path, e.g.
-        # "content-en-2-h7sjp8s.mp3".
-        self.filename = filename
-        # int. The file size, in bytes. Used to display potential bandwidth
-        # usage to the learner before they download the file.
-        self.file_size_bytes = file_size_bytes
-        # bool. Whether audio is marked for needing review.
-        self.needs_update = needs_update
-
-    def validate(self):
-        """Validates properties of the AudioTranslation.
-
-        Raises:
-            ValidationError: One or more attributes of the AudioTranslation are
-            invalid.
-        """
-        if not isinstance(self.filename, basestring):
-            raise utils.ValidationError(
-                'Expected audio filename to be a string, received %s' %
-                self.filename)
-        dot_index = self.filename.rfind('.')
-        if dot_index == -1 or dot_index == 0:
-            raise utils.ValidationError(
-                'Invalid audio filename: %s' % self.filename)
-        extension = self.filename[dot_index + 1:]
-        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
-            raise utils.ValidationError(
-                'Invalid audio filename: it should have one of '
-                'the following extensions: %s. Received: %s'
-                % (feconf.ACCEPTED_AUDIO_EXTENSIONS.keys(), self.filename))
-
-        if not isinstance(self.file_size_bytes, int):
-            raise utils.ValidationError(
-                'Expected file size to be an int, received %s' %
-                self.file_size_bytes)
-        if self.file_size_bytes <= 0:
-            raise utils.ValidationError(
-                'Invalid file size: %s' % self.file_size_bytes)
-
-        if not isinstance(self.needs_update, bool):
-            raise utils.ValidationError(
-                'Expected needs_update to be a bool, received %s' %
-                self.needs_update)
-
-
-class Voiceover(object):
+class Voiceover(python_utils.OBJECT):
     """Value object representing an voiceover."""
 
     def to_dict(self):
@@ -773,7 +702,7 @@ class Voiceover(object):
             ValidationError: One or more attributes of the Voiceover are
             invalid.
         """
-        if not isinstance(self.filename, basestring):
+        if not isinstance(self.filename, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected audio filename to be a string, received %s' %
                 self.filename)
@@ -786,7 +715,8 @@ class Voiceover(object):
             raise utils.ValidationError(
                 'Invalid audio filename: it should have one of '
                 'the following extensions: %s. Received: %s'
-                % (feconf.ACCEPTED_AUDIO_EXTENSIONS.keys(), self.filename))
+                % (list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()),
+                   self.filename))
 
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
@@ -802,7 +732,7 @@ class Voiceover(object):
                 self.needs_update)
 
 
-class WrittenTranslation(object):
+class WrittenTranslation(python_utils.OBJECT):
     """Value object representing a written translation for a content."""
 
     def __init__(self, html, needs_update):
@@ -850,7 +780,7 @@ class WrittenTranslation(object):
             ValidationError: One or more attributes of the WrittenTranslation
             are invalid.
         """
-        if not isinstance(self.html, basestring):
+        if not isinstance(self.html, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
 
@@ -860,7 +790,7 @@ class WrittenTranslation(object):
                 self.needs_update)
 
 
-class WrittenTranslations(object):
+class WrittenTranslations(python_utils.OBJECT):
     """Value object representing a content translations which stores
     translated contents of all state contents (like hints, feedback etc.) in
     different languages linked through their content_id.
@@ -878,10 +808,10 @@ class WrittenTranslations(object):
         """
         translations_mapping = {}
         for (content_id, language_code_to_written_translation) in (
-                self.translations_mapping.iteritems()):
+                self.translations_mapping.items()):
             translations_mapping[content_id] = {}
             for (language_code, written_translation) in (
-                    language_code_to_written_translation.iteritems()):
+                    language_code_to_written_translation.items()):
                 translations_mapping[content_id][language_code] = (
                     written_translation.to_dict())
         written_translations_dict = {
@@ -904,14 +834,45 @@ class WrittenTranslations(object):
         """
         translations_mapping = {}
         for (content_id, language_code_to_written_translation) in (
-                written_translations_dict['translations_mapping'].iteritems()):
+                written_translations_dict['translations_mapping'].items()):
             translations_mapping[content_id] = {}
             for (language_code, written_translation) in (
-                    language_code_to_written_translation.iteritems()):
+                    language_code_to_written_translation.items()):
                 translations_mapping[content_id][language_code] = (
                     WrittenTranslation.from_dict(written_translation))
 
         return cls(translations_mapping)
+
+    def get_content_ids_that_are_correctly_translated(self, language_code):
+        """Returns a list of content ids in which a correct translation is
+        available in the given language.
+
+        Args:
+            language_code: str. The abbreviated code of the language.
+
+        Return:
+            list(str). A list of content ids in which the translations are
+                available in the given language.
+        """
+        correctly_translated_content_ids = []
+        for content_id, translations in self.translations_mapping.items():
+            if language_code in translations and not (
+                    translations[language_code].needs_update):
+                correctly_translated_content_ids.append(content_id)
+
+        return correctly_translated_content_ids
+
+    def add_translation(self, content_id, language_code, html):
+        """Adds a translation for the given content id in a given language.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code of the translated html.
+            html: str. The translated html.
+        """
+        written_translation = WrittenTranslation(html, False)
+        self.translations_mapping[content_id][language_code] = (
+            written_translation)
 
     def validate(self, expected_content_id_list):
         """Validates properties of the WrittenTranslations.
@@ -931,12 +892,12 @@ class WrittenTranslations(object):
                     'Expected state written_translations to match the listed '
                     'content ids %s, found %s' % (
                         expected_content_id_list,
-                        self.translations_mapping.keys())
+                        list(self.translations_mapping.keys()))
                     )
 
         for (content_id, language_code_to_written_translation) in (
-                self.translations_mapping.iteritems()):
-            if not isinstance(content_id, basestring):
+                self.translations_mapping.items()):
+            if not isinstance(content_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
                     % content_id)
@@ -945,8 +906,8 @@ class WrittenTranslations(object):
                     'Expected content_id value to be a dict, received %s'
                     % language_code_to_written_translation)
             for (language_code, written_translation) in (
-                    language_code_to_written_translation.iteritems()):
-                if not isinstance(language_code, basestring):
+                    language_code_to_written_translation.items()):
+                if not isinstance(language_code, python_utils.BASESTRING):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
                         % language_code)
@@ -967,7 +928,7 @@ class WrittenTranslations(object):
         Returns:
             list(str). A list of content id available for text translation.
         """
-        return self.translations_mapping.keys()
+        return list(self.translations_mapping.keys())
 
     def add_content_id_for_translation(self, content_id):
         """Adds a content id as a key for the translation into the
@@ -979,7 +940,7 @@ class WrittenTranslations(object):
         Raises:
             Exception: The content id isn't a string.
         """
-        if not isinstance(content_id, basestring):
+        if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id in self.translations_mapping:
@@ -997,7 +958,7 @@ class WrittenTranslations(object):
         Raises:
             Exception: The content id isn't a string.
         """
-        if not isinstance(content_id, basestring):
+        if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id not in self.translations_mapping:
@@ -1006,8 +967,25 @@ class WrittenTranslations(object):
         else:
             self.translations_mapping.pop(content_id, None)
 
+    def get_translation_counts(self):
+        """Return a dict representing the number of translation available in a
+        languages in which there exist at least one translation in the
+        WrittenTranslation object.
 
-class RecordedVoiceovers(object):
+        Returns:
+            dict(str, int). A dict with language code as a key and number of
+            translation available in that language as the value.
+        """
+        translation_counts = collections.defaultdict(int)
+        for translations in self.translations_mapping.values():
+            for language, translation in translations.items():
+                if not translation.needs_update:
+                    translation_counts[language] += 1
+
+        return translation_counts
+
+
+class RecordedVoiceovers(python_utils.OBJECT):
     """Value object representing a recorded voiceovers which stores voiceover of
     all state contents (like hints, feedback etc.) in different languages linked
     through their content_id.
@@ -1025,10 +1003,10 @@ class RecordedVoiceovers(object):
         """
         voiceovers_mapping = {}
         for (content_id, language_code_to_voiceover) in (
-                self.voiceovers_mapping.iteritems()):
+                self.voiceovers_mapping.items()):
             voiceovers_mapping[content_id] = {}
             for (language_code, voiceover) in (
-                    language_code_to_voiceover.iteritems()):
+                    language_code_to_voiceover.items()):
                 voiceovers_mapping[content_id][language_code] = (
                     voiceover.to_dict())
         recorded_voiceovers_dict = {
@@ -1051,10 +1029,10 @@ class RecordedVoiceovers(object):
         """
         voiceovers_mapping = {}
         for (content_id, language_code_to_voiceover) in (
-                recorded_voiceovers_dict['voiceovers_mapping'].iteritems()):
+                recorded_voiceovers_dict['voiceovers_mapping'].items()):
             voiceovers_mapping[content_id] = {}
             for (language_code, voiceover) in (
-                    language_code_to_voiceover.iteritems()):
+                    language_code_to_voiceover.items()):
                 voiceovers_mapping[content_id][language_code] = (
                     Voiceover.from_dict(voiceover))
 
@@ -1078,12 +1056,12 @@ class RecordedVoiceovers(object):
                     'Expected state recorded_voiceovers to match the listed '
                     'content ids %s, found %s' % (
                         expected_content_id_list,
-                        self.voiceovers_mapping.keys())
+                        list(self.voiceovers_mapping.keys()))
                     )
 
         for (content_id, language_code_to_voiceover) in (
-                self.voiceovers_mapping.iteritems()):
-            if not isinstance(content_id, basestring):
+                self.voiceovers_mapping.items()):
+            if not isinstance(content_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
                     % content_id)
@@ -1092,8 +1070,8 @@ class RecordedVoiceovers(object):
                     'Expected content_id value to be a dict, received %s'
                     % language_code_to_voiceover)
             for (language_code, voiceover) in (
-                    language_code_to_voiceover.iteritems()):
-                if not isinstance(language_code, basestring):
+                    language_code_to_voiceover.items()):
+                if not isinstance(language_code, python_utils.BASESTRING):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
                         % language_code)
@@ -1111,7 +1089,7 @@ class RecordedVoiceovers(object):
         Returns:
             list(str). A list of content id available for voiceover.
         """
-        return self.voiceovers_mapping.keys()
+        return list(self.voiceovers_mapping.keys())
 
     def strip_all_existing_voiceovers(self):
         """Strips all existing voiceovers from the voiceovers_mapping."""
@@ -1130,7 +1108,7 @@ class RecordedVoiceovers(object):
             Exception: The content id already exist in the voiceovers_mapping
                 dict.
         """
-        if not isinstance(content_id, basestring):
+        if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id in self.voiceovers_mapping:
@@ -1150,7 +1128,7 @@ class RecordedVoiceovers(object):
             Exception: The content id does not exist in the voiceovers_mapping
                 dict.
         """
-        if not isinstance(content_id, basestring):
+        if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id not in self.voiceovers_mapping:
@@ -1160,7 +1138,7 @@ class RecordedVoiceovers(object):
             self.voiceovers_mapping.pop(content_id, None)
 
 
-class RuleSpec(object):
+class RuleSpec(python_utils.OBJECT):
     """Value object representing a rule specification."""
 
     def to_dict(self):
@@ -1249,10 +1227,12 @@ class RuleSpec(object):
                 % (self.rule_type, leftover_param_names))
 
         rule_params_dict = {rp[0]: rp[1] for rp in rule_params_list}
-        for (param_name, param_value) in self.inputs.iteritems():
+        for (param_name, param_value) in self.inputs.items():
             param_obj = rule_params_dict[param_name]
             # Validate the parameter type given the value.
-            if isinstance(param_value, basestring) and '{{' in param_value:
+            if isinstance(
+                    param_value,
+                    python_utils.BASESTRING) and '{{' in param_value:
                 # Value refers to a parameter spec. Cross-validate the type of
                 # the parameter spec with the rule parameter.
                 start_brace_index = param_value.index('{{') + 2
@@ -1275,7 +1255,7 @@ class RuleSpec(object):
                 param_obj.normalize(param_value)
 
 
-class SubtitledHtml(object):
+class SubtitledHtml(python_utils.OBJECT):
     """Value object representing subtitled HTML."""
 
     def __init__(self, content_id, html):
@@ -1288,13 +1268,7 @@ class SubtitledHtml(object):
                 a way as to contain a restricted set of HTML tags.
         """
         self.content_id = content_id
-        # The initial clean up of html by converting it to ckeditor format
-        # is required since user may copy and paste some stuff in the rte
-        # which is not a valid ckeditor html string but can be converted
-        # to a valid ckeditor string without errors. This initial clean up
-        # ensures that validation will not fail in such cases.
-        self.html = html_validation_service.convert_to_ckeditor(
-            html_cleaner.clean(html))
+        self.html = html_cleaner.clean(html)
         self.validate()
 
     def to_dict(self):
@@ -1329,29 +1303,14 @@ class SubtitledHtml(object):
             ValidationError: One or more attributes of the SubtitledHtml are
             invalid.
         """
-        if not isinstance(self.content_id, basestring):
+        if not isinstance(self.content_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected content id to be a string, received %s' %
                 self.content_id)
 
-        if not isinstance(self.html, basestring):
+        if not isinstance(self.html, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
-
-        err_dict = html_validation_service.validate_rte_format(
-            [self.html], feconf.RTE_FORMAT_CKEDITOR)
-        for key in err_dict:
-            if err_dict[key]:
-                raise utils.ValidationError(
-                    'Invalid html: %s for rte with invalid tags and '
-                    'strings: %s' % (self.html, err_dict))
-
-        err_dict = html_validation_service.validate_customization_args([
-            self.html])
-        if err_dict:
-            raise utils.ValidationError(
-                'Invalid html: %s due to errors in customization_args: %s' % (
-                    self.html, err_dict))
 
     @classmethod
     def create_default_subtitled_html(cls, content_id):
@@ -1359,7 +1318,7 @@ class SubtitledHtml(object):
         return cls(content_id, '')
 
 
-class State(object):
+class State(python_utils.OBJECT):
     """Domain object for a state."""
 
     def __init__(
@@ -1477,6 +1436,24 @@ class State(object):
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
 
+    def get_content_html(self, content_id):
+        """Returns the content belongs to a given content id of the object.
+
+        Args:
+            content_id: The id of the content.
+
+        Returns:
+            str. The html content corresponding to the given content id.
+
+        Raises:
+            ValueError: The given content_id does not exist.
+        """
+        content_id_to_html = self._get_all_translatable_content()
+        if content_id not in content_id_to_html:
+            raise ValueError('Content ID %s does not exist' % content_id)
+
+        return content_id_to_html[content_id]
+
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
         state_training_data_by_answer_group = []
@@ -1528,10 +1505,31 @@ class State(object):
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
         except Exception:
-            logging.info('Bad state dict: %s' % str(state_dict))
+            logging.info(
+                'Bad state dict: %s' % python_utils.UNICODE(state_dict))
             raise Exception('Could not convert state dict to YAML.')
 
-        return utils.yaml_from_dict(state.to_dict(), width=width)
+        return python_utils.yaml_from_dict(state.to_dict(), width=width)
+
+    def get_translation_counts(self):
+        """Return a dict representing the number of translations available in a
+        languages in which there exists at least one translation in the state
+        object.
+
+        Returns:
+            dict(str, int). A dict with language code as a key and number of
+            translations available in that language as the value.
+        """
+        return self.written_translations.get_translation_counts()
+
+    def get_content_count(self):
+        """Returns the number of distinct content fields available in the
+        object.
+
+        Returns:
+            int. The number of distinct content fields available in the state.
+        """
+        return len(self.written_translations.translations_mapping)
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
         """Adds or deletes content ids in assets i.e, other parts of state
@@ -1581,26 +1579,35 @@ class State(object):
                 self.written_translations.add_content_id_for_translation(
                     content_id)
 
-    def update_content(self, content_dict):
+    def add_translation(self, content_id, language_code, translation_html):
+        """Adds translation to a given content id in a specific language.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code.
+            translation_html: str. The translated html content.
+        """
+        translation_html = html_cleaner.clean(translation_html)
+        self.written_translations.add_translation(
+            content_id, language_code, translation_html)
+
+    def update_content(self, content):
         """Update the content of this state.
 
         Args:
-            content_dict: dict. The dict representation of SubtitledHtml
-                object.
+            content: SubtitledHtml. Representation of updated content.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
-        self.content = SubtitledHtml.from_dict(content_dict)
+        self.content = content
 
-    def update_param_changes(self, param_change_dicts):
+    def update_param_changes(self, param_changes):
         """Update the param_changes dict attribute.
 
         Args:
-            param_change_dicts: list(dict). List of param_change dicts that
-                represent ParamChange domain object.
+            param_changes: list(ParamChange). List of param_change domain
+            objects that represents ParamChange domain object.
         """
-        self.param_changes = [
-            param_domain.ParamChange.from_dict(param_change_dict)
-            for param_change_dict in param_change_dicts]
+        self.param_changes = param_changes
 
     def update_interaction_id(self, interaction_id):
         """Update the interaction id attribute.
@@ -1650,7 +1657,7 @@ class State(object):
             answer_group = AnswerGroup(
                 Outcome.from_dict(answer_group_dict['outcome']), [],
                 answer_group_dict['training_data'],
-                answer_group_dict['tagged_misconception_id'])
+                answer_group_dict['tagged_skill_misconception_id'])
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
@@ -1660,13 +1667,13 @@ class State(object):
                     raise Exception(
                         'Expected rule_inputs to be a dict, received %s'
                         % rule_inputs)
-                for param_name, value in rule_inputs.iteritems():
+                for param_name, value in rule_inputs.items():
                     param_type = (
                         interaction_registry.Registry.get_interaction_by_id(
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
-                    if (isinstance(value, basestring) and
+                    if (isinstance(value, python_utils.BASESTRING) and
                             '{{' in value and '}}' in value):
                         # TODO(jacobdavis11): Create checks that all parameters
                         # referred to exist and have the correct types.
@@ -1824,6 +1831,65 @@ class State(object):
                 'Expected solicit_answer_details to be a boolean, received %s'
                 % solicit_answer_details)
         self.solicit_answer_details = solicit_answer_details
+
+    def _get_all_translatable_content(self):
+        """Returns all content which can be translated into different languages.
+
+        Returns:
+            dict(str, str). Returns a dict with key as content id and content
+            html as the value.
+        """
+        content_id_to_html = {}
+
+        content_id_to_html[self.content.content_id] = self.content.html
+
+        # TODO(#6178): Remove empty html checks once we add a validation
+        # check that ensures each content in state should be non-empty html.
+        default_outcome = self.interaction.default_outcome
+        if default_outcome is not None and default_outcome.feedback.html != '':
+            content_id_to_html[default_outcome.feedback.content_id] = (
+                default_outcome.feedback.html)
+
+        for answer_group in self.interaction.answer_groups:
+            if answer_group.outcome.feedback.html != '':
+                content_id_to_html[answer_group.outcome.feedback.content_id] = (
+                    answer_group.outcome.feedback.html)
+
+        for hint in self.interaction.hints:
+            if hint.hint_content.html != '':
+                content_id_to_html[hint.hint_content.content_id] = (
+                    hint.hint_content.html)
+
+        solution = self.interaction.solution
+        if solution is not None and solution.explanation.html != '':
+            content_id_to_html[solution.explanation.content_id] = (
+                solution.explanation.html)
+
+        return content_id_to_html
+
+    def get_content_id_mapping_needing_translations(self, language_code):
+        """Returns all text html which can be translated in the given language.
+
+        Args:
+            language_code: str. The abbreviated code of the language.
+
+        Returns:
+            dict(str, str). A dict with key as content id and value as the
+            content html.
+        """
+        content_id_to_html = self._get_all_translatable_content()
+        available_translation_content_ids = (
+            self.written_translations
+            .get_content_ids_that_are_correctly_translated(language_code))
+
+        for content_id in available_translation_content_ids:
+            del content_id_to_html[content_id]
+
+        # TODO(#7571): Add functionality to return the list of
+        # translations which needs update.
+
+        return content_id_to_html
+
 
     def to_dict(self):
         """Returns a dict representing this State domain object.

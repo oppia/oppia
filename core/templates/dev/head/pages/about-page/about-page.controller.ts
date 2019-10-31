@@ -20,12 +20,10 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('aboutPage', ['UrlInterpolationService',
-  function(UrlInterpolationService) {
+angular.module('oppia').directive('aboutPage', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

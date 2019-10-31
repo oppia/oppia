@@ -15,16 +15,20 @@
 # limitations under the License.
 
 """Commands that can be used to operate on activity summaries."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
 from core.domain import user_services
+import python_utils
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
@@ -78,14 +82,14 @@ def get_human_readable_contributors_summary(contributors_summary):
             },
         }
     """
-    contributor_ids = contributors_summary.keys()
+    contributor_ids = list(contributors_summary.keys())
     contributor_usernames = user_services.get_human_readable_user_ids(
         contributor_ids)
     return {
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
         }
-        for ind in xrange(len(contributor_ids))
+        for ind in python_utils.RANGE(len(contributor_ids))
     }
 
 
@@ -249,26 +253,25 @@ def get_exploration_metadata_dicts(exploration_ids, user):
             'objective': the exploration objective.
     """
     exploration_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids))
     exploration_rights_objects = (
         rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            zip(exploration_summaries, exploration_rights_objects)):
-        if exploration_summary is None or exploration_rights is None:
-            continue
+            python_utils.ZIP(
+                exploration_summaries, exploration_rights_objects)):
+        if exploration_summary is not None and exploration_rights is not None:
+            if exploration_summary.status == (
+                    rights_manager.ACTIVITY_STATUS_PRIVATE):
+                if user.user_id is None:
+                    continue
 
-        if exploration_summary.status == (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if user.user_id is None:
-                continue
+                if not rights_manager.check_can_edit_activity(
+                        user, exploration_rights):
+                    continue
 
-            if not rights_manager.check_can_edit_activity(
-                    user, exploration_rights):
-                continue
-
-        filtered_exploration_summaries.append(exploration_summary)
+            filtered_exploration_summaries.append(exploration_summary)
 
     return [
         summary.to_metadata_dict()
@@ -312,25 +315,24 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
         }, ]
     """
     exploration_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids))
     exploration_rights_objects = (
         rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            zip(exploration_summaries, exploration_rights_objects)):
-        if exploration_summary is None or exploration_rights is None:
-            continue
+            python_utils.ZIP(
+                exploration_summaries, exploration_rights_objects)):
+        if exploration_summary is not None and exploration_rights is not None:
+            if exploration_summary.status == (
+                    rights_manager.ACTIVITY_STATUS_PRIVATE):
+                if user is None:
+                    continue
+                if not rights_manager.check_can_edit_activity(
+                        user, exploration_rights):
+                    continue
 
-        if exploration_summary.status == (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if user is None:
-                continue
-            if not rights_manager.check_can_edit_activity(
-                    user, exploration_rights):
-                continue
-
-        filtered_exploration_summaries.append(exploration_summary)
+            filtered_exploration_summaries.append(exploration_summary)
 
     return get_displayable_exp_summary_dicts(filtered_exploration_summaries)
 
@@ -531,7 +533,7 @@ def get_library_groups(language_codes):
 
     exp_summaries = [
         summary for summary in
-        exp_services.get_exploration_summaries_matching_ids(all_exp_ids)
+        exp_fetchers.get_exploration_summaries_matching_ids(all_exp_ids)
         if summary is not None]
 
     exp_summary_dicts = {
@@ -586,7 +588,7 @@ def require_activities_to_be_public(activity_references):
     activity_summaries_by_type = [{
         'type': constants.ACTIVITY_TYPE_EXPLORATION,
         'ids': exploration_ids,
-        'summaries': exp_services.get_exploration_summaries_matching_ids(
+        'summaries': exp_fetchers.get_exploration_summaries_matching_ids(
             exploration_ids),
     }, {
         'type': constants.ACTIVITY_TYPE_COLLECTION,

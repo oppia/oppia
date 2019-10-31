@@ -16,52 +16,9 @@
  * @fileoverview Data and directive for the Oppia admin page.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
-// introduce webpack for /extensions
-require('directives/FocusOnDirective.ts');
-require('components/forms/validators/is-at-least.filter.ts');
-require('components/forms/validators/is-at-most.filter.ts');
-require('components/forms/validators/is-float.filter.ts');
-require('components/forms/validators/is-integer.filter.ts');
-require('components/forms/validators/is-nonempty.filter.ts');
-require(
-  'components/forms/custom-forms-directives/apply-validation.directive.ts');
-require('components/forms/custom-forms-directives/object-editor.directive.ts');
-require(
-  'components/forms/custom-forms-directives/require-is-float.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-bool-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-choices-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-custom-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-dict-editor.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-expression-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-float-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-html-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-list-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-unicode-editor.directive.ts');
-// ^^^ this block of requires should be removed ^^^
-
+require('directives/focus-on.directive.ts');
 require('pages/admin-page/navbar/admin-navbar.directive.ts');
 require(
   'pages/admin-page/activities-tab/admin-dev-mode-activities-tab.directive.ts');
@@ -75,13 +32,13 @@ require('pages/admin-page/roles-tab/admin-roles-tab.directive.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
+require('services/CsrfTokenService.ts');
 require('services/UtilsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('adminPage', ['UrlInterpolationService',
+angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -91,18 +48,35 @@ oppia.directive('adminPage', ['UrlInterpolationService',
         '/pages/admin-page/admin-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',
-        function($http, $location, $scope, AdminRouterService, DEV_MODE) {
+        '$http', '$location', '$scope', 'AdminDataService',
+        'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
+        function($http, $location, $scope, AdminDataService,
+            AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
-          ctrl.userEmail = GLOBALS.USER_EMAIL;
+          ctrl.userEmail = '';
+          AdminDataService.getDataAsync().then(function(response) {
+            ctrl.userEmail = response.user_email;
+          });
           ctrl.inDevMode = DEV_MODE;
 
           ctrl.statusMessage = '';
-          ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
-          ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
-          ctrl.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
-          ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
-          ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
+          ctrl.isActivitiesTabOpen = function() {
+            return AdminRouterService.isActivitiesTabOpen();
+          };
+          ctrl.isJobsTabOpen = function() {
+            return AdminRouterService.isJobsTabOpen();
+          };
+          ctrl.isConfigTabOpen = function() {
+            return AdminRouterService.isConfigTabOpen();
+          };
+          ctrl.isRolesTabOpen = function() {
+            return AdminRouterService.isRolesTabOpen();
+          };
+          ctrl.isMiscTabOpen = function() {
+            return AdminRouterService.isMiscTabOpen();
+          };
+
+          CsrfTokenService.initializeToken();
 
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;

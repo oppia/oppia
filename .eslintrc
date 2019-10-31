@@ -8,7 +8,8 @@
   ],
   "plugins": [
     "angular",
-    "html"
+    "html",
+    "@typescript-eslint"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
@@ -23,7 +24,6 @@
       "error",
       "array",
     ],
-    "angular/di-order": "error",
     "angular/di-unused": "error",
     "angular/directive-restrict": [
       "error",
@@ -119,8 +119,10 @@
     ],
     "max-len": [
       "error",
-      "code": 80,
-      "ignoreUrls": true
+      {
+        "code": 80,
+        "ignoreUrls": true
+      }
     ],
     "no-compare-neg": "off",
     "no-console": [
@@ -147,6 +149,7 @@
     "no-multi-str": [
       "error"
     ],
+    "no-prototype-builtins": "off",
     "no-redeclare": [
       "off"
     ],
@@ -187,10 +190,9 @@
         "keywords": true
       }
     ],
-    "semi": [
-      "error",
-      "always"
-    ],
+    // The following must be off so that we can enable
+    // "@typescript-eslint/semi", which checks semicolons in TS files.
+    "semi": "off",
     "space-before-blocks": [
       "error",
       "always"
@@ -217,6 +219,14 @@
         "nonwords": false,
       }
     ],
+    "switch-colon-spacing": [
+      "error",
+      {
+        "after": true,
+        "before": false
+      }
+    ],
+    "@typescript-eslint/semi": ["error"],
     "wrap-iife": [
       "error",
       "any"

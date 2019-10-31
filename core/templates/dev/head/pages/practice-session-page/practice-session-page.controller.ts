@@ -16,6 +16,7 @@
  * @fileoverview Controllers for the practice session.
  */
 
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
@@ -28,82 +29,86 @@ require('objects/objectComponentsRequiresForPlayers.ts');
 
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
-require('pages/practice-session-page/practice-session-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require('services/PageTitleService.ts');
+require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/practice-session-page/practice-session-page.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$http', '$rootScope', 'AlertsService',
-      'UrlInterpolationService', 'UrlService',
-      'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL',
-      'PRACTICE_SESSIONS_URL',
-      'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
-      function(
-          $http, $rootScope, AlertsService,
-          UrlInterpolationService, UrlService,
-          FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL,
-          PRACTICE_SESSIONS_URL,
-          TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS
-      ) {
-        var ctrl = this;
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-        var _fetchSkillDetails = function() {
-          var practiceSessionsDataUrl = UrlInterpolationService.interpolateUrl(
-            PRACTICE_SESSIONS_DATA_URL, {
-              topic_name: ctrl.topicName
+angular.module('oppia').directive('practiceSessionPage', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/practice-session-page/practice-session-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$http', '$rootScope', 'AlertsService', 'PageTitleService',
+        'UrlInterpolationService', 'UrlService',
+        'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL',
+        'PRACTICE_SESSIONS_URL',
+        'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
+        function(
+            $http, $rootScope, AlertsService, PageTitleService,
+            UrlInterpolationService, UrlService,
+            FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL,
+            PRACTICE_SESSIONS_URL,
+            TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS
+        ) {
+          var ctrl = this;
+          ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+          var _fetchSkillDetails = function() {
+            var practiceSessionsDataUrl = UrlInterpolationService
+              .interpolateUrl(
+                PRACTICE_SESSIONS_DATA_URL, {
+                  topic_name: ctrl.topicName
+                });
+            var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
+              PRACTICE_SESSIONS_URL, {
+                topic_name: ctrl.topicName
+              });
+            var topicViewerUrl = UrlInterpolationService.interpolateUrl(
+              TOPIC_VIEWER_PAGE, {
+                topic_name: ctrl.topicName
+              });
+            $http.get(practiceSessionsDataUrl).then(function(result) {
+              var skillList = [];
+              var skillDescriptions = [];
+              for (var skillId in result.data.skill_descriptions) {
+                skillList.push(skillId);
+                skillDescriptions.push(
+                  result.data.skill_descriptions[skillId]);
+              }
+              var questionPlayerConfig = {
+                resultActionButtons: [
+                  {
+                    type: 'BOOST_SCORE',
+                    i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+                  },
+                  {
+                    type: 'RETRY_SESSION',
+                    i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
+                    url: practiceSessionsUrl
+                  },
+                  {
+                    type: 'DASHBOARD',
+                    i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
+                    url: topicViewerUrl
+                  }
+                ],
+                skillList: skillList,
+                skillDescriptions: skillDescriptions,
+                questionCount: TOTAL_QUESTIONS,
+                questionsSortedByDifficulty: false
+              };
+              ctrl.questionPlayerConfig = questionPlayerConfig;
             });
-          var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
-            PRACTICE_SESSIONS_URL, {
-              topic_name: ctrl.topicName
-            });
-          var topicViewerUrl = UrlInterpolationService.interpolateUrl(
-            TOPIC_VIEWER_PAGE, {
-              topic_name: ctrl.topicName
-            });
-          $http.get(practiceSessionsDataUrl).then(function(result) {
-            var skillList = [];
-            var skillDescriptions = [];
-            for (var skillId in result.data.skill_descriptions) {
-              skillList.push(skillId);
-              skillDescriptions.push(
-                result.data.skill_descriptions[skillId]);
-            }
-            var questionPlayerConfig = {
-              resultActionButtons: [
-                {
-                  type: 'BOOST_SCORE',
-                  text: 'Boost My Score'
-                },
-                {
-                  type: 'RETRY_SESSION',
-                  text: 'New Session',
-                  url: practiceSessionsUrl
-                },
-                {
-                  type: 'DASHBOARD',
-                  text: 'My Dashboard',
-                  url: topicViewerUrl
-                }
-              ],
-              skillList: skillList,
-              skillDescriptions: skillDescriptions,
-              questionCount: TOTAL_QUESTIONS
-            };
-            ctrl.questionPlayerConfig = questionPlayerConfig;
-          });
-        };
-        _fetchSkillDetails();
-      }
-    ]
-  };
-}]);
+          };
+          _fetchSkillDetails();
+          PageTitleService.setPageTitle(
+            'Practice Session: ' + ctrl.topicName + ' - Oppia');
+        }
+      ]
+    };
+  }]);

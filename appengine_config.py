@@ -15,6 +15,8 @@
 # pylint: skip-file
 
 """Configuration for App Engine."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 import os
@@ -29,7 +31,7 @@ appstats_CALC_RPC_COSTS = True
 appstats_MAX_STACK = 50
 
 
-def webapp_add_wsgi_middleware(app):
+def webapp_add_wsgi_middleware(app):  # pragma: no cover
     """Add AppStats recording.
 
     This also sets the level of appstats log messages to 'debug' by
@@ -91,16 +93,16 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.7.1'),
     os.path.join(ROOT_PATH, 'third_party', 'bleach-3.1.0'),
     os.path.join(ROOT_PATH, 'third_party', 'callbacks-0.3.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'future-0.17.1'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.22.1'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.22.0'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.22.1'),
     os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
     os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.0.1'),
     os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.42.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'requests-2.22.0'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.16.0'),
     os.path.join(ROOT_PATH, 'third_party', 'six-1.12.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.1'),    
+    os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.1'),
     os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
 ]
 
@@ -108,6 +110,3 @@ for lib_path in THIRD_PARTY_LIBS:
     if not os.path.isdir(lib_path):
         raise Exception('Invalid path for third_party library: %s' % lib_path)
     sys.path.insert(0, lib_path)
-
-# Required, otherwise MapReduce third-party library will throw errors.
-os.environ['PYTHONPATH'] = ','.join(sys.path)

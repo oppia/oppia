@@ -17,22 +17,39 @@
  *     domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('ClassifierObjectFactory', [function() {
-  var Classifier = function(algorithmId, classifierData, dataSchemaVersion) {
+export class Classifier {
+  algorithmId: string;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'classifierData' is a dict with underscore_cased keys which
+  // give tslint errors against underscore_casing in favor of camelCasing.
+  classifierData: any;
+  dataSchemaVersion: number;
+
+  constructor(
+      algorithmId: string, classifierData: any, dataSchemaVersion: number) {
     this.algorithmId = algorithmId;
     this.classifierData = classifierData;
     this.dataSchemaVersion = dataSchemaVersion;
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Classifier['create'] = function(
-  /* eslint-enable dot-notation */
-      algorithmId, classifierData, dataSchemaVersion) {
+@Injectable({
+  providedIn: 'root'
+})
+export class ClassifierObjectFactory {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'classifierData' is a dict with underscore_cased keys which
+  // give tslint errors against underscore_casing in favor of camelCasing.
+  create(
+      algorithmId: string, classifierData: any,
+      dataSchemaVersion: number): Classifier {
     return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-  };
+  }
+}
 
-  return Classifier;
-}]);
+angular.module('oppia').factory(
+  'ClassifierObjectFactory',
+  downgradeInjectable(ClassifierObjectFactory));

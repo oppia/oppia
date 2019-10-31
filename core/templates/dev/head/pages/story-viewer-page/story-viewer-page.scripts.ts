@@ -13,9 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in story viewer.
+ * @fileoverview Scripts required in story viewer.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/story-viewer-page/story-viewer-page.module.ts');
 require('App.ts');
 
+require('base-components/base-content.directive.ts');
 require('pages/story-viewer-page/story-viewer-page.directive.ts');

@@ -18,9 +18,7 @@
 
 require('services/UtilsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ChangesInHumanReadableFormService', [
+angular.module('oppia').factory('ChangesInHumanReadableFormService', [
   'UtilsService', function(UtilsService) {
     var CMD_ADD_STATE = 'add_state';
     var CMD_RENAME_STATE = 'rename_state';

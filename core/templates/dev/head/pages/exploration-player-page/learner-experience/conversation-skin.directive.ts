@@ -22,7 +22,7 @@ require(
 require('components/ratings/rating-display/rating-display.directive.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'correctness-footer.directive.ts');
@@ -30,20 +30,25 @@ require(
   'pages/exploration-player-page/layout-directives/progress-nav.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
+  'learner-answer-info-card.directive.ts');
+require(
+  'pages/exploration-player-page/learner-experience/' +
   'supplemental-card.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
-
-require('domain/collection/GuestCollectionProgressService.ts');
-require('domain/exploration/EditableExplorationBackendApiService.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
-require('domain/question/PretestQuestionBackendApiService.ts');
-require('domain/skill/ConceptCardBackendApiService.ts');
+require(
+  'pages/exploration-player-page/services/learner-answer-info.service.ts');
+require('domain/collection/guest-collection-progress.service.ts');
+require('domain/collection/read-only-collection-backend-api.service.ts');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('domain/question/pretest-question-backend-api.service.ts');
+require('domain/skill/concept-card-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
-require('domain/story_viewer/StoryViewerBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/story_viewer/story-viewer-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-manager.service.ts');
@@ -67,7 +72,6 @@ require('pages/exploration-player-page/services/learner-params.service.ts');
 require(
   'pages/exploration-player-page/services/learner-view-rating.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require(
   'pages/exploration-player-page/services/' +
   'player-correctness-feedback-enabled.service.ts');
@@ -92,8 +96,9 @@ require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -102,79 +107,49 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').animation(
+  '.conversation-skin-animate-tutor-card-on-narrow', function() {
+    var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
+    var tutorCardAnimatedLeft, tutorCardAnimatedWidth;
 
-oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
-  var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
-  var tutorCardAnimatedLeft, tutorCardAnimatedWidth;
+    var beforeAddClass = function(element, className, done) {
+      if (className !== 'ng-hide') {
+        done();
+        return;
+      }
+      var tutorCard = element;
+      var supplementalCard =
+        $('.conversation-skin-supplemental-card-container');
+      var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
+      oppiaAvatarLeft = supplementalCard.position().left +
+                        supplementalCard.width() - oppiaAvatar.width();
+      tutorCardLeft = tutorCard.position().left;
+      tutorCardWidth = tutorCard.width();
+      tutorCardHeight = tutorCard.height();
 
-  var beforeAddClass = function(element, className, done) {
-    if (className !== 'ng-hide') {
-      done();
-      return;
-    }
-    var tutorCard = element;
-    var supplementalCard = $('.conversation-skin-supplemental-card-container');
-    var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
-    oppiaAvatarLeft = supplementalCard.position().left +
-                      supplementalCard.width() - oppiaAvatar.width();
-    tutorCardLeft = tutorCard.position().left;
-    tutorCardWidth = tutorCard.width();
-    tutorCardHeight = tutorCard.height();
+      if (
+        tutorCard.offset().left + tutorCardWidth > oppiaAvatar.offset().left) {
+        var animationLength = Math.min(
+          oppiaAvatarLeft - tutorCard.offset().left,
+          tutorCardWidth);
+        tutorCardAnimatedLeft = tutorCardLeft + animationLength;
+        tutorCardAnimatedWidth = tutorCardWidth - animationLength;
+      } else {
+        tutorCardAnimatedLeft = oppiaAvatarLeft;
+        tutorCardAnimatedWidth = 0;
+      }
 
-    if (tutorCard.offset().left + tutorCardWidth > oppiaAvatar.offset().left) {
-      var animationLength = Math.min(
-        oppiaAvatarLeft - tutorCard.offset().left,
-        tutorCardWidth);
-      tutorCardAnimatedLeft = tutorCardLeft + animationLength;
-      tutorCardAnimatedWidth = tutorCardWidth - animationLength;
-    } else {
-      tutorCardAnimatedLeft = oppiaAvatarLeft;
-      tutorCardAnimatedWidth = 0;
-    }
-
-    oppiaAvatar.hide();
-    tutorCard.css({
-      'min-width': 0
-    });
-    tutorCard.animate({
-      left: tutorCardAnimatedLeft,
-      width: tutorCardAnimatedWidth,
-      height: 0,
-      opacity: 1
-    }, 500, function() {
-      oppiaAvatar.show();
+      oppiaAvatar.hide();
       tutorCard.css({
-        left: '',
-        width: '',
-        height: '',
-        opacity: '',
-        'min-width': ''
-      });
-      done();
-    });
-  };
-
-  var removeClass = function(element, className, done) {
-    if (className !== 'ng-hide') {
-      done();
-      return;
-    }
-    var tutorCard = element;
-    $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
-      tutorCard.css({
-        left: tutorCardAnimatedLeft,
-        width: tutorCardAnimatedWidth,
-        height: 0,
-        opacity: 0,
         'min-width': 0
       });
       tutorCard.animate({
-        left: tutorCardLeft,
-        width: tutorCardWidth,
-        height: tutorCardHeight,
+        left: tutorCardAnimatedLeft,
+        width: tutorCardAnimatedWidth,
+        height: 0,
         opacity: 1
       }, 500, function() {
+        oppiaAvatar.show();
         tutorCard.css({
           left: '',
           width: '',
@@ -184,135 +159,168 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
         });
         done();
       });
-    });
-  };
-
-  return {
-    beforeAddClass: beforeAddClass,
-    removeClass: removeClass
-  };
-});
-
-oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
-  var animateCardChange = function(element, className, done) {
-    if (className !== 'animate-card-change') {
-      return;
-    }
-
-    var currentHeight = element.height();
-    var expectedNextHeight = $(
-      '.conversation-skin-future-tutor-card ' +
-      '.oppia-learner-view-card-content'
-    ).height();
-
-    // Fix the current card height, so that it does not change during the
-    // animation, even though its contents might.
-    element.css('height', currentHeight);
-
-    jQuery(element).animate({
-      opacity: 0
-    }, TIME_FADEOUT_MSEC).animate({
-      height: expectedNextHeight
-    }, TIME_HEIGHT_CHANGE_MSEC).animate({
-      opacity: 1
-    }, TIME_FADEIN_MSEC, function() {
-      element.css('height', '');
-      done();
-    });
-
-    return function(cancel) {
-      if (cancel) {
-        element.css('opacity', '1.0');
-        element.css('height', '');
-        element.stop();
-      }
     };
-  };
 
-  return {
-    addClass: animateCardChange
-  };
-});
-
-oppia.animation('.conversation-skin-animate-cards', function() {
-  // This removes the newly-added class once the animation is finished.
-  var animateCards = function(element, className, done) {
-    var tutorCardElt = jQuery(element).find(
-      '.conversation-skin-main-tutor-card');
-    var supplementalCardElt = jQuery(element).find(
-      '.conversation-skin-supplemental-card-container');
-
-    if (className === 'animate-to-two-cards') {
-      var supplementalWidth = supplementalCardElt.width();
-      supplementalCardElt.css({
-        width: 0,
-        'min-width': '0',
-        opacity: '0'
-      });
-      supplementalCardElt.animate({
-        width: supplementalWidth
-      }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
-        supplementalCardElt.animate({
-          opacity: '1'
-        }, TIME_FADEIN_MSEC, function() {
-          supplementalCardElt.css({
+    var removeClass = function(element, className, done) {
+      if (className !== 'ng-hide') {
+        done();
+        return;
+      }
+      var tutorCard = element;
+      $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
+        tutorCard.css({
+          left: tutorCardAnimatedLeft,
+          width: tutorCardAnimatedWidth,
+          height: 0,
+          opacity: 0,
+          'min-width': 0
+        });
+        tutorCard.animate({
+          left: tutorCardLeft,
+          width: tutorCardWidth,
+          height: tutorCardHeight,
+          opacity: 1
+        }, 500, function() {
+          tutorCard.css({
+            left: '',
             width: '',
-            'min-width': '',
-            opacity: ''
+            height: '',
+            opacity: '',
+            'min-width': ''
           });
-          jQuery(element).removeClass('animate-to-two-cards');
           done();
         });
       });
+    };
 
-      return function(cancel) {
-        if (cancel) {
-          supplementalCardElt.css({
-            width: '',
-            'min-width': '',
-            opacity: ''
-          });
-          supplementalCardElt.stop();
-          jQuery(element).removeClass('animate-to-two-cards');
-        }
-      };
-    } else if (className === 'animate-to-one-card') {
-      supplementalCardElt.css({
-        opacity: 0,
-        'min-width': 0
-      });
-      supplementalCardElt.animate({
-        width: 0
-      }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
-        jQuery(element).removeClass('animate-to-one-card');
+    return {
+      beforeAddClass: beforeAddClass,
+      removeClass: removeClass
+    };
+  });
+
+angular.module('oppia').animation(
+  '.conversation-skin-animate-tutor-card-content', function() {
+    var animateCardChange = function(element, className, done) {
+      if (className !== 'animate-card-change') {
+        return;
+      }
+
+      var currentHeight = element.height();
+      var expectedNextHeight = $(
+        '.conversation-skin-future-tutor-card ' +
+        '.oppia-learner-view-card-content'
+      ).height();
+
+      // Fix the current card height, so that it does not change during the
+      // animation, even though its contents might.
+      element.css('height', currentHeight);
+
+      jQuery(element).animate({
+        opacity: 0
+      }, TIME_FADEOUT_MSEC).animate({
+        height: expectedNextHeight
+      }, TIME_HEIGHT_CHANGE_MSEC).animate({
+        opacity: 1
+      }, TIME_FADEIN_MSEC, function() {
+        element.css('height', '');
         done();
       });
 
       return function(cancel) {
         if (cancel) {
-          supplementalCardElt.css({
-            opacity: '',
-            'min-width': '',
-            width: ''
-          });
-          supplementalCardElt.stop();
-
-          jQuery(element).removeClass('animate-to-one-card');
+          element.css('opacity', '1.0');
+          element.css('height', '');
+          element.stop();
         }
       };
-    } else {
-      return;
-    }
-  };
+    };
 
-  return {
-    addClass: animateCards
-  };
-});
+    return {
+      addClass: animateCardChange
+    };
+  });
 
-oppia.directive('conversationSkin', [
-  'UrlInterpolationService', 'UrlService', 'UserService',
-  function(UrlInterpolationService, UrlService, UserService) {
+angular.module('oppia').animation(
+  '.conversation-skin-animate-cards', function() {
+    // This removes the newly-added class once the animation is finished.
+    var animateCards = function(element, className, done) {
+      var tutorCardElt = jQuery(element).find(
+        '.conversation-skin-main-tutor-card');
+      var supplementalCardElt = jQuery(element).find(
+        '.conversation-skin-supplemental-card-container');
+
+      if (className === 'animate-to-two-cards') {
+        var supplementalWidth = supplementalCardElt.width();
+        supplementalCardElt.css({
+          width: 0,
+          'min-width': '0',
+          opacity: '0'
+        });
+        supplementalCardElt.animate({
+          width: supplementalWidth
+        }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
+          supplementalCardElt.animate({
+            opacity: '1'
+          }, TIME_FADEIN_MSEC, function() {
+            supplementalCardElt.css({
+              width: '',
+              'min-width': '',
+              opacity: ''
+            });
+            jQuery(element).removeClass('animate-to-two-cards');
+            done();
+          });
+        });
+
+        return function(cancel) {
+          if (cancel) {
+            supplementalCardElt.css({
+              width: '',
+              'min-width': '',
+              opacity: ''
+            });
+            supplementalCardElt.stop();
+            jQuery(element).removeClass('animate-to-two-cards');
+          }
+        };
+      } else if (className === 'animate-to-one-card') {
+        supplementalCardElt.css({
+          opacity: 0,
+          'min-width': 0
+        });
+        supplementalCardElt.animate({
+          width: 0
+        }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
+          jQuery(element).removeClass('animate-to-one-card');
+          done();
+        });
+
+        return function(cancel) {
+          if (cancel) {
+            supplementalCardElt.css({
+              opacity: '',
+              'min-width': '',
+              width: ''
+            });
+            supplementalCardElt.stop();
+
+            jQuery(element).removeClass('animate-to-one-card');
+          }
+        };
+      } else {
+        return;
+      }
+    };
+
+    return {
+      addClass: animateCards
+    };
+  });
+
+angular.module('oppia').directive('conversationSkin', [
+  'UrlInterpolationService', 'UrlService',
+  function(UrlInterpolationService, UrlService) {
     return {
       restrict: 'E',
       scope: {
@@ -330,67 +338,73 @@ oppia.directive('conversationSkin', [
       },
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
-        '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        '$location', '$q', 'MessengerService', 'AlertsService',
-        'ExplorationEngineService', 'UrlService', 'FocusManagerService',
-        'LearnerViewRatingService', 'WindowDimensionsService',
-        'EditableExplorationBackendApiService', 'PlayerTranscriptService',
-        'QuestionPlayerStateService', 'LearnerParamsService',
-        'ExplorationRecommendationsService',
-        'ReadOnlyExplorationBackendApiService',
-        'ReadOnlyStoryNodeObjectFactory', 'PlayerPositionService',
-        'StatsReportingService', 'SiteAnalyticsService',
-        'PretestQuestionBackendApiService', 'StateCardObjectFactory',
-        'StoryViewerBackendApiService',
-        'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
-        'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_AVAILABLE', 'FEEDBACK_POPOVER_PATH',
-        'NUM_EXPLORATIONS_PER_REVIEW_TEST',
-        'FatigueDetectionService', 'GuestCollectionProgressService',
+        '$http', '$location', '$q', '$rootScope', '$scope', '$timeout',
+        '$translate', '$window', 'AlertsService',
+        'AudioTranslationManagerService', 'AutogeneratedAudioPlayerService',
+        'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
+        'ContextService', 'CurrentInteractionService',
+        'EditableExplorationBackendApiService', 'ExplorationEngineService',
+        'ExplorationPlayerStateService', 'ExplorationRecommendationsService',
+        'FatigueDetectionService', 'FocusManagerService',
+        'GuestCollectionProgressService', 'HintsAndSolutionManagerService',
+        'ImagePreloaderService', 'LearnerAnswerInfoService',
+        'LearnerParamsService', 'LearnerViewRatingService', 'MessengerService',
         'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
-        'ContextService', 'ConceptCardBackendApiService',
-        'ConceptCardObjectFactory',
-        'RefresherExplorationConfirmationModalService', 'PAGE_CONTEXT',
-        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'INTERACTION_SPECS',
-        'EVENT_NEW_CARD_OPENED', 'HintsAndSolutionManagerService',
-        'AudioTranslationManagerService', 'EVENT_AUTOPLAY_AUDIO',
-        'COMPONENT_NAME_FEEDBACK', 'AutogeneratedAudioPlayerService',
-        'StateClassifierMappingService', 'ImagePreloaderService',
-        'PlaythroughService', 'QuestionPlayerEngineService',
+        'PlayerPositionService', 'PlayerTranscriptService',
+        'PlaythroughService', 'PretestQuestionBackendApiService',
+        'QuestionPlayerEngineService', 'QuestionPlayerStateService',
+        'ReadOnlyCollectionBackendApiService',
+        'ReadOnlyExplorationBackendApiService',
+        'ReadOnlyStoryNodeObjectFactory',
+        'RefresherExplorationConfirmationModalService',
+        'StateClassifierMappingService', 'SiteAnalyticsService',
+        'StateCardObjectFactory', 'StatsReportingService',
+        'StoryViewerBackendApiService', 'UrlService', 'UserService',
+        'WindowDimensionsService', 'COMPONENT_NAME_FEEDBACK',
+        'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
+        'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
+        'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
+        'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_AUTOPLAY_AUDIO',
+        'EVENT_NEW_CARD_AVAILABLE', 'EVENT_NEW_CARD_OPENED',
+        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'FEEDBACK_POPOVER_PATH',
+        'INTERACTION_DISPLAY_MODE_INLINE',
+        'INTERACTION_SPECS', 'NUM_EXPLORATIONS_PER_REVIEW_TEST',
+        'PAGE_CONTEXT', 'SUPPORTED_SITE_LANGUAGES', 'TWO_CARD_THRESHOLD_PX',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
-        'ExplorationPlayerStateService', 'INTERACTION_DISPLAY_MODE_INLINE',
-        'CurrentInteractionService', 'UserService',
         function(
-            $scope, $timeout, $rootScope, $window, $translate, $http,
-            $location, $q, MessengerService, AlertsService,
-            ExplorationEngineService, UrlService, FocusManagerService,
-            LearnerViewRatingService, WindowDimensionsService,
-            EditableExplorationBackendApiService, PlayerTranscriptService,
-            QuestionPlayerStateService, LearnerParamsService,
-            ExplorationRecommendationsService,
-            ReadOnlyExplorationBackendApiService,
-            ReadOnlyStoryNodeObjectFactory, PlayerPositionService,
-            StatsReportingService, SiteAnalyticsService,
-            PretestQuestionBackendApiService, StateCardObjectFactory,
-            StoryViewerBackendApiService,
-            CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
-            CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_AVAILABLE, FEEDBACK_POPOVER_PATH,
-            NUM_EXPLORATIONS_PER_REVIEW_TEST,
-            FatigueDetectionService, GuestCollectionProgressService,
+            $http, $location, $q, $rootScope, $scope, $timeout,
+            $translate, $window, AlertsService,
+            AudioTranslationManagerService, AutogeneratedAudioPlayerService,
+            ConceptCardBackendApiService, ConceptCardObjectFactory,
+            ContextService, CurrentInteractionService,
+            EditableExplorationBackendApiService, ExplorationEngineService,
+            ExplorationPlayerStateService, ExplorationRecommendationsService,
+            FatigueDetectionService, FocusManagerService,
+            GuestCollectionProgressService, HintsAndSolutionManagerService,
+            ImagePreloaderService, LearnerAnswerInfoService,
+            LearnerParamsService, LearnerViewRatingService, MessengerService,
             NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
-            ContextService, ConceptCardBackendApiService,
-            ConceptCardObjectFactory,
-            RefresherExplorationConfirmationModalService, PAGE_CONTEXT,
-            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, INTERACTION_SPECS,
-            EVENT_NEW_CARD_OPENED, HintsAndSolutionManagerService,
-            AudioTranslationManagerService, EVENT_AUTOPLAY_AUDIO,
-            COMPONENT_NAME_FEEDBACK, AutogeneratedAudioPlayerService,
-            StateClassifierMappingService, ImagePreloaderService,
-            PlaythroughService, QuestionPlayerEngineService,
-            WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
-            ExplorationPlayerStateService, INTERACTION_DISPLAY_MODE_INLINE,
-            CurrentInteractionService, UserService) {
+            PlayerPositionService, PlayerTranscriptService,
+            PlaythroughService, PretestQuestionBackendApiService,
+            QuestionPlayerEngineService, QuestionPlayerStateService,
+            ReadOnlyCollectionBackendApiService,
+            ReadOnlyExplorationBackendApiService,
+            ReadOnlyStoryNodeObjectFactory,
+            RefresherExplorationConfirmationModalService,
+            StateClassifierMappingService, SiteAnalyticsService,
+            StateCardObjectFactory, StatsReportingService,
+            StoryViewerBackendApiService, UrlService, UserService,
+            WindowDimensionsService, COMPONENT_NAME_FEEDBACK,
+            CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
+            DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
+            ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
+            EVENT_ACTIVE_CARD_CHANGED, EVENT_AUTOPLAY_AUDIO,
+            EVENT_NEW_CARD_AVAILABLE, EVENT_NEW_CARD_OPENED,
+            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, FEEDBACK_POPOVER_PATH,
+            INTERACTION_DISPLAY_MODE_INLINE,
+            INTERACTION_SPECS, NUM_EXPLORATIONS_PER_REVIEW_TEST,
+            PAGE_CONTEXT, SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
+            WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -403,10 +417,30 @@ oppia.directive('conversationSkin', [
             $scope.isLoggedIn = userInfo.isLoggedIn();
           });
 
+          $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl();
+          if ($scope.collectionId) {
+            ReadOnlyCollectionBackendApiService
+              .loadCollection($scope.collectionId)
+              .then(function(collection) {
+                $scope.collectionTitle = collection.title;
+              });
+          } else {
+            $scope.collectionTitle = null;
+          }
+
           $scope.getFeedbackPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
               FEEDBACK_POPOVER_PATH);
           };
+
+          var alwaysAskLearnerForAnswerDetails = (
+            ExplorationEngineService.getAlwaysAskLearnerForAnswerDetails);
+
+          $scope.canAskLearnerForAnswerInfo = (
+            LearnerAnswerInfoService.canAskLearnerForAnswerInfo);
+
+          var initLearnerAnswerInfoService = (
+            LearnerAnswerInfoService.initLearnerAnswerInfoService);
 
           var hasInteractedAtLeastOnce = false;
           $scope.answerIsBeingProcessed = false;
@@ -478,7 +512,7 @@ oppia.directive('conversationSkin', [
           $scope.upcomingInlineInteractionHtml = null;
 
           $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
-            GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER;
+            DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 
           $scope.getContentFocusLabel = function(index) {
             return CONTENT_FOCUS_LABEL_PREFIX + index;
@@ -699,7 +733,7 @@ oppia.directive('conversationSkin', [
             // If the exploration is embedded, use the exploration language
             // as site language. If the exploration language is not supported
             // as site language, English is used as default.
-            var langCodes = constants.SUPPORTED_SITE_LANGUAGES.map(
+            var langCodes = SUPPORTED_SITE_LANGUAGES.map(
               function(language) {
                 return language.id;
               });
@@ -754,11 +788,11 @@ oppia.directive('conversationSkin', [
               // record their temporary progress.
               var collectionAllowsGuestProgress = (
                 WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
-                  GLOBALS.collectionId) !== -1);
+                  $scope.collectionId) !== -1);
               if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
                 GuestCollectionProgressService.
                   recordExplorationCompletedInCollection(
-                    GLOBALS.collectionId, $scope.explorationId);
+                    $scope.collectionId, $scope.explorationId);
               }
 
               if (ExplorationPlayerStateService.isInStoryChapterMode() &&
@@ -823,12 +857,36 @@ oppia.directive('conversationSkin', [
                 return;
               }
             }
+
+            if (!ExplorationPlayerStateService.isInQuestionMode() &&
+              !$scope.isInPreviewMode &&
+              ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
+              initLearnerAnswerInfoService(
+                $scope.explorationId, ExplorationEngineService.getState(),
+                answer, interactionRulesService,
+                alwaysAskLearnerForAnswerDetails());
+            }
+
             NumberAttemptsService.submitAttempt();
 
             $scope.answerIsBeingProcessed = true;
             hasInteractedAtLeastOnce = true;
 
             PlayerTranscriptService.addNewInput(answer, false);
+
+            if ($scope.canAskLearnerForAnswerInfo()) {
+              $timeout(function() {
+                PlayerTranscriptService.addNewResponse(
+                  LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion());
+                $scope.answerIsBeingProcessed = false;
+                $scope.$broadcast('helpCardAvailable', {
+                  helpCardHtml: (
+                    LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion()),
+                  hasContinueButton: false
+                });
+              }, 100);
+              return;
+            }
 
             var timeAtServerCall = new Date().getTime();
             PlayerPositionService.recordAnswerSubmission();
@@ -839,7 +897,8 @@ oppia.directive('conversationSkin', [
                   nextCard, refreshInteraction, feedbackHtml,
                   feedbackAudioTranslations, refresherExplorationId,
                   missingPrerequisiteSkillId, remainOnCurrentCard,
-                  wasOldStateInitial, isFirstHit, isFinalQuestion, focusLabel) {
+                  taggedSkillMisconceptionId, wasOldStateInitial,
+                  isFirstHit, isFinalQuestion, focusLabel) {
                 $scope.nextCard = nextCard;
                 if (!_editorPreviewMode &&
                     !ExplorationPlayerStateService.isInQuestionMode()) {
@@ -868,7 +927,8 @@ oppia.directive('conversationSkin', [
                 } else {
                   QuestionPlayerStateService.answerSubmitted(
                     QuestionPlayerEngineService.getCurrentQuestion(),
-                    !remainOnCurrentCard);
+                    !remainOnCurrentCard,
+                    taggedSkillMisconceptionId);
                 }
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
@@ -908,8 +968,8 @@ oppia.directive('conversationSkin', [
                     }
                     if (missingPrerequisiteSkillId) {
                       $scope.displayedCard.markAsCompleted();
-                      ConceptCardBackendApiService.fetchConceptCard(
-                        missingPrerequisiteSkillId
+                      ConceptCardBackendApiService.loadConceptCards(
+                        [missingPrerequisiteSkillId]
                       ).then(function(conceptCardBackendDict) {
                         $scope.conceptCard =
                           ConceptCardObjectFactory.createFromBackendDict(
@@ -1191,8 +1251,6 @@ oppia.directive('conversationSkin', [
             });
           }
 
-          $scope.collectionId = GLOBALS.collectionId;
-          $scope.collectionTitle = GLOBALS.collectionTitle;
           $scope.collectionSummary = null;
 
           if ($scope.collectionId) {

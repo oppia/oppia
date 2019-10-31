@@ -16,7 +16,7 @@
  * @fileoverview Directive for the feedback popup.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -36,9 +36,7 @@ require('services/stateful/FocusManagerService.ts');
 //
 // The state-name argument is optional. If it is not provided, the feedback is
 // assumed to apply to the exploration as a whole.
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('feedbackPopup', [
+angular.module('oppia').directive('feedbackPopup', [
   'ExplorationEngineService', 'UrlInterpolationService',
   function(ExplorationEngineService, UrlInterpolationService) {
     return {

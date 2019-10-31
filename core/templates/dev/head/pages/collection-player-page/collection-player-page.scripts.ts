@@ -16,12 +16,19 @@
  * @fileoverview Directives required in collection player.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/collection-player-page/collection-player-page.module.ts');
 require('App.ts');
 
+require('base-components/base-content.directive.ts');
 require(
   'pages/collection-player-page/collection-footer/' +
   'collection-footer.directive.ts');
 require(
   'pages/collection-player-page/collection-local-nav/' +
   'collection-local-nav.directive.ts');
+require(
+  'pages/collection-player-page/collection-navbar/' +
+  'collection-navbar.directive.ts');
 require('pages/collection-player-page/collection-player-page.directive.ts');

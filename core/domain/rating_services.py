@@ -15,13 +15,17 @@
 # limitations under the License.
 
 """System for assigning and displaying ratings of explorations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
 from core.domain import event_services
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.platform import models
 import feconf
+import python_utils
 
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
@@ -52,7 +56,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         raise ValueError('Expected a rating 1-5, received %s.' % new_rating)
 
     try:
-        exp_services.get_exploration_by_id(exploration_id)
+        exp_fetchers.get_exploration_by_id(exploration_id)
     except:
         raise Exception('Invalid exploration id %s' % exploration_id)
 
@@ -74,13 +78,13 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         return old_rating
     old_rating = transaction_services.run_in_transaction(_update_user_rating)
 
-    exploration_summary = exp_services.get_exploration_summary_by_id(
+    exploration_summary = exp_fetchers.get_exploration_summary_by_id(
         exploration_id)
     if not exploration_summary.ratings:
         exploration_summary.ratings = feconf.get_empty_ratings()
-    exploration_summary.ratings[str(new_rating)] += 1
+    exploration_summary.ratings[python_utils.UNICODE(new_rating)] += 1
     if old_rating:
-        exploration_summary.ratings[str(old_rating)] -= 1
+        exploration_summary.ratings[python_utils.UNICODE(old_rating)] -= 1
 
     event_services.RateExplorationEventHandler.record(
         exploration_id, user_id, new_rating, old_rating)
@@ -140,5 +144,5 @@ def get_overall_ratings_for_exploration(exploration_id):
         values are nonnegative integers representing the frequency counts
         of each rating.
     """
-    exp_summary = exp_services.get_exploration_summary_by_id(exploration_id)
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(exploration_id)
     return exp_summary.ratings

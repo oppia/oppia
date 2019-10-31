@@ -15,13 +15,17 @@
 # limitations under the License.
 
 """Tests for generic controller behavior."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import importlib
 import inspect
 import json
 import logging
 import os
 import re
+import sys
 import types
 
 from constants import constants
@@ -34,8 +38,10 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import main
+import python_utils
 import utils
 
+from mapreduce import main as mapreduce_main
 import webapp2
 import webtest
 
@@ -44,6 +50,26 @@ current_user_services = models.Registry.import_current_user_services()
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
+
+
+class UniqueTemplateNamesTests(test_utils.GenericTestBase):
+    """Tests to ensure that all template filenames in
+    core/templates/dev/head/pages have unique filenames. This is required
+    for the backend tests to work correctly since they fetch templates
+    from this directory based on name of the template. For details, refer
+    get_filepath_from_filename function in test_utils.py.
+    """
+
+    def test_template_filenames_are_unique(self):
+        templates_dir = os.path.join(
+            'core', 'templates', 'dev', 'head', 'pages')
+        all_template_names = []
+        for root, _, filenames in os.walk(templates_dir):
+            template_filenames = [
+                filename for filename in filenames if filename.endswith(
+                    '.html')]
+            all_template_names = all_template_names + template_filenames
+        self.assertEqual(len(all_template_names), len(set(all_template_names)))
 
 
 class BaseHandlerTests(test_utils.GenericTestBase):
@@ -72,6 +98,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.values['iframed'] = True
             self.render_template('invalid_page.html')
 
+    class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
+        def get(self):
+            """Handles GET requests."""
+            pass
+
+    class MockHandlerForTestingAuthorizationWrapper(base.BaseHandler):
+
+        def get(self):
+            """Handles GET requests."""
+            pass
+
     def setUp(self):
         super(BaseHandlerTests, self).setUp()
         self.signup('user@example.com', 'user')
@@ -87,21 +124,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.signup(self.TEST_CREATOR_EMAIL, self.TEST_CREATOR_USERNAME)
         self.signup(self.TEST_EDITOR_EMAIL, self.TEST_EDITOR_USERNAME)
 
-    def test_dev_indicator_appears_in_dev_and_not_in_production(self):
-        """Test dev indicator appears in dev and not in production."""
-
-        with self.swap(constants, 'DEV_MODE', True):
-            response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertIn(
-                '<div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>',
-                response.body)
-
-        with self.swap(constants, 'DEV_MODE', False):
-            response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertIn(
-                '<div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>',
-                response.body)
-
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 
@@ -113,6 +135,16 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             else:
                 url = route.template
             url = re.sub('<([^/^:]+)>', 'abc123', url)
+
+            # This url is ignored since it is only needed for a protractor test.
+            # The backend tests fetch templates from
+            # core/templates/dev/head/pages instead of webpack_bundles since we
+            # skip webpack compilation for backend tests.
+            # The console_errors.html template is present in
+            # core/templates/dev/head/tests and we want one canonical
+            # directory for retrieving templates so we ignore this url.
+            if url == '/console_errors':
+                continue
 
             # Some of these will 404 or 302. This is expected.
             self.get_response_without_checking_for_errors(
@@ -289,6 +321,188 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'Uh-oh! The Oppia exploration you requested may have been removed '
             'or deleted.', response.body)
 
+    def test_dev_mode_cannot_be_true_on_production(self):
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['feconf']
+        server_software_swap = self.swap(
+            os, 'environ', {'SERVER_SOFTWARE': 'Production'})
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'DEV_MODE can\'t be true on production.')
+        with assert_raises_regexp_context_manager, server_software_swap:
+            # This pragma is needed since we are re-importing under
+            # invalid conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import feconf  # pylint: disable-all
+
+    def test_valid_pillow_path(self):
+        # We need to re-import appengine_config here to make it look like a
+        # local variable so that we can again re-import appengine_config later.
+        import appengine_config
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'Invalid path for oppia_tools library: invalid_path')
+
+        def mock_os_path_join_for_pillow(*args):
+            """Mocks path for 'Pillow' with an invalid path. This is done by
+            substituting os.path.join to return an invalid path. This is
+            needed to test the scenario where the 'Pillow' path points
+            to a non-existent directory.
+            """
+            path = ''
+            if args[1] == 'Pillow-6.0.0':
+                return 'invalid_path'
+            else:
+                path = '/'.join(args)
+                return path
+
+        pil_path_swap = self.swap(os.path, 'join', mock_os_path_join_for_pillow)
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['appengine_config']
+
+        with assert_raises_regexp_context_manager, pil_path_swap:
+            # This pragma is needed since we are re-importing under
+            # invalid conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import appengine_config  # pylint: disable-all
+
+    def test_valid_third_party_library_path(self):
+        # We need to re-import appengine_config here to make it look like a
+        # local variable so that we can again re-import appengine_config later.
+        import appengine_config
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'Invalid path for third_party library: invalid_path')
+
+        def mock_os_path_join_for_third_party_lib(*args):
+            """Mocks path for third_party libs with an invalid path. This is
+            done by substituting os.path.join to return an invalid path. This is
+            needed to test the scenario where the third_party libs path points
+            to a non-existent directory.
+            """
+            path = ''
+            if args[1] == 'third_party':
+                return 'invalid_path'
+            else:
+                path = '/'.join(args)
+                return path
+
+        third_party_lib_path_swap = self.swap(
+            os.path, 'join', mock_os_path_join_for_third_party_lib)
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['appengine_config']
+
+        with assert_raises_regexp_context_manager, third_party_lib_path_swap:
+            # This pragma is needed since we are re-importing under
+            # invalid conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import appengine_config  # pylint: disable-all
+
+    def test_authorization_wrapper_with_x_app_engine_task_name(self):
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock', self.MockHandlerForTestingAuthorizationWrapper,
+                name='MockHandlerForTestingAuthorizationWrapper')],
+            debug=feconf.DEBUG,
+        ))
+
+        def mock_create_handlers_map():
+            return [('/mock', self.MockHandlerForTestingAuthorizationWrapper)]
+
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['main']
+        with self.swap(
+            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            # This pragma is needed since we are re-importing under
+            # different conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import main  # pylint: disable-all
+
+        headers_dict = {
+            'X-AppEngine-TaskName': b'taskname'
+        }
+        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
+        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
+
+        response = self.testapp.get('/mock', headers=headers_dict)
+        self.assertEqual(response.status_int, 200)
+
+    def test_authorization_wrapper_without_x_app_engine_task_name(self):
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock', self.MockHandlerForTestingAuthorizationWrapper,
+                name='MockHandlerForTestingAuthorizationWrapper')],
+            debug=feconf.DEBUG,
+        ))
+
+        def mock_create_handlers_map():
+            return [('/mock', self.MockHandlerForTestingAuthorizationWrapper)]
+
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['main']
+        with self.swap(
+            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            # This pragma is needed since we are re-importing under
+            # different conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import main  # pylint: disable-all
+
+        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
+        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
+        self.get_html_response('/mock', expected_status_int=403)
+
+    def test_ui_access_wrapper(self):
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/ui', self.MockHandlerForTestingUiAccessWrapper,
+                name='MockHandlerForTestingUiAccessWrapper')],
+            debug=feconf.DEBUG,
+        ))
+
+        def mock_create_handlers_map():
+            return [('/ui', self.MockHandlerForTestingUiAccessWrapper)]
+
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['main']
+        with self.swap(
+            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            # This pragma is needed since we are re-importing under
+            # different conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import main  # pylint: disable-all
+
+        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
+        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/ui')
+        self.get_html_response('/ui')
+
+    def test_frontend_error_handler(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.post_json('/frontend_errors', {'error': 'errors'})
+
+        self.assertEqual(observed_log_messages, ['Frontend error: errors'])
+
+    def test_redirect_oppia_test_server(self):
+        # The old demo server redirects to the new demo server.
+        response = self.get_html_response(
+            'https://oppiaserver.appspot.com/splash', expected_status_int=301)
+        self.assertEqual(
+            response.headers['Location'], 'https://oppiatestserver.appspot.com')
+
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
@@ -338,22 +552,11 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
             self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
                 'uid', token))
 
-    def test_redirect_oppia_test_server(self):
-        # The old demo server redirects to the new demo server.
-        self.get_html_response(
-            'https://oppiaserver.appspot.com/splash', expected_status_int=301)
-        self.get_html_response(
-            'https://oppiatestserver.appspot.com/splash')
-
 
 class EscapingTests(test_utils.GenericTestBase):
 
     class FakePage(base.BaseHandler):
         """Fake page for testing autoescaping."""
-
-        def get(self):
-            """Handles GET requests."""
-            self.render_template('tests/jinja_escaping.html')
 
         def post(self):
             """Handles POST requests."""
@@ -371,17 +574,6 @@ class EscapingTests(test_utils.GenericTestBase):
             [webapp2.Route('/fake', self.FakePage, name='FakePage')],
             debug=feconf.DEBUG,
         ))
-
-    def test_jinja_autoescaping(self):
-        dangerous_field_contents = '<[angular_tag]> x{{51 * 3}}y'
-        with self.swap(constants, 'DEV_MODE', dangerous_field_contents):
-            response = self.get_html_response('/fake')
-
-            self.assertIn('&lt;[angular_tag]&gt;', response.body)
-            self.assertNotIn('<[angular_tag]>', response.body)
-
-            self.assertIn('x{{51 * 3}}y', response.body)
-            self.assertNotIn('x153y', response.body)
 
     def test_special_char_escaping(self):
         response = self.testapp.post('/fake', params={})
@@ -546,8 +738,9 @@ class I18nDictsTests(test_utils.GenericTestBase):
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
         for filename in filenames:
-            with open(os.path.join(os.getcwd(), 'assets', 'i18n', filename),
-                      mode='r') as f:
+            with python_utils.open_file(
+                os.path.join(os.getcwd(), 'assets', 'i18n', filename),
+                mode='r') as f:
                 lines = f.readlines()
                 self.assertEqual(lines[0], '{\n')
                 self.assertEqual(lines[-1], '}\n')
@@ -604,7 +797,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         # HTML tags and Angular variable interpolations.
         master_tags_dict = {
             key: self._get_tags(value, key, 'en.json')
-            for key, value in master_translation_dict.iteritems()
+            for key, value in master_translation_dict.items()
         }
 
         mismatches = []
@@ -616,7 +809,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 continue
             translation_dict = json.loads(utils.get_file_contents(
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename)))
-            for key, value in translation_dict.iteritems():
+            for key, value in translation_dict.items():
                 tags = self._get_tags(value, key, filename)
                 if tags != master_tags_dict[key]:
                     mismatches.append('%s (%s): %s != %s' % (
@@ -670,8 +863,8 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
 
             # Following handler are present in base.py where acl_decorators
             # cannot be imported.
-            if (handler.__name__ == 'LogoutPage' or
-                    handler.__name__ == 'Error404Handler'):
+            if (handler.__name__ in (
+                    ('CsrfTokenHandler', 'Error404Handler', 'LogoutPage'))):
                 continue
 
             if handler.get != base.BaseHandler.get:
@@ -712,7 +905,7 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
 
         def get(self):
-            self.values.update(self.request.GET.items())
+            self.values.update(list(self.request.GET.items()))
             self.render_json(self.values)
 
     def test_get_items(self):
@@ -811,7 +1004,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
             self.render_template(
-                'pages/about-page/about-page.mainpage.html',
+                'about-page.mainpage.html',
                 iframe_restriction=iframe_restriction)
 
     def setUp(self):
@@ -856,8 +1049,7 @@ class SignUpTests(test_utils.GenericTestBase):
         during signup.
         """
         self.login('abc@example.com')
-        response = self.get_html_response(feconf.SIGNUP_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         response = self.get_html_response('/about', expected_status_int=302)
         self.assertIn('Logout', response.location)
@@ -877,9 +1069,7 @@ class SignUpTests(test_utils.GenericTestBase):
         after signup.
         """
         self.login('abc@example.com')
-        response = self.get_html_response(feconf.SIGNUP_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
-
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
@@ -887,4 +1077,18 @@ class SignUpTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token,
         )
 
-        self.get_html_response('/about')
+        self.get_html_response('/library')
+
+
+class CsrfTokenHandlerTests(test_utils.GenericTestBase):
+
+    def test_valid_token_is_returned(self):
+        """Test that a valid CSRF token is returned by
+        the handler.
+        """
+
+        response = self.get_json('/csrfhandler')
+        csrf_token = response['token']
+
+        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
+            None, csrf_token))

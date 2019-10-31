@@ -16,11 +16,9 @@
  * @fileoverview Directive for creating image links to a user's profile page.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('profileLinkImage', [
+angular.module('oppia').directive('profileLinkImage', [
   'UrlInterpolationService', 'SYSTEM_USER_IDS',
   function(UrlInterpolationService, SYSTEM_USER_IDS) {
     return {

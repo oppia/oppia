@@ -16,6 +16,14 @@
  * @fileoverview Unit tests for Solution Verification Service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+
 require('App.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -41,6 +49,7 @@ describe('Solution Verification Service', function() {
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
     angular.mock.module(function($provide) {
+      $provide.value('AngularNameService', new AngularNameService());
       $provide.constant('INTERACTION_SPECS', {
         TextInput: {
           display_mode: 'inline',
@@ -53,6 +62,12 @@ describe('Solution Verification Service', function() {
       });
     });
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   var ess, siis, scas, idc, sof, svs, see, IS, mockFunctions;
   var rootScope;

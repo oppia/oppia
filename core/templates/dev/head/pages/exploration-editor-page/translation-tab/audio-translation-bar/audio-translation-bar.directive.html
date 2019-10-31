@@ -31,7 +31,7 @@
             uib-tooltip="Record"
             tooltip-placement="above"
             ng-click="checkAndStartRecording()"
-            ng-disabled="!canVoiceover || cannotRecord"
+            ng-hide="!canVoiceover || cannotRecord"
             aria-label="Start recording"
             for="Recording">
       <i class="material-icons">&#xE029;</i>
@@ -42,7 +42,7 @@
             uib-tooltip="Upload"
             tooltip-placement="above"
             ng-click="openAddAudioTranslationModal()"
-            ng-disabled="!canVoiceover"
+            ng-hide="!canVoiceover"
             aria-label="Upload voiceovered file">
       <i class="material-icons">&#xE2C6;</i>
     </button>
@@ -142,7 +142,7 @@
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
             uib-tooltip="Upload audio"
             tooltip-placement="above"
-            ng-disabled="!canVoiceover"
+            ng-hide="!canVoiceover"
             ng-click="openAddAudioTranslationModal()">
       <i class="material-icons">&#xE2C6;</i>
     </button>
@@ -151,7 +151,7 @@
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
             uib-tooltip="Delete"
             tooltip-placement="above"
-            ng-disabled="!canVoiceover"
+            ng-hide="!canVoiceover"
             ng-click="openDeleteAudioTranslationModal()">
       <i class="material-icons">&#xE872;</i>
     </button>
@@ -160,7 +160,7 @@
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
             uib-tooltip="Audio needs update"
             tooltip-placement="above"
-            ng-disabled="!canVoiceover"
+            ng-hide="!canVoiceover"
             ng-click="toggleAudioNeedsUpdate()">
       <i class="material-icons">warning</i>
     </button>
@@ -169,7 +169,7 @@
     <button class="btn oppia-audio-button audio-update-needed-button oppia-audio-bar-button-transition"
             uib-tooltip="Audio does not need update"
             tooltip-placement="top"
-            ng-disabled="!canVoiceover"
+            ng-hide="!canVoiceover"
             ng-click="toggleAudioNeedsUpdate()">
       <i class="material-icons">warning</i>
     </button>
@@ -265,7 +265,7 @@
     border-radius: 3px;
     color: white;
     padding-left: 6px;
-    width: 63px;
+    width: 68px;
   }
   .oppia-cancel-button {
     background-color: #009688;

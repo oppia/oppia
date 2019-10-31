@@ -17,48 +17,47 @@
  *               help tab in the navbar.
  */
 
-var oppia = require('AppInit.ts').module;
+export class ExplorationEditorPageConstants {
+  public static EXPLORATION_TITLE_INPUT_FOCUS_LABEL =
+    'explorationTitleInputFocusLabel';
 
-oppia.constant(
-  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
-  'explorationTitleInputFocusLabel');
+  public static EVENT_EXPLORATION_PROPERTY_CHANGED =
+    'explorationPropertyChanged';
 
-oppia.constant(
-  'EVENT_EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
+  public static PARAM_ACTION_GET = 'get';
 
-oppia.constant(
-  'PARAM_ACTION_GET', 'get');
+  public static PARAM_ACTION_SET = 'set';
 
-oppia.constant(
-  'PARAM_ACTION_SET', 'set');
+  public static VOICEOVER_MODE = 'voiceoverMode';
 
-oppia.constant(
-  'VOICEOVER_MODE', 'voiceoverMode');
+  public static TRANSLATION_MODE = 'translationMode';
 
-oppia.constant(
-  'TRANSLATION_MODE', 'translationMode');
+  // When an unresolved answer's frequency exceeds this threshold, an
+  // exploration will be blocked from being published until the answer is
+  // resolved.
+  public static UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD = 5;
 
-// When an unresolved answer's frequency exceeds this threshold, an exploration
-// will be blocked from being published until the answer is resolved.
-oppia.constant(
-  'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
+  // Constant for audio recording time limit.
+  public static RECORDING_TIME_LIMIT = 300;
 
-// Constant for audio recording time limit.
-oppia.constant(
-  'RECORDING_TIME_LIMIT', 300);
+  public static IMPROVE_TYPE_INCOMPLETE = 'incomplete';
 
-oppia.constant(
-  'IMPROVE_TYPE_INCOMPLETE', 'incomplete');
+  public static DEFAULT_AUDIO_LANGUAGE = 'en';
 
-oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
+  public static INFO_MESSAGE_SOLUTION_IS_VALID =
+    'The solution is now valid!';
 
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
-  'The solution is now valid!');
+  public static INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE =
+    'The current solution is no longer valid.';
 
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
-  'The current solution is no longer valid.');
+  public static ACTION_ACCEPT_SUGGESTION = 'accept';
+  public static ACTION_REJECT_SUGGESTION = 'reject';
 
-oppia.constant('ACTION_ACCEPT_SUGGESTION', 'accept');
-oppia.constant('ACTION_REJECT_SUGGESTION', 'reject');
+  public static COMPONENT_NAME_DEFAULT_OUTCOME = 'default_outcome';
 
-oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
+  public static STATUS_COMPLIMENT = 'compliment';
+  public static STATUS_FIXED = 'fixed';
+  public static STATUS_IGNORED = 'ignored';
+  public static STATUS_NOT_ACTIONABLE = 'not_actionable';
+  public static STATUS_OPEN = 'open';
+}

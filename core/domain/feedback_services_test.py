@@ -13,6 +13,9 @@
 # limitations under the License.
 
 """Tests for feedback-related services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import json
 
 from core.domain import email_services
@@ -72,6 +75,28 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
             ):
             feedback_services.create_message(
                 'invalid_thread_id', 'user_id', None, None, 'Hello')
+
+    def test_create_message_with_no_message_count(self):
+        exp_id = '0'
+        thread_id = feedback_services.create_thread(
+            'exploration', exp_id, None, 'a subject', 'some text')
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread.message_count = None
+        thread.put()
+
+        recent_message = (
+            feedback_models.GeneralFeedbackMessageModel
+            .get_most_recent_message(thread_id))
+        self.assertEqual(recent_message.text, 'some text')
+
+        feedback_services.create_message(
+            thread_id, 'user_id', None, None, 'Hello')
+        recent_message = (
+            feedback_models.GeneralFeedbackMessageModel
+            .get_most_recent_message(thread_id))
+
+        self.assertEqual(recent_message.text, 'Hello')
 
     def test_status_of_newly_created_thread_is_open(self):
         exp_id = '0'
@@ -1068,8 +1093,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             thread_id = threadlist[0].id
 
             self.login(self.EDITOR_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response('/create/%s' % self.exploration.id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),

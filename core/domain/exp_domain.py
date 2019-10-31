@@ -20,7 +20,10 @@ Domain objects capture domain-specific logic and are agnostic of how the
 objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import copy
 import functools
 import re
@@ -34,6 +37,7 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -57,6 +61,10 @@ STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
 STATE_PROPERTY_INTERACTION_HINTS = 'hints'
 STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
+# Deprecated state properties.
+STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED = (
+    'content_ids_to_audio_translations')  # Deprecated in state schema v27.
+
 # These four properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
@@ -71,6 +79,9 @@ CMD_ADD_STATE = 'add_state'
 CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
+# This takes addition 'state_name', 'content_id', 'language_code' and
+# 'content_html' and 'translation_html' parameters.
+CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -140,7 +151,9 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_HINTS,
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
+        STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+        # Deprecated state properties.
+        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED)
 
     # The allowed list of exploration properties which can be used in
     # edit_exploration_property command.
@@ -166,6 +179,12 @@ class ExplorationChange(change_domain.BaseChange):
         'required_attribute_names': ['new_state_name', 'old_state_name'],
         'optional_attribute_names': []
     }, {
+        'name': CMD_ADD_TRANSLATION,
+        'required_attribute_names': [
+            'state_name', 'content_id', 'language_code', 'content_html',
+            'translation_html'],
+        'optional_attribute_names': []
+    }, {
         'name': CMD_EDIT_STATE_PROPERTY,
         'required_attribute_names': [
             'property_name', 'state_name', 'new_value'],
@@ -187,7 +206,7 @@ class ExplorationChange(change_domain.BaseChange):
     }]
 
 
-class ExplorationCommitLogEntry(object):
+class ExplorationCommitLogEntry(python_utils.OBJECT):
     """Value object representing a commit to an exploration."""
 
     def __init__(
@@ -256,7 +275,7 @@ class ExplorationCommitLogEntry(object):
         }
 
 
-class ExpVersionReference(object):
+class ExpVersionReference(python_utils.OBJECT):
     """Value object representing an exploration ID and a version number."""
 
     def __init__(self, exp_id, version):
@@ -288,7 +307,7 @@ class ExpVersionReference(object):
             ValidationError: One or more attributes of the ExpVersionReference
             are invalid.
         """
-        if not isinstance(self.exp_id, str):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a str, received %s' % self.exp_id)
 
@@ -297,7 +316,7 @@ class ExpVersionReference(object):
                 'Expected version to be an int, received %s' % self.version)
 
 
-class ExplorationVersionsDiff(object):
+class ExplorationVersionsDiff(python_utils.OBJECT):
     """Domain object for the difference between two versions of an Oppia
     exploration.
 
@@ -354,11 +373,11 @@ class ExplorationVersionsDiff(object):
         self.deleted_state_names = deleted_state_names
         self.new_to_old_state_names = new_to_old_state_names
         self.old_to_new_state_names = {
-            value: key for key, value in new_to_old_state_names.iteritems()
+            value: key for key, value in new_to_old_state_names.items()
         }
 
 
-class Exploration(object):
+class Exploration(python_utils.OBJECT):
     """Domain object for an Oppia exploration."""
 
     def __init__(
@@ -412,12 +431,12 @@ class Exploration(object):
         self.init_state_name = init_state_name
 
         self.states = {}
-        for (state_name, state_dict) in states_dict.iteritems():
+        for (state_name, state_dict) in states_dict.items():
             self.states[state_name] = state_domain.State.from_dict(state_dict)
 
         self.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in param_specs_dict.iteritems()
+            for (ps_name, ps_val) in param_specs_dict.items()
         }
         self.param_changes = [
             param_domain.ParamChange.from_dict(param_change_dict)
@@ -506,7 +525,7 @@ class Exploration(object):
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
-            (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
+            (ps_name, ps_val) in exploration_dict['param_specs'].items()
         }
 
         exploration.states_schema_version = exploration_dict[
@@ -517,7 +536,7 @@ class Exploration(object):
             state_name for state_name in exploration_dict['states']
             if state_name != init_state_name])
 
-        for (state_name, sdict) in exploration_dict['states'].iteritems():
+        for (state_name, sdict) in exploration_dict['states'].items():
             state = exploration.states[state_name]
 
             state.content = state_domain.SubtitledHtml(
@@ -595,25 +614,25 @@ class Exploration(object):
             ValidationError: One or more attributes of the Exploration are
             invalid.
         """
-        if not isinstance(self.title, basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the exploration title', allow_empty=True)
 
-        if not isinstance(self.category, basestring):
+        if not isinstance(self.category, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the exploration category', allow_empty=True)
 
-        if not isinstance(self.objective, basestring):
+        if not isinstance(self.objective, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -625,7 +644,7 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected \'tags\' to be a list, received %s' % self.tags)
         for tag in self.tags:
-            if not isinstance(tag, basestring):
+            if not isinstance(tag, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received '
                     '\'%s\'' % tag)
@@ -633,7 +652,7 @@ class Exploration(object):
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(feconf.TAG_REGEX, tag):
+            if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
@@ -651,11 +670,11 @@ class Exploration(object):
         if len(set(self.tags)) != len(self.tags):
             raise utils.ValidationError('Some tags duplicate each other')
 
-        if not isinstance(self.blurb, basestring):
+        if not isinstance(self.blurb, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected blurb to be a string, received %s' % self.blurb)
 
-        if not isinstance(self.author_notes, basestring):
+        if not isinstance(self.author_notes, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected author_notes to be a string, received %s' %
                 self.author_notes)
@@ -680,7 +699,8 @@ class Exploration(object):
                 if not answer_group.outcome.dest:
                     raise utils.ValidationError(
                         'Every outcome should have a destination.')
-                if not isinstance(answer_group.outcome.dest, basestring):
+                if not isinstance(
+                        answer_group.outcome.dest, python_utils.BASESTRING):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % answer_group.outcome.dest)
@@ -689,7 +709,8 @@ class Exploration(object):
                     raise utils.ValidationError(
                         'Every outcome should have a destination.')
                 if not isinstance(
-                        state.interaction.default_outcome.dest, basestring):
+                        state.interaction.default_outcome.dest,
+                        python_utils.BASESTRING):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
@@ -704,7 +725,7 @@ class Exploration(object):
             raise utils.ValidationError(
                 'There is no state in %s corresponding to the exploration\'s '
                 'initial state name %s.' %
-                (self.states.keys(), self.init_state_name))
+                (list(self.states.keys()), self.init_state_name))
 
         if not isinstance(self.param_specs, dict):
             raise utils.ValidationError(
@@ -722,10 +743,10 @@ class Exploration(object):
                 '%s' % self.correctness_feedback_enabled)
 
         for param_name in self.param_specs:
-            if not isinstance(param_name, basestring):
+            if not isinstance(param_name, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected parameter name to be a string, received %s (%s).'
-                    % param_name, type(param_name))
+                    % (param_name, type(param_name)))
             if not re.match(feconf.ALPHANUMERIC_REGEX, param_name):
                 raise utils.ValidationError(
                     'Only parameter names with characters in [a-zA-Z0-9] are '
@@ -738,14 +759,15 @@ class Exploration(object):
                 % self.param_changes)
         for param_change in self.param_changes:
             param_change.validate()
-            if param_change.name not in self.param_specs:
-                raise utils.ValidationError(
-                    'No parameter named \'%s\' exists in this exploration'
-                    % param_change.name)
-            if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+
+            if param_change.name in constants.INVALID_PARAMETER_NAMES:
                 raise utils.ValidationError(
                     'The exploration-level parameter with name \'%s\' is '
                     'reserved. Please choose a different name.'
+                    % param_change.name)
+            if param_change.name not in self.param_specs:
+                raise utils.ValidationError(
+                    'No parameter named \'%s\' exists in this exploration'
                     % param_change.name)
 
         # TODO(sll): Find a way to verify the param change customization args
@@ -755,24 +777,24 @@ class Exploration(object):
         # link to this one?
 
         # Check that all state param changes are valid.
-        for state_name, state in self.states.iteritems():
+        for state_name, state in self.states.items():
             for param_change in state.param_changes:
                 param_change.validate()
+                if param_change.name in constants.INVALID_PARAMETER_NAMES:
+                    raise utils.ValidationError(
+                        'The parameter name \'%s\' is reserved. Please choose '
+                        'a different name for the parameter being set in '
+                        'state \'%s\'.' % (param_change.name, state_name))
                 if param_change.name not in self.param_specs:
                     raise utils.ValidationError(
                         'The parameter with name \'%s\' was set in state '
                         '\'%s\', but it does not exist in the list of '
                         'parameter specifications for this exploration.'
                         % (param_change.name, state_name))
-                if param_change.name in feconf.INVALID_PARAMETER_NAMES:
-                    raise utils.ValidationError(
-                        'The parameter name \'%s\' is reserved. Please choose '
-                        'a different name for the parameter being set in '
-                        'state \'%s\'.' % (param_change.name, state_name))
 
         # Check that all answer groups, outcomes, and param_changes are valid.
-        all_state_names = self.states.keys()
-        for state_name, state in self.states.iteritems():
+        all_state_names = list(self.states.keys())
+        for state_name, state in self.states.items():
             interaction = state.interaction
             default_outcome = interaction.default_outcome
 
@@ -820,12 +842,12 @@ class Exploration(object):
             try:
                 self._verify_all_states_reachable()
             except utils.ValidationError as e:
-                warnings_list.append(unicode(e))
+                warnings_list.append(python_utils.UNICODE(e))
 
             try:
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
-                warnings_list.append(unicode(e))
+                warnings_list.append(python_utils.UNICODE(e))
 
             if not self.title:
                 warnings_list.append(
@@ -840,13 +862,9 @@ class Exploration(object):
                     'An objective must be specified (in the \'Settings\' tab).'
                 )
 
-            if not self.language_code:
-                warnings_list.append(
-                    'A language must be specified (in the \'Settings\' tab).')
-
             # Check that self-loop outcomes are not labelled as correct.
-            all_state_names = self.states.keys()
-            for state_name, state in self.states.iteritems():
+            all_state_names = list(self.states.keys())
+            for state_name, state in self.states.items():
                 interaction = state.interaction
                 default_outcome = interaction.default_outcome
 
@@ -891,20 +909,18 @@ class Exploration(object):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            if curr_state_name in processed_queue:
-                continue
+            if not curr_state_name in processed_queue:
+                processed_queue.append(curr_state_name)
 
-            processed_queue.append(curr_state_name)
+                curr_state = self.states[curr_state_name]
 
-            curr_state = self.states[curr_state_name]
-
-            if not curr_state.interaction.is_terminal:
-                all_outcomes = curr_state.interaction.get_all_outcomes()
-                for outcome in all_outcomes:
-                    dest_state = outcome.dest
-                    if (dest_state not in curr_queue and
-                            dest_state not in processed_queue):
-                        curr_queue.append(dest_state)
+                if not curr_state.interaction.is_terminal:
+                    all_outcomes = curr_state.interaction.get_all_outcomes()
+                    for outcome in all_outcomes:
+                        dest_state = outcome.dest
+                        if (dest_state not in curr_queue and
+                                dest_state not in processed_queue):
+                            curr_queue.append(dest_state)
 
         if len(self.states) != len(processed_queue):
             unseen_states = list(
@@ -924,7 +940,7 @@ class Exploration(object):
         processed_queue = []
         curr_queue = []
 
-        for (state_name, state) in self.states.iteritems():
+        for (state_name, state) in self.states.items():
             if state.interaction.is_terminal:
                 curr_queue.append(state_name)
 
@@ -932,20 +948,18 @@ class Exploration(object):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            if curr_state_name in processed_queue:
-                continue
+            if not curr_state_name in processed_queue:
+                processed_queue.append(curr_state_name)
 
-            processed_queue.append(curr_state_name)
-
-            for (state_name, state) in self.states.iteritems():
-                if (state_name not in curr_queue
-                        and state_name not in processed_queue):
-                    all_outcomes = (
-                        state.interaction.get_all_outcomes())
-                    for outcome in all_outcomes:
-                        if outcome.dest == curr_state_name:
-                            curr_queue.append(state_name)
-                            break
+                for (state_name, state) in self.states.items():
+                    if (state_name not in curr_queue
+                            and state_name not in processed_queue):
+                        all_outcomes = (
+                            state.interaction.get_all_outcomes())
+                        for outcome in all_outcomes:
+                            if outcome.dest == curr_state_name:
+                                curr_queue.append(state_name)
+                                break
 
         if len(self.states) != len(processed_queue):
             dead_end_states = list(
@@ -953,6 +967,25 @@ class Exploration(object):
             raise utils.ValidationError(
                 'It is impossible to complete the exploration from the '
                 'following states: %s' % ', '.join(dead_end_states))
+
+    def get_content_html(self, state_name, content_id):
+        """Return the content for a given content id of a state.
+
+        Args:
+            state_name: str. The name of the state.
+            content_id: str. The id of the content.
+
+        Returns:
+            str. The html content corresponding to the given content id of a
+            state.
+
+        Raises:
+            ValueError: The given state_name does not exist.
+        """
+        if state_name not in self.states:
+            raise ValueError('State %s does not exist' % state_name)
+
+        return self.states[state_name].get_content_html(content_id)
 
     # Derived attributes of an exploration.
     @property
@@ -972,7 +1005,7 @@ class Exploration(object):
             dict. Dict of parameter specs.
         """
         return {ps_name: ps_val.to_dict()
-                for (ps_name, ps_val) in self.param_specs.iteritems()}
+                for (ps_name, ps_val) in self.param_specs.items()}
 
     @property
     def param_change_dicts(self):
@@ -1003,6 +1036,29 @@ class Exploration(object):
             bool. True is the current exploration is a demo exploration.
         """
         return self.is_demo_exploration_id(self.id)
+
+    def has_state_name(self, state_name):
+        """Whether the exploration has a state with the given state name.
+
+        Args:
+            state_name: str. The name of the state.
+
+        Returns:
+            bool. Returns true if the exploration has the given state name.
+        """
+        state_names = list(self.states.keys())
+        return state_name in state_names
+
+    def get_interaction_id_by_state_name(self, state_name):
+        """Returns the interaction id of the state.
+
+        Args:
+            state_name: str. The name of the state.
+
+        Returns:
+            str or None. The ID of the interaction.
+        """
+        return self.states[state_name].interaction.id
 
     def update_title(self, title):
         """Update the exploration title.
@@ -1070,20 +1126,16 @@ class Exploration(object):
         """
         self.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in param_specs_dict.iteritems()
+            for (ps_name, ps_val) in param_specs_dict.items()
         }
 
-    def update_param_changes(self, param_changes_list):
+    def update_param_changes(self, param_changes):
         """Update the param change dict.
 
         Args:
-           param_changes_list: list(dict). List of dict where each dict is
-                used to initialize a ParamChange domain object.
+           param_changes: list(ParamChange). List of ParamChange objects.
         """
-        self.param_changes = [
-            param_domain.ParamChange.from_dict(param_change)
-            for param_change in param_changes_list
-        ]
+        self.param_changes = param_changes
 
     def update_init_state_name(self, init_state_name):
         """Update the name for the initial state of the exploration.
@@ -1095,7 +1147,7 @@ class Exploration(object):
             raise Exception(
                 'Invalid new initial state name: %s; '
                 'it is not in the list of states %s for this '
-                'exploration.' % (init_state_name, self.states.keys()))
+                'exploration.' % (init_state_name, list(self.states.keys())))
         self.init_state_name = init_state_name
 
     def update_auto_tts_enabled(self, auto_tts_enabled):
@@ -1201,6 +1253,25 @@ class Exploration(object):
 
         del self.states[state_name]
 
+    def get_translatable_text(self, language_code):
+        """Returns all the contents which needs translation in the given
+        language.
+
+        Args:
+            language_code: str. The language code in which translation is
+                required.
+
+        Returns:
+            dict(str, dict(str, str)). A dict where state_name is the key and a
+            dict with content_id as the key and html content as value.
+        """
+        state_names_to_content_id_mapping = {}
+        for state_name, state in self.states.items():
+            state_names_to_content_id_mapping[state_name] = (
+                state.get_content_id_mapping_needing_translations(
+                    language_code))
+
+        return state_names_to_content_id_mapping
 
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
@@ -1263,6 +1334,56 @@ class Exploration(object):
 
         return trainable_states_dict
 
+    def get_languages_with_complete_translation(self):
+        """Returns a list of language code in which the exploration translation
+        is 100%.
+
+        Return:
+            list(str). A list of language code in which the translation for the
+            exploration is complete i.e, 100%.
+        """
+        content_count = self.get_content_count()
+        language_code_list = []
+        for language_code, count in self.get_translation_counts().items():
+            if count == content_count:
+                language_code_list.append(language_code)
+
+        return language_code_list
+
+    def get_translation_counts(self):
+        """Returns a dict representing the number of translations available in a
+        language for which there exists at least one translation in the
+        exploration.
+
+        Returns:
+            dict(str, int). A dict with language code as a key and number of
+            translation available in that language as the value.
+        """
+        exploration_translation_counts = collections.defaultdict(int)
+        for state in self.states.values():
+            state_translation_counts = state.get_translation_counts()
+            for language, count in state_translation_counts.items():
+                exploration_translation_counts[language] += count
+
+        return dict(exploration_translation_counts)
+
+    def get_content_count(self):
+        """Returns the total number of distinct content fields available in the
+        exploration which are user facing and can be translated into
+        different languages.
+
+        (The content field includes state content, feedback, hints, solutions.)
+
+        Return:
+            int. The total number of distinct content fields available inside
+            the exploration.
+        """
+        content_count = 0
+        for state in self.states.values():
+            content_count += state.get_content_count()
+
+        return content_count
+
     @classmethod
     def _convert_states_v0_dict_to_v1_dict(cls, states_dict):
         """Converts old states schema to the modern v1 schema. v1 contains the
@@ -1280,7 +1401,7 @@ class Exploration(object):
             dict. The converted states_dict.
         """
         # Ensure widgets are renamed to be interactions.
-        for _, state_defn in states_dict.iteritems():
+        for _, state_defn in states_dict.items():
             if 'widget' not in state_defn:
                 continue
             state_defn['interaction'] = copy.deepcopy(state_defn['widget'])
@@ -1323,7 +1444,7 @@ class Exploration(object):
         # reached from other states, etc.).
         targets_end_state = False
         has_end_state = False
-        for (state_name, sdict) in states_dict.iteritems():
+        for (state_name, sdict) in states_dict.items():
             if not has_end_state and state_name == old_end_dest:
                 has_end_state = True
 
@@ -1938,7 +2059,8 @@ class Exploration(object):
 
             for index, answer_group in enumerate(
                     state_dict['interaction']['answer_groups']):
-                content_id = 'feedback_' + str(index + 1)
+                content_id = 'feedback_' + python_utils.convert_to_bytes(
+                    index + 1)
                 content_ids_to_audio_translations[content_id] = (
                     answer_group['outcome']['feedback'].pop(
                         'audio_translations'))
@@ -1952,7 +2074,7 @@ class Exploration(object):
                 default_outcome['feedback']['content_id'] = (content_id)
 
             for index, hint in enumerate(state_dict['interaction']['hints']):
-                content_id = 'hint_' + str(index + 1)
+                content_id = 'hint_' + python_utils.convert_to_bytes(index + 1)
                 content_ids_to_audio_translations[content_id] = (
                     hint['hint_content'].pop('audio_translations'))
                 hint['hint_content']['content_id'] = content_id
@@ -1981,7 +2103,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        for key, state_dict in states_dict.iteritems():
+        for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict, html_validation_service.convert_to_textangular)
         return states_dict
@@ -1998,7 +2120,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        for key, state_dict in states_dict.iteritems():
+        for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict, html_validation_service.add_caption_attr_to_image)
         return states_dict
@@ -2016,7 +2138,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        for key, state_dict in states_dict.iteritems():
+        for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict, html_validation_service.convert_to_ckeditor)
         return states_dict
@@ -2035,7 +2157,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        for key, state_dict in states_dict.iteritems():
+        for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
                 html_validation_service.add_dimensions_to_image_tags, # pylint: disable=line-too-long
                 exp_id)
@@ -2099,7 +2221,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in states_dict.itervalues():
+        for state_dict in states_dict.values():
             state_content_id_list = []
 
             # Add state card's content id into the state_content_id_list.
@@ -2161,7 +2283,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in states_dict.itervalues():
+        for state_dict in states_dict.values():
             state_dict['recorded_voiceovers'] = {
                 'voiceovers_mapping': (
                     state_dict.pop('content_ids_to_audio_translations'))
@@ -2177,14 +2299,36 @@ class Exploration(object):
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initalize a
+                respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in states_dict.itervalues():
+        for state_dict in states_dict.values():
             state_dict['solicit_answer_details'] = False
+        return states_dict
+
+    @classmethod
+    def _convert_states_v29_dict_to_v30_dict(cls, states_dict):
+        """Converts from version 29 to 30. Version 30 replaces
+        tagged_misconception_id with tagged_skill_misconception_id, which
+        contains the skill id and misconception id of the tagged misconception,
+        connected by '-'.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['tagged_skill_misconception_id'] = None
+                del answer_group['tagged_misconception_id']
         return states_dict
 
     @classmethod
@@ -2222,7 +2366,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 34
+    CURRENT_EXP_SCHEMA_VERSION = 35
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2285,7 +2429,7 @@ class Exploration(object):
         """
         exploration_dict['schema_version'] = 4
 
-        for _, state_defn in exploration_dict['states'].iteritems():
+        for _, state_defn in exploration_dict['states'].items():
             state_defn['interaction'] = copy.deepcopy(state_defn['widget'])
             state_defn['interaction']['id'] = copy.deepcopy(
                 state_defn['interaction']['widget_id'])
@@ -2837,6 +2981,29 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v34_dict_to_v35_dict(cls, exploration_dict):
+        """Converts a v34 exploration dict into a v35 exploration dict.
+        Replaces tagged_misconception_id with tagged_skill_misconception_id,
+        which contains the skill id and misconception id of the tagged
+        misconception, connected by '-'.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v34.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v35.
+        """
+        exploration_dict['schema_version'] = 35
+
+        exploration_dict['states'] = cls._convert_states_v29_dict_to_v30_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 30
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3039,6 +3206,11 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 34
 
+        if exploration_schema_version == 34:
+            exploration_dict = cls._convert_v34_dict_to_v35_dict(
+                exploration_dict)
+            exploration_schema_version = 35
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -3116,7 +3288,7 @@ class Exploration(object):
         # YAML representation.
         del exp_dict['id']
 
-        return utils.yaml_from_dict(exp_dict)
+        return python_utils.yaml_from_dict(exp_dict)
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
@@ -3141,7 +3313,7 @@ class Exploration(object):
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'states': {state_name: state.to_dict()
-                       for (state_name, state) in self.states.iteritems()}
+                       for (state_name, state) in self.states.items()}
         })
 
     def to_player_dict(self):
@@ -3161,6 +3333,7 @@ class Exploration(object):
                 - states: dict. Keys are states names and values are dict
                     representation of State domain object.
                 - title: str. The exploration title.
+                - objective: str. The exploration objective.
                 - language_code: str. The language code of the exploration.
                 - correctness_feedback_enabled: str. Whether to show correctness
                     feedback.
@@ -3171,22 +3344,13 @@ class Exploration(object):
             'param_specs': self.param_specs_dict,
             'states': {
                 state_name: state.to_dict()
-                for (state_name, state) in self.states.iteritems()
+                for (state_name, state) in self.states.items()
             },
             'title': self.title,
+            'objective': self.objective,
             'language_code': self.language_code,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
         }
-
-    def get_interaction_ids(self):
-        """Gets all interaction ids used in this exploration.
-
-        Returns:
-            list(str). The list of interaction ids.
-        """
-        return list(set([
-            state.interaction.id for state in self.states.itervalues()
-            if state.interaction.id is not None]))
 
     def get_all_html_content_strings(self):
         """Gets all html content strings used in this exploration.
@@ -3195,7 +3359,7 @@ class Exploration(object):
             list(str). The list of html content strings.
         """
         html_list = []
-        for state in self.states.itervalues():
+        for state in self.states.values():
             content_html = state.content.html
             interaction_html_list = (
                 state.interaction.get_all_html_content_strings())
@@ -3204,7 +3368,7 @@ class Exploration(object):
         return html_list
 
 
-class ExplorationSummary(object):
+class ExplorationSummary(python_utils.OBJECT):
     """Domain object for an Oppia exploration summary."""
 
     def __init__(
@@ -3281,25 +3445,25 @@ class ExplorationSummary(object):
             ValidationError: One or more attributes of the ExplorationSummary
                 are invalid.
         """
-        if not isinstance(self.title, basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the exploration title', allow_empty=True)
 
-        if not isinstance(self.category, basestring):
+        if not isinstance(self.category, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the exploration category', allow_empty=True)
 
-        if not isinstance(self.objective, basestring):
+        if not isinstance(self.objective, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -3311,7 +3475,7 @@ class ExplorationSummary(object):
             raise utils.ValidationError(
                 'Expected \'tags\' to be a list, received %s' % self.tags)
         for tag in self.tags:
-            if not isinstance(tag, basestring):
+            if not isinstance(tag, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received '
                     '\'%s\'' % tag)
@@ -3319,7 +3483,7 @@ class ExplorationSummary(object):
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(feconf.TAG_REGEX, tag):
+            if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
@@ -3362,7 +3526,7 @@ class ExplorationSummary(object):
                 'Expected scaled_average_rating to be float, received %s' % (
                     self.scaled_average_rating))
 
-        if not isinstance(self.status, basestring):
+        if not isinstance(self.status, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected status to be string, received %s' % self.status)
 
@@ -3375,7 +3539,7 @@ class ExplorationSummary(object):
             raise utils.ValidationError(
                 'Expected owner_ids to be list, received %s' % self.owner_ids)
         for owner_id in self.owner_ids:
-            if not isinstance(owner_id, basestring):
+            if not isinstance(owner_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each id in owner_ids to '
                     'be string, received %s' % owner_id)
@@ -3384,7 +3548,7 @@ class ExplorationSummary(object):
             raise utils.ValidationError(
                 'Expected editor_ids to be list, received %s' % self.editor_ids)
         for editor_id in self.editor_ids:
-            if not isinstance(editor_id, basestring):
+            if not isinstance(editor_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each id in editor_ids to '
                     'be string, received %s' % editor_id)
@@ -3394,7 +3558,7 @@ class ExplorationSummary(object):
                 'Expected voice_artist_ids to be list, received %s' % (
                     self.voice_artist_ids))
         for voice_artist_id in self.voice_artist_ids:
-            if not isinstance(voice_artist_id, basestring):
+            if not isinstance(voice_artist_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each id in voice_artist_ids to '
                     'be string, received %s' % voice_artist_id)
@@ -3403,7 +3567,7 @@ class ExplorationSummary(object):
             raise utils.ValidationError(
                 'Expected viewer_ids to be list, received %s' % self.viewer_ids)
         for viewer_id in self.viewer_ids:
-            if not isinstance(viewer_id, basestring):
+            if not isinstance(viewer_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
                     'be string, received %s' % viewer_id)
@@ -3413,7 +3577,7 @@ class ExplorationSummary(object):
                 'Expected contributor_ids to be list, received %s' % (
                     self.contributor_ids))
         for contributor_id in self.contributor_ids:
-            if not isinstance(contributor_id, basestring):
+            if not isinstance(contributor_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each id in contributor_ids to '
                     'be string, received %s' % contributor_id)

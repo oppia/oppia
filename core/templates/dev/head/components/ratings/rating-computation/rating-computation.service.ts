@@ -16,38 +16,47 @@
  * @fileoverview Service for computing the average rating.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('RatingComputationService', [function() {
-  var areRatingsShown = function(ratingFrequencies) {
-    var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
+export interface IRatingFrequencies {
+  [x: string]: number;
+}
 
-    var totalNumber = 0;
+@Injectable({
+  providedIn: 'root'
+})
+export class RatingComputationService {
+  static areRatingsShown(ratingFrequencies: IRatingFrequencies): boolean {
+    let MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS: number = 1;
+
+    let totalNumber: number = 0;
     for (var value in ratingFrequencies) {
       totalNumber += ratingFrequencies[value];
     }
 
     return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
-  };
+  }
 
-  return {
-    computeAverageRating: function(ratingFrequencies) {
-      if (!areRatingsShown(ratingFrequencies)) {
-        return undefined;
-      } else {
-        var totalNumber = 0;
-        var totalValue = 0.0;
-        for (var value in ratingFrequencies) {
-          totalValue += parseInt(value) * ratingFrequencies[value];
-          totalNumber += ratingFrequencies[value];
-        }
-
-        if (totalNumber === 0) {
-          return undefined;
-        }
-
-        return totalValue / totalNumber;
+  computeAverageRating(ratingFrequencies: IRatingFrequencies): number {
+    if (!RatingComputationService.areRatingsShown(ratingFrequencies)) {
+      return undefined;
+    } else {
+      var totalNumber = 0;
+      var totalValue = 0.0;
+      for (var value in ratingFrequencies) {
+        totalValue += parseInt(value) * ratingFrequencies[value];
+        totalNumber += ratingFrequencies[value];
       }
+
+      if (totalNumber === 0) {
+        return undefined;
+      }
+
+      return totalValue / totalNumber;
     }
-  };
-}]);
+  }
+}
+
+angular.module('oppia').factory(
+  'RatingComputationService', downgradeInjectable(RatingComputationService));

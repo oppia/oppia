@@ -15,7 +15,10 @@
 # limitations under the License.
 
 """Tests for subtopic page domain objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -115,33 +118,35 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     def test_get_subtopic_page_contents_by_id(self):
         self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 1)
-        content_ids_to_audio_translations_dict = {
-            'content': {
-                'en': {
-                    'filename': 'test.mp3',
-                    'file_size_bytes': 100,
-                    'needs_update': False
+        recorded_voiceovers = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'test.mp3',
+                        'file_size_bytes': 100,
+                        'needs_update': False
+                    }
                 }
             }
         }
         expected_page_contents_dict = {
-            'content_ids_to_audio_translations':
-                content_ids_to_audio_translations_dict,
             'subtitled_html': {
                 'content_id': 'content', 'html': '<p>hello world</p>'
             },
+            'recorded_voiceovers': recorded_voiceovers,
             'written_translations': {
                 'translations_mapping': {
                     'content': {}
                 }
             }
         }
-        self.subtopic_page.update_page_contents_html({
-            'html': '<p>hello world</p>',
-            'content_id': 'content'
-        })
+        self.subtopic_page.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': '<p>hello world</p>',
+                'content_id': 'content'
+            }))
         self.subtopic_page.update_page_contents_audio(
-            content_ids_to_audio_translations_dict)
+            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers))
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Updated page contents',
             [subtopic_page_domain.SubtopicPageChange({

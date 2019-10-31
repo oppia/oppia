@@ -20,9 +20,9 @@
  * page.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('FocusManagerService', [
+require('services/contextual/DeviceInfoService.ts');
+require('services/IdGenerationService.ts');
+angular.module('oppia').factory('FocusManagerService', [
   '$rootScope', '$timeout', 'DeviceInfoService', 'IdGenerationService',
   'LABEL_FOR_CLEARING_FOCUS',
   function(

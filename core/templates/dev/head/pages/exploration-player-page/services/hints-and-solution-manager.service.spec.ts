@@ -16,6 +16,16 @@
  * @fileoverview Unit tests for the Hints/Solution Manager service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// hints-and-solution-manager.service.spec.ts is upgraded to Angular 8.
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require(
@@ -31,6 +41,22 @@ describe('HintsAndSolutionManager service', function() {
   var EVENT_NEW_CARD_AVAILABLE;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     $timeout = $injector.get('$timeout');
     $rootScope = $injector.get('$rootScope');

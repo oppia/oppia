@@ -16,9 +16,7 @@
  * @fileoverview Service for mapping algorithmId to PredictionAlgorithmService.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('PredictionAlgorithmRegistryService', [
+angular.module('oppia').factory('PredictionAlgorithmRegistryService', [
   '$injector', function($injector) {
     /**
      * This mapping needs to be updated whenever a new prediction service needs

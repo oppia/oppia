@@ -13,9 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the skill editor page.
+ * @fileoverview Scripts for the skill editor page.
  */
 
+// These requires are needed before the module is bootstrapped since it
+// contains code for modules that are bootstrapped later as additional modules.
+require('interactions/codemirrorRequires.ts');
+
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/skill-editor-page/skill-editor-page.module.ts');
 require('App.ts');
 
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');

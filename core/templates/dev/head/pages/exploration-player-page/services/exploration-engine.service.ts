@@ -16,14 +16,14 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-require('domain/collection/GuestCollectionProgressService.ts');
-require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/collection/guest-collection-progress.service.ts');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ExplorationObjectFactory.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('expressions/ExpressionInterpolationService.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('pages/exploration-player-page/services/audio-preloader.service.ts');
@@ -33,21 +33,20 @@ require(
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('pages/exploration-player-page/services/learner-params.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
-require(
-  'pages/exploration-player-page/services/' +
-  'player-correctness-feedback-enabled.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
+require('services/ExplorationFeaturesBackendApiService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/UserService.ts');
+require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/interaction-specs.constants.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.
@@ -55,37 +54,27 @@ require('pages/interaction-specs.constants.ts');
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationEngineService', [
-  '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
+angular.module('oppia').factory('ExplorationEngineService', [
+  '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
-  'EditableExplorationBackendApiService', 'ExplorationHtmlFormatterService',
+  'ExplorationFeaturesBackendApiService', 'ExplorationHtmlFormatterService',
   'ExplorationObjectFactory', 'ExpressionInterpolationService',
-  'FocusManagerService', 'GuestCollectionProgressService',
-  'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
-  'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
+  'FocusManagerService', 'ImagePreloaderService', 'LearnerParamsService',
   'PlayerTranscriptService', 'ReadOnlyExplorationBackendApiService',
-  'StateCardObjectFactory', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService', 'UserService',
-  'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH', 'INTERACTION_SPECS',
-  'PAGE_CONTEXT', 'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
+  'StateCardObjectFactory', 'StatsReportingService', 'UrlService',
   function(
-      $http, $q, $rootScope, AlertsService, AnswerClassificationService,
+      $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
-      EditableExplorationBackendApiService, ExplorationHtmlFormatterService,
+      ExplorationFeaturesBackendApiService, ExplorationHtmlFormatterService,
       ExplorationObjectFactory, ExpressionInterpolationService,
-      FocusManagerService, GuestCollectionProgressService,
-      ImagePreloaderService, LanguageUtilService, LearnerParamsService,
-      NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
+      FocusManagerService, ImagePreloaderService, LearnerParamsService,
       PlayerTranscriptService, ReadOnlyExplorationBackendApiService,
-      StateCardObjectFactory, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService, UserService,
-      WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH, INTERACTION_SPECS,
-      PAGE_CONTEXT, WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
+      StateCardObjectFactory, StatsReportingService, UrlService) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
+    var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var answerIsBeingProcessed = false;
+    var alwaysAskLearnersForAnswerDetails = false;
 
     var exploration = null;
 
@@ -98,7 +87,14 @@ oppia.factory('ExplorationEngineService', [
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
     var initStateName = null;
-    var version = GLOBALS.explorationVersion;
+    var version = UrlService.getExplorationVersionFromUrl();
+    if (!_questionPlayerMode) {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(_explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    }
 
     var randomFromArray = function(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
@@ -234,6 +230,14 @@ oppia.factory('ExplorationEngineService', [
         labelForFocusTarget);
     };
 
+    var checkAlwaysAskLearnersForAnswerDetails = function() {
+      ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+        _explorationId).then(function(featuresData) {
+        alwaysAskLearnersForAnswerDetails = (
+          featuresData.always_ask_learners_for_answer_details);
+      });
+    };
+
     return {
       // This should only be used in editor preview mode. It sets the
       // exploration data from what's currently specified in the editor, and
@@ -296,6 +300,7 @@ oppia.factory('ExplorationEngineService', [
           ImagePreloaderService.init(exploration);
           ImagePreloaderService.kickOffImagePreloader(
             exploration.getInitialState().name);
+          checkAlwaysAskLearnersForAnswerDetails();
           _loadInitialState(successCallback);
         }
       },
@@ -307,6 +312,10 @@ oppia.factory('ExplorationEngineService', [
       },
       recordNewCardAdded: function() {
         currentStateName = nextStateName;
+      },
+      getState: function() {
+        var stateName = PlayerTranscriptService.getLastStateName();
+        return exploration.getState(stateName);
       },
       getExplorationId: function() {
         return _explorationId;
@@ -330,7 +339,6 @@ oppia.factory('ExplorationEngineService', [
         if (answerIsBeingProcessed) {
           return;
         }
-
         answerIsBeingProcessed = true;
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
@@ -387,7 +395,6 @@ oppia.factory('ExplorationEngineService', [
           AlertsService.addWarning('Expression parsing error.');
           return;
         }
-
         var newParams = (
           newState ? makeParams(
             oldParams, newState.paramChanges, [oldParams]) : oldParams);
@@ -439,13 +446,16 @@ oppia.factory('ExplorationEngineService', [
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, refresherExplorationId,
-          missingPrerequisiteSkillId, onSameCard,
+          missingPrerequisiteSkillId, onSameCard, null,
           (oldStateName === exploration.initStateName), isFirstHit, false,
           _nextFocusLabel);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;
+      },
+      getAlwaysAskLearnerForAnswerDetails: function() {
+        return alwaysAskLearnersForAnswerDetails;
       }
     };
   }

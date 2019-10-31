@@ -15,9 +15,11 @@
 """Funtions to create, accept, reject, update and perform other operations on
 suggestions.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import email_manager
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import suggestion_registry
 from core.domain import user_services
@@ -62,17 +64,27 @@ def create_suggestion(
     status = suggestion_models.STATUS_IN_REVIEW
 
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        exploration = exp_services.get_exploration_by_id(target_id)
+        exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+    elif suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        score_category = (
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        content_html = exploration.get_content_html(
+            change['state_name'], change['content_id'])
+        if content_html != change['content_html']:
+            raise Exception(
+                'The given content_html does not match the content of the '
+                'exploration.')
     elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
     else:
-        raise Exception('Invalid suggestion type')
+        raise Exception('Invalid suggestion type %s' % suggestion_type)
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
@@ -331,6 +343,46 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
          for s in suggestion_models.GeneralSuggestionModel
          .get_in_review_suggestions_in_score_categories(
              score_categories, user_id)])
+
+
+def get_reviewable_suggestions(user_id, suggestion_type):
+    """Returns a list of suggestions of given suggestion_type which the user
+    can review.
+
+    Args:
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of the suggestion.
+
+    Returns:
+        list(Suggestion). A list of suggestions which the given user is allowed
+            to review.
+    """
+    return ([
+        get_suggestion_from_model(s) for s in (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_suggestions_of_suggestion_type(
+                suggestion_type, user_id))
+    ])
+
+
+def get_submitted_suggestions(user_id, suggestion_type):
+    """Returns a list of suggestions of given suggestion_type which the user
+    has submitted.
+
+    Args:
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of the suggestion.
+
+    Returns:
+        list(Suggestion). A list of suggestions which the given user has
+        submitted.
+    """
+    return ([
+        get_suggestion_from_model(s) for s in (
+            suggestion_models.GeneralSuggestionModel
+            .get_user_created_suggestions_of_suggestion_type(
+                suggestion_type, user_id))
+    ])
 
 
 def get_all_scores_of_user(user_id):

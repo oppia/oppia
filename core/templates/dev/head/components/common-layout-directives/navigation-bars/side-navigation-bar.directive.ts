@@ -16,11 +16,9 @@
  * @fileoverview Directive for the side navigation bar.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('sideNavigationBar', [
+angular.module('oppia').directive('sideNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

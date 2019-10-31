@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Classes relating to value generators."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import inspect
@@ -22,10 +24,11 @@ import os
 import pkgutil
 
 import feconf
+import python_utils
 import utils
 
 
-class BaseValueGenerator(object):
+class BaseValueGenerator(python_utils.OBJECT):
     """Base value generator class.
 
     A value generator is a class containing a function that takes in
@@ -67,7 +70,7 @@ class BaseValueGenerator(object):
         raise NotImplementedError
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Maintains a registry of all the value generators.
 
     Attributes:

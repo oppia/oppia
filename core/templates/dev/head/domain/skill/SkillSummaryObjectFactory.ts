@@ -17,32 +17,35 @@
  * skill summary domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('SkillSummaryObjectFactory', [
-  function() {
-    var SkillSummary = function(skillId, skillDescription) {
-      this._id = skillId;
-      this._description = skillDescription;
-    };
+export class SkillSummary {
+  _id: string;
+  _description: string;
 
-    // Instance methods
-
-    SkillSummary.prototype.getId = function() {
-      return this._id;
-    };
-
-    SkillSummary.prototype.getDescription = function() {
-      return this._description;
-    };
-
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SkillSummary['create'] = function(skillId, skillDescription) {
-    /* eslint-enable dot-notation */
-      return new SkillSummary(skillId, skillDescription);
-    };
-
-    return SkillSummary;
+  constructor(skillId: string, skillDescription: string) {
+    this._id = skillId;
+    this._description = skillDescription;
   }
-]);
+  getId(): string {
+    return this._id;
+  }
+
+  getDescription(): string {
+    return this._description;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SkillSummaryObjectFactory {
+  create(skillId: string, skillDescription: string): SkillSummary {
+    return new SkillSummary(skillId, skillDescription);
+  }
+}
+
+angular.module('oppia').factory(
+  'SkillSummaryObjectFactory',
+  downgradeInjectable(SkillSummaryObjectFactory));

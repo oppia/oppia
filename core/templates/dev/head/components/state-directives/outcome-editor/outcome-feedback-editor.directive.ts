@@ -17,13 +17,11 @@
  */
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('outcomeFeedbackEditor', [
-  'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
-  function(SubtitledHtmlObjectFactory, UrlInterpolationService) {
+angular.module('oppia').directive('outcomeFeedbackEditor', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

@@ -16,25 +16,39 @@
  * @fileoverview Service to check if user is on a mobile device.
  */
 
-// See: https://stackoverflow.com/a/11381730
-var oppia = require('AppInit.ts').module;
 
-oppia.factory('DeviceInfoService', ['$window', function($window) {
-  return {
-    isMobileDevice: function() {
-      return Boolean(navigator.userAgent.match(/Android/i) ||
-         navigator.userAgent.match(/webOS/i) ||
-         navigator.userAgent.match(/iPhone/i) ||
-         navigator.userAgent.match(/iPad/i) ||
-         navigator.userAgent.match(/iPod/i) ||
-         navigator.userAgent.match(/BlackBerry/i) ||
-         navigator.userAgent.match(/Windows Phone/i));
-    },
-    isMobileUserAgent: function() {
-      return /Mobi/.test(navigator.userAgent);
-    },
-    hasTouchEvents: function() {
-      return 'ontouchstart' in $window;
-    }
-  };
-}]);
+
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { WindowRef } from 'services/contextual/WindowRefService';
+
+@Injectable({
+  providedIn: 'root'
+})
+// See: https://stackoverflow.com/a/11381730
+export class DeviceInfoService {
+  constructor(private window: WindowRef) {}
+
+  isMobileDevice(): boolean {
+    return Boolean(navigator.userAgent.match(/Android/i) ||
+        navigator.userAgent.match(/webOS/i) ||
+        navigator.userAgent.match(/iPhone/i) ||
+        navigator.userAgent.match(/iPad/i) ||
+        navigator.userAgent.match(/iPod/i) ||
+        navigator.userAgent.match(/BlackBerry/i) ||
+        navigator.userAgent.match(/Windows Phone/i));
+  }
+
+  isMobileUserAgent(): boolean {
+    return /Mobi/.test(navigator.userAgent);
+  }
+
+  hasTouchEvents(): boolean {
+    return 'ontouchstart' in this.window.nativeWindow;
+  }
+}
+
+angular.module('oppia').factory(
+  'DeviceInfoService',
+  downgradeInjectable(DeviceInfoService));

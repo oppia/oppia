@@ -19,20 +19,22 @@
 
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/RubricObjectFactory.ts');
 require('services/ValidatorsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SkillObjectFactory', [
-  'ConceptCardObjectFactory', 'MisconceptionObjectFactory', 'ValidatorsService',
+angular.module('oppia').factory('SkillObjectFactory', [
+  'ConceptCardObjectFactory', 'MisconceptionObjectFactory',
+  'RubricObjectFactory', 'ValidatorsService', 'SKILL_DIFFICULTIES',
   function(
-      ConceptCardObjectFactory, MisconceptionObjectFactory, ValidatorsService) {
+      ConceptCardObjectFactory, MisconceptionObjectFactory,
+      RubricObjectFactory, ValidatorsService, SKILL_DIFFICULTIES) {
     var Skill = function(
-        id, description, misconceptions, conceptCard, languageCode, version,
-        nextMisconceptionId, supersedingSkillId, allQuestionsMerged) {
+        id, description, misconceptions, rubrics, conceptCard, languageCode,
+        version, nextMisconceptionId, supersedingSkillId, allQuestionsMerged) {
       this._id = id;
       this._description = description;
       this._misconceptions = misconceptions;
+      this._rubrics = rubrics;
       this._conceptCard = conceptCard;
       this._languageCode = languageCode;
       this._version = version;
@@ -41,7 +43,7 @@ oppia.factory('SkillObjectFactory', [
       this._allQuestionsMerged = allQuestionsMerged;
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Skill['hasValidDescription'] = function(description) {
     /* eslint-enable dot-notation */
@@ -53,9 +55,14 @@ oppia.factory('SkillObjectFactory', [
 
     Skill.prototype.getValidationIssues = function() {
       var issues = [];
-      if (this.getConceptCard().getExplanation() === '') {
+      if (this.getConceptCard().getExplanation().getHtml() === '') {
         issues.push(
           'There should be review material in the concept card.');
+      }
+      if (this.getRubrics().length !== 3) {
+        issues.push(
+          'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
+          'in rubrics.');
       }
       return issues;
     };
@@ -66,6 +73,9 @@ oppia.factory('SkillObjectFactory', [
         description: this._description,
         misconceptions: this._misconceptions.map(function(misconception) {
           return misconception.toBackendDict();
+        }),
+        rubrics: this._rubrics.map(function(rubric) {
+          return rubric.toBackendDict();
         }),
         skill_contents: this._conceptCard.toBackendDict(),
         language_code: this._languageCode,
@@ -80,6 +90,7 @@ oppia.factory('SkillObjectFactory', [
       this._id = skill.getId();
       this._description = skill.getDescription();
       this._misconceptions = skill.getMisconceptions();
+      this._rubrics = skill.getRubrics();
       this._conceptCard = skill.getConceptCard();
       this._languageCode = skill.getLanguageCode();
       this._version = skill.getVersion();
@@ -88,7 +99,7 @@ oppia.factory('SkillObjectFactory', [
       this._allQuestionsMerged = skill.getAllQuestionsMerged();
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Skill['createFromBackendDict'] = function(skillBackendDict) {
     /* eslint-enable dot-notation */
@@ -96,6 +107,7 @@ oppia.factory('SkillObjectFactory', [
         skillBackendDict.id,
         skillBackendDict.description,
         generateMisconceptionsFromBackendDict(skillBackendDict.misconceptions),
+        generateRubricsFromBackendDict(skillBackendDict.rubrics),
         ConceptCardObjectFactory.createFromBackendDict(
           skillBackendDict.skill_contents),
         skillBackendDict.language_code,
@@ -108,13 +120,13 @@ oppia.factory('SkillObjectFactory', [
 
     // Create an interstitial skill that would be displayed in the editor until
     // the actual skill is fetched from the backend.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Skill['createInterstitialSkill'] = function() {
     /* eslint-enable dot-notation */
       return new Skill(null, 'Skill description loading',
-        [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en', 1,
-        0, null, false);
+        [], [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en',
+        1, 0, null, false);
     };
 
     var generateMisconceptionsFromBackendDict = function(
@@ -123,6 +135,12 @@ oppia.factory('SkillObjectFactory', [
           misconceptionsBackendDict) {
         return MisconceptionObjectFactory.createFromBackendDict(
           misconceptionsBackendDict);
+      });
+    };
+
+    var generateRubricsFromBackendDict = function(rubricBackendDicts) {
+      return rubricBackendDicts.map(function(rubricBackendDict) {
+        return RubricObjectFactory.createFromBackendDict(rubricBackendDict);
       });
     };
 
@@ -144,6 +162,10 @@ oppia.factory('SkillObjectFactory', [
 
     Skill.prototype.getMisconceptions = function() {
       return this._misconceptions.slice();
+    };
+
+    Skill.prototype.getRubrics = function() {
+      return this._rubrics.slice();
     };
 
     Skill.prototype.appendMisconception = function(newMisconception) {
@@ -195,6 +217,29 @@ oppia.factory('SkillObjectFactory', [
 
     Skill.prototype.getMisconceptionAtIndex = function(idx) {
       return this._misconceptions[idx];
+    };
+
+    Skill.prototype.getRubricExplanation = function(difficulty) {
+      for (var idx in this._rubrics) {
+        if (this._rubrics[idx].getDifficulty() === difficulty) {
+          return this._rubrics[idx].getExplanation();
+        }
+      }
+      return null;
+    };
+
+    Skill.prototype.updateRubricForDifficulty = function(
+        difficulty, explanation) {
+      if (SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
+        throw Error('Invalid difficulty value passed');
+      }
+      for (var idx in this._rubrics) {
+        if (this._rubrics[idx].getDifficulty() === difficulty) {
+          this._rubrics[idx].setExplanation(explanation);
+          return;
+        }
+      }
+      this._rubrics.push(RubricObjectFactory.create(difficulty, explanation));
     };
 
     return Skill;

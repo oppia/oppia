@@ -16,12 +16,10 @@
  * @fileoverview Directive that enables the user to upload audio files.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/IdGenerationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('audioFileUploader', [
+angular.module('oppia').directive('audioFileUploader', [
   'IdGenerationService', 'UrlInterpolationService',
   function(IdGenerationService, UrlInterpolationService) {
     return {
@@ -70,7 +68,7 @@ oppia.directive('audioFileUploader', [
           'audio-file-uploader-form' + IdGenerationService.generateNewId());
         angular.element(document).on(
           'change', '.' + scope.inputFieldClassName, function(evt) {
-            var file = evt.currentTarget.files[0];
+            var file = (<HTMLInputElement>evt.currentTarget).files[0];
             if (!file) {
               scope.onFileCleared();
               return;

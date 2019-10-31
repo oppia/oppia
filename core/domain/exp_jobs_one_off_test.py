@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for Exploration-related jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
@@ -23,15 +25,16 @@ import logging
 from constants import constants
 from core import jobs_registry
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
-from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (job_models, exp_models, base_models, classifier_models) = (
@@ -165,15 +168,15 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 self.admin_id,
                 title=default_spec['title'],
                 category=default_spec['category'])
-            exploration = exp_services.get_exploration_by_id(exp_id)
+            exploration = exp_fetchers.get_exploration_by_id(exp_id)
             exp_services.delete_exploration(self.admin_id, exp_id)
 
             # Get dummy explorations.
             num_exps = len(exp_specs)
             expected_job_output = {}
 
-            for ind in range(num_exps):
-                exp_id = str(ind)
+            for ind in python_utils.RANGE(num_exps):
+                exp_id = python_utils.convert_to_bytes(ind)
                 spec = default_spec
                 spec.update(exp_specs[ind])
 
@@ -182,7 +185,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 exploration.tags = ['computer science', 'analysis', 'a b c']
                 exp_services.save_new_exploration(self.admin_id, exploration)
 
-                exploration = exp_services.get_exploration_by_id(exp_id)
+                exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
                 rights_manager.assign_role_for_exploration(
                     self.admin, exp_id, self.voice_artist_id, 'voice artist')
@@ -201,7 +204,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 exp_rights_model = exp_models.ExplorationRightsModel.get(
                     exp_id)
 
-                exploration = exp_services.get_exploration_by_id(exp_id)
+                exploration = exp_fetchers.get_exploration_by_id(exp_id)
                 exploration_model_last_updated = exploration.last_updated
                 exploration_model_created_on = exploration.created_on
                 first_published_msec = (
@@ -263,7 +266,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             # Get and check job output.
             actual_job_output = exp_services.get_all_exploration_summaries()
             self.assertEqual(
-                actual_job_output.keys(), expected_job_output.keys())
+                list(actual_job_output.keys()),
+                list(expected_job_output.keys()))
 
             # Note: 'exploration_model_last_updated' is not expected to be the
             # same, because it is now read from the version model representing
@@ -349,7 +353,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(
             [self.user_a_id], exploration_summary.contributor_ids)
@@ -377,7 +381,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify that the length of the contributor list is one, and that
         # the list contains the user who made these commits.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(
             [self.user_a_id], exploration_summary.contributor_ids)
@@ -408,7 +412,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify that the committer list does not contain the user
         # who only reverted.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual([self.user_a_id], exploration_summary.contributor_ids)
 
@@ -425,7 +429,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         # Check that the system id was not added to the exploration's
         # contributor ids.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertNotIn(
             feconf.SYSTEM_COMMITTER_ID,
@@ -444,7 +448,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         # Check that the migration bot id was not added to the exploration's
         # contributor ids.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertNotIn(
             feconf.MIGRATION_BOT_USERNAME,
@@ -459,10 +463,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
-            check_error=True,
-            error_type=base_models.BaseModel.EntityNotFoundError,
-            error_msg='Entity for class ExpSummaryModel with id 100 not found',
-            function_to_be_called=exp_services.get_exploration_summary_by_id,
+            function_to_be_called=exp_fetchers.get_exploration_summary_by_id,
             exp_id=exp_id)
 
 
@@ -517,7 +518,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
 
         self.assertEqual(
@@ -556,7 +557,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
 
         # Check that the contributors_summary does not contains user_b_id.
@@ -604,7 +605,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Check that USER A's number of contributions is equal to 2.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(
             2, exploration_summary.contributors_summary[self.user_a_id])
@@ -635,7 +636,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         # Check that no system id was added to the exploration's
         # contributor's summary.
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
 
         for system_id in constants.SYSTEM_USER_IDS:
@@ -652,10 +653,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
-            check_error=True,
-            error_type=base_models.BaseModel.EntityNotFoundError,
-            error_msg='Entity for class ExpSummaryModel with id 100 not found',
-            function_to_be_called=exp_services.get_exploration_summary_by_id,
+            function_to_be_called=exp_fetchers.get_exploration_summary_by_id,
             exp_id=exp_id)
 
     def test_exploration_contributors_summary_job_output(self):
@@ -942,7 +940,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Verify the exploration is exactly the same after migration.
-        updated_exp = exp_services.get_exploration_by_id(self.VALID_EXP_ID)
+        updated_exp = exp_fetchers.get_exploration_by_id(self.VALID_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -963,7 +961,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Verify the new exploration has been migrated by the job.
-        updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        updated_exp = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -989,20 +987,20 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         # Ensure the exploration is deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+            exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
 
         # This running without errors indicates the deleted exploration is
-        # being ignored, since otherwise exp_services.get_exploration_by_id
+        # being ignored, since otherwise exp_fetchers.get_exploration_by_id
         # (used within the job) will raise an error.
         self.process_and_flush_pending_tasks()
 
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+            exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
     def test_exploration_migration_job_output(self):
         """Test that Exploration Migration job output is correct."""
@@ -1029,9 +1027,9 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         """
         self.save_new_exp_with_states_schema_v21(
             self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-        initial_state_name = exploration.states.keys()[0]
+        initial_state_name = list(exploration.states.keys())[0]
         # Store classifier model for the new exploration.
         classifier_model_id = classifier_models.ClassifierTrainingJobModel.create( # pylint: disable=line-too-long
             'TextClassifier', 'TextInput', self.NEW_EXP_ID, exploration.version,
@@ -1050,8 +1048,8 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
                     self.process_and_flush_pending_tasks()
 
-        new_exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
-        initial_state_name = new_exploration.states.keys()[0]
+        new_exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        initial_state_name = list(new_exploration.states.keys())[0]
         self.assertLess(exploration.version, new_exploration.version)
         classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
             self.NEW_EXP_ID, new_exploration.version,
@@ -1267,7 +1265,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         state1.update_interaction_customization_args(customization_args_dict1)
@@ -1315,7 +1313,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         state2.update_interaction_customization_args(customization_args_dict2)
@@ -1380,7 +1378,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         state1.update_interaction_customization_args(customization_args_dict)
@@ -1698,16 +1696,6 @@ class ExplorationContentValidationJobForCKEditorTests(
         """Tests that the exploration validation job validates the content
         without skipping any tags.
         """
-
-        # This mock should only be used for
-        # ExplorationContentValidationJobForCKEditor.
-        # The job finds invalid strings in an exploration.
-        # If we do not use the mock, some of the strings will be converted
-        # to a valid format during initialization of subtitled html
-        # in state.
-        def mock_convert_to_ckeditor(html_data):
-            return html_data
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exploration.add_states(['State1', 'State2', 'State3'])
@@ -1721,7 +1709,8 @@ class ExplorationContentValidationJobForCKEditorTests(
             )
         }
 
-        state1.update_content(content1_dict)
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1798,16 +1787,17 @@ class ExplorationContentValidationJobForCKEditorTests(
             'missing_prerequisite_skill_id': None
         }
 
-        mock_convert_to_ckeditor_context = self.swap(
-            html_validation_service, 'convert_to_ckeditor',
-            mock_convert_to_ckeditor)
         mock_validate_context = self.swap(
             state_domain.SubtitledHtml, 'validate', mock_validate)
 
-        with mock_validate_context, mock_convert_to_ckeditor_context:
-            state1.update_content(content1_dict)
-            state2.update_content(content2_dict)
-            state3.update_content(content3_dict)
+        with mock_validate_context:
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_content(
+                state_domain.SubtitledHtml.from_dict(content2_dict))
+            state3.update_content(
+                state_domain.SubtitledHtml.from_dict(content3_dict))
+
             state1.update_interaction_default_outcome(default_outcome_dict1)
             state2.update_interaction_default_outcome(default_outcome_dict2)
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1823,10 +1813,12 @@ class ExplorationContentValidationJobForCKEditorTests(
             .ExplorationContentValidationJobForCKEditor.get_output(job_id))
 
         expected_output = [
-            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\']]',
-            '[u\'ol\', [u\'ol\']]',
-            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\']]',
-            '[u\'p\', [u\'pre\']]',
+            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\', '
+            'u\'Exp Id: exp_id0\']]',
+            '[u\'ol\', [u\'ol\', u\'Exp Id: exp_id0\']]',
+            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\', '
+            'u\'Exp Id: exp_id0\']]',
+            '[u\'p\', [u\'pre\', u\'Exp Id: exp_id0\']]',
             (
                 '[u\'strings\', '
                 '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
@@ -1844,10 +1836,9 @@ class ExplorationContentValidationJobForCKEditorTests(
                 'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;lt;/pre&amp;'
                 'gt;&amp;quot;" heading-with-value="&amp;quot;lorem '
                 'ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
-                '</oppia-noninteractive-collapsible>\']]'
+                '</oppia-noninteractive-collapsible>\', u\'Exp Id: exp_id0\']]'
             )
         ]
-
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
@@ -1867,7 +1858,8 @@ class ExplorationContentValidationJobForCKEditorTests(
 
         with self.swap(
             state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(content_dict)
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content_dict))
             exp_services.save_new_exploration(self.albert_id, exploration)
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
@@ -1875,6 +1867,34 @@ class ExplorationContentValidationJobForCKEditorTests(
         run_job_for_deleted_exp(
             self,
             exp_jobs_one_off.ExplorationContentValidationJobForCKEditor)
+
+    def test_validation_job_fails_for_invalid_schema_version(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        exploration_model.states_schema_version = 100
+        exploration_model.commit(
+            self.albert_id, 'Changed states_schema_version.', [])
+        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForCKEditor.create_new())
+        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForCKEditor.get_output(job_id))
+        expected_output = [
+            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
+            'exploration state schemas at present. when loading exploration\', '
+            '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
+
+        self.assertEqual(actual_output, expected_output)
 
 
 class InteractionCustomizationArgsValidationJobTests(
@@ -1946,9 +1966,11 @@ class InteractionCustomizationArgsValidationJobTests(
         }
 
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(content1_dict)
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
             state2.update_interaction_default_outcome(default_outcome_dict2)
-            state3.update_content(content3_dict)
+            state3.update_content(
+                state_domain.SubtitledHtml.from_dict(content3_dict))
             exp_services.save_new_exploration(self.albert_id, exploration)
 
             # Start CustomizationArgsValidation job on sample exploration.
@@ -1964,17 +1986,19 @@ class InteractionCustomizationArgsValidationJobTests(
             .InteractionCustomizationArgsValidationJob.get_output(job_id))
 
         expected_output = [(
-            '[u\'Invalid filepath\', '
-            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-            'circle divided into equal fifths.&amp;quot;" caption-with-value'
-            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
-            'png&amp;quot;"></oppia-noninteractive-image>\']]'
-        ), (
             '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
             'https://\'; received htt://link.com", '
             '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
             'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
-            '&amp;quot;"></oppia-noninteractive-link></p>\']]'
+            '&amp;quot;"></oppia-noninteractive-link></p>\', '
+            'u\'Exp Id: exp_id0\']]'
+        ), (
+            '[u\'Invalid filepath\', '
+            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" caption-with-value'
+            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
+            'png&amp;quot;"></oppia-noninteractive-image>\', '
+            'u\'Exp Id: exp_id0\']]'
         )]
 
         self.assertEqual(actual_output, expected_output)
@@ -2000,7 +2024,8 @@ class InteractionCustomizationArgsValidationJobTests(
         state1 = exploration.states['State1']
 
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(content_dict)
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content_dict))
             exp_services.save_new_exploration(self.albert_id, exploration)
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
@@ -2176,59 +2201,3 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob)
-
-
-class DeleteStateIdMappingModelsOneOffJobTests(test_utils.GenericTestBase):
-    """Tests the state ID mapping deletion job."""
-    def test_job_deletes_all_instances_of_model(self):
-        exp_models.StateIdMappingModel.create(
-            'exp_id', 1, {'state_1': 1}, 1)
-        exp_models.StateIdMappingModel.create(
-            'exp_id', 2, {'state_1': 1}, 1)
-        exp_models.StateIdMappingModel.create(
-            'exp_id', 3, {'state_1': 1}, 1)
-
-        self.assertIsNotNone(
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 1))
-
-        self.assertIsNotNone(
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 2))
-
-        self.assertIsNotNone(
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 3))
-
-        self.assertEqual(self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-
-        job_id = (
-            exp_jobs_one_off.DeleteStateIdMappingModelsOneOffJob.create_new())
-        exp_jobs_one_off.DeleteStateIdMappingModelsOneOffJob.enqueue(job_id)
-
-        self.assertEqual(self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-
-        with self.assertRaisesRegexp(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class StateIdMappingModel with id exp_id.1 not found'):
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 1)
-
-
-        with self.assertRaisesRegexp(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class StateIdMappingModel with id exp_id.2 not found'):
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 2)
-
-        with self.assertRaisesRegexp(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class StateIdMappingModel with id exp_id.3 not found'):
-            exp_models.StateIdMappingModel.get_state_id_mapping_model(
-                'exp_id', 3)

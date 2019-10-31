@@ -17,67 +17,80 @@
  * skill rights domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('SkillRightsObjectFactory', [
-  function() {
-    var SkillRights = function(
-        skillId, creatorId, skillIsPrivate, canEditSkillDescription) {
-      this._skillId = skillId;
-      this._creatorId = creatorId;
-      this._skillIsPrivate = skillIsPrivate;
-      this._skillDescriptionIsEditable = canEditSkillDescription;
-    };
+export class SkillRights {
+  _skillId: string;
+  _creatorId: string;
+  _skillIsPrivate: boolean;
+  _skillDescriptionIsEditable: boolean;
 
-    SkillRights.prototype.getSkillId = function() {
-      return this._skillId;
-    };
+  constructor(
+      skillId: string, creatorId: string,
+      skillIsPrivate: boolean, canEditSkillDescription: boolean) {
+    this._skillId = skillId;
+    this._creatorId = creatorId;
+    this._skillIsPrivate = skillIsPrivate;
+    this._skillDescriptionIsEditable = canEditSkillDescription;
+  }
 
-    SkillRights.prototype.getCreatorId = function() {
-      return this._creatorId;
-    };
+  getSkillId(): string {
+    return this._skillId;
+  }
 
-    SkillRights.prototype.isPrivate = function() {
-      return this._skillIsPrivate;
-    };
+  getCreatorId(): string {
+    return this._creatorId;
+  }
 
-    SkillRights.prototype.isPublic = function() {
-      return !this._skillIsPrivate;
-    };
+  isPrivate(): boolean {
+    return this._skillIsPrivate;
+  }
 
-    SkillRights.prototype.canEditSkillDescription = function() {
-      return this._skillDescriptionIsEditable;
-    };
+  isPublic(): boolean {
+    return !this._skillIsPrivate;
+  }
 
-    SkillRights.prototype.setPublic = function() {
-      this._skillIsPrivate = false;
-    };
+  canEditSkillDescription(): boolean {
+    return this._skillDescriptionIsEditable;
+  }
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SkillRights['createFromBackendDict'] = function(skillRightsBackendDict) {
-    /* eslint-enable dot-notation */
-      return new SkillRights(
-        skillRightsBackendDict.skill_id,
-        skillRightsBackendDict.creator_id,
-        skillRightsBackendDict.skill_is_private,
-        skillRightsBackendDict.can_edit_skill_description);
-    };
+  setPublic(): void {
+    this._skillIsPrivate = false;
+  }
 
-    SkillRights.prototype.copyFromSkillRights = function(otherSkillRights) {
-      this._skillId = otherSkillRights.getSkillId();
-      this._creatorId = otherSkillRights.getCreatorId();
-      this._skillIsPrivate = otherSkillRights.isPrivate();
-      this._skillDescriptionIsEditable =
-        otherSkillRights.canEditSkillDescription();
-    };
+  copyFromSkillRights(otherSkillRights: {
+      getSkillId: () => string; getCreatorId: () => string;
+      isPrivate: () => boolean; canEditSkillDescription: () => boolean;
+    }): void {
+    this._skillId = otherSkillRights.getSkillId();
+    this._creatorId = otherSkillRights.getCreatorId();
+    this._skillIsPrivate = otherSkillRights.isPrivate();
+    this._skillDescriptionIsEditable =
+      otherSkillRights.canEditSkillDescription();
+  }
+}
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SkillRights['createInterstitialSkillRights'] = function() {
-    /* eslint-enable dot-notation */
-      return new SkillRights(null, null, true, false);
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class SkillRightsObjectFactory {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'skillRightsBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(skillRightsBackendDict: any): SkillRights {
+    return new SkillRights(
+      skillRightsBackendDict.skill_id,
+      skillRightsBackendDict.creator_id,
+      skillRightsBackendDict.skill_is_private,
+      skillRightsBackendDict.can_edit_skill_description);
+  }
+  createInterstitialSkillRights(): SkillRights {
+    return new SkillRights(null, null, true, false);
+  }
+}
 
-    return SkillRights;
-  }]);
+angular.module('oppia').factory(
+  'SkillRightsObjectFactory',
+  downgradeInjectable(SkillRightsObjectFactory));

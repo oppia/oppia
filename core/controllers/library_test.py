@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for the library page and associated handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
@@ -23,6 +25,7 @@ from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rating_services
@@ -63,7 +66,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
-            'additional_angular_modules': [],
             'search_cursor': None
         }, response_dict)
 
@@ -207,7 +209,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
-            'additional_angular_modules': [],
             'search_cursor': None
         }, response_dict)
 
@@ -235,7 +236,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
     def test_library_handler_with_given_category_and_language_code(self):
         self.login(self.ADMIN_EMAIL)
 
-        exp_id = exp_services.get_new_exploration_id()
+        exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exp_id, self.admin_id)
         self.publish_exploration(self.admin_id, exp_id)
         exp_services.index_explorations_given_ids([exp_id])
@@ -273,8 +274,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['en'],
         }, response_dict)
 
-        response = self.get_html_response(feconf.PREFERENCES_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # Change the user's preferred language to de.
         self.put_json(
@@ -402,8 +402,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['en'],
         }, response_dict)
 
-        response = self.get_html_response(feconf.PREFERENCES_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
@@ -523,7 +522,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
 class CategoryConfigTests(test_utils.GenericTestBase):
 
     def test_thumbnail_icons_exist_for_each_category(self):
-        all_categories = constants.CATEGORIES_TO_COLORS.keys()
+        all_categories = list(constants.CATEGORIES_TO_COLORS.keys())
 
         # Test that an icon exists for each default category.
         for category in all_categories:

@@ -20,9 +20,7 @@
 // the appropriate metric prefix (K, M or B). For example, 167656
 // becomes 167.7K.
 // Users of this filter should ensure that the input is a non-negative number.
-var oppia = require('AppInit.ts').module;
-
-oppia.filter('summarizeNonnegativeNumber', [function() {
+angular.module('oppia').filter('summarizeNonnegativeNumber', [function() {
   return function(input) {
     input = Number(input);
     // Nine zeros for billions (e.g. 146008788788 --> 146.0B).

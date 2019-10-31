@@ -16,12 +16,10 @@
  * @fileoverview Service that handles routing for the skill editor page.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SkillEditorRoutingService', [
-  '$interval', '$location', '$rootScope', '$timeout', '$window',
+angular.module('oppia').factory('SkillEditorRoutingService', [
+  '$location', '$rootScope',
   function(
-      $interval, $location, $rootScope, $timeout, $window) {
+      $location, $rootScope) {
     var MAIN_TAB = 'main';
     var QUESTIONS_TAB = 'questions';
 

@@ -16,18 +16,24 @@
  * @fileoverview Tests for SubtopicPageContentsObjectFactory.
  */
 
-require('domain/topic/SubtopicPageContentsObjectFactory.ts');
+import { TestBed } from '@angular/core/testing';
 
-describe('Subtopic page contents object factory', function() {
-  var SubtopicPageContentsObjectFactory = null;
+import { SubtopicPageContentsObjectFactory } from
+  'domain/topic/SubtopicPageContentsObjectFactory';
+
+describe('Subtopic page contents object factory', () => {
+  let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
+    null;
 
   var expectedDefaultObject = {
     subtitled_html: {
       html: '',
       content_id: 'content'
     },
-    content_ids_to_audio_translations: {
-      content: {}
+    recorded_voiceovers: {
+      voiceovers_mapping: {
+        content: {}
+      }
     }
   };
 
@@ -36,48 +42,51 @@ describe('Subtopic page contents object factory', function() {
       html: 'test content',
       content_id: 'content'
     },
-    content_ids_to_audio_translations: {
-      content: {
-        en: {
-          filename: 'test.mp3',
-          file_size_bytes: 100,
-          needs_update: false
+    recorded_voiceovers: {
+      voiceovers_mapping: {
+        content: {
+          en: {
+            filename: 'test.mp3',
+            file_size_bytes: 100,
+            needs_update: false
+          }
         }
       }
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [SubtopicPageContentsObjectFactory]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    SubtopicPageContentsObjectFactory =
-      $injector.get('SubtopicPageContentsObjectFactory');
-  }));
+    subtopicPageContentsObjectFactory = TestBed.get(
+      SubtopicPageContentsObjectFactory);
+  });
 
-  it('should be able to create a default object', function() {
-    var defaultObject = SubtopicPageContentsObjectFactory.createDefault();
+  it('should be able to create a default object', () => {
+    var defaultObject = subtopicPageContentsObjectFactory.createDefault();
     expect(defaultObject.toBackendDict()).toEqual(expectedDefaultObject);
   });
 
-  it('should convert from a backend dictionary', function() {
+  it('should convert from a backend dictionary', () => {
     var sampleSubtopicPageContents =
-      SubtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
+      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
     expect(sampleSubtopicPageContents.getSubtitledHtml().getHtml())
       .toEqual('test content');
     expect(sampleSubtopicPageContents.getSubtitledHtml().getContentId())
       .toEqual('content');
-    expect(sampleSubtopicPageContents.getContentIdsToAudioTranslations()
-      .getAudioTranslation('content', 'en').toBackendDict())
-      .toEqual({
-        filename: 'test.mp3',
-        file_size_bytes: 100,
-        needs_update: false
-      });
+    expect(sampleSubtopicPageContents.getRecordedVoiceovers().getVoiceover(
+      'content', 'en').toBackendDict()).toEqual({
+      filename: 'test.mp3',
+      file_size_bytes: 100,
+      needs_update: false
+    });
   });
 
-  it('should convert from a backend dictionary', function() {
+  it('should convert from a backend dictionary', () => {
     var sampleSubtopicPageContents =
-      SubtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
+      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
     expect(sampleSubtopicPageContents.toBackendDict()).toEqual(backendDict);
   });
 });

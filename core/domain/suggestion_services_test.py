@@ -13,8 +13,11 @@
 # limitations under the License.
 
 """Tests for suggestion related services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
@@ -25,6 +28,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
@@ -74,7 +78,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def mock_generate_new_thread_id(self, unused_entity_type, unused_entity_id):
         return self.THREAD_ID
 
-    class MockExploration(object):
+    class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
         def __init__(self, exploration_id, states):
             self.id = exploration_id
@@ -124,7 +128,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -145,6 +149,26 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, self.change, 'test description',
+                self.reviewer_id)
+
+    def test_cannot_create_translation_suggestion_with_invalid_content_html_raise_error(self): # pylint: disable=line-too-long
+        add_translation_change_dict = {
+            'cmd': 'add_translation',
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>The invalid content html</p>',
+            'translation_html': '<p>Translation for invalid content.</p>'
+        }
+        with self.assertRaisesRegexp(
+            Exception,
+            'The given content_html does not match the content of the '
+            'exploration.'):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id, self.target_version_at_submission,
+                self.author_id, add_translation_change_dict, 'test description',
                 self.reviewer_id)
 
     def test_get_all_stale_suggestions(self):
@@ -304,7 +328,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -319,7 +343,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             exp_services, 'update_exploration', self.mock_update_exploration):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 with self.swap(
                     suggestion_registry.SuggestionEditStateContent,
@@ -348,7 +372,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -390,7 +414,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -417,7 +441,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -438,7 +462,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -467,7 +491,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -509,7 +533,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -533,7 +557,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -557,7 +581,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -587,7 +611,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
-                exp_services, 'get_exploration_by_id',
+                exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -625,7 +649,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL_2 = 'author2@example.com'
     REVIEWER_EMAIL_2 = 'reviewer2@example.com'
 
-    class MockExploration(object):
+    class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
         def __init__(self, exploration_id, states):
             self.id = exploration_id
@@ -657,7 +681,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.reviewer_id_2 = self.get_user_id_from_email(self.REVIEWER_EMAIL_2)
 
         with self.swap(
-            exp_services, 'get_exploration_by_id',
+            exp_fetchers, 'get_exploration_by_id',
             self.mock_get_exploration_by_id):
 
             suggestion_services.create_suggestion(
@@ -849,7 +873,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.old_recorded_voiceovers = (
             state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
         # Create content in State A with a single audio subtitle.
-        exploration.states['State 1'].update_content(self.old_content)
+        exploration.states['State 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
         exploration.states['State 1'].update_recorded_voiceovers(
             self.old_recorded_voiceovers)
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
@@ -887,7 +912,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.accept_suggestion(
             suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
 
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
         self.assertEqual(
             exploration.states['State 1'].content.html,
@@ -911,7 +936,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.reject_suggestion(
             suggestion, self.reviewer_id, 'Reject message')
 
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(
@@ -939,7 +964,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion, self.reviewer_id, self.COMMIT_MESSAGE,
             'Accept message')
 
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(

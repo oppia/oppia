@@ -17,11 +17,9 @@
  * playing the exploration in each node.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionNodeList', [
+angular.module('oppia').directive('collectionNodeList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

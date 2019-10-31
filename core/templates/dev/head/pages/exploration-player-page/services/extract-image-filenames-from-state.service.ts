@@ -18,9 +18,7 @@
 
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExtractImageFilenamesFromStateService', [
+angular.module('oppia').factory('ExtractImageFilenamesFromStateService', [
   'HtmlEscaperService', function(HtmlEscaperService) {
     var INTERACTION_TYPE_MULTIPLE_CHOICE = 'MultipleChoiceInput';
     var INTERACTION_TYPE_ITEM_SELECTION = 'ItemSelectionInput';

@@ -13,6 +13,9 @@
 # limitations under the License.
 
 """Tests for question domain objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 
 from core.domain import question_domain
@@ -328,7 +331,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'rule_type': 'Contains'
                 }],
                 'training_data': [],
-                'tagged_misconception_id': None
+                'tagged_skill_misconception_id': None
             })
         ]
 
@@ -339,10 +342,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify validate method of a finalized Question domain object
         with correct input.
         """
-        try:
-            self.question.validate()
-        except utils.ValidationError:
-            self.fail(msg='validate() raised ValidationError unexpectedly!')
+        self.question.validate()
 
     def test_not_strict_validation(self):
         """Test to verify validate method of Question domain object with
@@ -472,34 +472,38 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     def test_validation_with_valid_properties(self):
         self.observed_object.validate()
 
-    def test_validation_with_invalid_html_in_question_content(self):
-        """Test validation fails with invalid html in question
-        content.
-        """
-        self.observed_object.question_content = '<a>Test</a>'
+    def test_validation_with_invalid_id(self):
+        self.observed_object.id = 1
         with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Invalid html: <a>Test</a> for rte with invalid tags and '
-                'strings: {\'invalidTags\': \\[u\'a\'], '
-                '\'strings\': \\[\'<a>Test</a>\']}')):
+            utils.ValidationError, 'Expected id to be a string, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_customization_args_in_question_content(
-            self):
-        """Test validation fails with invalid customization args in question
-        content.
-        """
-        self.observed_object.question_content = (
-            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+    def test_validation_with_invalid_creator_id(self):
+        self.observed_object.creator_id = 1
         with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Invalid html: <oppia-noninteractive-image>'
-                '</oppia-noninteractive-image> due to errors in '
-                'customization_args: {"Missing attributes: '
-                '\\[u\'alt-with-value\', u\'caption-with-value\', '
-                'u\'filepath-with-value\'], Extra attributes: \\[]": '
-                '\\[\'<oppia-noninteractive-image>'
-                '</oppia-noninteractive-image>\']}')):
+            utils.ValidationError,
+            'Expected creator id to be a string, received 1'):
+            self.observed_object.validate()
+
+    def test_validation_with_invalid_question_content(self):
+        self.observed_object.question_content = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected question content to be a string, received 1'):
+            self.observed_object.validate()
+
+    def test_validation_with_invalid_created_on(self):
+        self.observed_object.created_on = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected created on to be a datetime, received 1'):
+            self.observed_object.validate()
+
+    def test_validation_with_invalid_last_updated(self):
+        self.observed_object.last_updated = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected last updated to be a datetime, received 1'):
             self.observed_object.validate()
 
 
@@ -518,6 +522,24 @@ class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
         }
         observed_object = question_domain.QuestionSkillLink(
             'testquestion', 'testskill', 'testskilldescription', 0.5)
+        self.assertEqual(expected_object_dict, observed_object.to_dict())
+
+
+class MergedQuestionSkillLinkDomainTest(test_utils.GenericTestBase):
+    """Test for Merged Question Skill Link Domain object."""
+
+    def test_to_dict(self):
+        """Test to verify to_dict method of the Merged Question Skill Link
+        Domain object.
+        """
+        expected_object_dict = {
+            'question_id': 'testquestion',
+            'skill_ids': ['testskill'],
+            'skill_descriptions': ['testskilldescription'],
+            'skill_difficulties': [0.5],
+        }
+        observed_object = question_domain.MergedQuestionSkillLink(
+            'testquestion', ['testskill'], ['testskilldescription'], [0.5])
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
 

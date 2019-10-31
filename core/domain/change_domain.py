@@ -15,10 +15,13 @@
 # limitations under the License.
 
 """Domain object for changes made to domain objects of storage models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
 from core.platform import models
+import python_utils
 import utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -46,7 +49,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
         'required_attribute_names']
     optional_attribute_names = valid_cmd_attribute_specs[
         'optional_attribute_names']
-    actual_attribute_names = actual_cmd_attributes.keys()
+    actual_attribute_names = list(actual_cmd_attributes.keys())
 
     missing_attribute_names = [
         key for key in required_attribute_names if key not in (
@@ -74,7 +77,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
     if not allowed_values:
         return
 
-    for attribute_name, attribute_values in allowed_values.iteritems():
+    for attribute_name, attribute_values in allowed_values.items():
         actual_value = actual_cmd_attributes[attribute_name]
         if actual_value not in attribute_values:
             raise utils.ValidationError(
@@ -82,7 +85,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
                     attribute_name, cmd_name, actual_value))
 
 
-class BaseChange(object):
+class BaseChange(python_utils.OBJECT):
     """Domain object for changes made to storage models' domain objects."""
 
     # The list of allowed commands of a change domain object. Each item in the

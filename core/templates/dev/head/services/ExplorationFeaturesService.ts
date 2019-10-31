@@ -17,44 +17,67 @@
  *               the exploration editor.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('ExplorationFeaturesService', [function() {
-  var settings = {
-    areParametersEnabled: false,
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationFeaturesService {
+  static serviceIsInitialized = false;
+  static settings = {
     isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false,
+    areParametersEnabled: false
   };
 
-  return {
-    init: function(explorationData, featuresData) {
-      settings.isImprovementsTabEnabled =
-        featuresData.is_improvements_tab_enabled;
-      settings.isPlaythroughRecordingEnabled =
-        featuresData.is_exploration_whitelisted;
-      if (explorationData.param_changes &&
-          explorationData.param_changes.length > 0) {
-        this.enableParameters();
-      } else {
-        for (var state in explorationData.states) {
-          if (explorationData.states[state].param_changes.length > 0) {
-            this.enableParameters();
-            break;
-          }
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'explorationData' and 'featuresData' are dicts with
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  init(explorationData: any, featuresData: any): void {
+    if (ExplorationFeaturesService.serviceIsInitialized) {
+      return;
+    }
+    ExplorationFeaturesService.settings.isImprovementsTabEnabled =
+      featuresData.is_improvements_tab_enabled;
+    ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled =
+      featuresData.is_exploration_whitelisted;
+    if (explorationData.param_changes &&
+        explorationData.param_changes.length > 0) {
+      this.enableParameters();
+    } else {
+      for (var state in explorationData.states) {
+        if (explorationData.states[state].param_changes.length > 0) {
+          this.enableParameters();
+          break;
         }
       }
-    },
-    areParametersEnabled: function() {
-      return settings.areParametersEnabled;
-    },
-    isImprovementsTabEnabled: function() {
-      return settings.isImprovementsTabEnabled;
-    },
-    isPlaythroughRecordingEnabled: function() {
-      return settings.isPlaythroughRecordingEnabled;
-    },
-    enableParameters: function() {
-      settings.areParametersEnabled = true;
-    },
-  };
-}]);
+    }
+    ExplorationFeaturesService.serviceIsInitialized = true;
+  }
+
+  isInitialized(): boolean {
+    return ExplorationFeaturesService.serviceIsInitialized;
+  }
+
+  areParametersEnabled(): boolean {
+    return ExplorationFeaturesService.settings.areParametersEnabled;
+  }
+
+  isImprovementsTabEnabled(): boolean {
+    return ExplorationFeaturesService.settings.isImprovementsTabEnabled;
+  }
+
+  isPlaythroughRecordingEnabled(): boolean {
+    return ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled;
+  }
+
+  enableParameters(): void {
+    ExplorationFeaturesService.settings.areParametersEnabled = true;
+  }
+}
+
+angular.module('oppia').factory(
+  'ExplorationFeaturesService',
+  downgradeInjectable(ExplorationFeaturesService));

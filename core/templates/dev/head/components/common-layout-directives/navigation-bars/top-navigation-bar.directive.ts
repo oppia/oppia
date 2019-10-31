@@ -18,8 +18,8 @@
  * the editor pages).
  */
 
-require('domain/sidebar/SidebarStatusService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/sidebar/sidebar-status.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/DebouncerService.ts');
 require('services/NavigationService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -27,9 +27,7 @@ require('services/UserService.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('topNavigationBar', [
+angular.module('oppia').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -195,7 +193,7 @@ oppia.directive('topNavigationBar', [
 
           WindowDimensionsService.registerOnResizeHook(function() {
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-            $scope.$apply();
+            $scope.$applyAsync();
             // If window is resized larger, try displaying the hidden elements.
             if (currentWindowWidth < WindowDimensionsService.getWidth()) {
               for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {

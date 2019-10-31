@@ -16,9 +16,7 @@
  * @fileoverview Validator to check if input is nonempty.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.filter('isNonempty', [function() {
+angular.module('oppia').filter('isNonempty', [function() {
   return function(input) {
     return Boolean(input);
   };

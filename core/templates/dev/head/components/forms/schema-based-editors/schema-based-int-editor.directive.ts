@@ -16,14 +16,17 @@
  * @fileoverview Directive for a schema-based editor for integers.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
 
-var oppia = require('AppInit.ts').module;
+require('domain/utilities/url-interpolation.service.ts');
 
-oppia.directive('schemaBasedIntEditor', [
+angular.module('oppia').directive('schemaBasedIntEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
         localValue: '=',
         isDisabled: '&',
         validators: '&',
@@ -34,14 +37,15 @@ oppia.directive('schemaBasedIntEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema-based-editors/' +
         'schema-based-int-editor.directive.html'),
-      restrict: 'E',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', function($scope) {
-          if ($scope.localValue === undefined) {
-            $scope.localValue = 0;
+          var ctrl = this;
+          if (ctrl.localValue === undefined) {
+            ctrl.localValue = 0;
           }
 
-          $scope.onKeypress = function(evt) {
+          ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
               $scope.$emit('submittedSchemaBasedIntForm');
             }

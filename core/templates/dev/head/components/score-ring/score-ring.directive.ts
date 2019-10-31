@@ -16,32 +16,34 @@
  * @fileoverview Directive for the animated score ring.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('scoreRing', [
+angular.module('oppia').directive('scoreRing', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         getScore: '&score',
+        testIsPassed: '&testIsPassed'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/score-ring/score-ring.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', '$timeout', '$window',
-        function($scope, $timeout, $window) {
+      controller: ['$scope', '$timeout', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
+        function($scope, $timeout, $window, COLORS_FOR_PASS_FAIL_MODE) {
           var ctrl = this;
+
+          const circle = <SVGCircleElement>(
+            document.querySelector('.score-ring-circle'));
+          const radius = circle.r.baseVal.value;
+          const circumference = (radius * 2 * Math.PI);
+
           var setScore = function(percent) {
             const offset = circumference - percent / 100 * circumference;
-            circle.style.strokeDashoffset = offset;
+            circle.style.strokeDashoffset = offset.toString();
           };
 
-          const circle = document.querySelector('.score-ring-circle');
-          const radius = circle.r.baseVal.value;
-          const circumference = radius * 2 * Math.PI;
           circle.style.strokeDasharray = `${circumference} ${circumference}`;
-          circle.style.strokeDashoffset = circumference;
+          circle.style.strokeDashoffset = circumference.toString();
           $scope.$watch(function() {
             return ctrl.getScore();
           }, function(newScore) {
@@ -49,6 +51,24 @@ oppia.directive('scoreRing', [
               setScore(newScore);
             }
           });
+
+          ctrl.getScoreRingColor = function() {
+            if (ctrl.testIsPassed()) {
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+            } else {
+              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+            }
+          };
+
+          ctrl.getScoreOuterRingColor = function() {
+            if (ctrl.testIsPassed()) {
+              // return color green when passed.
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
+            } else {
+              // return color orange when failed.
+              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
+            }
+          };
         }
       ]
     };

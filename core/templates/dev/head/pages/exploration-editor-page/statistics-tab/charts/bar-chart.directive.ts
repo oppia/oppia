@@ -16,9 +16,7 @@
  * @fileoverview Directive for bar chart visualization.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('barChart', [function() {
+angular.module('oppia').directive('barChart', [function() {
   return {
     restrict: 'E',
     scope: {

@@ -16,55 +16,55 @@
  * @fileoverview Constants for shared services across Oppia.
  */
 
-var oppia = require('AppInit.ts').module;
+export class ServicesConstants {
+  public static PAGE_CONTEXT = {
+    COLLECTION_EDITOR: 'collection_editor',
+    EXPLORATION_EDITOR: 'editor',
+    EXPLORATION_PLAYER: 'learner',
+    QUESTION_EDITOR: 'question_editor',
+    QUESTION_PLAYER: 'question_player',
+    SKILL_EDITOR: 'skill_editor',
+    STORY_EDITOR: 'story_editor',
+    TOPIC_EDITOR: 'topic_editor',
+    OTHER: 'other'
+  };
 
-oppia.constant('PAGE_CONTEXT', {
-  EXPLORATION_EDITOR: 'editor',
-  EXPLORATION_PLAYER: 'learner',
-  QUESTION_EDITOR: 'question_editor',
-  QUESTION_PLAYER: 'question_player',
-  OTHER: 'other'
-});
+  public static EXPLORATION_EDITOR_TAB_CONTEXT = {
+    EDITOR: 'editor',
+    PREVIEW: 'preview'
+  };
 
-oppia.constant('EXPLORATION_EDITOR_TAB_CONTEXT', {
-  EDITOR: 'editor',
-  PREVIEW: 'preview'
-});
+  public static EXPLORATION_FEATURES_URL =
+    '/explorehandler/features/<exploration_id>';
 
-oppia.constant(
-  'EXPLORATION_FEATURES_URL', '/explorehandler/features/<exploration_id>');
+  public static FETCH_ISSUES_URL = '/issuesdatahandler/<exploration_id>';
 
-oppia.constant(
-  'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');
+  public static FETCH_PLAYTHROUGH_URL =
+    '/playthroughdatahandler/<exploration_id>/<playthrough_id>';
 
-oppia.constant(
-  'FETCH_PLAYTHROUGH_URL',
-  '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
+  public static RESOLVE_ISSUE_URL = '/resolveissuehandler/<exploration_id>';
 
-oppia.constant(
-  'RESOLVE_ISSUE_URL', '/resolveissuehandler/<exploration_id>');
+  public static STORE_PLAYTHROUGH_URL =
+    '/explorehandler/store_playthrough/<exploration_id>';
 
-oppia.constant(
-  'STORE_PLAYTHROUGH_URL',
-  '/explorehandler/store_playthrough/<exploration_id>');
+  // Enables recording playthroughs from learner sessions.
+  public static EARLY_QUIT_THRESHOLD_IN_SECS = 45;
+  public static NUM_INCORRECT_ANSWERS_THRESHOLD = 3;
+  public static NUM_REPEATED_CYCLES_THRESHOLD = 3;
+  public static CURRENT_ACTION_SCHEMA_VERSION = 1;
+  public static CURRENT_ISSUE_SCHEMA_VERSION = 1;
 
-// Enables recording playthroughs from learner sessions.
-oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);
-oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 3);
-oppia.constant('NUM_REPEATED_CYCLES_THRESHOLD', 3);
-oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
-oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
+  // Whether to enable the promo bar functionality. This does not actually turn
+  // on the promo bar, as that is gated by a config value (see config_domain).
+  // This merely avoids checking for whether the promo bar is enabled for every
+  // Oppia page visited.
+  public static ENABLE_PROMO_BAR = true;
 
-// Whether to enable the promo bar functionality. This does not actually turn on
-// the promo bar, as that is gated by a config value (see config_domain). This
-// merely avoids checking for whether the promo bar is enabled for every Oppia
-// page visited.
-oppia.constant('ENABLE_PROMO_BAR', true);
+  public static SEARCH_DATA_URL = '/searchhandler/data';
 
-oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
+  public static STATE_ANSWER_STATS_URL =
+    '/createhandler/state_answer_stats/<exploration_id>';
 
-oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
-
-oppia.constant(
-  'STATE_ANSWER_STATS_URL',
-  '/createhandler/state_answer_stats/<exploration_id>');
+  public static RTE_COMPONENT_SPECS = (
+      require('rich_text_components_definitions.ts'));
+}

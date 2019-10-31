@@ -17,48 +17,71 @@
  * resolve a particular improvement suggestion.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('ImprovementActionButtonObjectFactory', [function() {
+export class ImprovementActionButton {
+  _text: string;
+  _cssClass: string;
+  _actionFunc: () => void;
+  _enabledFunc: () => boolean;
+
   /**
    * @constructor
-   * @param {string} text - The text displayed on the button.
-   * @param {callback} actionFunc - Function to run when the button is clicked.
-   * @param {string} [cssClass=btn-default] - The CSS class to render the button
-   *    with.
+   * @param text - The text displayed on the button.
+   * @param cssClass - The CSS class to render the button with.
+   * @param actionFunc - Function to run when the button is clicked.
+   * @param enabledFunc - Function which returns whether this button should be
+   *    enabled and clickable.
    */
-  var ImprovementActionButton = function(text, actionFunc, cssClass) {
+  constructor(
+      text: string, cssClass: string, actionFunc: () => void,
+      enabledFunc?: () => boolean) {
     this._text = text;
+    this._cssClass = cssClass;
     this._actionFunc = actionFunc;
-    this._cssClass = cssClass || 'btn-default';
-  };
+    this._enabledFunc = enabledFunc;
+  }
 
-  /** @returns {string} - The text of the action (text rendered in button). */
-  ImprovementActionButton.prototype.getText = function() {
+  /** Returns the text of the action (text rendered in button). */
+  getText(): string {
     return this._text;
-  };
-
-  /** Performs the associated action and return its result. */
-  ImprovementActionButton.prototype.execute = function() {
-    return this._actionFunc();
-  };
+  }
 
   /** Returns the CSS class of the button. */
-  ImprovementActionButton.prototype.getCssClass = function() {
+  getCssClass(): string {
     return this._cssClass;
-  };
+  }
 
-  return {
-    /**
-     * @returns {ImprovementActionButton}
-     * @param {string} text - The text displayed on the button.
-     * @param {callback} actionFunc - Function to run when the button is
-     *    clicked.
-     * @param {string} [cssClass=btn-default] - The CSS class to render the
-     *    button with.
-     */
-    createNew: function(text, actionFunc, cssClass) {
-      return new ImprovementActionButton(text, actionFunc, cssClass);
-    },
-  };
-}]);
+  /** Returns whether the button should be enabled and clickable. */
+  isEnabled(): boolean {
+    return this._enabledFunc ? this._enabledFunc() : true;
+  }
+
+  /** Performs the associated action. */
+  execute(): void {
+    this._actionFunc();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ImprovementActionButtonObjectFactory {
+  /**
+   * @param text - The text displayed on the button.
+   * @param cssClass - The CSS class to render the button with.
+   * @param actionFunc - Function to run when the button is clicked.
+   * @param enabledFunc - Function which returns whether this button should be
+   *    enabled and clickable.
+   */
+  createNew(
+      text: string, cssClass: string, actionFunc: () => void,
+      enabledFunc?: () => boolean): ImprovementActionButton {
+    return new ImprovementActionButton(text, cssClass, actionFunc, enabledFunc);
+  }
+}
+
+angular.module('oppia').factory(
+  'ImprovementActionButtonObjectFactory',
+  downgradeInjectable(ImprovementActionButtonObjectFactory));

@@ -18,12 +18,10 @@
  * dismissible.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/PromoBarService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('promoBar', [
+angular.module('oppia').directive('promoBar', [
   '$window', 'PromoBarService', 'UrlInterpolationService',
   function($window, PromoBarService, UrlInterpolationService) {
     return {
@@ -38,11 +36,29 @@ oppia.directive('promoBar', [
         function() {
           var ctrl = this;
           var isPromoDismissed = function() {
+            if (!isSessionStorageAvailable()) {
+              return false;
+            }
             return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
           };
           var setPromoDismissed = function(promoIsDismissed) {
+            if (!isSessionStorageAvailable()) {
+              return false;
+            }
             $window.sessionStorage.promoIsDismissed = angular.toJson(
               promoIsDismissed);
+          };
+
+          var isSessionStorageAvailable = function() {
+            // This is to ensure sessionStorage is accessible.
+            var testKey = 'Oppia';
+            try {
+              $window.sessionStorage.setItem(testKey, testKey);
+              $window.sessionStorage.removeItem(testKey);
+              return true;
+            } catch (e) {
+              return false;
+            }
           };
 
           PromoBarService.getPromoBarData().then(function(promoBarObject) {

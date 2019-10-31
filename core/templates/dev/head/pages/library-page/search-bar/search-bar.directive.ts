@@ -18,8 +18,8 @@
 
 require('filters/string-utility-filters/truncate.filter.ts');
 
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/ConstructTranslationIdsService.ts');
 require('services/DebouncerService.ts');
 require('services/HtmlEscaperService.ts');
@@ -27,9 +27,7 @@ require('services/NavigationService.ts');
 require('services/SearchService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('searchBar', [
+angular.module('oppia').directive('searchBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

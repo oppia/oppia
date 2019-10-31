@@ -15,17 +15,20 @@
 """Contains a utility for fetching performance data using Selenium and
 Browsermob-proxy.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import time
-import urlparse
 
 from core.tests.performance_framework import perf_domain
 from core.tests.performance_tests import test_config
 import feconf
+import python_utils
 
 import browsermobproxy
 from selenium import webdriver
+
 
 CHROMEDRIVER_PATH = os.path.join(
     'node_modules', 'protractor', 'node_modules', 'webdriver-manager',
@@ -37,7 +40,7 @@ BROWSERMOB_PROXY_PATH = os.path.join(
 BROWSER_CHROME = 'chrome'
 
 
-class SeleniumPerformanceDataFetcher(object):
+class SeleniumPerformanceDataFetcher(python_utils.OBJECT):
     """Fetches performance data for locally served Oppia pages using Selenium
     and Browsermob-proxy.
 
@@ -248,7 +251,7 @@ class SeleniumPerformanceDataFetcher(object):
         if latency:
             proxy_options['latency'] = latency
 
-        if len(proxy_options.items()) > 0:
+        if len(list(proxy_options.items())) > 0:
             proxy.limits(proxy_options)
 
         return server, proxy
@@ -269,7 +272,7 @@ class SeleniumPerformanceDataFetcher(object):
             chrome_options.add_argument('--prerender-from-omnibox=disabled')
 
             if use_proxy:
-                proxy_url = urlparse.urlparse(proxy.proxy).path
+                proxy_url = python_utils.url_parse(proxy.proxy).path
                 proxy_argument = '--proxy-server={0}'.format(proxy_url)
                 chrome_options.add_argument(proxy_argument)
 

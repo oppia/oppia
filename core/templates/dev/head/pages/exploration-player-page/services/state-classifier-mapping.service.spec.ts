@@ -16,16 +16,20 @@
  * @fileoverview Unit tests for the State classifier mapping service.
  */
 
-require(
-  'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
+import { TestBed } from '@angular/core/testing';
 
-describe('State classifier mapping service', function() {
-  beforeEach(angular.mock.module('oppia'));
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
 
-  describe('Test correct retrieval of classifier details', function() {
-    var mappingService;
-    beforeEach(angular.mock.inject(function($injector) {
-      mappingService = $injector.get('StateClassifierMappingService');
+describe('State classifier mapping service', () => {
+  describe('Test correct retrieval of classifier details', () => {
+    let mappingService: StateClassifierMappingService;
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [StateClassifierMappingService]
+      });
+
+      mappingService = TestBed.get(StateClassifierMappingService);
 
       mappingService.init({
         stateName1: {
@@ -34,9 +38,9 @@ describe('State classifier mapping service', function() {
           data_schema_version: 1
         }
       });
-    }));
+    });
 
-    it('should return correct classifier details.', function() {
+    it('should return correct classifier details.', () => {
       var stateName = 'stateName1';
       var retrievedClassifier = mappingService.getClassifier(stateName);
 

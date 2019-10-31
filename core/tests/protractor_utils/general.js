@@ -41,6 +41,7 @@ var checkForConsoleErrors = function(errorsToIgnore) {
         return !(browserLog.message.includes(' Slow network is detected.'));
       });
     }
+
     for (var i = 0; i < browserLogs.length; i++) {
       if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
         var errorFatal = true;
@@ -59,10 +60,7 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var isInDevMode = function() {
-  browser.get('/library');
-  waitFor.pageToFullyLoad();
-  var devModeElement = element(by.css('.oppia-dev-mode'));
-  return devModeElement.isPresent();
+  return browser.params.devMode === 'true';
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';
@@ -187,6 +185,12 @@ var checkConsoleErrorsExist = function(expectedErrors) {
   });
 };
 
+var goToHomePage = function() {
+  var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
+  oppiaMainLogo.click();
+  return waitFor.pageToFullyLoad();
+};
+
 exports.acceptAlert = acceptAlert;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
@@ -211,3 +215,5 @@ exports.expect404Error = expect404Error;
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 
 exports.checkConsoleErrorsExist = checkConsoleErrorsExist;
+
+exports.goToHomePage = goToHomePage;

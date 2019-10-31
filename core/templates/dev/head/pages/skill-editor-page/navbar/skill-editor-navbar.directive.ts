@@ -20,30 +20,28 @@ require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/AlertsService.ts');
 
-require('pages/skill-editor-page/skill-editor-page.constants.ts');
+require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('skillEditorNavbar', [
+angular.module('oppia').directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
+        '$scope', '$uibModal', '$window', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
         'SkillRightsBackendApiService', 'SkillEditorRoutingService',
         'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $uibModal, AlertsService,
+            $scope, $uibModal, $window, AlertsService,
             UndoRedoService, SkillEditorStateService,
             SkillRightsBackendApiService, SkillEditorRoutingService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
@@ -125,7 +123,9 @@ oppia.directive('skillEditorNavbar', [
                 $scope.skillRights.setPublic();
                 SkillEditorStateService.setSkillRights(
                   $scope.skillRights);
-                AlertsService.addSuccessMessage('Skill Published.');
+                $window.location = '/topics_and_skills_dashboard';
+                AlertsService.addSuccessMessage(
+                  'Published Skill.', 1000);
               });
           };
 

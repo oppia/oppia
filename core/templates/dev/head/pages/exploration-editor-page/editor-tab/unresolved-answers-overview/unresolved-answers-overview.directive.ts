@@ -15,8 +15,10 @@
 /**
  * @fileoverview Directive for the state graph visualization.
  */
-
-require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -25,15 +27,15 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require('services/EditabilityService.ts');
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('unresolvedAnswersOverview', [
+angular.module('oppia').directive('unresolvedAnswersOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -47,20 +49,20 @@ oppia.directive('unresolvedAnswersOverview', [
         'ExplorationRightsService', 'ExplorationStatesService',
         'ImprovementsService', 'StateEditorService',
         'StateInteractionIdService', 'StateTopAnswersStatsService',
-        'INTERACTION_SPECS',
+        'INTERACTION_SPECS', 'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
             $rootScope, $scope, $uibModal, EditabilityService,
             ExplorationRightsService, ExplorationStatesService,
             ImprovementsService, StateEditorService,
             StateInteractionIdService, StateTopAnswersStatsService,
-            INTERACTION_SPECS) {
+            INTERACTION_SPECS, SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
           $scope.unresolvedAnswersOverviewIsShown = false;
 
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-            GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+            SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
 
           var isStateRequiredToBeResolved = function(stateName) {
             return ImprovementsService

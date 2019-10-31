@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
-require('domain/user/UserInfoObjectFactory.ts');
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 
-describe('User info factory', function() {
-  var UserInfoObjectFactory = null;
+describe('User info factory', () => {
+  let userInfoObjectFactory: UserInfoObjectFactory;
 
   var sampleUserInfoBackendObject = {
     is_moderator: true,
@@ -29,17 +29,16 @@ describe('User info factory', function() {
     can_create_collections: true,
     preferred_site_language_code: 'en',
     username: 'tester',
+    email: 'tester@example.org',
     user_is_logged_in: true
   };
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    userInfoObjectFactory = new UserInfoObjectFactory();
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    UserInfoObjectFactory = $injector.get('UserInfoObjectFactory');
-  }));
-
-  it('should create correct UserInfo obeject from backend dict', function() {
-    var userInfo = UserInfoObjectFactory.createFromBackendDict(
+  it('should create correct UserInfo obeject from backend dict', () => {
+    var userInfo = userInfoObjectFactory.createFromBackendDict(
       sampleUserInfoBackendObject);
 
     expect(userInfo.isModerator()).toBe(true);
@@ -49,11 +48,12 @@ describe('User info factory', function() {
     expect(userInfo.canCreateCollections()).toBe(true);
     expect(userInfo.getPreferredSiteLanguageCode()).toBe('en');
     expect(userInfo.getUsername()).toBe('tester');
+    expect(userInfo.getEmail()).toBe('tester@example.org');
     expect(userInfo.isLoggedIn()).toBe(true);
   });
 
-  it('should create correct default UserInfo object', function() {
-    var userInfo = UserInfoObjectFactory.createDefault();
+  it('should create correct default UserInfo object', () => {
+    var userInfo = userInfoObjectFactory.createDefault();
     expect(userInfo.isModerator()).toBe(false);
     expect(userInfo.isAdmin()).toBe(false);
     expect(userInfo.isSuperAdmin()).toBe(false);
@@ -61,6 +61,7 @@ describe('User info factory', function() {
     expect(userInfo.canCreateCollections()).toBe(false);
     expect(userInfo.getPreferredSiteLanguageCode()).toBeNull();
     expect(userInfo.getUsername()).toBeNull();
+    expect(userInfo.getEmail()).toBeNull();
     expect(userInfo.isLoggedIn()).toBe(false);
   });
 });

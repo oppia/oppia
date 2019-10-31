@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/StopwatchObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/ContextService.ts');
@@ -25,20 +25,17 @@ require('services/MessengerService.ts');
 require('services/PlaythroughService.ts');
 require('services/SiteAnalyticsService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StatsReportingService', [
+angular.module('oppia').factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',
   'PlaythroughService', 'SiteAnalyticsService', 'StopwatchObjectFactory',
-  'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',
-  'PAGE_CONTEXT', 'STATS_EVENT_TYPES', 'STATS_REPORTING_URLS',
+  'UrlInterpolationService', 'STATS_REPORTING_URLS',
   function(
       $http, $interval, ContextService, MessengerService,
       PlaythroughService, SiteAnalyticsService, StopwatchObjectFactory,
-      UrlInterpolationService, DEFAULT_OUTCOME_CLASSIFICATION,
-      PAGE_CONTEXT, STATS_EVENT_TYPES, STATS_REPORTING_URLS) {
+      UrlInterpolationService, STATS_REPORTING_URLS) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;
@@ -114,11 +111,13 @@ oppia.factory('StatsReportingService', [
       }
     };
 
-    if (!_editorPreviewMode && !_questionPlayerMode ) {
-      $interval(function() {
-        postStatsToBackend();
-      }, 300000);
-    }
+    var startStatsTimer = function() {
+      if (!_editorPreviewMode && !_questionPlayerMode ) {
+        $interval(function() {
+          postStatsToBackend();
+        }, 300000);
+      }
+    };
 
     // This method is called whenever a learner tries to leave an exploration,
     // when a learner starts an exploration, when a learner completes an
@@ -145,6 +144,7 @@ oppia.factory('StatsReportingService', [
         stateStopwatch = StopwatchObjectFactory.create();
         optionalCollectionId = collectionId;
         refreshAggregatedStats();
+        startStatsTimer();
       },
       // Note that this also resets the stateStopwatch.
       recordExplorationStarted: function(stateName, params) {

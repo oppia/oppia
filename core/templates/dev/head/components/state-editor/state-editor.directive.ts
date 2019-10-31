@@ -31,7 +31,7 @@ require(
   'components/state-editor/state-solution-editor/' +
   'state-solution-editor.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -42,9 +42,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('stateEditor', [
+angular.module('oppia').directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -124,6 +122,7 @@ oppia.directive('stateEditor', [
           });
 
           $rootScope.$broadcast('stateEditorDirectiveInitialized');
+          StateEditorService.updateStateEditorDirectiveInitialised();
         }
       ]
     };

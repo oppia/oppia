@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Config properties and functions for managing email notifications."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -26,6 +28,7 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
@@ -373,7 +376,7 @@ def send_mail_to_admin(email_subject, email_body):
         body, body.replace('\n', '<br/>'), bcc_admin=False)
 
 
-def send_post_signup_email(user_id):
+def send_post_signup_email(user_id, test_for_duplicate_email=False):
     """Sends a post-signup email to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
@@ -381,15 +384,17 @@ def send_post_signup_email(user_id):
 
     Args:
         user_id: str. User ID of the user that signed up.
+        test_for_duplicate_email: bool. For testing duplicate emails.
     """
 
-    for key, content in SIGNUP_EMAIL_CONTENT.value.iteritems():
-        if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
-            log_new_error(
-                'Please ensure that the value for the admin config property '
-                'SIGNUP_EMAIL_CONTENT is set, before allowing post-signup '
-                'emails to be sent.')
-            return
+    if not test_for_duplicate_email:
+        for key, content in SIGNUP_EMAIL_CONTENT.value.items():
+            if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
+                log_new_error(
+                    'Please ensure that the value for the admin config '
+                    'property SIGNUP_EMAIL_CONTENT is set, before allowing '
+                    'post-signup emails to be sent.')
+                return
 
     user_settings = user_services.get_user_settings(user_id)
     email_subject = SIGNUP_EMAIL_CONTENT.value['subject']
@@ -659,7 +664,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
 
     messages_html = ''
     count_messages = 0
-    for exp_id, reference in feedback_messages.iteritems():
+    for exp_id, reference in feedback_messages.items():
         messages_html += (
             '<li><a href="https://www.oppia.org/create/%s#/feedback">'
             '%s</a>:<br><ul>' % (exp_id, reference['title']))
@@ -699,7 +704,8 @@ def can_users_receive_thread_email(
     users_exploration_prefs = (
         user_services.get_users_email_preferences_for_exploration(
             recipient_ids, exploration_id))
-    zipped_preferences = zip(users_global_prefs, users_exploration_prefs)
+    zipped_preferences = list(
+        python_utils.ZIP(users_global_prefs, users_exploration_prefs))
 
     result = []
     if has_suggestion:

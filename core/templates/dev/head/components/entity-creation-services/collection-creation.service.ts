@@ -16,7 +16,7 @@
  * @fileoverview Modal and functionality for the create collection button.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/SiteAnalyticsService.ts');
 
@@ -24,9 +24,7 @@ require('services/SiteAnalyticsService.ts');
 // duplicated code between CollectionCreationService and
 // ExplorationCreationService.
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('CollectionCreationService', [
+angular.module('oppia').factory('CollectionCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
   'SiteAnalyticsService', 'UrlInterpolationService',
   function(

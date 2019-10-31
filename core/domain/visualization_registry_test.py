@@ -15,10 +15,13 @@
 # limitations under the License.
 
 """Tests for methods in the visualization registry."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import importlib
 import inspect
 import os
+import re
 
 from core.domain import visualization_registry
 from core.tests import test_utils
@@ -38,6 +41,43 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
             TypeError, 'is not a valid visualization id.'):
             visualization_registry.Registry.get_visualization_class(
                 'invalid_visualization_id')
+
+    def test_visualization_class_with_invalid_option_names(self):
+        bar_chart = visualization_registry.Registry.get_visualization_class(
+            'BarChart')
+        bar_chart_instance = bar_chart('AnswerFrequencies', {}, True)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape(
+                'For visualization BarChart, expected option names '
+                '[\'x_axis_label\', \'y_axis_label\']; received names []')):
+            bar_chart_instance.validate()
+
+    def test_visualization_class_with_invalid_addressed_info_is_supported(self):
+        bar_chart = visualization_registry.Registry.get_visualization_class(
+            'BarChart')
+        option_names = {
+            'x_axis_label': 'Answer',
+            'y_axis_label': 'Count'
+        }
+        bar_chart_instance = bar_chart(
+            'AnswerFrequencies', option_names, 'invalid_value')
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'For visualization BarChart, expected a bool value for '
+            'addressed_info_is_supported; received invalid_value'):
+            bar_chart_instance.validate()
+
+    def test_get_all_visualization_ids(self):
+        visualization_ids = (
+            visualization_registry.Registry.get_all_visualization_ids())
+        expected_visualizations = ['FrequencyTable', 'BarChart',
+                                   'EnumeratedFrequencyTable']
+
+        self.assertEqual(
+            sorted(visualization_ids), sorted(expected_visualizations))
 
 
 class VisualizationsNameTests(test_utils.GenericTestBase):

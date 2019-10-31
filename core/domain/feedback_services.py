@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Commands for feedback thread and message operations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -26,6 +28,7 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (feedback_models, email_models, suggestion_models) = (
@@ -39,7 +42,7 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
-# TODO (nithesh): Once feedback threads are generalised, the below function
+# TODO(nithesh): Once feedback threads are generalised, the below function
 # needs to be edited to get id of a general entity. For the moment, the
 # function will return the exploration_id from a thread_id.
 def get_exp_id_from_thread_id(thread_id):
@@ -167,7 +170,7 @@ def create_message(
     msg.put()
 
     # Update the message count in the thread.
-    if thread.message_count:
+    if thread.message_count is not None:
         thread.message_count += 1
     else:
         thread.message_count = (
@@ -475,7 +478,8 @@ def get_thread_summaries(user_id, thread_ids):
     messages = feedback_models.GeneralFeedbackMessageModel.get_multi(
         last_two_messages_ids)
 
-    last_two_messages = [messages[i:i + 2] for i in range(0, len(messages), 2)]
+    last_two_messages = [
+        messages[i:i + 2] for i in python_utils.RANGE(0, len(messages), 2)]
     last_message_is_read = False
 
     thread_summaries = []
@@ -929,10 +933,8 @@ def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
     # at most one user who does not have FeedbackEmailReplyToIdModel instance.
     for user_id in user_ids:
         if feedback_email_id_models[user_id] is None:
-            new_model = (
-                email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                    user_id, thread_id))
-            new_model.put()
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                user_id, thread_id)
 
 
 def _add_message_to_email_buffer(

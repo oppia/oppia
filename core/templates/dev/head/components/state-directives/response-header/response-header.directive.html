@@ -60,7 +60,7 @@
     <i class="material-icons md-18 oppia-response-tick-cross" ng-if="$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#10004;</i>
     <span ng-if="!$ctrl.isActive()" ng-attr-title="<[$ctrl.getSummary()]>">
       <[$ctrl.getShortSummary()]>
-      <span ng-if="$ctrl.getNumRules() > 1" class="label label-primary" style="position: relative; bottom: 4px;">
+      <span ng-if="$ctrl.getNumRules() > 1" class="badge badge-primary" style="position: relative; bottom: 4px;">
         +<[$ctrl.getNumRules() - 1]>
       </span>
     </span>

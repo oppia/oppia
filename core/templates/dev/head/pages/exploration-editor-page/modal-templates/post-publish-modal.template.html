@@ -37,21 +37,37 @@
   }
 
   .oppia-share-publish-body .oppia-share-publish-link{
-    display: inline-grid;
+    display: inline;
   }
 
   .oppia-share-publish-body .oppia-share-publish-link div {
     background-color: #fcfcfc;
     border: 1px solid #d9d9d9;
     border-radius: 4px;
-    display: inline-block;
-    padding: 10px;
-    margin-bottom: 2px;
     cursor: pointer;
+    display: inline-block;
+    margin-bottom: 2px;
+    margin-top: 10px;
+    max-width: 350px;
+    overflow: hidden;
+    padding: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .oppia-share-publish-body .oppia-share-publish-link div:hover {
     background-color: #f9f9f9;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link span {
+    position: absolute;
+    left: 481px;
+    top: 124px;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link i {
+    padding-left: 6px;
+    color: #3F9187;
   }
 </style>
 
@@ -66,16 +82,16 @@
       Now that you're a published Oppia teacher, you can share your creation.
     </p>
     <div class="oppia-share-publish-link">
-      Here's your exploration link:
+      Here's your exploration link:<br>
       <div ng-click="selectText($event)"><[explorationLink]></div>
+      <span ng-show="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
     </div>
     <sharing-links flex="100" layout-type="row"
                    layout-align-type="center center"
-                   twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"
                    share-type="exploration"
                    exploration-id="explorationId">
     </sharing-links>
-    <button class="btn btn-default oppia-share-publish-close protractor-test-share-publish-close"
+    <button class="btn btn-secondary oppia-share-publish-close protractor-test-share-publish-close"
             ng-click="close()">
       Close
     </button>

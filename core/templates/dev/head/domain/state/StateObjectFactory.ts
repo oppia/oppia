@@ -17,22 +17,19 @@
  * domain objects.
  */
 
-require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/InteractionObjectFactory.ts');
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/exploration/WrittenTranslationsObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StateObjectFactory', [
+angular.module('oppia').factory('StateObjectFactory', [
   'InteractionObjectFactory', 'ParamChangesObjectFactory',
   'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',
-  'WrittenTranslationsObjectFactory', function(
+  'WrittenTranslationsObjectFactory', 'NEW_STATE_TEMPLATE', function(
       InteractionObjectFactory, ParamChangesObjectFactory,
       RecordedVoiceoversObjectFactory, SubtitledHtmlObjectFactory,
-      WrittenTranslationsObjectFactory) {
+      WrittenTranslationsObjectFactory, NEW_STATE_TEMPLATE) {
     var State = function(name, classifierModelId, content, interaction,
         paramChanges, recordedVoiceovers, solicitAnswerDetails,
         writtenTranslations) {
@@ -76,11 +73,11 @@ oppia.factory('StateObjectFactory', [
       this.writtenTranslations = angular.copy(otherState.writtenTranslations);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     State['createDefaultState'] = function(newStateName) {
     /* eslint-enable dot-notation */
-      var newStateTemplate = angular.copy(constants.NEW_STATE_TEMPLATE);
+      var newStateTemplate = angular.copy(NEW_STATE_TEMPLATE);
       var newState = this.createFromBackendDict(newStateName, {
         classifier_model_id: newStateTemplate.classifier_model_id,
         content: newStateTemplate.content,
@@ -96,7 +93,7 @@ oppia.factory('StateObjectFactory', [
 
     // Static class methods. Note that "this" is not available in
     // static contexts.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     State['createFromBackendDict'] = function(stateName, stateDict) {
     /* eslint-enable dot-notation */

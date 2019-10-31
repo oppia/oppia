@@ -16,67 +16,7 @@
  * @fileoverview Dependencies for the explaration player page.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
-// introduce webpack for /extensions
-require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
-require('directives/AngularHtmlBindDirective.ts');
-require('directives/MathjaxBindDirective.ts');
-require('components/forms/validators/is-at-least.filter.ts');
-require('components/forms/validators/is-at-most.filter.ts');
-require('components/forms/validators/is-float.filter.ts');
-require('components/forms/validators/is-integer.filter.ts');
-require('components/forms/validators/is-nonempty.filter.ts');
-require(
-  'components/forms/custom-forms-directives/apply-validation.directive.ts');
-require(
-  'components/forms/custom-forms-directives/require-is-float.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-bool-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-choices-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-custom-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-dict-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-expression-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-float-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-html-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-list-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-unicode-editor.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
-// ^^^ this block of requires should be removed ^^^
-
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
@@ -84,19 +24,19 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
 
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('services/ContextService.ts');
 require('services/PageTitleService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('explorationPlayerPage', [
+angular.module('oppia').directive('explorationPlayerPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -118,6 +58,14 @@ oppia.directive('explorationPlayerPage', [
             .then(function(response) {
               PageTitleService.setPageTitle(
                 response.exploration.title + ' - Oppia');
+              angular.element('meta[itemprop="name"]').attr(
+                'content', response.exploration.title);
+              angular.element('meta[itemprop="description"]').attr(
+                'content', response.exploration.objective);
+              angular.element('meta[property="og:title"]').attr(
+                'content', response.exploration.title);
+              angular.element('meta[property="og:description"]').attr(
+                'content', response.exploration.objective);
             });
         }
       ]

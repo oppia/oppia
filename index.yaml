@@ -78,6 +78,11 @@ indexes:
   - name: last_updated
     direction: desc
 
+- kind: ExplorationOpportunitySummaryModel
+  properties:
+  - name: need_voice_artist_in_language_codes
+  - name: created_on
+
 - kind: ExplorationRecommendationsRealtimeModel
   properties:
   - name: realtime_layer
@@ -147,6 +152,13 @@ indexes:
   - name: status
   - name: last_updated
 
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: suggestion_type
+  - name: author_id
+
 - kind: InteractionAnswerSummariesRealtimeModel
   properties:
   - name: realtime_layer
@@ -172,6 +184,22 @@ indexes:
   properties:
   - name: skill_id
   - name: last_updated
+    direction: desc
+
+- kind: QuestionSkillLinkModel
+  properties:
+  - name: skill_id
+  - name: question_id
+
+- kind: QuestionSkillLinkModel
+  properties:
+  - name: skill_id
+  - name: skill_difficulty
+
+- kind: QuestionSkillLinkModel
+  properties:
+  - name: skill_id
+  - name: skill_difficulty
     direction: desc
 
 - kind: RecentUpdatesRealtimeModel

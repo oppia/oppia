@@ -16,6 +16,16 @@
  * @fileoverview Tests for TopicObjectFactory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// TopicObjectFactory.ts is upgraded to Angular 8.
+import { SkillSummaryObjectFactory } from
+  'domain/skill/SkillSummaryObjectFactory';
+import { StoryReferenceObjectFactory } from
+  'domain/topic/StoryReferenceObjectFactory';
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/topic/TopicObjectFactory.ts');
 
 describe('Topic object factory', function() {
@@ -23,7 +33,21 @@ describe('Topic object factory', function() {
   var _sampleTopic = null;
 
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+    $provide.value(
+      'StoryReferenceObjectFactory', new StoryReferenceObjectFactory());
+    $provide.value(
+      'SubtopicObjectFactory',
+      new SubtopicObjectFactory(new SkillSummaryObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
 
@@ -33,8 +57,20 @@ describe('Topic object factory', function() {
       description: 'Topic description',
       version: 1,
       uncategorized_skill_ids: ['skill_1', 'skill_2'],
-      canonical_story_ids: ['story_1', 'story_4'],
-      additional_story_ids: ['story_2', 'story_3'],
+      canonical_story_references: [{
+        story_id: 'story_1',
+        story_is_published: true
+      }, {
+        story_id: 'story_4',
+        story_is_published: false
+      }],
+      additional_story_references: [{
+        story_id: 'story_2',
+        story_is_published: true
+      }, {
+        story_id: 'story_3',
+        story_is_published: false
+      }],
       subtopics: [{
         id: 1,
         title: 'Title',
@@ -58,7 +94,7 @@ describe('Topic object factory', function() {
 
   it('should validate the topic', function() {
     _sampleTopic.setName('');
-    _sampleTopic.addCanonicalStoryId('story_2');
+    _sampleTopic.addCanonicalStory('story_2');
     _sampleTopic.getSubtopics()[0].addSkill('skill_1');
 
     expect(_sampleTopic.validate()).toEqual([
@@ -76,14 +112,14 @@ describe('Topic object factory', function() {
     expect(topic.getDescription()).toEqual('Topic description loading');
     expect(topic.getLanguageCode()).toBe('en');
     expect(topic.getSubtopics()).toEqual([]);
-    expect(topic.getAdditionalStoryIds()).toEqual([]);
-    expect(topic.getCanonicalStoryIds()).toEqual([]);
+    expect(topic.getAdditionalStoryReferences()).toEqual([]);
+    expect(topic.getCanonicalStoryReferences()).toEqual([]);
     expect(topic.getUncategorizedSkillSummaries()).toEqual([]);
   });
 
   it('should correctly remove the various array elements', function() {
-    _sampleTopic.removeCanonicalStoryId('story_1');
-    _sampleTopic.removeAdditionalStoryId('story_2');
+    _sampleTopic.removeCanonicalStory('story_1');
+    _sampleTopic.removeAdditionalStory('story_2');
     _sampleTopic.removeUncategorizedSkill('skill_1');
     expect(_sampleTopic.getAdditionalStoryIds()).toEqual(['story_3']);
     expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_4']);
@@ -103,8 +139,14 @@ describe('Topic object factory', function() {
       description: 'Another description',
       language_code: 'en',
       version: '15',
-      additional_story_ids: ['story_10'],
-      canonical_story_ids: ['story_5'],
+      canonical_story_references: [{
+        story_id: 'story_10',
+        story_is_published: true
+      }],
+      additional_story_references: [{
+        story_id: 'story_5',
+        story_is_published: true
+      }],
       uncategorized_skill_ids: ['skill_2', 'skill_3'],
       next_subtopic_id: 2,
       subtopics: [{

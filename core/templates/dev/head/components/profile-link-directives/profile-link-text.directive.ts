@@ -16,11 +16,9 @@
  * @fileoverview Directives for creating text links to a user's profile page.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('profileLinkText', [
+angular.module('oppia').directive('profileLinkText', [
   'UrlInterpolationService', 'SYSTEM_USER_IDS',
   function(UrlInterpolationService, SYSTEM_USER_IDS) {
     return {

@@ -16,17 +16,15 @@
  * @fileoverview Directive for the solution explanation editor.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/EditabilityService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('solutionExplanationEditor', [
-  'StateSolutionService', 'UrlInterpolationService',
-  function(StateSolutionService, UrlInterpolationService) {
+angular.module('oppia').directive('solutionExplanationEditor', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

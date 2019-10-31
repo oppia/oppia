@@ -20,13 +20,21 @@ require(
   'answer-group-editor.directive.ts');
 require(
   'components/state-directives/response-header/response-header.directive.ts');
+require('components/state-editor/state-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require('components/state-directives/rule-editor/rule-editor.directive.ts');
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/RuleObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/parameterize-rule-description.filter.ts');
@@ -67,9 +75,7 @@ require('services/ExplorationHtmlFormatterService.ts');
 require('services/GenerateContentIdService.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('stateResponses', [
+angular.module('oppia').directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -95,6 +101,7 @@ oppia.directive('stateResponses', [
         'UrlInterpolationService', 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+        'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
             $filter, $rootScope, $scope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService,
@@ -103,9 +110,10 @@ oppia.directive('stateResponses', [
             StateInteractionIdService, StateSolicitAnswerDetailsService,
             UrlInterpolationService, ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
-            PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
+            PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
+            SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-            GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+            SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
           $scope.stateName = StateEditorService.getActiveStateName();
           $scope.enableSolicitAnswerDetailsFeature = (
@@ -504,9 +512,9 @@ oppia.directive('stateResponses', [
             });
           };
 
-          $scope.saveTaggedMisconception = function(misconceptionId) {
+          $scope.saveTaggedMisconception = function(misconceptionId, skillId) {
             ResponsesService.updateActiveAnswerGroup({
-              taggedMisconceptionId: misconceptionId
+              taggedSkillMisconceptionId: skillId + '-' + misconceptionId
             }, function(newAnswerGroups) {
               $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
               $scope.refreshWarnings()();
@@ -653,6 +661,7 @@ oppia.directive('stateResponses', [
           if (StateEditorService.isInQuestionMode()) {
             $scope.onResponsesInitialized();
           }
+          StateEditorService.updateStateResponsesInitialised();
         }
       ]
     };

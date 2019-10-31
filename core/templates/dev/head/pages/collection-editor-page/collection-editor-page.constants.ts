@@ -17,21 +17,19 @@
  */
 
 // TODO(bhenning): These constants should be provided by the backend.
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
-  'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
-  '/collection_editor_handler/data/<collection_id>');
-oppia.constant(
-  'COLLECTION_RIGHTS_URL_TEMPLATE',
-  '/collection_editor_handler/rights/<collection_id>');
+export class CollectionEditorPageConstants {
+  public static EDITABLE_COLLECTION_DATA_URL_TEMPLATE =
+    '/collection_editor_handler/data/<collection_id>';
+  public static COLLECTION_RIGHTS_URL_TEMPLATE =
+    '/collection_editor_handler/rights/<collection_id>';
 
-oppia.constant(
-  'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
+  public static COLLECTION_TITLE_INPUT_FOCUS_LABEL =
+    'collectionTitleInputFocusLabel';
 
-oppia.constant(
-  'SEARCH_EXPLORATION_URL_TEMPLATE',
-  '/exploration/metadata_search?q=<query>');
+  public static SEARCH_EXPLORATION_URL_TEMPLATE =
+    '/exploration/metadata_search?q=<query>';
 
-oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
-oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
+  public static EVENT_COLLECTION_INITIALIZED = 'collectionInitialized';
+  public static EVENT_COLLECTION_REINITIALIZED = 'collectionReinitialized';
+}

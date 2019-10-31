@@ -5,7 +5,7 @@
 </div>
 <div class="modal-body" style="width: 96%; margin-left: 2%;">
   <question-editor question-id="questionId"
-                   misconceptions="misconceptions"
+                   misconceptions-by-skill="misconceptionsBySkill"
                    question-state-data="questionStateData"
                    question="question"
                    can-edit-question="canEditQuestion"
@@ -21,6 +21,6 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
+  <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
   <button class="btn btn-success protractor-test-save-question-button" ng-click="done()"> Save and Publish Question </button>
 </div>

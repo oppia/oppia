@@ -20,14 +20,12 @@ require(
   'pages/library-page/search-results/' +
   'activity-tiles-infinity-grid.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('searchResults', [
-  '$q', 'UrlInterpolationService', function($q, UrlInterpolationService) {
+angular.module('oppia').directive('searchResults', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

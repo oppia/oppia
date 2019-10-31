@@ -16,68 +16,19 @@
  * @fileoverview Development environment config file for Webpack.
  */
 
-var commonWebpackConfig = require('./webpack.config.ts');
-var path = require('path');
+const merge = require('webpack-merge');
+const common = require('./webpack.common.config.ts');
+const path = require('path');
 
-module.exports = {
+module.exports = merge(common, {
   mode: 'development',
-  resolve: {
-    modules: [
-      path.resolve(__dirname, 'core/templates/dev/head'),
-      path.resolve(__dirname, 'extensions'),
-      path.resolve(__dirname, 'node_modules')
-    ],
-    alias: {
-      '@angular/upgrade/static': (
-        '@angular/upgrade/bundles/upgrade-static.umd.js')
-    }
-  },
-  entry: commonWebpackConfig.entries,
-  plugins: commonWebpackConfig.plugins,
-  module: {
-    rules: [{
-      test: /\.ts$/,
-      include: [
-        path.resolve(__dirname, 'core/templates/dev/head'),
-        path.resolve(__dirname, 'extensions'),
-        path.resolve(__dirname, 'typings')
-      ],
-      use: [
-        'cache-loader',
-        {
-          loader: 'thread-loader',
-          options: {
-            poolTimeout: Infinity,
-          }
-        },
-        {
-          loader: 'ts-loader',
-          options: {
-            // this is needed for thread-loader to work correctly
-            happyPackMode: true
-          }
-        }
-      ]
-    },
-    {
-      test: /\.html$/,
-      loader: 'underscore-template-loader'
-    }]
-  },
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'core/templates/dev/head/dist')
+    path: path.resolve(__dirname, 'webpack_bundles')
   },
   devtool: 'inline-source-map',
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      minSize: 1024 * 10,
-      maxInitialRequests: 9,
-    }
-  },
   watchOptions: {
     aggregateTimeout: 500,
     poll: 1000
   }
-};
+});

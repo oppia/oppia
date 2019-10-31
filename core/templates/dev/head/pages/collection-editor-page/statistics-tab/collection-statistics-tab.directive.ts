@@ -16,11 +16,9 @@
  * @fileoverview Controller for the statistics tab of the collection editor.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionStatisticsTab', [
+angular.module('oppia').directive('collectionStatisticsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

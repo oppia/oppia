@@ -16,17 +16,15 @@
  * @fileoverview User exploration emails service for the exploration settings.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('UserEmailPreferencesService', [
-  '$http', '$q', 'AlertsService', 'ExplorationDataService',
+angular.module('oppia').factory('UserEmailPreferencesService', [
+  '$http', 'AlertsService', 'ExplorationDataService',
   'UrlInterpolationService',
   function(
-      $http, $q, AlertsService,
+      $http, AlertsService,
       ExplorationDataService, UrlInterpolationService) {
     var MESSAGE_TYPE_SUGGESTION = 'suggestion';
     var MESSAGE_TYPE_FEEDBACK = 'feedback';

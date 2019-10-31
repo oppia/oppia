@@ -18,14 +18,12 @@
 
 require('components/entity-creation-services/collection-creation.service.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
-require('domain/utilities/BrowserCheckerService.ts');
+require('domain/utilities/browser-checker.service.ts');
 require('services/contextual/UrlService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('createActivityButton', [
+angular.module('oppia').directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -17,22 +17,25 @@
  * within a card.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('NumberAttemptsService', [
-  function() {
-    var numberAttempts = 0;
+@Injectable({
+  providedIn: 'root'
+})
+export class NumberAttemptsService {
+  static numberAttempts: number = 0;
 
-    return {
-      submitAttempt: function() {
-        numberAttempts++;
-      },
-      reset: function() {
-        numberAttempts = 0;
-      },
-      getNumberAttempts: function() {
-        return numberAttempts;
-      }
-    };
+  submitAttempt(): void {
+    NumberAttemptsService.numberAttempts++;
   }
-]);
+  reset(): void {
+    NumberAttemptsService.numberAttempts = 0;
+  }
+  getNumberAttempts(): number {
+    return NumberAttemptsService.numberAttempts;
+  }
+}
+
+angular.module('oppia').factory(
+  'NumberAttemptsService', downgradeInjectable(NumberAttemptsService));

@@ -17,9 +17,7 @@
  */
 
 // TODO(sll): Add validation.
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StateContentService', [
+angular.module('oppia').factory('StateContentService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveStateContent';

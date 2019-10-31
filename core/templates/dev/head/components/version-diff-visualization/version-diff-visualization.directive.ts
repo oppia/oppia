@@ -20,12 +20,12 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
+require(
+  'components/version-diff-visualization/codemirror-mergeview.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('versionDiffVisualization', [
+angular.module('oppia').directive('versionDiffVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

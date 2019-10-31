@@ -18,26 +18,19 @@
 # https://github.com/oppia/oppia/wiki/Writing-Tests-For-Pylint
 
 """Unit tests for scripts/pylint_extensions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import os
-import sys
 import tempfile
 import unittest
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
-sys.path.insert(0, _PYLINT_PATH)
+import python_utils
 
-# Since these module needs to be imported after adding Pylint path,
-# we need to disable isort for the below lines to prevent import
-# order errors.
-# pylint: disable=wrong-import-position
-# pylint: disable=relative-import
+from . import pylint_extensions
+
 import astroid  # isort:skip
-import pylint_extensions  # isort:skip
 from pylint import testutils  # isort:skip
-# pylint: enable=wrong-import-position
-# pylint: enable=relative-import
+from pylint import lint  # isort:skip
 
 
 class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
@@ -47,16 +40,32 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.ExplicitKeywordArgsChecker)
         checker_test_object.setup_method()
-        func_call_node_one, func_call_node_two, func_call_node_three = (
-            astroid.extract_node("""
+        (
+            func_call_node_one, func_call_node_two, func_call_node_three,
+            func_call_node_four, func_call_node_five, func_call_node_six,
+            class_call_node) = astroid.extract_node("""
+        class TestClass():
+            pass
+
         def test(test_var_one, test_var_two=4, test_var_three=5, test_var_four="test_checker"):
             test_var_five = test_var_two + test_var_three
             return test_var_five
 
+        def test_1(test_var_one, test_var_one):
+            pass
+
+        def test_2((a, b)):
+            pass
+
         test(2, 5, test_var_three=6) #@
         test(2) #@
         test(2, 6, test_var_two=5, test_var_four="test_checker") #@
-        """))
+        max(5, 1) #@
+        test_1(1, 2) #@
+        test_2((1, 2)) #@
+
+        TestClass() #@
+        """)
         with checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='non-explicit-keyword-args',
@@ -89,6 +98,22 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
             checker_test_object.checker.visit_call(
                 func_call_node_three)
 
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_call(class_call_node)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_call(func_call_node_four)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_call(func_call_node_five)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_call(func_call_node_six)
+
+    def test_register(self):
+        pylinter_instance = lint.PyLinter()
+        pylint_extensions.register(pylinter_instance)
+
 
 class HangingIndentCheckerTests(unittest.TestCase):
 
@@ -102,9 +127,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                """self.post_json('/ml/trainedclassifierhandler',
+                u"""self.post_json('/ml/trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
                 """)
         node_break_after_hanging_indent.file = filename
@@ -121,22 +146,44 @@ class HangingIndentCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
-        node_no_err_message = astroid.scoped_nodes.Module(
+        node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                """master_translation_dict = json.loads(
+                u"""\"""Some multiline
+                docstring.
+                \"""
+                # Load JSON.
+                master_translation_dict = json.loads(
                 utils.get_file_contents(os.path.join(
                 os.getcwd(), 'assets', 'i18n', 'en.json')))
                 """)
-        node_no_err_message.file = filename
-        node_no_err_message.path = filename
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
 
-        checker_test_object.checker.process_module(node_no_err_message)
+        checker_test_object.checker.process_module(node_with_no_error_message)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""self.post_json('/',
+                self.payload, expect_errors=True, expected_status_int=401)""")
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        checker_test_object.checker.process_module(node_with_no_error_message)
 
         with checker_test_object.assertNoMessages():
             temp_file.close()
@@ -144,13 +191,273 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
 class DocstringParameterCheckerTests(unittest.TestCase):
 
-    def test_finds_docstring_parameter(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
+    def setUp(self):
+        super(DocstringParameterCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DocstringParameterChecker)
-        checker_test_object.setup_method()
-        func_node = astroid.extract_node("""
+        self.checker_test_object.setup_method()
+
+    def test_finds_docstring_parameter(self):
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DocstringParameterChecker)
+        self.checker_test_object.setup_method()
+        valid_func_node, valid_return_node = astroid.extract_node("""
         def test(test_var_one, test_var_two): #@
+            \"\"\"Function to test docstring parameters.
+
+            Args:
+                test_var_one: int. First test variable.
+                test_var_two: str. Second test variable.
+
+            Returns:
+                int. The test result.
+            \"\"\"
+            result = test_var_one + test_var_two
+            return result #@
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(valid_func_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_return(valid_return_node)
+
+        valid_func_node, valid_yield_node = astroid.extract_node("""
+        def test(test_var_one, test_var_two): #@
+            \"\"\"Function to test docstring parameters.\"\"\"
+            result = test_var_one + test_var_two
+            yield result #@
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(valid_func_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_yield(valid_yield_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_return(valid_yield_node)
+
+        (
+            missing_yield_type_func_node,
+            missing_yield_type_yield_node) = astroid.extract_node("""
+        class Test(python_utils.OBJECT):
+            def __init__(self, test_var_one, test_var_two): #@
+                \"\"\"Function to test docstring parameters.
+
+                Args:
+                    test_var_one: int. First test variable.
+                    test_var_two: str. Second test variable.
+
+                Returns:
+                    int. The test result.
+                \"\"\"
+                result = test_var_one + test_var_two
+                yield result #@
+        """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='redundant-returns-doc',
+                node=missing_yield_type_func_node
+            ),
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                missing_yield_type_func_node)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='missing-yield-doc',
+                node=missing_yield_type_func_node
+            ), testutils.Message(
+                msg_id='missing-yield-type-doc',
+                node=missing_yield_type_func_node
+            ),
+        ):
+            self.checker_test_object.checker.visit_yieldfrom(
+                missing_yield_type_yield_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_return(
+                missing_yield_type_yield_node)
+
+        (
+            missing_return_type_func_node,
+            missing_return_type_return_node) = astroid.extract_node("""
+        class Test(python_utils.OBJECT):
+            def __init__(self, test_var_one, test_var_two): #@
+                \"\"\"Function to test docstring parameters.
+
+                Args:
+                    test_var_one: int. First test variable.
+                    test_var_two: str. Second test variable.
+
+                Yields:
+                    int. The test result.
+                \"\"\"
+                result = test_var_one + test_var_two
+                return result #@
+        """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='redundant-yields-doc',
+                node=missing_return_type_func_node
+            ),
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                missing_return_type_func_node)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='missing-return-doc',
+                node=missing_return_type_func_node
+            ), testutils.Message(
+                msg_id='missing-return-type-doc',
+                node=missing_return_type_func_node
+            ),
+        ):
+            self.checker_test_object.checker.visit_return(
+                missing_return_type_return_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_yield(
+                missing_return_type_return_node)
+
+        valid_raise_node = astroid.extract_node("""
+        def func(test_var_one, test_var_two):
+            \"\"\"Function to test docstring parameters.
+
+            Args:
+                test_var_one: int. First test variable.
+                test_var_two: str. Second test variable.
+
+            Raises:
+                Exception: An exception.
+            \"\"\"
+            raise Exception #@
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
+
+        (
+            missing_raise_type_func_node,
+            missing_raise_type_raise_node) = astroid.extract_node("""
+        def func(test_var_one, test_var_two): #@
+            \"\"\"Function to test raising exceptions.
+
+            Args:
+                test_var_one: int. First test variable.
+                test_var_two: str. Second test variable.
+            \"\"\"
+            raise Exception #@
+        """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='missing-raises-doc',
+                args=('Exception',),
+                node=missing_raise_type_func_node
+            ),
+        ):
+            self.checker_test_object.checker.visit_raise(
+                missing_raise_type_raise_node)
+
+        valid_raise_node = astroid.extract_node("""
+        class Test(python_utils.OBJECT):
+            raise Exception #@
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
+
+        valid_raise_node = astroid.extract_node("""
+        class Test():
+            @property
+            def decorator_func(self):
+                pass
+
+            @decorator_func.setter
+            @property
+            def func(self):
+                raise Exception #@
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
+
+        valid_raise_node = astroid.extract_node("""
+        class Test():
+            def func(self):
+                raise Exception #@
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
+
+        valid_raise_node = astroid.extract_node("""
+        def func():
+            try:
+                raise Exception #@
+            except Exception:
+                pass
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
+
+        valid_raise_node = astroid.extract_node("""
+        def func():
+            \"\"\"Function to test raising exceptions.\"\"\"
+            raise Exception #@
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
+
+        valid_raise_node = astroid.extract_node("""
+        def my_func(self):
+            \"\"\"This is a docstring.
+            :raises NameError: Never.
+            \"\"\"
+            def ex_func(val):
+                return RuntimeError(val)
+            raise ex_func('hi') #@
+            raise NameError('hi')
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
+
+        valid_raise_node = astroid.extract_node("""
+        from unknown import Unknown
+        def my_func(self):
+            \"\"\"This is a docstring.
+            :raises NameError: Never.
+            \"\"\"
+            raise Unknown('hi') #@
+            raise NameError('hi')
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
+
+        valid_raise_node = astroid.extract_node("""
+        def my_func(self):
+            \"\"\"This is a docstring.
+            :raises NameError: Never.
+            \"\"\"
+            def ex_func(val):
+                def inner_func(value):
+                    return OSError(value)
+                return RuntimeError(val)
+            raise ex_func('hi') #@
+            raise NameError('hi')
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
+
+        valid_return_node = astroid.extract_node("""
+        def func():
+            \"\"\"Function to test return values.\"\"\"
+            return None #@
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_return(valid_return_node)
+
+        valid_return_node = astroid.extract_node("""
+        def func():
+            \"\"\"Function to test return values.\"\"\"
+            return #@
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_return(valid_return_node)
+
+        missing_param_func_node = astroid.extract_node("""
+        def func(test_var_one, test_var_two, *args, **kwargs): #@
             \"\"\"Function to test docstring parameters.
 
             Args:
@@ -163,8 +470,104 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             result = test_var_one + test_var_two
             return result
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_functiondef(func_node)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='missing-param-doc',
+                node=missing_param_func_node,
+                args=('args, kwargs',),
+            ),
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                missing_param_func_node)
+
+        missing_param_func_node = astroid.extract_node("""
+        def func(test_var_one, test_var_two): #@
+            \"\"\"Function to test docstring parameters.
+
+            Args:
+                test_var_one: int. First test variable.
+                invalid_var_name: str. Second test variable.
+
+            Returns:
+                int. The test result.
+            \"\"\"
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='missing-param-doc',
+                node=missing_param_func_node,
+                args=('test_var_two',),
+            ), testutils.Message(
+                msg_id='missing-type-doc',
+                node=missing_param_func_node,
+                args=('test_var_two',),
+            ), testutils.Message(
+                msg_id='differing-param-doc',
+                node=missing_param_func_node,
+                args=('invalid_var_name',),
+            ), testutils.Message(
+                msg_id='differing-type-doc',
+                node=missing_param_func_node,
+                args=('invalid_var_name',),
+            ),
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                missing_param_func_node)
+
+        class_node, multiple_constructor_func_node = astroid.extract_node("""
+        class Test(): #@
+            \"\"\"Function to test docstring parameters.
+
+            Args:
+                test_var_one: int. First test variable.
+                test_var_two: str. Second test variable.
+
+            Returns:
+                int. The test result.
+            \"\"\"
+
+            def __init__(self, test_var_one, test_var_two): #@
+                \"\"\"Function to test docstring parameters.
+
+                Args:
+                    test_var_one: int. First test variable.
+                    test_var_two: str. Second test variable.
+
+                Returns:
+                    int. The test result.
+                \"\"\"
+                result = test_var_one + test_var_two
+                return result
+        """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='multiple-constructor-doc',
+                node=class_node,
+                args=(class_node.name,),
+            ),
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                multiple_constructor_func_node)
+
+    def test_visit_raise_warns_unknown_style(self):
+        self.checker_test_object.checker.config.accept_no_raise_doc = False
+        node = astroid.extract_node("""
+        def my_func(self):
+            \"\"\"This is a docstring.\"\"\"
+            raise RuntimeError('hi')
+        """)
+        raise_node = node.body[0]
+        func_node = raise_node.frame()
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='missing-raises-doc',
+                args=('RuntimeError',),
+                node=func_node
+            ),
+        ):
+            self.checker_test_object.checker.visit_raise(raise_node)
 
 
 class ImportOnlyModulesCheckerTests(unittest.TestCase):
@@ -195,6 +598,36 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
             checker_test_object.checker.visit_importfrom(
                 importfrom_node2)
 
+        importfrom_node3 = astroid.extract_node("""
+            from invalid_module import invalid_module #@
+        """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_importfrom(importfrom_node3)
+
+        importfrom_node4 = astroid.extract_node("""
+            from constants import constants #@
+        """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_importfrom(importfrom_node4)
+
+        importfrom_node5 = astroid.extract_node("""
+            from os import invalid_module #@
+        """)
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='import-only-modules',
+                node=importfrom_node5,
+                args=('invalid_module', 'os')
+            ),
+        ):
+            checker_test_object.checker.visit_importfrom(importfrom_node5)
+
+        importfrom_node6 = astroid.extract_node("""
+            from .constants import constants #@
+        """, module_name='.constants')
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_importfrom(importfrom_node6)
+
 
 class BackslashContinuationCheckerTests(unittest.TestCase):
 
@@ -207,9 +640,9 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                """message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
+                u"""message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
                 """'cde'\\\n""" # pylint: disable=backslash-continuation
                 """'xyz'
                 message2 = 'abc\\\\'
@@ -264,6 +697,19 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
             ),
         ):
             checker_test_object.checker.visit_functiondef(functiondef_node2)
+
+        functiondef_node3 = astroid.extract_node("""
+        def test(test_var_one, test_var_two, cls): #@
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='function-args-order-cls',
+                node=functiondef_node3
+            ),
+        ):
+            checker_test_object.checker.visit_functiondef(functiondef_node3)
 
 
 class RestrictedImportCheckerTests(unittest.TestCase):
@@ -384,9 +830,9 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                """c = 'something dummy'
+                u"""c = 'something dummy'
                 """)
         node_missing_newline_at_eof.file = filename
         node_missing_newline_at_eof.path = filename
@@ -407,8 +853,8 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
-            tmp.write("""1""")
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(u"""1""")
         node_single_char_file.file = filename
         node_single_char_file.path = filename
 
@@ -422,18 +868,181 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
-        node_no_err_message = astroid.scoped_nodes.Module(
+        node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
-            tmp.write("""x = 'something dummy'""")
-        node_no_err_message.file = filename
-        node_no_err_message.path = filename
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(u"""x = 'something dummy'""")
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
 
-        checker_test_object.checker.process_module(node_no_err_message)
+        checker_test_object.checker.process_module(node_with_no_error_message)
 
         with checker_test_object.assertNoMessages():
+            temp_file.close()
+
+
+class SingleSpaceAfterYieldTests(unittest.TestCase):
+
+    def setUp(self):
+        super(SingleSpaceAfterYieldTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.SingleSpaceAfterYieldChecker)
+        self.checker_test_object.setup_method()
+
+    def test_well_formed_yield_statement_on_single_line(self):
+        node_well_formed_one_line_yield_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    yield (5, 2)
+                """)
+        node_well_formed_one_line_yield_file.file = filename
+        node_well_formed_one_line_yield_file.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_well_formed_one_line_yield_file)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_well_formed_yield_statement_on_multiple_lines(self):
+        node_well_formed_mult_lines_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    yield (
+                        'This line was too long to be put on one line.')
+                """)
+        node_well_formed_mult_lines_file.file = filename
+        node_well_formed_mult_lines_file.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_well_formed_mult_lines_file)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_yield_nothing(self):
+        yield_nothing_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    yield
+                """)
+        yield_nothing_file.file = filename
+        yield_nothing_file.path = filename
+
+        self.checker_test_object.checker.process_module(
+            yield_nothing_file)
+
+        # No errors on yield statements that do nothing.
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_yield_in_multi_line_comment(self):
+        yield_in_multiline_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    \"\"\"
+                        yield(\"invalid yield format\")
+                    \"\"\"
+                    extract_node(\"\"\"
+                        yield   (invalid)
+                    \"\"\")
+                    extract_node(
+                    b\"\"\"
+                        yield(1, 2)
+                    \"\"\")
+                    extract_node(
+                    u\"\"\"
+                        yield(3, 4)
+                    \"\"\")
+                    )
+                """)
+        yield_in_multiline_file.file = filename
+        yield_in_multiline_file.path = filename
+
+        self.checker_test_object.checker.process_module(
+            yield_in_multiline_file)
+
+        # No errors on yield statements in multi-line comments.
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_too_many_spaces_after_yield_statement(self):
+        node_too_many_spaces_after_yield_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    yield  (5, 2)
+                """)
+        node_too_many_spaces_after_yield_file.file = filename
+        node_too_many_spaces_after_yield_file.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_too_many_spaces_after_yield_file)
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-after-yield',
+                line=2
+            ),
+        ):
+            temp_file.close()
+
+    def test_no_space_after_yield_statement(self):
+        node_no_spaces_after_yield_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    yield(5, 2)
+                """)
+        node_no_spaces_after_yield_file.file = filename
+        node_no_spaces_after_yield_file.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_no_spaces_after_yield_file)
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-after-yield',
+                line=2
+            ),
+        ):
             temp_file.close()

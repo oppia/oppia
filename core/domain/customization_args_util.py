@@ -15,9 +15,12 @@
 # limitations under the License.
 
 """Utility methods for customization args of interactions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+import python_utils
 import schema_utils
 import utils
 
@@ -96,7 +99,7 @@ def validate_customization_args_and_values(
     # Remove extra keys.
     extra_args = []
     for arg_name in customization_args.keys():
-        if not isinstance(arg_name, basestring):
+        if not isinstance(arg_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid customization arg name: %s' % arg_name)
         if arg_name not in ca_spec_names:

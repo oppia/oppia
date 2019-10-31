@@ -21,9 +21,10 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
-import StringIO
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import collections
-import copy
 import datetime
 import logging
 import math
@@ -35,11 +36,14 @@ import zipfile
 from constants import constants
 from core.domain import activity_services
 from core.domain import classifier_services
+from core.domain import draft_upgrade_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import fs_domain
-from core.domain import fs_services
 from core.domain import html_cleaner
+from core.domain import opportunity_services
+from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -47,12 +51,12 @@ from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-gae_image_services = models.Registry.import_gae_image_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -63,335 +67,6 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # The maximum number of iterations allowed for populating the results of a
 # search query.
 MAX_ITERATIONS = 10
-
-
-def _migrate_states_schema(versioned_exploration_states, exploration_id):
-    """Holds the responsibility of performing a step-by-step, sequential update
-    of an exploration states structure based on the schema version of the input
-    exploration dictionary. This is very similar to the YAML conversion process
-    found in exp_domain.py and, in fact, many of the conversion functions for
-    states are also used in the YAML conversion pipeline. If the current
-    exploration states schema version changes
-    (feconf.CURRENT_STATE_SCHEMA_VERSION), a new conversion
-    function must be added and some code appended to this function to account
-    for that new version.
-
-    Args:
-        versioned_exploration_states: dict. A dict with two keys:
-            - states_schema_version: int. the states schema version for the
-                exploration.
-            - states: the dict of states comprising the exploration. The keys in
-                this dict are state names.
-        exploration_id: str. ID of the exploration.
-
-    Raises:
-        Exception: The given states_schema_version is invalid.
-    """
-    states_schema_version = versioned_exploration_states[
-        'states_schema_version']
-    if states_schema_version is None or states_schema_version < 1:
-        states_schema_version = 0
-
-    if not (0 <= states_schema_version
-            <= feconf.CURRENT_STATE_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v1-v%d and unversioned exploration '
-            'state schemas at present.' %
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-
-    while (states_schema_version <
-           feconf.CURRENT_STATE_SCHEMA_VERSION):
-        exp_domain.Exploration.update_states_from_model(
-            versioned_exploration_states, states_schema_version,
-            exploration_id)
-        states_schema_version += 1
-
-
-# Repository GET methods.
-def _get_exploration_memcache_key(exploration_id, version=None):
-    """Returns a memcache key for an exploration.
-
-    Args:
-        exploration_id: str. The id of the exploration whose memcache key
-            is to be returned.
-        version: int or None. If specified, the version of the exploration
-            whose memcache key is to be returned.
-
-    Returns:
-        str. Memcache key for the given exploration (or exploration version).
-    """
-
-    if version:
-        return 'exploration-version:%s:%s' % (exploration_id, version)
-    else:
-        return 'exploration:%s' % exploration_id
-
-
-def get_exploration_from_model(exploration_model, run_conversion=True):
-    """Returns an Exploration domain object given an exploration model loaded
-    from the datastore.
-
-    If run_conversion is True, then the exploration's states schema version
-    will be checked against the current states schema version. If they do not
-    match, the exploration will be automatically updated to the latest states
-    schema version.
-
-    IMPORTANT NOTE TO DEVELOPERS: In general, run_conversion should never be
-    False. This option is only used for testing that the states schema version
-    migration works correctly, and it should never be changed otherwise.
-
-    Args:
-        exploration_model: ExplorationModel. An exploration storage model.
-        run_conversion: bool. When True, updates the exploration to the latest
-            states_schema_version if necessary.
-
-    Returns:
-       Exploration. The exploration domain object corresponding to the given
-       exploration model.
-    """
-
-    # Ensure the original exploration model does not get altered.
-    versioned_exploration_states = {
-        'states_schema_version': exploration_model.states_schema_version,
-        'states': copy.deepcopy(exploration_model.states)
-    }
-
-    # If the exploration uses the latest states schema version, no conversion
-    # is necessary.
-    if (run_conversion and exploration_model.states_schema_version !=
-            feconf.CURRENT_STATE_SCHEMA_VERSION):
-        _migrate_states_schema(
-            versioned_exploration_states, exploration_model.id)
-
-    return exp_domain.Exploration(
-        exploration_model.id, exploration_model.title,
-        exploration_model.category, exploration_model.objective,
-        exploration_model.language_code, exploration_model.tags,
-        exploration_model.blurb, exploration_model.author_notes,
-        versioned_exploration_states['states_schema_version'],
-        exploration_model.init_state_name,
-        versioned_exploration_states['states'],
-        exploration_model.param_specs, exploration_model.param_changes,
-        exploration_model.version, exploration_model.auto_tts_enabled,
-        exploration_model.correctness_feedback_enabled,
-        created_on=exploration_model.created_on,
-        last_updated=exploration_model.last_updated)
-
-
-def get_exploration_summary_from_model(exp_summary_model):
-    """Returns an ExplorationSummary domain object.
-
-    Args:
-        exp_summary_model: ExplorationSummary. An ExplorationSummary model
-            instance.
-
-    Returns:
-        ExplorationSummary. The summary domain object correspoding to the
-        given exploration summary model.
-    """
-
-    return exp_domain.ExplorationSummary(
-        exp_summary_model.id, exp_summary_model.title,
-        exp_summary_model.category, exp_summary_model.objective,
-        exp_summary_model.language_code, exp_summary_model.tags,
-        exp_summary_model.ratings, exp_summary_model.scaled_average_rating,
-        exp_summary_model.status, exp_summary_model.community_owned,
-        exp_summary_model.owner_ids, exp_summary_model.editor_ids,
-        exp_summary_model.voice_artist_ids, exp_summary_model.viewer_ids,
-        exp_summary_model.contributor_ids,
-        exp_summary_model.contributors_summary, exp_summary_model.version,
-        exp_summary_model.exploration_model_created_on,
-        exp_summary_model.exploration_model_last_updated,
-        exp_summary_model.first_published_msec
-    )
-
-
-def get_exploration_by_id(exploration_id, strict=True, version=None):
-    """Returns an Exploration domain object.
-
-    Args:
-        exploration_id: str. The id of the exploration to be returned.
-        strict: bool. Whether to fail noisily if no exploration with a given id
-            exists.
-        version: int or None. The version of the exploration to be returned.
-            If None, the latest version of the exploration is returned.
-
-    Returns:
-        Exploration. The domain object corresponding to the given exploration.
-    """
-
-    exploration_memcache_key = _get_exploration_memcache_key(
-        exploration_id, version=version)
-    memcached_exploration = memcache_services.get_multi(
-        [exploration_memcache_key]).get(exploration_memcache_key)
-
-    if memcached_exploration is not None:
-        return memcached_exploration
-    else:
-        exploration_model = exp_models.ExplorationModel.get(
-            exploration_id, strict=strict, version=version)
-        if exploration_model:
-            exploration = get_exploration_from_model(exploration_model)
-            memcache_services.set_multi({
-                exploration_memcache_key: exploration})
-            return exploration
-        else:
-            return None
-
-
-def get_exploration_summary_by_id(exploration_id):
-    """Returns a domain object representing an exploration summary.
-
-    Args:
-        exploration_id: str. The id of the ExplorationSummary to be returned.
-
-    Returns:
-        ExplorationSummary. The summary domain object corresponding to the
-        given exploration.
-    """
-    # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
-    exp_summary_model = exp_models.ExpSummaryModel.get(
-        exploration_id)
-    if exp_summary_model:
-        exp_summary = get_exploration_summary_from_model(exp_summary_model)
-        return exp_summary
-    else:
-        return None
-
-
-def get_multiple_explorations_by_version(exp_id, version_numbers):
-    """Returns a list of Exploration domain objects corresponding to the
-    specified versions.
-
-    Args:
-        exp_id: str. ID of the exploration.
-        version_numbers: list(int). List of version numbers.
-
-    Returns:
-        list(Exploration). List of Exploration domain objects.
-
-    Raises:
-        Exception. One or more of the given versions of the exploration could
-            not be converted to the latest schema version.
-    """
-    explorations = []
-    exploration_models = exp_models.ExplorationModel.get_multi_versions(
-        exp_id, version_numbers)
-    error_versions = []
-    for index, exploration_model in enumerate(exploration_models):
-        try:
-            explorations.append(get_exploration_from_model(exploration_model))
-        except utils.ExplorationConversionError:
-            error_versions.append(version_numbers[index])
-
-    if error_versions:
-        raise Exception(
-            'Exploration %s, versions [%s] could not be converted to latest'
-            'schema version.' % (exp_id, ', '.join(map(str, error_versions))))
-    return explorations
-
-
-def get_multiple_explorations_by_id(exp_ids, strict=True):
-    """Returns a dict of domain objects representing explorations with the
-    given ids as keys. If an exp_id is not present, it is not included in the
-    return dict.
-
-    Args:
-        exp_ids: list(str). List of ids of the exploration to be returned.
-        strict: bool. If True, a ValueError is raised when any exploration id
-            is invalid.
-
-    Returns:
-        dict. Maps exploration ids to the corresponding Exploration domain
-        objects. Any invalid exploration ids are omitted.
-
-    Raises:
-        ValueError: When strict is True and at least one of the given exp_ids
-        is invalid.
-    """
-    exp_ids = set(exp_ids)
-    result = {}
-    uncached = []
-    memcache_keys = [_get_exploration_memcache_key(i) for i in exp_ids]
-    cache_result = memcache_services.get_multi(memcache_keys)
-
-    for exp_obj in cache_result.itervalues():
-        result[exp_obj.id] = exp_obj
-
-    for _id in exp_ids:
-        if _id not in result:
-            uncached.append(_id)
-
-    db_exp_models = exp_models.ExplorationModel.get_multi(uncached)
-    db_results_dict = {}
-    not_found = []
-    for i, eid in enumerate(uncached):
-        model = db_exp_models[i]
-        if model:
-            exploration = get_exploration_from_model(model)
-            db_results_dict[eid] = exploration
-        else:
-            logging.info('Tried to fetch exploration with id %s, but no such '
-                         'exploration exists in the datastore' % eid)
-            not_found.append(eid)
-
-    if strict and not_found:
-        raise ValueError(
-            'Couldn\'t find explorations with the following ids:\n%s'
-            % '\n'.join(not_found))
-
-    cache_update = {
-        eid: db_results_dict[eid] for eid in db_results_dict.iterkeys()
-        if db_results_dict[eid] is not None
-    }
-
-    if cache_update:
-        memcache_services.set_multi(cache_update)
-
-    result.update(db_results_dict)
-    return result
-
-
-def get_exploration_and_exploration_rights_by_id(exploration_id):
-    """Returns a tuple for exploration domain object and exploration rights
-    object.
-
-    Args:
-        exploration_id: str. Id of the exploration.
-
-    Returns:
-        tuple(Exploration|None, ExplorationRights|None). The exploration and
-        exploration rights object, respectively.
-    """
-    exploration_and_rights = (
-        datastore_services.fetch_multiple_entities_by_ids_and_models(
-            [
-                ('ExplorationModel', [exploration_id]),
-                ('ExplorationRightsModel', [exploration_id])
-            ]))
-
-    exploration = None
-    if exploration_and_rights[0][0] is not None:
-        exploration = get_exploration_from_model(
-            exploration_and_rights[0][0])
-
-    exploration_rights = None
-    if exploration_and_rights[1][0] is not None:
-        exploration_rights = (
-            rights_manager.get_activity_rights_from_model(
-                exploration_and_rights[1][0],
-                constants.ACTIVITY_TYPE_EXPLORATION))
-
-    return (exploration, exploration_rights)
-
-
-def get_new_exploration_id():
-    """Returns a new exploration id.
-
-    Returns:
-        str. A new exploration id.
-    """
-    return exp_models.ExplorationModel.get_new_id('')
 
 
 def is_exp_summary_editable(exp_summary, user_id=None):
@@ -430,7 +105,7 @@ def get_exploration_titles_and_categories(exp_ids):
         ids are excluded.
     """
     explorations = [
-        (get_exploration_from_model(e) if e else None)
+        (exp_fetchers.get_exploration_from_model(e) if e else None)
         for e in exp_models.ExplorationModel.get_multi(exp_ids)]
 
     result = {}
@@ -444,45 +119,6 @@ def get_exploration_titles_and_categories(exp_ids):
                 'category': exploration.category,
             }
     return result
-
-
-def _get_exploration_summaries_from_models(exp_summary_models):
-    """Returns a dict with ExplorationSummary domain objects as values,
-    keyed by their exploration id.
-
-    Args:
-        exp_summary_models: list(ExplorationSummary). List of ExplorationSummary
-            model instances.
-
-    Returns:
-        dict. The keys are exploration ids and the values are the corresponding
-        ExplorationSummary domain objects.
-    """
-    exploration_summaries = [
-        get_exploration_summary_from_model(exp_summary_model)
-        for exp_summary_model in exp_summary_models]
-    result = {}
-    for exp_summary in exploration_summaries:
-        result[exp_summary.id] = exp_summary
-    return result
-
-
-def get_exploration_summaries_matching_ids(exp_ids):
-    """Returns a list of ExplorationSummary domain objects (or None if the
-    corresponding summary does not exist) corresponding to the given
-    list of exploration ids.
-
-    Args:
-        exp_ids: list(str). List of exploration ids.
-
-    Returns:
-        list(ExplorationSummary|None). List of ExplorationSummary domain objects
-        corresponding to the given exploration ids. If an ExplorationSummary
-        does not exist, the corresponding returned list element is None.
-    """
-    return [
-        (get_exploration_summary_from_model(model) if model else None)
-        for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
 
 
 def get_exploration_ids_matching_query(query_string, cursor=None):
@@ -506,7 +142,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
     returned_exploration_ids = []
     search_cursor = cursor
 
-    for _ in range(MAX_ITERATIONS):
+    for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
@@ -546,7 +182,7 @@ def get_non_private_exploration_summaries():
         dict. The keys are exploration ids and the values are corresponding
         non-private ExplorationSummary domain objects.
     """
-    return _get_exploration_summaries_from_models(
+    return exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_non_private())
 
 
@@ -563,7 +199,7 @@ def get_top_rated_exploration_summaries(limit):
         top rated ExplorationSummary domain model instances.  At most limit
         entries are returned.
     """
-    return _get_exploration_summaries_from_models(
+    return exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_top_rated(limit))
 
 
@@ -581,7 +217,7 @@ def get_recently_published_exp_summaries(limit):
             instances as a value keyed by their exploration id. At most 'limit'
             entries are returned.
     """
-    return _get_exploration_summaries_from_models(
+    return exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_recently_published(limit))
 
 
@@ -593,7 +229,7 @@ def get_all_exploration_summaries():
         dict. A dict with all ExplorationSummary domain objects keyed by their
         exploration id.
     """
-    return _get_exploration_summaries_from_models(
+    return exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_all())
 
 
@@ -611,10 +247,11 @@ def export_to_zip_file(exploration_id, version=None):
         str. The contents of the ZIP archive of the exploration (which can be
         subsequently converted into a zip file via zipfile.ZipFile()).
     """
-    exploration = get_exploration_by_id(exploration_id, version=version)
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
-    memfile = StringIO.StringIO()
+    memfile = python_utils.string_io()
     with zipfile.ZipFile(
         memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
 
@@ -622,7 +259,7 @@ def export_to_zip_file(exploration_id, version=None):
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
             # Currently, the version number of all files is 1, since they are
@@ -632,7 +269,7 @@ def export_to_zip_file(exploration_id, version=None):
             file_contents = fs.get(filepath, version=1)
 
             str_filepath = 'assets/%s' % filepath
-            assert isinstance(str_filepath, str)
+            assert isinstance(str_filepath, python_utils.UNICODE)
             unicode_filepath = str_filepath.decode('utf-8')
             zfile.writestr(unicode_filepath, file_contents)
 
@@ -656,10 +293,11 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
         dict. The keys are state names, and the values are YAML strings
         representing the corresponding state's contents.
     """
-    exploration = get_exploration_by_id(exploration_id, version=version)
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, version=version)
     exploration_dict = {}
     for state in exploration.states:
-        exploration_dict[state] = utils.yaml_from_dict(
+        exploration_dict[state] = python_utils.yaml_from_dict(
             exploration.states[state].to_dict(), width=width)
     return exploration_dict
 
@@ -683,8 +321,9 @@ def apply_change_list(exploration_id, change_list):
     Raises:
         Exception: Any entries in the changelist are invalid.
     """
-    exploration = get_exploration_by_id(exploration_id)
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     try:
+        to_param_domain = param_domain.ParamChange.from_dict
         for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 exploration.add_states([change.state_name])
@@ -697,9 +336,12 @@ def apply_change_list(exploration_id, change_list):
                 state = exploration.states[change.state_name]
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
-                    state.update_param_changes(change.new_value)
+                    state.update_param_changes(
+                        list(python_utils.MAP(
+                            to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    state.update_content(change.new_value)
+                    state.update_content(
+                        state_domain.SubtitledHtml.from_dict(change.new_value))
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_ID):
@@ -765,6 +407,10 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.WrittenTranslations.from_dict(
                             change.new_value))
                     state.update_written_translations(written_translations)
+            elif change.cmd == exp_domain.CMD_ADD_TRANSLATION:
+                exploration.states[change.state_name].add_translation(
+                    change.content_id, change.language_code,
+                    change.translation_html)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -783,7 +429,9 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'param_specs':
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
-                    exploration.update_param_changes(change.new_value)
+                    exploration.update_param_changes(
+                        list(python_utils.MAP(
+                            to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -829,31 +477,27 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         Exception: The versions of the given exploration and the currently
             stored exploration model do not match.
     """
-    if change_list is None:
-        change_list = []
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
 
-    exploration_model = exp_models.ExplorationModel.get(
-        exploration.id, strict=False)
-    if exploration_model is None:
-        exploration_model = exp_models.ExplorationModel(id=exploration.id)
-    else:
-        if exploration.version > exploration_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of exploration '
-                'from version %s. Please reload the page and try again.'
-                % (exploration_model.version, exploration.version))
-        elif exploration.version < exploration_model.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration_model.version, exploration.version))
+    exploration_model = exp_models.ExplorationModel.get(exploration.id)
 
-    old_states = get_exploration_from_model(exploration_model).states
+    if exploration.version > exploration_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of exploration '
+            'from version %s. Please reload the page and try again.'
+            % (exploration_model.version, exploration.version))
+    elif exploration.version < exploration_model.version:
+        raise Exception(
+            'Trying to update version %s of exploration from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (exploration_model.version, exploration.version))
+
+    old_states = exp_fetchers.get_exploration_from_model(
+        exploration_model).states
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
     exploration_model.objective = exploration.objective
@@ -866,7 +510,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
         state_name: state.to_dict()
-        for (state_name, state) in exploration.states.iteritems()}
+        for (state_name, state) in exploration.states.items()}
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
@@ -875,17 +519,19 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
-    memcache_services.delete(_get_exploration_memcache_key(exploration.id))
-    index_explorations_given_ids([exploration.id])
+    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
+    memcache_services.delete(exp_memcache_key)
 
     exploration.version += 1
 
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
     # Trigger statistics model update.
-    stats_services.handle_stats_creation_for_new_exp_version(
+    new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
         exp_versions_diff=exp_versions_diff, revert_to_version=None)
+
+    stats_services.create_stats_model(new_exp_stats)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         trainable_states_dict = exploration.get_trainable_states_dict(
@@ -945,7 +591,7 @@ def _create_exploration(
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()
-            for (state_name, state) in exploration.states.iteritems()},
+            for (state_name, state) in exploration.states.items()},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
@@ -956,8 +602,9 @@ def _create_exploration(
     exploration.version += 1
 
     # Trigger statistics model creation.
-    stats_services.handle_stats_creation_for_new_exploration(
+    exploration_stats = stats_services.get_stats_for_new_exploration(
         exploration.id, exploration.version, exploration.states)
+    stats_services.create_stats_model(exploration_stats)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -1032,7 +679,8 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
     # This must come after the exploration is retrieved. Otherwise the memcache
     # key will be reinstated.
-    exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
+    exploration_memcache_key = exp_fetchers.get_exploration_memcache_key(
+        exploration_id)
     memcache_services.delete(exploration_memcache_key)
 
     # Delete the exploration from search.
@@ -1085,9 +733,9 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
         consecutive and in ascending order. There are exploration.version_number
         items in the returned list.
     """
-    exploration = get_exploration_by_id(exploration_id)
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     current_version = exploration.version
-    version_nums = range(1, current_version + 1)
+    version_nums = list(python_utils.RANGE(1, current_version + 1))
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
         exploration_id, version_nums, allow_deleted=allow_deleted)
@@ -1131,11 +779,12 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
         exp_id: str. The id of the exploration to be published.
     """
     rights_manager.publish_exploration(committer, exp_id)
-    exp_title = get_exploration_by_id(exp_id).title
+    exp_title = exp_fetchers.get_exploration_by_id(exp_id).title
     email_subscription_services.inform_subscribers(
         committer.user_id, exp_id, exp_title)
     contribution_time_msec = utils.get_current_time_in_millisecs()
-    contributor_ids = get_exploration_summary_by_id(exp_id).contributor_ids
+    contributor_ids = exp_fetchers.get_exploration_summary_by_id(
+        exp_id).contributor_ids
     for contributor in contributor_ids:
         user_services.update_first_contribution_msec_if_not_set(
             contributor, contribution_time_msec)
@@ -1150,8 +799,9 @@ def update_exploration(
         committer_id: str. The id of the user who is performing the update
             action.
         exploration_id: str. The id of the exploration to be updated.
-        change_list: list(ExplorationChange). A change list to be applied to the
-            given exploration.
+        change_list: list(ExplorationChange) or None. A change list to be
+            applied to the given exploration. If None, it corresponds to an
+            empty list.
         commit_message: str or None. A description of changes made to the state.
             For published explorations, this must be present; for unpublished
             explorations, it should be equal to None. For suggestions that are
@@ -1170,6 +820,9 @@ def update_exploration(
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
+    if change_list is None:
+        change_list = []
+
     if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
             'Voice artist does not have permission to make some '
@@ -1192,19 +845,25 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    exploration = apply_change_list(exploration_id, change_list)
-    _save_exploration(committer_id, exploration, commit_message, change_list)
+    updated_exploration = apply_change_list(exploration_id, change_list)
+    _save_exploration(
+        committer_id, updated_exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
-    update_exploration_summary(exploration.id, committer_id)
-    user_services.add_edited_exploration_id(committer_id, exploration.id)
-    user_services.record_user_edited_an_exploration(committer_id)
+    update_exploration_summary(exploration_id, committer_id)
 
-    if (not rights_manager.is_exploration_private(exploration.id) and
-            committer_id != feconf.MIGRATION_BOT_USER_ID):
-        user_services.update_first_contribution_msec_if_not_set(
-            committer_id, utils.get_current_time_in_millisecs())
+    if committer_id != feconf.MIGRATION_BOT_USER_ID:
+        user_services.add_edited_exploration_id(committer_id, exploration_id)
+        user_services.record_user_edited_an_exploration(committer_id)
+        if not rights_manager.is_exploration_private(exploration_id):
+            user_services.update_first_contribution_msec_if_not_set(
+                committer_id, utils.get_current_time_in_millisecs())
+
+    if opportunity_services.is_exploration_available_for_contribution(
+            exploration_id):
+        opportunity_services.update_opportunity_with_updated_exploration(
+            exploration_id)
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):
@@ -1218,7 +877,7 @@ def create_exploration_summary(exploration_id, contributor_id_to_add):
             for the exploration if the argument is not None and it is not a
             system id.
     """
-    exploration = get_exploration_by_id(exploration_id)
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(
         exploration, contributor_id_to_add)
     save_exploration_summary(exp_summary)
@@ -1236,7 +895,7 @@ def update_exploration_summary(exploration_id, contributor_id_to_add):
             contributours for the exploration if the argument is not None and it
             is not a system id.
     """
-    exploration = get_exploration_by_id(exploration_id)
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(
         exploration, contributor_id_to_add)
     save_exploration_summary(exp_summary)
@@ -1263,7 +922,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
     exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
     if exp_summary_model:
-        old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
+        old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
+            exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
         scaled_average_rating = get_scaled_average_rating(
             old_exp_summary.ratings)
@@ -1295,7 +955,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
                 contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        get_last_updated_by_human_ms(exploration.id) / 1000.0)
+        python_utils.divide(
+            get_last_updated_by_human_ms(exploration.id), 1000.0))
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
@@ -1380,6 +1041,12 @@ def save_exploration_summary(exp_summary):
 
     exp_summary_model.put()
 
+    # The index should be updated after saving the exploration
+    # summary instead of after saving the exploration since the
+    # index contains documents computed on basis of exploration
+    # summary.
+    index_explorations_given_ids([exp_summary.id])
+
 
 def delete_exploration_summary(exploration_id):
     """Delete an exploration summary model.
@@ -1424,7 +1091,7 @@ def revert_exploration(
 
     # Validate the previous version of the exploration before committing the
     # change.
-    exploration = get_exploration_by_id(
+    exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
@@ -1436,24 +1103,26 @@ def revert_exploration(
         exploration_model, committer_id,
         'Reverted exploration to version %s' % revert_to_version,
         revert_to_version)
-    memcache_services.delete(_get_exploration_memcache_key(exploration_id))
+    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
+    memcache_services.delete(exp_memcache_key)
 
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.
     update_exploration_summary(exploration_id, None)
 
-    stats_services.handle_stats_creation_for_new_exp_version(
+    exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
         exp_versions_diff=None, revert_to_version=revert_to_version)
+    stats_services.create_stats_model(exploration_stats)
 
-    current_exploration = get_exploration_by_id(
+    current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
     stats_services.update_exp_issues_for_new_exp_version(
         current_exploration, exp_versions_diff=None,
         revert_to_version=revert_to_version)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        exploration_to_revert_to = get_exploration_by_id(
+        exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
             exploration_id, version=revert_to_version)
         classifier_services.create_classifier_training_job_for_reverted_exploration( # pylint: disable=line-too-long
             current_exploration, exploration_to_revert_to)
@@ -1523,7 +1192,7 @@ def save_new_exploration_from_yaml_and_assets(
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(committer_id, asset_filename, asset_content)
 
     if (exp_schema_version <=
@@ -1567,7 +1236,8 @@ def delete_demo(exploration_id):
     if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
 
-    exploration = get_exploration_by_id(exploration_id, strict=False)
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False)
     if not exploration:
         logging.info('Exploration with id %s was not deleted, because it '
                      'does not exist.' % exploration_id)
@@ -1588,10 +1258,10 @@ def load_demo(exploration_id):
     Raises:
         Exception: The exploration id provided is invalid.
     """
-    delete_demo(exploration_id)
-
     if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
+
+    delete_demo(exploration_id)
 
     exp_filename = feconf.DEMO_EXPLORATIONS[exploration_id]
 
@@ -1664,7 +1334,7 @@ def get_image_filenames_from_exploration(exploration):
        list(str). List containing the name of the image files in exploration.
     """
     filenames = []
-    for state in exploration.states.itervalues():
+    for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
                 'imageAndRegions']['value']['imagePath'])
@@ -1677,64 +1347,11 @@ def get_image_filenames_from_exploration(exploration):
                 html_string))
 
     for rte_comp in rte_components_in_exp:
-        if 'id' in rte_comp and (
-                str(rte_comp['id']) == 'oppia-noninteractive-image'):
+        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.
     return list(set(filenames))
-
-
-def save_original_and_compressed_versions_of_image(
-        user_id, filename, exp_id, original_image_content):
-    """Saves the three versions of the image file.
-
-    Args:
-        user_id: str. The id of the user who wants to upload the image.
-        filename: str. The name of the image file.
-        exp_id: str. The id of the exploration.
-        original_image_content: str. The content of the original image.
-    """
-    filepath = 'image/%s' % filename
-
-    filename_wo_filetype = filename[:filename.rfind('.')]
-    filetype = filename[filename.rfind('.') + 1:]
-
-    compressed_image_filename = '%s_compressed.%s' % (
-        filename_wo_filetype, filetype)
-    compressed_image_filepath = 'image/%s' % compressed_image_filename
-
-    micro_image_filename = '%s_micro.%s' % (
-        filename_wo_filetype, filetype)
-    micro_image_filepath = 'image/%s' % micro_image_filename
-
-    file_system_class = fs_services.get_exploration_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(
-        fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
-
-    compressed_image_content = gae_image_services.compress_image(
-        original_image_content, 0.8)
-    micro_image_content = gae_image_services.compress_image(
-        original_image_content, 0.7)
-
-    # Because in case of CreateVersionsOfImageJob, the original image is
-    # already there. Also, even if the compressed, micro versions for some
-    # image exists, then this would prevent from creating another copy of
-    # the same.
-    if not fs.isfile(filepath.encode('utf-8')):
-        fs.commit(
-            user_id, filepath.encode('utf-8'), original_image_content,
-            mimetype='image/%s' % filetype)
-
-    if not fs.isfile(compressed_image_filepath.encode('utf-8')):
-        fs.commit(
-            user_id, compressed_image_filepath.encode('utf-8'),
-            compressed_image_content, mimetype='image/%s' % filetype)
-
-    if not fs.isfile(micro_image_filepath.encode('utf-8')):
-        fs.commit(
-            user_id, micro_image_filepath.encode('utf-8'),
-            micro_image_content, mimetype='image/%s' % filetype)
 
 
 def get_number_of_ratings(ratings):
@@ -1772,7 +1389,7 @@ def get_average_rating(ratings):
 
         for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
-        return rating_sum / (number_of_ratings * 1.0)
+        return python_utils.divide(rating_sum, (number_of_ratings * 1.0))
 
 
 def get_scaled_average_rating(ratings):
@@ -1792,26 +1409,16 @@ def get_scaled_average_rating(ratings):
         return 0
     average_rating = get_average_rating(ratings)
     z = 1.9599639715843482
-    x = (average_rating - 1) / 4
+    x = python_utils.divide((average_rating - 1), 4)
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
-    a = x + (z**2) / (2 * n)
-    b = z * math.sqrt((x * (1 - x)) / n + (z**2) / (4 * n**2))
-    wilson_score_lower_bound = (a - b) / (1 + z**2 / n)
+    a = x + python_utils.divide((z**2), (2 * n))
+    b = z * math.sqrt(
+        python_utils.divide((x * (1 - x)), n) + python_utils.divide(
+            (z**2), (4 * n**2)))
+    wilson_score_lower_bound = python_utils.divide(
+        (a - b), (1 + python_utils.divide(z**2, n)))
     return 1 + 4 * wilson_score_lower_bound
-
-
-def get_exploration_search_rank(exp_id):
-    """Returns the search rank.
-
-    Args:
-        exp_id: str. The id of the exploration.
-
-    Returns:
-        int. The rank of the exploration.
-    """
-    exp_summary = get_exploration_summary_by_id(exp_id)
-    return search_services.get_search_rank_from_exp_summary(exp_summary)
 
 
 def index_explorations_given_ids(exp_ids):
@@ -1820,7 +1427,8 @@ def index_explorations_given_ids(exp_ids):
     Args:
         exp_ids: list(str). List of ids of the explorations to be indexed.
     """
-    exploration_summaries = get_exploration_summaries_matching_ids(exp_ids)
+    exploration_summaries = exp_fetchers.get_exploration_summaries_matching_ids(
+        exp_ids)
     search_services.index_exploration_summaries([
         exploration_summary for exploration_summary in exploration_summaries
         if exploration_summary is not None])
@@ -1858,30 +1466,38 @@ def is_version_of_draft_valid(exp_id, version):
         version number of the exploration in the datastore.
     """
 
-    return get_exploration_by_id(exp_id).version == version
+    return exp_fetchers.get_exploration_by_id(exp_id).version == version
 
 
 def get_user_exploration_data(
         user_id, exploration_id, apply_draft=False, version=None):
     """Returns a description of the given exploration."""
-    if apply_draft:
-        exploration = get_exp_with_draft_applied(exploration_id, user_id)
-    else:
-        exploration = get_exploration_by_id(exploration_id, version=version)
-
-    states = {}
-    for state_name in exploration.states:
-        state_dict = exploration.states[state_name].to_dict()
-        states[state_name] = state_dict
     exp_user_data = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
-    draft_changes = (exp_user_data.draft_change_list if exp_user_data
-                     and exp_user_data.draft_change_list else None)
     is_valid_draft_version = (
         is_version_of_draft_valid(
             exploration_id, exp_user_data.draft_change_list_exp_version)
         if exp_user_data and exp_user_data.draft_change_list_exp_version
         else None)
+    if apply_draft:
+        updated_exploration = (
+            get_exp_with_draft_applied(exploration_id, user_id))
+        if updated_exploration is None:
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id, version=version)
+        else:
+            exploration = updated_exploration
+            is_valid_draft_version = True
+    else:
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, version=version)
+
+    states = {}
+    for state_name in exploration.states:
+        state_dict = exploration.states[state_name].to_dict()
+        states[state_name] = state_dict
+    draft_changes = (exp_user_data.draft_change_list if exp_user_data
+                     and exp_user_data.draft_change_list else None)
     draft_change_list_id = (exp_user_data.draft_change_list_id
                             if exp_user_data else 0)
     exploration_email_preferences = (
@@ -1991,21 +1607,38 @@ def get_exp_with_draft_applied(exp_id, user_id):
         user_id: str. The id of the user whose draft is to be applied.
 
     Returns:
-        Exploration. The exploration domain object.
+        Exploration or None. Returns the exploration domain object with draft
+        applied, or None if draft can not be applied.
     """
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
-    exploration = get_exploration_by_id(exp_id)
+    exploration = exp_fetchers.get_exploration_by_id(exp_id)
     if exp_user_data:
         if exp_user_data.draft_change_list:
+            draft_change_list_exp_version = (
+                exp_user_data.draft_change_list_exp_version)
             draft_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in exp_user_data.draft_change_list]
+            if (
+                    exploration.version >
+                    exp_user_data.draft_change_list_exp_version):
+                logging.info(
+                    'Exploration and draft versions out of sync, trying '
+                    'to upgrade draft version to match exploration\'s.')
+                new_draft_change_list = (
+                    draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                        draft_change_list,
+                        exp_user_data.draft_change_list_exp_version,
+                        exploration.version, exp_id))
+                if new_draft_change_list is not None:
+                    draft_change_list = new_draft_change_list
+                    draft_change_list_exp_version = exploration.version
+
     return (
         apply_change_list(exp_id, draft_change_list)
         if exp_user_data and exp_user_data.draft_change_list and
-        is_version_of_draft_valid(
-            exp_id, exp_user_data.draft_change_list_exp_version)
-        else exploration)
+        is_version_of_draft_valid(exp_id, draft_change_list_exp_version)
+        else None)
 
 
 def discard_draft(exp_id, user_id):
@@ -2023,3 +1656,24 @@ def discard_draft(exp_id, user_id):
         exp_user_data.draft_change_list_last_updated = None
         exp_user_data.draft_change_list_exp_version = None
         exp_user_data.put()
+
+
+def get_interaction_id_for_state(exp_id, state_name):
+    """Returns the interaction id for the given state name.
+
+    Args:
+        exp_id: str. The ID of the exp.
+        state_name: str. The name of the state.
+
+    Returns:
+        str. The ID of the interaction.
+
+    Raises:
+        Exception: If the state with the given state name does not exist in
+            the exploration.
+    """
+    exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    if exploration.has_state_name(state_name):
+        return exploration.get_interaction_id_by_state_name(state_name)
+    raise Exception(
+        'There exist no state in the exploration with the given state name.')

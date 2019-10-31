@@ -17,21 +17,19 @@
  */
 
 require('components/profile-link-directives/circular-image.directive.ts');
-require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
+require('domain/learner_dashboard/learner-dashboard-icons.directive.ts');
 require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
 require('components/ratings/rating-computation/rating-computation.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('explorationSummaryTile', [
+angular.module('oppia').directive('explorationSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -98,17 +96,16 @@ oppia.directive('explorationSummaryTile', [
       controller: [
         '$scope', '$http', '$window', 'DateTimeFormatService',
         'RatingComputationService', 'UrlService', 'UserService',
-        'WindowDimensionsService',
+        'WindowDimensionsService', 'ACTIVITY_TYPE_EXPLORATION',
         function(
             $scope, $http, $window, DateTimeFormatService,
             RatingComputationService, UrlService, UserService,
-            WindowDimensionsService) {
+            WindowDimensionsService, ACTIVITY_TYPE_EXPLORATION) {
           $scope.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.userIsLoggedIn = userInfo.isLoggedIn();
           });
-          $scope.ACTIVITY_TYPE_EXPLORATION = (
-            constants.ACTIVITY_TYPE_EXPLORATION);
+          $scope.ACTIVITY_TYPE_EXPLORATION = ACTIVITY_TYPE_EXPLORATION;
           var contributorsSummary = $scope.getContributorsSummary() || {};
           $scope.contributors = Object.keys(
             contributorsSummary).sort(

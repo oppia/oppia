@@ -17,37 +17,36 @@
  * since the Epoch to human-readable dates.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('DateTimeFormatService', ['$filter', function($filter) {
-  return {
-    // Returns just the time if the local datetime representation has the
-    // same date as the current date. Otherwise, returns just the date if the
-    // local datetime representation has the same year as the current date.
-    // Otherwise, returns the full date (with the year abbreviated).
-    getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-        return date.toLocaleTimeString([], {
-          hour: 'numeric',
-          minute: 'numeric',
-          hour12: true
-        });
-      } else if (date.getFullYear() === new Date().getFullYear()) {
-        return $filter('date')(date, 'MMM d');
-      } else {
-        return $filter('date')(date, 'shortDate');
+angular.module('oppia').factory('DateTimeFormatService', [
+  '$filter', function($filter) {
+    return {
+      // Returns just the time if the local datetime representation has the
+      // same date as the current date. Otherwise, returns just the date if the
+      // local datetime representation has the same year as the current date.
+      // Otherwise, returns the full date (with the year abbreviated).
+      getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
+        var date = new Date(millisSinceEpoch);
+        if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
+          return date.toLocaleTimeString([], {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+          });
+        } else if (date.getFullYear() === new Date().getFullYear()) {
+          return $filter('date')(date, 'MMM d');
+        } else {
+          return $filter('date')(date, 'shortDate');
+        }
+      },
+      // Returns just the date.
+      getLocaleDateString: function(millisSinceEpoch) {
+        var date = new Date(millisSinceEpoch);
+        return date.toLocaleDateString();
+      },
+      // Returns whether the date is at most one week before the current date.
+      isRecent: function(millisSinceEpoch) {
+        var ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
+        return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
       }
-    },
-    // Returns just the date.
-    getLocaleDateString: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      return date.toLocaleDateString();
-    },
-    // Returns whether the date is at most one week before the current date.
-    isRecent: function(millisSinceEpoch) {
-      var ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
-      return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
-    }
-  };
-}]);
+    };
+  }]);

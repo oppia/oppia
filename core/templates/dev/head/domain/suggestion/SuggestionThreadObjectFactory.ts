@@ -19,9 +19,7 @@
 
 require('domain/suggestion/SuggestionObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SuggestionThreadObjectFactory', [
+angular.module('oppia').factory('SuggestionThreadObjectFactory', [
   'SuggestionObjectFactory', function(SuggestionObjectFactory) {
     var SuggestionThread = function(
         status, subject, summary, originalAuthorName, lastUpdated, messageCount,
@@ -37,7 +35,7 @@ oppia.factory('SuggestionThreadObjectFactory', [
       this.messages = [];
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SuggestionThread['createFromBackendDicts'] = function(
     /* eslint-enable dot-notation */

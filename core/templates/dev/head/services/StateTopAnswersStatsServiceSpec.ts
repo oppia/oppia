@@ -17,9 +17,82 @@
  * statistics for a particular state.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// StateTopAnswersStatsService.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { IAnswerStatsBackendDict } from
+  'domain/exploration/AnswerStatsObjectFactory';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory';
+import { FractionInputRulesService } from
+  'interactions/FractionInput/directives/fraction-input-rules.service';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+/* eslint-enable max-len */
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
+/* eslint-disable max-len */
+import { StateEditorService } from
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+/* eslint-enable max-len */
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/StateTopAnswersStatsService.ts');
+
+class MockAnswerStats {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' since 'answer' is a dict with underscore_cased keys which gives
+  // tslint errors against underscore_casing in favor of camelCasing.
+  answer: any;
+  answerHtml: string;
+  frequency: number;
+  isAddressed: boolean;
+  constructor(
+      answer: any, answerHtml: string, frequency: number,
+      isAddressed: boolean) {
+    this.answer = angular.copy(answer);
+    this.answerHtml = answerHtml;
+    this.frequency = frequency;
+    this.isAddressed = isAddressed;
+  }
+  toBackendDict(): IAnswerStatsBackendDict {
+    return {
+      answer: angular.copy(this.answer),
+      frequency: this.frequency
+    };
+  }
+}
 
 var joC = jasmine.objectContaining;
 
@@ -30,10 +103,72 @@ describe('StateTopAnswersStatsService', function() {
   var ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
-  var RuleObjectFactory = null;
+  var ruleObjectFactory = null;
   var StateTopAnswersStatsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', new AngularNameService());
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value('AnswerStatsObjectFactory', {
+      createFromBackendDict: function(backendDict) {
+        var answerHtml = (typeof backendDict.answer === 'string') ?
+          backendDict.answer : angular.toJson(backendDict.answer);
+        return new MockAnswerStats(
+          backendDict.answer, answerHtml, backendDict.frequency, false);
+      }
+    });
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('FractionInputRulesService', new FractionInputRulesService(
+      new FractionObjectFactory()));
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+        new ParamChangeObjectFactory()));
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value(
+      'StateClassifierMappingService', new StateClassifierMappingService(
+        new ClassifierObjectFactory()));
+    $provide.value(
+      'StateEditorService', new StateEditorService(
+        new SolutionValidityService()));
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
       _ExplorationStatesService_, _RuleObjectFactory_,
@@ -44,7 +179,7 @@ describe('StateTopAnswersStatsService', function() {
     ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
-    RuleObjectFactory = _RuleObjectFactory_;
+    ruleObjectFactory = _RuleObjectFactory_;
     StateTopAnswersStatsService = _StateTopAnswersStatsService_;
 
     ExplorationStatesService.init({
@@ -298,7 +433,7 @@ describe('StateTopAnswersStatsService', function() {
         var newAnswerGroups = angular.copy(
           ExplorationStatesService.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
-          RuleObjectFactory.createNew('Contains', {x: 'adios'})
+          ruleObjectFactory.createNew('Contains', {x: 'adios'})
         ];
         ExplorationStatesService.saveInteractionAnswerGroups(
           'Hola', newAnswerGroups);
@@ -314,7 +449,7 @@ describe('StateTopAnswersStatsService', function() {
         var newAnswerGroups = angular.copy(
           ExplorationStatesService.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
-          RuleObjectFactory.createNew('Contains', {x: 'bonjour'})
+          ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
         ];
         ExplorationStatesService.saveInteractionAnswerGroups(
           'Hola', newAnswerGroups);

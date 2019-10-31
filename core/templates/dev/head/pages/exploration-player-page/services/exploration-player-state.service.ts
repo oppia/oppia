@@ -17,10 +17,10 @@
  *  like engine service.
  */
 
-require('domain/exploration/EditableExplorationBackendApiService.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
-require('domain/question/PretestQuestionBackendApiService.ts');
-require('domain/question/QuestionBackendApiService.ts');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('domain/question/pretest-question-backend-api.service.ts');
+require('domain/question/question-backend-api.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -37,27 +37,26 @@ require('services/PlaythroughIssuesService.ts');
 require('services/PlaythroughService.ts');
 require('services/contextual/UrlService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationPlayerStateService', [
-  '$log', '$q', '$rootScope', 'ContextService',
+angular.module('oppia').factory('ExplorationPlayerStateService', [
+  '$q', '$rootScope', 'ContextService',
   'EditableExplorationBackendApiService',
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
   'ExplorationFeaturesService', 'NumberAttemptsService',
-  'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
+  'PlayerCorrectnessFeedbackEnabledService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
   'PretestQuestionBackendApiService',
   'QuestionBackendApiService', 'QuestionPlayerEngineService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
   function(
-      $log, $q, $rootScope, ContextService,
+      $q, $rootScope, ContextService,
       EditableExplorationBackendApiService,
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
       ExplorationFeaturesService, NumberAttemptsService,
-      PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
+      PlayerCorrectnessFeedbackEnabledService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
       PretestQuestionBackendApiService,
       QuestionBackendApiService, QuestionPlayerEngineService,
@@ -68,7 +67,15 @@ oppia.factory('ExplorationPlayerStateService', [
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
     var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
-    var version = GLOBALS.explorationVersion;
+    var version = UrlService.getExplorationVersionFromUrl();
+    if (!questionPlayerMode) {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    }
+
     var storyId = UrlService.getStoryIdInPlayer();
 
     var initializeExplorationServices = function(
@@ -76,7 +83,7 @@ oppia.factory('ExplorationPlayerStateService', [
       StateClassifierMappingService.init(returnDict.state_classifier_mapping);
       StatsReportingService.initSession(
         explorationId, returnDict.exploration.title, version,
-        returnDict.session_id, GLOBALS.collectionId);
+        returnDict.session_id, UrlService.getCollectionIdFromExplorationUrl());
       PlaythroughService.initSession(
         explorationId, version, returnDict.record_playthrough_probability);
       PlaythroughIssuesService.initSession(explorationId, version);
@@ -141,7 +148,9 @@ oppia.factory('ExplorationPlayerStateService', [
       setQuestionPlayerMode();
       QuestionBackendApiService.fetchQuestions(
         questionPlayerConfig.skillList,
-        questionPlayerConfig.questionCount).then(function(questionData) {
+        questionPlayerConfig.questionCount,
+        questionPlayerConfig.questionsSortedByDifficulty
+      ).then(function(questionData) {
         $rootScope.$broadcast('totalQuestionsReceived', questionData.length);
         initializeQuestionPlayerServices(questionData, callback);
       });

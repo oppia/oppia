@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """One-off jobs for explorations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import itertools
@@ -24,11 +26,13 @@ import re
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (file_models, base_models, exp_models,) = models.Registry.import_models([
@@ -54,9 +58,9 @@ NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
 ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
     'Added compressed versions of images in exploration')
-ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
+ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
-    feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
+    iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
 GCS_AUDIO_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/audio/(([^/]+)\.(' + '|'.join(
         ALLOWED_AUDIO_EXTENSIONS) + '))$')
@@ -138,7 +142,7 @@ class ExplorationContributorsSummaryOneOffJob(
         if item.deleted:
             return
 
-        summary = exp_services.get_exploration_summary_by_id(item.id)
+        summary = exp_fetchers.get_exploration_summary_by_id(item.id)
         summary.contributors_summary = (
             exp_services.compute_exploration_contributors_summary(item.id))
         exp_services.save_exploration_summary(summary)
@@ -195,7 +199,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
 
-        exploration = exp_services.get_exploration_from_model(item)
+        exploration = exp_fetchers.get_exploration_from_model(item)
         exp_rights = rights_manager.get_exploration_rights(item.id)
 
         try:
@@ -204,7 +208,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
             else:
                 exploration.validate(strict=True)
         except utils.ValidationError as e:
-            yield (item.id, unicode(e).encode(encoding='utf-8'))
+            yield (item.id, python_utils.convert_to_bytes(e))
 
     @staticmethod
     def reduce(key, values):
@@ -230,7 +234,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Do not upgrade explorations that fail non-strict validation.
-        old_exploration = exp_services.get_exploration_by_id(item.id)
+        old_exploration = exp_fetchers.get_exploration_by_id(item.id)
         try:
             old_exploration.validate()
         except Exception as e:
@@ -251,8 +255,9 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             # as str to conform with legacy data.
             commit_cmds = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': str(item.states_schema_version),
-                'to_version': str(
+                'from_version': python_utils.UNICODE(
+                    item.states_schema_version),
+                'to_version': python_utils.UNICODE(
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             })]
             exp_services.update_exploration(
@@ -284,8 +289,8 @@ class InteractionAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
 
-        exploration = exp_services.get_exploration_from_model(item)
-        for state_name, state in exploration.states.iteritems():
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
             exp_and_state_key = '%s %s' % (item.id, state_name)
             yield (state.interaction.id, exp_and_state_key)
 
@@ -309,8 +314,8 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
 
-        exploration = exp_services.get_exploration_from_model(item)
-        for state_name, state in exploration.states.iteritems():
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
             if state.interaction.id == 'ItemSelectionInput':
                 choices = (
                     state.interaction.customization_args['choices']['value'])
@@ -369,13 +374,13 @@ class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
 
-        exploration = exp_services.get_exploration_from_model(item)
-        for state_name, state in exploration.states.iteritems():
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
             hints_length = len(state.interaction.hints)
             if hints_length > 0:
                 exp_and_state_key = '%s %s' % (
                     item.id, state_name.encode('utf-8'))
-                yield (str(hints_length), exp_and_state_key)
+                yield (python_utils.UNICODE(hints_length), exp_and_state_key)
 
     @staticmethod
     def reduce(key, values):
@@ -397,7 +402,13 @@ class ExplorationContentValidationJobForCKEditor(
         if item.deleted:
             return
 
-        exploration = exp_services.get_exploration_from_model(item)
+        try:
+            exploration = exp_fetchers.get_exploration_from_model(item)
+        except Exception as e:
+            yield (
+                'Error %s when loading exploration'
+                % python_utils.convert_to_bytes(e), [item.id])
+            return
 
         html_list = exploration.get_all_html_content_strings()
 
@@ -406,14 +417,20 @@ class ExplorationContentValidationJobForCKEditor(
 
         for key in err_dict:
             if err_dict[key]:
-                yield (key, err_dict[key])
+                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
 
     @staticmethod
     def reduce(key, values):
         final_values = [ast.literal_eval(value) for value in values]
         # Combine all values from multiple lists into a single list
         # for that error type.
-        yield (key, list(set().union(*final_values)))
+        output_values = list(set().union(*final_values))
+        exp_id_index = key.find('Exp Id:')
+        if exp_id_index == -1:
+            yield (key, output_values)
+        else:
+            output_values.append(key[exp_id_index:])
+            yield (key[:exp_id_index - 1], output_values)
 
 
 class InteractionCustomizationArgsValidationJob(
@@ -432,9 +449,11 @@ class InteractionCustomizationArgsValidationJob(
         err_dict = {}
 
         try:
-            exploration = exp_services.get_exploration_from_model(item)
+            exploration = exp_fetchers.get_exploration_from_model(item)
         except Exception as e:
-            yield ('Error %s when loading exploration' % str(e), [item.id])
+            yield (
+                'Error %s when loading exploration'
+                % python_utils.UNICODE(e), [item.id])
             return
 
         html_list = exploration.get_all_html_content_strings()
@@ -443,14 +462,20 @@ class InteractionCustomizationArgsValidationJob(
 
         for key in err_dict:
             if err_dict[key]:
-                yield (key, err_dict[key])
+                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
 
     @staticmethod
     def reduce(key, values):
         final_values = [ast.literal_eval(value) for value in values]
         # Combine all values from multiple lists into a single list
         # for that error type.
-        yield (key, list(set().union(*final_values)))
+        output_values = list(set().union(*final_values))
+        exp_id_index = key.find('Exp Id:')
+        if exp_id_index == -1:
+            yield (key, output_values)
+        else:
+            output_values.append(key[exp_id_index:])
+            yield (key[:exp_id_index - 1], output_values)
 
 
 class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -498,14 +523,3 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
-
-
-class DeleteStateIdMappingModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for wiping out state ID mapping models."""
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.StateIdMappingModel]
-
-    @staticmethod
-    def map(item):
-        item.delete()

@@ -23,15 +23,13 @@ require(
   'pages/collection-editor-page/editor-tab/' +
   'collection-node-editor.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require(
   'pages/collection-editor-page/services/collection-linearizer.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionEditorTab', [
+angular.module('oppia').directive('collectionEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

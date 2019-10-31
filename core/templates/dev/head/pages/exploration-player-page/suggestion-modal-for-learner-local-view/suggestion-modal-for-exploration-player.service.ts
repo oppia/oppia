@@ -16,16 +16,17 @@
  * @fileoverview Service to display suggestion modal in learner local view.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('services/AlertsService.ts');
 require('services/SuggestionModalService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SuggestionModalForExplorationPlayerService', [
+angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($http, $uibModal, AlertsService, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
@@ -64,6 +65,7 @@ oppia.factory('SuggestionModalForExplorationPlayerService', [
             $scope.cancelSuggestion = function() {
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };
+
             $scope.submitSuggestion = function() {
               var data = {
                 target_id: ExplorationEngineService.getExplorationId(),

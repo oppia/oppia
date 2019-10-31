@@ -15,16 +15,16 @@
 /**
  * @fileoverview Service to display suggestion modal in creator view.
  */
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/SuggestionModalService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SuggestionModalForCreatorDashboardService', [
-  '$http', '$log', '$rootScope',
+angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
+  '$http', '$log',
   '$uibModal', 'UrlInterpolationService',
-  function($http, $log, $rootScope,
+  function($http, $log,
       $uibModal, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
@@ -66,13 +66,13 @@ oppia.factory('SuggestionModalForCreatorDashboardService', [
         },
         controller: [
           '$log', '$scope', '$uibModalInstance', 'SuggestionModalService',
-          'canReviewActiveThread', 'description', 'newContent',
-          'oldContent', 'stateName', 'suggestionIsHandled', 'suggestionStatus',
+          'canReviewActiveThread', 'description', 'newContent', 'oldContent',
+          'stateName', 'suggestionIsHandled', 'suggestionStatus',
           'suggestionType',
           function(
               $log, $scope, $uibModalInstance, SuggestionModalService,
-              canReviewActiveThread, description, newContent,
-              oldContent, stateName, suggestionIsHandled, suggestionStatus,
+              canReviewActiveThread, description, newContent, oldContent,
+              stateName, suggestionIsHandled, suggestionStatus,
               suggestionType
           ) {
             $scope.isNotHandled = !suggestionIsHandled;

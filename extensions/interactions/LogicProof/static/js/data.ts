@@ -1200,3 +1200,5 @@ var logicProofData = (function() {
     BASE_GENERAL_MESSAGES: BASE_GENERAL_MESSAGES
   };
 })();
+
+export default logicProofData;

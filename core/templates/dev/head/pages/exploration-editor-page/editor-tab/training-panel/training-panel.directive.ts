@@ -15,10 +15,12 @@
 /**
  * @fileoverview Directive for the training panel in the state editor.
  */
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require('directives/angular-html-bind.directive.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('trainingPanel', [
+angular.module('oppia').directive('trainingPanel', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

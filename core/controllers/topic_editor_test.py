@@ -13,8 +13,11 @@
 # limitations under the License.
 
 """Tests for the topic editor page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import skill_services
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -92,33 +95,39 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             additional_story_id, self.admin_id, 'another title',
             'another description', 'another note', topic_id)
 
+        topic_services.publish_story(
+            topic_id, canonical_story_id, self.admin_id)
+
         response = self.get_json(
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
-        canonical_story_summary_dicts = response[
+        canonical_story_summary_dict = response[
             'canonical_story_summary_dicts'][0]
-        additional_story_summary_dicts = response[
+        additional_story_summary_dict = response[
             'additional_story_summary_dicts'][0]
 
         self.assertEqual(
-            canonical_story_summary_dicts['description'], 'description')
-        self.assertEqual(canonical_story_summary_dicts['title'], 'title')
+            canonical_story_summary_dict['description'], 'description')
+        self.assertEqual(canonical_story_summary_dict['title'], 'title')
         self.assertEqual(
-            canonical_story_summary_dicts['id'], canonical_story_id)
+            canonical_story_summary_dict['id'], canonical_story_id)
         self.assertEqual(
-            additional_story_summary_dicts['description'],
+            canonical_story_summary_dict['story_is_published'], True)
+
+        self.assertEqual(
+            additional_story_summary_dict['description'],
             'another description')
         self.assertEqual(
-            additional_story_summary_dicts['title'], 'another title')
+            additional_story_summary_dict['title'], 'another title')
         self.assertEqual(
-            additional_story_summary_dicts['id'], additional_story_id)
+            additional_story_summary_dict['id'], additional_story_id)
+        self.assertEqual(
+            additional_story_summary_dict['story_is_published'], False)
 
         self.logout()
 
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         json_response = self.post_json(
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
             {'title': 'Story title'},
@@ -126,7 +135,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         story_id = json_response['storyId']
         self.assertEqual(len(story_id), 12)
         self.assertIsNotNone(
-            story_services.get_story_by_id(story_id, strict=False))
+            story_fetchers.get_story_by_id(story_id, strict=False))
         self.logout()
 
 
@@ -165,8 +174,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -191,8 +202,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -213,8 +226,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -263,6 +278,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
 
     def test_editable_topic_handler_get(self):
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
         # Check that non-admins cannot access the editable topic data.
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
@@ -273,14 +289,29 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
         # Check that admins can access the editable topic data.
         self.login(self.ADMIN_EMAIL)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            json_response = self.get_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
+            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertEqual(
+                'Skill Description',
+                json_response['skill_id_to_description_dict'][self.skill_id])
 
-        json_response = self.get_json(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
-        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
-        self.assertEqual(
-            'Skill Description',
-            json_response['skill_id_to_description_dict'][self.skill_id])
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: %s are still'
+                ' present in topic with id %s' % (
+                    self.skill_id_2, self.topic_id))
+            self.assertEqual(len(messages), 1)
+            self.assertIn(
+                expected_email_html_body,
+                messages[0].html.decode())
+
         self.logout()
 
         # Check that editable topic handler is accessed only when a topic id
@@ -306,9 +337,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s' % (
@@ -359,14 +388,18 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_audio',
                 'old_value': {
-                    'content': {}
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'new_value': {
-                    'content': {
-                        'en': {
-                            'filename': 'test.mp3',
-                            'file_size_bytes': 100,
-                            'needs_update': False
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'filename': 'test.mp3',
+                                'file_size_bytes': 100,
+                                'needs_update': False
+                            }
                         }
                     }
                 },
@@ -374,20 +407,34 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
-        json_response = self.put_json(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-            change_cmd, csrf_token=csrf_token)
-        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
-        self.assertEqual('A new name', json_response['topic_dict']['name'])
-        self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
-        self.assertEqual(
-            'Skill Description',
-            json_response['skill_id_to_description_dict'][self.skill_id])
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                change_cmd, csrf_token=csrf_token)
+            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertEqual('A new name', json_response['topic_dict']['name'])
+            self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
+            self.assertEqual(
+                'Skill Description',
+                json_response['skill_id_to_description_dict'][self.skill_id])
+
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: %s are still'
+                ' present in topic with id %s' % (
+                    self.skill_id_2, self.topic_id))
+            self.assertEqual(len(messages), 1)
+            self.assertIn(
+                expected_email_html_body,
+                messages[0].html.decode())
 
         # Test if the corresponding subtopic pages were created.
         json_response = self.get_json(
@@ -399,8 +446,10 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'html': '<p>New Data</p>',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -417,12 +466,14 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'html': '<p>New Value</p>',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {
-                    'en': {
-                        'file_size_bytes': 100,
-                        'filename': 'test.mp3',
-                        'needs_update': False
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'file_size_bytes': 100,
+                            'filename': 'test.mp3',
+                            'needs_update': False
+                        }
                     }
                 }
             },
@@ -525,14 +576,18 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_audio',
                 'old_value': {
-                    'content': {}
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'new_value': {
-                    'content': {
-                        'en': {
-                            'filename': 'test.mp3',
-                            'file_size_bytes': 100,
-                            'needs_update': False
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'filename': 'test.mp3',
+                                'file_size_bytes': 100,
+                                'needs_update': False
+                            }
                         }
                     }
                 },
@@ -545,9 +600,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             self.topic_id)
 
         self.login(self.TOPIC_MANAGER_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         # Check that the topic manager can edit the topic now.
         json_response = self.put_json(
             '%s/%s' % (
@@ -600,9 +653,7 @@ class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
 
     def test_send_mail(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.put_json(
                 '%s/%s' % (
@@ -661,9 +712,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_get_can_not_access_handler_with_invalid_publish_status(self):
         self.login(self.ADMIN_EMAIL)
 
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         response = self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
@@ -678,9 +727,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_publish_and_unpublish_topic(self):
         """Test the publish and unpublish functionality."""
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         # Test whether admin can publish and unpublish a topic.
         self.put_json(
             '%s/%s' % (
@@ -710,9 +757,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_get_can_not_access_handler_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
 
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         new_topic_id = topic_services.get_new_topic_id()
         self.put_json(
@@ -723,9 +768,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
     def test_cannot_publish_a_published_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
@@ -742,9 +785,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
     def test_cannot_unpublish_an_unpublished_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         topic_rights = topic_services.get_topic_rights(self.topic_id)
         self.assertFalse(topic_rights.topic_is_published)
 

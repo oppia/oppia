@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// state-interaction-editor.directive.ts is upgraded to Angular 8.
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.directive.ts');
@@ -42,6 +49,10 @@ describe('State Interaction controller', function() {
   describe('StateInteraction', function() {
     beforeEach(function() {
       angular.mock.module('oppia');
+      angular.mock.module(function($provide) {
+        $provide.value(
+          'ExplorationFeaturesService', new ExplorationFeaturesService());
+      });
       // Set a global value for INTERACTION_SPECS that will be used by all the
       // descendant dependencies.
       angular.mock.module(function($provide) {
@@ -57,6 +68,12 @@ describe('State Interaction controller', function() {
         });
       });
     });
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+        $provide.value(key, value);
+      }
+    }));
 
     var scope, ecs, cls, ess, siis, scas, scs, idc, IS;
     var $httpBackend;

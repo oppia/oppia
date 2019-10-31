@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Controllers for the questions list in topic editors and skill editors."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -43,19 +45,25 @@ class QuestionsListHandler(base.BaseHandler):
 
         try:
             skill_services.get_multi_skills(skill_ids)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
-        question_summaries, skill_descriptions_list, next_start_cursor = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
-        )
+        (
+            question_summaries, merged_question_skill_links,
+            next_start_cursor) = (
+                question_services.get_displayable_question_skill_link_details(
+                    constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
+            )
         return_dicts = []
         for index, summary in enumerate(question_summaries):
-            return_dicts.append({
-                'summary': summary.to_dict(),
-                'skill_descriptions': skill_descriptions_list[index]
-            })
+            if summary is not None:
+                return_dicts.append({
+                    'summary': summary.to_dict(),
+                    'skill_descriptions': (
+                        merged_question_skill_links[index].skill_descriptions),
+                    'skill_difficulties': (
+                        merged_question_skill_links[index].skill_difficulties)
+                })
 
         self.values.update({
             'question_summary_dicts': return_dicts,

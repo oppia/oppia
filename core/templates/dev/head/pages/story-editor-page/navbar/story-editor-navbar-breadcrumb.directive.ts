@@ -16,17 +16,15 @@
  * @fileoverview Controller for the navbar breadcrumb of the story editor.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
 require('services/contextual/UrlService.ts');
 
-require('pages/story-editor-page/story-editor-page.constants.ts');
+require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('storyEditorNavbarBreadcrumb', [
+angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -45,7 +43,6 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
         ) {
           $scope.story = StoryEditorStateService.getStory();
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-          var topicId = UrlService.getTopicIdFromUrl();
           $scope.$on(EVENT_STORY_INITIALIZED, function() {
             $scope.topicName = StoryEditorStateService.getTopicName();
           });
@@ -54,7 +51,7 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/story-editor-page/modal-templates/' +
-                  'save-pending-changes-modal.template.html'),
+                  'story-save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',
@@ -69,7 +66,7 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
               $window.open(
                 UrlInterpolationService.interpolateUrl(
                   TOPIC_EDITOR_URL_TEMPLATE, {
-                    topicId: topicId
+                    topicId: $scope.story.getCorrespondingTopicId()
                   }
                 ), '_self');
             }

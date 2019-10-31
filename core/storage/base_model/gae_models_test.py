@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for core.storage.base_model.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import types
 
@@ -22,6 +24,7 @@ from constants import constants
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -35,6 +38,14 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             entity.delete()
 
         super(BaseModelUnitTests, self).tearDown()
+
+    def test_get_deletion_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_deletion_policy()
+
+    def test_has_reference_to_user_id(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.has_reference_to_user_id('user_id')
 
     def test_error_cases_for_get_method(self):
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
@@ -51,7 +62,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
     def test_export_data(self):
         with self.assertRaises(NotImplementedError):
-            base_models.BaseModel.export_data('model_id')
+            base_models.BaseModel.export_data('user_id')
 
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
@@ -117,7 +128,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])
-        for _ in range(100):
+        for _ in python_utils.RANGE(100):
             new_id = base_models.BaseModel.get_new_id('')
             self.assertNotIn(new_id, ids)
 
@@ -127,6 +138,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_get_new_id_method_does_not_fail_with_bad_names(self):
         base_models.BaseModel.get_new_id(None)
         base_models.BaseModel.get_new_id('¡Hola!')
+        base_models.BaseModel.get_new_id(u'¡Hola!')
         base_models.BaseModel.get_new_id(12345)
         base_models.BaseModel.get_new_id({'a': 'b'})
 
@@ -157,6 +169,17 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
 
 class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
+
+    def test_exists_for_user_id(self):
+        model1 = base_models.BaseSnapshotMetadataModel(
+            id='model_id-1', committer_id='committer_id', commit_type='create')
+        model1.put()
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('committer_id'))
+        self.assertFalse(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('x_id'))
 
     def test_get_version_string(self):
         model1 = base_models.BaseSnapshotMetadataModel(

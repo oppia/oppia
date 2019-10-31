@@ -15,3 +15,160 @@
 /**
  * @fileoverview End-to-end tests for user profile features.
  */
+
+var DEFAULT_BIO = 'This user has not supplied a bio yet.';
+var PLACEHOLDER_INTEREST_TEXT = 'none specified';
+
+var users = require('../protractor_utils/users.js');
+var general = require('../protractor_utils/general.js');
+var waitFor = require('../protractor_utils/waitFor.js');
+var workflow = require('../protractor_utils/workflow.js');
+
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
+var ProfilePage = require('../protractor_utils/ProfilePage.js');
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
+
+describe('Un-customized profile page', function() {
+  var TEST_USERNAME = 'defaultProfileFeatures';
+  var TEST_EMAIL = TEST_USERNAME + '@example.com';
+
+  var profilePage = null;
+
+  beforeAll(function() {
+    profilePage = new ProfilePage.ProfilePage();
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+  });
+
+  it('displays photo, default bio, and interest placeholder when logged in',
+    function() {
+      users.login(TEST_EMAIL);
+      profilePage.get(TEST_USERNAME);
+      profilePage.expectCurrUserToHaveProfilePhoto();
+      profilePage.expectUserToHaveBio(DEFAULT_BIO);
+      profilePage.expectUserToHaveNoInterests();
+      profilePage.expectUserToHaveInterestPlaceholder(
+        PLACEHOLDER_INTEREST_TEXT);
+      users.logout();
+    }
+  );
+
+  it('displays no photo, default bio, and no interests when logged out',
+    function() {
+      profilePage.get(TEST_USERNAME);
+      profilePage.expectOtherUserToNotHaveProfilePhoto();
+      profilePage.expectUserToHaveBio(DEFAULT_BIO);
+      profilePage.expectUserToHaveNoInterests();
+      profilePage.expectUserToHaveInterestPlaceholder(
+        PLACEHOLDER_INTEREST_TEXT);
+    }
+  );
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
+
+describe('Customized profile page for current user', function() {
+  var TEST_USERNAME = 'customizedProfileFeatures';
+  var TEST_EMAIL = TEST_USERNAME + '@example.com';
+  var TEST_BIO = 'My test bio!';
+  var TEST_INTERESTS = ['math', 'social studies'];
+
+  var profilePage = null;
+
+  beforeAll(function() {
+    profilePage = new ProfilePage.ProfilePage();
+    var preferencesPage = new PreferencesPage.PreferencesPage();
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+    users.login(TEST_EMAIL);
+    preferencesPage.get();
+    preferencesPage.setUserBio(TEST_BIO);
+    preferencesPage.get();
+    preferencesPage.setUserInterests(TEST_INTERESTS);
+    users.logout();
+  });
+
+  it('displays photo, custom bio, and interests when logged in', function() {
+    users.login(TEST_EMAIL);
+    profilePage.get(TEST_USERNAME);
+    profilePage.expectCurrUserToHaveProfilePhoto();
+    profilePage.expectUserToHaveBio(TEST_BIO);
+    profilePage.expectUserToHaveInterests(TEST_INTERESTS);
+    profilePage.expectUserToNotHaveInterestPlaceholder();
+    users.logout();
+  });
+
+  it('displays no photo, custom bio, and interests when logged out',
+    function() {
+      profilePage.get(TEST_USERNAME);
+      profilePage.expectOtherUserToNotHaveProfilePhoto();
+      profilePage.expectUserToHaveBio(TEST_BIO);
+      profilePage.expectUserToHaveInterests(TEST_INTERESTS);
+      profilePage.expectUserToNotHaveInterestPlaceholder();
+    }
+  );
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
+
+describe('Visiting user profile page', function() {
+  var TEST_USERNAME = 'myUser';
+  var TEST_EMAIL = TEST_USERNAME + '@example.com';
+
+  var ANOTHER_USERNAME = 'anotherUser';
+  var ANOTHER_EMAIL = ANOTHER_USERNAME + '@example.com';
+
+  var profilePage = null;
+  var creatorDashboardPage = null;
+
+  var EXPLORATION = {
+    title: 'A new exploration',
+    category: 'Learning',
+    objective: 'The goal is to create a new exploration',
+    language: 'English'
+  };
+
+  beforeAll(function() {
+    profilePage = new ProfilePage.ProfilePage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+
+    users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
+    users.login(ANOTHER_EMAIL);
+
+    workflow.createAndPublishExploration(
+      EXPLORATION.title,
+      EXPLORATION.category,
+      EXPLORATION.objective,
+      EXPLORATION.language
+    );
+
+    creatorDashboardPage.get();
+    creatorDashboardPage.expectToHaveExplorationCard(EXPLORATION.title);
+    users.logout();
+  });
+
+  it('should show the explorations created by the user', function() {
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+    users.login(TEST_EMAIL);
+
+    profilePage.get(ANOTHER_USERNAME);
+    profilePage.expectToHaveExplorationCards();
+    profilePage.expectToHaveExplorationCardByName(EXPLORATION.title);
+  });
+
+  it('should show created exploration stats for user', function() {
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+    users.login(TEST_EMAIL);
+
+    profilePage.get(ANOTHER_USERNAME);
+    profilePage.expectToHaveCreatedExplorationStat('1');
+  });
+
+  afterEach(function() {
+    users.logout();
+    general.checkForConsoleErrors([]);
+  });
+});

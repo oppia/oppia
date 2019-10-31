@@ -16,11 +16,9 @@
  * @fileoverview Directive for the social buttons displayed in footer.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('socialButtons', [
+angular.module('oppia').directive('socialButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

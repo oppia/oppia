@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Model for an Oppia collection."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -68,6 +70,23 @@ class CollectionModel(base_models.VersionedModel):
     # contains the list of nodes. This dict should contain collection data
     # whose structure might need to be changed in the future.
     collection_contents = ndb.JsonProperty(default={}, indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Collection is deleted only if it is not public."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CollectionModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
     @classmethod
     def get_collection_count(cls):
@@ -165,6 +184,34 @@ class CollectionRightsModel(base_models.VersionedModel):
     # DEPRECATED in v2.8.3. Do not use.
     translator_ids = ndb.StringProperty(indexed=True, repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Collection rights are deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CollectionRightsModel or its snapshots references the
+        given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return (
+            cls.query(ndb.OR(
+                cls.owner_ids == user_id,
+                cls.editor_ids == user_id,
+                cls.voice_artist_ids == user_id,
+                cls.viewer_ids == user_id
+            )).get() is not None
+            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+
+
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
@@ -229,6 +276,37 @@ class CollectionRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export user-relevant properties of CollectionRightsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. The user-relevant properties of CollectionRightsModel
+            in a python dict format. In this case, we are returning all the
+            ids of collections that the user is connected to, so they either
+            own, edit, voice, or have permission to view.
+        """
+        owned_collections = cls.get_all().filter(cls.owner_ids == user_id)
+        editable_collections = cls.get_all().filter(cls.editor_ids == user_id)
+        voiced_collections = (
+            cls.get_all().filter(cls.voice_artist_ids == user_id))
+        viewable_collections = cls.get_all().filter(cls.viewer_ids == user_id)
+
+        owned_collection_ids = [col.key.id() for col in owned_collections]
+        editable_collection_ids = [col.key.id() for col in editable_collections]
+        voiced_collection_ids = [col.key.id() for col in voiced_collections]
+        viewable_collection_ids = [col.key.id() for col in viewable_collections]
+
+        return {
+            'owned_collection_ids': owned_collection_ids,
+            'editable_collection_ids': editable_collection_ids,
+            'voiced_collection_ids': voiced_collection_ids,
+            'viewable_collection_ids': viewable_collection_ids
+        }
+
 
 class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to collections.
@@ -241,6 +319,13 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
     # The id of the collection being edited.
     collection_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Collection commit log is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def _get_instance_id(cls, collection_id, version):
@@ -368,6 +453,29 @@ class CollectionSummaryModel(base_models.BaseModel):
     version = ndb.IntegerProperty()
     # The number of nodes(explorations) that are within this collection.
     node_count = ndb.IntegerProperty()
+
+    @staticmethod
+    def get_deletion_policy():
+        """Collection summary is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CollectionSummaryModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(ndb.OR(
+            cls.owner_ids == user_id,
+            cls.editor_ids == user_id,
+            cls.viewer_ids == user_id,
+            cls.contributor_ids == user_id)).get() is not None
 
     @classmethod
     def get_non_private(cls):

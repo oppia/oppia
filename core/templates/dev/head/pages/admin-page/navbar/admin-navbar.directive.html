@@ -14,9 +14,9 @@
     color: #00376d;
   }
 </style>
-<nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
+<nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection" role="navigation">
   <div class="navbar-container" style="background-color: #00376d">
-    <div class="navbar-header protractor-test-navbar-header pull-left">
+    <div class="navbar-header protractor-test-navbar-header float-left">
       <a class="oppia-navbar-brand-name oppia-transition-200" href="/library">
         <img ng-src="<[$ctrl.logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'">
       </a>
@@ -27,124 +27,20 @@
         </li>
       </ul>
     </div>
-
-    <div ng-cloak class="navbar-header pull-right">
+    <div ng-cloak class="navbar-header float-right">
       <ul class="nav oppia-navbar-nav oppia-navbar-profile-admin">
-        <li uib-dropdown class="uib-dropdown pull-right">
-          <a uib-dropdown-toggle class="uib-dropdown-toggle oppia-navbar-dropdown-toggle"
-             data-toggle="dropdown"
-             ng-mouseover="$ctrl.onMouseoverProfilePictureOrDropdown($event)"
-             ng-mouseleave="$ctrl.onMouseoutProfilePictureOrDropdown($event)">
-            <div class="oppia-navbar-profile-picture-container" ng-cloak>
-              <div ng-if="$ctrl.profilePictureDataUrl">
-                <img ng-src="<[$ctrl.profilePictureDataUrl]>"
-                     class="oppia-navbar-profile-picture img-circle">
-                <span class="caret" style="margin-top: 10px;"></span>
-              </div>
-              <div ng-if="!$ctrl.profilePictureDataUrl">
-                <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
-                <span class="caret" style="margin-top: -26px;"></span>
-              </div>
-
-              <div style="display: none;" class="oppia-user-email">
-                <[$ctrl.getUserEmail()]>
-              </div>
-            </div>
-          </a>
-          <ul uib-dropdown-menu class="uib-dropdown-menu ng-cloak oppia-navbar-dropdown"
-              role="menu"
-              ng-mouseover="$ctrl.onMouseoverProfilePictureOrDropdown($event)"
-              ng-mouseleave="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-              ng-show="$ctrl.profileDropdownIsActive">
-            <li>
-              <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                 ng-href="<[$ctrl.profileUrl]>"
-                 style="color: #00376d">
-                <strong><[$ctrl.username]></strong>
-              </a>
-            </li>
-            <hr class="oppia-top-right-menu-item-separator">
-            <li>
-              <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                 href="/creator_dashboard"
-                 style="color: #00376d">
-                Creator Dashboard
-              </a>
-            </li>
-            <li>
-              <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                 href="/notifications_dashboard"
-                 style="color: #00376d">
-                Notifications
-              </a>
-            </li>
-            <li>
-              <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                 href="/preferences"
-                 style="color: #00376d">
-                Preferences
-              </a>
-            </li>
-
-            <li ng-if="$ctrl.isModerator">
-              <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                 href="/moderator"
-                 target="_blank"
-                 rel="noopener"
-                 style="color: #00376d">
-                Moderator Page
-              </a>
-            </li>
-            <li ng-if="$ctrl.isSuperAdmin">
-              <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                 href="/admin"
-                 target="_blank"
-                 rel="noopener"
-                 style="color: #00376d">
-                Admin Page
-              </a>
-            </li>
-            <hr class="oppia-top-right-menu-item-separator">
-            <li>
-              <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                 ng-href="<[$ctrl.logoutUrl]>"
-                 style="color: #00376d">
-                Logout
-              </a>
-            </li>
-          </ul>
-        </li>
-
         <ul class="nav oppia-navbar-tabs-admin">
-          <li class="oppia-clickable-navbar-element pull-right">
-            <a class="oppia-navbar-tab"
-               ng-href="<[::$ctrl.ADMIN_TAB_URLS.MISC]>"
-               ng-class="{active: $ctrl.isMiscTabOpen()}"
-               uib-tooltip="Miscellaneous"
+          <li class="nav-item oppia-clickable-navbar-element float-right">
+            <a class="nav-link oppia-navbar-tab"
+               ng-href="<[::$ctrl.ADMIN_TAB_URLS.ACTIVITIES]>"
+               ng-class="{active: $ctrl.isActivitiesTabOpen()}"
+               uib-tooltip="Activities"
                tooltip-placement="bottom">
-              Misc
+              Activities
             </a>
           </li>
-          <li class="oppia-clickable-navbar-element pull-right">
-            <a class="oppia-navbar-tab protractor-test-admin-roles-tab"
-               ng-href="<[::$ctrl.ADMIN_TAB_URLS.ROLES]>"
-               ng-class="{active: $ctrl.isRolesTabOpen()}"
-               uib-tooltip="Roles"
-               tooltip-placement="bottom">
-              Roles
-            </a>
-          </li>
-          <li class="oppia-clickable-navbar-element pull-right">
-            <a class="oppia-navbar-tab protractor-test-admin-config-tab"
-               ng-href="<[::$ctrl.ADMIN_TAB_URLS.CONFIG]>"
-               ng-class="{active: $ctrl.isConfigTabOpen()}"
-               uib-tooltip="Config"
-               tooltip-placement="bottom">
-              Config
-            </a>
-          </li>
-          <li class="oppia-clickable-navbar-element pull-right">
-            <a class="oppia-navbar-tab"
+          <li class="nav-item oppia-clickable-navbar-element float-right">
+            <a class="nav-link oppia-navbar-tab"
                ng-href="<[::$ctrl.ADMIN_TAB_URLS.JOBS]>"
                ng-class="{active: $ctrl.isJobsTabOpen()}"
                uib-tooltip="Jobs"
@@ -152,14 +48,120 @@
               Jobs
             </a>
           </li>
-          <li class="oppia-clickable-navbar-element pull-right">
-            <a class="oppia-navbar-tab"
-               ng-href="<[::$ctrl.ADMIN_TAB_URLS.ACTIVITIES]>"
-               ng-class="{active: $ctrl.isActivitiesTabOpen()}"
-               uib-tooltip="Activities"
+          <li class="nav-item oppia-clickable-navbar-element float-right">
+            <a class="nav-link oppia-navbar-tab protractor-test-admin-config-tab"
+               ng-href="<[::$ctrl.ADMIN_TAB_URLS.CONFIG]>"
+               ng-class="{active: $ctrl.isConfigTabOpen()}"
+               uib-tooltip="Config"
                tooltip-placement="bottom">
-              Activities
+              Config
             </a>
+          </li>
+          <li class="nav-item oppia-clickable-navbar-element float-right">
+            <a class="nav-link oppia-navbar-tab protractor-test-admin-roles-tab"
+               ng-href="<[::$ctrl.ADMIN_TAB_URLS.ROLES]>"
+               ng-class="{active: $ctrl.isRolesTabOpen()}"
+               uib-tooltip="Roles"
+               tooltip-placement="bottom">
+              Roles
+            </a>
+          </li>
+          <li class="nav-item oppia-clickable-navbar-element float-right">
+            <a class="nav-link oppia-navbar-tab"
+               ng-href="<[::$ctrl.ADMIN_TAB_URLS.MISC]>"
+               ng-class="{active: $ctrl.isMiscTabOpen()}"
+               uib-tooltip="Miscellaneous"
+               tooltip-placement="bottom">
+              Misc
+            </a>
+          </li>
+          <li uib-dropdown class="nav-item uib-dropdown float-right">
+            <a uib-dropdown-toggle class="nav-link uib-dropdown-toggle oppia-navbar-dropdown-toggle"
+               data-toggle="dropdown"
+               ng-mouseover="$ctrl.onMouseoverProfilePictureOrDropdown($event)"
+               ng-mouseleave="$ctrl.onMouseoutProfilePictureOrDropdown($event)">
+              <div class="oppia-navbar-profile-picture-container float-left" ng-cloak>
+                <div ng-if="$ctrl.profilePictureDataUrl">
+                  <img ng-src="<[$ctrl.profilePictureDataUrl]>"
+                       class="dropdown-toggle oppia-navbar-profile-picture rounded-circle">
+                </div>
+                <div ng-if="!$ctrl.profilePictureDataUrl" class="dropdown-toggle">
+                  <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
+                </div>
+
+                <div style="display: none;" class="oppia-user-email">
+                  <[$ctrl.getUserEmail()]>
+                </div>
+              </div>
+            </a>
+            <ul uib-dropdown-menu class="dropdown-menu uib-dropdown-menu ng-cloak oppia-navbar-dropdown"
+                role="menu"
+                ng-mouseover="$ctrl.onMouseoverProfilePictureOrDropdown($event)"
+                ng-mouseleave="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                ng-show="$ctrl.profileDropdownIsActive">
+              <li>
+                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                   ng-href="<[$ctrl.profileUrl]>"
+                   style="color: #00376d"
+                   class="dropdown-item">
+                  <strong><[$ctrl.username]></strong>
+                </a>
+              </li>
+              <hr class="oppia-top-right-menu-item-separator">
+              <li>
+                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                   href="/creator_dashboard"
+                   class="dropdown-item"
+                   style="color: #00376d">
+                  Creator Dashboard
+                </a>
+              </li>
+              <li>
+                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                   href="/notifications_dashboard"
+                   class="dropdown-item"
+                   style="color: #00376d">
+                  Notifications
+                </a>
+              </li>
+              <li>
+                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                   href="/preferences"
+                   class="dropdown-item"
+                   style="color: #00376d">
+                  Preferences
+                </a>
+              </li>
+              <li ng-if="$ctrl.isModerator">
+                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                   href="/moderator"
+                   target="_blank"
+                   rel="noopener"
+                   class="dropdown-item"
+                   style="color: #00376d">
+                  Moderator Page
+                </a>
+              </li>
+              <li ng-if="$ctrl.isSuperAdmin">
+                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                   href="/admin"
+                   target="_blank"
+                   rel="noopener"
+                   class="dropdown-item"
+                   style="color: #00376d">
+                  Admin Page
+                </a>
+              </li>
+              <hr class="oppia-top-right-menu-item-separator">
+              <li>
+                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                   ng-href="<[$ctrl.logoutUrl]>"
+                   class="dropdown-item"
+                   style="color: #00376d">
+                  Logout
+                </a>
+              </li>
+            </ul>
           </li>
         </ul>
       </ul>

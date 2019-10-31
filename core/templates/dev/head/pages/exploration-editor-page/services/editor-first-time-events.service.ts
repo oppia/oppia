@@ -20,9 +20,7 @@
 
 require('services/SiteAnalyticsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('EditorFirstTimeEventsService', [
+angular.module('oppia').factory('EditorFirstTimeEventsService', [
   'SiteAnalyticsService',
   function(SiteAnalyticsService) {
     var explorationId = null;

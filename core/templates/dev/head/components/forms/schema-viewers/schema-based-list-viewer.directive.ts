@@ -16,12 +16,12 @@
  * @fileoverview Directive for a schema-based viewer for lists.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
+
+require('domain/utilities/url-interpolation.service.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('schemaBasedListViewer', [
+angular.module('oppia').directive('schemaBasedListViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(

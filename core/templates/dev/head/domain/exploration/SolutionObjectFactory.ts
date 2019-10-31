@@ -24,9 +24,7 @@ require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SolutionObjectFactory', [
+angular.module('oppia').factory('SolutionObjectFactory', [
   '$filter', 'ExplorationHtmlFormatterService', 'FractionObjectFactory',
   'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
   'SubtitledHtmlObjectFactory',
@@ -47,7 +45,7 @@ oppia.factory('SolutionObjectFactory', [
       };
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Solution['createFromBackendDict'] = function(solutionBackendDict) {
     /* eslint-enable dot-notation */
@@ -58,7 +56,7 @@ oppia.factory('SolutionObjectFactory', [
           solutionBackendDict.explanation));
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Solution['createNew'] = function(
     /* eslint-enable dot-notation */

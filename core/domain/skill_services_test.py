@@ -13,9 +13,12 @@
 # limitations under the License.
 
 """Tests the methods defined in skill services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from constants import constants
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
@@ -23,6 +26,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -40,7 +44,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                 state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
@@ -64,6 +70,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=misconceptions,
             skill_contents=skill_contents)
 
+    def test_apply_change_list_with_invalid_property_name(self):
+        class MockSkillChange(python_utils.OBJECT):
+            def __init__(self, cmd, property_name):
+                self.cmd = cmd
+                self.property_name = property_name
+
+        invalid_skill_change_list = [MockSkillChange(
+            skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+            'invalid_property_name')]
+
+        with self.assertRaisesRegexp(Exception, 'Invalid change dict.'):
+            skill_services.apply_change_list(
+                self.SKILL_ID, invalid_skill_change_list, self.user_id_a)
+
     def test_compute_summary(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
 
@@ -77,6 +97,84 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(new_skill_id), 12)
         self.assertEqual(skill_models.SkillModel.get_by_id(new_skill_id), None)
+
+    def test_get_descriptions_of_skills(self):
+        self.save_new_skill(
+            'skill_id_1', self.user_id_admin, 'Description 1',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+        self.save_new_skill(
+            'skill_id_2', self.user_id_admin, 'Description 2',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+
+        skill_services.delete_skill(self.user_id_admin, 'skill_id_2')
+        skill_descriptions, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(
+                ['skill_id_1', 'skill_id_2']))
+        self.assertEqual(deleted_skill_ids, ['skill_id_2'])
+        self.assertEqual(
+            skill_descriptions, {
+                'skill_id_1': 'Description 1',
+                'skill_id_2': None
+            }
+        )
+
+    def test_get_rubrics_of_linked_skills(self):
+        self.save_new_skill(
+            'skill_id_1', self.user_id_admin, 'Description 1',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+        self.save_new_skill(
+            'skill_id_2', self.user_id_admin, 'Description 2',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+
+        skill_services.delete_skill(self.user_id_admin, 'skill_id_2')
+        skill_rubrics, deleted_skill_ids = (
+            skill_services.get_rubrics_of_skills(
+                ['skill_id_1', 'skill_id_2']))
+        self.assertEqual(deleted_skill_ids, ['skill_id_2'])
+
+        self.assertEqual(
+            skill_rubrics, {
+                'skill_id_1': [
+                    skill_domain.Rubric(
+                        constants.SKILL_DIFFICULTIES[0], 'Explanation 1'
+                    ).to_dict(),
+                    skill_domain.Rubric(
+                        constants.SKILL_DIFFICULTIES[1], 'Explanation 2'
+                    ).to_dict(),
+                    skill_domain.Rubric(
+                        constants.SKILL_DIFFICULTIES[2], 'Explanation 3'
+                    ).to_dict()],
+                'skill_id_2': None
+            }
+        )
 
     def test_get_skill_from_model(self):
         skill_model = skill_models.SkillModel.get(self.SKILL_ID)
@@ -102,49 +200,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].description, 'Description')
         self.assertEqual(skill_summaries[0].misconception_count, 1)
         self.assertEqual(skill_summaries[0].worked_examples_count, 1)
-
-    def test_get_skill_descriptions_by_ids(self):
-        self.save_new_skill(
-            'skill_2', self.USER_ID, 'Description 2', misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-        self.save_new_skill(
-            'skill_3', self.USER_ID, 'Description 3', misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            skill_descriptions = skill_services.get_skill_descriptions_by_ids(
-                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
-
-            skill_services.delete_skill(self.USER_ID, 'skill_2')
-            skill_descriptions = skill_services.get_skill_descriptions_by_ids(
-                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            expected_email_html_body = (
-                'The deleted skills: skill_2 are still'
-                ' present in topic with id topic_id')
-            self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
-            self.assertEqual(
-                skill_descriptions, {
-                    self.SKILL_ID: 'Description',
-                    'skill_2': None,
-                    'skill_3': 'Description 3'
-                }
-            )
 
     def test_get_skill_by_id(self):
         expected_skill = self.skill.to_dict()
@@ -184,6 +239,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'misconception_id': self.skill.next_misconception_id,
                 'old_value': 'test name',
                 'new_value': 'Name'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_RUBRICS,
+                'difficulty': constants.SKILL_DIFFICULTIES[0],
+                'explanation': '<p>New Explanation</p>'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_RUBRICS,
+                'difficulty': constants.SKILL_DIFFICULTIES[1],
+                'explanation': '<p>Explanation</p>'
             })
         ]
         skill_services.update_skill(
@@ -195,6 +260,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.version, 2)
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.misconceptions[1].name, 'Name')
+        self.assertEqual(skill.rubrics[0].explanation, '<p>New Explanation</p>')
+        self.assertEqual(skill.rubrics[1].explanation, '<p>Explanation</p>')
 
     def test_merge_skill(self):
         changelist = [
@@ -294,14 +361,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
 
         skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
@@ -321,14 +392,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
 
         skills = skill_services.get_multi_skills(['skill_a', 'skill_b'])
@@ -358,8 +433,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             description='description',
             language_code='en',
             misconceptions=[],
+            rubrics=[],
             next_misconception_id=0,
             misconceptions_schema_version=1,
+            rubric_schema_version=1,
             skill_contents_schema_version=0,
             all_questions_merged=False
         )
@@ -384,8 +461,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             description='description',
             language_code='en',
             misconceptions=[],
+            rubrics=[],
             next_misconception_id=0,
             misconceptions_schema_version=0,
+            rubric_schema_version=1,
             skill_contents_schema_version=1,
             all_questions_merged=False
         )
@@ -397,6 +476,33 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Sorry, we can only process v1-v%d misconception schemas at '
             'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+            skill_services.get_skill_from_model(model)
+
+    def test_get_skill_from_model_with_invalid_rubric_schema_version(self):
+        skill_services.create_new_skill_rights('skill_id', self.user_id_admin)
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
+        model = skill_models.SkillModel(
+            id='skill_id',
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=0,
+            skill_contents_schema_version=1,
+            all_questions_merged=False
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            self.user_id_admin, 'skill model created', commit_cmd_dicts)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v%d rubric schemas at '
+            'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
             skill_services.get_skill_from_model(model)
 
     def test_get_skill_by_id_with_different_versions(self):
@@ -655,9 +761,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'commit message')
 
         self.assertEqual(len(observed_log_messages), 1)
-        self.assertEqual(
-            observed_log_messages[0], 'AttributeError \'str\' object has no '
-            'attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
+        self.assertRegexpMatches(
+            observed_log_messages[0], 'object has no'
+            ' attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
 
     def test_cannot_update_misconception_name_with_invalid_id(self):
         changelist = [skill_domain.SkillChange({
@@ -674,6 +780,19 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception name.')
+
+    def test_cannot_add_rubric_with_invalid_difficulty(self):
+        changelist = [skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_UPDATE_RUBRICS,
+            'difficulty': 'invalid_difficulty',
+            'explanation': '<p>Explanation</p>'
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception, 'There is no rubric for the given difficulty.'):
+            skill_services.update_skill(
+                self.USER_ID, self.SKILL_ID, changelist,
+                'Added rubric.')
 
     def test_cannot_delete_misconception_with_invalid_id(self):
         changelist = [skill_domain.SkillChange({
@@ -731,24 +850,46 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         super(SkillMasteryServicesUnitTests, self).setUp()
         self.SKILL_ID_1 = skill_services.get_new_skill_id()
         self.SKILL_ID_2 = skill_services.get_new_skill_id()
-        self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2]
+        self.SKILL_ID_3 = skill_services.get_new_skill_id()
+        self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2, self.SKILL_ID_3]
         skill_services.create_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1)
         skill_services.create_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2)
 
-    def test_get_skill_mastery(self):
-        degree_of_mastery = skill_services.get_skill_mastery(
+    def test_get_user_skill_mastery(self):
+        degree_of_mastery = skill_services.get_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_1)
 
         self.assertEqual(degree_of_mastery, self.DEGREE_OF_MASTERY_1)
 
-    def test_get_multi_skill_mastery(self):
-        degree_of_mastery = skill_services.get_multi_skill_mastery(
+        degree_of_mastery = skill_services.get_user_skill_mastery(
+            self.USER_ID, self.SKILL_ID_3)
+
+        self.assertEqual(degree_of_mastery, None)
+
+    def test_get_multi_user_skill_mastery(self):
+        degree_of_mastery = skill_services.get_multi_user_skill_mastery(
             self.USER_ID, self.SKILL_IDS)
 
-        self.assertEqual(degree_of_mastery, ([
-            self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2]))
+        self.assertEqual(
+            degree_of_mastery, {
+                self.SKILL_ID_1: self.DEGREE_OF_MASTERY_1,
+                self.SKILL_ID_2: self.DEGREE_OF_MASTERY_2,
+                self.SKILL_ID_3: None
+            })
+
+    def test_create_multi_user_skill_mastery(self):
+        skill_id_4 = skill_services.get_new_skill_id()
+        skill_id_5 = skill_services.get_new_skill_id()
+        skill_services.create_multi_user_skill_mastery(
+            self.USER_ID, {skill_id_4: 0.3, skill_id_5: 0.5})
+
+        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
+            self.USER_ID, [skill_id_4, skill_id_5])
+
+        self.assertEqual(
+            degrees_of_mastery, {skill_id_4: 0.3, skill_id_5: 0.5})
 
 
 # TODO(lilithxxx): Remove this mock class and tests for the mock skill
@@ -767,6 +908,11 @@ class MockSkillObject(skill_domain.Skill):
         """Converts v1 misconceptions dict to v2."""
         return misconceptions
 
+    @classmethod
+    def _convert_rubric_v1_dict_to_v2_dict(cls, rubrics):
+        """Converts v1 rubrics dict to v2."""
+        return rubrics
+
 
 class SkillMigrationTests(test_utils.GenericTestBase):
 
@@ -779,7 +925,11 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
-            {explanation_content_id: {}},
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    explanation_content_id: {}
+                }
+            }),
             state_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     explanation_content_id: {}
@@ -790,9 +940,11 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             description='description',
             language_code='en',
             misconceptions=[],
+            rubrics=[],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=1,
             misconceptions_schema_version=1,
+            rubric_schema_version=1,
             skill_contents_schema_version=1,
             all_questions_merged=False
         )
@@ -818,7 +970,11 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
-            {explanation_content_id: {}},
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    explanation_content_id: {}
+                }
+            }),
             state_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     explanation_content_id: {}
@@ -831,9 +987,11 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             description='description',
             language_code='en',
             misconceptions=[misconception.to_dict()],
+            rubrics=[],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=1,
             misconceptions_schema_version=1,
+            rubric_schema_version=1,
             skill_contents_schema_version=1,
             all_questions_merged=False
         )
@@ -849,3 +1007,50 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             skill = skill_services.get_skill_from_model(model)
 
         self.assertEqual(skill.misconceptions_schema_version, 2)
+
+    def test_migrate_rubrics_to_latest_schema(self):
+        skill_services.create_new_skill_rights('skill_id', 'user_id_admin')
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
+        explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
+        skill_contents = skill_domain.SkillContents(
+            state_domain.SubtitledHtml(
+                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    explanation_content_id: {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    explanation_content_id: {}
+                }
+            }))
+        rubric = skill_domain.Rubric(
+            constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>')
+        model = skill_models.SkillModel(
+            id='skill_id',
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[rubric.to_dict()],
+            skill_contents=skill_contents.to_dict(),
+            next_misconception_id=1,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=1,
+            all_questions_merged=False
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            'user_id_admin', 'skill model created', commit_cmd_dicts)
+
+        swap_skill_object = self.swap(skill_domain, 'Skill', MockSkillObject)
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 2)
+
+        with swap_skill_object, current_schema_version_swap:
+            skill = skill_services.get_skill_from_model(model)
+
+        self.assertEqual(skill.rubric_schema_version, 2)

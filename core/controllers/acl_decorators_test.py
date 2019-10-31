@@ -15,12 +15,15 @@
 # limitations under the License.
 
 """Tests for core.domain.acl_decorators."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_services
+from core.domain import story_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -1891,6 +1894,92 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class EditStoryDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_edit_story."""
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_edit_story
+        def get(self, story_id):
+            self.render_json({'story_id': story_id})
+
+    def setUp(self):
+        super(EditStoryDecoratorTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_edit_story/<story_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.story_id = story_services.get_new_story_id()
+        self.topic_id = topic_services.get_new_topic_id()
+        self.save_new_story(
+            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
+        self.save_new_topic(
+            self.topic_id, self.admin_id, 'Name', 'Description',
+            [self.story_id], [], [], [], 1)
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
+
+    def test_can_not_edit_story_with_invalid_story_id(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_story/story_id_new', expected_status_int=404)
+        self.logout()
+
+    def test_can_not_edit_story_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        story_id = story_services.get_new_story_id()
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_story(
+            story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            topic_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_story/%s' % story_id, expected_status_int=404)
+        self.logout()
+
+    def test_admin_can_edit_story(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_story/%s' % self.story_id)
+        self.assertEqual(response['story_id'], self.story_id)
+        self.logout()
+
+    def test_topic_manager_can_edit_story(self):
+        self.signup(self.manager_email, self.manager_username)
+        self.set_topic_managers([self.manager_username])
+        manager_id = self.get_user_id_from_email(self.manager_email)
+        manager = user_services.UserActionsInfo(manager_id)
+        topic_services.assign_role(
+            self.admin, manager, topic_domain.ROLE_MANAGER, self.topic_id)
+
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_story/%s' % self.story_id)
+        self.assertEqual(response['story_id'], self.story_id)
+        self.logout()
+
+    def test_normal_user_cannot_edit_story(self):
+        self.signup(self.viewer_email, self.viewer_username)
+
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_story/%s' % self.story_id, expected_status_int=401)
+        self.logout()
+
+
 class AddStoryToTopicTests(test_utils.GenericTestBase):
     """Tests for decorator can_add_new_story_to_topic."""
     manager_username = 'topicmanager'
@@ -1975,6 +2064,66 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
+
+
+class StoryViewerTests(test_utils.GenericTestBase):
+    """Tests for decorator can_access_story_viewer_page."""
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_access_story_viewer_page
+        def get(self, story_id):
+            self.render_json({'story_id': story_id})
+
+    def setUp(self):
+        super(StoryViewerTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.set_banned_users([self.banned_user])
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_story/<story_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+        self.topic_id = topic_services.get_new_topic_id()
+        self.story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
+        self.save_new_topic(
+            self.topic_id, self.admin_id, 'Name', 'Description',
+            [self.story_id], [], [], [], 1)
+
+    def test_cannot_access_non_existent_story(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_story/story_id', expected_status_int=404)
+
+    def test_cannot_access_story_when_topic_is_not_published(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story/%s' % self.story_id, expected_status_int=404)
+
+    def test_cannot_access_story_when_story_is_not_published(self):
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story/%s' % self.story_id, expected_status_int=404)
+
+    def test_can_access_story_when_story_and_topic_are_published(self):
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story/%s' % self.story_id, expected_status_int=200)
 
 
 class CreateSkillTests(test_utils.GenericTestBase):
@@ -2553,4 +2702,367 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock_edit_question/%s' % self.question_id,
                 expected_status_int=401)
+        self.logout()
+
+
+class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_play_question."""
+    question_id = 'question_id'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_play_question
+        def get(self, question_id):
+            self.render_json({'question_id': question_id})
+
+    def setUp(self):
+        super(PlayQuestionDecoratorTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_question/<question_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_question(
+            self.question_id, self.owner_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+
+    def test_can_play_question_with_valid_question_id(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_play_question/%s' % (
+                self.question_id))
+            self.assertEqual(response['question_id'], self.question_id)
+
+
+class PlayEntityDecoratorTests(test_utils.GenericTestBase):
+    """Test the decorator can_play_entity."""
+    user_email = 'user@example.com'
+    username = 'user'
+    published_exp_id = 'exp_id_1'
+    private_exp_id = 'exp_id_2'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_play_entity
+        def get(self, entity_type, entity_id):
+            self.render_json(
+                {'entity_type': entity_type, 'entity_id': entity_id})
+
+    def setUp(self):
+        super(PlayEntityDecoratorTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_entity/<entity_type>/<entity_id>',
+                self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.question_id = question_services.get_new_question_id()
+        self.save_new_question(
+            self.question_id, self.owner_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_cannot_play_exploration_on_disabled_exploration_ids(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_play_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_EXPLORATION,
+                feconf.DISABLED_EXPLORATION_IDS[0]), expected_status_int=404)
+
+    def test_guest_can_play_exploration_on_published_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_play_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_EXPLORATION, self.published_exp_id))
+            self.assertEqual(
+                response['entity_type'], feconf.ENTITY_TYPE_EXPLORATION)
+            self.assertEqual(
+                response['entity_id'], self.published_exp_id)
+
+    def test_guest_cannot_play_exploration_on_private_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_play_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.private_exp_id), expected_status_int=404)
+
+    def test_cannot_play_exploration_with_none_exploration_rights(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_play_entity/%s/%s'
+                % (feconf.ENTITY_TYPE_EXPLORATION, 'fake_exp_id'),
+                expected_status_int=404)
+
+    def test_can_play_question_for_valid_question_id(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_play_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_QUESTION, self.question_id))
+        self.assertEqual(
+            response['entity_type'], feconf.ENTITY_TYPE_QUESTION)
+        self.assertEqual(response['entity_id'], self.question_id)
+        self.assertEqual(response['entity_type'], 'question')
+
+    def test_cannot_play_question_invalid_question_id(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_play_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_QUESTION, 'question_id'),
+                          expected_status_int=404)
+
+    def test_cannot_play_entity_for_invalid_entity(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_play_entity/%s/%s' % (
+                'fake_entity_type', 'fake_entity_id'), expected_status_int=404)
+
+
+class EditEntityDecoratorTests(test_utils.GenericTestBase):
+    username = 'banneduser'
+    user_email = 'user@example.com'
+    published_exp_id = 'exp_0'
+    private_exp_id = 'exp_1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_edit_entity
+        def get(self, entity_type, entity_id):
+            return self.render_json(
+                {'entity_type': entity_type, 'entity_id': entity_id})
+
+    def setUp(self):
+        super(EditEntityDecoratorTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_banned_users([self.username])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_edit_entity/<entity_type>/<entity_id>',
+                self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.question_id = question_services.get_new_question_id()
+        self.save_new_question(
+            self.question_id, self.owner_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_can_edit_exploration_with_valid_exp_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_entity/exploration/%s' % (
+                    self.published_exp_id))
+            self.assertEqual(
+                response['entity_type'], feconf.ENTITY_TYPE_EXPLORATION)
+            self.assertEqual(
+                response['entity_id'], self.published_exp_id)
+        self.logout()
+
+    def test_cannot_edit_exploration_with_invalid_exp_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_entity/exploration/invalid_exp_id',
+                expected_status_int=404)
+        self.logout()
+
+    def test_banned_user_cannot_edit_exploration(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_EXPLORATION, self.private_exp_id),
+                expected_status_int=401)
+        self.logout()
+
+    def test_can_edit_question_with_valid_question_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_QUESTION, self.question_id))
+            self.assertEqual(response['entity_id'], self.question_id)
+            self.assertEqual(response['entity_type'], 'question')
+        self.logout()
+
+    def test_can_edit_topic(self):
+        self.login(self.ADMIN_EMAIL)
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, 'Name', 'Description',
+            [], [], [], [], 1)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_TOPIC, topic_id))
+            self.assertEqual(response['entity_id'], topic_id)
+            self.assertEqual(response['entity_type'], 'topic')
+        self.logout()
+
+    def test_can_edit_skill(self):
+        self.login(self.ADMIN_EMAIL)
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, 'Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_SKILL, skill_id))
+            self.assertEqual(response['entity_id'], skill_id)
+            self.assertEqual(response['entity_type'], 'skill')
+        self.logout()
+
+    def test_can_edit_story(self):
+        self.login(self.ADMIN_EMAIL)
+        story_id = story_services.get_new_story_id()
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_story(
+            story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            topic_id)
+        self.save_new_topic(
+            topic_id, self.admin_id, 'Name', 'Description',
+            [story_id], [], [], [], 1)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_STORY, story_id))
+            self.assertEqual(response['entity_id'], story_id)
+            self.assertEqual(response['entity_type'], 'story')
+        self.logout()
+
+    def test_cannot_edit_entity_invalid_entity(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_edit_entity/%s/%s' % (
+                'invalid_entity_type', 'q_id'), expected_status_int=404)
+
+
+class SaveExplorationTests(test_utils.GenericTestBase):
+    """Tests for can_save_exploration decorator."""
+    role = rights_manager.ROLE_VOICE_ARTIST
+    username = 'user'
+    user_email = 'user@example.com'
+    banned_username = 'banneduser'
+    banned_user_email = 'banneduser@example.com'
+    published_exp_id_1 = 'exp_1'
+    published_exp_id_2 = 'exp_2'
+    private_exp_id_1 = 'exp_3'
+    private_exp_id_2 = 'exp_4'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_save_exploration
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(SaveExplorationTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.signup(self.banned_user_email, self.banned_username)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_banned_users([self.banned_username])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.published_exp_id_2, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_2, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
+
+        rights_manager.assign_role_for_exploration(
+            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.role)
+        rights_manager.assign_role_for_exploration(
+            self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
+
+    def test_unautheticated_user_cannot_save_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+
+    def test_can_not_save_exploration_with_invalid_exp_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/invalid_exp_id', expected_status_int=404)
+        self.logout()
+
+    def test_banned_user_cannot_save_exploration(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+        self.logout()
+
+    def test_owner_can_save_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
+        self.logout()
+
+    def test_moderator_can_save_public_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.published_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.published_exp_id_1)
+        self.logout()
+
+    def test_moderator_cannot_save_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+        self.logout()
+
+    def test_admin_can_save_private_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
+        self.logout()
+
+    def test_voice_artist_can_only_save_assigned_exploration(self):
+        self.login(self.VOICE_ARTIST_EMAIL)
+        # Checking voice artist can only save assigned public exploration.
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.published_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.published_exp_id_1)
+
+        # Checking voice artist cannot save public exploration which he/she
+        # is not assigned for.
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()

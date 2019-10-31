@@ -18,16 +18,15 @@
 
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts.ts');
-require('domain/topic/EditableTopicBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/skill/RubricObjectFactory.ts');
+require('domain/topic/editable-topic-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page.constants.ts');
+  'topics-and-skills-dashboard-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('topicsAndSkillsDashboardNavbar', [
+angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -36,18 +35,28 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
         'topics-and-skills-dashboard-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
-        'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
+        'RubricObjectFactory', 'SkillCreationService',
+        'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        'SKILL_DIFFICULTIES',
         function(
             $scope, $rootScope, $uibModal, TopicCreationService,
-            SkillCreationService, EVENT_TYPE_TOPIC_CREATION_ENABLED,
+            RubricObjectFactory, SkillCreationService,
+            EVENT_TYPE_TOPIC_CREATION_ENABLED,
             EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+            SKILL_DIFFICULTIES) {
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
           };
           $scope.createSkill = function() {
+            var rubrics = [];
+            for (var idx in SKILL_DIFFICULTIES) {
+              rubrics.push(
+                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], 'N/A')
+              );
+            }
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -57,9 +66,38 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.newSkillDescription = '';
+                  $scope.rubrics = rubrics;
+                  $scope.allRubricsAdded = true;
+
+                  $scope.$watch('newSkillDescription', function() {
+                    $scope.rubrics[1].setExplanation(
+                      $scope.newSkillDescription);
+                  });
+
+                  var areAllRubricsPresent = function() {
+                    for (var idx in $scope.rubrics) {
+                      if ($scope.rubrics[idx].getExplanation() === '') {
+                        $scope.allRubricsAdded = false;
+                        return;
+                      }
+                    }
+                    $scope.allRubricsAdded = true;
+                  };
+
+
+                  $scope.onSaveRubric = function(difficulty, explanation) {
+                    for (var idx in $scope.rubrics) {
+                      if ($scope.rubrics[idx].getDifficulty() === difficulty) {
+                        $scope.rubrics[idx].setExplanation(explanation);
+                      }
+                    }
+                    areAllRubricsPresent();
+                  };
+
                   $scope.createNewSkill = function() {
                     $uibModalInstance.close({
-                      description: $scope.newSkillDescription
+                      description: $scope.newSkillDescription,
+                      rubrics: $scope.rubrics
                     });
                   };
 
@@ -69,7 +107,8 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
                 }
               ]
             }).result.then(function(result) {
-              SkillCreationService.createNewSkill(result.description, []);
+              SkillCreationService.createNewSkill(
+                result.description, result.rubrics, []);
             });
           };
           $rootScope.$on(

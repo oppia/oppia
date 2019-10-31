@@ -16,11 +16,9 @@
  * @fileoverview Controller for the history tab of the collection editor.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionHistoryTab', [
+angular.module('oppia').directive('collectionHistoryTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

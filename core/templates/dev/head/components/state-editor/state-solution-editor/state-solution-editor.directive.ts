@@ -23,7 +23,7 @@ require(
   'components/state-directives/solution-editor/solution-editor.directive.ts');
 
 require('domain/exploration/SolutionObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
@@ -56,11 +56,9 @@ require('services/EditabilityService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/GenerateContentIdService.ts');
 
-require('components/state-editor/state-editor.constants.ts');
+require('components/state-editor/state-editor.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('stateSolutionEditor', [
+angular.module('oppia').directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -292,6 +290,8 @@ oppia.directive('stateSolutionEditor', [
               StateEditorService.deleteCurrentSolutionValidity();
             });
           };
+
+          StateEditorService.updateStateSolutionEditorInitialised();
         }
       ]
     };

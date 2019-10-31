@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for the skill editor page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import role_services
 from core.domain import skill_services
@@ -49,15 +51,6 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description',
             [], [], [self.skill_id], [], 1)
-
-    def _get_csrf_token_for_put(self):
-        """Gets the csrf token."""
-        csrf_token = None
-        url_prefix = feconf.SKILL_EDITOR_URL_PREFIX
-        response = self.get_html_response(
-            '%s/%s' % (url_prefix, self.skill_id))
-        csrf_token = self.get_csrf_token_from_response(response)
-        return csrf_token
 
     def _delete_skill_model_and_memcache(self, user_id, skill_id):
         """Deletes skill model and memcache corresponding to the given skill
@@ -196,7 +189,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def test_editable_skill_handler_put_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         # Check that admins can edit a skill.
         json_response = self.put_json(
             self.url, self.put_payload, csrf_token=csrf_token)
@@ -207,7 +200,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def test_editable_skill_handler_put_fails(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         # Check PUT returns 400 when an exception is raised updating the
         # skill.
         update_skill_swap = self.swap(
@@ -284,14 +277,14 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
     def test_skill_publish_handler_succeeds(self):
         self.login(self.ADMIN_EMAIL)
         # Check that an admin can publish a skill.
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         self.put_json(self.url, {'version': 1}, csrf_token=csrf_token)
         self.logout()
 
     def test_skill_publish_handler_fails(self):
 
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         # Check that a skill cannot be published when the payload has no
         # version.
         self.put_json(
@@ -313,7 +306,7 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
             skill_services, 'publish_skill',
             self._mock_publish_skill_raise_exception)
         with skill_services_swap:
-            csrf_token = self._get_csrf_token_for_put()
+            csrf_token = self.get_new_csrf_token()
             self.put_json(
                 self.url, {'version': 1}, csrf_token=csrf_token,
                 expected_status_int=401)

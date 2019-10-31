@@ -16,12 +16,13 @@
  * @fileoverview Requires for GraphInput interaction.
  */
 
-require('interactions/GraphInput/directives/GraphInputRulesService.ts');
-require('interactions/GraphInput/directives/GraphInputValidationService.ts');
-require(
-  'interactions/GraphInput/directives/OppiaInteractiveGraphInputDirective.ts');
-require(
-  'interactions/GraphInput/directives/OppiaResponseGraphInputDirective.ts');
+require('interactions/GraphInput/directives/graph-input-rules.service.ts');
+require('interactions/GraphInput/directives/graph-input-validation.service.ts');
 require(
   'interactions/GraphInput/directives/' +
-  'OppiaShortResponseGraphInputDirective.ts');
+  'oppia-interactive-graph-input.directive.ts');
+require(
+  'interactions/GraphInput/directives/oppia-response-graph-input.directive.ts');
+require(
+  'interactions/GraphInput/directives/' +
+  'oppia-short-response-graph-input.directive.ts');

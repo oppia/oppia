@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Test calculations to get interaction answer views."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import calculation_registry
 from core.domain import exp_domain

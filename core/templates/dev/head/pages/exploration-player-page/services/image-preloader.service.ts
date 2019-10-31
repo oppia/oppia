@@ -16,7 +16,6 @@
  * @fileoverview Service to preload image into AssetsBackendApiService's cache.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/' +
   'extract-image-filenames-from-state.service.ts');
@@ -24,15 +23,11 @@ require('services/AssetsBackendApiService.ts');
 require('services/ComputeGraphService.ts');
 require('services/ContextService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ImagePreloaderService', [
-  '$q', '$uibModal', 'AssetsBackendApiService', 'ComputeGraphService',
-  'ContextService', 'ExtractImageFilenamesFromStateService',
-  'UrlInterpolationService',
-  function($q, $uibModal, AssetsBackendApiService, ComputeGraphService,
-      ContextService, ExtractImageFilenamesFromStateService,
-      UrlInterpolationService) {
+angular.module('oppia').factory('ImagePreloaderService', [
+  '$q', 'AssetsBackendApiService', 'ComputeGraphService',
+  'ContextService', 'ExtractImageFilenamesFromStateService', 'ENTITY_TYPE',
+  function($q, AssetsBackendApiService, ComputeGraphService,
+      ContextService, ExtractImageFilenamesFromStateService, ENTITY_TYPE) {
     var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
     var _filenamesOfImageCurrentlyDownloading = [];
@@ -63,7 +58,7 @@ oppia.factory('ImagePreloaderService', [
      */
     var _getImageUrl = function(filename, onLoadCallback, onErrorCallback) {
       AssetsBackendApiService.loadImage(
-        ContextService.getExplorationId(), filename)
+        ContextService.getEntityType(), ContextService.getEntityId(), filename)
         .then(function(loadedImageFile) {
           if (_isInFailedDownload(loadedImageFile.filename)) {
             _removeFromFailedDownload(loadedImageFile.filename);
@@ -147,7 +142,8 @@ oppia.factory('ImagePreloaderService', [
      */
     var _loadImage = function(imageFilename) {
       AssetsBackendApiService.loadImage(
-        ContextService.getExplorationId(), imageFilename)
+        ENTITY_TYPE.EXPLORATION, ContextService.getExplorationId(),
+        imageFilename)
         .then(function(loadedImage) {
           _removeCurrentAndLoadNextImage(loadedImage.filename);
           if (_imageLoadedCallback[loadedImage.filename]) {

@@ -16,31 +16,35 @@
  * @fileoverview Controllers for the error page.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/PageTitleService.ts');
 
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').directive('errorPage', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
+        statusCode: '@'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/error-pages/error-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        'PageTitleService', 'UrlInterpolationService',
+        function(
+            PageTitleService, UrlInterpolationService) {
+          var ctrl = this;
+          ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/oops_mint.png');
 
-oppia.directive('errorPage', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/error-pages/error-page.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      'PageTitleService', 'UrlInterpolationService',
-      function(
-          PageTitleService, UrlInterpolationService) {
-        var ctrl = this;
-        ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
-          '/general/oops_mint.png');
+          ctrl.getStatusCode = function() {
+            return Number(ctrl.statusCode);
+          };
 
-        ctrl.statusCode = GLOBALS.status_code;
-
-        PageTitleService.setPageTitle('Error ' + ctrl.statusCode + ' - Oppia');
-      }
-    ]};
-}]);
+          PageTitleService.setPageTitle(
+            'Error ' + ctrl.statusCode + ' - Oppia');
+        }
+      ]};
+  }]);

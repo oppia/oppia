@@ -13,10 +13,13 @@
 # limitations under the License.
 
 """Controllers for the story viewer page"""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
 import feconf
@@ -31,7 +34,7 @@ class StoryPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        self.render_template('dist/story-viewer-page.mainpage.html')
+        self.render_template('story-viewer-page.mainpage.html')
 
 
 class StoryPageDataHandler(base.BaseHandler):
@@ -46,11 +49,11 @@ class StoryPageDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        story = story_services.get_story_by_id(story_id)
+        story = story_fetchers.get_story_by_id(story_id)
 
         completed_node_ids = [
             completed_node.id for completed_node in
-            story_services.get_completed_nodes_in_story(self.user_id, story_id)]
+            story_fetchers.get_completed_nodes_in_story(self.user_id, story_id)]
 
         ordered_node_dicts = [
             node.to_dict() for node in story.story_contents.get_ordered_nodes()
@@ -91,9 +94,9 @@ class StoryNodeCompletionHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         try:
-            story_services.get_node_index_by_story_id_and_node_id(
+            story_fetchers.get_node_index_by_story_id_and_node_id(
                 story_id, node_id)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
         story_services.record_completed_node_in_story_context(

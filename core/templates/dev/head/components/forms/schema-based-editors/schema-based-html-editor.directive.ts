@@ -16,14 +16,17 @@
  * @fileoverview Directive for a schema-based editor for HTML.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
-var oppia = require('AppInit.ts').module;
+require('domain/utilities/url-interpolation.service.ts');
 
-oppia.directive('schemaBasedHtmlEditor', [
+angular.module('oppia').directive('schemaBasedHtmlEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
         localValue: '=',
         isDisabled: '&',
         labelForFocusTarget: '&',
@@ -32,6 +35,7 @@ oppia.directive('schemaBasedHtmlEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema-based-editors/' +
         'schema-based-html-editor.directive.html'),
-      restrict: 'E',
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }]);

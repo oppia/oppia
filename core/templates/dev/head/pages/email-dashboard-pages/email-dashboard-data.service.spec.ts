@@ -16,17 +16,36 @@
  * @fileoverview Unit tests for the email dashboard page.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('pages/email-dashboard-pages/email-dashboard-data.service.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Email Dashboard Services', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   describe('Email Dashboard Services', function() {
-    var service, $httpBackend, recentQueries;
+    var service, $httpBackend, recentQueries, CsrfService;
 
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector, $q) {
       $httpBackend = $injector.get('$httpBackend');
       service = $injector.get('EmailDashboardDataService');
+      CsrfService = $injector.get('CsrfTokenService');
+
+      spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+        var deferred = $q.defer();
+        deferred.resolve('sample-csrf-token');
+        return deferred.promise;
+      });
     }));
 
     it('should fetch correct data from backend', function() {

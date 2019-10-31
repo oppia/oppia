@@ -16,9 +16,12 @@
  * @fileoverview File to import necessary scripts for get_started page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/get-started-page/get-started-page.module.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');

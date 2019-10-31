@@ -13,13 +13,14 @@
 # limitations under the License.
 
 """Controllers for incoming email handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_services
 from core.domain import feedback_services
 from google.appengine.api import mail
-
 
 
 class IncomingReplyEmailHandler(base.BaseHandler):

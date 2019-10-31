@@ -20,37 +20,51 @@
 // the current active version? Previous versions should not be editable.
 // TODO(SD): Remove translatable part from this service after translation tab
 // will get implemented.
-var oppia = require('AppInit.ts').module;
 
-oppia.factory('EditabilityService', [function() {
-  var isEditable = false;
-  var isTranslatable = false;
-  var inTutorialMode = false;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-  return {
-    isEditable: function() {
-      return isEditable && !inTutorialMode;
-    },
-    isTranslatable: function() {
-      return isTranslatable && !inTutorialMode;
-    },
-    isEditableOutsideTutorialMode: function() {
-      return isEditable;
-    },
-    markEditable: function() {
-      isEditable = true;
-    },
-    markTranslatable: function() {
-      isTranslatable = true;
-    },
-    markNotEditable: function() {
-      isEditable = false;
-    },
-    onEndTutorial: function() {
-      inTutorialMode = false;
-    },
-    onStartTutorial: function() {
-      inTutorialMode = true;
-    }
-  };
-}]);
+@Injectable({
+  providedIn: 'root'
+})
+export class EditabilityService {
+  static isEditable: boolean = false;
+  static isTranslatable: boolean = false;
+  static inTutorialMode: boolean = false;
+
+  isEditable(): boolean {
+    return EditabilityService.isEditable && !EditabilityService.inTutorialMode;
+  }
+
+  isTranslatable(): boolean {
+    return (
+      EditabilityService.isTranslatable && !EditabilityService.inTutorialMode);
+  }
+
+  isEditableOutsideTutorialMode(): boolean {
+    return EditabilityService.isEditable;
+  }
+
+  markEditable(): void {
+    EditabilityService.isEditable = true;
+  }
+
+  markTranslatable(): void {
+    EditabilityService.isTranslatable = true;
+  }
+
+  markNotEditable(): void {
+    EditabilityService.isEditable = false;
+  }
+
+  onEndTutorial(): void {
+    EditabilityService.inTutorialMode = false;
+  }
+
+  onStartTutorial(): void {
+    EditabilityService.inTutorialMode = true;
+  }
+}
+
+angular.module('oppia').factory(
+  'EditabilityService', downgradeInjectable(EditabilityService));

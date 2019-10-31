@@ -19,13 +19,11 @@
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/IdGenerationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('schemaBasedDictEditor', [
+angular.module('oppia').directive('schemaBasedDictEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(

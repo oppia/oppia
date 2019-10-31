@@ -16,13 +16,11 @@
  * @fileoverview Directive for visualizing early quit issue.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('earlyQuitIssue', [
+angular.module('oppia').directive('earlyQuitIssue', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

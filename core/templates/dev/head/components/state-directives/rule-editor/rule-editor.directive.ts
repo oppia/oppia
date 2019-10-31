@@ -16,9 +16,14 @@
  * @fileoverview Directive for the rule editor.
  */
 
+require('components/forms/custom-forms-directives/html-select.directive.ts');
+require('components/forms/custom-forms-directives/object-editor.directive.ts');
+require(
+  'components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(
@@ -29,13 +34,12 @@ require(
   'state-property.service.ts');
 require('services/ValidatorsService.ts');
 
+var DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 // This directive controls an editor for selecting the type and input parameters
 // to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
 // buttons only show up if 'isEditingRuleInline' is true.
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('ruleEditor', [
+angular.module('oppia').directive('ruleEditor', [
   '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -59,7 +63,6 @@ oppia.directive('ruleEditor', [
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
           var ctrl = this;
-          var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
 
           ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
           ctrl.editRuleForm = {};

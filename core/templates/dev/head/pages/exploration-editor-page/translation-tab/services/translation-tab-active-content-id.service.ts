@@ -23,11 +23,9 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TranslationTabActiveContentIdService', [
-  '$log', '$rootScope', 'StateRecordedVoiceoversService',
-  function($log, $rootScope, StateRecordedVoiceoversService) {
+angular.module('oppia').factory('TranslationTabActiveContentIdService', [
+  '$rootScope', 'StateRecordedVoiceoversService',
+  function($rootScope, StateRecordedVoiceoversService) {
     var activeContentId = null;
     return {
       getActiveContentId: function() {

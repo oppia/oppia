@@ -16,13 +16,11 @@
  * @fileoverview Controller for oppia email dashboard page.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('emailDashboardResultPage', [
+angular.module('oppia').directive('emailDashboardResultPage', [
   'UrlInterpolationService', function(
       UrlInterpolationService) {
     return {

@@ -17,10 +17,10 @@
  */
 
 require('domain/collection/CollectionNodeObjectFactory.ts');
-require('domain/collection/CollectionUpdateService.ts');
-require('domain/collection/SearchExplorationsBackendApiService.ts');
-require('domain/summary/ExplorationSummaryBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/collection/collection-update.service.ts');
+require('domain/collection/search-explorations-backend-api.service.ts');
+require('domain/summary/exploration-summary-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
@@ -30,9 +30,7 @@ require('services/AlertsService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/ValidatorsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionNodeCreator', [
+angular.module('oppia').directive('collectionNodeCreator', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

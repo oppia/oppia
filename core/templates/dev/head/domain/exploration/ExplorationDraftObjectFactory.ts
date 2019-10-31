@@ -17,54 +17,75 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('ExplorationDraftObjectFactory', [
-  function() {
-    var ExplorationDraft = function(draftChanges, draftChangeListId) {
-      this.draftChanges = draftChanges;
-      this.draftChangeListId = draftChangeListId;
-    };
+export interface IExplorationDraftDict {
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'draftChanges' is an array of dicts with possible
+  // underscore_cased keys. A thorough check needs to be done to assure of
+  // its exact type.
+  draftChanges: any;
+  draftChangeListId: number
+}
 
-    /**
-     * Checks whether the draft object has been overwritten by another
-     * draft which has been committed to the back-end. If the supplied draft id
-     * has a different value then a newer changeList must have been committed
-     * to the back-end.
-     * @param {Integer} - currentDraftId. The id of the draft changes whch was
-     *  retrieved from the back-end.
-     * @returns {Boolean} - True iff the currentDraftId is the same as the
-     * draftChangeListId corresponding to this draft.
-     */
-    ExplorationDraft.prototype.isValid = function(currentDraftId) {
-      return (currentDraftId === this.draftChangeListId);
-    };
+export class ExplorationDraft {
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'draftChanges' is an array of dicts with possible
+  // underscore_cased keys. A thorough check needs to be done to assure of
+  // its exact type.
+  draftChanges: any;
+  draftChangeListId: number;
 
-    ExplorationDraft.prototype.getChanges = function() {
-      return this.draftChanges;
-    };
-
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    ExplorationDraft['createFromLocalStorageDict'] = function(
-    /* eslint-enable dot-notation */
-        explorationDraftDict) {
-      return new ExplorationDraft(
-        explorationDraftDict.draftChanges,
-        explorationDraftDict.draftChangeListId);
-    };
-
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    ExplorationDraft['toLocalStorageDict'] = function(
-    /* eslint-enable dot-notation */
-        changeList, draftChangeListId) {
-      return {
-        draftChanges: changeList,
-        draftChangeListId: draftChangeListId
-      };
-    };
-
-    return ExplorationDraft;
+  constructor(draftChanges: any, draftChangeListId: number) {
+    this.draftChanges = draftChanges;
+    this.draftChangeListId = draftChangeListId;
   }
-]);
+  /**
+   * Checks whether the draft object has been overwritten by another
+   * draft which has been committed to the back-end. If the supplied draft id
+   * has a different value then a newer changeList must have been committed
+   * to the back-end.
+   * @param {Integer} - currentDraftId. The id of the draft changes whch was
+   *  retrieved from the back-end.
+   * @returns {Boolean} - True iff the currentDraftId is the same as the
+   * draftChangeListId corresponding to this draft.
+   */
+  isValid(currentDraftId: number): boolean {
+    return (currentDraftId === this.draftChangeListId);
+  }
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'draftChanges' is an array of dicts with possible
+  // underscore_cased keys. A thorough check needs to be done to assure of
+  // its exact type.
+  getChanges(): any {
+    return this.draftChanges;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationDraftObjectFactory {
+  createFromLocalStorageDict(
+      explorationDraftDict: IExplorationDraftDict): ExplorationDraft {
+    return new ExplorationDraft(
+      explorationDraftDict.draftChanges,
+      explorationDraftDict.draftChangeListId);
+  }
+  toLocalStorageDict(
+      // TODO(#7165): Replace 'any' with the exact type. This has been typed
+      // as 'any' since 'changeList' is an array of dicts with possible
+      // underscore_cased keys. A thorough check needs to be done to assure of
+      // its exact type.
+      changeList: any, draftChangeListId: number): IExplorationDraftDict {
+    return {
+      draftChanges: changeList,
+      draftChangeListId: draftChangeListId
+    };
+  }
+}
+
+angular.module('oppia').factory(
+  'ExplorationDraftObjectFactory',
+  downgradeInjectable(ExplorationDraftObjectFactory));

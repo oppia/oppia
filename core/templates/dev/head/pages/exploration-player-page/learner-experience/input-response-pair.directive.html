@@ -1,5 +1,5 @@
 <div class="conversation-skin-learner-answer-container">
-  <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
+  <img class="conversation-skin-user-avatar rounded-circle" ng-src="<[profilePicture()]>" alt="">
   <div ng-if="!data.isHint">
     <div ng-if="getShortAnswerHtml()"
          popover-placement="bottom" uib-popover-template="'<[getAnswerPopoverUrl()]>'"
@@ -20,7 +20,7 @@
 </div>
 
 <div class="conversation-skin-oppia-feedback-container" ng-if="data.oppiaResponse !== ''">
-  <img class="conversation-skin-oppia-avatar img-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
+  <img class="conversation-skin-oppia-avatar rounded-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
   <div ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()" class="protractor-test-input-response-loading-dots">
     <div class="conversation-skin-feedback-dot-one"></div>
     <div class="conversation-skin-feedback-dot-two"></div>

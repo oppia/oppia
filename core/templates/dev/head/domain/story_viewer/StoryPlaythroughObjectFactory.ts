@@ -19,9 +19,7 @@
 
 require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StoryPlaythroughObjectFactory', [
+angular.module('oppia').factory('StoryPlaythroughObjectFactory', [
   'ReadOnlyStoryNodeObjectFactory', function(ReadOnlyStoryNodeObjectFactory) {
     // Stores information about a current playthrough of a story for a
     // user.
@@ -60,7 +58,7 @@ oppia.factory('StoryPlaythroughObjectFactory', [
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // story playthrough python dict.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     StoryPlaythrough['createFromBackendDict'] = function(
     /* eslint-enable dot-notation */

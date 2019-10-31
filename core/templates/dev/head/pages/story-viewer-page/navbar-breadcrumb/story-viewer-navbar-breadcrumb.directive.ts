@@ -16,13 +16,11 @@
  * @fileoverview Directive for the navbar breadcrumb of the story viewer.
  */
 
-require('domain/story_viewer/StoryViewerBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/story_viewer/story-viewer-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('storyViewerNavbarBreadcrumb', [
+angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -3,7 +3,7 @@
      height="300">
   <text x="100" y="160" fill="#015C53"> <[$ctrl.getScore()]>%</text>
   <circle class="score-outer-ring-circle"
-          stroke="#F4CEBA"
+          stroke="<[$ctrl.getScoreOuterRingColor()]>"
           stroke-width="10"
           fill="transparent"
           r="125"
@@ -11,7 +11,7 @@
           cy="150">
   </circle>
   <circle class="score-ring-circle"
-          stroke="#D95C0C"
+          stroke="<[$ctrl.getScoreRingColor()]>"
           stroke-width="10"
           fill="transparent"
           r="125"

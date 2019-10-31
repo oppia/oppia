@@ -16,36 +16,56 @@
  * @fileoverview Unit tests for the ImprovementActionButtonObjectFactory.
  */
 
-require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
+import { ImprovementActionButtonObjectFactory } from
+  'domain/statistics/ImprovementActionButtonObjectFactory';
 
-describe('ImprovementActionButtonObjectFactory', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    this.ImprovementActionButtonObjectFactory =
-      $injector.get('ImprovementActionButtonObjectFactory');
-  }));
+describe('ImprovementActionButtonObjectFactory', () => {
+  let improvementActionButtonObjectFactory:
+    ImprovementActionButtonObjectFactory = null;
 
-  describe('.createNew', function() {
-    it('stores the name and action', function() {
-      var flagToSetOnCallback = false;
-      var improvementAction =
-        this.ImprovementActionButtonObjectFactory.createNew('Test', function() {
-          flagToSetOnCallback = true;
-        }, 'btn-success');
+  beforeEach(() => {
+    improvementActionButtonObjectFactory =
+      new ImprovementActionButtonObjectFactory();
+  });
+
+  describe('.createNew', () => {
+    it('stores the name and class', () => {
+      var improvementAction = improvementActionButtonObjectFactory.createNew(
+        'Test', 'btn-success', () => {});
 
       expect(improvementAction.getText()).toEqual('Test');
       expect(improvementAction.getCssClass()).toEqual('btn-success');
+    });
+  });
+
+  describe('.execute', () => {
+    it('executes the passed function when called', () => {
+      var flagToSetOnCallback = false;
+      var improvementAction = improvementActionButtonObjectFactory.createNew(
+        'Test', 'btn-success', () => flagToSetOnCallback = true);
+
       expect(flagToSetOnCallback).toBe(false);
       improvementAction.execute();
       expect(flagToSetOnCallback).toBe(true);
     });
+  });
 
-    it('uses btn-default as class by default', function() {
-      var improvementAction =
-        this.ImprovementActionButtonObjectFactory.createNew('Test', function() {
-        });
+  describe('.isEnabled', () => {
+    it('is always true when no enabled func is provided', () => {
+      var improvementAction = improvementActionButtonObjectFactory.createNew(
+        'Test', 'btn-success', () => {});
 
-      expect(improvementAction.getCssClass()).toEqual('btn-default');
+      expect(improvementAction.isEnabled()).toBe(true);
+    });
+
+    it('returns the same value that the enabled func does', () => {
+      var boolValue = true;
+      var improvementAction = improvementActionButtonObjectFactory.createNew(
+        'Test', 'btn-success', () => {}, () => boolValue);
+
+      expect(improvementAction.isEnabled()).toBe(true);
+      boolValue = false;
+      expect(improvementAction.isEnabled()).toBe(false);
     });
   });
 });

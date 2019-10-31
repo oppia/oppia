@@ -16,13 +16,11 @@
  * @fileoverview Data and controllers for the user's notifications dashboard.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 
 require('services/DateTimeFormatService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('notificationsDashboardPage', [
+angular.module('oppia').directive('notificationsDashboardPage', [
   'UrlInterpolationService', function(
       UrlInterpolationService) {
     return {

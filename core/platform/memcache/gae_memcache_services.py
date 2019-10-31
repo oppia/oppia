@@ -15,6 +15,10 @@
 # limitations under the License.
 
 """Provides memcache services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import python_utils
 
 from google.appengine.api import memcache
 
@@ -61,7 +65,7 @@ def delete(key):
       0 on network failure, 1 if the item does not exist, and 2 for a
       successful delete.
     """
-    assert isinstance(key, basestring)
+    assert isinstance(key, python_utils.BASESTRING)
     return_code = memcache.delete(key)
     return return_code
 
@@ -76,6 +80,6 @@ def delete_multi(keys):
       True if all operations complete successfully; False otherwise.
     """
     for key in keys:
-        assert isinstance(key, basestring)
+        assert isinstance(key, python_utils.BASESTRING)
     return_value = memcache.delete_multi(keys)
     return return_value

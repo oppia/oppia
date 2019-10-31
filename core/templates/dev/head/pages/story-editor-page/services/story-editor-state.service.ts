@@ -18,16 +18,14 @@
  * retrieving the story, saving it, and listening for changes.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/story/editable-story-backend-api.service.ts');
 require('domain/story/StoryObjectFactory.ts');
 require('services/AlertsService.ts');
 
-require('pages/story-editor-page/story-editor-page.constants.ts');
+require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StoryEditorStateService', [
+angular.module('oppia').factory('StoryEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',
   'StoryObjectFactory', 'UndoRedoService',
   'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
@@ -40,6 +38,8 @@ oppia.factory('StoryEditorStateService', [
     var _storyIsLoading = false;
     var _storyIsBeingSaved = false;
     var _topicName = null;
+    var _storyIsPublished = false;
+    var _skillSummaries = [];
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
@@ -51,8 +51,16 @@ oppia.factory('StoryEditorStateService', [
       }
     };
 
+    var _setSkillSummaries = function(skillSummaries) {
+      _skillSummaries = angular.copy(skillSummaries);
+    };
+
     var _setTopicName = function(topicName) {
       _topicName = topicName;
+    };
+
+    var _setStoryPublicationStatus = function(storyIsPublished) {
+      _storyIsPublished = storyIsPublished;
     };
 
     var _updateStory = function(newBackendStoryObject) {
@@ -66,12 +74,14 @@ oppia.factory('StoryEditorStateService', [
        * specified story ID. See setStory() for more information on
        * additional behavior of this function.
        */
-      loadStory: function(topicId, storyId) {
+      loadStory: function(storyId) {
         _storyIsLoading = true;
-        EditableStoryBackendApiService.fetchStory(
-          topicId, storyId).then(
+        EditableStoryBackendApiService.fetchStory(storyId).then(
           function(newBackendStoryObject) {
             _setTopicName(newBackendStoryObject.topicName);
+            _setStoryPublicationStatus(
+              newBackendStoryObject.storyIsPublished);
+            _setSkillSummaries(newBackendStoryObject.skillSummaries);
             _updateStory(newBackendStoryObject.story);
             _storyIsLoading = false;
           },
@@ -110,6 +120,10 @@ oppia.factory('StoryEditorStateService', [
         return _story;
       },
 
+      getSkillSummaries: function() {
+        return _skillSummaries;
+      },
+
       /**
        * Sets the story stored within this service, propogating changes to
        * all bindings to the story returned by getStory(). The first
@@ -125,6 +139,10 @@ oppia.factory('StoryEditorStateService', [
         return _topicName;
       },
 
+      isStoryPublished: function() {
+        return _storyIsPublished;
+      },
+
       /**
        * Attempts to save the current story given a commit message. This
        * function cannot be called until after a story has been initialized
@@ -133,7 +151,7 @@ oppia.factory('StoryEditorStateService', [
        * will clear the UndoRedoService of pending changes. This function also
        * shares behavior with setStory(), when it succeeds.
        */
-      saveStory: function(topicId, commitMessage, successCallback) {
+      saveStory: function(commitMessage, successCallback) {
         if (!_storyIsInitialized) {
           AlertsService.fatalWarning(
             'Cannot save a story before one is loaded.');
@@ -145,7 +163,7 @@ oppia.factory('StoryEditorStateService', [
         }
         _storyIsBeingSaved = true;
         EditableStoryBackendApiService.updateStory(
-          topicId, _story.getId(), _story.getVersion(),
+          _story.getId(), _story.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(storyBackendObject) {
             _updateStory(storyBackendObject);
@@ -158,6 +176,28 @@ oppia.factory('StoryEditorStateService', [
             AlertsService.addWarning(
               error || 'There was an error when saving the story.');
             _storyIsBeingSaved = false;
+          });
+        return true;
+      },
+
+      changeStoryPublicationStatus: function(
+          newStoryStatusIsPublic, successCallback) {
+        if (!_storyIsInitialized) {
+          AlertsService.fatalWarning(
+            'Cannot publish a story before one is loaded.');
+        }
+
+        EditableStoryBackendApiService.changeStoryPublicationStatus(
+          _story.getId(), newStoryStatusIsPublic).then(
+          function(storyBackendObject) {
+            _setStoryPublicationStatus(newStoryStatusIsPublic);
+            if (successCallback) {
+              successCallback();
+            }
+          }, function(error) {
+            AlertsService.addWarning(
+              error ||
+              'There was an error when publishing/unpublishing the story.');
           });
         return true;
       },

@@ -16,8 +16,12 @@
  * @fileoverview Directives required in collection editor.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/collection-editor-page/collection-editor-page.module.ts');
 require('App.ts');
 
+require('base-components/base-content.directive.ts');
 require('pages/collection-editor-page/collection-editor-page.directive.ts');
 require(
   'pages/collection-editor-page/navbar/' +

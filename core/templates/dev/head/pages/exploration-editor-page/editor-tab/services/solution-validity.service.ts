@@ -16,36 +16,45 @@
  * @fileoverview Service for keeping track of solution validity.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('SolutionValidityService', [
-  function() {
-    return {
-      init: function(stateNames) {
-        this.solutionValidities = {};
-        var self = this;
-        stateNames.forEach(function(stateName) {
-          self.solutionValidities[stateName] = true;
-        });
-      },
-      onRenameState: function(newStateName, oldStateName) {
-        this.solutionValidities[newStateName] =
-          this.solutionValidities[oldStateName];
-        this.deleteSolutionValidity(oldStateName);
-      },
-      updateValidity: function(stateName, solutionIsValid) {
-        this.solutionValidities[stateName] = solutionIsValid;
-      },
-      isSolutionValid: function(stateName) {
-        if (this.solutionValidities.hasOwnProperty(stateName)) {
-          return this.solutionValidities[stateName];
-        }
-      },
-      deleteSolutionValidity: function(stateName) {
-        delete this.solutionValidities[stateName];
-      },
-      getAllValidities: function() {
-        return this.solutionValidities;
-      }
-    };
-  }]);
+@Injectable({
+  providedIn: 'root'
+})
+export class SolutionValidityService {
+  solutionValidities = {};
+
+  init(stateNames: string[]): void {
+    stateNames.forEach((stateName: string) => {
+      this.solutionValidities[stateName] = true;
+    });
+  }
+
+  deleteSolutionValidity(stateName: string): void {
+    delete this.solutionValidities[stateName];
+  }
+
+  onRenameState(newStateName: string, oldStateName: string): void {
+    this.solutionValidities[newStateName] =
+      this.solutionValidities[oldStateName];
+    this.deleteSolutionValidity(oldStateName);
+  }
+
+  updateValidity(stateName: string, solutionIsValid: boolean): void {
+    this.solutionValidities[stateName] = solutionIsValid;
+  }
+
+  isSolutionValid(stateName: string): boolean {
+    if (this.solutionValidities.hasOwnProperty(stateName)) {
+      return this.solutionValidities[stateName];
+    }
+  }
+
+  getAllValidities(): {} {
+    return this.solutionValidities;
+  }
+}
+
+angular.module('oppia').factory(
+  'SolutionValidityService', downgradeInjectable(SolutionValidityService));

@@ -13,14 +13,24 @@
 # limitations under the License.
 
 """Tests for Oppia job models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.platform import models
 from core.tests import test_utils
 
-(job_models,) = models.Registry.import_models([models.NAMES.job])
+(base_models, job_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.job])
 
 
 class JobModelTest(test_utils.GenericTestBase):
     """Tests for Oppia job models."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            job_models.JobModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
     def test_is_cancelable(self):
         """The job is cancelable if its status is either queued or started."""
         job = job_models.JobModel(
@@ -73,3 +83,12 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
         job2.put()
         self.assertFalse(job_models.JobModel.do_unfinished_jobs_exist(
             'JobType2'))
+
+
+class ContinuousComputationModelTest(test_utils.GenericTestBase):
+    """Tests for Oppia continuous computation models."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            job_models.ContinuousComputationModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)

@@ -17,23 +17,27 @@
  * used at multiple places in the codebase.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('UtilsService', [function() {
-  var utils = {
-    isEmpty: function(obj) {
-      for (var property in obj) {
-        if (obj.hasOwnProperty(property)) {
-          return false;
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class UtilsService {
+  isEmpty(obj: any): boolean {
+    for (var property in obj) {
+      if (obj.hasOwnProperty(property)) {
+        return false;
       }
-      return true;
-    },
-
-    // http://stackoverflow.com/questions/203739
-    isString: function(input) {
-      return (typeof input === 'string' || input instanceof String);
     }
-  };
-  return utils;
-}]);
+    return true;
+  }
+
+  isString(input: any): boolean {
+    return (typeof input === 'string' || input instanceof String);
+  }
+}
+
+angular.module('oppia').factory(
+  'UtilsService',
+  downgradeInjectable(UtilsService));

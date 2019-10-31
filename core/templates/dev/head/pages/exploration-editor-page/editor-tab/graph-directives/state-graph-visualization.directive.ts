@@ -16,8 +16,10 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+import * as d3 from 'd3';
+
 require('components/graph-services/graph-layout.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
@@ -26,9 +28,7 @@ require(
   'translation-status.service.ts');
 
 /* eslint-disable angular/directive-restrict */
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('stateGraphVisualization', [
+angular.module('oppia').directive('stateGraphVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       // Note: This directive is used as attribute because pannability does not
@@ -93,6 +93,15 @@ oppia.directive('stateGraphVisualization', [
             ExplorationWarningsService, StateGraphLayoutService,
             TranslationStatusService, MAX_NODES_PER_ROW,
             MAX_NODE_LABEL_LENGTH) {
+          var graphBounds = {
+            bottom: 0,
+            left: 0,
+            top: 0,
+            right: 0
+          };
+          var nodeData = {};
+          // The translation applied when the graph is first loaded.
+          var origTranslations = [0, 0];
           var redrawGraph = function() {
             if ($scope.graphData()) {
               $scope.graphLoaded = false;
@@ -108,8 +117,99 @@ oppia.directive('stateGraphVisualization', [
             }
           };
 
+          var makeGraphPannable = function() {
+            // Without the timeout, $element.find fails to find the required
+            // rect in the state graph modal dialog.
+            $timeout(function() {
+              var dimensions = getElementDimensions();
+
+              d3.select($element.find('rect.pannable-rect')[0])
+                .call(d3.zoom().scaleExtent([1, 1])
+                  .on('zoom', function() {
+                    if (graphBounds.right - graphBounds.left < dimensions.w) {
+                      (d3.event).transform.x = 0;
+                    } else {
+                      d3.event.transform.x = clamp(
+                        d3.event.transform.x,
+                        dimensions.w - graphBounds.right -
+                         origTranslations[0],
+                        -graphBounds.left - origTranslations[0]);
+                    }
+
+                    if (graphBounds.bottom - graphBounds.top < dimensions.h) {
+                      d3.event.transform.y = 0;
+                    } else {
+                      d3.event.transform.y = clamp(
+                        d3.event.transform.y,
+                        dimensions.h - graphBounds.bottom -
+                         origTranslations[1],
+                        -graphBounds.top - origTranslations[1]);
+                    }
+
+                    // We need a separate layer here so that the translation
+                    // does not influence the panning event receivers.
+                    $scope.innerTransformStr = (
+                      'translate(' + d3.event.transform.x +
+                      ',' + d3.event.transform.y + ')'
+                    );
+                    $scope.$apply();
+                  })
+                );
+            }, 10);
+          };
+
+          var centerGraph = function() {
+            if ($scope.graphLoaded && $scope.centerAtCurrentState) {
+              if ($scope.allowPanning) {
+                makeGraphPannable();
+              }
+
+              $timeout(function() {
+                var dimensions = getElementDimensions();
+
+                // Center the graph at the node representing the current state.
+                origTranslations[0] = (
+                  dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
+                  nodeData[$scope.currentStateId()].width / 2);
+                origTranslations[1] = (
+                  dimensions.h / 2 - nodeData[$scope.currentStateId()].y0 -
+                  nodeData[$scope.currentStateId()].height / 2);
+
+                if (graphBounds.right - graphBounds.left < dimensions.w) {
+                  origTranslations[0] = (
+                    dimensions.w / 2 -
+                    (graphBounds.right + graphBounds.left) / 2);
+                } else {
+                  origTranslations[0] = clamp(
+                    origTranslations[0],
+                    dimensions.w - graphBounds.right,
+                    -graphBounds.left);
+                }
+
+                if (graphBounds.bottom - graphBounds.top < dimensions.h) {
+                  origTranslations[1] = (
+                    dimensions.h / 2 -
+                    (graphBounds.bottom + graphBounds.top) / 2);
+                } else {
+                  origTranslations[1] = clamp(
+                    origTranslations[1],
+                    dimensions.h - graphBounds.bottom,
+                    -graphBounds.top);
+                }
+
+                $scope.overallTransformStr = (
+                  'translate(' + origTranslations + ')');
+                $scope.$apply();
+              }, 20);
+            }
+          };
+
           $scope.$on('redrawGraph', function() {
             redrawGraph();
+          });
+
+          $scope.$on('centerGraph', function() {
+            centerGraph();
           });
 
           $scope.$watch('graphData()', redrawGraph, true);
@@ -144,7 +244,7 @@ oppia.directive('stateGraphVisualization', [
             $scope.finalStateIds = finalStateIds;
             var links = angular.copy(originalLinks);
 
-            var nodeData = StateGraphLayoutService.computeLayout(
+            nodeData = StateGraphLayoutService.computeLayout(
               nodes, links, initStateId, angular.copy(finalStateIds));
 
             $scope.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
@@ -164,7 +264,7 @@ oppia.directive('stateGraphVisualization', [
             $scope.VIEWPORT_X = -Math.max(1000, $scope.GRAPH_WIDTH * 2);
             $scope.VIEWPORT_Y = -Math.max(1000, $scope.GRAPH_HEIGHT * 2);
 
-            var graphBounds = StateGraphLayoutService.getGraphBoundaries(
+            graphBounds = StateGraphLayoutService.getGraphBoundaries(
               nodeData);
 
             $scope.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
@@ -301,89 +401,15 @@ oppia.directive('stateGraphVisualization', [
               }
             };
 
-            // The translation applied when the graph is first loaded.
-            var origTranslations = [0, 0];
             $scope.overallTransformStr = 'translate(0,0)';
             $scope.innerTransformStr = 'translate(0,0)';
 
             if ($scope.allowPanning) {
-              // Without the timeout, $element.find fails to find the required
-              // rect in the state graph modal dialog.
-              $timeout(function() {
-                var dimensions = getElementDimensions();
-
-                d3.select($element.find('rect.pannable-rect')[0])
-                  .call(d3.zoom().scaleExtent([1, 1])
-                    .on('zoom', function() {
-                      if (graphBounds.right - graphBounds.left < dimensions.w) {
-                        (<d3.ZoomEvent>d3.event).translate[0] = 0;
-                      } else {
-                        (<d3.ZoomEvent>d3.event).translate[0] = clamp(
-                          (<d3.ZoomEvent>d3.event).translate[0],
-                          dimensions.w - graphBounds.right -
-                           origTranslations[0],
-                          -graphBounds.left - origTranslations[0]);
-                      }
-
-                      if (graphBounds.bottom - graphBounds.top < dimensions.h) {
-                        (<d3.ZoomEvent>d3.event).translate[1] = 0;
-                      } else {
-                        (<d3.ZoomEvent>d3.event).translate[1] = clamp(
-                          (<d3.ZoomEvent>d3.event).translate[1],
-                          dimensions.h - graphBounds.bottom -
-                           origTranslations[1],
-                          -graphBounds.top - origTranslations[1]);
-                      }
-
-                      // We need a separate layer here so that the translation
-                      // does not influence the panning event receivers.
-                      $scope.innerTransformStr = (
-                        'translate(' + (<d3.ZoomEvent>d3.event).translate + ')'
-                      );
-                      $scope.$apply();
-                    })
-                  );
-              }, 10);
+              makeGraphPannable();
             }
 
             if ($scope.centerAtCurrentState) {
-              $timeout(function() {
-                var dimensions = getElementDimensions();
-
-                // Center the graph at the node representing the current state.
-                origTranslations[0] = (
-                  dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
-                  nodeData[$scope.currentStateId()].width / 2);
-                origTranslations[1] = (
-                  dimensions.h / 2 - nodeData[$scope.currentStateId()].y0 -
-                  nodeData[$scope.currentStateId()].height / 2);
-
-                if (graphBounds.right - graphBounds.left < dimensions.w) {
-                  origTranslations[0] = (
-                    dimensions.w / 2 -
-                    (graphBounds.right + graphBounds.left) / 2);
-                } else {
-                  origTranslations[0] = clamp(
-                    origTranslations[0],
-                    dimensions.w - graphBounds.right,
-                    -graphBounds.left);
-                }
-
-                if (graphBounds.bottom - graphBounds.top < dimensions.h) {
-                  origTranslations[1] = (
-                    dimensions.h / 2 -
-                    (graphBounds.bottom + graphBounds.top) / 2);
-                } else {
-                  origTranslations[1] = clamp(
-                    origTranslations[1],
-                    dimensions.h - graphBounds.bottom,
-                    -graphBounds.top);
-                }
-
-                $scope.overallTransformStr = (
-                  'translate(' + origTranslations + ')');
-                $scope.$apply();
-              }, 20);
+              centerGraph();
             }
           };
         }

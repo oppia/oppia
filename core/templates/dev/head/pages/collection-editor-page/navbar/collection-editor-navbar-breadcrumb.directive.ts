@@ -16,7 +16,7 @@
  * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
@@ -28,9 +28,7 @@ require('services/stateful/FocusManagerService.ts');
 // support both displaying the current title of the collection (or untitled if
 // it does not yet have one) or setting a new title in the case of an untitled
 // collection.
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionEditorNavbarBreadcrumb', [
+angular.module('oppia').directive('collectionEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -17,11 +17,12 @@
  * the training data editor of an answer group.
  */
 
+require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require(
   'pages/exploration-editor-page/editor-tab/test-interaction-panel/' +
   'test-interaction-panel.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/angular-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -47,9 +48,7 @@ require('services/ContextService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TrainingDataEditorPanelService', [
+angular.module('oppia').factory('TrainingDataEditorPanelService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
     return {

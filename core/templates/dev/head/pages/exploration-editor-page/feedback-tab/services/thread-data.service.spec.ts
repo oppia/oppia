@@ -17,6 +17,15 @@
  * data for the feedback tab of the exploration editor.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// thread-data.service.ts is upgraded to Angular 8.
+import { FeedbackThreadObjectFactory } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
@@ -30,8 +39,17 @@ describe('retrieving threads service', function() {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
+      $provide.value(
+        'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
+      $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     });
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
   var ThreadDataService, httpBackend;
   beforeEach(angular.mock.inject(function($httpBackend, _ThreadDataService_) {
@@ -111,12 +129,12 @@ describe('retrieving threads service', function() {
 
     ThreadDataService.fetchThreads(function() {
       for (var i = 0; i < mockFeedbackThreads.length; i++) {
-        expect(ThreadDataService.data.feedbackThreads).toContain(
+        expect(ThreadDataService.getData().feedbackThreads).toContain(
           mockFeedbackThreads[i]);
       }
 
       for (var i = 0; i < mockGeneralSuggestionThreads.length; i++) {
-        expect(ThreadDataService.data.suggestionThreads).toContain(
+        expect(ThreadDataService.getData().suggestionThreads).toContain(
           mockGeneralSuggestionThreads[i]);
       }
     });

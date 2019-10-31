@@ -24,14 +24,12 @@ require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/ContextService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StateTopAnswersStatsService', [
+angular.module('oppia').factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsObjectFactory', 'ContextService', 'ExplorationStatesService',
+  'AnswerStatsObjectFactory', 'ExplorationStatesService',
   function(
       $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsObjectFactory, ContextService, ExplorationStatesService) {
+      AnswerStatsObjectFactory, ExplorationStatesService) {
     /**
      * A collection of answers associated to a specific interaction id.
      * @typedef {Object} AnswerStatsCache

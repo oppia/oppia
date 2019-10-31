@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Maintenance" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" ng-controller="Maintenance" itemscope itemtype="http://schema.org/Organization">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -8,19 +8,20 @@
     @require('../header_js_libs.html')
   </head>
   <body>
+    <service-bootstrap></service-bootstrap>
     <div class="oppia-base-container">
       <div class="oppia-content-container">
         <div id="wrapper">
           <div class="oppia-main-body">
             <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
               <div class="navbar-container">
-                <div class="navbar-header protractor-test-navbar-header pull-left">
+                <div class="navbar-header protractor-test-navbar-header float-left">
                   <a class="oppia-navbar-brand-name oppia-transition-200" href="/">
                     <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>"
                          class="oppia-logo oppia-logo-wide" alt="Oppia Home">
                   </a>
                 </div>
-                <div ng-cloak class="navbar-header pull-right">
+                <div ng-cloak class="navbar-header float-right">
                 </div>
               </div>
             </nav>

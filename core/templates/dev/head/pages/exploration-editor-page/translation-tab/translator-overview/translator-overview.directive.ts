@@ -17,8 +17,8 @@
  * translation language.
  */
 
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
@@ -26,11 +26,10 @@ require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-status.service.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('translatorOverview', [
+angular.module('oppia').directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

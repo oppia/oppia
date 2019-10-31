@@ -17,13 +17,11 @@
  * permissions.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionPermissionsCard', [
+angular.module('oppia').directive('collectionPermissionsCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

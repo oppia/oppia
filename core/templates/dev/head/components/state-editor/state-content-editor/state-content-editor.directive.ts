@@ -18,9 +18,9 @@
 
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require(
@@ -28,9 +28,7 @@ require(
   'state-property.service.ts');
 require('services/EditabilityService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('stateContentEditor', [
+angular.module('oppia').directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -50,11 +48,11 @@ oppia.directive('stateContentEditor', [
         '/components/state-editor/state-content-editor/' +
         'state-content-editor.directive.html'),
       controller: [
-        '$scope', 'StateContentService', 'EditabilityService',
-        'EditorFirstTimeEventsService',
+        '$scope', 'EditabilityService', 'EditorFirstTimeEventsService',
+        'StateContentService', 'StateEditorService',
         function(
-            $scope, StateContentService, EditabilityService,
-            EditorFirstTimeEventsService) {
+            $scope, EditabilityService, EditorFirstTimeEventsService,
+            StateContentService, StateEditorService) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
@@ -116,6 +114,8 @@ oppia.directive('stateContentEditor', [
             StateContentService.restoreFromMemento();
             $scope.contentEditorIsOpen = false;
           };
+
+          StateEditorService.updateStateContentEditorInitialised();
         }
       ]
     };

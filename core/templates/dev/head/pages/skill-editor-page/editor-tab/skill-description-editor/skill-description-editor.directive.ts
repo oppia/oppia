@@ -17,15 +17,13 @@
  */
 
 require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/SkillUpdateService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/skill/skill-update.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
-require('pages/skill-editor-page/skill-editor-page.constants.ts');
+require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('skillDescriptionEditor', [
+angular.module('oppia').directive('skillDescriptionEditor', [
   'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
   'UrlInterpolationService',
   function(

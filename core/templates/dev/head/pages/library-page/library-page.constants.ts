@@ -20,17 +20,17 @@
 // be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
 // LIBRARY_PAGE_MODES.GROUP should have the same value as
 // LIBRARY_PAGE_MODE_GROUP in feconf.py.
-var oppia = require('AppInit.ts').module;
+export class LibraryPageConstants {
+  public static LIBRARY_PAGE_MODES = {
+    GROUP: 'group',
+    INDEX: 'index',
+    SEARCH: 'search'
+  };
 
-oppia.constant('LIBRARY_PAGE_MODES', {
-  GROUP: 'group',
-  INDEX: 'index',
-  SEARCH: 'search'
-});
-
-oppia.constant('LIBRARY_PATHS_TO_MODES', {
-  '/library': 'index',
-  '/library/top_rated': 'group',
-  '/library/recently_published': 'group',
-  '/search/find': 'search'
-});
+  public static LIBRARY_PATHS_TO_MODES = {
+    '/library': 'index',
+    '/library/top_rated': 'group',
+    '/library/recently_published': 'group',
+    '/search/find': 'search'
+  };
+}

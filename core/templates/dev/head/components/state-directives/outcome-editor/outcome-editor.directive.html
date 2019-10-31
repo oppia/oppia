@@ -12,7 +12,7 @@
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing protractor-test-open-outcome-feedback-editor"
            ng-if="$ctrl.isEditable()" ng-click="$ctrl.openFeedbackEditor()">
-        <i ng-if="$ctrl.isEditable()" class="material-icons oppia-editor-edit-icon pull-right"
+        <i ng-if="$ctrl.isEditable()" class="material-icons oppia-editor-edit-icon float-right"
            title="Edit Feedback">&#xE254;
         </i>
       </div>
@@ -49,9 +49,9 @@
   </form>
 
   <div class="oppia-rule-save-cancel-buttons">
-    <div class="pull-right">
+    <div class="float-right">
       <button type="button"
-              class="btn btn-default"
+              class="btn btn-secondary"
               ng-click="$ctrl.cancelThisFeedbackEdit()">
         Cancel
       </button>
@@ -77,7 +77,7 @@
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-editor"
            ng-if="$ctrl.isEditable()" ng-click="$ctrl.openDestinationEditor()">
-        <i ng-if="$ctrl.isEditable()" class="material-icons oppia-editor-edit-icon pull-right"
+        <i ng-if="$ctrl.isEditable()" class="material-icons oppia-editor-edit-icon float-right"
            title="Edit Destination">&#xE254;
         </i>
       </div>
@@ -116,9 +116,9 @@
   </form>
 
   <div class="oppia-rule-save-cancel-buttons">
-    <div class="pull-right">
+    <div class="float-right">
       <button type="button"
-              class="btn btn-default protractor-test-cancel-outcome-dest"
+              class="btn btn-secondary protractor-test-cancel-outcome-dest"
               ng-click="$ctrl.cancelThisDestinationEdit()">
         Cancel
       </button>
@@ -144,7 +144,7 @@
       <div class="oppia-rule-details-header">
         <div class="oppia-click-to-start-editing"
              ng-if="$ctrl.isEditable()" ng-click="$ctrl.openCorrectnessLabelEditor()">
-          <i ng-if="$ctrl.isEditable()" class="material-icons oppia-editor-edit-icon pull-right"
+          <i ng-if="$ctrl.isEditable()" class="material-icons oppia-editor-edit-icon float-right"
              title="Edit Correctness setting">&#xE254;
           </i>
         </div>

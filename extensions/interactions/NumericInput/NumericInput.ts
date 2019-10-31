@@ -16,14 +16,15 @@
  * @fileoverview Requires for NumericInput interaction.
  */
 
-require('interactions/NumericInput/directives/NumericInputRulesService.ts');
+require('interactions/NumericInput/directives/numeric-input-rules.service.ts');
 require(
-  'interactions/NumericInput/directives/NumericInputValidationService.ts');
-require(
-  'interactions/NumericInput/directives/' +
-  'OppiaInteractiveNumericInputDirective.ts');
-require(
-  'interactions/NumericInput/directives/OppiaResponseNumericInputDirective.ts');
+  'interactions/NumericInput/directives/numeric-input-validation.service.ts');
 require(
   'interactions/NumericInput/directives/' +
-  'OppiaShortResponseNumericInputDirective.ts');
+  'oppia-interactive-numeric-input.directive.ts');
+require(
+  'interactions/NumericInput/directives/' +
+  'oppia-response-numeric-input.directive.ts');
+require(
+  'interactions/NumericInput/directives/' +
+  'oppia-short-response-numeric-input.directive.ts');

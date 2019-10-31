@@ -13,14 +13,18 @@
 # limitations under the License.
 
 """Tests for story domain objects and methods defined on them."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
 from constants import constants
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 
@@ -200,98 +204,6 @@ class StoryChangeTests(test_utils.GenericTestBase):
         self.assertEqual(story_change_object.to_dict(), story_change_dict)
 
 
-class StoryRightsChangeTests(test_utils.GenericTestBase):
-
-    def test_story_rights_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Missing cmd key in change dict'):
-            story_domain.StoryRightsChange({'invalid': 'data'})
-
-    def test_story_change_rights_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Command invalid is not allowed'):
-            story_domain.StoryRightsChange({'cmd': 'invalid'})
-
-    def test_story_rights_change_object_with_missing_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following required attributes are missing: '
-                'new_role, old_role')):
-            story_domain.StoryRightsChange({
-                'cmd': 'change_role',
-                'assignee_id': 'assignee_id',
-            })
-
-    def test_story_rights_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following extra attributes are present: invalid')):
-            story_domain.StoryRightsChange({
-                'cmd': 'publish_story',
-                'invalid': 'invalid'
-            })
-
-    def test_story_rights_change_object_with_invalid_role(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Value for old_role in cmd change_role: '
-                'invalid is not allowed')):
-            story_domain.StoryRightsChange({
-                'cmd': 'change_role',
-                'assignee_id': 'assignee_id',
-                'old_role': 'invalid',
-                'new_role': story_domain.ROLE_MANAGER
-            })
-
-    def test_story_rights_change_object_with_create_new(self):
-        story_rights_change_object = story_domain.StoryRightsChange({
-            'cmd': 'create_new'
-        })
-
-        self.assertEqual(story_rights_change_object.cmd, 'create_new')
-
-    def test_story_rights_change_object_with_change_role(self):
-        story_rights_change_object = story_domain.StoryRightsChange({
-            'cmd': 'change_role',
-            'assignee_id': 'assignee_id',
-            'old_role': story_domain.ROLE_NONE,
-            'new_role': story_domain.ROLE_MANAGER
-        })
-
-        self.assertEqual(story_rights_change_object.cmd, 'change_role')
-        self.assertEqual(story_rights_change_object.assignee_id, 'assignee_id')
-        self.assertEqual(
-            story_rights_change_object.old_role, story_domain.ROLE_NONE)
-        self.assertEqual(
-            story_rights_change_object.new_role, story_domain.ROLE_MANAGER)
-
-    def test_story_rights_change_object_with_publish_story(self):
-        story_rights_change_object = story_domain.StoryRightsChange({
-            'cmd': 'publish_story'
-        })
-
-        self.assertEqual(story_rights_change_object.cmd, 'publish_story')
-
-    def test_story_rights_change_object_with_unpublish_story(self):
-        story_rights_change_object = story_domain.StoryRightsChange({
-            'cmd': 'unpublish_story'
-        })
-
-        self.assertEqual(story_rights_change_object.cmd, 'unpublish_story')
-
-    def test_to_dict(self):
-        story_rights_change_dict = {
-            'cmd': 'change_role',
-            'assignee_id': 'assignee_id',
-            'old_role': story_domain.ROLE_NONE,
-            'new_role': story_domain.ROLE_MANAGER
-        }
-        story_rights_change_object = story_domain.StoryRightsChange(
-            story_rights_change_dict)
-        self.assertEqual(
-            story_rights_change_object.to_dict(), story_rights_change_dict)
-
-
 class StoryDomainUnitTests(test_utils.GenericTestBase):
     """Test the story domain object."""
 
@@ -336,7 +248,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_story_id('Invalid story id', 'abc')
 
     def test_to_human_readable_dict(self):
-        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         expected_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
@@ -466,7 +378,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_corresponding_topic_id_validation(self):
         # Generating valid topic id of type str.
         valid_topic_id = utils.generate_random_string(12)
-        self.assertTrue(isinstance(valid_topic_id, basestring))
+        self.assertTrue(isinstance(valid_topic_id, python_utils.BASESTRING))
         self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 
@@ -613,6 +525,97 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(calculated_list[0].id, expected_list[0].id)
         self.assertEqual(calculated_list[1].id, expected_list[1].id)
         self.assertEqual(calculated_list[2].id, expected_list[2].id)
+
+    def test_get_all_linked_exp_ids(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'title': 'Title 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1'
+        }
+        node_2 = {
+            'id': 'node_2',
+            'title': 'Title 2',
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_2'
+        }
+        node_3 = {
+            'id': 'node_3',
+            'title': 'Title 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_3'
+        }
+        self.story.story_contents.initial_node_id = 'node_2'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+        ]
+        self.assertEqual(
+            self.story.story_contents.get_all_linked_exp_ids(),
+            ['exp_1', 'exp_2'])
+        self.story.story_contents.nodes.append(
+            story_domain.StoryNode.from_dict(node_3))
+        self.assertEqual(
+            self.story.story_contents.get_all_linked_exp_ids(),
+            ['exp_1', 'exp_2', 'exp_3'])
+
+    def test_get_node_with_corresponding_exp_id_with_valid_exp_id(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'title': 'Title 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1'
+        }
+        self.story.story_contents.initial_node_id = 'node_1'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1)
+        ]
+
+        node_with_exp_1 = (
+            self.story.story_contents.get_node_with_corresponding_exp_id(
+                'exp_1'))
+
+        self.assertEqual(node_with_exp_1.to_dict(), node_1)
+
+    def test_get_node_with_corresponding_exp_id_with_invalid_exp_id(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'title': 'Title 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1'
+        }
+        self.story.story_contents.initial_node_id = 'node_1'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1)
+        ]
+        with self.assertRaisesRegexp(
+            Exception,
+            'Unable to find the exploration id in any node: invalid_id'):
+            self.story.story_contents.get_node_with_corresponding_exp_id(
+                'invalid_id')
 
     def test_all_nodes_visited(self):
         self.story.story_contents.next_node_id = 'node_4'
@@ -837,24 +840,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_contents_dict)
         self.assertEqual(
             story_contents_from_dict.to_dict(), story_contents_dict)
-
-    def test_to_dict(self):
-        user_ids = [self.USER_ID, self.USER_ID_1]
-        story_rights = story_domain.StoryRights(self.STORY_ID, user_ids, False)
-        expected_dict = {
-            'story_id': self.STORY_ID,
-            'manager_names': ['user', 'user1'],
-            'story_is_published': False
-        }
-
-        self.assertEqual(expected_dict, story_rights.to_dict())
-
-    def test_is_manager(self):
-        user_ids = [self.USER_ID, self.USER_ID_1]
-        story_rights = story_domain.StoryRights(self.STORY_ID, user_ids, False)
-        self.assertTrue(story_rights.is_manager(self.USER_ID))
-        self.assertTrue(story_rights.is_manager(self.USER_ID_1))
-        self.assertFalse(story_rights.is_manager('fakeuser'))
 
     def test_validate_non_str_exploration_id(self):
         self.story.story_contents.nodes[0].exploration_id = 1

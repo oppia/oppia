@@ -16,6 +16,51 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// translation-status.service.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+/* eslint-enable max-len */
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
+/* eslint-disable max-len */
+import { StateEditorService } from
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+/* eslint-enable max-len */
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
@@ -37,7 +82,50 @@ describe('Translation status service', function() {
         return ['en', 'hi'];
       }
     });
-
+    $provide.value('AngularNameService', new AngularNameService());
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+        new ParamChangeObjectFactory()));
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value(
+      'StateClassifierMappingService', new StateClassifierMappingService(
+        new ClassifierObjectFactory()));
+    $provide.value(
+      'StateEditorService', new StateEditorService(
+        new SolutionValidityService()));
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
     $provide.constant('INTERACTION_SPECS', {
       MultipleChoiceInput: {
         is_linear: false,
@@ -48,6 +136,12 @@ describe('Translation status service', function() {
         is_terminal: true
       }
     });
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
   }));
 
   describe('Translation status service', function() {
@@ -123,7 +217,7 @@ describe('Translation status service', function() {
           },
           interaction: {
             answer_groups: [{
-              tagged_misconception_id: null,
+              tagged_skill_misconception_id: null,
               outcome: {
                 refresher_exploration_id: null,
                 param_changes: [],
@@ -144,7 +238,7 @@ describe('Translation status service', function() {
               training_data: []
             },
             {
-              tagged_misconception_id: null,
+              tagged_skill_misconception_id: null,
               outcome: {
                 refresher_exploration_id: null,
                 param_changes: [],
@@ -210,7 +304,7 @@ describe('Translation status service', function() {
           },
           interaction: {
             answer_groups: [{
-              tagged_misconception_id: null,
+              tagged_skill_misconception_id: null,
               outcome: {
                 refresher_exploration_id: null,
                 param_changes: [],

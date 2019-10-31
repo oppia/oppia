@@ -15,15 +15,19 @@
 # limitations under the License.
 
 """Domain objects relating to questions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import datetime
 
 from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
-from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
@@ -104,7 +108,7 @@ class QuestionRightsChange(change_domain.BaseChange):
     }]
 
 
-class Question(object):
+class Question(python_utils.OBJECT):
     """Domain object for a question."""
 
     def __init__(
@@ -203,6 +207,27 @@ class Question(object):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v29_dict_to_v30_dict(cls, question_state_dict):
+        """Converts from version 29 to 30. Version 30 replaces
+        tagged_misconception_id with tagged_skill_misconception_id, which
+        is default to None.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initalize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        answer_groups = question_state_dict['interaction']['answer_groups']
+        for answer_group in answer_groups:
+            answer_group['tagged_skill_misconception_id'] = None
+            del answer_group['tagged_misconception_id']
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
@@ -225,6 +250,7 @@ class Question(object):
 
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
+
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])
 
@@ -234,7 +260,7 @@ class Question(object):
         question before it is finalized.
         """
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -245,7 +271,8 @@ class Question(object):
 
         if not (isinstance(self.linked_skill_ids, list) and (
                 all(isinstance(
-                    elem, basestring) for elem in self.linked_skill_ids))):
+                    elem, python_utils.BASESTRING) for elem in (
+                        self.linked_skill_ids)))):
             raise utils.ValidationError(
                 'Expected linked_skill_ids to be a list of strings, '
                 'received %s' % self.linked_skill_ids)
@@ -310,7 +337,7 @@ class Question(object):
     def validate(self):
         """Validates the Question domain object before it is saved."""
 
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected ID to be a string, received %s' % self.id)
 
@@ -382,7 +409,7 @@ class Question(object):
         self.question_state_data = question_state_data
 
 
-class QuestionSummary(object):
+class QuestionSummary(python_utils.OBJECT):
     """Domain object for Question Summary."""
     def __init__(
             self, creator_id, question_id, question_content,
@@ -401,13 +428,7 @@ class QuestionSummary(object):
         """
         self.id = question_id
         self.creator_id = creator_id
-        # The initial clean up of html by converting it to ckeditor format
-        # is required since user may copy and paste some stuff in the rte
-        # which is not a valid ckeditor html string but can be converted
-        # to a valid ckeditor string without errors. This initial clean up
-        # ensures that validation will not fail in such cases.
-        self.question_content = html_validation_service.convert_to_ckeditor(
-            html_cleaner.clean(question_content))
+        self.question_content = html_cleaner.clean(question_content)
         self.created_on = question_model_created_on
         self.last_updated = question_model_last_updated
 
@@ -432,23 +453,32 @@ class QuestionSummary(object):
             ValidationError: One or more attributes of question summary are
                 invalid.
         """
-        err_dict = html_validation_service.validate_rte_format(
-            [self.question_content], feconf.RTE_FORMAT_CKEDITOR)
-        for key in err_dict:
-            if err_dict[key]:
-                raise utils.ValidationError(
-                    'Invalid html: %s for rte with invalid tags and '
-                    'strings: %s' % (self.question_content, err_dict))
-
-        err_dict = html_validation_service.validate_customization_args([
-            self.question_content])
-        if err_dict:
+        if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Invalid html: %s due to errors in customization_args: %s' % (
-                    self.question_content, err_dict))
+                'Expected id to be a string, received %s' % self.id)
+
+        if not isinstance(self.creator_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected creator id to be a string, received %s' %
+                self.creator_id)
+
+        if not isinstance(self.question_content, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected question content to be a string, received %s' %
+                self.question_content)
+
+        if not isinstance(self.created_on, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected created on to be a datetime, received %s' %
+                self.created_on)
+
+        if not isinstance(self.last_updated, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected last updated to be a datetime, received %s' %
+                self.last_updated)
 
 
-class QuestionSkillLink(object):
+class QuestionSkillLink(python_utils.OBJECT):
     """Domain object for Question Skill Link.
 
     Attributes:
@@ -456,6 +486,7 @@ class QuestionSkillLink(object):
         skill_id: str. The ID of the skill to which the
             question is linked.
         skill_description: str. The description of the corresponding skill.
+        skill_difficulty: float. The difficulty between [0, 1] of the skill.
     """
 
     def __init__(
@@ -487,7 +518,52 @@ class QuestionSkillLink(object):
         }
 
 
-class QuestionRights(object):
+class MergedQuestionSkillLink(python_utils.OBJECT):
+    """Domain object for the Merged Question Skill Link object, returned to the
+    editors.
+
+    Attributes:
+        question_id: str. The ID of the question.
+        skill_ids: list(str). The skill IDs of the linked skills.
+        skill_descriptions: list(str). The descriptions of the skills to which
+            the question is linked.
+        skill_difficulties: list(float). The difficulties between [0, 1] of the
+            skills.
+    """
+
+    def __init__(
+            self, question_id, skill_ids, skill_descriptions,
+            skill_difficulties):
+        """Constructs a Merged Question Skill Link domain object.
+
+        Args:
+            question_id: str. The ID of the question.
+            skill_ids: list(str). The skill IDs of the linked skills.
+            skill_descriptions: list(str). The descriptions of the skills to
+                which the question is linked.
+            skill_difficulties: list(float). The difficulties between [0, 1] of
+                the skills.
+        """
+        self.question_id = question_id
+        self.skill_ids = skill_ids
+        self.skill_descriptions = skill_descriptions
+        self.skill_difficulties = skill_difficulties
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this MergedQuestionSkillLink object.
+        """
+        return {
+            'question_id': self.question_id,
+            'skill_ids': self.skill_ids,
+            'skill_descriptions': self.skill_descriptions,
+            'skill_difficulties': self.skill_difficulties,
+        }
+
+
+class QuestionRights(python_utils.OBJECT):
     """Domain object for question rights."""
 
     def __init__(self, question_id, creator_id):

@@ -17,32 +17,26 @@
  * in the skill editor.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/question/QuestionBackendApiService.ts');
-require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/question/question-backend-api.service.ts');
+require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/SkillRightsBackendApiService.ts');
+require('domain/skill/skill-rights-backend-api.service.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/QuestionsListService.ts');
 
-require('pages/skill-editor-page/skill-editor-page.constants.ts');
+require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SkillEditorStateService', [
+angular.module('oppia').factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
-  'QuestionBackendApiService', 'QuestionsListService',
-  'SkillObjectFactory', 'SkillRightsBackendApiService',
+  'QuestionsListService', 'SkillObjectFactory', 'SkillRightsBackendApiService',
   'SkillRightsObjectFactory', 'UndoRedoService',
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED',
   'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
       $rootScope, AlertsService, EditableSkillBackendApiService,
-      QuestionBackendApiService, QuestionsListService,
-      SkillObjectFactory, SkillRightsBackendApiService,
+      QuestionsListService, SkillObjectFactory, SkillRightsBackendApiService,
       SkillRightsObjectFactory, UndoRedoService,
-      EVENT_QUESTION_SUMMARIES_INITIALIZED,
       EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = SkillRightsObjectFactory.createInterstitialSkillRights();

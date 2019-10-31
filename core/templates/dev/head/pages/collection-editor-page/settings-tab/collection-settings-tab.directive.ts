@@ -23,11 +23,9 @@ require(
   'pages/collection-editor-page/settings-tab/' +
   'collection-permissions-card.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionSettingsTab', [
+angular.module('oppia').directive('collectionSettingsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

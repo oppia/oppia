@@ -13,19 +13,22 @@
 # limitations under the License.
 
 """Domain objects for classifier models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import datetime
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
 
 
-class ClassifierTrainingJob(object):
+class ClassifierTrainingJob(python_utils.OBJECT):
     """Domain object for a classifier training job.
 
     A classifier training job is an abstraction of a request made by Oppia
@@ -295,11 +298,11 @@ class ClassifierTrainingJob(object):
         """Validates the training job before it is saved to storage."""
 
         algorithm_ids = []
-        if not isinstance(self.job_id, basestring):
+        if not isinstance(self.job_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.job_id)
 
-        if not isinstance(self.exp_id, basestring):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
 
@@ -313,7 +316,7 @@ class ClassifierTrainingJob(object):
                 'Expected next_scheduled_check_time to be datetime,' +
                 ' received %s' % self.next_scheduled_check_time)
 
-        if not isinstance(self.state_name, basestring):
+        if not isinstance(self.state_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state to be a string, received %s' % self.state_name)
         utils.require_valid_name(self.state_name, 'the state name')
@@ -323,7 +326,7 @@ class ClassifierTrainingJob(object):
                 'Expected status to be in %s, received %s'
                 % (feconf.ALLOWED_TRAINING_JOB_STATUSES, self.status))
 
-        if not isinstance(self.interaction_id, basestring):
+        if not isinstance(self.interaction_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected interaction_id to be a string, received %s' %
                 self.interaction_id)
@@ -332,7 +335,7 @@ class ClassifierTrainingJob(object):
             raise utils.ValidationError(
                 'Invalid interaction id: %s' % self.interaction_id)
 
-        if not isinstance(self.algorithm_id, basestring):
+        if not isinstance(self.algorithm_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected algorithm_id to be a string, received %s' %
                 self.algorithm_id)
@@ -378,7 +381,7 @@ class ClassifierTrainingJob(object):
                 self.data_schema_version)
 
 
-class TrainingJobExplorationMapping(object):
+class TrainingJobExplorationMapping(python_utils.OBJECT):
     """Domain object for a job-exploration mapping model.
 
     A job-exploration mapping is a one-to-one relation between the
@@ -469,7 +472,7 @@ class TrainingJobExplorationMapping(object):
     def validate(self):
         """Validates the mapping before it is saved to storage."""
 
-        if not isinstance(self.exp_id, basestring):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
 
@@ -478,12 +481,12 @@ class TrainingJobExplorationMapping(object):
                 'Expected exp_version to be an int, received %s' % (
                     self.exp_version))
 
-        if not isinstance(self.state_name, basestring):
+        if not isinstance(self.state_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state_name to be a string, received %s' % (
                     self.state_name))
 
-        if not isinstance(self.job_id, basestring):
+        if not isinstance(self.job_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected job_id to be a string, received %s' % (
                     self.job_id))

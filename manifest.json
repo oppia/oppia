@@ -55,14 +55,6 @@
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
-      "requests": {
-        "version": "2.22.0",
-        "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/01/62/ddcf76d1d19885e8579acb1b1df26a852b03472c0e46d2b959a714c90608/requests-2.22.0.tar.gz",
-        "tarRootDirPrefix": "requests-",
-        "rootDirPrefix": "requests-",
-        "targetDirPrefix": "requests-"
-      },
       "simpleJson": {
         "version": "3.16.0",
         "downloadFormat": "tar",
@@ -70,7 +62,7 @@
         "tarRootDirPrefix": "simplejson-",
         "rootDirPrefix": "simplejson-",
         "targetDirPrefix": "simplejson-"
-      }, 
+      },
       "six": {
         "version": "1.12.0",
         "downloadFormat": "tar",
@@ -169,7 +161,7 @@
       "angularTranslate": {
         "version": "2.18.1",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1",
         "rootDirPrefix": "bower-angular-translate-",
         "targetDirPrefix": "bower-angular-translate-",
         "files": ["angular-translate.min.js"],
@@ -180,7 +172,7 @@
       "angularTranslateLoader": {
         "version": "2.18.1",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-static-files/",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-static-files",
         "rootDirPrefix": "bower-angular-translate-loader-static-files-",
         "targetDirPrefix": "bower-angular-translate-loader-static-files-",
         "files": ["angular-translate-loader-static-files.min.js"],
@@ -211,7 +203,7 @@
       "angularStorageCookiesRev": {
         "version": "2.18.1",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-storage-cookie/",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-storage-cookie",
         "rootDirPrefix": "bower-angular-translate-storage-cookie-",
         "targetDirPrefix": "bower-angular-translate-storage-cookie-",
         "files": ["angular-translate-storage-cookie.min.js"],
@@ -232,7 +224,7 @@
       "angularTranslateInterpolationMessageFormat": {
         "version": "2.18.1",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-interpolation-messageformat/",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-interpolation-messageformat",
         "rootDirPrefix": "bower-angular-translate-interpolation-messageformat-",
         "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
         "files": ["angular-translate-interpolation-messageformat.min.js"],
@@ -251,11 +243,21 @@
           "js": ["dist/angular-toastr.tpls.min.js"]
         }
       },
-      "bootstrap": {
-        "version": "3.3.4",
+      "popperJs": {
+        "version": "1.15.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/twbs/bootstrap/releases/download/v3.3.4/bootstrap-3.3.4-dist.zip",
-        "rootDir": "bootstrap-3.3.4-dist",
+        "url": "https://github.com/FezVrasta/popper.js/archive/v1.15.0.zip",
+        "rootDirPrefix": "popper.js-",
+        "targetDirPrefix": "popperJs-",
+        "bundle": {
+          "js": ["dist/umd/popper.js"]
+        }
+      },
+      "bootstrap": {
+        "version": "4.3.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip",
+        "rootDir": "bootstrap-4.3.1-dist",
         "targetDirPrefix": "bootstrap-",
         "bundle": {
           "css": ["css/bootstrap.css"],
@@ -266,7 +268,7 @@
       "bowerAngularTranslateLoaderPartial": {
         "version": "2.18.1",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-partial/",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-partial",
         "rootDirPrefix": "bower-angular-translate-loader-partial-",
         "targetDirPrefix": "bower-angular-translate-loader-partial-",
         "files": ["angular-translate-loader-partial.min.js"],
@@ -275,9 +277,10 @@
         }
       },
       "bowerMaterial": {
-        "version": "0.6.0-rc1",
-        "downloadFormat": "files",
-        "url": "https://raw.github.com/angular/bower-material/252d44f381cab4f381ea41491744356295c381a0/",
+        "version": "1.1.19",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular/bower-material/archive/v1.1.19.zip",
+        "rootDirPrefix": "bower-material-",
         "targetDirPrefix": "bower-material-",
         "files": ["angular-material.css", "angular-material.js"],
         "bundle": {
@@ -295,17 +298,6 @@
           "css": ["lib/codemirror.css", "addon/merge/merge.css"]
         }
       },
-      "d3": {
-        "version": "5.9.2",
-        "downloadFormat": "files",
-        "url": "https://unpkg.com/d3@5.9.2/dist/",
-        "rootDirPrefix": "d3js-",
-        "targetDirPrefix": "d3js-",
-        "files": ["d3.min.js"],
-        "bundle": {
-          "js": ["d3.min.js"]
-        }
-      },
       "diff-match-patch": {
         "version": "1.0.0",
         "downloadFormat": "files",
@@ -314,11 +306,11 @@
         "files": ["diff_match_patch.js"]
       },
       "fontAwesome": {
-        "version": "5.8.1",
+        "version": "5.9.0",
         "downloadFormat": "zip",
-        "url": "https://use.fontawesome.com/releases/v5.8.1/fontawesome-free-5.8.1-web.zip",
-        "rootDir": "fontawesome-free-5.8.1-web",
-        "targetDir": "fontawesome-free-5.8.1-web",
+        "url": "https://github.com/FortAwesome/Font-Awesome/releases/download/5.9.0/fontawesome-free-5.9.0-web.zip",
+        "rootDir": "fontawesome-free-5.9.0-web",
+        "targetDir": "fontawesome-free-5.9.0-web",
         "bundle": {
           "css": ["css/all.css"],
           "fontsPath": "webfonts"
@@ -438,11 +430,11 @@
         "targetDir": "midi-js-a8a842"
       },
       "ngJoyride": {
-        "version": "5b25d076405c9a787db602d2a8ff49919228f4fc",
+        "version": "b117e019582433995393f81e2006a6bc36ca1cf2",
         "downloadFormat": "zip",
-        "url": "https://github.com/seanlip/ng-joyride/archive/5b25d076405c9a787db602d2a8ff49919228f4fc.zip",
+        "url": "https://github.com/oppia/ng-joyride/archive/b117e019582433995393f81e2006a6bc36ca1cf2.zip",
         "rootDirPrefix": "ng-joyride-",
-        "targetDir": "ng-joyride-5b25d0",
+        "targetDir": "ng-joyride-b117e0",
         "bundle": {
           "css": ["ng-joyride.css"],
           "js": ["ng-joyride.js"]
@@ -462,7 +454,7 @@
       "ngInfiniteScroll": {
         "version": "1.0.0",
         "downloadFormat": "files",
-        "url": "https://raw.github.com/BinaryMuse/ngInfiniteScroll/1.0.0/build/",
+        "url": "https://raw.github.com/BinaryMuse/ngInfiniteScroll/1.0.0/build",
         "rootDirPrefix": "nginfinitescroll-",
         "targetDirPrefix": "nginfinitescroll-",
         "files": ["ng-infinite-scroll.min.js"],
@@ -482,16 +474,16 @@
         }
       },
       "ckeditor": {
-        "version": "4.9.2",
+        "version": "4.12.1",
         "downloadFormat": "zip",
-        "url": "https://download.cksource.com/CKEditor/CKEditor/CKEditor%204.9.2/ckeditor_4.9.2_full.zip",
+        "url": "https://download.cksource.com/CKEditor/CKEditor/CKEditor%204.12.1/ckeditor_4.12.1_full.zip",
         "rootDir": "ckeditor",
         "targetDirPrefix": "ckeditor-"
       },
       "ckeditorSharedspace": {
-        "version": "4.9.2",
+        "version": "4.12.1",
         "downloadFormat": "zip",
-        "url": "https://download.ckeditor.com/sharedspace/releases/sharedspace_4.9.2.zip",
+        "url": "https://download.ckeditor.com/sharedspace/releases/sharedspace_4.12.1.zip",
         "rootDir": "sharedspace",
         "targetDirPrefix": "ckeditor-sharedspace-"
       },
@@ -514,11 +506,11 @@
         }
       },
       "uiCodemirror": {
-        "version": "0.3.0",
+        "version": "5d04fa5c991f915e4578be5f1175e22d94696633",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.3.0.zip",
-        "rootDirPrefix": "ui-codemirror-src",
-        "targetDirPrefix": "ui-codemirror-"
+        "url": "https://github.com/oppia/ui-codemirror/archive/5d04fa5c991f915e4578be5f1175e22d94696633.zip",
+        "rootDirPrefix": "ui-codemirror-",
+        "targetDir": "ui-codemirror-5d04fa"
       },
       "uiSortable": {
         "version": "0.19.0",
@@ -554,7 +546,7 @@
       "waveSurferJs": {
         "version": "2.2.1",
         "downloadFormat": "files",
-        "url": "https://unpkg.com/wavesurfer.js@2.2.1/dist/",
+        "url": "https://unpkg.com/wavesurfer.js@2.2.1/dist",
         "rootDirPrefix": "waveSurfer-js-",
         "targetDirPrefix": "wave-surfer-js-",
         "files": ["wavesurfer.min.js"],

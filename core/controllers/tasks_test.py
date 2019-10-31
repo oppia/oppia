@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for Tasks Email Handler."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import feedback_services
@@ -22,6 +24,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
@@ -125,7 +128,7 @@ class TasksTests(test_utils.GenericTestBase):
     def test_email_is_sent_when_suggestion_created(self):
         """Tests SuggestionEmailHandler functionality."""
 
-        class MockActivityRights(object):
+        class MockActivityRights(python_utils.OBJECT):
             def __init__(
                     self, exploration_id, owner_ids, editor_ids,
                     voice_artist_ids, viewer_ids, community_owned=False,

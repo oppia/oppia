@@ -21,17 +21,15 @@
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 
-require('domain/collection/CollectionUpdateService.ts');
-require('domain/collection/CollectionValidationService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/collection/collection-update.service.ts');
+require('domain/collection/collection-validation.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/collection-editor-page/collection-editor-page.directive.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionDetailsEditor', [
+angular.module('oppia').directive('collectionDetailsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -44,13 +42,15 @@ oppia.directive('collectionDetailsEditor', [
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
         'CollectionValidationService', 'AlertsService', 'ALL_CATEGORIES',
+        'ALL_LANGUAGE_CODES', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
-        'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
+        'TAG_REGEX',
         function(
             $scope, CollectionEditorStateService, CollectionUpdateService,
             CollectionValidationService, AlertsService, ALL_CATEGORIES,
+            ALL_LANGUAGE_CODES, COLLECTION_TITLE_INPUT_FOCUS_LABEL,
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
-            COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
+            TAG_REGEX) {
           var ctrl = this;
           ctrl.collection = CollectionEditorStateService.getCollection();
           ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
@@ -66,9 +66,8 @@ oppia.directive('collectionDetailsEditor', [
             }
           );
 
-          ctrl.languageListForSelect = constants.ALL_LANGUAGE_CODES;
-
-          ctrl.TAG_REGEX = GLOBALS.TAG_REGEX;
+          ctrl.languageListForSelect = ALL_LANGUAGE_CODES;
+          ctrl.TAG_REGEX = TAG_REGEX;
 
           var refreshSettingsTab = function() {
             ctrl.displayedCollectionTitle = ctrl.collection.getTitle();

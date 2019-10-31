@@ -16,44 +16,42 @@
  * @fileoverview Unit tests for EditabilityService.
  */
 
-require('services/EditabilityService.ts');
+import { EditabilityService } from 'services/EditabilityService';
 
-describe('EditabilityService', function() {
-  var EditabilityService = null;
+describe('EditabilityService', () => {
+  let editabilityService: EditabilityService;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    editabilityService = new EditabilityService();
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    EditabilityService = $injector.get('EditabilityService');
-  }));
-
-  it('should allow to edit an exploration after the tutorial ends', function() {
-    EditabilityService.onEndTutorial();
-    EditabilityService.markEditable();
-    expect(EditabilityService.isEditable()).toBe(true);
+  it('should allow to edit an exploration after the tutorial ends', () => {
+    editabilityService.onEndTutorial();
+    editabilityService.markEditable();
+    expect(editabilityService.isEditable()).toBe(true);
   });
 
   it('should allow to translate an exploration after the tutorial ends',
-    function() {
-      EditabilityService.onEndTutorial();
-      EditabilityService.markTranslatable();
-      expect(EditabilityService.isTranslatable()).toBe(true);
+    () => {
+      editabilityService.onEndTutorial();
+      editabilityService.markTranslatable();
+      expect(editabilityService.isTranslatable()).toBe(true);
     });
 
   it('should allow to edit an exploration outside the tutorial mode',
-    function() {
-      EditabilityService.markEditable();
-      expect(EditabilityService.isEditableOutsideTutorialMode()).toBe(true);
+    () => {
+      editabilityService.markEditable();
+      expect(editabilityService.isEditableOutsideTutorialMode()).toBe(true);
     });
 
   it('should not allow to edit an exploration during tutorial mode',
-    function() {
-      EditabilityService.onStartTutorial();
-      expect(EditabilityService.isEditable()).toBe(false);
+    () => {
+      editabilityService.onStartTutorial();
+      expect(editabilityService.isEditable()).toBe(false);
     });
 
-  it('should not allow to edit an uneditable exploration', function() {
-    EditabilityService.markNotEditable();
-    expect(EditabilityService.isEditable()).toBe(false);
+  it('should not allow to edit an uneditable exploration', () => {
+    editabilityService.markNotEditable();
+    expect(editabilityService.isEditable()).toBe(false);
   });
 });

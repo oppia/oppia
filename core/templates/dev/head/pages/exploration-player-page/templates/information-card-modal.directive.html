@@ -65,12 +65,12 @@
               <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_TAGS_TOOLTIP' | translate]></span>
             </span>
           </div>
-          <md-chips layout-align="center center">
+          <div layout-align="center center">
             <md-chip ng-if="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
                      tooltip-append-to-body="true" uib-tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
                      tooltip-placement="right"
                      translate="I18N_PLAYER_PLUS_TAGS"
-                     translate-values="{additionalTagNumber: <[explorationTags.tagsInTooltip.length]>}">
+                     translate-values="{additionalTagNumber: explorationTags.tagsInTooltip.length}">
             </md-chip>
             <md-chip ng-if="explorationTags.tagsToShow.length > 0">
               <[explorationTags.tagsToShow.join(", ")]>
@@ -79,7 +79,7 @@
               explorationTags.tagsInTooltip.length === 0">
               <span><em translate="I18N_PLAYER_NO_TAGS"></em></span>
             </md-chip>
-          </md-chips>
+          </div>
         </md-content>
       </div>
       <div flex="60">
@@ -100,5 +100,8 @@
 <style>
   .oppia-info-card-content .private-card-info {
     color: red;
+  }
+  .oppia-info-card-bottom-row em {
+    font-size: 12px;
   }
 </style>

@@ -13,8 +13,11 @@
 # limitations under the License.
 
 """Tests for the learner dashboard and the notifications dashboard."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
@@ -276,6 +279,14 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(thread.entity_type, 'exploration')
         self.logout()
 
+    def test_learner_dashboard_page(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
+        self.assertIn('{"title": "Learner Dashboard - Oppia"})', response.body)
+
+        self.logout()
+
 
 class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
@@ -290,8 +301,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         # Get the CSRF token and create a single thread with a single message.
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/%s' % self.EXP_ID_1)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        self.csrf_token = self.get_new_csrf_token()
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1
         ), {
@@ -411,7 +421,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         suggestion_thread = feedback_services.get_thread(thread_id)
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID_1)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID_1)
         current_content_html = (
             exploration.states[
                 suggestion.change.state_name].content.html)

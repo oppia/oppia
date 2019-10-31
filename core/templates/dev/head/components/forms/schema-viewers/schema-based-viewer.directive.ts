@@ -16,19 +16,33 @@
  * @fileoverview Directive for general schema-based viewers.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 
-var oppia = require('AppInit.ts').module;
+require('domain/utilities/url-interpolation.service.ts');
 
-oppia.directive('schemaBasedViewer', [
+angular.module('oppia').directive('schemaBasedViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
         schema: '&',
         localValue: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema-viewers/schema-based-viewer.directive.html'),
-      restrict: 'E'
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }]);

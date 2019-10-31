@@ -16,12 +16,10 @@
  * @fileoverview Functionality for creating a new skill.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SkillCreationService', [
+angular.module('oppia').factory('SkillCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
   'UrlInterpolationService',
   function(
@@ -32,16 +30,20 @@ oppia.factory('SkillCreationService', [
     var skillCreationInProgress = false;
 
     return {
-      createNewSkill: function(description, linkedTopicIds) {
+      createNewSkill: function(description, rubrics, linkedTopicIds) {
         if (skillCreationInProgress) {
           return;
+        }
+        for (var idx in rubrics) {
+          rubrics[idx] = rubrics[idx].toBackendDict();
         }
         skillCreationInProgress = true;
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating skill';
         $http.post('/skill_editor_handler/create_new', {
           description: description,
-          linked_topic_ids: linkedTopicIds
+          linked_topic_ids: linkedTopicIds,
+          rubrics: rubrics
         }).then(function(response) {
           $timeout(function() {
             $window.location = UrlInterpolationService.interpolateUrl(

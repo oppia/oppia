@@ -16,62 +16,71 @@
  * @fileoverview Directive for the topic viewer.
  */
 
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('pages/topic-viewer-page/stories-list/stories-list.directive.ts');
-
-require('domain/topic_viewer/TopicViewerBackendApiService.ts');
+require('components/skills-mastery-list/skills-mastery-list.directive.ts');
+require(
+  'pages/topic-viewer-page/stories-list/' +
+  'topic-viewer-stories-list.directive.ts');
+require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
+require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
+require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').directive('topicViewerPage', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/topic-viewer-page/topic-viewer-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$rootScope', '$window', 'AlertsService',
+        'PageTitleService', 'TopicViewerBackendApiService',
+        'UrlService', 'WindowDimensionsService', 'FATAL_ERROR_CODES',
+        function(
+            $rootScope, $window, AlertsService,
+            PageTitleService, TopicViewerBackendApiService,
+            UrlService, WindowDimensionsService, FATAL_ERROR_CODES) {
+          var ctrl = this;
+          ctrl.setActiveTab = function(newActiveTabName) {
+            ctrl.activeTab = newActiveTabName;
+          };
+          ctrl.setActiveTab('story');
 
-oppia.directive('topicViewerPage', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/topic-viewer-page/topic-viewer-page.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$rootScope', '$window', 'AlertsService',
-      'PageTitleService', 'TopicViewerBackendApiService',
-      'UrlService', 'FATAL_ERROR_CODES',
-      function(
-          $rootScope, $window, AlertsService,
-          PageTitleService, TopicViewerBackendApiService,
-          UrlService, FATAL_ERROR_CODES) {
-        var ctrl = this;
-        ctrl.setActiveTab = function(newActiveTabName) {
-          ctrl.activeTab = newActiveTabName;
-        };
-        ctrl.setActiveTab('story');
+          ctrl.checkMobileView = function() {
+            return (WindowDimensionsService.getWidth() < 500);
+          };
+          ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
-        ctrl.checkMobileView = function() {
-          return ($window.innerWidth < 500);
-        };
-        ctrl.topicId = UrlService.getTopicIdFromUrl();
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+          PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
 
-        PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
-
-        $rootScope.loadingMessage = 'Loading';
-        TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
-          function(topicDataDict) {
-            ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
-            $rootScope.loadingMessage = '';
-          },
-          function(errorResponse) {
-            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-              AlertsService.addWarning('Failed to get dashboard data');
+          $rootScope.loadingMessage = 'Loading';
+          TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
+            function(topicDataDict) {
+              ctrl.topicId = topicDataDict.topic_id;
+              ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
+              ctrl.degreesOfMastery = topicDataDict.degrees_of_mastery;
+              ctrl.skillDescriptions = topicDataDict.skill_descriptions;
+              ctrl.subtopics = topicDataDict.subtopics;
+              $rootScope.loadingMessage = '';
+              ctrl.topicId = topicDataDict.id;
+            },
+            function(errorResponse) {
+              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                AlertsService.addWarning('Failed to get dashboard data');
+              }
             }
-          }
-        );
-      }
-    ]
-  };
-}]);
+          );
+        }
+      ]
+    };
+  }]);

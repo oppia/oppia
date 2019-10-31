@@ -25,9 +25,7 @@ require(
   'state-editor.service.ts');
 require('services/ExplorationFeaturesService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('RouterService', [
+angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
   'ExplorationFeaturesService', 'ExplorationInitStateNameService',
   'ExplorationStatesService', 'StateEditorService',
@@ -48,6 +46,21 @@ oppia.factory('RouterService', [
 
     var SLUG_GUI = 'gui';
     var SLUG_PREVIEW = 'preview';
+    // PREVIEW_TAB_WAIT_TIME_MSEC is the minimum duration to wait
+    // before calling _actuallyNavigate. This is done in order to
+    // ensure all pending changes are saved before navigating to
+    // the preview tab.
+    // _savePendingChanges triggers 'externalSave' event which
+    // will be caught by appropriate editors that will
+    // save pending changes. However, the autosave / saving of
+    // changelist is async. Promises cannot be used here to
+    // ensure that _actuallyNavigate is called only after
+    // _savePendingChanges has completed because there is
+    // currently no way to check if all promises returned are
+    // resolved after the 'externalSave' is triggered. Therefore,
+    // to allow autosave / saving of change list to complete,
+    // PREVIEW_TAB_WAIT_TIME_MSEC is provided.
+    var PREVIEW_TAB_WAIT_TIME_MSEC = 200;
 
     var activeTabName = TABS.MAIN.name;
 
@@ -94,9 +107,16 @@ oppia.factory('RouterService', [
       } else if (newPath === TABS.STATS.path) {
         activeTabName = TABS.STATS.name;
         $rootScope.$broadcast('refreshStatisticsTab');
-      } else if (newPath === TABS.IMPROVEMENTS.path &&
-                 isImprovementsTabEnabled()) {
+      } else if (newPath === TABS.IMPROVEMENTS.path) {
         activeTabName = TABS.IMPROVEMENTS.name;
+        var waitToCheckThatImprovementsTabIsEnabled = $interval(function() {
+          if (ExplorationFeaturesService.isInitialized()) {
+            $interval.cancel(waitToCheckThatImprovementsTabIsEnabled);
+            if (!ExplorationFeaturesService.isImprovementsTabEnabled()) {
+              RouterService.navigateToMainTab(null);
+            }
+          }
+        }, 5);
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {
@@ -105,6 +125,14 @@ oppia.factory('RouterService', [
         activeTabName = TABS.HISTORY.name;
       } else if (newPath === TABS.FEEDBACK.path) {
         activeTabName = TABS.FEEDBACK.name;
+        var waitToCheckThatFeedbackTabIsEnabled = $interval(function() {
+          if (ExplorationFeaturesService.isInitialized()) {
+            $interval.cancel(waitToCheckThatFeedbackTabIsEnabled);
+            if (ExplorationFeaturesService.isImprovementsTabEnabled()) {
+              RouterService.navigateToMainTab(null);
+            }
+          }
+        }, 5);
       } else if (newPath.indexOf('/gui/') === 0) {
         activeTabName = TABS.MAIN.name;
         _doNavigationWithState(newPath, SLUG_GUI);
@@ -126,11 +154,9 @@ oppia.factory('RouterService', [
             StateEditorService.setActiveStateName(putativeStateName);
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
+              // Fire an event to center the Graph in the Editor.
+              $rootScope.$broadcast('centerGraph');
             }
-            // TODO(sll): Fire an event to center the graph, in the case
-            // where another tab is loaded first and then the user switches
-            // to the editor tab. We used to redraw the graph completely but
-            // this is taking lots of time and is probably not worth it.
           } else {
             $location.path(pathBase +
                            ExplorationInitStateNameService.savedMemento);
@@ -184,8 +210,7 @@ oppia.factory('RouterService', [
           currentPath === TABS.TRANSLATION.path ||
           currentPath === TABS.PREVIEW.path ||
           currentPath === TABS.STATS.path ||
-          (isImprovementsTabEnabled() &&
-            currentPath === TABS.IMPROVEMENTS.path) ||
+          currentPath === TABS.IMPROVEMENTS.path ||
           currentPath === TABS.SETTINGS.path ||
           currentPath === TABS.HISTORY.path ||
           currentPath === TABS.FEEDBACK.path);
@@ -225,7 +250,9 @@ oppia.factory('RouterService', [
       navigateToPreviewTab: function() {
         if (activeTabName !== TABS.PREVIEW.name) {
           _savePendingChanges();
-          _actuallyNavigate(SLUG_PREVIEW, null);
+          $timeout(function() {
+            _actuallyNavigate(SLUG_PREVIEW, null);
+          }, PREVIEW_TAB_WAIT_TIME_MSEC);
         }
       },
       navigateToStatsTab: function() {

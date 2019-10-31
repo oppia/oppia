@@ -21,33 +21,23 @@ require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionFooter', [
+angular.module('oppia').directive('collectionFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {
-        twitterText: '@'
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection-player-page/collection-footer/' +
         'collection-footer.directive.html'),
       controllerAs: '$ctrl',
-      controller: [
-        function() {
-          var ctrl = this;
-          ctrl.collectionId = GLOBALS.collectionId;
+      controller: ['UrlService', function(UrlService) {
+        var ctrl = this;
+        ctrl.collectionId = UrlService.getCollectionIdFromUrl();
 
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-
-          ctrl.getTwitterText = function() {
-            return ctrl.twitterText;
-          };
-        }
-      ]
+        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+      }]
     };
   }]);

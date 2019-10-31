@@ -16,22 +16,28 @@
  * @fileoverview Unit tests for the audio translation manager service.
  */
 
-require('domain/exploration/AudioTranslationObjectFactory.ts');
-require('domain/exploration/VoiceoverObjectFactory.ts');
-require(
-  'pages/exploration-player-page/services/' +
-  'audio-translation-manager.service.ts');
+import { TestBed } from '@angular/core/testing';
 
-describe('Audio translation manager service', function() {
-  beforeEach(angular.mock.module('oppia'));
+import { AudioTranslationManagerService } from
+  'pages/exploration-player-page/services/audio-translation-manager.service';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
 
-  var atms, vof;
+describe('Audio translation manager service', () => {
+  let atms: AudioTranslationManagerService, vof: VoiceoverObjectFactory;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [AudioTranslationManagerService, VoiceoverObjectFactory]
+    });
+
+    atms = TestBed.get(AudioTranslationManagerService);
+    vof = TestBed.get(VoiceoverObjectFactory);
+  });
+
   var testAudioTranslations;
   var testAudioTranslations2;
-  beforeEach(angular.mock.inject(function($injector) {
-    atms = $injector.get('AudioTranslationManagerService');
-    vof = $injector.get('VoiceoverObjectFactory');
-
+  beforeEach(() => {
     testAudioTranslations = {
       en: vof.createFromBackendDict({
         filename: 'audio-en.mp3',
@@ -57,11 +63,11 @@ describe('Audio translation manager service', function() {
         needs_update: false
       })
     };
-  }));
+  });
 
   it('should properly set primary and secondary audio translations',
-    function() {
-      atms.setContentAudioTranslations(testAudioTranslations);
+    () => {
+      atms.setContentAudioTranslations(testAudioTranslations, '', '');
       expect(atms.getCurrentAudioTranslations()).toEqual({
         en: vof.createFromBackendDict({
           filename: 'audio-en.mp3',
@@ -74,7 +80,7 @@ describe('Audio translation manager service', function() {
           needs_update: false
         })
       });
-      atms.setSecondaryAudioTranslations(testAudioTranslations2);
+      atms.setSecondaryAudioTranslations(testAudioTranslations2, '', '');
       expect(atms.getCurrentAudioTranslations()).toEqual({
         zh: vof.createFromBackendDict({
           filename: 'audio-zh.mp3',

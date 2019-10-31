@@ -22,20 +22,19 @@ require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
-require('domain/collection/CollectionRightsBackendApiService.ts');
-require('domain/collection/CollectionUpdateService.ts');
-require('domain/collection/CollectionValidationService.ts');
-require('domain/collection/EditableCollectionBackendApiService.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/collection/collection-rights-backend-api.service.ts');
+require('domain/collection/collection-update.service.ts');
+require('domain/collection/collection-validation.service.ts');
+require('domain/collection/editable-collection-backend-api.service.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionEditorNavbar', [
+angular.module('oppia').directive('collectionEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -50,7 +49,7 @@ oppia.directive('collectionEditorNavbar', [
         'UndoRedoService', 'CollectionEditorStateService',
         'CollectionValidationService',
         'CollectionRightsBackendApiService',
-        'EditableCollectionBackendApiService',
+        'EditableCollectionBackendApiService', 'UrlService',
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
@@ -58,11 +57,11 @@ oppia.directive('collectionEditorNavbar', [
             UndoRedoService, CollectionEditorStateService,
             CollectionValidationService,
             CollectionRightsBackendApiService,
-            EditableCollectionBackendApiService,
+            EditableCollectionBackendApiService, UrlService,
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
-          ctrl.collectionId = GLOBALS.collectionId;
+          ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
           ctrl.collection = CollectionEditorStateService.getCollection();
           ctrl.collectionRights = (
             CollectionEditorStateService.getCollectionRights());
@@ -168,79 +167,81 @@ oppia.directive('collectionEditorNavbar', [
 
             if (additionalMetadataNeeded) {
               $uibModal.open({
+                bindToController: {},
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/collection-editor-page/templates/' +
                   'collection-editor-pre-publish-modal.directive.html'),
                 backdrop: true,
+                controllerAs: '$ctrl',
                 controller: [
-                  '$scope', '$uibModalInstance', 'CollectionEditorStateService',
+                  '$uibModalInstance', 'CollectionEditorStateService',
                   'CollectionUpdateService', 'ALL_CATEGORIES',
                   function(
-                      $scope, $uibModalInstance, CollectionEditorStateService,
+                      $uibModalInstance, CollectionEditorStateService,
                       CollectionUpdateService, ALL_CATEGORIES) {
+                    var ctrl = this;
                     var collection = (
                       CollectionEditorStateService.getCollection());
-
-                    $scope.requireTitleToBeSpecified = !collection.getTitle();
-                    $scope.requireObjectiveToBeSpecified = (
+                    ctrl.requireTitleToBeSpecified = !collection.getTitle();
+                    ctrl.requireObjectiveToBeSpecified = (
                       !collection.getObjective());
-                    $scope.requireCategoryToBeSpecified = (
+                    ctrl.requireCategoryToBeSpecified = (
                       !collection.getCategory());
 
-                    $scope.newTitle = collection.getTitle();
-                    $scope.newObjective = collection.getObjective();
-                    $scope.newCategory = collection.getCategory();
+                    ctrl.newTitle = collection.getTitle();
+                    ctrl.newObjective = collection.getObjective();
+                    ctrl.newCategory = collection.getCategory();
 
-                    $scope.CATEGORY_LIST_FOR_SELECT2 = [];
+                    ctrl.CATEGORY_LIST_FOR_SELECT2 = [];
                     for (var i = 0; i < ALL_CATEGORIES.length; i++) {
-                      $scope.CATEGORY_LIST_FOR_SELECT2.push({
+                      ctrl.CATEGORY_LIST_FOR_SELECT2.push({
                         id: ALL_CATEGORIES[i],
                         text: ALL_CATEGORIES[i]
                       });
                     }
 
-                    $scope.isSavingAllowed = function() {
+                    ctrl.isSavingAllowed = function() {
                       return Boolean(
-                        $scope.newTitle && $scope.newObjective &&
-                        $scope.newCategory);
+                        ctrl.newTitle && ctrl.newObjective &&
+                        ctrl.newCategory);
                     };
 
-                    $scope.save = function() {
-                      if (!$scope.newTitle) {
+                    ctrl.save = function() {
+                      if (!ctrl.newTitle) {
                         AlertsService.addWarning('Please specify a title');
                         return;
                       }
-                      if (!$scope.newObjective) {
+                      if (!ctrl.newObjective) {
                         AlertsService.addWarning('Please specify an objective');
                         return;
                       }
-                      if (!$scope.newCategory) {
+                      if (!ctrl.newCategory) {
                         AlertsService.addWarning('Please specify a category');
                         return;
                       }
 
                       // Record any fields that have changed.
                       var metadataList = [];
-                      if ($scope.newTitle !== collection.getTitle()) {
+                      if (ctrl.newTitle !== collection.getTitle()) {
                         metadataList.push('title');
                         CollectionUpdateService.setCollectionTitle(
-                          collection, $scope.newTitle);
+                          collection, ctrl.newTitle);
                       }
-                      if ($scope.newObjective !== collection.getObjective()) {
+                      if (ctrl.newObjective !== collection.getObjective()) {
                         metadataList.push('objective');
                         CollectionUpdateService.setCollectionObjective(
-                          collection, $scope.newObjective);
+                          collection, ctrl.newObjective);
                       }
-                      if ($scope.newCategory !== collection.getCategory()) {
+                      if (ctrl.newCategory !== collection.getCategory()) {
                         metadataList.push('category');
                         CollectionUpdateService.setCollectionCategory(
-                          collection, $scope.newCategory);
+                          collection, ctrl.newCategory);
                       }
 
                       $uibModalInstance.close(metadataList);
                     };
 
-                    $scope.cancel = function() {
+                    ctrl.cancel = function() {
                       $uibModalInstance.dismiss('cancel');
                     };
                   }

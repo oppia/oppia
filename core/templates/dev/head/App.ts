@@ -16,14 +16,19 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
-require('directives/FocusOnDirective.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
+require('directives/focus-on.directive.ts');
 
 require('pages/Base.ts');
 
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
+require('services/CsrfTokenService.ts');
 require('services/NavigationService.ts');
-require('services/UtilsService.ts');
 require('services/DebouncerService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/IdGenerationService.ts');
@@ -36,7 +41,6 @@ require('services/UserService.ts');
 require('services/PromoBarService.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 require('services/stateful/FocusManagerService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -58,28 +62,32 @@ require(
   'components/common-layout-directives/navigation-bars/' +
   'top-navigation-bar.directive.ts');
 
-require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-require('app.constants.ts');
+require('app.constants.ajs.ts');
+
+require('google-analytics.initializer.ts');
 
 // The following file uses constants in app.constants.ts and hence needs to be
 // loaded after app.constants.ts
 require('I18nFooter.ts');
 
-var oppia = require('AppInit.ts').module;
+const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
-oppia.config([
+angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider',
+  '$interpolateProvider', '$locationProvider', '$provide',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider) {
+      $interpolateProvider, $locationProvider, $provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
-
     // Set the AngularJS interpolators as <[ and ]>, to not conflict with
     // Jinja2 templates.
     $interpolateProvider.startSymbol('<[');
@@ -93,7 +101,6 @@ oppia.config([
 
     // Prevent storing duplicate cookies for translation language.
     $cookiesProvider.defaults.path = '/';
-
     // Set default headers for POST and PUT requests.
     $httpProvider.defaults.headers.post = {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -105,15 +112,22 @@ oppia.config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'AlertsService', function($q, $log, AlertsService) {
+      '$q', '$log', 'AlertsService', 'CsrfTokenService',
+      function($q, $log, AlertsService, CsrfTokenService) {
         return {
           request: function(config) {
             if (config.data) {
-              config.data = $.param({
-                csrf_token: GLOBALS.csrf_token,
-                payload: JSON.stringify(config.data),
-                source: document.URL
-              }, true);
+              return $q(function(resolve, reject) {
+                // Get CSRF token before sending the request.
+                CsrfTokenService.getTokenAsync().then(function(token) {
+                  config.data = $.param({
+                    csrf_token: token,
+                    payload: JSON.stringify(config.data),
+                    source: document.URL
+                  }, true);
+                  resolve(config);
+                });
+              });
             }
             return config;
           },
@@ -140,7 +154,7 @@ oppia.config([
   }
 ]);
 
-oppia.config(['$provide', function($provide) {
+angular.module('oppia').config(['$provide', function($provide) {
   $provide.decorator('$log', ['$delegate', 'DEV_MODE',
     function($delegate, DEV_MODE) {
       var _originalError = $delegate.error;
@@ -164,7 +178,7 @@ oppia.config(['$provide', function($provide) {
   ]);
 }]);
 
-oppia.config(['toastrConfig', function(toastrConfig) {
+angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
   angular.extend(toastrConfig, {
     allowHtml: false,
     iconClasses: {
@@ -183,50 +197,69 @@ oppia.config(['toastrConfig', function(toastrConfig) {
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
-oppia.factory('$exceptionHandler', ['$log', function($log) {
-  var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
-  var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
+// NOTE: The line number logged in stack driver will not accurately
+// match the line number in the source code. This is because browsers
+// automatically remove empty lines and concatinate strings which are
+// spread over multiple lines. The errored file may be viewed on the
+// browser console where the line number should match.
+angular.module('oppia').factory('$exceptionHandler', [
+  '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
+    var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
+    var TPLOAD_STATUS_CODE_REGEX = (
+      new RegExp(/\[\$compile:tpload\].*p1=(.*?)&p2=/));
+    var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
-  return function(exception, cause) {
-    var messageAndSourceAndStackTrace = [
-      '',
-      'Cause: ' + cause,
-      exception.message,
-      String(exception.stack),
-      '    at URL: ' + window.location.href
-    ].join('\n');
-
-    // To prevent an overdose of errors, throttle to at most 1 error every
-    // MIN_TIME_BETWEEN_ERRORS_MSEC.
-    if (Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
-      // Catch all errors, to guard against infinite recursive loops.
-      try {
-        // We use jQuery here instead of Angular's $http, since the latter
-        // creates a circular dependency.
-        $.ajax({
-          type: 'POST',
-          url: '/frontend_errors',
-          data: $.param({
-            csrf_token: GLOBALS.csrf_token,
-            payload: JSON.stringify({
-              error: messageAndSourceAndStackTrace
-            }),
-            source: document.URL
-          }, true),
-          contentType: 'application/x-www-form-urlencoded',
-          dataType: 'text',
-          async: true
-        });
-
-        timeOfLastPostedError = Date.now();
-      } catch (loggingError) {
-        $log.warn('Error logging failed.');
+    return function(exception, cause) {
+      var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
+      // Suppress tpload errors which occur with p1 of -1 in the error URL
+      // because -1 is the status code for aborted requests.
+      if (tploadStatusCode !== null && tploadStatusCode[1] === '-1') {
+        return;
       }
-    }
+      sourceMappedStackTrace.mapStackTrace(
+        exception.stack, function(mappedStack) {
+          var messageAndSourceAndStackTrace = [
+            '',
+            'Cause: ' + cause,
+            exception.message,
+            mappedStack.join('\n'),
+            '    at URL: ' + window.location.href
+          ].join('\n');
+          // To prevent an overdose of errors, throttle to at most 1 error every
+          // MIN_TIME_BETWEEN_ERRORS_MSEC.
+          if (
+            Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+            // Catch all errors, to guard against infinite recursive loops.
+            try {
+              // We use jQuery here instead of Angular's $http, since the latter
+              // creates a circular dependency.
+              CsrfTokenService.getTokenAsync().then(function(token) {
+                $.ajax({
+                  type: 'POST',
+                  url: '/frontend_errors',
+                  data: $.param({
+                    csrf_token: token,
+                    payload: JSON.stringify({
+                      error: messageAndSourceAndStackTrace
+                    }),
+                    source: document.URL
+                  }, true),
+                  contentType: 'application/x-www-form-urlencoded',
+                  dataType: 'text',
+                  async: true
+                });
 
-    $log.error.apply($log, arguments);
-  };
-}]);
+                timeOfLastPostedError = Date.now();
+              });
+            } catch (loggingError) {
+              $log.warn('Error logging failed.');
+            }
+          }
+        });
+      $log.error.apply($log, arguments);
+    };
+  }
+]);
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {

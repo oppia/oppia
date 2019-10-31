@@ -22,7 +22,7 @@ require(
   'training-panel.directive.ts');
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/angular-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -44,9 +44,7 @@ require(
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TrainingModalService', [
+angular.module('oppia').factory('TrainingModalService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
     return {

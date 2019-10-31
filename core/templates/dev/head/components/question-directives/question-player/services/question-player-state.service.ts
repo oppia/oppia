@@ -17,9 +17,7 @@
  * in the test session.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('QuestionPlayerStateService', [
+angular.module('oppia').factory('QuestionPlayerStateService', [
   function() {
     var questionPlayerState = {};
 
@@ -58,7 +56,8 @@ oppia.factory('QuestionPlayerStateService', [
         timestamp: getCurrentTime()};
     };
 
-    var _answerSubmitted = function(question, isCorrect) {
+    var _answerSubmitted = function(
+        question, isCorrect, taggedSkillMisconceptionId) {
       var questionId = question.getId();
       if (!questionPlayerState[questionId]) {
         createNewQuestionPlayerState(
@@ -72,7 +71,8 @@ oppia.factory('QuestionPlayerStateService', [
       }
       questionPlayerState[questionId].answers.push(
         {isCorrect: isCorrect,
-          timestamp: getCurrentTime()
+          timestamp: getCurrentTime(),
+          taggedSkillMisconceptionId: taggedSkillMisconceptionId
         });
     };
 
@@ -84,8 +84,9 @@ oppia.factory('QuestionPlayerStateService', [
       solutionViewed: function(question) {
         _solutionViewed(question);
       },
-      answerSubmitted: function(question, isCorrect) {
-        _answerSubmitted(question, isCorrect);
+      answerSubmitted: function(
+          question, isCorrect, taggedSkillMisconceptionId) {
+        _answerSubmitted(question, isCorrect, taggedSkillMisconceptionId);
       },
       getQuestionPlayerStateData: function() {
         return questionPlayerState;

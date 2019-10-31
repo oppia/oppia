@@ -20,7 +20,7 @@
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/objects/UnitsObjectFactory.ts');
 
-require('domain/objects/objects-domain.constants.ts');
+require('domain/objects/objects-domain.constants.ajs.ts');
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
@@ -35,9 +35,7 @@ require('domain/objects/objects-domain.constants.ts');
     base_unit: Define the unit in terms of base unit only if the defined custom
       unit is a sub unit else assign it 'null' value.*/
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('NumberWithUnitsObjectFactory', [
+angular.module('oppia').factory('NumberWithUnitsObjectFactory', [
   'FractionObjectFactory', 'UnitsObjectFactory', 'CURRENCY_UNITS',
   'NUMBER_WITH_UNITS_PARSING_ERRORS', function(
       FractionObjectFactory, UnitsObjectFactory, CURRENCY_UNITS,
@@ -101,7 +99,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       };
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['createCurrencyUnits'] = function() {
     /* eslint-enable dot-notation */
@@ -110,7 +108,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       } catch (parsingError) {}
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['fromRawInputString'] = function(rawInput) {
     /* eslint-enable dot-notation */
@@ -219,7 +217,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       return new NumberWithUnits(type, real, fractionObj, unitsObj);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['fromDict'] = function(numberWithUnitsDict) {
     /* eslint-enable dot-notation */

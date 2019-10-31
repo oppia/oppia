@@ -13,10 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the error page.
+ * @fileoverview Scripts for the error page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/error-pages/error-page.module.ts');
 require('App.ts');
 
-require('pages/OppiaFooterDirective.ts');
+require('base-components/base-content.directive.ts');
 require('pages/error-pages/error-page.controller.ts');

@@ -15,26 +15,27 @@
 """Controllers for the topics editor, from where topics are edited and stories
 are created.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import logging
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import dependency_registry
 from core.domain import email_manager
-from core.domain import interaction_registry
-from core.domain import obj_services
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 import feconf
 import utils
-
-import jinja2
 
 
 class TopicEditorStoryHandler(base.BaseHandler):
@@ -46,16 +47,31 @@ class TopicEditorStoryHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-        topic = topic_services.get_topic_by_id(topic_id)
-        canonical_story_summaries = story_services.get_story_summaries_by_ids(
-            topic.canonical_story_ids)
-        additional_story_summaries = story_services.get_story_summaries_by_ids(
-            topic.additional_story_ids)
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        story_id_to_publication_status_map = {}
+        for reference in topic.canonical_story_references:
+            story_id_to_publication_status_map[reference.story_id] = (
+                reference.story_is_published)
+        for reference in topic.additional_story_references:
+            story_id_to_publication_status_map[reference.story_id] = (
+                reference.story_is_published)
+        canonical_story_summaries = story_fetchers.get_story_summaries_by_ids(
+            topic.get_canonical_story_ids())
+        additional_story_summaries = story_fetchers.get_story_summaries_by_ids(
+            topic.get_additional_story_ids())
 
         canonical_story_summary_dicts = [
             summary.to_dict() for summary in canonical_story_summaries]
         additional_story_summary_dicts = [
             summary.to_dict() for summary in additional_story_summaries]
+
+        for summary in canonical_story_summary_dicts:
+            summary['story_is_published'] = (
+                story_id_to_publication_status_map[summary['id']])
+
+        for summary in additional_story_summary_dicts:
+            summary['story_is_published'] = (
+                story_id_to_publication_status_map[summary['id']])
 
         self.values.update({
             'canonical_story_summary_dicts': canonical_story_summary_dicts,
@@ -78,6 +94,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         story = story_domain.Story.create_default_story(
             new_story_id, title, topic_id)
         story_services.save_new_story(self.user_id, story)
+        topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
         self.render_json({
             'storyId': new_story_id
         })
@@ -86,41 +103,16 @@ class TopicEditorStoryHandler(base.BaseHandler):
 class TopicEditorPage(base.BaseHandler):
     """The editor page for a single topic."""
 
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
-
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
-
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
-                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
-
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
-        self.values.update({
-            'topic_id': topic.id,
-            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
-            'additional_angular_modules': additional_angular_modules,
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
-            'dependencies_html': jinja2.utils.Markup(dependencies_html)
-        })
-
-        self.render_template('dist/topic-editor-page.mainpage.html')
+        self.render_template('topic-editor-page.mainpage.html')
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):
@@ -167,20 +159,36 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        skill_ids = topic.get_all_skill_ids()
+        skill_id_to_description_dict, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(
+                topic.get_all_skill_ids()))
 
-        skill_id_to_description_dict = (
-            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
+        skill_id_to_rubrics_dict, deleted_skill_ids = (
+            skill_services.get_rubrics_of_skills(topic.get_all_skill_ids())
+        )
+
+        if deleted_skill_ids:
+            deleted_skills_string = ', '.join(deleted_skill_ids)
+            logging.error(
+                'The deleted skills: %s are still present in topic with id %s'
+                % (deleted_skills_string, topic_id)
+            )
+            if feconf.CAN_SEND_EMAILS:
+                email_manager.send_mail_to_admin(
+                    'Deleted skills present in topic',
+                    'The deleted skills: %s are still present in topic with '
+                    'id %s' % (deleted_skills_string, topic_id))
 
         self.values.update({
             'topic_dict': topic.to_dict(),
-            'skill_id_to_description_dict': skill_id_to_description_dict
+            'skill_id_to_description_dict': skill_id_to_description_dict,
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })
 
         self.render_json(self.values)
@@ -195,7 +203,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         includes editing its html data as of now).
         """
         topic_domain.Topic.require_valid_topic_id(topic_id)
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         version = self.payload.get('version')
         self._require_valid_version(version, topic.version)
@@ -219,15 +227,32 @@ class EditableTopicDataHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        skill_ids = topic.get_all_skill_ids()
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
-        skill_id_to_description_dict = (
-            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
+        skill_id_to_description_dict, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(
+                topic.get_all_skill_ids()))
+
+        skill_id_to_rubrics_dict, deleted_skill_ids = (
+            skill_services.get_rubrics_of_skills(topic.get_all_skill_ids())
+        )
+
+        if deleted_skill_ids:
+            deleted_skills_string = ', '.join(deleted_skill_ids)
+            logging.error(
+                'The deleted skills: %s are still present in topic with id %s'
+                % (deleted_skills_string, topic_id)
+            )
+            if feconf.CAN_SEND_EMAILS:
+                email_manager.send_mail_to_admin(
+                    'Deleted skills present in topic',
+                    'The deleted skills: %s are still present in topic with '
+                    'id %s' % (deleted_skills_string, topic_id))
 
         self.values.update({
             'topic_dict': topic.to_dict(),
-            'skill_id_to_description_dict': skill_id_to_description_dict
+            'skill_id_to_description_dict': skill_id_to_description_dict,
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })
 
         self.render_json(self.values)
@@ -236,7 +261,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     def delete(self, topic_id):
         """Handles Delete requests."""
         topic_domain.Topic.require_valid_topic_id(topic_id)
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException(
                 'The topic with the given id doesn\'t exist.')
@@ -299,7 +324,7 @@ class TopicPublishHandler(base.BaseHandler):
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id):
         """Publishes or unpublishes a topic."""
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException
 

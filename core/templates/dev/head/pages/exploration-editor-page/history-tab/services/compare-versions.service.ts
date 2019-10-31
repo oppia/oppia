@@ -16,7 +16,7 @@
  * @fileoverview Service to compare versions of explorations.
  */
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/state/StateObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -24,15 +24,13 @@ require('pages/exploration-editor-page/services/exploration-diff.service.ts');
 require(
   'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('CompareVersionsService', [
-  '$http', '$q', 'ExplorationDataService', 'ExplorationDiffService',
-  'ReadOnlyExplorationBackendApiService', 'StateObjectFactory',
+angular.module('oppia').factory('CompareVersionsService', [
+  '$q', 'ExplorationDataService', 'ExplorationDiffService',
+  'ReadOnlyExplorationBackendApiService',
   'StatesObjectFactory', 'VersionTreeService',
   function(
-      $http, $q, ExplorationDataService, ExplorationDiffService,
-      ReadOnlyExplorationBackendApiService, StateObjectFactory,
+      $q, ExplorationDataService, ExplorationDiffService,
+      ReadOnlyExplorationBackendApiService,
       StatesObjectFactory, VersionTreeService) {
     /**
      * Constructs the combined list of changes needed to get from v1 to v2.

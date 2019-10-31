@@ -17,9 +17,10 @@
  *     result domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('PredictionResultObjectFactory', [function() {
+export class PredictionResult {
   /**
    * Stores the prediction result for an answer as returned by the
    * various prediction services used in Oppia for Machine Learning based
@@ -31,31 +32,30 @@ oppia.factory('PredictionResultObjectFactory', [function() {
    *   its prediction label. The value is probability (between 0 and 1) that
    *   answer belongs to predicted answer group.
    */
-  var predictionResult = function(label, confidence) {
+  predictionLabel: number;
+  predictionConfidence: number;
+  constructor(label: number, confidence: number) {
     this.predictionLabel = label;
     this.predictionConfidence = confidence;
-  };
+  }
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  predictionResult['createNew'] = function(label, confidence) {
-  /* eslint-enable dot-notation */
-    return new predictionResult(label, confidence);
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  predictionResult['getLabel'] = function() {
-  /* eslint-enable dot-notation */
+  getLabel(): number {
     return this.predictionLabel;
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  predictionResult['getConfidence'] = function() {
-  /* eslint-enable dot-notation */
+  }
+  getConfidence(): number {
     return this.predictionConfidence;
-  };
+  }
+}
 
-  return predictionResult;
-}]);
+@Injectable({
+  providedIn: 'root'
+})
+export class PredictionResultObjectFactory {
+  createNew(label: number, confidence: number): PredictionResult {
+    return new PredictionResult(label, confidence);
+  }
+}
+
+angular.module('oppia').factory(
+  'PredictionResultObjectFactory',
+  downgradeInjectable(PredictionResultObjectFactory));

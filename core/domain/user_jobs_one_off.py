@@ -13,15 +13,18 @@
 # limitations under the License.
 
 """Jobs for queries personalized to individual users."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
 from core import jobs
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import python_utils
 import utils
 
 (exp_models, collection_models, feedback_models, user_models) = (
@@ -165,7 +168,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             else:
                 # Go through the history.
                 current_version = item.version
-                for version in range(1, current_version + 1):
+                for version in python_utils.RANGE(1, current_version + 1):
                     model = exp_models.ExplorationRightsModel.get_version(
                         item.id, version)
 
@@ -209,7 +212,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             else:
                 # Go through the history.
                 current_version = item.version
-                for version in range(1, current_version + 1):
+                for version in python_utils.RANGE(1, current_version + 1):
                     model = (
                         collection_models.CollectionRightsModel.get_version(
                             item.id, version))
@@ -337,7 +340,7 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_id = user_model.id
         contributions = user_models.UserContributionsModel.get(user_id)
 
-        created_explorations = exp_services.get_multiple_explorations_by_id(
+        created_explorations = exp_fetchers.get_multiple_explorations_by_id(
             contributions.created_exploration_ids)
         if created_explorations:
             user_model.last_created_an_exploration = max(
@@ -375,9 +378,9 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                     [('ExplorationModel', model_instance.activity_ids)]))[0]
 
             exp_ids_removed = []
-            for exp_id, exp_instance in zip(
+            for exp_id, exp_instance in list(python_utils.ZIP(
                     model_instance.activity_ids,
-                    fetched_exploration_model_instances):
+                    fetched_exploration_model_instances)):
                 if exp_instance is None or exp_instance.deleted:
                     exp_ids_removed.append(exp_id)
                     model_instance.activity_ids.remove(exp_id)
@@ -386,7 +389,29 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                 yield (
                     'Successfully cleaned up UserSubscriptionsModel %s and '
                     'removed explorations %s' % (
-                        model_instance.id, str(exp_ids_removed)), 1)
+                        model_instance.id,
+                        ', '.join(exp_ids_removed)),
+                    1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class UserGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for populating UserSettingsModel with gae_user_id."""
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model_instance):
+        """Implements the map function for this job."""
+        if model_instance.gae_user_id is None:
+            model_instance.gae_user_id = model_instance.id
+        model_instance.put(update_last_updated_time=False)
+        yield ('SUCCESS', model_instance.id)
 
     @staticmethod
     def reduce(key, values):

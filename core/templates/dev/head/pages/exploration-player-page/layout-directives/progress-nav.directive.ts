@@ -20,7 +20,7 @@ require(
   'pages/exploration-player-page/learner-experience/' +
   'continue-button.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
@@ -29,12 +29,11 @@ require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('progressNav', [
+angular.module('oppia').directive('progressNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -85,9 +84,7 @@ oppia.directive('progressNav', [
               $scope.interactionId = $scope.displayedCard.getInteractionId();
               if ($scope.interactionId) {
                 interactionHasNavSubmitButton = (
-                  Boolean($scope.interactionId) &&
-                  INTERACTION_SPECS[$scope.interactionId].
-                    show_generic_submit_button);
+                  doesInteractionHaveNavSubmitButton());
               }
             }
 
@@ -101,6 +98,19 @@ oppia.directive('progressNav', [
           $scope.$on('helpCardAvailable', function(evt, helpCard) {
             $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
           });
+
+          var doesInteractionHaveNavSubmitButton = function() {
+            try {
+              return (Boolean($scope.interactionId) &&
+                INTERACTION_SPECS[$scope.interactionId].
+                  show_generic_submit_button);
+            } catch (e) {
+              var additionalInfo = ('\nSubmit button debug logs:' +
+                '\ninterationId: ' + $scope.interactionId);
+              e.message += additionalInfo;
+              throw e;
+            }
+          };
 
           $scope.changeCard = function(index) {
             if (index >= 0 && index < transcriptLength) {
@@ -127,7 +137,7 @@ oppia.directive('progressNav', [
               return true;
             }
 
-            return (interactionHasNavSubmitButton && (
+            return (doesInteractionHaveNavSubmitButton() && (
               interactionIsInline ||
               !$scope.canWindowShowTwoCards()
             ));

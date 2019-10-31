@@ -16,19 +16,21 @@
  * @fileoverview Directive for a schema-based editor for custom values.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('components/forms/custom-forms-directives/object-editor.directive.ts');
+
+require('domain/utilities/url-interpolation.service.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('schemaBasedCustomEditor', [
+angular.module('oppia').directive('schemaBasedCustomEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(
       NestedDirectivesRecursionTimeoutPreventionService,
       UrlInterpolationService) {
     return {
-      scope: {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
         localValue: '=',
         // The class of the object being edited.
         objType: '='
@@ -36,8 +38,9 @@ oppia.directive('schemaBasedCustomEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema-based-editors/' +
         'schema-based-custom-editor.directive.html'),
-      restrict: 'E',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile
+      controllerAs: '$ctrl',
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
+      controller: [function() {}]
     };
   }
 ]);

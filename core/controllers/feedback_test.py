@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for the feedback controllers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -29,6 +31,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
@@ -67,8 +70,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         # The corresponding user has already registered as an editor, and has a
         # username.
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        self.csrf_token = self.get_new_csrf_token()
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
         ), {
@@ -144,8 +146,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
     def test_create_thread(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
                 'subject': u'New Thread ¡unicode!',
@@ -177,8 +178,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
     def test_missing_thread_subject_raises_400_error(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         response_dict = self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
                 'state_name': None,
@@ -190,8 +190,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
     def test_missing_thread_text_raises_400_error(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         response_dict = self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
             {
@@ -205,8 +204,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
     def test_post_message_to_existing_thread(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # First, create a thread.
         self.post_json(
@@ -265,8 +263,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.editor_id, exploration)
         rights_manager.publish_exploration(self.editor, new_exp_id)
 
-        response = self.get_html_response('/create/%s' % new_exp_id)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/explorehandler/give_feedback/%s' % new_exp_id,
             {
@@ -288,8 +285,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
     def test_message_id_assignment_for_multiple_posts_to_same_thread(self):
         # Create a thread for others to post to.
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
                 'state_name': None,
@@ -328,16 +324,15 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         # Generate 10 users.
         num_users = 10
-        for num in range(num_users):
+        for num in python_utils.RANGE(num_users):
             username = _get_username(num)
             email = _get_email(num)
             self.signup(email, username)
 
         # Each of these users posts a new message to the same thread.
-        for num in range(num_users):
+        for num in python_utils.RANGE(num_users):
             self.login(_get_email(num))
-            response = self.get_html_response('/create/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 thread_url, {
                     'text': 'New Message %s' % num
@@ -357,7 +352,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             self.EDITOR_USERNAME)
         self.assertEqual(response_dict['messages'][0]['message_id'], 0)
         self.assertEqual(response_dict['messages'][0]['text'], 'Message 0')
-        for num in range(num_users):
+        for num in python_utils.RANGE(num_users):
             self.assertEqual(
                 response_dict['messages'][num + 1]['author_username'],
                 _get_username(num))
@@ -424,8 +419,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
     def test_feedback_threads(self):
         self.login(self.USER_EMAIL)
-        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
@@ -451,8 +445,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.logout()
 
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # The owner opens the feedback thread.
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
@@ -481,8 +474,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.logout()
 
         self.login(self.USER_EMAIL)
-        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # The user opens the feedback thread.
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
@@ -511,8 +503,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
         # Another owner logs in.
         self.login(self.OWNER_EMAIL_2)
-        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # The second owner opens the feedback thread.
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
@@ -571,8 +562,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
     def test_post_feedback_threads_with_no_text_and_no_updated_status_raise_400(
             self):
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         thread_id = feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, self.owner_id_1,
@@ -594,8 +584,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
     def test_post_feedback_threads_with_updated_suggestion_status_raises_400(
             self):
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         new_content = state_domain.SubtitledHtml(
             'content', '<p>new content html</p>').to_dict()

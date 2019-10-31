@@ -16,10 +16,10 @@
  * @fileoverview Controller for the questions player directive.
  */
 
-require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
-require('directives/AngularHtmlBindDirective.ts');
-require('directives/MathjaxBindDirective.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require('directives/angular-html-bind.directive.ts');
+require('directives/mathjax-bind.directive.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
@@ -77,9 +77,8 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/question-directives/question-player/' +
-  'question-player.constants.ts');
+  'question-player.constants.ajs.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
@@ -88,6 +87,8 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require('components/concept-card/concept-card.directive.ts');
+require('components/skill-mastery/skill-mastery.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
@@ -101,17 +102,19 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
 
-require('domain/question/QuestionBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/question/question-backend-api.service.ts');
+require('domain/skill/skill-mastery-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/AlertsService.ts');
+require('services/UserService.ts');
+require('services/contextual/UrlService.ts');
 
-require('pages/interaction-specs.constants.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('questionPlayer', [
-  '$http', 'UrlInterpolationService',
+angular.module('oppia').directive('questionPlayer', [
+  'UrlInterpolationService',
   function(
-      $http, UrlInterpolationService) {
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -125,24 +128,43 @@ oppia.directive('questionPlayer', [
       controller: [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
-        '$sanitize', '$window', 'HtmlEscaperService',
-        'QuestionPlayerBackendApiService',
+        '$sanitize', '$timeout', '$uibModal', '$window',
+        'AlertsService', 'HtmlEscaperService',
+        'QuestionBackendApiService', 'SkillMasteryBackendApiService',
+        'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
+        'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
+        'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
+        'VIEW_HINT_PENALTY_FOR_MASTERY',
+        'WRONG_ANSWER_PENALTY', 'WRONG_ANSWER_PENALTY_FOR_MASTERY',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
-            $sanitize, $window, HtmlEscaperService,
-            QuestionPlayerBackendApiService) {
+            $sanitize, $timeout, $uibModal, $window,
+            AlertsService, HtmlEscaperService,
+            QuestionBackendApiService, SkillMasteryBackendApiService,
+            UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
+            MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
+            QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
+            VIEW_HINT_PENALTY_FOR_MASTERY,
+            WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
-          var questionPlayerConfig = ctrl.getQuestionPlayerConfig();
-          $scope.resultsLoaded = false;
-          ctrl.currentQuestion = 0;
-          ctrl.totalQuestions = 0;
-          ctrl.currentProgress = 0;
-          ctrl.totalScore = 0.0;
+          ctrl.userIsLoggedIn = null;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            ctrl.canCreateCollections = userInfo.canCreateCollections();
+            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+          });
 
-          var VIEW_HINT_PENALTY = 0.1;
-          var WRONG_ANSWER_PENALTY = 0.1;
-
+          var initResults = function() {
+            $scope.resultsLoaded = false;
+            ctrl.currentQuestion = 0;
+            ctrl.totalQuestions = 0;
+            ctrl.currentProgress = 0;
+            ctrl.totalScore = 0.0;
+            ctrl.scorePerSkillMapping = {};
+            ctrl.testIsPassed = true;
+          };
+          initResults();
+          ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           var getStaticImageUrl = function(url) {
             return UrlInterpolationService.getStaticImageUrl(url);
           };
@@ -187,13 +209,72 @@ oppia.directive('questionPlayer', [
           };
 
           ctrl.showActionButtonsFooter = function() {
-            return (questionPlayerConfig.resultActionButtons &&
-              questionPlayerConfig.resultActionButtons.length > 0);
+            return (ctrl.questionPlayerConfig.resultActionButtons &&
+              ctrl.questionPlayerConfig.resultActionButtons.length > 0);
           };
 
+          var getWorstSkillId = function() {
+            var minScore = Number.MAX_VALUE;
+            var worstSkillId = '';
+            Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
+              var skillScoreData = ctrl.scorePerSkillMapping[skillId];
+              var scorePercentage = skillScoreData.score / skillScoreData.total;
+              if (scorePercentage < minScore) {
+                minScore = scorePercentage;
+                worstSkillId = skillId;
+              }
+            });
+            return worstSkillId;
+          };
+
+          var openConceptCardModal = function(skillIds) {
+            var skills = [];
+            skillIds.forEach(function(skillId) {
+              skills.push(
+                ctrl.scorePerSkillMapping[skillId].description);
+            });
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/concept-card/concept-card-modal.template.html'
+              ),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', '$window',
+                'UrlService',
+                function(
+                    $scope, $uibModalInstance, $window,
+                    UrlService) {
+                  $scope.skillIds = skillIds;
+                  $scope.skills = skills;
+                  $scope.index = 0;
+                  $scope.currentSkill = $scope.skills[$scope.index];
+                  $scope.isInTestMode = true;
+
+                  $scope.isLastConceptCard = function() {
+                    return $scope.index === $scope.skills.length - 1;
+                  };
+
+                  $scope.closeModal = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.goToNextConceptCard = function() {
+                    $scope.index++;
+                    $scope.currentSkill = $scope.skills[$scope.index];
+                  };
+
+                  $scope.retryTest = function() {
+                    $window.location.replace(UrlService.getPathname());
+                  };
+                }
+              ]
+            });
+          };
+
+
           var boostScoreModal = function() {
-            // Will open a boost score modal that explains the worst skill
-            // and redirects to the concept card of that skill.
+            var worstSkillId = getWorstSkillId();
+            openConceptCardModal([worstSkillId]);
           };
 
           var getClassNameForType = function(actionButtonType) {
@@ -236,23 +317,54 @@ oppia.directive('questionPlayer', [
             return ctrl.totalQuestions;
           };
 
+          var isInPassOrFailMode = function() {
+            return (ctrl.questionPlayerConfig.questionPlayerMode &&
+              ctrl.questionPlayerConfig.questionPlayerMode.modeType ===
+              QUESTION_PLAYER_MODE.PASS_FAIL_MODE);
+          };
+
           var createScorePerSkillMapping = function() {
             var scorePerSkillMapping = {};
-            if (questionPlayerConfig.skillList) {
-              for (var i = 0; i < questionPlayerConfig.skillList.length; i++) {
-                var skillId = questionPlayerConfig.skillList[i];
-                var description = questionPlayerConfig.skillDescriptions[i];
+            if (ctrl.questionPlayerConfig.skillList) {
+              for (var i = 0;
+                i < ctrl.questionPlayerConfig.skillList.length; i++) {
+                var skillId = ctrl.questionPlayerConfig.skillList[i];
+                var description =
+                  ctrl.questionPlayerConfig.skillDescriptions[i];
                 scorePerSkillMapping[skillId] = {
                   description: description,
-                  score: 0.0
+                  score: 0.0,
+                  total: 0.0
                 };
               }
             }
-            return scorePerSkillMapping;
+            ctrl.scorePerSkillMapping = scorePerSkillMapping;
+          };
+
+          var createMasteryPerSkillMapping = function() {
+            var masteryPerSkillMapping = {};
+            if (ctrl.questionPlayerConfig.skillList) {
+              for (var i = 0;
+                i < ctrl.questionPlayerConfig.skillList.length; i++) {
+                var skillId = ctrl.questionPlayerConfig.skillList[i];
+                masteryPerSkillMapping[skillId] = 0.0;
+              }
+            }
+            ctrl.masteryPerSkillMapping = masteryPerSkillMapping;
+          };
+
+          var createMasteryChangePerQuestion = function(questionData) {
+            var masteryChangePerQuestion = {};
+            for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
+              var skillId = questionData.linkedSkillIds[i];
+              masteryChangePerQuestion[skillId] =
+                MAX_MASTERY_GAIN_PER_QUESTION;
+            }
+            return masteryChangePerQuestion;
           };
 
           var calculateScores = function(questionStateData) {
-            var scorePerSkillMapping = createScorePerSkillMapping();
+            createScorePerSkillMapping();
             $scope.resultsLoaded = false;
             var totalQuestions = Object.keys(questionStateData).length;
             for (var question in questionStateData) {
@@ -284,15 +396,160 @@ oppia.directive('questionPlayer', [
               }
               for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
                 var skillId = questionData.linkedSkillIds[i];
-                if (!(skillId in scorePerSkillMapping)) {
+                if (!(skillId in ctrl.scorePerSkillMapping)) {
                   continue;
                 }
-                scorePerSkillMapping[skillId].score += questionScore;
+                ctrl.scorePerSkillMapping[skillId].score += questionScore;
+                ctrl.scorePerSkillMapping[skillId].total += 1.0;
               }
             }
             ctrl.totalScore = Math.round(
               ctrl.totalScore * 100 / totalQuestions);
             $scope.resultsLoaded = true;
+          };
+
+          var getMasteryChangeForWrongAnswers = function(
+              answers, masteryChangePerQuestion) {
+            answers.forEach(function(answer) {
+              if (!answer.isCorrect) {
+                if (answer.taggedSkillMisconceptionId) {
+                  var skillId = answer.taggedSkillMisconceptionId.split('-')[0];
+                  if (masteryChangePerQuestion.hasOwnProperty(skillId)) {
+                    masteryChangePerQuestion[skillId] -=
+                      WRONG_ANSWER_PENALTY_FOR_MASTERY;
+                  }
+                } else {
+                  for (var masterySkillId in masteryChangePerQuestion) {
+                    masteryChangePerQuestion[masterySkillId] -=
+                      WRONG_ANSWER_PENALTY_FOR_MASTERY;
+                  }
+                }
+              }
+            });
+            return masteryChangePerQuestion;
+          };
+
+          var updateMasteryPerSkillMapping = function(
+              masteryChangePerQuestion) {
+            for (var skillId in masteryChangePerQuestion) {
+              if (!(skillId in ctrl.masteryPerSkillMapping)) {
+                continue;
+              }
+              // Set the lowest bound of mastery change for each question.
+              ctrl.masteryPerSkillMapping[skillId] += Math.max(
+                masteryChangePerQuestion[skillId],
+                MAX_MASTERY_LOSS_PER_QUESTION);
+            }
+          };
+
+          var calculateMasteryDegrees = function(questionStateData) {
+            createMasteryPerSkillMapping();
+
+            for (var question in questionStateData) {
+              var questionData = questionStateData[question];
+              if (!(questionData.linkedSkillIds)) {
+                continue;
+              }
+              var masteryChangePerQuestion =
+                createMasteryChangePerQuestion(questionData);
+
+              if (questionData.viewedSolution) {
+                for (var skillId in masteryChangePerQuestion) {
+                  masteryChangePerQuestion[skillId] =
+                    MAX_MASTERY_LOSS_PER_QUESTION;
+                }
+              } else {
+                if (questionData.usedHints) {
+                  for (var skillId in masteryChangePerQuestion) {
+                    masteryChangePerQuestion[skillId] -= (
+                      questionData.usedHints.length *
+                      VIEW_HINT_PENALTY_FOR_MASTERY);
+                  }
+                }
+                if (questionData.answers) {
+                  masteryChangePerQuestion = getMasteryChangeForWrongAnswers(
+                    questionData.answers, masteryChangePerQuestion);
+                }
+              }
+              updateMasteryPerSkillMapping(masteryChangePerQuestion);
+            }
+
+            SkillMasteryBackendApiService.updateSkillMasteryDegrees(
+              ctrl.masteryPerSkillMapping);
+          };
+
+          var hasUserPassedTest = function() {
+            var testIsPassed = true;
+            var failedSkillIds = [];
+            if (isInPassOrFailMode()) {
+              Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
+                var correctionRate = ctrl.scorePerSkillMapping[skillId].score /
+                  ctrl.scorePerSkillMapping[skillId].total;
+                if (correctionRate <
+                  ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
+                  testIsPassed = false;
+                  failedSkillIds.push(skillId);
+                }
+              });
+            }
+
+            if (!testIsPassed) {
+              ctrl.questionPlayerConfig.resultActionButtons = [];
+              ctrl.failedSkillIds = failedSkillIds;
+            }
+            return testIsPassed;
+          };
+
+          ctrl.getScorePercentage = function(scorePerSkill) {
+            return scorePerSkill.score / scorePerSkill.total * 100;
+          };
+
+          ctrl.getColorForScore = function(scorePerSkill) {
+            if (!isInPassOrFailMode()) {
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+            }
+            var correctionRate = scorePerSkill.score / scorePerSkill.total;
+            if (correctionRate >=
+              ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+            } else {
+              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+            }
+          };
+
+          ctrl.reviewConceptCardAndRetryTest = function() {
+            if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
+              throw Error('No failed skills');
+            }
+            openConceptCardModal(ctrl.failedSkillIds);
+          };
+
+          ctrl.openSkillMasteryModal = function(skillId) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/question-directives/question-player/' +
+                'skill-mastery-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function(
+                    $scope, $uibModalInstance) {
+                  $scope.skillId = skillId;
+                  $scope.userIsLoggedIn = ctrl.userIsLoggedIn;
+                  if ($scope.userIsLoggedIn) {
+                    $scope.masteryChange = ctrl.masteryPerSkillMapping[skillId];
+                  }
+
+                  $scope.closeModal = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.openConceptCardModal = function(skillId) {
+                    openConceptCardModal([skillId]);
+                  };
+                }
+              ]
+            });
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {
@@ -317,8 +574,13 @@ oppia.directive('questionPlayer', [
               hashContent.substring(hashContent.indexOf(
                 HASH_PARAM) + HASH_PARAM.length));
             if (resultHashString) {
+              initResults();
               var questionStateData = JSON.parse(resultHashString);
               calculateScores(questionStateData);
+              if (ctrl.userIsLoggedIn) {
+                calculateMasteryDegrees(questionStateData);
+              }
+              ctrl.testIsPassed = hasUserPassedTest();
             }
           });
         }

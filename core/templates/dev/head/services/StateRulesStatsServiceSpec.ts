@@ -16,6 +16,22 @@
  * @fileoverview Unit tests for state rules stats service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// StateRulesStatsService.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory';
+import { FractionInputRulesService } from
+  'interactions/FractionInput/directives/fraction-input-rules.service';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('App.ts');
 require('services/StateRulesStatsService.ts');
 
@@ -23,6 +39,28 @@ describe('State Rules Stats Service', function() {
   var StateRulesStatsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', new AngularNameService());
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value(
+      'FractionInputRulesService', new FractionInputRulesService(
+        new FractionObjectFactory()));
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'StateClassifierMappingService', new StateClassifierMappingService(
+        new ClassifierObjectFactory()));
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     StateRulesStatsService = $injector.get('StateRulesStatsService');
   }));

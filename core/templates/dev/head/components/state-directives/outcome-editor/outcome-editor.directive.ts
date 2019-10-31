@@ -16,17 +16,22 @@
  * @fileoverview Directives for the outcome editor.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require('components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require('directives/angular-html-bind.directive.ts');
+
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('outcomeEditor', [
+angular.module('oppia').directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -48,16 +53,16 @@ oppia.directive('outcomeEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'StateEditorService', 'StateInteractionIdService',
-        'INTERACTION_SPECS',
+        'ENABLE_PREREQUISITE_SKILLS', 'INTERACTION_SPECS',
         function(
             $scope, StateEditorService, StateInteractionIdService,
-            INTERACTION_SPECS) {
+            ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.editOutcomeForm = {};
           ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
-          ctrl.canAddPrerequisiteSkill =
-            constants.ENABLE_PREREQUISITE_SKILLS &&
-              StateEditorService.isExplorationWhitelisted();
+          ctrl.canAddPrerequisiteSkill = (
+            ENABLE_PREREQUISITE_SKILLS &&
+            StateEditorService.isExplorationWhitelisted());
           ctrl.feedbackEditorIsOpen = false;
           ctrl.destinationEditorIsOpen = false;
           ctrl.correctnessLabelEditorIsOpen = false;
