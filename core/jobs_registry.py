@@ -178,7 +178,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ReviewerRotationTrackingModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSnapshotContentModelAuditOneOffJob,
