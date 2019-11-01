@@ -16,6 +16,7 @@
 
 """Unit tests for core.domain.rte_component_registry."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 import os
@@ -136,6 +137,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
         for (component_id, component_specs) in rte_components.items():
             # Check that the component id is valid.
+            hyphenated_component_id = utils.camelcase_to_hyphenated(
+                component_id)
             self.assertTrue(self._is_camel_cased(component_id))
 
             # Check that the component directory exists.
@@ -160,11 +163,10 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(protractor_file))
 
             main_ts_file = os.path.join(
-                directives_dir, 'OppiaNoninteractive%sDirective.ts'
-                % component_id)
+                directives_dir, 'oppia-noninteractive-%s.directive.ts'
+                % hyphenated_component_id)
             main_html_file = os.path.join(
-                directives_dir, '%s_directive.html' % component_id.lower())
-
+                directives_dir, '%s.directive.html' % hyphenated_component_id)
             self.assertTrue(os.path.isfile(main_ts_file))
             self.assertTrue(os.path.isfile(main_html_file))
 

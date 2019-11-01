@@ -21,6 +21,7 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 import string
@@ -354,7 +355,7 @@ class Collection(python_utils.OBJECT):
         # YAML representation.
         del collection_dict['id']
 
-        return utils.yaml_from_dict(collection_dict)
+        return python_utils.yaml_from_dict(collection_dict)
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
@@ -552,7 +553,7 @@ class Collection(python_utils.OBJECT):
             skill_names.update(node['acquired_skills'])
             skill_names.update(node['prerequisite_skills'])
         skill_names_to_ids = {
-            name: _SKILL_ID_PREFIX + python_utils.STR(index)
+            name: _SKILL_ID_PREFIX + python_utils.UNICODE(index)
             for index, name in enumerate(sorted(skill_names))
         }
 

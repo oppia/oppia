@@ -16,6 +16,7 @@
 
 """Test calculations to get interaction answer views."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import calculation_registry
 from core.domain import exp_domain
@@ -32,9 +33,9 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
                 state_answers_dict={})
 
     def test_equality_of_hashable_answers(self):
-        hashable_answer_1 = answer_models._HashableAnswer('answer_1')  # pylint: disable=protected-access
-        hashable_answer_2 = answer_models._HashableAnswer('answer_2')  # pylint: disable=protected-access
-        hashable_answer_3 = answer_models._HashableAnswer('answer_1')  # pylint: disable=protected-access
+        hashable_answer_1 = answer_models.HashableAnswer('answer_1')
+        hashable_answer_2 = answer_models.HashableAnswer('answer_2')
+        hashable_answer_3 = answer_models.HashableAnswer('answer_1')
 
         self.assertFalse(hashable_answer_1 == hashable_answer_2)
         self.assertTrue(hashable_answer_1 == hashable_answer_3)

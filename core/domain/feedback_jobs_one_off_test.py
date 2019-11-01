@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for Feedback-related jobs."""
+from __future__ import absolute_import # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
@@ -25,7 +27,7 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
-    """Tests for ExpSummary aggregations."""
+    """Tests for GeneralFeedbackThreadUser migration."""
 
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
         feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob]

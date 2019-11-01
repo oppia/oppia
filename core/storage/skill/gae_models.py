@@ -14,6 +14,7 @@
 
 """Models for storing the skill data models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -74,6 +75,23 @@ class SkillModel(base_models.VersionedModel):
     # It will initially be False, and set to true only when there is a value
     # for superseding_skill_id and the merge was completed.
     all_questions_merged = ndb.BooleanProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Skill should be kept if it is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SkillModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
     @classmethod
     def get_merged_skills(cls):
@@ -142,6 +160,13 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the skill being edited.
     skill_id = ndb.StringProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Skill commit log is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def _get_instance_id(cls, skill_id, version):
         """This function returns the generated id for the get_commit function
@@ -188,6 +213,11 @@ class SkillSummaryModel(base_models.BaseModel):
     skill_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Skill summary should be kept if associated skill is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
 
 class SkillRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill rights snapshot."""
@@ -213,6 +243,25 @@ class SkillRightsModel(base_models.VersionedModel):
     # Whether the skill is private.
     skill_is_private = ndb.BooleanProperty(
         indexed=True, required=True, default=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Skill rights should be kept if associated skill is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SkillRightsModel or its snapshots references the given
+        user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return (cls.query(cls.creator_id == user_id).get() is not None or
+                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

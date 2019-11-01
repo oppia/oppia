@@ -16,6 +16,7 @@
 activities.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -24,12 +25,10 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import dependency_registry
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import interaction_registry
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
@@ -41,8 +40,6 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
-
-import jinja2
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
@@ -58,7 +55,7 @@ class NotificationsDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_creator_dashboard
     def get(self):
         self.render_template(
-            'dist/notifications-dashboard-page.mainpage.html')
+            'notifications-dashboard-page.mainpage.html')
 
 
 class NotificationsDashboardHandler(base.BaseHandler):
@@ -114,20 +111,8 @@ class CreatorDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
-        interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
-                interaction_dependency_ids + self.ADDITIONAL_DEPENDENCY_IDS))
 
-        self.values.update({
-            'additional_angular_modules': additional_angular_modules,
-            'dependencies_html': jinja2.utils.Markup(dependencies_html)
-        })
-        self.render_template('dist/creator-dashboard-page.mainpage.html')
+        self.render_template('creator-dashboard-page.mainpage.html')
 
 
 class CreatorDashboardHandler(base.BaseHandler):

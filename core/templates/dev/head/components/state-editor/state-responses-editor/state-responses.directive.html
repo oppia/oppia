@@ -2,7 +2,7 @@
   <div class="oppia-editor-header">
     <strong>Learner's Answers and Oppia's Responses</strong>
     <span style="margin-left: 150px;" ng-if="!isCurrentInteractionTrivial()" ng-hide="!enableSolicitAnswerDetailsFeature">
-      <input type="checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed">
+      <input type="checkbox" class="protractor-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed">
       Solicit Answer Details
     </span>
   </div>
@@ -108,9 +108,9 @@
     </div>
   </md-card>
 
-  <md-card style="margin: 0px; padding: 0px;">
+  <md-card style="margin: 0; padding: 0;">
     <div ng-if="EditabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
-      <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
+      <button type="button" class="btn btn-secondary btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
         + Add New Oppia Response
       </button>
     </div>

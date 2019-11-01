@@ -19,16 +19,16 @@
 require('interactions/MusicNotesInput/static/music_notes_input.css');
 
 require(
-  'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
+  'interactions/MusicNotesInput/directives/music-notes-input-rules.service.ts');
 require(
   'interactions/MusicNotesInput/directives/' +
-  'MusicNotesInputValidationService.ts');
+  'music-notes-input-validation.service.ts');
 require(
   'interactions/MusicNotesInput/directives/' +
-  'OppiaInteractiveMusicNotesInputDirective.ts');
+  'oppia-interactive-music-notes-input.directive.ts');
 require(
   'interactions/MusicNotesInput/directives/' +
-  'OppiaResponseMusicNotesInputDirective.ts');
+  'oppia-response-music-notes-input.directive.ts');
 require(
   'interactions/MusicNotesInput/directives/' +
-  'OppiaShortResponseMusicNotesInputDirective.ts');
+  'oppia-short-response-music-notes-input.directive.ts');

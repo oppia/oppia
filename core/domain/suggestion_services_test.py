@@ -14,6 +14,7 @@
 
 """Tests for suggestion related services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -148,6 +149,26 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, self.change, 'test description',
+                self.reviewer_id)
+
+    def test_cannot_create_translation_suggestion_with_invalid_content_html_raise_error(self): # pylint: disable=line-too-long
+        add_translation_change_dict = {
+            'cmd': 'add_translation',
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>The invalid content html</p>',
+            'translation_html': '<p>Translation for invalid content.</p>'
+        }
+        with self.assertRaisesRegexp(
+            Exception,
+            'The given content_html does not match the content of the '
+            'exploration.'):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id, self.target_version_at_submission,
+                self.author_id, add_translation_change_dict, 'test description',
                 self.reviewer_id)
 
     def test_get_all_stale_suggestions(self):

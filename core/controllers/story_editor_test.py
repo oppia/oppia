@@ -14,6 +14,7 @@
 
 """Tests for the story editor page."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import story_services
 from core.domain import topic_fetchers
@@ -351,6 +352,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id))
         self.assertEqual(self.story_id, json_response['story']['id'])
         self.assertEqual('Name', json_response['topic_name'])
+        self.assertEqual([], json_response['skill_summaries'])
         self.logout()
 
     def test_editable_story_handler_put(self):

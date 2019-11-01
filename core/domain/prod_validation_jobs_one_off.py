@@ -16,6 +16,7 @@
 
 """One-off jobs for validating prod models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import datetime
@@ -37,6 +38,7 @@ from core.domain import fs_domain
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
 from core.domain import question_domain
+from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -147,7 +149,7 @@ class BaseModelValidator(python_utils.OBJECT):
             item: ndb.Model. Entity to validate.
         """
         regex_string = cls._get_model_id_regex(item)
-        if not re.compile(regex_string).match(python_utils.STR(item.id)):
+        if not re.compile(regex_string).match(item.id):
             cls.errors['model id check'].append((
                 'Entity id %s: Entity id does not match regex pattern') % (
                     item.id))
@@ -174,14 +176,12 @@ class BaseModelValidator(python_utils.OBJECT):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        model_domain_object_instance = cls._get_model_domain_object_instance(
-            item)
-
-        if model_domain_object_instance is None:
-            # No domain object exists for this storage model class.
-            return
-
         try:
+            model_domain_object_instance = (
+                cls._get_model_domain_object_instance(item))
+            if model_domain_object_instance is None:
+                # No domain object exists for this storage model class.
+                return
             model_domain_object_instance.validate()
         except Exception as e:
             cls.errors['domain object check'].append((
@@ -222,7 +222,7 @@ class BaseModelValidator(python_utils.OBJECT):
                         ' value %s, expect model %s with id %s but it doesn\'t'
                         ' exist' % (
                             item.id, field_name, model_id,
-                            python_utils.STR(model_class.__name__), model_id)))
+                            model_class.__name__, model_id)))
 
     @classmethod
     def _fetch_external_instance_details(cls, item):
@@ -1372,6 +1372,73 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
             ]
 
 
+class SkillOpportunityModelValidator(BaseSummaryModelValidator):
+    """Class for validating SkillOpportunityModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return (
+            opportunity_services.get_skill_opportunity_from_model(item))
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_ids': (
+                skill_models.SkillModel, [item.id])
+        }
+
+    @classmethod
+    def _validate_question_count(cls, item):
+        """Validate that question_count matches the number of questions linked
+        to the opportunity's skill.
+
+        Args:
+            item: ndb.Model. SkillOpportunityModel to validate.
+        """
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+
+        for (_, _, skill_model) in (
+                skill_model_class_model_id_model_tuples):
+            # The case for missing skill external model is ignored here
+            # since errors for missing skill external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if skill_model is None or skill_model.deleted:
+                continue
+            skill = skill_services.get_skill_from_model(skill_model)
+            question_skill_links = (
+                question_services.get_question_skill_links_of_skill(
+                    skill.id, skill.description))
+            question_count = len(question_skill_links)
+            if question_count != item.question_count:
+                cls.errors['question_count check'].append((
+                    'Entity id %s: question_count: %s does not match the '
+                    'question_count of external skill model: %s') % (
+                        item.id, item.question_count, question_count))
+
+    @classmethod
+    def _get_external_model_properties(cls):
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+
+        skill_model_properties_dict = {
+            'skill_description': 'description'
+        }
+
+        return [(
+            'skill',
+            skill_model_class_model_id_model_tuples,
+            skill_model_properties_dict
+        )]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_question_count,
+        ]
+
+
 class ConfigPropertyModelValidator(BaseModelValidator):
     """Class for validating ConfigPropertyModel."""
 
@@ -2457,7 +2524,7 @@ class QuestionModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return question_services.get_question_from_model(item)
+        return question_fetchers.get_question_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2759,7 +2826,7 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
             similarity_list = []
             for topic2 in item.content[topic1]:
                 similarity_list.append(
-                    python_utils.STR(item.content[topic1][topic2]))
+                    python_utils.UNICODE(item.content[topic1][topic2]))
             if len(similarity_list):
                 data = data + '%s\n' % (',').join(similarity_list)
 
@@ -3615,16 +3682,17 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             # function.
             if topic_model is None or topic_model.deleted:
                 continue
-            canonical_story_ids = [
+            pubished_canonical_story_ids = [
                 reference['story_id']
-                for reference in topic_model.canonical_story_references]
-            if item.canonical_story_count != len(canonical_story_ids):
+                for reference in topic_model.canonical_story_references
+                if reference['story_is_published']]
+            if item.canonical_story_count != len(pubished_canonical_story_ids):
                 cls.errors['canonical story count check'].append((
                     'Entity id %s: Canonical story count: %s does not '
                     'match the number of story ids in canonical_story_ids in '
                     'topic model: %s') % (
                         item.id, item.canonical_story_count,
-                        canonical_story_ids))
+                        pubished_canonical_story_ids))
 
     @classmethod
     def _validate_additional_story_count(cls, item):
@@ -3644,16 +3712,19 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             # function.
             if topic_model is None or topic_model.deleted:
                 continue
-            additional_story_ids = [
+            published_additional_story_ids = [
                 reference['story_id']
-                for reference in topic_model.additional_story_references]
-            if item.additional_story_count != len(additional_story_ids):
+                for reference in topic_model.additional_story_references
+                if reference['story_is_published']]
+            if (
+                    item.additional_story_count !=
+                    len(published_additional_story_ids)):
                 cls.errors['additional story count check'].append((
                     'Entity id %s: Additional story count: %s does not '
                     'match the number of story ids in additional_story_ids in '
                     'topic model: %s') % (
                         item.id, item.additional_story_count,
-                        additional_story_ids))
+                        published_additional_story_ids))
 
     @classmethod
     def _validate_uncategorized_skill_count(cls, item):
@@ -5003,8 +5074,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
     collection_models.CollectionCommitLogEntryModel: (
         CollectionCommitLogEntryModelValidator),
     collection_models.CollectionSummaryModel: CollectionSummaryModelValidator,
-    opportunity_models.ExplorationOpportunitySummaryModel: (
-        ExplorationOpportunitySummaryModelValidator),
     config_models.ConfigPropertyModel: ConfigPropertyModelValidator,
     config_models.ConfigPropertySnapshotMetadataModel: (
         ConfigPropertySnapshotMetadataModelValidator),
@@ -5045,6 +5114,9 @@ MODEL_TO_VALIDATOR_MAPPING = {
     file_models.FileSnapshotContentModel: FileSnapshotContentModelValidator,
     job_models.JobModel: JobModelValidator,
     job_models.ContinuousComputationModel: ContinuousComputationModelValidator,
+    opportunity_models.ExplorationOpportunitySummaryModel: (
+        ExplorationOpportunitySummaryModelValidator),
+    opportunity_models.SkillOpportunityModel: (SkillOpportunityModelValidator),
     question_models.QuestionModel: QuestionModelValidator,
     question_models.QuestionSkillLinkModel: (
         QuestionSkillLinkModelValidator),
@@ -5273,6 +5345,14 @@ class ExplorationOpportunitySummaryModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [opportunity_models.ExplorationOpportunitySummaryModel]
+
+
+class SkillOpportunityModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillOpportunityModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [opportunity_models.SkillOpportunityModel]
 
 
 class ConfigPropertyModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -5848,12 +5928,12 @@ class UserNormalizedNameAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model_instance):
         if not model_instance.deleted:
-            yield(model_instance.normalized_username, model_instance.id)
+            yield (model_instance.normalized_username, model_instance.id)
 
     @staticmethod
     def reduce(key, values):
         if len(values) > 1:
-            yield(
+            yield (
                 'failed validation check for normalized username check of '
                 'UserSettingsModel',
                 'Users with ids %s have the same normalized username %s' % (

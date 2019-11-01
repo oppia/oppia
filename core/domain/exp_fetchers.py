@@ -22,6 +22,7 @@ delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import logging

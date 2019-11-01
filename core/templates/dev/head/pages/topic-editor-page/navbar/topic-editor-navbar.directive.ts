@@ -20,8 +20,8 @@ require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/topic/TopicRightsBackendApiService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/topic/topic-rights-backend-api.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/AlertsService.ts');

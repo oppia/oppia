@@ -14,6 +14,7 @@
 
 """Controllers for the story viewer page"""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -33,7 +34,7 @@ class StoryPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        self.render_template('dist/story-viewer-page.mainpage.html')
+        self.render_template('story-viewer-page.mainpage.html')
 
 
 class StoryPageDataHandler(base.BaseHandler):

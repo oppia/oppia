@@ -16,28 +16,43 @@
 
 """Unit tests for core.domain.opportunity_services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import opportunity_domain
 from core.domain import opportunity_services
+from core.domain import question_services
+from core.domain import skill_domain
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_services
 from core.tests import test_utils
 import python_utils
 
 
-class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
+class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     """Test the opportunity services module."""
+
     def setUp(self):
-        super(OpportunityServicesIntegerationTest, self).setUp()
+        super(OpportunityServicesIntegrationTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
+        self.USER_ID = 'user'
+        self.SKILL_ID = 'skill'
+        self.QUESTION_ID = question_services.get_new_question_id()
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
@@ -361,3 +376,225 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
         self.assertEqual(translation_opportunities[0]['content_count'], 5)
+
+    def test_create_new_skill_creates_new_skill_opportunity(self):
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertEqual(len(skill_opportunities), 0)
+
+        self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertEqual(len(skill_opportunities), 1)
+        opportunity = skill_opportunities[0]
+        self.assertEqual(opportunity['id'], self.SKILL_ID)
+        self.assertEqual(opportunity['skill_description'], 'skill_description')
+
+    def test_create_skill_opportunity_counts_existing_linked_questions(self):
+        self.save_new_question(
+            self.QUESTION_ID, self.USER_ID,
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+        question_services.create_new_question_skill_link(
+            self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
+
+        opportunity_services.create_skill_opportunity(
+            self.SKILL_ID, 'description')
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertEqual(len(skill_opportunities), 1)
+        opportunity = skill_opportunities[0]
+        self.assertEqual(opportunity['id'], self.SKILL_ID)
+        self.assertEqual(opportunity['skill_description'], 'description')
+        self.assertEqual(opportunity['question_count'], 1)
+
+    def test_create_skill_opportunity_for_existing_opportunity_raises_exception(
+            self):
+        opportunity_services.create_skill_opportunity(
+            self.SKILL_ID, 'description')
+        with self.assertRaisesRegexp(
+            Exception,
+            ('SkillOpportunity corresponding to skill ID %s already exists.'
+             % self.SKILL_ID)):
+            opportunity_services.create_skill_opportunity(
+                self.SKILL_ID, 'description')
+
+    def test_update_skill_description_updates_skill_opportunity(self):
+        self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_DESCRIPTION),
+                'old_value': 'skill_description',
+                'new_value': 'new_description'
+            })
+        ]
+
+        skill_services.update_skill(
+            self.admin_id, self.SKILL_ID, changelist,
+            'Updated misconception name.')
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        opportunity = skill_opportunities[0]
+        self.assertEqual(opportunity['id'], self.SKILL_ID)
+        self.assertEqual(opportunity['skill_description'], 'new_description')
+
+    def test_update_skill_opportunity_skill_description_invalid_skill_id(self):
+        opportunity_services.update_skill_opportunity_skill_description(
+            'bad_skill_id', 'bad_description')
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertEqual(len(skill_opportunities), 0)
+
+    def test_delete_skill_deletes_skill_opportunity(self):
+        self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertEqual(len(skill_opportunities), 1)
+
+        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertEqual(len(skill_opportunities), 0)
+
+    def test_add_question_increments_skill_opportunity_question_count(self):
+        opportunity_services.create_skill_opportunity(
+            self.SKILL_ID, 'description')
+
+        self.save_new_question(
+            self.QUESTION_ID, self.USER_ID,
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        opportunity = skill_opportunities[0]
+        self.assertEqual(len(skill_opportunities), 1)
+        self.assertEqual(opportunity['question_count'], 1)
+
+    def test_create_question_skill_link_increments_question_count(self):
+        opportunity_services.create_skill_opportunity(
+            self.SKILL_ID, 'description')
+        self.save_new_question(
+            self.QUESTION_ID, self.USER_ID,
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+
+        question_services.create_new_question_skill_link(
+            self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        opportunity = skill_opportunities[0]
+        self.assertEqual(opportunity['question_count'], 1)
+
+    def test_link_multiple_skills_for_question_increments_question_count(self):
+        opportunity_services.create_skill_opportunity(
+            self.SKILL_ID, 'description')
+        self.save_new_question(
+            self.QUESTION_ID, self.USER_ID,
+            self._create_valid_question_data('ABC'), ['skill_2'])
+
+        question_services.link_multiple_skills_for_question(
+            self.USER_ID, self.QUESTION_ID, [self.SKILL_ID], [0.3])
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        opportunity = skill_opportunities[0]
+        self.assertEqual(opportunity['question_count'], 1)
+
+    def test_delete_question_decrements_question_count(self):
+        opportunity_services.create_skill_opportunity(
+            self.SKILL_ID, 'description')
+        self.save_new_question(
+            self.QUESTION_ID, self.USER_ID,
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+
+        question_services.delete_question(self.USER_ID, self.QUESTION_ID)
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        opportunity = skill_opportunities[0]
+        self.assertEqual(len(skill_opportunities), 1)
+        self.assertEqual(opportunity['question_count'], 0)
+
+    def test_delete_question_skill_link_decrements_question_count(self):
+        opportunity_services.create_skill_opportunity(
+            self.SKILL_ID, 'description')
+        self.save_new_question(
+            self.QUESTION_ID, self.USER_ID,
+            self._create_valid_question_data('ABC'), ['skill_2'])
+        question_services.create_new_question_skill_link(
+            self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
+
+        question_services.delete_question_skill_link(
+            self.USER_ID, self.QUESTION_ID, self.SKILL_ID)
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        opportunity = skill_opportunities[0]
+        self.assertEqual(opportunity['question_count'], 0)
+
+
+class OpportunityServicesUnitTest(test_utils.GenericTestBase):
+    """Test the opportunity services methods."""
+    def setUp(self):
+        super(OpportunityServicesUnitTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.TOPIC_ID = 'topic'
+        self.STORY_ID = 'story'
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(5)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id=self.TOPIC_ID, name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, title='A story',
+            corresponding_topic_id=self.TOPIC_ID)
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+
+    def test_get_exploration_opportunity_summaries_by_ids_returns_list_of_objects(self): # pylint: disable=line-too-long
+        output = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                []))
+
+        self.assertEqual(output, {})
+
+        opportunities = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['0']))
+
+        self.assertEqual(len(opportunities), 1)
+        self.assertIsInstance(
+            opportunities['0'],
+            opportunity_domain.ExplorationOpportunitySummary)
+        self.assertEqual(opportunities['0'].id, '0')

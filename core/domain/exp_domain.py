@@ -21,6 +21,7 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
@@ -78,6 +79,9 @@ CMD_ADD_STATE = 'add_state'
 CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
+# This takes addition 'state_name', 'content_id', 'language_code' and
+# 'content_html' and 'translation_html' parameters.
+CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -173,6 +177,12 @@ class ExplorationChange(change_domain.BaseChange):
     }, {
         'name': CMD_RENAME_STATE,
         'required_attribute_names': ['new_state_name', 'old_state_name'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_TRANSLATION,
+        'required_attribute_names': [
+            'state_name', 'content_id', 'language_code', 'content_html',
+            'translation_html'],
         'optional_attribute_names': []
     }, {
         'name': CMD_EDIT_STATE_PROPERTY,
@@ -297,7 +307,7 @@ class ExpVersionReference(python_utils.OBJECT):
             ValidationError: One or more attributes of the ExpVersionReference
             are invalid.
         """
-        if not isinstance(self.exp_id, str):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a str, received %s' % self.exp_id)
 
@@ -832,12 +842,12 @@ class Exploration(python_utils.OBJECT):
             try:
                 self._verify_all_states_reachable()
             except utils.ValidationError as e:
-                warnings_list.append(python_utils.STR(e))
+                warnings_list.append(python_utils.UNICODE(e))
 
             try:
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
-                warnings_list.append(python_utils.STR(e))
+                warnings_list.append(python_utils.UNICODE(e))
 
             if not self.title:
                 warnings_list.append(
@@ -957,6 +967,25 @@ class Exploration(python_utils.OBJECT):
             raise utils.ValidationError(
                 'It is impossible to complete the exploration from the '
                 'following states: %s' % ', '.join(dead_end_states))
+
+    def get_content_html(self, state_name, content_id):
+        """Return the content for a given content id of a state.
+
+        Args:
+            state_name: str. The name of the state.
+            content_id: str. The id of the content.
+
+        Returns:
+            str. The html content corresponding to the given content id of a
+            state.
+
+        Raises:
+            ValueError: The given state_name does not exist.
+        """
+        if state_name not in self.states:
+            raise ValueError('State %s does not exist' % state_name)
+
+        return self.states[state_name].get_content_html(content_id)
 
     # Derived attributes of an exploration.
     @property
@@ -1224,6 +1253,25 @@ class Exploration(python_utils.OBJECT):
 
         del self.states[state_name]
 
+    def get_translatable_text(self, language_code):
+        """Returns all the contents which needs translation in the given
+        language.
+
+        Args:
+            language_code: str. The language code in which translation is
+                required.
+
+        Returns:
+            dict(str, dict(str, str)). A dict where state_name is the key and a
+            dict with content_id as the key and html content as value.
+        """
+        state_names_to_content_id_mapping = {}
+        for state_name, state in self.states.items():
+            state_names_to_content_id_mapping[state_name] = (
+                state.get_content_id_mapping_needing_translations(
+                    language_code))
+
+        return state_names_to_content_id_mapping
 
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
@@ -3240,7 +3288,7 @@ class Exploration(python_utils.OBJECT):
         # YAML representation.
         del exp_dict['id']
 
-        return utils.yaml_from_dict(exp_dict)
+        return python_utils.yaml_from_dict(exp_dict)
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
@@ -3303,16 +3351,6 @@ class Exploration(python_utils.OBJECT):
             'language_code': self.language_code,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
         }
-
-    def get_interaction_ids(self):
-        """Gets all interaction ids used in this exploration.
-
-        Returns:
-            list(str). The list of interaction ids.
-        """
-        return list(set([
-            state.interaction.id for state in self.states.values()
-            if state.interaction.id is not None]))
 
     def get_all_html_content_strings(self):
         """Gets all html content strings used in this exploration.

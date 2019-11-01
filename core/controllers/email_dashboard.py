@@ -14,6 +14,7 @@
 
 """Controller for user query related pages and handlers."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -35,7 +36,7 @@ class EmailDashboardPage(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/email-dashboard-page.mainpage.html')
+        self.render_template('email-dashboard-page.mainpage.html')
 
 
 class EmailDashboardDataHandler(base.BaseHandler):
@@ -173,7 +174,7 @@ class EmailDashboardResultPage(base.BaseHandler):
             'query_id': query_id,
         })
         self.render_template(
-            'dist/email-dashboard-result.mainpage.html')
+            'email-dashboard-result.mainpage.html')
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):

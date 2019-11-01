@@ -14,6 +14,7 @@
 
 """Domain objects for feedback models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import user_services
 import python_utils
@@ -90,7 +91,7 @@ class FeedbackThread(python_utils.OBJECT):
         Returns:
             str. The full id corresponding to the given message id.
         """
-        return '.'.join([self.id, python_utils.STR(message_id)])
+        return '.'.join([self.id, python_utils.UNICODE(message_id)])
 
     def get_last_two_message_ids(self):
         """Returns the full message ids of the last two messages of the thread.

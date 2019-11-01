@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for the BackgroundMaskService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('services/contextual/UrlService.ts');
 
 describe('Url Service', function() {
@@ -26,6 +31,12 @@ describe('Url Service', function() {
   var origin = 'http://sample.com';
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     mockLocation = {
       href: origin + pathname,
@@ -135,6 +146,21 @@ describe('Url Service', function() {
     expect(function() {
       UrlService.getTopicNameFromLearnerUrl();
     }).toThrowError('Invalid URL for topic');
+  });
+
+  it('should correctly retrieve classroom name from url', function() {
+    mockLocation.pathname = '/classroom/abcdefgijklm';
+    expect(
+      UrlService.getClassroomNameFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/classroom/class%20name';
+    expect(
+      UrlService.getClassroomNameFromUrl()
+    ).toBe('class name');
+    mockLocation.pathname = '/invalid/abcdefgijklm';
+    expect(function() {
+      UrlService.getClassroomNameFromUrl();
+    }).toThrowError('Invalid URL for classroom');
   });
 
   it('should correctly retrieve subtopic id from url', function() {

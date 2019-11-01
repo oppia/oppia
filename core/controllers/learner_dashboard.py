@@ -14,6 +14,7 @@
 
 """Controllers for the learner dashboard."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -35,7 +36,7 @@ class LearnerDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/learner-dashboard-page.mainpage.html')
+        self.render_template('learner-dashboard-page.mainpage.html')
 
 
 class LearnerDashboardHandler(base.BaseHandler):

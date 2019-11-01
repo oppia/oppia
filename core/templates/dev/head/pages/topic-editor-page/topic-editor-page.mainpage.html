@@ -1,13 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base_components/header.html', {"title": "Oppia"})
-    <script>
-      var GLOBALS = {
-        ADDITIONAL_ANGULAR_MODULES: JSON.parse(
-          '{{additional_angular_modules|js_string}}'),
-      };
-    </script>
+    @require('../../base-components/header.template.html', {"title": "Oppia"})
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
@@ -30,10 +24,10 @@
         <page-footer></page-footer>
       </base-content>
     </div>
-    <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
-    <script src="/templates/dev/head/mathjaxConfig.js"></script>
-    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
     @require('../footer_js_libs.html')
-    {{ dependencies_html }}
+    <script src="/third_party/static/ckeditor-4.12.1/ckeditor.js"></script>
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    @require('../../../../../../extensions/interactions/codemirror.html')
   </body>
 </html>

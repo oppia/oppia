@@ -16,18 +16,16 @@
 
 """Unit tests for scripts/docstrings_checker."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import contextlib
 import unittest
 
-# pylint: disable=wrong-import-position
-import astroid
+from . import docstrings_checker  # isort:skip
 
-from . import docstrings_checker
-
+import astroid  # isort:skip
 from pylint.checkers import utils # isort:skip
-# pylint: enable=wrong-import-position
 
 
 class ASTDocstringsCheckerTest(unittest.TestCase):

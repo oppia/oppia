@@ -16,12 +16,13 @@
 are created.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import logging
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import dependency_registry
 from core.domain import email_manager
-from core.domain import interaction_registry
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -35,8 +36,6 @@ from core.domain import topic_services
 from core.domain import user_services
 import feconf
 import utils
-
-import jinja2
 
 
 class TopicEditorStoryHandler(base.BaseHandler):
@@ -104,8 +103,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
 class TopicEditorPage(base.BaseHandler):
     """The editor page for a single topic."""
 
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
-
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
@@ -115,21 +112,7 @@ class TopicEditorPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
-
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
-                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
-
-        self.values.update({
-            'additional_angular_modules': additional_angular_modules,
-            'dependencies_html': jinja2.utils.Markup(dependencies_html)
-        })
-
-        self.render_template('dist/topic-editor-page.mainpage.html')
+        self.render_template('topic-editor-page.mainpage.html')
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):
@@ -182,14 +165,30 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        skill_ids = topic.get_all_skill_ids()
+        skill_id_to_description_dict, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(
+                topic.get_all_skill_ids()))
 
-        skill_id_to_description_dict = (
-            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
+        skill_id_to_rubrics_dict, deleted_skill_ids = (
+            skill_services.get_rubrics_of_skills(topic.get_all_skill_ids())
+        )
+
+        if deleted_skill_ids:
+            deleted_skills_string = ', '.join(deleted_skill_ids)
+            logging.error(
+                'The deleted skills: %s are still present in topic with id %s'
+                % (deleted_skills_string, topic_id)
+            )
+            if feconf.CAN_SEND_EMAILS:
+                email_manager.send_mail_to_admin(
+                    'Deleted skills present in topic',
+                    'The deleted skills: %s are still present in topic with '
+                    'id %s' % (deleted_skills_string, topic_id))
 
         self.values.update({
             'topic_dict': topic.to_dict(),
-            'skill_id_to_description_dict': skill_id_to_description_dict
+            'skill_id_to_description_dict': skill_id_to_description_dict,
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })
 
         self.render_json(self.values)
@@ -229,14 +228,31 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        skill_ids = topic.get_all_skill_ids()
 
-        skill_id_to_description_dict = (
-            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
+        skill_id_to_description_dict, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(
+                topic.get_all_skill_ids()))
+
+        skill_id_to_rubrics_dict, deleted_skill_ids = (
+            skill_services.get_rubrics_of_skills(topic.get_all_skill_ids())
+        )
+
+        if deleted_skill_ids:
+            deleted_skills_string = ', '.join(deleted_skill_ids)
+            logging.error(
+                'The deleted skills: %s are still present in topic with id %s'
+                % (deleted_skills_string, topic_id)
+            )
+            if feconf.CAN_SEND_EMAILS:
+                email_manager.send_mail_to_admin(
+                    'Deleted skills present in topic',
+                    'The deleted skills: %s are still present in topic with '
+                    'id %s' % (deleted_skills_string, topic_id))
 
         self.values.update({
             'topic_dict': topic.to_dict(),
-            'skill_id_to_description_dict': skill_id_to_description_dict
+            'skill_id_to_description_dict': skill_id_to_description_dict,
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })
 
         self.render_json(self.values)

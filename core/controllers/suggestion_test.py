@@ -16,6 +16,7 @@
 
 """Tests for suggestion controllers."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import exp_domain
@@ -27,7 +28,10 @@ from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import suggestion_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -690,13 +694,17 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)
-        questions, grouped_skill_descriptions, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                1, [self.SKILL_ID], ''))
+        (
+            questions, merged_question_skill_links, _) = (
+                question_services.get_displayable_question_skill_link_details(
+                    1, [self.SKILL_ID], ''))
         self.assertEqual(len(questions), 1)
         self.assertEqual(questions[0].creator_id, self.author_id)
         self.assertEqual(
-            grouped_skill_descriptions[0], [self.SKILL_DESCRIPTION])
+            merged_question_skill_links[0].skill_descriptions,
+            [self.SKILL_DESCRIPTION])
+        self.assertEqual(
+            merged_question_skill_links[0].skill_difficulties, [0.3])
         self.assertEqual(
             questions[0].question_content,
             self.question_dict['question_state_data']['content']['html']
@@ -949,3 +957,258 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
         self.logout()
+
+
+class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
+    """Unit test for the UserSubmittedSuggestionsHandler."""
+    AUTHOR_EMAIL = 'author@example.com'
+
+    def setUp(self):
+        super(UserSubmittedSuggestionsHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.AUTHOR_EMAIL, 'author')
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.TOPIC_ID = 'topic'
+        self.STORY_ID = 'story'
+        self.EXP_ID = 'exp1'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='Exploration title')
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id=self.TOPIC_ID, name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, title='A story',
+            corresponding_topic_id=self.TOPIC_ID)
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': self.EXP_ID
+            })], 'Changes.')
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.reviewer_id = self.editor_id
+
+        self.set_admins([self.ADMIN_USERNAME])
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
+        # Login and create exploration and suggestions.
+        self.login(self.EDITOR_EMAIL)
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
+            ['TextInput'], category='Algebra')
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'Introduction',
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': '<p>new content html</p>'
+                    }
+                })], 'Add content')
+
+        self.logout()
+
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': (suggestion_models.TARGET_TYPE_EXPLORATION),
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'state_name': 'Introduction',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>new content html</p>',
+                    'translation_html': '<p>new content html in Hindi</p>'
+                },
+                'description': 'Adds translation',
+                'final_reviewer_id': None
+            }, csrf_token=csrf_token)
+        self.logout()
+
+    def test_handler_returns_data(self):
+        self.login(self.AUTHOR_EMAIL)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content')
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(len(response['target_ids_to_opportunity_dicts']), 1)
+        response = self.get_json(
+            '/getsubmittedsuggestions/topic/translate_content')
+        self.assertEqual(response, {})
+
+    def test_handler_with_invalid_suggestion_type_raise_error(self):
+        self.login(self.AUTHOR_EMAIL)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content')
+        self.assertEqual(len(response['suggestions']), 1)
+
+        self.get_json(
+            '/getsubmittedsuggestions/exploration/invalid_suggestion_type',
+            expected_status_int=400)
+
+    def test_handler_with_invalid_target_type_raise_error(self):
+        self.login(self.AUTHOR_EMAIL)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content')
+        self.assertEqual(len(response['suggestions']), 1)
+
+        self.get_json(
+            '/getsubmittedsuggestions/invalid_target_type'
+            '/translate_content', expected_status_int=400)
+
+
+class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
+    """Unit test for the ReviewableSuggestionsHandler."""
+    def setUp(self):
+        super(ReviewableSuggestionsHandlerTest, self).setUp()
+        self.AUTHOR_EMAIL = 'author@example.com'
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.AUTHOR_EMAIL, 'author')
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.TOPIC_ID = 'topic'
+        self.STORY_ID = 'story'
+        self.EXP_ID = 'exp1'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='Exploration title')
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id=self.TOPIC_ID, name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, title='A story',
+            corresponding_topic_id=self.TOPIC_ID)
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': self.EXP_ID
+            })], 'Changes.')
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.reviewer_id = self.editor_id
+
+        self.set_admins([self.ADMIN_USERNAME])
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
+        # Login and create exploration and suggestions.
+        self.login(self.EDITOR_EMAIL)
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
+            ['TextInput'], category='Algebra')
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'Introduction',
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': '<p>new content html</p>'
+                    }
+                })], 'Add content')
+
+        self.logout()
+
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': (suggestion_models.TARGET_TYPE_EXPLORATION),
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'state_name': 'Introduction',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>new content html</p>',
+                    'translation_html': '<p>new content html in Hindi</p>'
+                },
+                'description': 'Adds translation',
+                'final_reviewer_id': None
+            }, csrf_token=csrf_token)
+        self.logout()
+
+    def test_handler_returns_data(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content')
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(len(response['target_ids_to_opportunity_dicts']), 1)
+        response = self.get_json(
+            '/getreviewablesuggestions/topic/translate_content')
+        self.assertEqual(response, {})
+
+    def test_handler_with_invalid_suggestion_type_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content')
+        self.assertEqual(len(response['suggestions']), 1)
+
+        self.get_json(
+            '/getreviewablesuggestions/exploration/invalid_suggestion_type',
+            expected_status_int=400)
+
+    def test_handler_with_invalid_target_type_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content')
+        self.assertEqual(len(response['suggestions']), 1)
+
+        self.get_json(
+            '/getreviewablesuggestions/invalid_target_type'
+            '/translate_content', expected_status_int=400)

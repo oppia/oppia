@@ -14,7 +14,9 @@
 
 """Installation script for Oppia third-party libraries."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
 import contextlib
 import json
 import os
@@ -25,12 +27,6 @@ import zipfile
 import python_utils
 
 from . import common
-
-# These two lines prevent a "IOError: [Errno socket error]
-# [Errno -2] Name or service not known" error
-# in urllib.urlretrieve, if the user is behind a proxy.
-if 'VAGRANT' in os.environ:
-    os.environ['http_proxy'] = ''
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -73,6 +69,10 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
         'optional_key_pairs': []
     }
 }
+
+_PARSER = argparse.ArgumentParser(description="""
+Installation script for Oppia third-party libraries.
+""")
 
 
 def download_files(source_url_root, target_dir, source_filenames):
@@ -237,7 +237,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
                 python_utils.PRINT(dependency_dict)
                 python_utils.PRINT(
                     'Only one of these keys pair must be used: "%s".'
-                    % python_utils.STR(optional_keys))
+                    % ', '.join(optional_keys))
                 python_utils.PRINT('Exiting')
                 sys.exit(1)
 
@@ -325,10 +325,11 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-def _install_third_party_libs():
+def main(args=None):
     """Installs all the third party libraries."""
+    unused_parsed_args = _PARSER.parse_args(args=args)
     download_manifest_files(MANIFEST_FILE_PATH)
 
 
 if __name__ == '__main__':
-    _install_third_party_libs()
+    main()

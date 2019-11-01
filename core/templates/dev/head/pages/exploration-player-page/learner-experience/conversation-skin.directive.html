@@ -47,13 +47,19 @@
                            is-learn-again-button="isLearnAgainButton()">
         </supplemental-card>
       </div>
-      <progress-nav on-submit="submitAnswerFromProgressNav()"
-                    is-learn-again-button="isLearnAgainButton()"
-                    submit-button-is-disabled="isSubmitButtonDisabled()"
-                    displayed-card="displayedCard"
-                    submit-button-is-shown="!answerIsBeingProcessed"
-                    on-click-continue-button="showUpcomingCard()">
-      </progress-nav>
+      <div ng-if="canAskLearnerForAnswerInfo()">
+        <learner-answer-info-card submit-answer="submitAnswer">
+        </learner-answer-info-card>
+      </div>
+      <div ng-if="!canAskLearnerForAnswerInfo()">
+        <progress-nav on-submit="submitAnswerFromProgressNav()"
+                      is-learn-again-button="isLearnAgainButton()"
+                      submit-button-is-disabled="isSubmitButtonDisabled()"
+                      displayed-card="displayedCard"
+                      submit-button-is-shown="!answerIsBeingProcessed"
+                      on-click-continue-button="showUpcomingCard()">
+        </progress-nav>
+      </div>
     </div>
 
     <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
@@ -62,7 +68,7 @@
                          displayed-card="displayedCard"
                          is-learn-again-button="isLearnAgainButton()">
       </supplemental-card>
-      <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown()">
+      <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !canAskLearnerForAnswerInfo()">
         <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                    ng-click="submitAnswerFromProgressNav()"
                    ng-disabled="isSubmitButtonDisabled()"
@@ -361,23 +367,23 @@ otherwise they will interfere with the iframed conversation skin directive.
   .conversation-skin-supplemental-nav-submit-button {
     margin-right: 10px;
     position: absolute;
-    right: 0;
+    right: 8px;
     top: -10px;
   }
 
   @media screen and (max-width: 959px) {
     .conversation-skin-cards-container {
       display: block;
-      padding: 66px 0px;
+      padding: 66px 0;
       position: relative;
       width: 100%;
     }
 
     .conversation-skin-tutor-card-container {
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
-      left: 0px;
+      left: 0;
       margin: 0 auto;
-      right: 0px;
+      right: 0;
       top: 40px;
       width: 100%;
       z-index: 15;
@@ -385,7 +391,7 @@ otherwise they will interfere with the iframed conversation skin directive.
 
     .conversation-skin-tutor-card-alone {
       position: relative;
-      top: 0px;
+      top: 0;
     }
 
     .conversation-skin-supplemental-card-container {

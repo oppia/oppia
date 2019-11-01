@@ -17,7 +17,7 @@
  */
 
 require('components/button-directives/exploration-embed-button.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/HtmlEscaperService.ts');
 require('services/SiteAnalyticsService.ts');
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base_components/header.html', {"title": "Community Dashboard - Oppia"})
+    @require('../../base-components/header.template.html', {"title": "Community Dashboard - Oppia"})
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
@@ -18,6 +18,8 @@
       <page-footer></page-footer>
     </base-content>
 
+    <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     @require('../footer_js_libs.html')
   </body>
 </html>

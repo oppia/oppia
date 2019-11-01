@@ -1,15 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base_components/header.html', {"title": "Oppia"})
-
-    <script type="text/javascript">
-      var GLOBALS = {
-        ADDITIONAL_ANGULAR_MODULES: JSON.parse(
-            '{{additional_angular_modules|js_string}}'),
-      };
-    </script>
-
+    @require('../../base-components/header.template.html', {"title": "Oppia"})
     <style>
       @media(max-width: 500px) {
         .oppia-exploration-header {
@@ -28,7 +20,7 @@
     <div ng-controller="Base">
       <base-content>
         <navbar-breadcrumb>
-          <learner-view-info exploration-title="{{exploration_title}}"></learner-view-info>
+          <learner-view-info></learner-view-info>
         </navbar-breadcrumb>
 
         <nav-options>
@@ -40,14 +32,13 @@
         </content>
 
         <page-footer>
-          <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
+          <exploration-footer></exploration-footer>
         </page-footer>
       </base-content>
     </div>
-    <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
-    <script src="/templates/dev/head/mathjaxConfig.js"></script>
-    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     @require('../footer_js_libs.html')
-    {{ dependencies_html }}
+    <script src="/third_party/static/ckeditor-4.12.1/ckeditor.js"></script>
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    @require('../../../../../../extensions/interactions/dependency_html.html')
   </body>
 </html>

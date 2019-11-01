@@ -83,16 +83,16 @@ angular.module('oppia').directive('reviewTestPage', [
                 resultActionButtons: [
                   {
                     type: 'BOOST_SCORE',
-                    text: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+                    i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
                   },
                   {
                     type: 'RETRY_SESSION',
-                    text: 'I18N_QUESTION_PLAYER_RETRY_TEST',
+                    i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
                     url: reviewTestsUrl
                   },
                   {
                     type: 'DASHBOARD',
-                    text: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
+                    i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
                     url: storyViewerUrl
                   }
                 ],
@@ -103,7 +103,8 @@ angular.module('oppia').directive('reviewTestPage', [
                 questionPlayerMode: {
                   modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
                   passCutoff: 0.75
-                }
+                },
+                questionsSortedByDifficulty: true
               };
               ctrl.questionPlayerConfig = questionPlayerConfig;
             });

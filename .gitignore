@@ -7,12 +7,12 @@ gae_runtime/*
 # ignore the files and dirs inside the .git dir.
 .git/*
 third_party/*
-assets/hashes.js
+assets/hashes.json
 backend_prod_files/*
 local_compiled_js/*
 local_compiled_js_for_test/*
 core/templates/prod/*
-core/templates/dev/head/dist/*
+webpack_bundles/*
 core/tests/.browserstack.env
 node_modules/*
 .coverage*
@@ -32,6 +32,7 @@ venv/
 .idea
 .vagrant/*
 .lock
+yarn-error.log
 
 # Oppia uses cache slugs for various resources and we need separate resource
 # directories for dev and prod. Resource directories for prod are generated

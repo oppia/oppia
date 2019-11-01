@@ -16,6 +16,7 @@
 
 """Provides mailgun api to send email."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
 
@@ -84,9 +85,10 @@ def send_mail(
     data = {
         'from': sender_email,
         'to': recipient_email,
-        'subject': subject,
-        'text': plaintext_body,
-        'html': html_body}
+        'subject': subject.encode(encoding='utf-8'),
+        'text': plaintext_body.encode(encoding='utf-8'),
+        'html': html_body.encode(encoding='utf-8')
+    }
 
     if bcc_admin:
         data['bcc'] = feconf.ADMIN_EMAIL_ADDRESS
@@ -142,9 +144,9 @@ def send_bulk_mail(
         data = {
             'from': sender_email,
             'to': email_set,
-            'subject': subject,
-            'text': plaintext_body,
-            'html': html_body,
+            'subject': subject.encode(encoding='utf-8'),
+            'text': plaintext_body.encode(encoding='utf-8'),
+            'html': html_body.encode(encoding='utf-8'),
             'recipient-variables': '{}'}
 
         post_to_mailgun(data)

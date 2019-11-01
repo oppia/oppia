@@ -16,6 +16,7 @@
 classifiers.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import json
@@ -104,7 +105,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
         self.payload['message'] = self.job_result_dict
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload['signature'] = classifier.generate_signature(
-            secret, self.payload['message'])
+            python_utils.convert_to_bytes(secret), self.payload['message'])
 
     def test_trained_classifier_handler(self):
         # Normal end-to-end test.
@@ -268,9 +269,9 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         )
 
         self.expected_response = {
-            u'job_id': python_utils.STR(self.job_id, 'utf-8'),
+            u'job_id': self.job_id,
             u'training_data': self.training_data,
-            u'algorithm_id': python_utils.STR(self.algorithm_id, 'utf-8')
+            u'algorithm_id': self.algorithm_id
         }
 
         self.payload = {}
@@ -278,7 +279,7 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload['message'] = json.dumps({})
         self.payload['signature'] = classifier.generate_signature(
-            secret, self.payload['message'])
+            python_utils.convert_to_bytes(secret), self.payload['message'])
 
     def test_next_job_handler(self):
         json_response = self.post_json(

@@ -16,6 +16,7 @@
 
 """Tests for Exploration models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -37,6 +38,18 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_models.ExplorationModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'id', title='A Title',
+            category='A Category', objective='An Objective')
+        exp_services.save_new_exploration('committer_id', exploration)
+        self.assertTrue(
+            exploration_models.ExplorationModel
+            .has_reference_to_user_id('committer_id'))
+        self.assertFalse(
+            exploration_models.ExplorationModel
+            .has_reference_to_user_id('x_id'))
 
     def test_get_exploration_count(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -61,11 +74,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'  # Related to all three explorations
     USER_ID_2 = 'id_2'  # Related to a subset of the three explorations
     USER_ID_3 = 'id_3'  # Related to no explorations
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            exploration_models.ExplorationRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+    USER_ID_COMMITTER = 'id_4'  # User id used in commits
 
     def setUp(self):
         super(ExplorationRightsModelUnitTest, self).setUp()
@@ -80,7 +89,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            'cid', 'Created new exploration right',
+            self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         exploration_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_2,
@@ -93,7 +102,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            'cid', 'Created new exploration right',
+            self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         exploration_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_3,
@@ -106,8 +115,27 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            'cid', 'Created new exploration right',
+            self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exploration_models.ExplorationRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            exploration_models.ExplorationRightsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            exploration_models.ExplorationRightsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            exploration_models.ExplorationRightsModel
+            .has_reference_to_user_id(self.USER_ID_COMMITTER))
+        self.assertFalse(
+            exploration_models.ExplorationRightsModel
+            .has_reference_to_user_id(self.USER_ID_3))
 
     def test_save(self):
         exploration_models.ExplorationRightsModel(
@@ -180,15 +208,35 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationCommitLogEntryModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exploration_models.ExplorationCommitLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        commit = exploration_models.ExplorationCommitLogEntryModel.create(
+            'b', 0, 'committer_id', 'username', 'msg',
+            'create', [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False)
+        commit.exploration_id = 'b'
+        commit.put()
+        self.assertTrue(
+            exploration_models.ExplorationCommitLogEntryModel
+            .has_reference_to_user_id('committer_id'))
+        self.assertFalse(
+            exploration_models.ExplorationCommitLogEntryModel
+            .has_reference_to_user_id('x_id'))
+
     def test_get_all_non_private_commits(self):
         private_commit = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'commiter_id', 'username', 'msg',
+                'a', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         public_commit = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'b', 1, 'commiter_id', 'username', 'msg',
+                'b', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         private_commit.exploration_id = 'a'
@@ -218,12 +266,12 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test_get_multi(self):
         commit1 = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'commiter_id', 'username', 'msg',
+                'a', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         commit2 = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 2, 'commiter_id', 'username', 'msg',
+                'a', 2, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         commit1.exploration_id = 'a'
@@ -248,6 +296,35 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_models.ExpSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        exploration_models.ExpSummaryModel(
+            id='id0',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            owner_ids=['owner_id'],
+            editor_ids=['editor_id'],
+            viewer_ids=['viewer_id'],
+            contributor_ids=['contributor_id'],
+        ).put()
+        self.assertTrue(
+            exploration_models.ExpSummaryModel
+            .has_reference_to_user_id('owner_id'))
+        self.assertTrue(
+            exploration_models.ExpSummaryModel
+            .has_reference_to_user_id('editor_id'))
+        self.assertTrue(
+            exploration_models.ExpSummaryModel
+            .has_reference_to_user_id('viewer_id'))
+        self.assertTrue(
+            exploration_models.ExpSummaryModel
+            .has_reference_to_user_id('contributor_id'))
+        self.assertFalse(
+            exploration_models.ExpSummaryModel
+            .has_reference_to_user_id('x_id'))
 
     def test_get_non_private(self):
         public_exploration_summary_model = (
@@ -468,119 +545,3 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             exploration_models.ExpSummaryModel
             .get_at_least_editable('nonexistent_id'))
         self.assertEqual(0, len(exploration_summary_models))
-
-
-class StateIdMappingModelUnitTest(test_utils.GenericTestBase):
-    """Tests for the StateIdMappingModel."""
-
-    def test_create_successfully_with_new_id(self):
-        exploration_models.StateIdMappingModel.create(
-            exp_id='id_0',
-            exp_version=0,
-            state_names_to_ids={},
-            largest_state_id_used=0)
-
-        observed_model = (
-            exploration_models.StateIdMappingModel.
-            get_state_id_mapping_model('id_0', 0))
-
-        self.assertEqual(observed_model.state_names_to_ids, {})
-        self.assertEqual(observed_model.largest_state_id_used, 0)
-
-    def test_create_successfully_if_id_exists_and_overwrite(self):
-        exploration_models.StateIdMappingModel.create(
-            exp_id='id_1',
-            exp_version=0,
-            state_names_to_ids={},
-            largest_state_id_used=1,
-            overwrite=True)
-
-        observed_model = (
-            exploration_models.StateIdMappingModel.
-            get_state_id_mapping_model('id_1', 0))
-
-        self.assertEqual(observed_model.state_names_to_ids, {})
-        self.assertEqual(observed_model.largest_state_id_used, 1)
-
-        exploration_models.StateIdMappingModel.create(
-            exp_id='id_1',
-            exp_version=0,
-            state_names_to_ids={},
-            largest_state_id_used=0,
-            overwrite=True)
-
-        observed_model = (
-            exploration_models.StateIdMappingModel.
-            get_state_id_mapping_model('id_1', 0))
-
-        self.assertEqual(observed_model.state_names_to_ids, {})
-        self.assertEqual(observed_model.largest_state_id_used, 0)
-
-    def test_create_failed_if_id_exists_and_no_overwrite(self):
-        exploration_models.StateIdMappingModel.create(
-            exp_id='id_1',
-            exp_version=0,
-            state_names_to_ids={},
-            largest_state_id_used=1,
-            overwrite=False)
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'State id mapping model already exists for exploration id_1,'
-            ' version 0'):
-            exploration_models.StateIdMappingModel.create(
-                exp_id='id_1',
-                exp_version=0,
-                state_names_to_ids={},
-                largest_state_id_used=0)
-
-    def test_get_state_id_mapping_model(self):
-        exploration_models.StateIdMappingModel.create(
-            exp_id='id_2',
-            exp_version=0,
-            state_names_to_ids={},
-            largest_state_id_used=1,
-            overwrite=False)
-
-        observed_model = (
-            exploration_models.StateIdMappingModel.
-            get_state_id_mapping_model('id_2', 0))
-        self.assertEqual(observed_model.state_names_to_ids, {})
-        self.assertEqual(observed_model.largest_state_id_used, 1)
-
-    def test_delete_state_id_mapping_models(self):
-        exploration_models.StateIdMappingModel.create(
-            exp_id='id_3',
-            exp_version=0,
-            state_names_to_ids={},
-            largest_state_id_used=1,
-            overwrite=True)
-
-        exploration_models.StateIdMappingModel.create(
-            exp_id='id_3',
-            exp_version=1,
-            state_names_to_ids={},
-            largest_state_id_used=1,
-            overwrite=True)
-
-        observed_model = (
-            exploration_models.StateIdMappingModel.
-            get_state_id_mapping_model('id_3', 0))
-        self.assertEqual(observed_model.state_names_to_ids, {})
-        self.assertEqual(observed_model.largest_state_id_used, 1)
-
-        exploration_models.StateIdMappingModel.delete_state_id_mapping_models(
-            'id_3', [0])
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'Entity for class StateIdMappingModel with id id_3.0 not found'):
-            observed_model = (
-                exploration_models.StateIdMappingModel.
-                get_state_id_mapping_model('id_3', 0))
-
-        observed_model = (
-            exploration_models.StateIdMappingModel.
-            get_state_id_mapping_model('id_3', 1))
-        self.assertEqual(observed_model.state_names_to_ids, {})
-        self.assertEqual(observed_model.largest_state_id_used, 1)

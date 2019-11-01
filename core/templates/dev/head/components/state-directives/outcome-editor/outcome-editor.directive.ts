@@ -29,7 +29,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -53,16 +53,16 @@ angular.module('oppia').directive('outcomeEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'StateEditorService', 'StateInteractionIdService',
-        'INTERACTION_SPECS',
+        'ENABLE_PREREQUISITE_SKILLS', 'INTERACTION_SPECS',
         function(
             $scope, StateEditorService, StateInteractionIdService,
-            INTERACTION_SPECS) {
+            ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.editOutcomeForm = {};
           ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
-          ctrl.canAddPrerequisiteSkill =
-            constants.ENABLE_PREREQUISITE_SKILLS &&
-              StateEditorService.isExplorationWhitelisted();
+          ctrl.canAddPrerequisiteSkill = (
+            ENABLE_PREREQUISITE_SKILLS &&
+            StateEditorService.isExplorationWhitelisted());
           ctrl.feedbackEditorIsOpen = false;
           ctrl.destinationEditorIsOpen = false;
           ctrl.correctnessLabelEditorIsOpen = false;

@@ -16,6 +16,7 @@
 
 """Unit tests for scripts/build.py."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # pylint: disable=invalid-name
 import collections
@@ -23,7 +24,6 @@ import json
 import os
 import random
 import subprocess
-import sys
 import tempfile
 import threading
 
@@ -221,6 +221,10 @@ class BuildTests(test_utils.GenericTestBase):
             ValueError, '%s is expected to contain MD5 hash' % base_filename):
             build._verify_filepath_hash(base_filename, file_hashes)
 
+        base_without_hash_filename = 'base_without_hash.html'
+        self.assertIsNone(build._verify_filepath_hash(
+            base_without_hash_filename, file_hashes))
+
         bad_filepath = 'README'
         with self.assertRaisesRegexp(
             ValueError, 'Filepath has less than 2 partitions after splitting'):
@@ -293,10 +297,10 @@ class BuildTests(test_utils.GenericTestBase):
         service_js_filepath = os.path.join(
             'local_compiled_js', 'core', 'pages', 'AudioService.js')
         generated_parser_js_filepath = os.path.join(
-            'core', 'expressions', 'ExpressionParserService.js')
+            'core', 'expressions', 'expression-parser.service.js')
         compiled_generated_parser_js_filepath = os.path.join(
             'local_compiled_js', 'core', 'expressions',
-            'ExpressionParserService.js')
+            'expression-parser.service.js')
         service_ts_filepath = os.path.join('core', 'pages', 'AudioService.ts')
         spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
         protractor_filepath = os.path.join('extensions', 'protractor.js')
@@ -326,7 +330,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         with self.swap(
             build, 'JS_FILEPATHS_NOT_TO_BUILD', (
-                'core/expressions/ExpressionParserService.js',)):
+                'core/expressions/expression-parser.service.js',)):
             self.assertFalse(
                 build.should_file_be_built(generated_parser_js_filepath))
             self.assertTrue(
@@ -470,22 +474,28 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertNotIn('/path/path/file.js', filtered_hashes)
             self.assertNotIn('/file.html', filtered_hashes)
 
-    def test_get_hashes_json_file_contents(self):
-        """Test get_hashes_json_file_contents parses provided hash dict
-        correctly to JSON format.
+    def test_save_hashes_to_file(self):
+        """Test save_hashes_to_file saves provided hash dict correctly to
+        JSON file.
         """
+        hashes_path = os.path.join(MOCK_ASSETS_OUT_DIR, 'hashes.json')
+
         # Set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
-            hashes = {'path/file.js': '123456'}
-            self.assertEqual(
-                build.get_hashes_json_file_contents(hashes),
-                'var hashes = JSON.parse(\'{"/path/file.js": "123456"}\');')
+            with self.swap(build, 'HASHES_JSON_FILEPATH', hashes_path):
+                hashes = {'path/file.js': '123456'}
+                build.save_hashes_to_file(hashes)
+                with python_utils.open_file(hashes_path, 'r') as hashes_file:
+                    self.assertEqual(
+                        hashes_file.read(), '{"/path/file.js": "123456"}\n')
 
-            hashes = {'file.js': '123456', 'file.min.js': '654321'}
-            self.assertEqual(
-                build.get_hashes_json_file_contents(hashes),
-                ('var hashes = JSON.parse(\'{"/file.min.js": "654321", '
-                 '"/file.js": "123456"}\');'))
+                hashes = {'file.js': '123456', 'file.min.js': '654321'}
+                build.save_hashes_to_file(hashes)
+                with python_utils.open_file(hashes_path, 'r') as hashes_file:
+                    self.assertEqual(
+                        hashes_file.read(),
+                        '{"/file.min.js": "654321", "/file.js": "123456"}\n')
+                os.remove(hashes_path)
 
     def test_execute_tasks(self):
         """Test _execute_tasks joins all threads after executing all tasks."""
@@ -905,11 +915,10 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'compile_typescript_files', mock_compile_typescript_files)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
-        args_swap = self.swap(sys, 'argv', ['build.py', '--prod_env'])
 
         with ensure_files_exist_swap, build_using_webpack_swap, (
-            compile_typescript_files_swap), compare_file_count_swap, args_swap:
-            build.build()
+            compile_typescript_files_swap), compare_file_count_swap:
+            build.main(args=['--prod_env'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -935,11 +944,10 @@ class BuildTests(test_utils.GenericTestBase):
         compile_typescript_files_continuously_swap = self.swap(
             build, 'compile_typescript_files_continuously',
             mock_compile_typescript_files_continuously)
-        args_swap = self.swap(sys, 'argv', ['build.py', '--enable_watcher'])
 
         with ensure_files_exist_swap, (
-            compile_typescript_files_continuously_swap), args_swap:
-            build.build()
+            compile_typescript_files_continuously_swap):
+            build.main(args=['--enable_watcher'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -963,15 +971,13 @@ class BuildTests(test_utils.GenericTestBase):
             build, '_ensure_files_exist', mock_ensure_files_exist)
         compile_typescript_files_swap = self.swap(
             build, 'compile_typescript_files', mock_compile_typescript_files)
-        args_swap = self.swap(
-            sys, 'argv', ['build.py', '--minify_third_party_libs_only'])
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception,
             'minify_third_party_libs_only should not be set in non-prod mode.')
 
         with ensure_files_exist_swap, compile_typescript_files_swap, (
-            assert_raises_regexp_context_manager), args_swap:
-            build.build()
+            assert_raises_regexp_context_manager):
+            build.main(args=['--minify_third_party_libs_only'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

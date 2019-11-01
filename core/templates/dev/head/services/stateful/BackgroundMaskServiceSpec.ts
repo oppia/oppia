@@ -16,23 +16,22 @@
  * @fileoverview Unit tests for the BackgroundMaskService.
  */
 
-require('services/stateful/BackgroundMaskService.ts');
+import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 
-describe('Background Mask Service', function() {
-  var BackgroundMaskService;
+describe('Background Mask Service', () => {
+  let backgroundMaskService;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    BackgroundMaskService = $injector.get('BackgroundMaskService');
-  }));
-
-  it('should activate mask', function() {
-    BackgroundMaskService.activateMask();
-    expect(BackgroundMaskService.isMaskActive()).toBe(true);
+  beforeEach(() => {
+    backgroundMaskService = new BackgroundMaskService();
   });
 
-  it('should deactivate mask', function() {
-    BackgroundMaskService.deactivateMask();
-    expect(BackgroundMaskService.isMaskActive()).toBe(false);
+  it('should activate mask', () => {
+    backgroundMaskService.activateMask();
+    expect(backgroundMaskService.isMaskActive()).toBe(true);
+  });
+
+  it('should deactivate mask', () => {
+    backgroundMaskService.deactivateMask();
+    expect(backgroundMaskService.isMaskActive()).toBe(false);
   });
 });

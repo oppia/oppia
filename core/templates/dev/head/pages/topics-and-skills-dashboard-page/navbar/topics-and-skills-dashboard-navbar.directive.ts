@@ -18,8 +18,9 @@
 
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts.ts');
-require('domain/topic/EditableTopicBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/skill/RubricObjectFactory.ts');
+require('domain/topic/editable-topic-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
@@ -53,7 +54,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
             var rubrics = [];
             for (var idx in SKILL_DIFFICULTIES) {
               rubrics.push(
-                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], '')
+                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], 'N/A')
               );
             }
             $uibModal.open({
@@ -66,7 +67,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                 function($scope, $uibModalInstance) {
                   $scope.newSkillDescription = '';
                   $scope.rubrics = rubrics;
-                  $scope.allRubricsAdded = false;
+                  $scope.allRubricsAdded = true;
+
+                  $scope.$watch('newSkillDescription', function() {
+                    $scope.rubrics[1].setExplanation(
+                      $scope.newSkillDescription);
+                  });
 
                   var areAllRubricsPresent = function() {
                     for (var idx in $scope.rubrics) {

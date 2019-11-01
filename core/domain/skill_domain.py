@@ -14,6 +14,7 @@
 
 """Domain objects relating to skills."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import change_domain
@@ -786,10 +787,17 @@ class Skill(python_utils.OBJECT):
         """Updates the explanation of the skill.
 
         Args:
-            explanation: SubtitledHtml. The new explanation of the skill.
+            explanation: dict. The new explanation of the skill.
         """
+        old_content_ids = []
+        if self.skill_contents.explanation:
+            old_content_ids = [self.skill_contents.explanation.content_id]
+
         self.skill_contents.explanation = (
             state_domain.SubtitledHtml.from_dict(explanation))
+
+        new_content_ids = [self.skill_contents.explanation.content_id]
+        self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
     def update_worked_examples(self, worked_examples):
         """Updates the worked examples list of the skill.

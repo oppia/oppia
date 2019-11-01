@@ -16,6 +16,7 @@
 
 """Getter commands for for topic models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
@@ -23,7 +24,8 @@ from core.domain import topic_domain
 from core.platform import models
 import feconf
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(skill_models, topic_models,) = models.Registry.import_models([
+    models.NAMES.skill, models.NAMES.topic])
 memcache_services = models.Registry.import_memcache_services()
 
 

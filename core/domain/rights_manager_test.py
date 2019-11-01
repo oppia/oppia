@@ -14,6 +14,7 @@
 
 """Tests for classes and methods relating to user rights."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -269,6 +270,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_voiceover_activity(
             self.user_a, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
+            self.user_a, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_a, exp_rights))
 
@@ -278,6 +281,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_voiceover_activity(
             self.user_admin, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_admin, exp_rights))
 
@@ -286,6 +291,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_voiceover_activity(
+            self.user_moderator, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_moderator, exp_rights))
@@ -304,6 +311,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_voiceover_activity(
             self.user_a, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
+            self.user_a, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_a, exp_rights))
 
@@ -313,6 +322,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_voiceover_activity(
             self.user_admin, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_admin, exp_rights))
 
@@ -321,6 +332,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_voiceover_activity(
+            self.user_moderator, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_moderator, exp_rights))
@@ -349,6 +362,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_voiceover_activity(
             self.user_a, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
+            self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_a, exp_rights))
 
@@ -358,6 +373,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_voiceover_activity(
             self.user_admin, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_admin, exp_rights))
 
@@ -367,6 +384,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_moderator, exp_rights))
         self.assertFalse(rights_manager.check_can_voiceover_activity(
             self.user_moderator, exp_rights))
+        self.assertFalse(rights_manager.check_can_save_activity(
+            self.user_moderator, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_moderator, exp_rights))
 
@@ -375,6 +394,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_edit_activity(
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_voiceover_activity(
+            self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_save_activity(
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
@@ -390,6 +411,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_voiceover_activity(
             self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_save_activity(
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
 
@@ -403,6 +426,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_b, exp_rights))
         self.assertTrue(rights_manager.check_can_voiceover_activity(
+            self.user_b, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
@@ -418,6 +443,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_voiceover_activity(
             self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_save_activity(
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
 
@@ -431,6 +458,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_edit_activity(
             self.user_b, exp_rights))
         self.assertTrue(rights_manager.check_can_voiceover_activity(
+            self.user_b, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
@@ -446,6 +475,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_voiceover_activity(
             self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_save_activity(
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
 
@@ -459,6 +490,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_edit_activity(
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_voiceover_activity(
+            self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_save_activity(
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
@@ -1257,6 +1290,10 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 
     def test_check_cannot_voiceover_activity_with_no_activity_rights(self):
         self.assertFalse(rights_manager.check_can_voiceover_activity(
+            self.owner, None))
+
+    def test_cannot_save_activity_with_no_activity_rights(self):
+        self.assertFalse(rights_manager.check_can_save_activity(
             self.owner, None))
 
     def test_check_cannot_delete_activity_with_no_activity_rights(self):

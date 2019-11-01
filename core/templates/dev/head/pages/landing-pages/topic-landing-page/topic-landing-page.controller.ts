@@ -16,12 +16,12 @@
  * @fileoverview Controller for landing page.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/PageTitleService.ts');
 require('services/SiteAnalyticsService.ts');
 

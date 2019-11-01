@@ -16,6 +16,7 @@
 
 """Models for topics and related constructs."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -74,6 +75,22 @@ class TopicModel(base_models.VersionedModel):
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Topic should be kept if it is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether TopicModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -146,6 +163,13 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the topic being edited.
     topic_id = ndb.StringProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Topic commit log is deleted only if the correspondingm topic is not
+        public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def _get_instance_id(cls, topic_id, version):
         """This function returns the generated id for the get_commit function
@@ -202,6 +226,11 @@ class TopicSummaryModel(base_models.BaseModel):
     subtopic_count = ndb.IntegerProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Topic summary should be kept if associated topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
@@ -232,6 +261,23 @@ class SubtopicPageModel(base_models.VersionedModel):
         required=True, indexed=True)
     # The ISO 639-1 code for the language this subtopic page is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Subtopic should be kept if associated topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SubtopicPageModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -280,6 +326,13 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the subtopic page being edited.
     subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Subtopic page commit log is deleted only if the corresponding
+        topic is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def _get_instance_id(cls, subtopic_page_id, version):
         """This function returns the generated id for the get_commit function
@@ -321,6 +374,24 @@ class TopicRightsModel(base_models.VersionedModel):
     # Whether this topic is published.
     topic_is_published = ndb.BooleanProperty(
         indexed=True, required=True, default=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Topic rights should be kept if associated topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether TopicRightsModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return (cls.query(cls.manager_ids == user_id).get() is not None or
+                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     @classmethod
     def get_by_user(cls, user_id):

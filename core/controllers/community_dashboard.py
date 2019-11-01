@@ -14,10 +14,12 @@
 
 """Controllers for the community dashboard page."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import exp_fetchers
 from core.domain import opportunity_services
 import feconf
 import utils
@@ -32,7 +34,7 @@ class CommunityDashboardPage(base.BaseHandler):
         # the COMMUNITY_DASHBOARD_ENABLED flag is removed.
         if not feconf.COMMUNITY_DASHBOARD_ENABLED:
             raise self.PageNotFoundException
-        self.render_template('dist/community-dashboard-page.mainpage.html')
+        self.render_template('community-dashboard-page.mainpage.html')
 
 
 class ContributionOpportunitiesHandler(base.BaseHandler):
@@ -72,6 +74,38 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             'opportunities': opportunities,
             'next_cursor': next_cursor,
             'more': more
+        }
+
+        self.render_json(self.values)
+
+
+class TranslatableTextHandler(base.BaseHandler):
+    """Provides lessons content which can be translated in a given language."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        language_code = self.request.get('language_code')
+        exp_id = self.request.get('exp_id')
+
+        if not utils.is_supported_audio_language_code(language_code):
+            raise self.InvalidInputException('Invalid language_code: %s' % (
+                language_code))
+
+        if not opportunity_services.is_exploration_available_for_contribution(
+                exp_id):
+            raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
+
+        exp = exp_fetchers.get_exploration_by_id(exp_id)
+        state_names_to_content_id_mapping = exp.get_translatable_text(
+            language_code)
+
+        self.values = {
+            'state_names_to_content_id_mapping': (
+                state_names_to_content_id_mapping),
+            'version': exp.version
         }
 
         self.render_json(self.values)

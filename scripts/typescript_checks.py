@@ -14,6 +14,7 @@
 
 """File for compiling and checking typescript."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import os
@@ -68,6 +69,6 @@ def compile_and_check_typescript():
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when build.py is used as a script.
+# it will only be called when typescript_checks.py is used as a script.
 if __name__ == '__main__':  # pragma: no cover
     compile_and_check_typescript()

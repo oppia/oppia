@@ -1,0 +1,106 @@
+<div class="oppia-translate-text-header-container">
+  <div class="oppia-translate-text-header">
+    <div class="oppia-opportunities-details">
+      <div class="oppia-opportunities-subheading"><[subheading]></div>
+      <div class="oppia-opportunities-heading"><[heading]></div>
+    </div>
+    <button type="button" class="close oppia-close-button-position" ng-click="cancel()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+</div>
+<div class="modal-body">
+  <div>
+    <div class="oppia-translatable-text-section">
+      <strong>Please translate the given content in <[languageDescription]>:</strong>
+      <a class="oppia-skip-button" ng-disabled="false" ng-click="skipActiveTranslation()"> skip </a>
+    </div>
+    <div class="oppia-loading-text" ng-if="loadingData || uploadingTranslation">
+      <div class="oppia-loading-text1 oppia-animate-fadein">
+        <lazy-loading></lazy-loading>
+      </div>
+      <div class="oppia-loading-text2 oppia-animate-fadein">
+        <lazy-loading></lazy-loading>
+      </div>
+    </div>
+    <div ng-if="!loadingData && !uploadingTranslation">
+      <angular-html-bind html-data="textToTranslate"
+                         class="oppia-rte-editor">
+      </angular-html-bind>
+    </div>
+
+    <div class="oppia-login-required-to-translate" ng-if="!userIsLoggedIn">
+      <div class="oppia-login-required-message">
+        Oops! You haven't logged in yet.
+        <br>
+        Log in <a style="color: #009688;" ng-click="$ctrl.onLoginButtonClicked()">here</a> to start contributing!
+      </div>
+    </div>
+
+    <div class="oppia-translation-editor-section" ng-if="userIsLoggedIn">
+      <div class="protractor-test-state-translation-editor">
+        <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
+        </schema-based-editor>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer" ng-if="userIsLoggedIn">
+  <div>
+    <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
+    <button class="btn btn-success oppia-upload-translated-text-button"
+            ng-disabled="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
+            ng-click="suggestTranslatedText()">
+      <i ng-show="uploadingTranslation" class="fa fa-spinner"></i>
+      <span ng-show="!uploadingTranslation && !moreAvailable">Save and close</span>
+      <span ng-show="!uploadingTranslation && moreAvailable">Save and translate another</span>
+    </button>
+  </div>
+</div>
+<style>
+  .oppia-translate-text-header-container {
+    border-bottom: 1px solid #e5e5e5;
+    padding-left: 15px;
+  }
+  .oppia-translate-text-header,
+  .oppia-translatable-text-section {
+    display: flex;
+    justify-content: space-between;
+  }
+  .oppia-loading-text {
+    height: 40px;
+    width: 100%;
+  }
+  .oppia-loading-text1 {
+    height: 50%;
+    width: 60%;
+  }
+  .oppia-loading-text2 {
+    height: 50%;
+    width: 40%;
+  }
+  .oppia-translation-editor-section {
+    padding: 25px 0px;
+    word-wrap: break-word;
+  }
+  .oppia-login-required-to-translate {
+    padding: 50px;
+    text-align: center;
+  }
+  .oppia-login-required-message {
+    font-size: 28px;
+    color: #4a4a4a;
+  }
+  .oppia-skip-button {
+    color: #ababab;
+    margin-left: 5%;
+  }
+  .oppia-close-button-position {
+    position: absolute;
+    right: 20px;
+    top: 12px;
+  }
+  .oppia-upload-translated-text-button {
+    min-width: 200px;
+  }
+</style>

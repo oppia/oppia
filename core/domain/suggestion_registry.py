@@ -16,6 +16,7 @@
 subclasses for each type of suggestion.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import exp_domain
@@ -377,6 +378,94 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'The new html must not match the old html')
 
 
+class SuggestionTranslateContent(BaseSuggestion):
+    """Domain object for a suggestion of type
+    SUGGESTION_TYPE_TRANSLATE_CONTENT.
+    """
+
+    def __init__( # pylint: disable=super-init-not-called
+            self, suggestion_id, target_id, target_version_at_submission,
+            status, author_id, final_reviewer_id,
+            change, score_category, last_updated):
+        """Initializes an object of type SuggestionTranslateContent
+        corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
+        """
+        self.suggestion_id = suggestion_id
+        self.suggestion_type = (
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
+        self.target_id = target_id
+        self.target_version_at_submission = target_version_at_submission
+        self.status = status
+        self.author_id = author_id
+        self.final_reviewer_id = final_reviewer_id
+        self.change = exp_domain.ExplorationChange(change)
+        self.score_category = score_category
+        self.last_updated = last_updated
+
+    def validate(self):
+        """Validates a suggestion object of type SuggestionTranslateContent.
+
+        Raises:
+            ValidationError: One or more attributes of the
+                SuggestionTranslateContent object are invalid.
+        """
+        super(SuggestionTranslateContent, self).validate()
+
+        if not isinstance(self.change, exp_domain.ExplorationChange):
+            raise utils.ValidationError(
+                'Expected change to be an ExplorationChange, received %s'
+                % type(self.change))
+
+        if self.get_score_type() != suggestion_models.SCORE_TYPE_TRANSLATION:
+            raise utils.ValidationError(
+                'Expected the first part of score_category to be %s '
+                ', received %s' % (
+                    suggestion_models.SCORE_TYPE_TRANSLATION,
+                    self.get_score_type()))
+
+        if self.get_score_sub_type() not in constants.ALL_CATEGORIES:
+            raise utils.ValidationError(
+                'Expected the second part of score_category to be a valid'
+                ' category, received %s' % self.get_score_sub_type())
+
+        if self.change.cmd != exp_domain.CMD_ADD_TRANSLATION:
+            raise utils.ValidationError(
+                'Expected cmd to be %s, received %s' % (
+                    exp_domain.CMD_ADD_TRANSLATION, self.change.cmd))
+
+        if not utils.is_supported_audio_language_code(
+                self.change.language_code):
+            raise utils.ValidationError(
+                'Invalid language_code: %s' % self.change.language_code)
+
+    def pre_accept_validate(self):
+        """Performs referential validation. This function needs to be called
+        before accepting the suggestion.
+        """
+        self.validate()
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+        if self.change.state_name not in exploration.states:
+            raise utils.ValidationError(
+                'Expected %s to be a valid state name' % self.change.state_name)
+        content_html = exploration.get_content_html(
+            self.change.state_name, self.change.content_id)
+        if content_html != self.change.content_html:
+            raise Exception(
+                'The given content_html does not match the content of the '
+                'exploration.')
+
+    def accept(self, commit_message):
+        """Accepts the suggestion.
+
+        Args:
+            commit_message: str. The commit message.
+        """
+        exp_services.update_exploration(
+            self.final_reviewer_id, self.target_id, [self.change],
+            commit_message, is_suggestion=True)
+
+
 class SuggestionAddQuestion(BaseSuggestion):
     """Domain object for a suggestion of type SUGGESTION_TYPE_ADD_QUESTION.
 
@@ -550,5 +639,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT: (
         SuggestionEditStateContent),
+    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+        SuggestionTranslateContent),
     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: SuggestionAddQuestion
 }

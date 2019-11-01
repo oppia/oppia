@@ -16,15 +16,38 @@
 
 """Controllers for suggestions."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import opportunity_services
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
+import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+
+
+def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
+    """Checks whether the given target_type and suggestion_type are valid.
+
+    Args:
+        target_type: str. The type of the suggestion target.
+        suggestion_type: str. The type of the suggestion.
+
+    Raises:
+        InvalidInputException: If the given target_type of suggestion_type are
+            invalid.
+    """
+    if target_type not in suggestion_models.TARGET_TYPE_CHOICES:
+        raise utils.InvalidInputException(
+            'Invalid target_type: %s' % target_type)
+
+    if suggestion_type not in suggestion_models.SUGGESTION_TYPE_CHOICES:
+        raise utils.InvalidInputException(
+            'Invalid suggestion_type: %s' % suggestion_type)
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -136,6 +159,78 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
             raise self.InvalidInputException('Invalid action.')
 
         self.render_json(self.values)
+
+
+class ReviewableSuggestionsHandler(base.BaseHandler):
+    """Provides all suggestions which can be reviewed by the user for a given
+    suggestion type.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self, target_type, suggestion_type):
+        """Handles GET requests."""
+        try:
+            _require_valid_suggestion_and_target_types(
+                target_type, suggestion_type)
+
+            suggestions = suggestion_services.get_reviewable_suggestions(
+                self.user_id, suggestion_type)
+
+            if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+                target_ids = set([s.target_id for s in suggestions])
+                target_ids_to_opportunities = (
+                    opportunity_services
+                    .get_exploration_opportunity_summaries_by_ids(
+                        list(target_ids)))
+                self.render_json({
+                    'suggestions': [s.to_dict() for s in suggestions],
+                    'target_ids_to_opportunity_dicts': {
+                        t: d.to_dict() for (
+                            t, d) in target_ids_to_opportunities.items()
+                    }
+                })
+            else:
+                self.render_json({})
+        except Exception as e:
+            raise self.InvalidInputException(e)
+
+
+class UserSubmittedSuggestionsHandler(base.BaseHandler):
+    """Provides all suggestions which are submitted by the user for a given
+    suggestion type.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_suggest_changes
+    def get(self, target_type, suggestion_type):
+        """Handles GET requests."""
+        try:
+            _require_valid_suggestion_and_target_types(
+                target_type, suggestion_type)
+
+            suggestions = suggestion_services.get_submitted_suggestions(
+                self.user_id, suggestion_type)
+
+            if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+                target_ids = set([s.target_id for s in suggestions])
+                target_ids_to_opportunities = (
+                    opportunity_services
+                    .get_exploration_opportunity_summaries_by_ids(
+                        list(target_ids)))
+                self.render_json({
+                    'suggestions': [s.to_dict() for s in suggestions],
+                    'target_ids_to_opportunity_dicts': {
+                        t: d.to_dict() for (
+                            t, d) in target_ids_to_opportunities.items()
+                    }
+                })
+            else:
+                self.render_json({})
+        except Exception as e:
+            raise self.InvalidInputException(e)
 
 
 class SuggestionListHandler(base.BaseHandler):

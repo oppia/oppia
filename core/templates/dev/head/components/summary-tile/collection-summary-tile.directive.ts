@@ -16,10 +16,10 @@
  * @fileoverview Summary tile for collections.
  */
 
-require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
+require('domain/learner_dashboard/learner-dashboard-icons.directive.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
@@ -51,16 +51,18 @@ angular.module('oppia').directive('collectionSummaryTile', [
       controllerAs: '$ctrl',
       controller: [
         'DateTimeFormatService', 'UserService',
-        'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function(
+        'ACTIVITY_TYPE_COLLECTION', 'COLLECTION_VIEWER_URL',
+        'COLLECTION_EDITOR_URL', function(
             DateTimeFormatService, UserService,
-            COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
+            ACTIVITY_TYPE_COLLECTION, COLLECTION_VIEWER_URL,
+            COLLECTION_EDITOR_URL) {
           var ctrl = this;
           ctrl.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           });
           ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
-          ctrl.ACTIVITY_TYPE_COLLECTION = constants.ACTIVITY_TYPE_COLLECTION;
+          ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;
 
           ctrl.getLastUpdatedDatetime = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(

@@ -17,8 +17,16 @@ var suites = {
       'protractor/accessibility.js'
     ],
 
-    additionalEditorAndPlayerFeatures: [
-      'protractor_desktop/additionalEditorAndPlayerFeatures.js'
+    additionalEditorFeatures: [
+      'protractor_desktop/additionalEditorFeatures.js'
+    ],
+
+    additionalPlayerFeatures: [
+      'protractor_desktop/additionalPlayerFeatures.js'
+    ],
+
+    adminPage: [
+      'protractor_desktop/adminTabFeatures.js'
     ],
 
     collections: [
@@ -27,6 +35,10 @@ var suites = {
 
     coreEditorAndPlayerFeatures: [
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
+    ],
+
+    creatorDashboard: [
+      'protractor_desktop/creatorDashboard.js'
     ],
 
     embedding: [
@@ -39,6 +51,10 @@ var suites = {
 
     explorationHistoryTab: [
       'protractor_desktop/explorationHistoryTab.js'
+    ],
+
+    explorationImprovementsTab: [
+      'protractor_desktop/explorationImprovementsTab.js'
     ],
 
     explorationStatisticsTab: [

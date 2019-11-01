@@ -16,6 +16,7 @@
 
 """Stores various configuration options and constants for Oppia."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import datetime
@@ -62,15 +63,14 @@ INTERACTIONS_DIR = (
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
-    os.path.join('assets', 'rich_text_components_definitions.js'))
+    os.path.join('assets', 'rich_text_components_definitions.ts'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
-    os.path.join(
-        'core', 'templates', 'dev', 'head') if constants.DEV_MODE else
-    os.path.join('backend_prod_files', 'templates', 'head'))
+    os.path.join('webpack_bundles') if constants.DEV_MODE else
+    os.path.join('backend_prod_files', 'webpack_bundles'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -493,6 +493,13 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
+# The number of medium question skill difficulty.
+MEDIUM_SKILL_DIFFICULTY = 0.6
+
+# The maximum number of skills to be requested at one time when fetching
+# questions.
+MAX_NUMBER_OF_SKILL_IDS = 20
+
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
@@ -604,6 +611,8 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+CLASSROOM_URL_PREFIX = '/classroom'
+CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
@@ -720,8 +729,8 @@ TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
+USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
-VOICEOVER_DATA_PREFIX = '/createhandler/voiceover'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

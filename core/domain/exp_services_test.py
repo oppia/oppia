@@ -16,6 +16,7 @@
 
 """Unit tests for core.domain.exp_services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -868,7 +869,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
                 duration.microseconds, 1E6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)' %
-                (exploration.title.encode('utf-8'), processing_time))
+                (exploration.title, processing_time))
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(),
@@ -2373,6 +2374,35 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
 
+    def test_add_translation(self):
+        """Test updating of content."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+        self.assertEqual(exploration.get_translation_counts(), {})
+
+        change_list = _get_change_list(
+            self.init_state_name, 'content', {
+                'html': '<p><strong>Test content</strong></p>',
+                'content_id': 'content',
+            })
+
+        change_list.append(exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': self.init_state_name,
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p><strong>Test content</strong></p>',
+            'translation_html': '<p>Translated text</p>'
+        }))
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+        self.assertEqual(exploration.get_translation_counts(), {
+            'hi': 1
+        })
+
     def test_update_solicit_answer_details(self):
         """Test updating of solicit_answer_details."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -3032,6 +3062,59 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
+    def test_updated_exploration_is_added_correctly_to_index(self):
+        exp_id = 'id0'
+        exp_title = 'title 0'
+        exp_category = 'cat0'
+        actual_docs = []
+        initial_exp_doc = {
+            'category': 'cat0',
+            'id': 'id0',
+            'language_code': 'en',
+            'objective': 'An objective',
+            'rank': 20,
+            'tags': [],
+            'title': 'title 0'}
+        updated_exp_doc = {
+            'category': 'cat1',
+            'id': 'id0',
+            'language_code': 'en',
+            'objective': 'An objective',
+            'rank': 20,
+            'tags': [],
+            'title': 'title 0'
+        }
+
+        def mock_add_documents_to_index(docs, index):
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            actual_docs.extend(docs)
+
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
+        add_docs_swap = self.swap(
+            search_services,
+            'add_documents_to_index',
+            add_docs_counter)
+
+        with add_docs_swap:
+            self.save_new_valid_exploration(
+                exp_id, self.owner_id, title=exp_title, category=exp_category,
+                end_state_name='End')
+
+            rights_manager.publish_exploration(self.owner, exp_id)
+            self.assertEqual(actual_docs, [initial_exp_doc])
+            self.assertEqual(add_docs_counter.times_called, 2)
+
+            actual_docs = []
+            exp_services.update_exploration(
+                self.owner_id, exp_id, [
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'category',
+                        'new_value': 'cat1'})], 'update category')
+            self.assertEqual(actual_docs, [updated_exp_doc])
+            self.assertEqual(add_docs_counter.times_called, 3)
+
+
     def test_get_number_of_ratings(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
@@ -3477,9 +3560,9 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """) % (
-    feconf.DEFAULT_INIT_STATE_NAME,
+    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
+    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'

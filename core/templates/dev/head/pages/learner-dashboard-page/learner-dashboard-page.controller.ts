@@ -29,14 +29,14 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('directives/angular-html-bind.directive.ts');
 require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
-require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
+require('domain/learner_dashboard/learner-dashboard-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
 require(
   'pages/learner-dashboard-page/suggestion-modal/' +
   'suggestion-modal-for-learner-dashboard.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
@@ -55,6 +55,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
       controller: [
         '$scope', '$rootScope', '$q', '$window', '$http', '$uibModal',
         'AlertsService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
+        'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
         'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
         'LearnerDashboardBackendApiService', 'UrlInterpolationService',
         'LEARNER_DASHBOARD_SECTION_I18N_IDS',
@@ -66,6 +67,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
         function(
             $scope, $rootScope, $q, $window, $http, $uibModal,
             AlertsService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
+            ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
             SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
             LearnerDashboardBackendApiService, UrlInterpolationService,
             LEARNER_DASHBOARD_SECTION_I18N_IDS,
@@ -409,9 +411,9 @@ angular.module('oppia').directive('learnerDashboardPage', [
           };
 
           ctrl.collectionPlaylistSortableOptions = getPlaylistSortableOptions(
-            constants.ACTIVITY_TYPE_COLLECTION);
+            ACTIVITY_TYPE_COLLECTION);
           ctrl.explorationPlaylistSortableOptions = getPlaylistSortableOptions(
-            constants.ACTIVITY_TYPE_EXPLORATION);
+            ACTIVITY_TYPE_EXPLORATION);
 
           ctrl.onClickThread = function(
               threadStatus, explorationId, threadId, explorationTitle) {
@@ -511,10 +513,12 @@ angular.module('oppia').directive('learnerDashboardPage', [
               },
               controller: [
                 '$scope', '$uibModalInstance', '$http', 'sectionNameI18nId',
-                'subsectionName',
+                'subsectionName', 'ACTIVITY_TYPE_COLLECTION',
+                'ACTIVITY_TYPE_EXPLORATION',
                 function(
                     $scope, $uibModalInstance, $http, sectionNameI18nId,
-                    subsectionName) {
+                    subsectionName, ACTIVITY_TYPE_COLLECTION,
+                    ACTIVITY_TYPE_EXPLORATION) {
                   $scope.sectionNameI18nId = sectionNameI18nId;
                   $scope.subsectionName = subsectionName;
                   $scope.activityTitle = activity.title;
@@ -522,11 +526,11 @@ angular.module('oppia').directive('learnerDashboardPage', [
                     var activityType = '';
                     if (subsectionName ===
                       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-                      activityType = constants.ACTIVITY_TYPE_EXPLORATION;
+                      activityType = ACTIVITY_TYPE_EXPLORATION;
                     } else if (subsectionName ===
                               LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
                                 .COLLECTIONS) {
-                      activityType = constants.ACTIVITY_TYPE_COLLECTION;
+                      activityType = ACTIVITY_TYPE_COLLECTION;
                     } else {
                       throw new Error('Subsection name is not valid.');
                     }

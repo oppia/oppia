@@ -6,6 +6,9 @@
     resize: none;
     width: 200px;
   }
+  feedback-popup label {
+    font-weight: normal;
+}
 </style>
 <div style="min-width: 200px;">
   <div ng-show="!feedbackSubmitted">
@@ -21,7 +24,7 @@
     </div>
 
     <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
-    <md-button class="pull-right protractor-test-exploration-feedback-submit-btn"
+    <md-button class="float-right protractor-test-exploration-feedback-submit-btn"
                ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;"
                ng-click="saveFeedback()"
                ng-disabled="!feedbackText"

@@ -16,6 +16,7 @@
 
 """Controllers for the collections editor."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
 
@@ -63,7 +64,7 @@ class CollectionEditorPage(CollectionEditorHandler):
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
         })
 
-        self.render_template('dist/collection-editor-page.mainpage.html')
+        self.render_template('collection-editor-page.mainpage.html')
 
 
 class EditableCollectionDataHandler(CollectionEditorHandler):

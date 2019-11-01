@@ -14,6 +14,7 @@
 
 """Jinja-related utilities."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import json
@@ -25,7 +26,6 @@ import jinja2
 from jinja2 import meta
 
 import python_utils  # isort:skip
-import utils  # isort:skip
 
 
 def _js_string_filter(value):
@@ -82,23 +82,6 @@ def get_jinja_env(dir_path):
         os.path.dirname(__file__), dir_path))
     env = jinja2.Environment(autoescape=True, loader=loader)
 
-    def get_complete_static_resource_url(domain_url, resource_suffix):
-        """Returns the relative path for the resource, appending it to the
-        corresponding cache slug.
-
-        Args:
-            domain_url: str. The url of the domain.
-            resource_suffix: str. The resource suffix to get the relative path
-                for the resource. It should have a leading slash.
-
-        Returns:
-            str. The relative path for the resource.
-        """
-        return '%s%s%s' % (
-            domain_url, utils.get_asset_dir_prefix(), resource_suffix)
-
-    env.globals['get_complete_static_resource_url'] = (
-        get_complete_static_resource_url)
     env.filters.update(JINJA_FILTERS)
     return env
 

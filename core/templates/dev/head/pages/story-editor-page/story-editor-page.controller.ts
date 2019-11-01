@@ -27,8 +27,8 @@ require(
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
 require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
@@ -64,7 +64,7 @@ angular.module('oppia').directive('storyEditorPage', [
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/story-editor-page/modal-templates/' +
-                  'save-pending-changes-modal.template.html'),
+                  'story-save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',

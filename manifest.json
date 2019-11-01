@@ -243,11 +243,21 @@
           "js": ["dist/angular-toastr.tpls.min.js"]
         }
       },
-      "bootstrap": {
-        "version": "3.3.4",
+      "popperJs": {
+        "version": "1.15.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/twbs/bootstrap/releases/download/v3.3.4/bootstrap-3.3.4-dist.zip",
-        "rootDir": "bootstrap-3.3.4-dist",
+        "url": "https://github.com/FezVrasta/popper.js/archive/v1.15.0.zip",
+        "rootDirPrefix": "popper.js-",
+        "targetDirPrefix": "popperJs-",
+        "bundle": {
+          "js": ["dist/umd/popper.js"]
+        }
+      },
+      "bootstrap": {
+        "version": "4.3.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip",
+        "rootDir": "bootstrap-4.3.1-dist",
         "targetDirPrefix": "bootstrap-",
         "bundle": {
           "css": ["css/bootstrap.css"],
@@ -286,17 +296,6 @@
         "targetDirPrefix": "code-mirror-",
         "bundle": {
           "css": ["lib/codemirror.css", "addon/merge/merge.css"]
-        }
-      },
-      "d3": {
-        "version": "5.9.2",
-        "downloadFormat": "files",
-        "url": "https://unpkg.com/d3@5.9.2/dist",
-        "rootDirPrefix": "d3js-",
-        "targetDirPrefix": "d3js-",
-        "files": ["d3.min.js"],
-        "bundle": {
-          "js": ["d3.min.js"]
         }
       },
       "diff-match-patch": {
@@ -431,11 +430,11 @@
         "targetDir": "midi-js-a8a842"
       },
       "ngJoyride": {
-        "version": "5b25d076405c9a787db602d2a8ff49919228f4fc",
+        "version": "b117e019582433995393f81e2006a6bc36ca1cf2",
         "downloadFormat": "zip",
-        "url": "https://github.com/seanlip/ng-joyride/archive/5b25d076405c9a787db602d2a8ff49919228f4fc.zip",
+        "url": "https://github.com/oppia/ng-joyride/archive/b117e019582433995393f81e2006a6bc36ca1cf2.zip",
         "rootDirPrefix": "ng-joyride-",
-        "targetDir": "ng-joyride-5b25d0",
+        "targetDir": "ng-joyride-b117e0",
         "bundle": {
           "css": ["ng-joyride.css"],
           "js": ["ng-joyride.js"]
@@ -475,16 +474,16 @@
         }
       },
       "ckeditor": {
-        "version": "4.9.2",
+        "version": "4.12.1",
         "downloadFormat": "zip",
-        "url": "https://download.cksource.com/CKEditor/CKEditor/CKEditor%204.9.2/ckeditor_4.9.2_full.zip",
+        "url": "https://download.cksource.com/CKEditor/CKEditor/CKEditor%204.12.1/ckeditor_4.12.1_full.zip",
         "rootDir": "ckeditor",
         "targetDirPrefix": "ckeditor-"
       },
       "ckeditorSharedspace": {
-        "version": "4.9.2",
+        "version": "4.12.1",
         "downloadFormat": "zip",
-        "url": "https://download.ckeditor.com/sharedspace/releases/sharedspace_4.9.2.zip",
+        "url": "https://download.ckeditor.com/sharedspace/releases/sharedspace_4.12.1.zip",
         "rootDir": "sharedspace",
         "targetDirPrefix": "ckeditor-sharedspace-"
       },
@@ -507,11 +506,11 @@
         }
       },
       "uiCodemirror": {
-        "version": "0.3.0",
+        "version": "5d04fa5c991f915e4578be5f1175e22d94696633",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.3.0.zip",
-        "rootDirPrefix": "ui-codemirror-src",
-        "targetDirPrefix": "ui-codemirror-"
+        "url": "https://github.com/oppia/ui-codemirror/archive/5d04fa5c991f915e4578be5f1175e22d94696633.zip",
+        "rootDirPrefix": "ui-codemirror-",
+        "targetDir": "ui-codemirror-5d04fa"
       },
       "uiSortable": {
         "version": "0.19.0",

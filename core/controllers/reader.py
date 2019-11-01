@@ -14,6 +14,7 @@
 
 """Controllers for the Oppia exploration learner view."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
@@ -25,7 +26,6 @@ from core.controllers import base
 from core.domain import classifier_services
 from core.domain import collection_services
 from core.domain import config_domain
-from core.domain import dependency_registry
 from core.domain import event_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -33,6 +33,7 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
+from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -45,8 +46,6 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
-
-import jinja2
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -66,11 +65,7 @@ def _get_exploration_player_data(
     Returns:
         dict. A dict of exploration player data.
         The keys and values of the dict are as follows:
-        - 'additional_angular_modules': list. A de-duplicated list of strings,
-            each representing an additional angular module that should be
-            loaded.
         - 'can_edit': bool. Whether the given user can edit this activity.
-        - 'dependencies_html': str. The additional HTML to insert on the page.
         - 'exploration_title': str. Title of exploration.
         - 'exploration_version': int. The version of the exploration.
         - 'collection_id': str. ID of the collection.
@@ -97,24 +92,8 @@ def _get_exploration_player_data(
 
     version = exploration.version
 
-    # TODO(sll): Cache these computations.
-    interaction_ids = exploration.get_interaction_ids()
-    for interaction_id in feconf.ALLOWED_QUESTION_INTERACTION_IDS:
-        if interaction_id not in interaction_ids:
-            interaction_ids.append(interaction_id)
-
-    dependency_ids = (
-        interaction_registry.Registry.get_deduplicated_dependency_ids(
-            interaction_ids))
-    dependencies_html, additional_angular_modules = (
-        dependency_registry.Registry.get_deps_html_and_angular_modules(
-            dependency_ids))
-
     return {
-        'additional_angular_modules': additional_angular_modules,
         'can_edit': can_edit,
-        'dependencies_html': jinja2.utils.Markup(
-            dependencies_html),
         'exploration_title': exploration.title,
         'exploration_version': version,
         'collection_id': collection_id,
@@ -166,7 +145,7 @@ class ExplorationEmbedPage(base.BaseHandler):
         self.values.update(exploration_data_values)
         self.values['iframed'] = True
         self.render_template(
-            'dist/exploration-player-page.mainpage.html',
+            'exploration-player-page.mainpage.html',
             iframe_restriction=None)
 
 
@@ -212,7 +191,7 @@ class ExplorationPage(base.BaseHandler):
         self.values.update(exploration_data_values)
         self.values['iframed'] = False
         self.render_template(
-            'dist/exploration-player-page.mainpage.html')
+            'exploration-player-page.mainpage.html')
 
 
 class ExplorationHandler(base.BaseHandler):
@@ -279,7 +258,7 @@ class ExplorationHandler(base.BaseHandler):
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
-                config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value)
+                config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
         })
         self.render_json(self.values)
 
@@ -300,7 +279,7 @@ class PretestHandler(base.BaseHandler):
         if not story.has_exploration(exploration_id):
             raise self.InvalidInputException
         pretest_questions, _, next_start_cursor = (
-            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
                 feconf.NUM_PRETEST_QUESTIONS,
                 story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
                 start_cursor)
@@ -1003,15 +982,21 @@ class QuestionPlayerHandler(base.BaseHandler):
 
         skill_ids = self.request.get('skill_ids').split(',')
         question_count = self.request.get('question_count')
+        fetch_by_difficulty_value = self.request.get('fetch_by_difficulty')
 
         if not question_count.isdigit() or int(question_count) <= 0:
             raise self.InvalidInputException(
                 'Question count has to be greater than 0')
 
+        if not (fetch_by_difficulty_value == 'true' or
+                fetch_by_difficulty_value == 'false'):
+            raise self.InvalidInputException(
+                'fetch_by_difficulty must be true or false')
+        fetch_by_difficulty = (fetch_by_difficulty_value == 'true')
+
         questions = (
             question_services.get_questions_by_skill_ids(
-                int(question_count),
-                skill_ids)
+                int(question_count), skill_ids, fetch_by_difficulty)
         )
 
         question_dicts = [question.to_dict() for question in questions]

@@ -14,6 +14,7 @@
 
 """Tests the methods defined in skill services."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
@@ -97,6 +98,84 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(new_skill_id), 12)
         self.assertEqual(skill_models.SkillModel.get_by_id(new_skill_id), None)
 
+    def test_get_descriptions_of_skills(self):
+        self.save_new_skill(
+            'skill_id_1', self.user_id_admin, 'Description 1',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+        self.save_new_skill(
+            'skill_id_2', self.user_id_admin, 'Description 2',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+
+        skill_services.delete_skill(self.user_id_admin, 'skill_id_2')
+        skill_descriptions, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(
+                ['skill_id_1', 'skill_id_2']))
+        self.assertEqual(deleted_skill_ids, ['skill_id_2'])
+        self.assertEqual(
+            skill_descriptions, {
+                'skill_id_1': 'Description 1',
+                'skill_id_2': None
+            }
+        )
+
+    def test_get_rubrics_of_linked_skills(self):
+        self.save_new_skill(
+            'skill_id_1', self.user_id_admin, 'Description 1',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+        self.save_new_skill(
+            'skill_id_2', self.user_id_admin, 'Description 2',
+            misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
+
+        skill_services.delete_skill(self.user_id_admin, 'skill_id_2')
+        skill_rubrics, deleted_skill_ids = (
+            skill_services.get_rubrics_of_skills(
+                ['skill_id_1', 'skill_id_2']))
+        self.assertEqual(deleted_skill_ids, ['skill_id_2'])
+
+        self.assertEqual(
+            skill_rubrics, {
+                'skill_id_1': [
+                    skill_domain.Rubric(
+                        constants.SKILL_DIFFICULTIES[0], 'Explanation 1'
+                    ).to_dict(),
+                    skill_domain.Rubric(
+                        constants.SKILL_DIFFICULTIES[1], 'Explanation 2'
+                    ).to_dict(),
+                    skill_domain.Rubric(
+                        constants.SKILL_DIFFICULTIES[2], 'Explanation 3'
+                    ).to_dict()],
+                'skill_id_2': None
+            }
+        )
+
     def test_get_skill_from_model(self):
         skill_model = skill_models.SkillModel.get(self.SKILL_ID)
         skill = skill_services.get_skill_from_model(skill_model)
@@ -121,53 +200,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].description, 'Description')
         self.assertEqual(skill_summaries[0].misconception_count, 1)
         self.assertEqual(skill_summaries[0].worked_examples_count, 1)
-
-    def test_get_skill_descriptions_by_ids(self):
-        self.save_new_skill(
-            'skill_2', self.USER_ID, 'Description 2', misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
-                state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-        self.save_new_skill(
-            'skill_3', self.USER_ID, 'Description 3', misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
-                state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            skill_descriptions = skill_services.get_skill_descriptions_by_ids(
-                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
-
-            skill_services.delete_skill(self.USER_ID, 'skill_2')
-            skill_descriptions = skill_services.get_skill_descriptions_by_ids(
-                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            expected_email_html_body = (
-                'The deleted skills: skill_2 are still'
-                ' present in topic with id topic_id')
-            self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
-            self.assertEqual(
-                skill_descriptions, {
-                    self.SKILL_ID: 'Description',
-                    'skill_2': None,
-                    'skill_3': 'Description 3'
-                }
-            )
 
     def test_get_skill_by_id(self):
         expected_skill = self.skill.to_dict()
@@ -729,9 +761,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'commit message')
 
         self.assertEqual(len(observed_log_messages), 1)
-        self.assertEqual(
-            observed_log_messages[0], 'AttributeError \'str\' object has no '
-            'attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
+        self.assertRegexpMatches(
+            observed_log_messages[0], 'object has no'
+            ' attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
 
     def test_cannot_update_misconception_name_with_invalid_id(self):
         changelist = [skill_domain.SkillChange({

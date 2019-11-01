@@ -24,11 +24,11 @@ require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.directive.ts');
 
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
-require('domain/learner_dashboard/LearnerDashboardIdsBackendApiService.ts');
-require('domain/learner_dashboard/LearnerPlaylistService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
+require('domain/learner_dashboard/learner-playlist.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
-require('services/ConstructTranslationIdsService.ts');
 require('services/PageTitleService.ts');
 require('services/SearchService.ts');
 require('services/UserService.ts');
@@ -48,8 +48,7 @@ angular.module('oppia').directive('libraryPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
-        '$window', 'AlertsService', 'ConstructTranslationIdsService',
-        'LearnerDashboardActivityIdsObjectFactory',
+        '$window', 'AlertsService', 'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'PageTitleService', 'SearchService',
         'UrlInterpolationService', 'UrlService', 'UserService',
@@ -57,8 +56,7 @@ angular.module('oppia').directive('libraryPage', [
         'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
         function(
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
-            $window, AlertsService, ConstructTranslationIdsService,
-            LearnerDashboardActivityIdsObjectFactory,
+            $window, AlertsService, LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             PageTitleService, SearchService,
             UrlInterpolationService, UrlService, UserService,

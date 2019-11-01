@@ -14,6 +14,7 @@
 
 """Tests for question domain objects."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -521,6 +522,24 @@ class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
         }
         observed_object = question_domain.QuestionSkillLink(
             'testquestion', 'testskill', 'testskilldescription', 0.5)
+        self.assertEqual(expected_object_dict, observed_object.to_dict())
+
+
+class MergedQuestionSkillLinkDomainTest(test_utils.GenericTestBase):
+    """Test for Merged Question Skill Link Domain object."""
+
+    def test_to_dict(self):
+        """Test to verify to_dict method of the Merged Question Skill Link
+        Domain object.
+        """
+        expected_object_dict = {
+            'question_id': 'testquestion',
+            'skill_ids': ['testskill'],
+            'skill_descriptions': ['testskilldescription'],
+            'skill_difficulties': [0.5],
+        }
+        observed_object = question_domain.MergedQuestionSkillLink(
+            'testquestion', ['testskill'], ['testskilldescription'], [0.5])
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
 

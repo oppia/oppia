@@ -16,6 +16,7 @@
 
 """Jobs for statistics views."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import collections
@@ -95,7 +96,7 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                 stats_services.get_playthrough_from_model(playthrough_model))
             playthrough.validate()
         except Exception as e:
-            validate_error = python_utils.STR(e)
+            validate_error = python_utils.UNICODE(e)
         else:
             validate_error = None
 
@@ -169,8 +170,9 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     'Details: %s.' % (key, audit_data['reference_error']),)
 
 
-class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job to regenerate missing stats models for explorations with
+class RegenerateMissingV1StatsModelsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to regenerate missing v1 stats models for explorations with
     correct v1 stats from previous versions.
 
     Note that job RecomputeStatisticsOneOffJob must be run immediately after
@@ -339,7 +341,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': python_utils.STR(item.created_on)
+                    'created_on': python_utils.UNICODE(item.created_on)
                 })
         elif isinstance(
                 item, stats_models.AnswerSubmittedEventLogEntryModel):
@@ -350,7 +352,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': python_utils.STR(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'is_feedback_useful': item.is_feedback_useful
                 })
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
@@ -361,7 +363,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': python_utils.STR(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
@@ -372,7 +374,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': python_utils.STR(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -384,7 +386,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': python_utils.STR(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -396,7 +398,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': python_utils.STR(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -408,7 +410,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': python_utils.STR(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         # pylint: enable=too-many-return-statements
@@ -1237,8 +1239,9 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                         key, state_name, all_state_hit[state_name]),)
 
 
-class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job to regenerate stats models which were missing due to
+class RegenerateMissingV2StatsModelsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to regenerate v2 stats models which were missing due to
     incorrect handling of exploration reverts. If a model is missing at version
     x, we will regenerate all models from version x-1 till the max version of
     the exploration.

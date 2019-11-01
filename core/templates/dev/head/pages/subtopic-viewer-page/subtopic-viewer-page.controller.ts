@@ -18,7 +18,7 @@
 
 require('rich_text_components/richTextComponentsRequires.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
@@ -26,7 +26,7 @@ require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/subtopic_viewer/SubtopicViewerBackendApiService.ts');
+require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');

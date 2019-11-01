@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
@@ -24,7 +24,7 @@ require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/UrlService.ts');
 require('services/UserService.ts');
 require('services/DateTimeFormatService.ts');

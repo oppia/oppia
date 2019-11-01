@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
@@ -25,8 +25,8 @@ require(
   'background-banner.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/UtilsService.ts');
@@ -264,7 +264,7 @@ angular.module('oppia').directive('preferencesPage', [
                 .then(function() {
                   // The reload is needed in order to update the profile picture
                   // in the top-right corner.
-                  $window.reload();
+                  $window.location.reload();
                 });
             });
           };

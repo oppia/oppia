@@ -24,6 +24,7 @@ The objects that can be described by these schemas must be composable from the
 following Python types: bool, dict, float, int, list, unicode.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import numbers
 import re
@@ -116,8 +117,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
-            obj = python_utils.STR(obj)
-        assert isinstance(obj, python_utils.STR), (
+            obj = python_utils.UNICODE(obj)
+        assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
         normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
@@ -134,8 +135,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
-            obj = python_utils.STR(obj)
-        assert isinstance(obj, python_utils.STR), (
+            obj = python_utils.UNICODE(obj)
+        assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     else:

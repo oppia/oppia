@@ -16,10 +16,16 @@
  * @fileoverview Directive for the community dashboard page.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'lazy-loading.directive.ts');
+require(
+  'pages/community-dashboard-page/contributions-and-review/' +
+  'contributions-and-review.directive.ts');
 require(
   'pages/community-dashboard-page/translation-opportunities/' +
   'translation-opportunities.directive.ts');
@@ -27,9 +33,10 @@ require(
   'pages/community-dashboard-page/voiceover-opportunities/' +
   'voiceover-opportunities.directive.ts');
 
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/LocalStorageService.ts');
+require('services/UserService.ts');
 
 require(
   'pages/community-dashboard-page/community-dashboard-page.constants.ajs.ts');
@@ -47,13 +54,26 @@ angular.module('oppia').directive('communityDashboardPage', [
       controllerAs: '$ctrl',
       controller: [
         '$window', 'LanguageUtilService', 'LocalStorageService',
-        'TranslationLanguageService', 'COMMUNITY_DASHBOARD_TABS_DETAILS',
+        'TranslationLanguageService', 'UserService',
+        'COMMUNITY_DASHBOARD_TABS_DETAILS',
         'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
         function(
             $window, LanguageUtilService, LocalStorageService,
-            TranslationLanguageService, COMMUNITY_DASHBOARD_TABS_DETAILS,
+            TranslationLanguageService, UserService,
+            COMMUNITY_DASHBOARD_TABS_DETAILS,
             DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
           var ctrl = this;
+          ctrl.profilePictureDataUrl = null;
+          ctrl.username = null;
+
+          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+            ctrl.profilePictureDataUrl = dataUrl;
+          });
+
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            ctrl.username = userInfo.getUsername();
+          });
+
           var prevSelectedLanguageCode = (
             LocalStorageService.getLastSelectedTranslationLanguageCode());
           var allAudioLanguageCodes = LanguageUtilService

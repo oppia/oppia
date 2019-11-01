@@ -15,7 +15,8 @@ interface ICustomScope extends ng.IScope {
     onFileCleared?: (() => void);
     droppedFile?: any;
 
-    // custom-forms-directives/audio-file-uploader.directive.ts, image-uploader.directive.ts
+    // custom-forms-directives/audio-file-uploader.directive.ts,
+    // image-uploader.directive.ts
     errorMessage?: string;
     onFileChanged?: ((file: any, fileName?: string) => void);
 
@@ -36,7 +37,8 @@ interface ICustomScope extends ng.IScope {
     getAlwaysEditable?: (() => boolean);
     getIsEditable?: (() => boolean);
 
-    // value-generator-editor.directive.ts, CopierDirective.ts, RandomSelectorDirective.ts
+    // value-generator-editor.directive.ts, CopierDirective.ts,
+    // RandomSelectorDirective.ts
     generatorId?: string;
 
     // value-generator-editor.directive.ts

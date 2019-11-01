@@ -19,19 +19,23 @@
 
 require(
   'pages/exploration-editor-page/improvements-tab/' +
-  'feedback-improvement-card/feedback-improvement-card.directive.ts'
+  'answer-details-improvement-task/answer-details-improvement-task.directive.ts'
 );
 require(
   'pages/exploration-editor-page/improvements-tab/' +
-  'playthrough-improvement-card/playthrough-improvement-card.directive.ts'
+  'feedback-improvement-task/feedback-improvement-task.directive.ts'
 );
 require(
   'pages/exploration-editor-page/improvements-tab/' +
-  'suggestion-improvement-card/suggestion-improvement-card.directive.ts'
+  'playthrough-improvement-task/playthrough-improvement-task.directive.ts'
+);
+require(
+  'pages/exploration-editor-page/improvements-tab/' +
+  'suggestion-improvement-task/suggestion-improvement-task.directive.ts'
 );
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/ImprovementCardService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/ImprovementTaskService.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvements-display.service.ts');
@@ -45,12 +49,14 @@ angular.module('oppia').directive('improvementsTab', [
         '/pages/exploration-editor-page/improvements-tab/' +
         'improvements-tab.directive.html'),
       controller: [
-        '$scope', 'ImprovementCardService', 'ImprovementsDisplayService',
-        function($scope, ImprovementCardService, ImprovementsDisplayService) {
-          var fetchedCards = [];
-          ImprovementCardService.fetchCards().then(function(cards) {
-            fetchedCards = cards;
+        '$scope', 'ImprovementTaskService', 'ImprovementsDisplayService',
+        function($scope, ImprovementTaskService, ImprovementsDisplayService) {
+          var fetchedTasks = [];
+          ImprovementTaskService.fetchTasks().then(function(tasks) {
+            fetchedTasks = tasks;
           });
+
+          $scope.onlyShowOpenTasks = true;
 
           $scope.getStatusCssClass =
             ImprovementsDisplayService.getStatusCssClass;
@@ -58,24 +64,28 @@ angular.module('oppia').directive('improvementsTab', [
           $scope.getHumanReadableStatus =
             ImprovementsDisplayService.getHumanReadableStatus;
 
-          $scope.getCards = function() {
-            return fetchedCards;
+          $scope.getTasks = function() {
+            return fetchedTasks;
           };
 
-          $scope.isCardOpen = function(card) {
-            return ImprovementsDisplayService.isOpen(card.getStatus());
+          $scope.isTaskOpen = function(task) {
+            return ImprovementsDisplayService.isOpen(task.getStatus());
           };
 
-          $scope.getCardTitle = function(card) {
-            return card.getTitle();
+          $scope.isTaskShown = function(task) {
+            return $scope.isTaskOpen(task) || !$scope.onlyShowOpenTasks;
           };
 
-          $scope.isCardObsolete = function(card) {
-            return card.isObsolete();
+          $scope.getTaskTitle = function(task) {
+            return task.getTitle();
           };
 
-          $scope.getOpenCardCount = function() {
-            return fetchedCards.filter($scope.isCardOpen).length;
+          $scope.isTaskObsolete = function(task) {
+            return task.isObsolete();
+          };
+
+          $scope.getOpenTaskCount = function() {
+            return fetchedTasks.filter($scope.isTaskOpen).length;
           };
         }
       ],

@@ -60,6 +60,13 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
       }
       throw Error('Invalid URL for topic');
     },
+    getClassroomNameFromUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/classroom/g)) {
+        return decodeURIComponent(pathname.split('/')[2]);
+      }
+      throw Error('Invalid URL for classroom');
+    },
     getSubtopicIdFromUrl: function() {
       var pathname = this.getPathname();
       var argumentsArray = pathname.split('/');

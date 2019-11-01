@@ -23,6 +23,7 @@ Usage: Run this script from your oppia root folder:
 where x.y.z is the new version of Oppia, e.g. 2.5.3.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import json
@@ -31,6 +32,7 @@ import subprocess
 import sys
 
 import python_utils
+import release_constants
 
 from . import common
 
@@ -167,7 +169,7 @@ def _execute_branch_cut():
         python_utils.PRINT(
             'Please confirm: are Travis checks passing on develop? (y/n) ')
         answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
+        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
             break
         elif answer:
             python_utils.PRINT(

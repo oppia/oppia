@@ -23,7 +23,7 @@ IMPORTANT NOTES:
 1.  Before running this script, you must install third-party dependencies by
     running
 
-        bash scripts/start.sh
+        python -m scripts.install_third_party_libs
 
     at least once.
 
@@ -35,6 +35,7 @@ IMPORTANT NOTES:
     named 'oppia'.
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -47,9 +48,11 @@ import string
 import subprocess
 
 import python_utils
+import release_constants
 
 from . import common
 from . import gcloud_adapter
+from . import install_third_party_libs
 # pylint: enable=wrong-import-order
 
 _PARSER = argparse.ArgumentParser()
@@ -107,10 +110,15 @@ def preprocess_release():
     does the following:
 
     (1) Substitutes files from the per-app deployment data.
-    (2) Change the DEV_MODE constant in assets/constants.js.
-    (3) Change GCS_RESOURCE_BUCKET in assets/constants.js.
+    (2) Change the DEV_MODE constant in assets/constants.ts.
+    (3) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
     (4) Removes the "version" field from app.yaml, since gcloud does not like
         it (when deploying).
+
+    Raises:
+        Exception: Could not find deploy data directory.
+        Exception: Could not find source path.
+        Exception: Could not find destination path.
     """
     if not os.path.exists(DEPLOY_DATA_PATH):
         raise Exception(
@@ -146,43 +154,21 @@ def preprocess_release():
             dst = os.path.join(dst_dir, filename)
             shutil.copyfile(src, dst)
 
-    # Changes the DEV_MODE constant in assets/constants.js.
+    # Changes the DEV_MODE constant in assets/constants.ts.
     with python_utils.open_file(
-        os.path.join('assets', 'constants.js'), 'r') as assets_file:
+        os.path.join('assets', 'constants.ts'), 'r') as assets_file:
         content = assets_file.read()
     bucket_name = APP_NAME + BUCKET_NAME_SUFFIX
     assert '"DEV_MODE": true' in content
     assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
-    os.remove(os.path.join('assets', 'constants.js'))
+    os.remove(os.path.join('assets', 'constants.ts'))
     content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
     content = content.replace(
         '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
     with python_utils.open_file(
-        os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
+        os.path.join('assets', 'constants.ts'), 'w+') as new_assets_file:
         new_assets_file.write(content)
-
-
-def install_required_dev_dependencies():
-    """Runs start.sh to ensure that dev dependencies are up-to-date
-    and installs required dependencies.
-    """
-
-    cmd = ['bash', 'scripts/start.sh']
-    if os.path.exists('dev_output.txt'):
-        os.remove('dev_output.txt')
-
-    with python_utils.open_file('dev_output.txt', 'w') as out:
-        process = subprocess.Popen(cmd, stdout=out)
-
-        while True:
-            with python_utils.open_file('dev_output.txt', 'r') as f:
-                lines = f.readlines()
-                for line in lines:
-                    if 'Oppia setup complete!' in line:
-                        process.kill()
-                        os.remove('dev_output.txt')
-                        return
 
 
 def check_errors_in_a_page(url_to_check, msg_to_confirm):
@@ -204,16 +190,28 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
             'PLEASE CONFIRM: %s See %s '
             '(y/n)' % (msg_to_confirm, url_to_check))
         answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
+        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
             return True
         elif answer:
             return False
 
 
 def _execute_deployment():
-    """Executes the deployment process after doing the prerequisite checks."""
+    """Executes the deployment process after doing the prerequisite checks.
 
-    install_required_dev_dependencies()
+    Raises:
+        Exception: The deployment script is not run from a release branch.
+        Exception: Current release version has '.' character.
+        Exception: The mailgun API key is not added before deployment.
+        Exception: Could not find third party directory.
+        Exception: Invalid directory accessed during deployment.
+        Exception: All the indexes have not been served before deployment.
+        Exception: Build failed.
+        Exception: Issue in library page loading.
+        Exception: There is a major breakage.
+    """
+
+    install_third_party_libs.main(args=[])
 
     if not common.is_current_branch_a_release_branch():
         raise Exception(
@@ -229,8 +227,8 @@ def _execute_deployment():
         'https://console.cloud.google.com/datastore/indexes'
         '?project=%s') % APP_NAME
     release_version_library_url = (
-        'https://%s-dot-%s.appspot.com/library' %
-        current_release_version, APP_NAME)
+        'https://%s-dot-%s.appspot.com/library' % (
+            current_release_version, APP_NAME))
     memcache_url = (
         'https://pantheon.corp.google.com/appengine/memcache?'
         'project=%s') % APP_NAME
@@ -259,8 +257,9 @@ def _execute_deployment():
                     'The mailgun API key must be added before deployment.')
     if not os.path.exists(THIRD_PARTY_DIR):
         raise Exception(
-            'Could not find third_party directory at %s. Please run start.sh '
-            'prior to running this script.' % THIRD_PARTY_DIR)
+            'Could not find third_party directory at %s. Please run '
+            'install_third_party_libs.py prior to running this script.'
+            % THIRD_PARTY_DIR)
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
@@ -302,7 +301,7 @@ def _execute_deployment():
         # Do a build, while outputting to the terminal.
         python_utils.PRINT('Building and minifying scripts...')
         build_process = subprocess.Popen(
-            ['python', 'scripts/build.py', '--prod_env'],
+            ['python', '-m', 'scripts.build', '--prod_env'],
             stdout=subprocess.PIPE)
         while True:
             line = build_process.stdout.readline().strip()
@@ -367,7 +366,11 @@ def _execute_deployment():
 
 
 def get_unique_id():
-    """Returns a unique id."""
+    """Returns a unique id.
+
+    Returns:
+        str. The unique id to be returned.
+    """
     unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
                         for _ in python_utils.RANGE(CACHE_SLUG_PROD_LENGTH))
     return unique_id

@@ -17,7 +17,7 @@
  */
 
 require('components/graph-services/graph-layout.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require(
@@ -44,15 +44,17 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
       controller: [
         '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
         'StateEditorService', 'StateGraphLayoutService', 'UserService',
-        'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
+        'ENABLE_PREREQUISITE_SKILLS', 'EXPLORATION_AND_SKILL_ID_PATTERN',
+        'PLACEHOLDER_OUTCOME_DEST',
         function(
             $scope, EditorFirstTimeEventsService, FocusManagerService,
             StateEditorService, StateGraphLayoutService, UserService,
-            EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
+            ENABLE_PREREQUISITE_SKILLS, EXPLORATION_AND_SKILL_ID_PATTERN,
+            PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
           var currentStateName = null;
           ctrl.canAddPrerequisiteSkill = (
-            constants.ENABLE_PREREQUISITE_SKILLS &&
+            ENABLE_PREREQUISITE_SKILLS &&
             StateEditorService.isExplorationWhitelisted());
 
           $scope.$on('saveOutcomeDestDetails', function() {

@@ -43,6 +43,7 @@
     "I18N_ACTION_CREATE_EXPLORATION": "Create an Exploration",
     "I18N_ACTION_CREATE_LESSON": "Create your own Lesson",
     "I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "This card is quite long, and students might lose interest. Consider shortening it, or breaking it into two cards.",
+    "I18N_CLASSROOM_PAGE_HEADING": "The Oppia Classroom Page",
     "I18N_CONTACT_PAGE_HEADING": "Get Involved!",
     "I18N_CONTACT_PAGE_PARAGRAPH_1": "Thanks for your interest in helping out with the Oppia project!",
     "I18N_CONTACT_PAGE_PARAGRAPH_10": "The Oppia project is fully open source, and is maintained by a large community of volunteers on <a href=\"https://github.com/oppia/oppia/\">GitHub</a>. We are in need of coders, designers and copywriters, so if you would like to help out, please drop us a line! The best way to get started is to follow the instructions on our <a href=\"https://github.com/oppia/oppia/wiki\">GitHub wiki page</a>.",
@@ -440,8 +441,13 @@
     "I18N_QUESTION_PLAYER_RETURN_TO_STORY": "Return To Story",
     "I18N_QUESTION_PLAYER_SCORE": "Score",
     "I18N_QUESTION_PLAYER_SKILL_DESCRIPTIONS": "Skill Descriptions",
+<<<<<<< HEAD
     "I18N_QUESTION_PLAYER_TEST_FAILED": "Test Failed. Please Review And Retry.",
     "I18N_QUESTION_PLAYER_TEST_PASSED": "Test Complete. Well Done!",
+=======
+    "I18N_QUESTION_PLAYER_TEST_FAILED": "Test failed. Please review the skills and try again",
+    "I18N_QUESTION_PLAYER_TEST_PASSED": "Test complete. Well done!",
+>>>>>>> upstream/develop
     "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "Registration Session Expired",
     "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Sorry, your registration session has expired. Please click \"Continue Registration\" to restart the process.",
     "I18N_SIDEBAR_ABOUT_LINK": "About",
@@ -484,6 +490,8 @@
     "I18N_SIGNUP_USERNAME_EXPLANATION": "Your username will be shown next to your contributions.",
     "I18N_SIGNUP_WAIVER_OBJECTIVE": "The waiver of the attribution (BY) requirement means that, if someone reuses this work, they are not required to attribute the authors. However, all of your individual contributions to explorations will be available on this site in the exploration change log, and people who reuse the exploration are encouraged (but not required) to include a link to this page.",
     "I18N_SIGNUP_WHY_LICENSE": "Why CC-BY-SA?",
+    "I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK": "Okay, now let's go back to your answer.",
+    "I18N_SOLICIT_ANSWER_DETAILS_QUESTION": "Could you explain why you picked this answer?",
     "I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "Oppia's lessons, also known as explorations, provide more immersive experiences than static videos or text, helping users learn by doing.",
     "I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href=\"<[hrefUrl]>\">click here.</a>",
     "I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Thank you.",
@@ -516,6 +524,7 @@
     "I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2": "Explorations are meant to be continuously improved, and explorations that haven't been edited for a long time may be considered \"orphaned\". In this case, ownership may be handed to the Oppia community at large (at moderator discretion), so that the exploration can continue to be improved.",
     "I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "Participation Playbook",
     "I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Teach with Oppia",
+    "I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lesson} other{# lessons}}",
     "I18N_TOPIC_VIEWER_PLAY": "Play",
     "I18N_TOPIC_VIEWER_REVIEW": "Review",
     "I18N_TOPIC_VIEWER_TRAIN": "Train",

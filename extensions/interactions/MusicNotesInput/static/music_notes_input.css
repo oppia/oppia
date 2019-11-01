@@ -4,7 +4,7 @@
 
 .oppia-music-input-valid-note-area {
   position: relative;
-  float:left;
+  float: left;
   margin: 0 0 0 11.0784%;
   width: 87.34525%;
   height: 43%;
@@ -18,6 +18,20 @@
   clear: both;
   background: transparent;
   max-width: 673px;
+
+  /* The invisible box around droppable staff */
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  float: right;
+  width: 110.1%;
+  padding: 1.5% 0 3% 0;
+
+  /* Background */
+  background-image: url(/extensions/interactions/MusicNotesInput/static/images/treble_clef.png);
+  background-repeat: no-repeat;
+  background-position: 0.1% 62%;
+  background-size: 8.5% 89%
 }
 
 /* The box around note choices */
@@ -36,18 +50,6 @@
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-}
-
-/* The invisible box around droppable staff */
-
-.oppia-music-input-staff {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  clear: both;
-  float: right;
-  width: 110.1%;
-  padding: 1.5% 0 3% 0;
 }
 
 /* The staff lines and ledger lines */
@@ -70,13 +72,6 @@
   height: 2px;
   position: absolute;
   width: 100%;
-}
-
-.oppia-music-input-staff {
-  background-image: url(/extensions/interactions/MusicNotesInput/static/images/treble_clef.png);
-  background-repeat: no-repeat;
-  background-position: 0.1% 62%;
-  background-size: 8.5% 89%;
 }
 
 /* Individual notes */

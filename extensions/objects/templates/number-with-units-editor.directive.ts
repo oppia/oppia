@@ -1,0 +1,60 @@
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for number with units editor.
+ */
+
+angular.module('oppia').directive('numberWithUnitsEditor', [
+  'NumberWithUnitsObjectFactory', 'UrlInterpolationService',
+  function(NumberWithUnitsObjectFactory, UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
+        value: '='
+      },
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/number-with-units-editor.directive.html'),
+      controllerAs: '$ctrl',
+      controller: ['$scope', function($scope) {
+        var ctrl = this;
+        var errorMessage = '';
+        var numberWithUnitsString = '';
+        if (ctrl.value !== null) {
+          var defaultNumberWithUnits =
+            NumberWithUnitsObjectFactory.fromDict(ctrl.value);
+          numberWithUnitsString = defaultNumberWithUnits.toString();
+        }
+        ctrl.localValue = {
+          label: numberWithUnitsString
+        };
+
+        $scope.$watch('$ctrl.localValue.label', function(newValue) {
+          try {
+            var numberWithUnits =
+              NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+            ctrl.value = numberWithUnits;
+            errorMessage = '';
+          } catch (parsingError) {
+            errorMessage = parsingError.message;
+          }
+        });
+
+        ctrl.getWarningText = function() {
+          return errorMessage;
+        };
+      }]
+    };
+  }]);

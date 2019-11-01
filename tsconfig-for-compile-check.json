@@ -19,10 +19,19 @@
       "pages/*": ["core/templates/dev/head/pages/*"],
       "services/*": ["core/templates/dev/head/services/*"],
       "classifiers/*": ["extensions/classifiers/*"],
-      "interactions/*": ["extensions/interactions/*"]
+      "interactions/*": ["extensions/interactions/*"],
+      "filters/*": ["core/templates/dev/head/filters/*"]
     }
   },
-  "files": ["assets/constants.js", "assets/rich_text_components_definitions.js", "core/tests/karma-globals.ts", "core/tests/karma.conf.ts"],
+  "files": [
+    "assets/constants.ts",
+    "assets/rich_text_components_definitions.ts",
+    "core/tests/karma-globals.ts",
+    "core/tests/karma.conf.ts"
+  ],
   "include": ["core", "extensions", "typings"],
-  "exclude": ["core/tests", "core/templates/dev/head/dist"]
+  "exclude": [
+    "core/tests",
+    "core/templates/dev/head/google-analytics.initializer.ts"
+  ]
 }

@@ -14,6 +14,7 @@
 
 """Tests for the topics and skills dashboard page."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import question_services
@@ -144,9 +145,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         response = self.get_html_response(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
         self.assertIn(
-            '<title itemprop="name">Topics and Skills Dashboard - Oppia'
-            '</title>',
-            response.body)
+            '{"title": "Topics and Skills Dashboard - Oppia"})', response.body)
 
         self.logout()
 

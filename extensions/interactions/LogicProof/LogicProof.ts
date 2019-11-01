@@ -18,12 +18,16 @@
 
 require('interactions/LogicProof/static/logic_proof.css');
 
-require('interactions/LogicProof/directives/LogicProofRulesService.ts');
-require('interactions/LogicProof/directives/LogicProofValidationService.ts');
-require(
-  'interactions/LogicProof/directives/OppiaInteractiveLogicProofDirective.ts');
-require(
-  'interactions/LogicProof/directives/OppiaResponseLogicProofDirective.ts');
+require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
   'interactions/LogicProof/directives/' +
-  'OppiaShortResponseLogicProofDirective.ts');
+  'logic-proof-validation.service.ts');
+require(
+  'interactions/LogicProof/directives/' +
+  'oppia-interactive-logic-proof.directive.ts');
+require(
+  'interactions/LogicProof/directives/' +
+  'oppia-response-logic-proof.directive.ts');
+require(
+  'interactions/LogicProof/directives/' +
+  'oppia-short-response-logic-proof.directive.ts');

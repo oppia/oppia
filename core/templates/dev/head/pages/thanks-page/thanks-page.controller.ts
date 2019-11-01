@@ -20,7 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('thanksPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

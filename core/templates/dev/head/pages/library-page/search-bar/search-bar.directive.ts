@@ -18,8 +18,8 @@
 
 require('filters/string-utility-filters/truncate.filter.ts');
 
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/ConstructTranslationIdsService.ts');
 require('services/DebouncerService.ts');
 require('services/HtmlEscaperService.ts');

@@ -14,6 +14,7 @@
 
 """Tests for the library page and associated handlers."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
@@ -65,7 +66,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
-            'additional_angular_modules': [],
             'search_cursor': None
         }, response_dict)
 
@@ -209,7 +209,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
-            'additional_angular_modules': [],
             'search_cursor': None
         }, response_dict)
 

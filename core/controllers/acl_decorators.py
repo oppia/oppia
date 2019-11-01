@@ -16,6 +16,7 @@
 
 """Decorators to provide authorization across the site."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 
@@ -961,6 +962,7 @@ def can_edit_exploration(handler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
+
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1019,6 +1021,54 @@ def can_voiceover_exploration(handler):
     test_can_voiceover.__wrapped__ = True
 
     return test_can_voiceover
+
+
+def can_save_exploration(handler):
+    """Decorator to check whether user can save exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks if
+            a user has permission to save a given exploration.
+    """
+
+    def test_can_save(self, exploration_id, **kwargs):
+        """Checks if the user can save the exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+            **kwargs: dict(str: *). Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to save changes to this exploration.
+        """
+
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_save_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have permissions to save this exploration.')
+
+    test_can_save.__wrapped__ = True
+
+    return test_can_save
 
 
 def can_delete_exploration(handler):

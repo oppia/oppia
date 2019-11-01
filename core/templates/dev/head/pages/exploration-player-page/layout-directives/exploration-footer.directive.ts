@@ -19,8 +19,8 @@
 
 require('components/button-directives/hint-and-solution-buttons.directive.ts');
 
-require('domain/summary/ExplorationSummaryBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/summary/exploration-summary-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
@@ -29,9 +29,6 @@ angular.module('oppia').directive('explorationFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        twitterText: '@'
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-player-page/layout-directives/' +
         'exploration-footer.directive.html'),

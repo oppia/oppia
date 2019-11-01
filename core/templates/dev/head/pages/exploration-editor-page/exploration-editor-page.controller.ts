@@ -83,7 +83,7 @@ require('objects/objectComponentsRequires.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/autosave-info-modals.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -124,6 +124,9 @@ require(
   'state-tutorial-first-time.service.ts');
 require(
   'pages/exploration-editor-page/services/user-email-preferences.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require(
@@ -172,7 +175,8 @@ angular.module('oppia').directive('explorationEditorPage', [
         'StateEditorService', 'StateTopAnswersStatsBackendApiService',
         'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
         'ThreadDataService', 'UrlInterpolationService',
-        'UserEmailPreferencesService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
+        'UserEmailPreferencesService', 'UserExplorationPermissionsService',
+        'EVENT_EXPLORATION_PROPERTY_CHANGED',
         function(
             $http, $log, $q, $rootScope, $scope, $templateCache,
             $timeout, $uibModal, $window, AutosaveInfoModalsService,
@@ -191,7 +195,8 @@ angular.module('oppia').directive('explorationEditorPage', [
             StateEditorService, StateTopAnswersStatsBackendApiService,
             StateTopAnswersStatsService, StateTutorialFirstTimeService,
             ThreadDataService, UrlInterpolationService,
-            UserEmailPreferencesService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
+            UserEmailPreferencesService, UserExplorationPermissionsService,
+            EVENT_EXPLORATION_PROPERTY_CHANGED) {
           var ctrl = this;
           ctrl.EditabilityService = EditabilityService;
           ctrl.StateEditorService = StateEditorService;
@@ -311,13 +316,15 @@ angular.module('oppia').directive('explorationEditorPage', [
                 explorationData.email_preferences
                   .mute_suggestion_notifications);
 
-              if (GLOBALS.can_edit) {
-                EditabilityService.markEditable();
-              }
-
-              if (GLOBALS.can_voiceover || GLOBALS.can_edit) {
-                EditabilityService.markTranslatable();
-              }
+              UserExplorationPermissionsService.getPermissionsAsync()
+                .then(function(permissions) {
+                  if (permissions.can_edit) {
+                    EditabilityService.markEditable();
+                  }
+                  if (permissions.can_voiceover || permissions.can_edit) {
+                    EditabilityService.markTranslatable();
+                  }
+                });
 
               StateEditorService.updateExplorationWhitelistedStatus(
                 featuresData.is_exploration_whitelisted);
@@ -536,11 +543,14 @@ angular.module('oppia').directive('explorationEditorPage', [
           // Remove save from tutorial if user does not has edit rights for
           // exploration since in that case Save Draft button will not be
           // visible on the create page.
-          if (!GLOBALS.can_edit) {
-            var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
-              saveButtonTutorialElement);
-            ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
-          }
+          UserExplorationPermissionsService.getPermissionsAsync()
+            .then(function(permissions) {
+              if (!permissions.can_edit) {
+                var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
+                  saveButtonTutorialElement);
+                ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
+              }
+            });
 
           // Replace the ng-joyride template with one that uses <[...]>
           // interpolators instead of/ {{...}} interpolators.

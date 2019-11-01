@@ -16,7 +16,7 @@
  * @fileoverview Dependencies for the explaration player page.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
@@ -32,7 +32,7 @@ require(
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('services/ContextService.ts');
 require('services/PageTitleService.ts');
 

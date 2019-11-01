@@ -16,6 +16,7 @@
 
 """Config properties and functions for managing email notifications."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -375,7 +376,7 @@ def send_mail_to_admin(email_subject, email_body):
         body, body.replace('\n', '<br/>'), bcc_admin=False)
 
 
-def send_post_signup_email(user_id):
+def send_post_signup_email(user_id, test_for_duplicate_email=False):
     """Sends a post-signup email to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
@@ -383,15 +384,17 @@ def send_post_signup_email(user_id):
 
     Args:
         user_id: str. User ID of the user that signed up.
+        test_for_duplicate_email: bool. For testing duplicate emails.
     """
 
-    for key, content in SIGNUP_EMAIL_CONTENT.value.items():
-        if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
-            log_new_error(
-                'Please ensure that the value for the admin config property '
-                'SIGNUP_EMAIL_CONTENT is set, before allowing post-signup '
-                'emails to be sent.')
-            return
+    if not test_for_duplicate_email:
+        for key, content in SIGNUP_EMAIL_CONTENT.value.items():
+            if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
+                log_new_error(
+                    'Please ensure that the value for the admin config '
+                    'property SIGNUP_EMAIL_CONTENT is set, before allowing '
+                    'post-signup emails to be sent.')
+                return
 
     user_settings = user_services.get_user_settings(user_id)
     email_subject = SIGNUP_EMAIL_CONTENT.value['subject']

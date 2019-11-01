@@ -33,7 +33,7 @@ require(
   'pages/exploration-editor-page/editor-tab/unresolved-answers-overview/' +
   'unresolved-answers-overview.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-correctness-feedback.service.ts');
@@ -92,6 +92,16 @@ angular.module('oppia').directive('explorationEditorTab', [
             }
           }, true);
 
+          $scope.$watch(function() {
+            return StateEditorService.isStateEditorInitialised();
+          }, function() {
+            if (StateEditorService.isStateEditorInitialised() &&
+            ExplorationStatesService.isInitialized()) {
+              var stateData = ExplorationStatesService.getState(ctrl.stateName);
+              $rootScope.$broadcast('stateEditorInitialized', stateData);
+            }
+          });
+
           ctrl.getStateContentPlaceholder = function() {
             if (
               StateEditorService.getActiveStateName() ===
@@ -134,6 +144,14 @@ angular.module('oppia').directive('explorationEditorTab', [
               $rootScope.loadingMessage = '';
             }
           };
+
+          $scope.$on('stateEditorDirectiveInitialized', function(evt) {
+            if (ExplorationStatesService.isInitialized()) {
+              var stateData = (
+                ExplorationStatesService.getState(ctrl.stateName));
+              $rootScope.$broadcast('stateEditorInitialized', stateData);
+            }
+          });
 
           ctrl.recomputeGraph = function() {
             GraphDataService.recompute();

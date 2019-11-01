@@ -16,13 +16,13 @@
 
 """Tests for the base interaction specification."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import re
 import string
 import struct
 
-from core.domain import dependency_registry
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import interaction_registry
@@ -127,15 +127,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     ca_spec['default_value'],
                     obj_class.normalize(ca_spec['default_value']))
-
-    def _validate_dependencies(self, dependency_ids):
-        """Validates all the dependency ids.
-
-        Args:
-            dependency_ids: list(str). A list of dependency ids.
-        """
-        for dependency_id in dependency_ids:
-            dependency_registry.Registry.get_dependency_html(dependency_id)
 
     def _validate_answer_visualization_specs(self, answer_visualization_specs):
         """Validates all the answer_visualization_specs for the interaction.
@@ -259,10 +250,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
-
         for interaction_id in all_interaction_ids:
             # Check that the interaction id is valid.
             self.assertTrue(self._is_camel_cased(interaction_id))
+            hyphenated_interaction_id = (
+                utils.camelcase_to_hyphenated(interaction_id))
 
             # Check that the interaction directory exists.
             interaction_dir = os.path.join(
@@ -294,15 +286,15 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir,
-                    '%sPredictionService.ts' % interaction_id)))
+                    '%s-prediction.service.ts' % hyphenated_interaction_id)))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir,
-                    '%sPredictionServiceSpec.ts' % interaction_id)))
+                    interaction_dir, '%s-prediction.service.spec.ts'
+                    % hyphenated_interaction_id)))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -331,47 +323,49 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # The directives directory should contain the following files:
             #  Required:
             #    * A TS file called
-            #    OppiaInteractive{InteractionName}Directive.ts.
-            #    * A TS file called OppiaResponse{InteractionName}Directive.ts.
+            #    oppia-interactive-{InteractionName}.directive.ts.
+            #    * A TS file called OppiaResponse{InteractionName}.directive.ts.
             #    * A TS file called
-            #    OppiaShortResponse{InteractionName}Directive.ts.
-            #    * A TS file called {InteractionName}RulesService.ts.
-            #    * A TS file called {InteractionName}ValidationService.ts.
+            #    oppia-short-response-{InteractionName}.directive.ts.
+            #    * A TS file called {InteractionName}-rules.service.ts.
+            #    * A TS file called {InteractionName}-validation.service.ts.
             #    * A HTML file called
-            #      {InteractionName}_interaction_directive.html.
+            #      {InteractionName}-interaction.directive.html.
             #    * A HTML file called
-            #      {InteractionName}_response_directive.html.
+            #      {InteractionName}-response.directive.html.
             #    * A HTML file called
-            #      {InteractionName}_short_response_directive.html.
+            #      {InteractionName}-short-response.directive.html.
             #  Optional:
-            #    * A TS file called {InteractionName}ValidationServiceSpecs.ts.
-            #    * A TS file called {InteractionName}RulesServiceSpecs.ts.
+            #    * A TS file called
+            #      {InteractionName}-validation.service.specs.ts.
+            #    * A TS file called {InteractionName}-rules.service.specs.ts.
 
-            snakecase_interaction_id = (
-                utils.camelcase_to_snakecase(interaction_id))
-
+            hyphenated_interaction_id = (
+                utils.camelcase_to_hyphenated(interaction_id))
             interaction_directive_ts_file = os.path.join(
-                directives_dir, 'OppiaInteractive%sDirective.ts' % (
-                    interaction_id))
+                directives_dir, 'oppia-interactive-%s.directive.ts' % (
+                    hyphenated_interaction_id))
             response_directive_ts_file = os.path.join(
-                directives_dir, 'OppiaResponse%sDirective.ts' % interaction_id)
+                directives_dir, 'oppia-response-%s.directive.ts'
+                % hyphenated_interaction_id)
             short_response_directive_ts_file = os.path.join(
-                directives_dir, 'OppiaShortResponse%sDirective.ts' % (
-                    interaction_id))
+                directives_dir, 'oppia-short-response-%s.directive.ts' % (
+                    hyphenated_interaction_id))
             rules_service_ts_file = os.path.join(
-                directives_dir, '%sRulesService.ts' % interaction_id)
+                directives_dir, '%s-rules.service.ts'
+                % hyphenated_interaction_id)
             validation_service_ts_file = os.path.join(
-                directives_dir, '%sValidationService.ts' % interaction_id)
+                directives_dir, '%s-validation.service.ts'
+                % hyphenated_interaction_id)
             interaction_directive_html = os.path.join(
                 directives_dir,
-                '%s_interaction_directive.html' % snakecase_interaction_id)
+                '%s-interaction.directive.html' % hyphenated_interaction_id)
             response_directive_html = os.path.join(
                 directives_dir,
-                '%s_response_directive.html' % snakecase_interaction_id)
+                '%s-response.directive.html' % hyphenated_interaction_id)
             short_response_directive_html = os.path.join(
                 directives_dir,
-                '%s_short_response_directive.html' % snakecase_interaction_id)
-
+                '%s-short-response.directive.html' % hyphenated_interaction_id)
             self.assertTrue(os.path.isfile(interaction_directive_ts_file))
             self.assertTrue(os.path.isfile(response_directive_ts_file))
             self.assertTrue(os.path.isfile(short_response_directive_ts_file))
@@ -386,7 +380,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(static_dir))
             png_file = os.path.join(
                 interaction_dir, 'static', '%s.png' % interaction_id)
-
             self.assertTrue(os.path.isfile(png_file))
             with python_utils.open_file(png_file, 'rb', encoding=None) as f:
                 img_data = f.read()
@@ -406,9 +399,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             validation_service_ts_file_content = utils.get_file_contents(
                 validation_service_ts_file)
 
-            self.assertIn(
-                'oppiaInteractive%s' % interaction_id,
-                interaction_directive_ts_file_content)
+            self.assertIn('oppiaInteractive%s' % interaction_id,
+                          interaction_directive_ts_file_content)
             self.assertIn(
                 'oppiaResponse%s' % interaction_id,
                 response_directive_ts_file_content)
@@ -426,19 +418,19 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that the html template includes js script for the
             # interaction.
             self.assertIn(
-                'OppiaInteractive%sDirective.ts' % interaction_id,
+                'oppia-interactive-%s.directive.ts' % hyphenated_interaction_id,
                 ts_file_content)
             self.assertIn(
-                'OppiaResponse%sDirective.ts' % interaction_id,
+                'oppia-response-%s.directive.ts' % hyphenated_interaction_id,
                 ts_file_content)
             self.assertIn(
-                'OppiaShortResponse%sDirective.ts' % interaction_id,
+                'oppia-short-response-%s.directive.ts'
+                % hyphenated_interaction_id, ts_file_content)
+            self.assertIn(
+                '%s-rules.service.ts' % hyphenated_interaction_id,
                 ts_file_content)
             self.assertIn(
-                '%sRulesService.ts' % interaction_id,
-                ts_file_content)
-            self.assertIn(
-                '%sValidationService.ts' % interaction_id,
+                '%s-validation.service.ts' % hyphenated_interaction_id,
                 ts_file_content)
 
             self.assertNotIn('<script>', interaction_directive_ts_file_content)
@@ -481,8 +473,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             self._validate_customization_arg_specs(
                 interaction._customization_arg_specs)  # pylint: disable=protected-access
-
-            self._validate_dependencies(interaction.dependency_ids)
 
             answer_visualization_specs = (
                 interaction.answer_visualization_specs)

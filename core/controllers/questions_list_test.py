@@ -14,6 +14,7 @@
 
 """ Tests for the questions list. """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import question_services
@@ -96,6 +97,11 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                 self.assertEqual(
                     question_summary_dicts_2[i]['skill_descriptions'],
                     ['Skill Description 2', 'Skill Description'])
+                self.assertEqual(
+                    question_summary_dicts[i]['skill_difficulties'], [0.3, 0.5])
+                self.assertEqual(
+                    question_summary_dicts_2[i]['skill_difficulties'],
+                    [0.3, 0.5])
             self.assertNotEqual(
                 question_summary_dicts[0]['summary']['id'],
                 question_summary_dicts_2[0]['summary']['id'])

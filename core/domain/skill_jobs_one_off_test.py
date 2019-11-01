@@ -16,6 +16,7 @@
 
 """Tests for Skill-related one-off jobs."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
@@ -211,7 +212,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         # 'successfully migrated' message. Its absence means that the skill
         # could not be processed.
         expected = [[u'validation_error',
-                     [u'Skill %s failed validation: \'str\' object has '
+                     [u'Skill %s failed validation: \'unicode\' object has '
                       'no attribute \'validate\'' % (self.SKILL_ID)]]]
         self.assertEqual(
             expected, [ast.literal_eval(x) for x in output])

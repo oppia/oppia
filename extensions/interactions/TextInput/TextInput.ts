@@ -16,12 +16,16 @@
  * @fileoverview Requires for TextInput interaction.
  */
 
-require('interactions/TextInput/TextInputPredictionService.ts');
+require('interactions/TextInput/text-input-prediction.service.ts');
 
-require('interactions/TextInput/directives/TextInputRulesService.ts');
-require('interactions/TextInput/directives/TextInputValidationService.ts');
+require('interactions/TextInput/directives/text-input-rules.service.ts');
+require('interactions/TextInput/directives/text-input-validation.service.ts');
 require(
-  'interactions/TextInput/directives/OppiaInteractiveTextInputDirective.ts');
-require('interactions/TextInput/directives/OppiaResponseTextInputDirective.ts');
+  'interactions/TextInput/directives/' +
+  'oppia-interactive-text-input.directive.ts');
 require(
-  'interactions/TextInput/directives/OppiaShortResponseTextInputDirective.ts');
+  'interactions/TextInput/directives/' +
+  'oppia-response-text-input.directive.ts');
+require(
+  'interactions/TextInput/directives/' +
+  'oppia-short-response-text-input.directive.ts');
