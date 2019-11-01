@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { TestBed } from '@angular/core/testing';
-import { WindowRef } from 'services/contextual/WindowRefService';
+import { WindowRef } from '../../services/contextual/window-ref.service';
 
 describe('SidebarStatusService', () => {
   let sss, $window;

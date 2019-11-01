@@ -26,11 +26,11 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
+import { EditabilityService } from './editability.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService';
+  'services/exploration-features.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -64,7 +64,7 @@ import { StateEditorService } from
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { SuggestionModalService } from 'services/SuggestionModalService';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 /* eslint-disable max-len */
@@ -90,7 +90,7 @@ require('domain/statistics/AnswerDetailsImprovementTaskObjectFactory.ts');
 require('domain/statistics/FeedbackImprovementTaskObjectFactory.ts');
 require('domain/statistics/PlaythroughImprovementTaskObjectFactory.ts');
 require('domain/statistics/SuggestionImprovementTaskObjectFactory.ts');
-require('services/ImprovementTaskService.ts');
+require('services/improvement-task.service.ts');
 
 describe('ImprovementTaskService', function() {
   var $q = null;

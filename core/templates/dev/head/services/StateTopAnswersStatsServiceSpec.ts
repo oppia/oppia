@@ -68,7 +68,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('services/StateTopAnswersStatsService.ts');
+require('services/state-top-answers-stats.service.ts');
 
 class MockAnswerStats {
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as

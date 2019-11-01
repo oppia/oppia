@@ -28,8 +28,8 @@ require(
 require(
   'interactions/MusicNotesInput/directives/' +
   'music-phrase-player.service.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/html-escaper.service.ts');
 
 require('interactions/interactions-extension.constants.ajs.ts');
 
