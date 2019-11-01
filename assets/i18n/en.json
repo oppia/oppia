@@ -441,13 +441,8 @@
     "I18N_QUESTION_PLAYER_RETURN_TO_STORY": "Return To Story",
     "I18N_QUESTION_PLAYER_SCORE": "Score",
     "I18N_QUESTION_PLAYER_SKILL_DESCRIPTIONS": "Skill Descriptions",
-<<<<<<< HEAD
-    "I18N_QUESTION_PLAYER_TEST_FAILED": "Test Failed. Please Review And Retry.",
-    "I18N_QUESTION_PLAYER_TEST_PASSED": "Test Complete. Well Done!",
-=======
     "I18N_QUESTION_PLAYER_TEST_FAILED": "Test failed. Please review the skills and try again",
     "I18N_QUESTION_PLAYER_TEST_PASSED": "Test complete. Well done!",
->>>>>>> upstream/develop
     "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "Registration Session Expired",
     "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Sorry, your registration session has expired. Please click \"Continue Registration\" to restart the process.",
     "I18N_SIDEBAR_ABOUT_LINK": "About",
