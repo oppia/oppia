@@ -27,9 +27,6 @@ require(
   'state-tutorial-first-time.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
-require(
-  'pages/exploration-editor-page/improvements-tab/services/' +
-  'improvements-display.service.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -47,15 +44,15 @@ angular.module('oppia').directive('editorNavigation', [
       controller: [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
-        'ExplorationWarningsService', 'ImprovementTaskService',
-        'ImprovementsDisplayService', 'RouterService',
+        'ExplorationWarningsService', 'ImprovementsDisplayService',
+        'ImprovementTaskService', 'RouterService',
         'SiteAnalyticsService', 'StateTutorialFirstTimeService',
         'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
-            ExplorationWarningsService, ImprovementTaskService,
-            ImprovementsDisplayService, RouterService,
+            ExplorationWarningsService, ImprovementsDisplayService,
+            ImprovementTaskService, RouterService,
             SiteAnalyticsService, StateTutorialFirstTimeService,
             ThreadDataService, UserService, WindowDimensionsService) {
           var fetchedTasks = [];
@@ -63,12 +60,12 @@ angular.module('oppia').directive('editorNavigation', [
             fetchedTasks = tasks;
           });
 
-          $scope.isTaskOpen = function(task) {
+          var isTaskOpen = function(task) {
             return ImprovementsDisplayService.isOpen(task.getStatus());
           };
 
           $scope.getOpenTaskCount = function() {
-            return fetchedTasks.filter($scope.isTaskOpen).length;
+            return fetchedTasks.filter(isTaskOpen).length;
           };
 
           $scope.popoverControlObject = {
