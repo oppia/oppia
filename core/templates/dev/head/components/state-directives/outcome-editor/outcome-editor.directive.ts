@@ -60,7 +60,7 @@ angular.module('oppia').directive('outcomeEditor', [
           var ctrl = this;
           ctrl.editOutcomeForm = {};
           ctrl.isInQuestionMode = function() {
-            return StateEditorService.isInQuestionMode(); 
+            return StateEditorService.isInQuestionMode();
           };
           ctrl.canAddPrerequisiteSkill = (
             ENABLE_PREREQUISITE_SKILLS &&
