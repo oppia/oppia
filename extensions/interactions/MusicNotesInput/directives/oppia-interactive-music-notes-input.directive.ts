@@ -780,6 +780,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // is treated like a chord and all its values are played back
         // simultaneously.
         var playSequence = function(midiSequence) {
+          // TODO(#7892): Move this check to music-phrase-player.service.ts
+          // once AlertsService has been successfully migrated.
           if (window.AudioContext || window.Audio) {
             var notes = [];
             for (var i = 0; i < midiSequence.length; i++) {
