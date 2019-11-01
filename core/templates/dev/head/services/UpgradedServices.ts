@@ -19,7 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { BackgroundMaskService } from 'services/stateful/background-mask.service';
+import { BackgroundMaskService } from
+  'services/stateful/background-mask.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';

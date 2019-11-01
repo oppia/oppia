@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for the BackgroundMaskService.
  */
 
-import { BackgroundMaskService } from 'services/stateful/background-mask.service';
+import { BackgroundMaskService } from
+  'services/stateful/background-mask.service';
 
 describe('Background Mask Service', () => {
   let backgroundMaskService;
