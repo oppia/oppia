@@ -46,7 +46,7 @@ class SentEmailModel(base_models.BaseModel):
     recipient_email = ndb.StringProperty(required=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
-    sender_id = ndb.StringProperty(required=True)
+    sender_id = ndb.StringProperty(required=True, indexed=True)
     # The email address used to send the notification.
     sender_email = ndb.StringProperty(required=True)
     # The intent of the email.
@@ -252,7 +252,7 @@ class BulkEmailModel(base_models.BaseModel):
     recipient_ids = ndb.JsonProperty(default=[], compressed=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
-    sender_id = ndb.StringProperty(required=True)
+    sender_id = ndb.StringProperty(required=True, indexed=True)
     # The email address used to send the notification.
     sender_email = ndb.StringProperty(required=True)
     # The intent of the email.

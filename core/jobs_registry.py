@@ -44,6 +44,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.SnapshotMetadataModelsIndexesJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    email_jobs_one_off.EmailModelsIndexesOneOffJob,
     email_jobs_one_off.GeneralFeedbackEmailReplyToIdOneOffJob,
     exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
