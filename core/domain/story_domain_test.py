@@ -248,7 +248,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         Args:
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
-            story_id: string. The story ID to validate.
+            story_id: str. The story ID to validate.
         """
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
