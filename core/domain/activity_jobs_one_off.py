@@ -24,7 +24,7 @@ from core.platform import models
 
 (
     collection_models, config_models,
-    exploration_models, question_models,
+    exp_models, question_models,
     skill_models, story_models,
     topic_models) = (
         models.Registry.import_models([
@@ -41,13 +41,13 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exploration_models.ExpSummaryModel,
+        return [exp_models.ExpSummaryModel,
                 collection_models.CollectionSummaryModel]
 
     @staticmethod
     def map(item):
         if not item.deleted:
-            if isinstance(item, exploration_models.ExpSummaryModel):
+            if isinstance(item, exp_models.ExpSummaryModel):
                 search_services.index_exploration_summaries([item])
             else:
                 search_services.index_collection_summaries([item])
@@ -67,8 +67,8 @@ class SnapshotMetadataModelsIndexesJob(jobs.BaseMapReduceOneOffJobManager):
         return [collection_models.CollectionSnapshotMetadataModel,
                 collection_models.CollectionRightsSnapshotMetadataModel,
                 config_models.ConfigPropertySnapshotMetadataModel,
-                exploration_models.ExplorationSnapshotMetadataModel,
-                exploration_models.ExplorationRightsSnapshotMetadataModel,
+                exp_models.ExplorationSnapshotMetadataModel,
+                exp_models.ExplorationRightsSnapshotMetadataModel,
                 question_models.QuestionSnapshotMetadataModel,
                 question_models.QuestionRightsSnapshotMetadataModel,
                 skill_models.SkillSnapshotMetadataModel,

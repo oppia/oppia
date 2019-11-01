@@ -39,7 +39,7 @@ gae_search_services = models.Registry.import_search_services()
 
 (
     collection_models, config_models,
-    exploration_models, question_models,
+    exp_models, question_models,
     skill_models, story_models,
     topic_models) = (
         models.Registry.import_models([
@@ -127,8 +127,8 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
         collection_models.CollectionSnapshotMetadataModel,
         collection_models.CollectionRightsSnapshotMetadataModel,
         config_models.ConfigPropertySnapshotMetadataModel,
-        exploration_models.ExplorationSnapshotMetadataModel,
-        exploration_models.ExplorationRightsSnapshotMetadataModel,
+        exp_models.ExplorationSnapshotMetadataModel,
+        exp_models.ExplorationRightsSnapshotMetadataModel,
         question_models.QuestionSnapshotMetadataModel,
         question_models.QuestionRightsSnapshotMetadataModel,
         skill_models.SkillSnapshotMetadataModel,
@@ -217,7 +217,7 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
             commit_message='commit message 1',
             commit_cmds=[{'cmd': 'some_command'}])
         collection_model.put()
-        exploration_model = exploration_models.ExplorationSnapshotMetadataModel(
+        exploration_model = exp_models.ExplorationSnapshotMetadataModel(
             id=instance_id_2,
             committer_id='committer_id',
             commit_type='create',
@@ -240,7 +240,7 @@ class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
                 instance_id_1))
         self._check_model_validity(collection_model, migrated_collection_model)
         migrated_exploration_model = (
-            exploration_models.ExplorationSnapshotMetadataModel.get_by_id(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
                 instance_id_2))
         self._check_model_validity(
             exploration_model, migrated_exploration_model)
