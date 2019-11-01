@@ -81,6 +81,21 @@ class SentEmailModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SentEmailModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(ndb.OR(
+            cls.recipient_id == user_id,
+            cls.sender_id == user_id,
+        )).get() is not None
+
+    @classmethod
     def _generate_id(cls, intent):
         """Generates an ID for a new SentEmailModel instance.
 
@@ -137,12 +152,12 @@ class SentEmailModel(base_models.BaseModel):
 
         email_model_instance.put()
 
-    def put(self):
+    def put(self, update_last_updated_time=True):
         """Saves this SentEmailModel instance to the datastore."""
         email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
         self.email_hash = email_hash
-        super(SentEmailModel, self).put()
+        super(SentEmailModel, self).put(update_last_updated_time)
 
     @classmethod
     def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
@@ -274,6 +289,21 @@ class BulkEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether BulkEmailModel exists for user. Since recipient_ids
+        can't be indexed it also can't be checked by this method, we can allow
+        this because the deletion policy for this model is keep , thus even the
+        deleted user's id will remain here.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.sender_id == user_id).get() is not None
 
     @classmethod
     def create(
