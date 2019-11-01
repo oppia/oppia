@@ -19,6 +19,7 @@
 var DEFAULT_BIO = 'This user has not supplied a bio yet.';
 var PLACEHOLDER_INTEREST_TEXT = 'none specified';
 
+var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
@@ -28,6 +29,9 @@ var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ProfilePage = require('../protractor_utils/ProfilePage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Un-customized profile page', function() {
   var TEST_USERNAME = 'defaultProfileFeatures';
@@ -162,5 +166,63 @@ describe('Visiting user profile page', function() {
   afterEach(function() {
     users.logout();
     general.checkForConsoleErrors([]);
+  });
+});
+
+describe('playing the exploration', function() {
+  var TEST_USERNAME = 'testUser';
+  var TEST_EMAIL = TEST_USERNAME + '@example.com';
+
+  var continueButton = element(by.css('.protractor-test-continue-button'));
+  var backButton = element(by.css('.protractor-test-back-button'));
+  var nextButton = element(by.css('.protractor-test-next-button'));
+
+  var explorationPlayerPage = null;
+  var libraryPage = null;
+
+  var EXPLORATION = {
+    title: 'A new exploration',
+    category: 'Learning',
+    objective: 'The goal is to create a new exploration',
+    language: 'English'
+  };
+
+  beforeAll(function() {
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+    users.login(TEST_EMAIL);
+    workflow.createAndPublishTwoCardExploration(
+      EXPLORATION.title,
+      EXPLORATION.category,
+      EXPLORATION.objective,
+      EXPLORATION.language
+    );
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION.title);
+    libraryPage.playExploration(EXPLORATION.title);
+  });
+
+  it('should change the cards on clicking next and back buttons', function() {
+    explorationPlayerPage.expectExplorationNameToBe(EXPLORATION.title);
+    explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
+    // Test continue button
+    waitFor.elementToBeClickable(
+      continueButton, 'Could not click continue button');
+    continueButton.click();
+    waitFor.pageToFullyLoad();
+    explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
+    // Test back button
+    waitFor.elementToBeClickable(
+      backButton, 'Could not click back button');
+    backButton.click();
+    waitFor.pageToFullyLoad();
+    explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
+    // Test next button
+    waitFor.elementToBeClickable(
+      nextButton, 'Could not click back button');
+    nextButton.click();
+    waitFor.pageToFullyLoad();
+    explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
   });
 });
