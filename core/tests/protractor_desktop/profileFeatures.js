@@ -220,7 +220,7 @@ describe('playing the exploration', function() {
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
     // Test next button
     waitFor.elementToBeClickable(
-      nextButton, 'Could not click back button');
+      nextButton, 'Could not click next button');
     nextButton.click();
     waitFor.pageToFullyLoad();
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
