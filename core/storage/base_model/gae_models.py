@@ -934,7 +934,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     """
 
     # The id of the user who committed this revision.
-    committer_id = ndb.StringProperty(required=True)
+    committer_id = ndb.StringProperty(required=True, indexed=True)
     # The type of the commit associated with this snapshot.
     commit_type = ndb.StringProperty(
         required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES)
