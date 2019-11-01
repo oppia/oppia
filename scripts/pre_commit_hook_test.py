@@ -29,20 +29,6 @@ import python_utils
 
 from . import pre_commit_hook
 
-RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
-VALID_FECONF_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
-VALID_CONSTANTS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'valid_constants.txt')
-INVALID_FECONF_FILEPATH_WITH_MAILGUN_API_KEY = os.path.join(
-    RELEASE_TEST_DIR, 'invalid_feconf_with_mailgun_api_key.txt')
-INVALID_FECONF_FILEPATH_WITH_ADDRESS = os.path.join(
-    RELEASE_TEST_DIR, 'invalid_feconf_with_address.txt')
-INVALID_CONSTANTS_FILEPATH_WITH_ANALYTICS_ID = os.path.join(
-    RELEASE_TEST_DIR, 'invalid_constants_with_analytics_id.txt')
-INVALID_CONSTANTS_FILEPATH_WITH_SITE_NAME = os.path.join(
-    RELEASE_TEST_DIR, 'invalid_constants_with_site_name.txt')
-INVALID_CONSTANTS_FILEPATH_WITH_FEEDBACK_URL = os.path.join(
-    RELEASE_TEST_DIR, 'invalid_constants_with_feedback_url.txt')
-
 
 class PreCommitHookTests(test_utils.GenericTestBase):
     """Test the methods for pre commit hook script."""
@@ -204,71 +190,49 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                 .does_current_folder_contain_have_package_lock_file())
 
     def test_check_changes_in_config_with_no_invalid_changes(self):
-        feconf_swap = self.swap(
-            pre_commit_hook, 'FECONF_FILEPATH', VALID_FECONF_FILEPATH)
-        constants_swap = self.swap(
-            pre_commit_hook, 'CONSTANTS_FILEPATH', VALID_CONSTANTS_FILEPATH)
-        with feconf_swap, constants_swap:
+        def mock_check_output(cmd_tokens):
+            if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
+                return (
+                    '-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
+                    '+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
+            return (
+                '-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
+                '+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
+        with self.swap(subprocess, 'check_output', mock_check_output):
             pre_commit_hook.check_changes_in_config()
 
-    def test_check_changes_in_config_with_invalid_mailgun_api_key(self):
-        feconf_swap = self.swap(
-            pre_commit_hook, 'FECONF_FILEPATH',
-            INVALID_FECONF_FILEPATH_WITH_MAILGUN_API_KEY)
-        constants_swap = self.swap(
-            pre_commit_hook, 'CONSTANTS_FILEPATH', VALID_CONSTANTS_FILEPATH)
-        with feconf_swap, constants_swap, self.assertRaisesRegexp(
+    def test_check_changes_in_config_with_invalid_feconf_changes(self):
+        def mock_check_output(cmd_tokens):
+            if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
+                return (
+                    '-SYSTEM_EMAIL_NAME = \'sys@email.com\'\n+'
+                    '+SYSTEM_EMAIL_NAME = \'sys-change@email.com\'\n')
+            return (
+                '-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
+                '+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        with check_output_swap, self.assertRaisesRegexp(
             Exception,
             'Changes to %s made for deployment cannot be committed.' % (
-                INVALID_FECONF_FILEPATH_WITH_MAILGUN_API_KEY)):
+                pre_commit_hook.FECONF_FILEPATH)):
             pre_commit_hook.check_changes_in_config()
 
-    def test_check_changes_in_config_with_invalid_address(self):
-        feconf_swap = self.swap(
-            pre_commit_hook, 'FECONF_FILEPATH',
-            INVALID_FECONF_FILEPATH_WITH_ADDRESS)
-        constants_swap = self.swap(
-            pre_commit_hook, 'CONSTANTS_FILEPATH', VALID_CONSTANTS_FILEPATH)
-        with feconf_swap, constants_swap, self.assertRaisesRegexp(
+    def test_check_changes_in_config_with_invalid_constants_changes(self):
+        def mock_check_output(cmd_tokens):
+            if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
+                return (
+                    '-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
+                    '+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
+            return (
+                '-  "ANALYTICS_ID": "",\n'
+                '+  "ANALYTICS_ID": "change",\n')
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        with check_output_swap, self.assertRaisesRegexp(
             Exception,
             'Changes to %s made for deployment cannot be committed.' % (
-                INVALID_FECONF_FILEPATH_WITH_ADDRESS)):
-            pre_commit_hook.check_changes_in_config()
-
-    def test_check_changes_in_config_with_invalid_analytics_id(self):
-        feconf_swap = self.swap(
-            pre_commit_hook, 'FECONF_FILEPATH', VALID_FECONF_FILEPATH)
-        constants_swap = self.swap(
-            pre_commit_hook, 'CONSTANTS_FILEPATH',
-            INVALID_CONSTANTS_FILEPATH_WITH_ANALYTICS_ID)
-        with feconf_swap, constants_swap, self.assertRaisesRegexp(
-            Exception,
-            'Changes to %s made for deployment cannot be committed.' % (
-                INVALID_CONSTANTS_FILEPATH_WITH_ANALYTICS_ID)):
-            pre_commit_hook.check_changes_in_config()
-
-    def test_check_changes_in_config_with_invalid_site_name(self):
-        feconf_swap = self.swap(
-            pre_commit_hook, 'FECONF_FILEPATH', VALID_FECONF_FILEPATH)
-        constants_swap = self.swap(
-            pre_commit_hook, 'CONSTANTS_FILEPATH',
-            INVALID_CONSTANTS_FILEPATH_WITH_SITE_NAME)
-        with feconf_swap, constants_swap, self.assertRaisesRegexp(
-            Exception,
-            'Changes to %s made for deployment cannot be committed.' % (
-                INVALID_CONSTANTS_FILEPATH_WITH_SITE_NAME)):
-            pre_commit_hook.check_changes_in_config()
-
-    def test_check_changes_in_config_with_invalid_feedback_url(self):
-        feconf_swap = self.swap(
-            pre_commit_hook, 'FECONF_FILEPATH', VALID_FECONF_FILEPATH)
-        constants_swap = self.swap(
-            pre_commit_hook, 'CONSTANTS_FILEPATH',
-            INVALID_CONSTANTS_FILEPATH_WITH_FEEDBACK_URL)
-        with feconf_swap, constants_swap, self.assertRaisesRegexp(
-            Exception,
-            'Changes to %s made for deployment cannot be committed.' % (
-                INVALID_CONSTANTS_FILEPATH_WITH_FEEDBACK_URL)):
+                pre_commit_hook.CONSTANTS_FILEPATH)):
             pre_commit_hook.check_changes_in_config()
 
     def test_main_with_errors(self):

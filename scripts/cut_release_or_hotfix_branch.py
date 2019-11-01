@@ -22,15 +22,17 @@ For release branch:
 
     python -m scripts.cut_release_or_hotfix_branch --version="x.y.z"
 
-where x.y.z is the new version of Oppia, e.g. 2.5.3.
+where x.y.z is the new version of Oppia, e.g. 2.5.3. The generated branch
+name will be release-x.y.z, e.g. release-2.5.3.
 
 For hotfix branch:
 
     python -m scripts.cut_release_or_hotfix_branch --version="x.y.z"
-    --hotfix_version=d
+    --hotfix_number=d
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3,
-d is number of the hotfix being created.
+d is number of the hotfix being created, e.g. 1. The generated branch
+name will be release-x.y.z-hotfix-d, e.g. release-2.5.3-hotfix-1.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -72,7 +74,7 @@ def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--new_version', help='new version to be released', type=new_version_type)
-_PARSER.add_argument('--hotfix_version', default=0)
+_PARSER.add_argument('--hotfix_number', default=0)
 
 PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.new_version:
@@ -81,11 +83,11 @@ else:
     raise Exception('ERROR: A "new_version" arg must be specified.')
 
 # Construct the new branch name.
-HOTFIX_VERSION = int(PARSED_ARGS.hotfix_version)
-if not HOTFIX_VERSION:
+HOTFIX_NUMBER = int(PARSED_ARGS.hotfix_number)
+if not HOTFIX_NUMBER:
     NEW_BRANCH_NAME = 'release-%s' % TARGET_VERSION
 else:
-    NEW_BRANCH_NAME = 'release-%s-hotfix-%s' % (TARGET_VERSION, HOTFIX_VERSION)
+    NEW_BRANCH_NAME = 'release-%s-hotfix-%s' % (TARGET_VERSION, HOTFIX_NUMBER)
 
 
 def _verify_target_branch_does_not_already_exist(remote_alias):
@@ -162,10 +164,10 @@ def _verify_target_version_is_consistent_with_latest_released_version():
         assert int(curr_patch) == 0
 
 
-def _verify_hotfix_version_is_one_ahead_of_previous_hotfix_version(
+def _verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
         remote_alias):
-    """Checks that the hotfix version is one ahead of previous hotfix
-        version.
+    """Checks that the hotfix number is one ahead of previous hotfix
+        number.
 
     Args:
         remote_alias: str. The alias that points to the remote oppia
@@ -175,23 +177,23 @@ def _verify_hotfix_version_is_one_ahead_of_previous_hotfix_version(
             repository.
 
     Raises:
-        Exception: The difference between two continuous hotfix version
+        Exception: The difference between two continuous hotfix numbers
              is not one.
     """
     all_branches = subprocess.check_output([
         'git', 'branch', '-a'])[:-1].split('\n')
 
-    last_hotfix_version = 0
+    last_hotfix_number = 0
     hotfix_branch_name_regex = '^%s/release-%s-hotfix-\\d*$' % (
         remote_alias, TARGET_VERSION)
     for branch_name in all_branches:
         branch_name = branch_name.lstrip().rstrip()
         if re.match(hotfix_branch_name_regex, branch_name):
-            hotfix_version = int(branch_name[branch_name.rfind('-') + 1:])
-            if hotfix_version > last_hotfix_version:
-                last_hotfix_version = hotfix_version
+            hotfix_number = int(branch_name[branch_name.rfind('-') + 1:])
+            if hotfix_number > last_hotfix_number:
+                last_hotfix_number = hotfix_number
 
-    assert HOTFIX_VERSION == last_hotfix_version + 1
+    assert HOTFIX_NUMBER == last_hotfix_number + 1
 
 
 def _execute_branch_cut():
@@ -214,13 +216,13 @@ def _execute_branch_cut():
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia#oppia---')
     while True:
-        if not HOTFIX_VERSION:
+        if not HOTFIX_NUMBER:
             branch_to_check = 'develop'
-        elif HOTFIX_VERSION == 1:
+        elif HOTFIX_NUMBER == 1:
             branch_to_check = 'release-%s' % TARGET_VERSION
         else:
             branch_to_check = 'release-%s-hotfix-%s' % (
-                TARGET_VERSION, HOTFIX_VERSION - 1)
+                TARGET_VERSION, HOTFIX_NUMBER - 1)
         python_utils.PRINT(
             'Please confirm: are Travis checks passing on %s? (y/n) ' % (
                 branch_to_check))
@@ -233,16 +235,21 @@ def _execute_branch_cut():
                 'Exiting.' % branch_to_check)
             sys.exit()
 
-    # Cut a new release branch.
-    if HOTFIX_VERSION:
-        _verify_hotfix_version_is_one_ahead_of_previous_hotfix_version(
+    if HOTFIX_NUMBER:
+        new_branch_type = 'hotfix'
+    else:
+        new_branch_type = 'release'
+
+    # Cut a new release or hotfix branch.
+    if new_branch_type == 'hotfix':
+        _verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             remote_alias)
         new_branch_type = 'hotfix'
-        if HOTFIX_VERSION == 1:
+        if HOTFIX_NUMBER == 1:
             branch_to_cut_from = 'release-%s' % TARGET_VERSION
         else:
             branch_to_cut_from = 'release-%s-hotfix-%s' % (
-                TARGET_VERSION, HOTFIX_VERSION - 1)
+                TARGET_VERSION, HOTFIX_NUMBER - 1)
         python_utils.PRINT('Cutting a new hotfix branch: %s' % NEW_BRANCH_NAME)
         subprocess.call([
             'git', 'checkout', '-b', NEW_BRANCH_NAME, branch_to_cut_from])

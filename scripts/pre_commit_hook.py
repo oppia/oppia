@@ -31,7 +31,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -41,6 +40,16 @@ import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
+KEYS_UPDATED_IN_FECONF = [
+    'INCOMING_EMAILS_DOMAIN_NAME', 'ADMIN_EMAIL_ADDRESS',
+    'SYSTEM_EMAIL_ADDRESS', 'NOREPLY_EMAIL_ADDRESS', 'CAN_SEND_EMAILS',
+    'CAN_SEND_EDITOR_ROLE_EMAILS', 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS',
+    'CAN_SEND_SUBSCRIPTION_EMAILS', 'DEFAULT_EMAIL_UPDATES_PREFERENCE',
+    'REQUIRE_EMAIL_ON_MODERATOR_ACTION', 'EMAIL_SERVICE_PROVIDER',
+    'SYSTEM_EMAIL_NAME', 'MAILGUN_DOMAIN_NAME']
+KEYS_UPDATED_IN_CONSTANTS = [
+    'CAN_SEND_ANALYTICS_EVENTS', 'SITE_FEEDBACK_FORM_URL',
+    'ANALYTICS_ID', 'SITE_NAME_FOR_ANALYTICS']
 
 
 def install_hook():
@@ -111,6 +120,40 @@ def does_current_folder_contain_have_package_lock_file():
     return os.path.isfile('package-lock.json')
 
 
+def check_changes(filetype):
+    """Checks if diff in feconf or constants file includes
+    changes made for release.
+
+    Args:
+        filetype: str. The file to check - feconf or constants.
+
+    Returns:
+        bool. Whether the diff includes changes made for release.
+    """
+    if filetype == 'feconf':
+        filepath = FECONF_FILEPATH
+        keys_to_check = KEYS_UPDATED_IN_FECONF
+        assignment_op = '= '
+    else:
+        filepath = CONSTANTS_FILEPATH
+        keys_to_check = KEYS_UPDATED_IN_CONSTANTS
+        assignment_op = ': '
+
+    diff_output = subprocess.check_output([
+        'git', 'diff', filepath])[:-1].split('\n')
+    for index, line in enumerate(diff_output):
+        if index + 1 >= len(diff_output):
+            continue
+        next_line = diff_output[index + 1]
+        if line.startswith('-') and next_line.startswith('+') and any(
+                key in line for key in keys_to_check):
+            intial_value = line[line.find(assignment_op):]
+            final_value = next_line[next_line.find(assignment_op):]
+            if intial_value != final_value:
+                return False
+    return True
+
+
 def check_changes_in_config():
     """Checks whether feconf and assets have changes made for release
     deployment.
@@ -118,35 +161,15 @@ def check_changes_in_config():
     Raises:
         Exception: There are deployment changes in feconf or constants filepath.
     """
-    with python_utils.open_file(FECONF_FILEPATH, 'r') as f:
-        lines = f.readlines()
-        invalid_commit = False
-        for line in lines:
-            if re.match('^MAILGUN_API_KEY = \'key-[a-z0-9]{32}\'\n$', line):
-                invalid_commit = True
-            if 'oppia.org' in line or 'Oppia.org' in line:
-                invalid_commit = True
-            if invalid_commit:
-                raise Exception(
-                    'Changes to %s made for deployment cannot be committed.' % (
-                        FECONF_FILEPATH))
+    if not check_changes('feconf'):
+        raise Exception(
+            'Changes to %s made for deployment cannot be committed.' % (
+                FECONF_FILEPATH))
 
-    with python_utils.open_file(CONSTANTS_FILEPATH, 'r') as f:
-        lines = f.readlines()
-        invalid_commit = False
-        for line in lines:
-            if 'ANALYTICS_ID' in line and line != '  "ANALYTICS_ID": "",\n':
-                invalid_commit = True
-            if 'SITE_FEEDBACK_FORM_URL' in line and (
-                    line != '  "SITE_FEEDBACK_FORM_URL": "",\n'):
-                invalid_commit = True
-            if '"SITE_NAME_FOR_ANALYTICS"' in line and (
-                    line != '  "SITE_NAME_FOR_ANALYTICS": "",\n'):
-                invalid_commit = True
-            if invalid_commit:
-                raise Exception(
-                    'Changes to %s made for deployment cannot be committed.' % (
-                        CONSTANTS_FILEPATH))
+    if not check_changes('constants'):
+        raise Exception(
+            'Changes to %s made for deployment cannot be committed.' % (
+                CONSTANTS_FILEPATH))
 
 
 def main(args=None):
