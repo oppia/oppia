@@ -16,16 +16,24 @@
  * @fileoverview Service for generating random IDs.
  */
 
-angular.module('oppia').factory('IdGenerationService', [function() {
-  return {
-    generateNewId: function() {
-      // Generates random string using the last 10 digits of
-      // the string for better entropy.
-      var randomString = Math.random().toString(36).slice(2);
-      while (randomString.length < 10) {
-        randomString = randomString + '0';
-      }
-      return randomString.slice(-10);
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class IdGenerationService {
+  generateNewId(): string {
+    // Generates random string using the last 10 digits of
+    // the string for better entropy.
+    var randomString = Math.random().toString(36).slice(2);
+    while (randomString.length < 10) {
+      randomString = randomString + '0';
     }
-  };
-}]);
+    return randomString.slice(-10);
+  }
+}
+
+angular.module('oppia').factory(
+  'IdGenerationService',
+  downgradeInjectable(IdGenerationService));
