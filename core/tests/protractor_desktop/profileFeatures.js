@@ -208,19 +208,19 @@ describe('playing the exploration', function() {
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
     // Test continue button
     waitFor.elementToBeClickable(
-      continueButton, 'Could not click continue button');
+      continueButton, 'Continue button taking too long to be clickable');
     continueButton.click();
     waitFor.pageToFullyLoad();
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
     // Test back button
     waitFor.elementToBeClickable(
-      backButton, 'Could not click back button');
+      backButton, 'Back button taking too long to be clickable');
     backButton.click();
     waitFor.pageToFullyLoad();
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
     // Test next button
     waitFor.elementToBeClickable(
-      nextButton, 'Could not click next button');
+      nextButton, 'Next button taking too long to be clickable');
     nextButton.click();
     waitFor.pageToFullyLoad();
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
