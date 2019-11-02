@@ -371,6 +371,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
         email_hash2 = email_model_instance2.email_hash
         self.assertNotEqual(email_hash1, email_hash2)
 
+
 class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackEmailReplyToId model."""
     USER_ID_1 = 'user_id_1'
