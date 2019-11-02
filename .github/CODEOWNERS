@@ -186,7 +186,7 @@
 /core/templates/dev/head/services/site-analytics.service*.ts @ankita240796
 /core/templates/dev/head/services/date-time-format.service*.ts @ankita240796
 /core/templates/dev/head/services/utils.service*.ts @ankita240796
-/core/templates/dev/head/services/local-storage.servicee*.ts @ankita240796
+/core/templates/dev/head/services/local-storage.service*.ts @ankita240796
 /core/templates/dev/head/services/id-generation.service*.ts @ankita240796
 /core/templates/dev/head/services/alerts.service*.ts @ankita240796
 /core/templates/dev/head/services/page-title.service*.ts @ankita240796
@@ -211,7 +211,7 @@
 /core/templates/dev/head/components/version-diff-visualization/codemirror-mergeview.directive.ts @kevinlee12
 /core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
-/core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
+/core/templates/dev/head/services/code-normalizer.service*.ts @kevinlee12
 /extensions/domain*.py @DubeySandeep
 /extensions/interactions/ @kevinlee12 @vojtechjelinek
 /extensions/objects/ @aks681
@@ -311,7 +311,7 @@
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
-/core/templates/dev/head/components/entity-creation-services/topic-creation.service.ts @aks681
+/core/templates/dev/head/components/entity-creation-services/topic-creation.service.ts.ts @aks681
 /core/templates/dev/head/domain/classroom/ @aks681
 /core/templates/dev/head/domain/subtopic_viewer/ @aks681
 /core/templates/dev/head/domain/topic/ @aks681
@@ -444,7 +444,7 @@
 /core/templates/dev/head/pages/footer_js_libs.html @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/header_css_libs.html @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/header_js_libs.html @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/services/CsrfTokenService*.ts @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/services/csrf-token.service*.ts @jamesjay4199 @vojtechjelinek
 /gulpfile.js @jamesjay4199 @vojtechjelinek
 /jinja_utils*.py @jamesjay4199 @vojtechjelinek
 /webpack.common.config.ts @jamesjay4199 @vojtechjelinek
