@@ -962,7 +962,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
 
 
 class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
-    """Checks if there are excessive newlines between function definations."""
+    """Checks if there are excessive newlines between method definitions."""
     __implements__ = interfaces.IRawChecker
 
     name = 'excessive-new-lines'
@@ -976,7 +976,8 @@ class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
     }
 
     def process_module(self, node):
-        """Process a module.
+        """Process a module to ensure that method definitions are not seperated
+        by more than two blank lines.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
@@ -985,6 +986,7 @@ class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
         multi_line_indicator = b'"""'
         file_content = read_from_node(node)
         file_length = len(file_content)
+        blank_line_counter = 0
 
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].strip()
@@ -1006,9 +1008,15 @@ class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
             if in_multi_line_comment:
                 continue
 
-            if line.startswith(b'def'):
-                if (file_content[line_num - 3] == b'\n' and (
-                        file_content[line_num - 2] == b'\n')):
+            if file_content[line_num] == b'\n':
+                blank_line_counter += 1
+
+            else:
+                blank_line_counter = 0
+
+            if line_num + 1 < file_length and blank_line_counter > 2:
+                line = file_content[line_num + 1].strip()
+                if line.startswith(b'def') or line.startswith(b'@'):
                     self.add_message('excessive-new-lines', line=line_num + 1)
 
 

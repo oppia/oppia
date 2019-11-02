@@ -1079,7 +1079,67 @@ class ExcessiveEmptyLinesCheckerTests(unittest.TestCase):
         with checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='excessive-new-lines',
-                line=6
+                line=5
             ),
         ):
+            temp_file.close()
+
+        node_method_with_decorator = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func0():
+                        returns_something
+
+
+
+                    @something
+                    def func1():
+                        returns_something
+                """)
+        node_method_with_decorator.file = filename
+        node_method_with_decorator.path = filename
+
+        checker_test_object.checker.process_module(node_method_with_decorator)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='excessive-new-lines',
+                line=5
+            ),
+        ):
+            temp_file.close()
+
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func0():
+                        returns_something
+
+                    def func1():
+                        returns_something
+
+
+                    def func2():
+                        returns_something
+
+                    @something
+                    def func3():
+                        returns_something
+                """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        checker_test_object.checker.process_module(node_with_no_error_message)
+
+        with checker_test_object.assertNoMessages():
             temp_file.close()
