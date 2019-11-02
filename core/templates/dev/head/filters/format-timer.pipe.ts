@@ -20,7 +20,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({name: 'formatTime'})
 export class FormatTimePipe implements PipeTransform {
-  transform(input: any): string {
+  transform(input: number): string {
     let formatNum = function(n) {
       return (n < 10 ? '0' : '') + n;
     };

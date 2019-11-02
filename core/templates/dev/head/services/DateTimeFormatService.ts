@@ -43,11 +43,11 @@ export class DateTimeFormatService {
         hour12: true
       });
     } else if (date.getFullYear() === new Date().getFullYear()) {
-      let transformedDate = this.formatTimePipe.transform(date);
+      let transformedDate = this.formatTimePipe.transform(Number(date));
       // moment will return Oct 10
       return moment(transformedDate).format('MMM d');
     } else {
-      let transformedDate = this.formatTimePipe.transform(date);
+      let transformedDate = this.formatTimePipe.transform(Number(date));
       // moment will return 10/22/35(shortDate)
       return moment(transformedDate).format('MM/DD/YY');
     }
