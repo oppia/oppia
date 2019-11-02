@@ -1394,7 +1394,7 @@ def _check_codeowner_file(verbose_mode_enabled):
                         break
                 if not match:
                     python_utils.PRINT(
-                        '%s is not covered under CODEOWNERS' % file_path)
+                        '%s is not listed in the .github/CODEOWNERS file.' % file_path)
                     failed = True
 
         failed = failed or (
@@ -1402,10 +1402,10 @@ def _check_codeowner_file(verbose_mode_enabled):
                 important_rules_in_critical_section))
 
         if failed:
-            summary_message = '%s   CODEOWNERS file check failed' % (
+            summary_message = '%s   CODEOWNERS file coverage check failed' % (
                 _MESSAGE_TYPE_FAILED)
         else:
-            summary_message = '%s  CODEOWNERS file check passed' % (
+            summary_message = '%s  CODEOWNERS file coverage check passed' % (
                 _MESSAGE_TYPE_SUCCESS)
 
         summary_messages.append(summary_message)
