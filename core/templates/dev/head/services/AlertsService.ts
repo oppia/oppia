@@ -18,6 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+
 import { LoggerService } from 'services/contextual/LoggerService';
 
 export interface Warning {

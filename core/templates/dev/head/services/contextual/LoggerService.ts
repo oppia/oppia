@@ -19,55 +19,28 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export enum LogLevel {
-  ALL = 0,
-  DEBUG = 1,
-  INFO = 2,
-  WARN = 3,
-  ERROR = 4,
-  FATAL = 5,
-  OFF = 6
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class LoggerService {
-  level: LogLevel = LogLevel.ALL;
-
   constructor() {}
-  // Flag to check if we can log the message in console. It will always log
-  // level is set to ALL. We can turn it off by replacing level with
-  // LogLevel.OFF.
-  private shouldLog(level:LogLevel) {
-    return (level >= this.level && level !== LogLevel.OFF) || (
-      this.level === LogLevel.ALL);
-  }
 
   debug(msg: string, optionalParams?: any[]) {
-    if (this.shouldLog(LogLevel.DEBUG)) {
-      // eslint-disable-next-line no-console
-      console.debug(msg, optionalParams);
-    }
+    // eslint-disable-next-line no-console
+    console.debug(msg, optionalParams);
   }
 
   info(msg: string, optionalParams?: any[]) {
-    if (this.shouldLog(LogLevel.INFO)) {
-      // eslint-disable-next-line no-console
-      console.info(msg, optionalParams);
-    }
+    // eslint-disable-next-line no-console
+    console.info(msg, optionalParams);
   }
 
   warn(msg: string, optionalParams?: any[]) {
-    if (this.shouldLog(LogLevel.WARN)) {
-      console.warn(msg, optionalParams);
-    }
+    console.warn(msg, optionalParams);
   }
 
   error(msg: string, optionalParams?: any[]) {
-    if (this.shouldLog(LogLevel.ERROR)) {
-      console.error(msg, optionalParams);
-    }
+    console.error(msg, optionalParams);
   }
 
   log(msg: string, optionalParams?: any[]) {

@@ -17,7 +17,7 @@
  */
 import { TestBed } from '@angular/core/testing';
 
-import { AlertsService } from 'services/AlertsService.ts';
+import { AlertsService } from 'services/AlertsService';
 
 describe('Alerts Service', function() {
   let alertsService: AlertsService = null;
