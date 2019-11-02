@@ -26,7 +26,7 @@ export class DebouncerService {
   // Returns a function that will not be triggered as long as it continues to
   // be invoked. The function only gets executed after it stops being called
   // for `wait` milliseconds.
-  debounce(func: any, millisecsToWait: any) {
+  debounce(func: Function, millisecsToWait: number) {
     let timeout;
     let context = this;
     let args = arguments;
