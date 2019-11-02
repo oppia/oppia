@@ -1394,7 +1394,8 @@ def _check_codeowner_file(verbose_mode_enabled):
                         break
                 if not match:
                     python_utils.PRINT(
-                        '%s is not listed in the .github/CODEOWNERS file.' % file_path)
+                        '%s is not listed in the .github/CODEOWNERS file.' % (
+                            file_path))
                     failed = True
 
         failed = failed or (
