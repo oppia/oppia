@@ -71,6 +71,8 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-return-to-parent-button'));
   var answerDetailsSubmitButton = element(
     by.css('.protractor-test-answer-details-submit-button'));
+  var correctFeedbackElement = element(
+    by.css('.protractor-test-correct-feedback'));
 
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
@@ -303,6 +305,12 @@ var ExplorationPlayerPage = function() {
     suggestionSubmitButton.click();
     waitFor.invisibilityOf(
       suggestionSubmitButton, 'Suggestion popup takes too long to disappear');
+  };
+
+  this.expectCorrectFeedback = function() {
+    waitFor.visibilityOf(
+      correctFeedbackElement,
+      'Correct feedback footer takes too long to appear');
   };
 };
 

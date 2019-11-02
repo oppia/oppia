@@ -134,7 +134,7 @@ describe('Interactions', function() {
         explorationEditorMainTab.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
-        explorationEditorMainTab.addResponse.apply(null, [
+        explorationEditorMainTab.addResponse.apply(explorationEditorMainTab, [
           interactionId, forms.toRichText('yes'), null, false
         ].concat(test.ruleArguments));
 
