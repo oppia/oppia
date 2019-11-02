@@ -399,7 +399,7 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
 
 
 class UserGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for populating UserSettingsModel with gae_user_id."""
+    """One-off job for populating UserSettingsModel with gae_id."""
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -408,8 +408,8 @@ class UserGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model_instance):
         """Implements the map function for this job."""
-        if model_instance.gae_user_id is None:
-            model_instance.gae_user_id = model_instance.id
+        if model_instance.gae_id is None:
+            model_instance.gae_id = model_instance.id
         model_instance.put(update_last_updated_time=False)
         yield ('SUCCESS', model_instance.id)
 

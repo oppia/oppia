@@ -42,8 +42,8 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         super(QuestionMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test questions.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
         self.skill_id = 'skill_id'
         self.save_new_skill(self.skill_id, self.albert_id, 'Skill Description')

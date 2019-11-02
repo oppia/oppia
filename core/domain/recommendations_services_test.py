@@ -241,10 +241,9 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         super(RecommendationsServicesUnitTests, self).setUp()
 
         for name, user in self.USER_DATA.items():
+            self.signup(user['email'], name)
             user['id'] = self.get_user_id_from_email(
                 user['email'])
-            user_services.create_new_user(user['id'], user['email'])
-            self.signup(user['email'], name)
             self.USER_DATA[name]['id'] = user['id']
 
         self.EXP_DATA['exp_id_1']['owner_id'] = self.USER_DATA['alice']['id']
@@ -258,9 +257,8 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             owner = user_services.UserActionsInfo(exp['owner_id'])
             rights_manager.publish_exploration(owner, exp_id)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        user_services.create_new_user(self.admin_id, self.ADMIN_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.admin = user_services.UserActionsInfo(self.admin_id)
 

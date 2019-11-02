@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.domain import feedback_domain
-from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -32,9 +31,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FeedbackThreadDomainUnitTests, self).setUp()
 
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_to_dict(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
@@ -89,9 +87,8 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(FeedbackMessageDomainUnitTests, self).setUp()
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_to_dict(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)

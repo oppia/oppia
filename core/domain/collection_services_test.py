@@ -60,18 +60,14 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         """Before each individual test, create dummy users."""
         super(CollectionServicesUnitTests, self).setUp()
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
-        user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
-
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -1636,10 +1632,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
 
     def test_contributor_ids(self):
         # Sign up two users.
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         albert = user_services.UserActionsInfo(albert_id)
 
         # Have Albert create a collection.
@@ -1675,10 +1671,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         self.assertEqual(expected, contributors_summary)
 
     def test_contributor_summary(self):
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
         # Have Albert create a new collection. Version 1.
         self.save_new_valid_collection(self.COLLECTION_ID, albert_id)
