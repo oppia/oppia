@@ -139,7 +139,7 @@ class SentEmailModel(base_models.BaseModel):
 
     def put(self):
         """Saves this SentEmailModel instance to the datastore."""
-        email_hash = self.generate_hash(
+        email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
         self.email_hash = email_hash
         super(SentEmailModel, self).put()
@@ -185,7 +185,7 @@ class SentEmailModel(base_models.BaseModel):
         return messages
 
     @classmethod
-    def generate_hash(cls, recipient_id, email_subject, email_body):
+    def _generate_hash(cls, recipient_id, email_subject, email_body):
         """Generate hash for a given recipient_id, email_subject and cleaned
         email_body.
 
@@ -219,7 +219,7 @@ class SentEmailModel(base_models.BaseModel):
                 in the last DUPLICATE_EMAIL_INTERVAL_MINS.
         """
 
-        email_hash = cls.generate_hash(
+        email_hash = cls._generate_hash(
             recipient_id, email_subject, email_body)
 
         datetime_now = datetime.datetime.utcnow()

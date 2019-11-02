@@ -2893,7 +2893,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         self.recipient_model.put()
 
         with self.swap(
-            email_models.SentEmailModel, 'generate_hash',
+            email_models.SentEmailModel, '_generate_hash',
             types.MethodType(mock_generate_hash, email_models.SentEmailModel)):
             email_models.SentEmailModel.create(
                 self.recipient_id, self.recipient_email, self.sender_id,
