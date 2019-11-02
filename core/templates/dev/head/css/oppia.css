@@ -1820,6 +1820,7 @@ pre.oppia-pre-wrapped-text {
 .tooltip.bottom {
   margin-top: 3px;
   padding: 5px 0;
+  left: -1em !important;
 }
 .tooltip-arrow {
   border-color: transparent;
@@ -1827,6 +1828,7 @@ pre.oppia-pre-wrapped-text {
   height: 0;
   position: absolute;
   width: 0;
+  left: 0.75em !important;
 }
 .tooltip.bottom .tooltip-arrow {
   border-bottom-color: #000;
@@ -4526,6 +4528,8 @@ div.oppia-issues-learner-action {
 
 /* To fix the shifting of tooltip when text is too long. */
 .nav .tooltip-inner {
-  max-width: none;
-  white-space: nowrap;
+  max-width: 20vw;
+  height : auto;
+  white-space: pre-line;
+  line-height: normal;
 }
