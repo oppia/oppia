@@ -1406,8 +1406,7 @@ def _check_codeowner_file(verbose_mode_enabled):
             summary_message = (
                 '%s   CODEOWNERS file coverage check failed, see messages '
                 'above for files that need to be added or patterns that need '
-                'to be fixed.' % (
-                _MESSAGE_TYPE_FAILED))
+                'to be fixed.' % _MESSAGE_TYPE_FAILED)
         else:
             summary_message = '%s  CODEOWNERS file coverage check passed' % (
                 _MESSAGE_TYPE_SUCCESS)
@@ -1782,8 +1781,7 @@ def _check_codeowner_file(verbose_mode_enabled):
             summary_message = (
                 '%s   CODEOWNERS file coverage check failed, see messages '
                 'above for files that need to be added or patterns that need '
-                'to be fixed.' % (
-                _MESSAGE_TYPE_FAILED))
+                'to be fixed.' % _MESSAGE_TYPE_FAILED)
         else:
             summary_message = '%s  CODEOWNERS file check passed' % (
                 _MESSAGE_TYPE_SUCCESS)
@@ -1904,8 +1902,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
             if failed:
                 summary_message = (
                     '%s  Mandatory pattern check failed, see errors above for'
-                    'patterns that should be added.' % (
-                        _MESSAGE_TYPE_FAILED))
+                    'patterns that should be added.' % _MESSAGE_TYPE_FAILED)
             else:
                 summary_message = (
                     '%s  Mandatory pattern check passed' % (
@@ -2179,7 +2176,7 @@ class JsTsLintChecksManager(LintChecksManager):
             if failed:
                 summary_message = ('%s  Extra JS files check failed, see '
                     'message above on resolution steps.' % (
-                    _MESSAGE_TYPE_FAILED))
+                        _MESSAGE_TYPE_FAILED))
             else:
                 summary_message = '%s  Extra JS files check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
@@ -2367,7 +2364,7 @@ class JsTsLintChecksManager(LintChecksManager):
             if failed:
                 summary_message = ('%s   Directive scope check failed, '
                     'see messages above for suggested fixes.' % (
-                    _MESSAGE_TYPE_FAILED))
+                        _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -2707,7 +2704,7 @@ class JsTsLintChecksManager(LintChecksManager):
             if failed:
                 summary_message = ('%s  Constants declaration check failed, '
                     'see messages above for constants with errors.' % (
-                    _MESSAGE_TYPE_FAILED))
+                        _MESSAGE_TYPE_FAILED))
             else:
                 summary_message = '%s  Constants declaration check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
@@ -2897,7 +2894,7 @@ class OtherLintChecksManager(LintChecksManager):
                 summary_message = (
                     '%s Division operator check failed, "/" should not be '
                     'used, remove the operator from files listed above.' % (
-                         _MESSAGE_TYPE_FAILED))
+                        _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -3230,8 +3227,7 @@ class OtherLintChecksManager(LintChecksManager):
 
             if failed:
                 summary_message = ('%s   HTML tag and attribute check failed, '
-                    'fix the HTML files listed above.' % (
-                    _MESSAGE_TYPE_FAILED))
+                    'fix the HTML files listed above.' % _MESSAGE_TYPE_FAILED)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
