@@ -26,25 +26,24 @@ angular.module('oppia').factory('UserService', [
       UserInfoObjectFactory, DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
-    var userInfo = null;
+    var userInfoPromise = null;
 
     var getUserInfoAsync = function() {
       if (UrlService.getPathname() === '/signup') {
         return $q.resolve(UserInfoObjectFactory.createDefault());
       }
-      if (userInfo) {
-        return $q.resolve(userInfo);
+      if (userInfoPromise === null) {
+        userInfoPromise = $http.get('/userinfohandler')
+          .then(function(response) {
+            if (response.data.user_is_logged_in) {
+              return UserInfoObjectFactory.createFromBackendDict(response.data);
+            } else {
+              return UserInfoObjectFactory.createDefault();
+            }
+          });
       }
-      return $http.get(
-        '/userinfohandler'
-      ).then(function(response) {
-        if (response.data.user_is_logged_in) {
-          userInfo = UserInfoObjectFactory.createFromBackendDict(response.data);
-          return $q.resolve(userInfo);
-        } else {
-          return $q.resolve(UserInfoObjectFactory.createDefault());
-        }
-      });
+
+      return userInfoPromise;
     };
 
     return {
