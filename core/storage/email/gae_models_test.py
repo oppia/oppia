@@ -300,74 +300,95 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
 
 class GenerateHashTests(test_utils.GenericTestBase):
     """Test that generating hash functionality works as expected."""
-    def setUp(self): 
-        super(GenerateHashTests, self).setUp()
 
     def test_same_inputs_always_gives_same_hashes(self):
         email_model_instance = email_models.SentEmailModel(
-            id='exp_id.new_id', recipient_id='recipient_id',
-            recipient_email='recipient@email.com', sender_id='sender_id',
-            sender_email='sender@email.com', intent=feconf.EMAIL_INTENT_SIGNUP,
-            subject='email_subject', html_body='email_html_body', 
+            id='exp_id.new_id',
+            recipient_id='recipient_id',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject',
+            html_body='email_html_body',
             sent_datetime=datetime.datetime.utcnow())
         email_model_instance.put()
 
         email_hash1 = email_model_instance.email_hash
         email_hash2 = email_model_instance.email_hash
-        
         self.assertEqual(email_hash1, email_hash2)
-    
+
     def test_different_inputs_give_different_hashes(self):
         email_model_instance = email_models.SentEmailModel(
-            id='exp_id.new_id', recipient_id='recipient_id',
-            recipient_email='recipient@email.com', sender_id='sender_id',
-            sender_email='sender@email.com', intent=feconf.EMAIL_INTENT_SIGNUP,
-            subject='email_subject', html_body='email_html_body', 
+            id='exp_id.new_id',
+            recipient_id='recipient_id',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject',
+            html_body='email_html_body',
             sent_datetime=datetime.datetime.utcnow())
         email_model_instance.put()
 
         email_model_instance2 = email_models.SentEmailModel(
-            id='exp_id.new_id2', recipient_id='recipient_id',
-            recipient_email='recipient@email.com', sender_id='sender_id',
-            sender_email='sender@email.com', intent=feconf.EMAIL_INTENT_SIGNUP,
-            subject='email_subject', html_body='email_html_body2', 
+            id='exp_id.new_id2',
+            recipient_id='recipient_id',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject',
+            html_body='email_html_body2',
             sent_datetime=datetime.datetime.utcnow())
         email_model_instance2.put()
-        
+
         email_hash1 = email_model_instance.email_hash
         email_hash2 = email_model_instance2.email_hash
         self.assertNotEqual(email_hash1, email_hash2)
 
         email_model_instance2 = email_models.SentEmailModel(
-            id='exp_id.new_id2', recipient_id='recipient_id2',
-            recipient_email='recipient@email.com', sender_id='sender_id',
-            sender_email='sender@email.com', intent=feconf.EMAIL_INTENT_SIGNUP,
-            subject='email_subject', html_body='email_html_body', 
+            id='exp_id.new_id2',
+            recipient_id='recipient_id2',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject',
+            html_body='email_html_body',
             sent_datetime=datetime.datetime.utcnow())
         email_model_instance2.put()
-        
+
         email_hash2 = email_model_instance2.email_hash
         self.assertNotEqual(email_hash1, email_hash2)
 
         email_model_instance2 = email_models.SentEmailModel(
-            id='exp_id.new_id2', recipient_id='recipient_id',
-            recipient_email='recipient@email.com', sender_id='sender_id',
-            sender_email='sender@email.com', intent=feconf.EMAIL_INTENT_SIGNUP,
-            subject='email_subject2', html_body='email_html_body', 
+            id='exp_id.new_id2',
+            recipient_id='recipient_id',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject2',
+            html_body='email_html_body',
             sent_datetime=datetime.datetime.utcnow())
         email_model_instance2.put()
-        
+
         email_hash2 = email_model_instance2.email_hash
         self.assertNotEqual(email_hash1, email_hash2)
 
         email_model_instance2 = email_models.SentEmailModel(
-            id='exp_id.new_id2', recipient_id='recipient_id2',
-            recipient_email='recipient@email.com', sender_id='sender_id',
-            sender_email='sender@email.com', intent=feconf.EMAIL_INTENT_SIGNUP,
-            subject='email_subject2', html_body='email_html_body2', 
+            id='exp_id.new_id2',
+            recipient_id='recipient_id2',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject2',
+            html_body='email_html_body2',
             sent_datetime=datetime.datetime.utcnow())
         email_model_instance2.put()
-        
+
         email_hash2 = email_model_instance2.email_hash
         self.assertNotEqual(email_hash1, email_hash2)
 
