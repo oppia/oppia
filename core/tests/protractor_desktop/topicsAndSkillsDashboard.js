@@ -108,7 +108,10 @@ describe('Topics and skills dashboard functionality', function() {
   });
 
   it('should remove a skill from list once deleted', function() {
-    topicsAndSkillsDashboardPage.navigateToUnpublishedSkillsTab();
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill to be deleted', 'Concept card explanation');
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
     topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
 

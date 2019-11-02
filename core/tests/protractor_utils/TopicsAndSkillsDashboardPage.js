@@ -55,9 +55,6 @@ var TopicsAndSkillsDashboardPage = function() {
   var confirmSkillDeletionButton = element(
     by.css('.protractor-test-confirm-skill-deletion-button')
   );
-  var unpublishedSkillsTabButton = element(
-    by.css('.protractor-test-unpublished-skills-tab')
-  );
   var unusedSkillsTabButton = element(
     by.css('.protractor-test-unused-skills-tab')
   );
@@ -180,10 +177,6 @@ var TopicsAndSkillsDashboardPage = function() {
       'Create skill button takes too long to be clickable');
     confirmSkillCreationButton.click();
     waitFor.pageToFullyLoad();
-  };
-
-  this.navigateToUnpublishedSkillsTab = function() {
-    unpublishedSkillsTabButton.click();
   };
 
   this.navigateToUnusedSkillsTab = function() {
