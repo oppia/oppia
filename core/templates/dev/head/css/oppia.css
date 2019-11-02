@@ -899,6 +899,9 @@ textarea {
   margin: 4px;
   margin-left: 10px;
 }
+.oppia-navbar-nav.oppia-navbar-profile > li:hover {
+  background-color: #009688
+}
 .dropup .caret,
 .navbar-fixed-bottom .dropdown .caret {
   content: "";
