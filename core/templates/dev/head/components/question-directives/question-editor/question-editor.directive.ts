@@ -61,14 +61,14 @@ angular.module('oppia').directive('questionEditor', [
         '$scope', '$rootScope', '$uibModal',
         'AlertsService', 'QuestionCreationService',
         'EditabilityService', 'EditableQuestionBackendApiService',
-        'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'QuestionObjectFactory',
         'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
         'SolutionValidityService', 'QuestionUpdateService',
         function(
             $scope, $rootScope, $uibModal,
             AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
-            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            QuestionObjectFactory,
             INTERACTION_SPECS, StateEditorService, ResponsesService,
             SolutionValidityService, QuestionUpdateService) {
           var ctrl = this;

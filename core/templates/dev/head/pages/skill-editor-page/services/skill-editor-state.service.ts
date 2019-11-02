@@ -75,7 +75,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject);
             QuestionsListService.getQuestionSummariesAsync(
-              0, [skillId], true, false
+              [skillId], true, false
             );
             _skillIsBeingLoaded = false;
           }, function(error) {

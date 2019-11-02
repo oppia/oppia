@@ -86,15 +86,11 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-question-list-item'));
   var questionItem = element(by.css('.protractor-test-question-list-item'));
 
-  var selectRubricDifficultyDropdown = element(
-    by.css('.protractor-test-select-rurbic-difficulty-dropdown'));
-  var rubricDifficulties = element.all(
-    by.css('.protractor-test-rubric-difficulty'));
-  var editRubricExplanationButton = element(
+  var editRubricExplanationButtons = element.all(
     by.css('.protractor-test-edit-rubric-explanation'));
   var saveRubricExplanationButton = element(
     by.css('.protractor-test-save-rubric-explanation-button'));
-  var rubricExplanation = element(
+  var rubricExplanations = element.all(
     by.css('.protractor-test-rubric-explanation'));
 
   this.get = function(skillId) {
@@ -103,33 +99,25 @@ var SkillEditorPage = function() {
   };
 
   this.editRubricExplanationWithIndex = function(index, explanation) {
-    selectRubricDifficultyDropdown.click();
-    rubricDifficulties.get(index).click();
-    waitFor.elementToBeClickable(
-      editRubricExplanationButton,
-      'Edit Rubric Explanation takes too long to be clickable');
-    editRubricExplanationButton.click();
-
-    var editor = element(
-      by.css('.protractor-test-rubric-explanation-text'));
-    waitFor.visibilityOf(
-      editor, 'Rubric explanation editor takes too long to appear');
-
-    browser.switchTo().activeElement().sendKeys(explanation);
-
-    waitFor.elementToBeClickable(
-      saveRubricExplanationButton,
-      'Save Rubric Explanation button takes too long to be clickable');
-    saveRubricExplanationButton.click();
-    waitFor.invisibilityOf(
-      editor, 'Rubric explanation editor takes too long to close');
+    editRubricExplanationButtons.then(function(buttons) {
+      buttons[index].click();
+      var editor = element(
+        by.css('.protractor-test-rubric-explanation-text'));
+      waitFor.visibilityOf(
+        editor, 'Rubric explanation editor takes too long to appear');
+      browser.switchTo().activeElement().sendKeys(explanation);
+      waitFor.elementToBeClickable(
+        saveRubricExplanationButton,
+        'Save Rubric Explanation button takes too long to be clickable');
+      saveRubricExplanationButton.click();
+    });
   };
 
   this.expectRubricExplanationToMatch = function(index, explanation) {
-    selectRubricDifficultyDropdown.click();
-    rubricDifficulties.get(index).click();
-    rubricExplanation.getText().then(function(text) {
-      expect(text).toMatch(explanation);
+    rubricExplanations.then(function(explanations) {
+      explanations[index].getText().then(function(text) {
+        expect(text).toMatch(explanation);
+      });
     });
   };
 

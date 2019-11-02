@@ -135,7 +135,8 @@ describe('Topic editor functionality', function() {
 
       topicEditorPage.get(topicId);
       topicEditorPage.moveToQuestionsTab();
-      topicEditorPage.expectNumberOfQuestionsToBe(1);
+      topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+        1, 'Skill 1');
 
       skillEditorPage.get(skillId);
       skillEditorPage.moveToQuestionsTab();

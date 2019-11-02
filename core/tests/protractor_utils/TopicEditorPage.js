@@ -78,13 +78,18 @@ var TopicEditorPage = function() {
   var questionItems = element.all(
     by.css('.protractor-test-question-list-item'));
   var questionItem = element(by.css('.protractor-test-question-list-item'));
+  var selectSkillDropdown = element(
+    by.css('.protractor-test-select-skill-dropdown'));
 
   this.get = function(topicId) {
     browser.get(EDITOR_URL_PREFIX + topicId);
     return waitFor.pageToFullyLoad();
   };
 
-  this.expectNumberOfQuestionsToBe = function(count) {
+  this.expectNumberOfQuestionsForSkillWithDescriptionToBe = function(
+      count, skillDescription) {
+    selectSkillDropdown.click();
+    element(by.css('option[label="' + skillDescription + '"]')).click();
     waitFor.visibilityOf(
       questionItem, 'Question takes too long to appear');
     questionItems.then(function(items) {
