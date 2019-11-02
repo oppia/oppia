@@ -18,7 +18,7 @@
  */
 
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('domain/statistics/LearnerAnswerInfoObjectFactory.ts');
 require('domain/statistics/LearnerAnswerDetailsObjectFactory.ts');
 

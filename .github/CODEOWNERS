@@ -290,6 +290,7 @@
 /core/storage/skill/ @aks681
 /core/templates/dev/head/components/entity-creation-services/skill-creation.service.ts @aks681
 /core/templates/dev/head/components/rubrics-editor/ @aks681
+/core/templates/dev/head/components/skill-selector/ @aks681
 /core/templates/dev/head/domain/skill/ @aks681
 /core/templates/dev/head/pages/skill-editor-page/ @aks681
 
@@ -354,6 +355,7 @@
 /core/templates/dev/head/services/contextual/DocumentAttributeCustomizationService.ts @YashJipkate
 /core/templates/dev/head/services/contextual/MetaTagCustomizationService.ts @YashJipkate
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @DubeySandeep
+/release_constants.py @ankita240796 @nithusha21 @DubeySandeep @seanlip
 
 
 # Miscellaneous.

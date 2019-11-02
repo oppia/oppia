@@ -305,6 +305,10 @@ export = {
     "description": "Dutch",
     "relatedLanguages": ["nl"]
   }, {
+    "id": "ee",
+    "description": "Ewe",
+    "relatedLanguages": ["ee"]
+  }, {
     "id": "tl",
     "description": "Filipino",
     "relatedLanguages": ["tl"]
@@ -538,6 +542,8 @@ export = {
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
 
   "MAX_SKILLS_PER_QUESTION": 3,
+
+  "MAX_QUESTIONS_PER_SKILL": 50,
 
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 

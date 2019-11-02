@@ -17,7 +17,7 @@
  */
 
 require('components/graph-services/graph-layout.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
 angular.module('oppia').directive('roleGraph', [

@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/MathExpressionInput/directives/' +
   'math-expression-input-rules.service.ts');

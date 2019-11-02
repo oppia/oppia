@@ -18,8 +18,8 @@
  * the editor pages).
  */
 
-require('domain/sidebar/SidebarStatusService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/sidebar/sidebar-status.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/DebouncerService.ts');
 require('services/NavigationService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -175,7 +175,7 @@ angular.module('oppia').directive('topNavigationBar', [
           angular.element(document).on('click', function(evt) {
             if (!angular.element(evt.target).closest('li').length) {
               ctrl.activeMenuName = '';
-              $scope.$apply();
+              $scope.$applyAsync();
             }
           });
 
@@ -275,7 +275,7 @@ angular.module('oppia').directive('topNavigationBar', [
                   // Force a digest cycle to hide element immediately.
                   // Otherwise it would be hidden after the next call.
                   // This is due to setTimeout use in debounce.
-                  $scope.$apply();
+                  $scope.$applyAsync();
                   $timeout(truncateNavbar, 50);
                   return;
                 }

@@ -16,8 +16,8 @@
  * @fileoverview Service to preload audio into AssetsBackendApiService's cache.
  */
 
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-language.service.ts');
