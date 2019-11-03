@@ -1419,7 +1419,7 @@ class State(python_utils.OBJECT):
         """Retrieves training data from the State domain object.
 
         Returns:
-            list(dict). Each dict contains the index and the answers of
+            list(dict). Each dict contains the index and the answers from
             the answer group as key and value pairs respectively.
         """
         state_training_data_by_answer_group = []
