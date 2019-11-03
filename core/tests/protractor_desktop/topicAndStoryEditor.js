@@ -220,6 +220,10 @@ describe('Topic editor functionality', function() {
     topicEditorPage.dragSkillBetweenSubtopics(0, 0, 1);
     topicEditorPage.expectSubtopicToHaveSkills(0, []);
     topicEditorPage.expectSubtopicToHaveSkills(1, ['Skill 2']);
+
+    topicEditorPage.dragSkillFromSubtopicToUncategorized(1, 0);
+    topicEditorPage.expectSubtopicToHaveSkills(0, []);
+    topicEditorPage.expectSubtopicToHaveSkills(1, []);
   });
 
   afterEach(function() {

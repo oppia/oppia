@@ -58,6 +58,8 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-skill-card'));
   var uncategorizedSkillItems = element.all(
     by.css('.protractor-test-uncategorized-skill-item'));
+  var uncategorizedSkillsContainer = element(
+    by.css('.protractor-test-uncategorized-skills-container'));
   var editSubtopicButtons = element.all(
     by.css('.protractor-test-edit-subtopic-button'));
   var subtopicTitleField = element(
@@ -192,6 +194,19 @@ var TopicEditorPage = function() {
     var target = subtopicTitles.get(toSubtopicIndex);
     browser.executeScript(
       dragAndDrop, toMove.getWebElement(), target.getWebElement());
+  };
+
+  this.dragSkillFromSubtopicToUncategorized = function(
+      subtopicIndex, skillCardIndex) {
+    var subtopicTitleElem = subtopicTitles.get(subtopicIndex);
+    var subtopicCol = subtopicTitleElem.element(
+      by.xpath('..')).element(by.xpath('..'));
+    skillNamesElems = subtopicCol.all(
+      by.css('.protractor-test-assigned-skill-card-text'));
+    var toMove = skillNamesElems.get(skillCardIndex);
+    browser.executeScript(
+      dragAndDrop, toMove.getWebElement(),
+      uncategorizedSkillsContainer.getWebElement());
   };
 
   this.expectSubtopicToHaveSkills = function(subtopicIndex, skillNames) {
