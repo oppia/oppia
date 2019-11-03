@@ -193,6 +193,30 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
   });
 
+    var skillId = null;
+  it('should assign a skill to a subtopic correctly', function() {
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 2');
+    browser.getCurrentUrl().then(function(url) {
+      skillId = url.split('/')[4];
+      skillEditorPage.editConceptCard('Concept card explanation');
+      skillEditorPage.saveOrPublishSkill('Added review material.');
+      skillEditorPage.firstTimePublishSkill();
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+      topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+
+      topicEditorPage.get(topicId);
+      topicEditorPage.moveToSubtopicsTab();
+      topicEditorPage.addSubtopic('Subtopic 2');
+      topicEditorPage.saveTopic('Added subtopic.');
+
+      topicEditorPage.expectSubtopicToHaveSkills(0, []);
+      topicEditorPage.dragSkillToSubtopic(0, 0);
+      topicEditorPage.expectSubtopicToHaveSkills(0, ['Skill 2']);
+    });
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
     users.logout();

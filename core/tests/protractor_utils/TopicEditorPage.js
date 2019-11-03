@@ -17,6 +17,7 @@
  * in Protractor tests.
  */
 
+const dragAndDrop = require('html-dnd').code;
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
@@ -53,6 +54,8 @@ var TopicEditorPage = function() {
   var subtopics = element.all(by.css('.protractor-test-subtopic'));
   var deleteSubtopicButtons = element.all(
     by.css('.protractor-test-delete-subtopic-button'));
+  var skillCards = element.all(
+    by.css('.protractor-test-skill-card'));
   var uncategorizedSkillItems = element.all(
     by.css('.protractor-test-uncategorized-skill-item'));
   var editSubtopicButtons = element.all(
@@ -169,6 +172,26 @@ var TopicEditorPage = function() {
     addSubtopicCard.click();
     newSubtopicTitlefield.sendKeys(title);
     confirmSubtopicCreationButton.click();
+  };
+
+  this.dragSkillToSubtopic = function(skillIndex, subtopicIndex) {
+    var target = subtopicTitles.get(subtopicIndex);
+    var toMove = skillCards.get(skillIndex);
+    browser.executeScript(
+      dragAndDrop, toMove.getWebElement(), target.getWebElement());
+  };
+
+  this.expectSubtopicToHaveSkills = function(subtopicIndex, skillNames) {
+    var subtopicTitleElem = subtopicTitles.get(subtopicIndex);
+    var subtopicCol = subtopicTitleElem.element(
+      by.xpath('..')).element(by.xpath('..'));
+    skillNamesElems = subtopicCol.all(
+      by.css('.protractor-test-assigned-skill-card-text'));
+    skillNamesElems.each(function(skillCardTextElem, index) {
+      var text = skillCardTextElem.getText();
+      expect(skillNames[index]).toEqual(text);
+    });
+    expect(skillNamesElems.count()).toEqual(skillNames.length);
   };
 
   this.moveToSubtopicsTab = function() {

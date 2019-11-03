@@ -28,7 +28,8 @@
                    dnd-dragstart="startMoveSkill(subtopic.getId(), skillSummary)"
                    dnd-effect-allowed="move"
                    dnd-disable-if="isSkillDeleted(skillSummary)">
-            <a ng-if="!isSkillDeleted(skillSummary)"
+            <a class="protractor-test-assigned-skill-card-text"
+               ng-if="!isSkillDeleted(skillSummary)"
                ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
               <[skillSummary.getDescription()]>
             </a>
@@ -57,8 +58,9 @@
                dnd-effect-allowed="move"
                dnd-dragstart="startMoveSkill(null, skillSummary)"
                dnd-disable-if="isSkillDeleted(skillSummary)">
-        <div class="skill-card">
-          <a ng-if="!isSkillDeleted(skillSummary)"
+        <div class="skill-card protractor-test-skill-card">
+          <a class="protractor-test-skill-card-text"
+             ng-if="!isSkillDeleted(skillSummary)"
              ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
             <[skillSummary.getDescription()]>
           </a>
