@@ -35,7 +35,7 @@ angular.module('oppia').factory('StoryUpdateService', [
   'STORY_NODE_PROPERTY_OUTLINE', 'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
   'STORY_NODE_PROPERTY_TITLE', 'STORY_PROPERTY_DESCRIPTION',
   'STORY_PROPERTY_LANGUAGE_CODE', 'STORY_PROPERTY_NOTES',
-  'STORY_PROPERTY_TITLE', function(
+  'STORY_PROPERTY_TITLE', 'AlertsService', function(
       ChangeObjectFactory, UndoRedoService,
       CMD_ADD_STORY_NODE, CMD_DELETE_STORY_NODE,
       CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
@@ -46,7 +46,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       STORY_NODE_PROPERTY_OUTLINE, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       STORY_NODE_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
       STORY_PROPERTY_LANGUAGE_CODE, STORY_PROPERTY_NOTES,
-      STORY_PROPERTY_TITLE) {
+      STORY_PROPERTY_TITLE, AlertsService) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // story.
@@ -54,7 +54,11 @@ angular.module('oppia').factory('StoryUpdateService', [
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
       var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
-      UndoRedoService.applyChange(changeObj, story);
+      try {
+        UndoRedoService.applyChange(changeObj, story);
+      } catch(err) {
+        AlertsService.addWarning(err.message);
+      }
     };
 
     var _getParameterFromChangeDict = function(changeDict, paramName) {

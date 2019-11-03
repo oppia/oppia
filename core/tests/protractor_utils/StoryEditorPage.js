@@ -58,6 +58,32 @@ var StoryEditorPage = function() {
   var unpublishStoryButton = element(
     by.css('.protractor-test-unpublish-story-button'));
 
+  /*
+   * CHAPTER
+   */
+
+  var explorationIdInput = element(
+    by.css('.protractor-test-exploration-id-input'));
+  var explorationIdSaveButton = element(
+    by.css('.protractor-test-exploration-id-save-button'));
+  var nodeOutlineEditor = element(
+    by.css('.protractor-test-add-chapter-outline'));
+  var nodeOutlineSaveButton = element(
+    by.css('.protractor-test-node-outline-save-button'));
+
+
+  var nodeDiagramNavigator = function(id) {
+    if (id === undefined) {
+      id = 0;
+    }
+    return element(by.css('.protractor-test-chapter-title-' + id.toString()));
+  };
+
+  this.get = function(storyId) {
+    browser.get(EDITOR_URL_PREFIX + storyId);
+    return waitFor.pageToFullyLoad();
+  };
+
   this.publishStory = function() {
     publishStoryButton.click();
   };
@@ -138,6 +164,46 @@ var StoryEditorPage = function() {
       'Close save modal button takes too long to be clickable');
     closeSaveModalButton.click();
     waitFor.pageToFullyLoad();
+  };
+
+  this.setChapterExplorationId = function(explorationId) {
+    waitFor.visibilityOf(
+      explorationIdInput,
+      'ExplorationIdInput takes too long to be visible'
+    );
+
+    explorationIdInput.sendKeys(explorationId);
+    waitFor.elementToBeClickable(
+      explorationIdSaveButton,
+      'ExplorationIdSaveButton takes too long to be visible'
+    );
+    explorationIdSaveButton.click();
+  };
+
+  this.changeNodeOutline = function(richTextInstructions) {
+    var editor = forms.RichTextEditor(
+      nodeOutlineEditor);
+    editor.clear();
+    richTextInstructions(editor);
+    nodeOutlineSaveButton.click();
+  };
+
+  this.navigateToChapterByIndex = function(index) {
+    nodeDiagramNavigator(index).click();
+  };
+
+  this.expectExplorationIdAlreadyExistWarning = function() {
+    var warningToast = element(by.css('.toast-message'));
+    waitFor.visibilityOf(
+      warningToast,
+      'warningToast takes too long to be visible.');
+    expect(warningToast.getText()).toEqual(
+      'The given exploration already exists in the story.');
+    var closeToastButton = element(by.css('.toast-close-button'));
+    waitFor.elementToBeClickable(
+      closeToastButton,
+      'closeToastButton takes too long to be clickable.');
+    closeToastButton.click();
   };
 };
 
