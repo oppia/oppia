@@ -116,19 +116,6 @@ angular.module('oppia').directive('skillEditorNavbar', [
               $scope.getChangeListCount() === 0);
           };
 
-          var _publishSkill = function() {
-            SkillRightsBackendApiService.setSkillPublic(
-              $scope.skill.getId(), $scope.skill.getVersion()).then(
-              function() {
-                $scope.skillRights.setPublic();
-                SkillEditorStateService.setSkillRights(
-                  $scope.skillRights);
-                $window.location = '/topics_and_skills_dashboard';
-                AlertsService.addSuccessMessage(
-                  'Published Skill.', 1000);
-              });
-          };
-
           $scope.saveChanges = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -151,29 +138,6 @@ angular.module('oppia').directive('skillEditorNavbar', [
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
               AlertsService.addSuccessMessage('Changes Saved.');
-            });
-          };
-
-          $scope.publishSkill = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor-page/modal-templates/' +
-                'skill-editor-pre-publish-modal.directive.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function(
-                    $scope, $uibModalInstance) {
-                  $scope.save = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }]
-            }).result.then(function() {
-              _publishSkill();
             });
           };
         }]
