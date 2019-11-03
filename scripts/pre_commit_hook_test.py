@@ -201,6 +201,9 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'check_output', mock_check_output):
             pre_commit_hook.check_changes_in_config()
 
+    def test_check_changes_with_no_config_file_changed(self):
+        self.assertTrue(pre_commit_hook.check_changes('filetype'))
+
     def test_check_changes_in_config_with_invalid_feconf_changes(self):
         def mock_check_output(cmd_tokens):
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
