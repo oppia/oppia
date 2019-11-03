@@ -210,6 +210,14 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             self.put_json(
                 self.url, self.put_payload, csrf_token=csrf_token,
                 expected_status_int=400)
+        self.put_payload['version'] = None
+        self.put_json(
+            self.url, self.put_payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.put_payload['version'] = -1
+        self.put_json(
+            self.url, self.put_payload, csrf_token=csrf_token,
+            expected_status_int=400)
         # Check PUT returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.put_json(
