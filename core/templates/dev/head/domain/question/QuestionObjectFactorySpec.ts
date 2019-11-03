@@ -237,9 +237,9 @@ describe('Question object factory', function() {
     expect(
       _sampleQuestion.validate(misconceptionsDict)).toEqual(
       'Click on (or create) an answer ' +
-      'that is neither marked correct nor is a default answer (marked ' +
-      'above as [All other answers]) and tag the following misconceptions' +
-      ' to that answer group: name, name_2, name_3');
+      'that is neither marked correct nor is a default answer (marked ' + 
+      'above as [All other answers]) and tag the following misconceptions ' +
+      'to that answer group:  name, name_2, name_3');
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     expect(_sampleQuestion.validate([])).toEqual(
