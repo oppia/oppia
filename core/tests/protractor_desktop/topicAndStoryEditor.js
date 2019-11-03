@@ -193,7 +193,7 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
   });
 
-  it('should assign a skill to a subtopic correctly', function() {
+  it('should assign a skill to, between, and from subtopics', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 2');
     skillEditorPage.editConceptCard('Concept card explanation');
