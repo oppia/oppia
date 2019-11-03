@@ -133,24 +133,18 @@ def check_changes(filetype):
     if filetype == 'feconf':
         filepath = FECONF_FILEPATH
         keys_to_check = KEYS_UPDATED_IN_FECONF
-        assignment_op = '= '
-    else:
+    elif filetype == 'constants':
         filepath = CONSTANTS_FILEPATH
         keys_to_check = KEYS_UPDATED_IN_CONSTANTS
-        assignment_op = ': '
+    else:
+        return True
 
     diff_output = subprocess.check_output([
         'git', 'diff', filepath])[:-1].split('\n')
-    for index, line in enumerate(diff_output):
-        if index + 1 >= len(diff_output):
-            continue
-        next_line = diff_output[index + 1]
-        if line.startswith('-') and next_line.startswith('+') and any(
+    for line in diff_output:
+        if (line.startswith('-') or line.startswith('+')) and any(
                 key in line for key in keys_to_check):
-            intial_value = line[line.find(assignment_op):]
-            final_value = next_line[next_line.find(assignment_op):]
-            if intial_value != final_value:
-                return False
+            return False
     return True
 
 

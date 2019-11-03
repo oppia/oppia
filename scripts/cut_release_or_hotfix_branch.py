@@ -86,8 +86,10 @@ else:
 HOTFIX_NUMBER = int(PARSED_ARGS.hotfix_number)
 if not HOTFIX_NUMBER:
     NEW_BRANCH_NAME = 'release-%s' % TARGET_VERSION
+    NEW_BRANCH_TYPE = 'release'
 else:
     NEW_BRANCH_NAME = 'release-%s-hotfix-%s' % (TARGET_VERSION, HOTFIX_NUMBER)
+    NEW_BRANCH_TYPE = 'hotfix'
 
 
 def _verify_target_branch_does_not_already_exist(remote_alias):
@@ -167,7 +169,7 @@ def _verify_target_version_is_consistent_with_latest_released_version():
 def _verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
         remote_alias):
     """Checks that the hotfix number is one ahead of previous hotfix
-        number.
+    number.
 
     Args:
         remote_alias: str. The alias that points to the remote oppia
@@ -235,16 +237,10 @@ def _execute_branch_cut():
                 'Exiting.' % branch_to_check)
             sys.exit()
 
-    if HOTFIX_NUMBER:
-        new_branch_type = 'hotfix'
-    else:
-        new_branch_type = 'release'
-
     # Cut a new release or hotfix branch.
-    if new_branch_type == 'hotfix':
+    if NEW_BRANCH_TYPE == 'hotfix':
         _verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             remote_alias)
-        new_branch_type = 'hotfix'
         if HOTFIX_NUMBER == 1:
             branch_to_cut_from = 'release-%s' % TARGET_VERSION
         else:
@@ -254,18 +250,17 @@ def _execute_branch_cut():
         subprocess.call([
             'git', 'checkout', '-b', NEW_BRANCH_NAME, branch_to_cut_from])
     else:
-        new_branch_type = 'release'
         python_utils.PRINT('Cutting a new release branch: %s' % NEW_BRANCH_NAME)
         subprocess.call(['git', 'checkout', '-b', NEW_BRANCH_NAME])
 
     # Push the new release branch to GitHub.
-    python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
+    python_utils.PRINT('Pushing new %s branch to GitHub.' % NEW_BRANCH_TYPE)
     subprocess.call(['git', 'push', remote_alias, NEW_BRANCH_NAME])
 
     python_utils.PRINT('')
     python_utils.PRINT(
         'New %s branch successfully cut. You are now on branch %s' % (
-            new_branch_type, NEW_BRANCH_NAME))
+            NEW_BRANCH_TYPE, NEW_BRANCH_NAME))
     python_utils.PRINT('Done!')
 
 
