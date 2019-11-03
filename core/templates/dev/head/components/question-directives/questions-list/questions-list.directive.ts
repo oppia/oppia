@@ -474,7 +474,8 @@ angular.module('oppia').directive('questionsList', [
                     }
                     $uibModalInstance.close();
                   };
-                  // Checking if Question contains all requirement to enable Save and Publish Question
+                  // Checking if Question contains all requirement to enable
+                  //Save and Publish Question
                   $scope.toggleEnableButton = function() {
                     return $scope.question.validate(
                       $scope.misconceptionsBySkill);
