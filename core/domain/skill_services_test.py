@@ -965,11 +965,6 @@ class MockSkillObject(skill_domain.Skill):
         return skill_contents
 
     @classmethod
-    def _convert_misconception_v1_dict_to_v2_dict(cls, misconceptions):
-        """Converts v1 misconceptions dict to v2."""
-        return misconceptions
-
-    @classmethod
     def _convert_rubric_v1_dict_to_v2_dict(cls, rubrics):
         """Converts v1 rubrics dict to v2."""
         return rubrics
@@ -1041,16 +1036,19 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                     explanation_content_id: {}
                 }
             }))
-        misconception = skill_domain.Misconception(
-            1, 'name', 'description', 'default_feedback', True)
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
             language_code='en',
-            misconceptions=[misconception.to_dict()],
+            misconceptions=[{
+                'id': 1,
+                'name': 'name',
+                'notes': 'notes',
+                'feedback': 'default_feedback'
+            }],
             rubrics=[],
             skill_contents=skill_contents.to_dict(),
-            next_misconception_id=1,
+            next_misconception_id=2,
             misconceptions_schema_version=1,
             rubric_schema_version=1,
             skill_contents_schema_version=1,
@@ -1060,14 +1058,14 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         model.commit(
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
-        swap_skill_object = self.swap(skill_domain, 'Skill', MockSkillObject)
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 2)
 
-        with swap_skill_object, current_schema_version_swap:
+        with current_schema_version_swap:
             skill = skill_services.get_skill_from_model(model)
 
         self.assertEqual(skill.misconceptions_schema_version, 2)
+        self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
 
     def test_migrate_rubrics_to_latest_schema(self):
         skill_services.create_new_skill_rights('skill_id', 'user_id_admin')
