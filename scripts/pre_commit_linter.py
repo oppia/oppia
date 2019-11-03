@@ -1967,7 +1967,8 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                             python_utils.PRINT('')
                             total_error_count += 1
             if failed:
-                summary_message = ('%s Pattern check failed, see errors above '
+                summary_message = (
+                    '%s Pattern check failed, see errors above '
                     'for patterns that should be removed.' % (
                         _MESSAGE_TYPE_FAILED))
                 summary_messages.append(summary_message)
@@ -2174,7 +2175,8 @@ class JsTsLintChecksManager(LintChecksManager):
                 python_utils.PRINT(err_msg)
 
             if failed:
-                summary_message = ('%s  Extra JS files check failed, see '
+                summary_message = (
+                    '%s  Extra JS files check failed, see '
                     'message above on resolution steps.' % (
                         _MESSAGE_TYPE_FAILED))
             else:
@@ -2228,8 +2230,8 @@ class JsTsLintChecksManager(LintChecksManager):
             if failed:
                 summary_message = (
                     '%s  JS and TS Component name and count check failed, '
-                    'see messages above for duplicate names.' %
-                    (_MESSAGE_TYPE_FAILED))
+                    'see messages above for duplicate names.' % (
+                        _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -2362,7 +2364,8 @@ class JsTsLintChecksManager(LintChecksManager):
 
         with _redirect_stdout(stdout):
             if failed:
-                summary_message = ('%s   Directive scope check failed, '
+                summary_message = (
+                    '%s   Directive scope check failed, '
                     'see messages above for suggested fixes.' % (
                         _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
@@ -2702,7 +2705,8 @@ class JsTsLintChecksManager(LintChecksManager):
                                 'constants file.' % (filepath, constant))
 
             if failed:
-                summary_message = ('%s  Constants declaration check failed, '
+                summary_message = (
+                    '%s  Constants declaration check failed, '
                     'see messages above for constants with errors.' % (
                         _MESSAGE_TYPE_FAILED))
             else:
@@ -2795,8 +2799,9 @@ class JsTsLintChecksManager(LintChecksManager):
                         python_utils.PRINT('')
 
             if failed:
-                summary_message = ('%s   HTML directive name check failed, see '
-                    'files above that did not end with _directive.html but '
+                summary_message = (
+                    '%s   HTML directive name check failed, see files above '
+                    'that did not end with _directive.html but '
                     'should have.' % _MESSAGE_TYPE_FAILED)
                 summary_messages.append(summary_message)
             else:
@@ -3226,8 +3231,9 @@ class OtherLintChecksManager(LintChecksManager):
                     failed = True
 
             if failed:
-                summary_message = ('%s   HTML tag and attribute check failed, '
-                    'fix the HTML files listed above.' % _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s   HTML tag and attribute check failed, fix the HTML '
+                    'files listed above.' % _MESSAGE_TYPE_FAILED)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -3289,7 +3295,8 @@ class OtherLintChecksManager(LintChecksManager):
             if total_error_count:
                 python_utils.PRINT('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
-                summary_message = ('%s   HTML linting failed, '
+                summary_message = (
+                    '%s   HTML linting failed, '
                     'fix the HTML files listed above.' % _MESSAGE_TYPE_FAILED)
                 summary_messages.append(summary_message)
             else:
