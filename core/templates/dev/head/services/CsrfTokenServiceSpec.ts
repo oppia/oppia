@@ -18,11 +18,11 @@
 
 import $ from 'jquery';
 
-import { CsrfTokenService } from './CsrfTokenService';
+import { CsrfTokenService } from 'services/CsrfTokenService';
 
 
-describe('Csrf Token Service', function() {
-  let csrfTokenService: CsrfTokenService ;
+fdescribe('Csrf Token Service', function() {
+  let csrfTokenService: CsrfTokenService = null;
 
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
@@ -47,9 +47,7 @@ describe('Csrf Token Service', function() {
   });
 
   it('should error if getTokenAsync is called before initialize', () => {
-    csrfTokenService.getTokenAsync();
-
-    expect(csrfTokenService.getTokenAsync)
-      .toThrowError('Token needs to be initialized');
+    expect(csrfTokenService.getTokenAsync())
+      .toThrow(new Error('Token needs to be initialized'));
   });
 });
