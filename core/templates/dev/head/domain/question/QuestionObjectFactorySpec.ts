@@ -236,10 +236,10 @@ describe('Question object factory', function() {
     };
     expect(
       _sampleQuestion.validate(misconceptionsDict)).toEqual(
-      'The following misconceptions should also be caught: name, name_2, ' +
-      'name_3. Click on (or create) an answer that is neither marked correct ' +
-      'nor is a default answer (marked above as [All other answers]) to tag ' +
-      'a misconception to that answer group.');
+      'Click on (or create) an answer ' +
+      'that is neither marked correct nor is a default answer (marked ' +
+      'above as [All other answers]) and tag the following misconceptions' +
+      ' to that answer group: name, name_2, name_3');
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     expect(_sampleQuestion.validate([])).toEqual(
