@@ -15,7 +15,7 @@
     <th class="dashboard-table-headings">
       <p> No. </p>
     </th>
-    <th class="dashboard-table-headings">
+    <th class="dashboard-table-headings question-content-heading">
       <p> Question Content </p>
     </th>
     <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
@@ -40,7 +40,8 @@
   <tr ng-repeat="questionSummary in $ctrl.getQuestionSummaries()"
       class="list-item protractor-test-question-list-item"
       style="height: 4em;"
-      ng-click="$ctrl.editQuestion(questionSummary.summary)">
+      ng-click="$ctrl.editQuestion(questionSummary.summary)"
+      ng-dblclick="$event.stopPropagation()">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
     <td> <[questionSummary.summary.question_content]> </td>
     <td> <[$ctrl.getDifficultyString(questionSummary.skill_difficulties[0])]> </td>
@@ -97,6 +98,10 @@
     border-bottom: 2px solid #bbb;
     padding-bottom: 0.7em;
     text-align: center;
+  }
+
+  questions-list .dashboard-table .question-content-heading {
+    text-align: left;
   }
 
   questions-list .dashboard-table .dashboard-table-headings p {

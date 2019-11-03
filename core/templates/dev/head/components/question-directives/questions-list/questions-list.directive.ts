@@ -88,6 +88,7 @@ angular.module('oppia').directive('questionsList', [
           ctrl.getQuestionSummaries =
             QuestionsListService.getCachedQuestionSummaries;
           ctrl.getCurrentPageNumber = QuestionsListService.getCurrentPageNumber;
+          ctrl.isEditorOpen = false;
 
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
@@ -311,6 +312,9 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.editQuestion = function(questionSummary) {
+            if (ctrl.isEditorOpen) {
+              return;
+            }
             ctrl.misconceptionsBySkill = {};
             EditableQuestionBackendApiService.fetchQuestion(
               questionSummary.id).then(function(response) {
@@ -559,6 +563,7 @@ angular.module('oppia').directive('questionsList', [
             var canEditQuestion = ctrl.canEditQuestion();
             var misconceptionsBySkill = ctrl.misconceptionsBySkill;
             QuestionUndoRedoService.clearChanges();
+            ctrl.isEditorOpen = true;
 
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -631,7 +636,10 @@ angular.module('oppia').directive('questionsList', [
             });
 
             modalInstance.result.then(function() {
+              ctrl.isEditorOpen = false;
               ctrl.saveAndPublishQuestion();
+            }, function() {
+              ctrl.isEditorOpen = false;
             });
           };
 
