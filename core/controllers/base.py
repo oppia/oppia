@@ -38,7 +38,6 @@ import jinja_utils
 import python_utils
 import utils
 
-from google.appengine.api import users
 import webapp2
 
 current_user_services = models.Registry.import_current_user_services()
@@ -49,7 +48,6 @@ DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
-
 
 
 def _clear_login_cookies(response_headers):
@@ -80,7 +78,8 @@ class LogoutPage(webapp2.RequestHandler):
         url_to_redirect_to = '/'
 
         if constants.DEV_MODE:
-            self.redirect(users.create_logout_url(url_to_redirect_to))
+            self.redirect(
+                current_user_services.create_logout_url(url_to_redirect_to))
         else:
             self.redirect(url_to_redirect_to)
 
@@ -140,24 +139,25 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.user_id = current_user_services.get_current_user_id()
+        self.gae_id = current_user_services.get_current_gae_id()
+        self.user_id = None
         self.username = None
         self.partially_logged_in = False
 
-        if self.user_id:
-            user_settings = user_services.get_user_settings(
-                self.user_id, strict=False)
+        if self.gae_id:
+            user_settings = user_services.get_user_settings_by_gae_id(
+                self.gae_id, strict=False)
             if user_settings is None:
                 email = current_user_services.get_current_user_email()
                 user_settings = user_services.create_new_user(
-                    self.user_id, email)
+                    self.gae_id, email)
             self.values['user_email'] = user_settings.email
+            self.user_id = user_settings.user_id
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                    user_services.has_fully_registered(self.user_id)):
+                    user_services.has_fully_registered(user_settings.user_id)):
                 _clear_login_cookies(self.response.headers)
                 self.partially_logged_in = True
-                self.user_id = None
             else:
                 self.username = user_settings.username
                 self.values['username'] = self.username
@@ -208,7 +208,8 @@ class BaseHandler(webapp2.RequestHandler):
         # In DEV_MODE, clearing cookies does not log out the user, so we
         # force-clear them by redirecting to the logout URL.
         if constants.DEV_MODE and self.partially_logged_in:
-            self.redirect(users.create_logout_url(self.request.uri))
+            self.redirect(
+                current_user_services.create_logout_url(self.request.uri))
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
