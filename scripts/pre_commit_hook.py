@@ -132,10 +132,10 @@ def check_changes(filetype):
     """
     if filetype == 'feconf':
         filepath = FECONF_FILEPATH
-        keys_to_check = KEYS_UPDATED_IN_FECONF
+        keys_to_check = ['%s = ' % key for key in KEYS_UPDATED_IN_FECONF]
     elif filetype == 'constants':
         filepath = CONSTANTS_FILEPATH
-        keys_to_check = KEYS_UPDATED_IN_CONSTANTS
+        keys_to_check = ['"%s": ' % key for key in KEYS_UPDATED_IN_CONSTANTS]
     else:
         return True
 
