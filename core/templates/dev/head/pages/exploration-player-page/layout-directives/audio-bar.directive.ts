@@ -17,9 +17,9 @@
  * audio translation in the learner view.
  */
 
-require('domain/utilities/BrowserCheckerService.ts');
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/browser-checker.service.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/audio-preloader.service.ts');
 require(
   'pages/exploration-player-page/services/' +

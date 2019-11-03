@@ -17,17 +17,18 @@
  * questions list in editors.
  */
 
-require('domain/question/QuestionBackendApiService.ts');
+require('domain/question/question-backend-api.service.ts');
 require('services/ContextService.ts');
 require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionsListService', [
-  '$rootScope', 'QuestionBackendApiService',
+  '$filter', '$rootScope', 'QuestionBackendApiService',
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'NUM_QUESTIONS_PER_PAGE', function(
-      $rootScope, QuestionBackendApiService,
+      $filter, $rootScope, QuestionBackendApiService,
       EVENT_QUESTION_SUMMARIES_INITIALIZED, NUM_QUESTIONS_PER_PAGE) {
     var _questionSummaries = [];
     var _nextCursorForQuestions = '';
+    var _currentPage = 0;
 
     var _setQuestionSummaries = function(newQuestionSummaries) {
       if (_questionSummaries.length > 0) {
@@ -57,27 +58,25 @@ angular.module('oppia').factory('QuestionsListService', [
     };
 
     return {
-      isLastQuestionBatch: function(index) {
+      isLastQuestionBatch: function() {
         return (
           _nextCursorForQuestions === null &&
-          (index + 1) * NUM_QUESTIONS_PER_PAGE >=
+          (_currentPage + 1) * NUM_QUESTIONS_PER_PAGE >=
             _questionSummaries.length);
       },
 
       getQuestionSummariesAsync: function(
-          index, skillIds, fetchMore, resetHistory) {
+          skillIds, fetchMore, resetHistory) {
         if (resetHistory) {
           _questionSummaries = [];
           _nextCursorForQuestions = '';
         }
-
         var num = NUM_QUESTIONS_PER_PAGE;
 
         if (skillIds === undefined || skillIds.length === 0) {
-          return [];
+          return;
         }
-
-        if ((index + 1) * num > _questionSummaries.length &&
+        if ((_currentPage + 1) * num > _questionSummaries.length &&
             _nextCursorForQuestions !== null && fetchMore) {
           QuestionBackendApiService.fetchQuestionSummaries(
             skillIds, _nextCursorForQuestions).then(
@@ -87,8 +86,36 @@ angular.module('oppia').factory('QuestionsListService', [
             }
           );
         }
-        return _questionSummaries.slice(index * num, (index + 1) * num);
       },
+
+      getCachedQuestionSummaries: function() {
+        var num = NUM_QUESTIONS_PER_PAGE;
+        return _questionSummaries.slice(
+          _currentPage * num, (_currentPage + 1) * num).map(
+          function(question) {
+            var summary = $filter(
+              'formatRtePreview')(question.summary.question_content);
+            question.summary.question_content =
+              $filter('truncate')(summary, 100);
+            return question;
+          });
+      },
+
+      incrementPageNumber: function() {
+        _currentPage++;
+      },
+
+      decrementPageNumber: function() {
+        _currentPage--;
+      },
+
+      resetPageNumber: function() {
+        _currentPage = 0;
+      },
+
+      getCurrentPageNumber: function() {
+        return _currentPage;
+      }
     };
   }
 ]);

@@ -18,23 +18,23 @@
  * retrieving the topic, saving it, and listening for changes.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/skill/RubricObjectFactory.ts');
+require('domain/story/editable-story-backend-api.service.ts');
 require('domain/story/StorySummaryObjectFactory.ts');
-require('domain/topic/EditableTopicBackendApiService.ts');
+require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
-require('domain/topic/TopicRightsBackendApiService.ts');
+require('domain/topic/topic-rights-backend-api.service.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
-require('services/QuestionsListService.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'QuestionsListService', 'StorySummaryObjectFactory',
+  'RubricObjectFactory', 'StorySummaryObjectFactory',
   'SubtopicPageObjectFactory', 'TopicObjectFactory',
   'TopicRightsBackendApiService', 'TopicRightsObjectFactory', 'UndoRedoService',
   'EVENT_STORY_SUMMARIES_INITIALIZED',
@@ -42,7 +42,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
   'EVENT_TOPIC_REINITIALIZED', function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
-      QuestionsListService, StorySummaryObjectFactory,
+      RubricObjectFactory, StorySummaryObjectFactory,
       SubtopicPageObjectFactory, TopicObjectFactory,
       TopicRightsBackendApiService, TopicRightsObjectFactory, UndoRedoService,
       EVENT_STORY_SUMMARIES_INITIALIZED,
@@ -62,6 +62,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
+    var _skillIdToRubricsObject = {};
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -94,6 +95,14 @@ angular.module('oppia').factory('TopicEditorStateService', [
       _setTopic(
         TopicObjectFactory.create(
           newBackendTopicDict, skillIdToDescriptionDict));
+    };
+    var _updateSkillIdToRubricsObject = function(skillIdToRubricsObject) {
+      for (var skillId in skillIdToRubricsObject) {
+        var rubrics = skillIdToRubricsObject[skillId].map(function(rubric) {
+          return RubricObjectFactory.createFromBackendDict(rubric);
+        });
+        _skillIdToRubricsObject[skillId] = rubrics;
+      }
     };
     var _setSubtopicPage = function(subtopicPage) {
       _subtopicPage.copyFromSubtopicPage(subtopicPage);
@@ -134,13 +143,12 @@ angular.module('oppia').factory('TopicEditorStateService', [
               newBackendTopicObject.topicDict,
               newBackendTopicObject.skillIdToDescriptionDict
             );
+            _updateSkillIdToRubricsObject(
+              newBackendTopicObject.skillIdToRubricsDict);
             EditableTopicBackendApiService.fetchStories(topicId).then(
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
               });
-            QuestionsListService.getQuestionSummariesAsync(
-              0, _topic.getSkillIds(), true, false
-            );
           },
           function(error) {
             AlertsService.addWarning(
@@ -196,6 +204,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
        */
       hasLoadedTopic: function() {
         return _topicIsInitialized;
+      },
+
+      getSkillIdToRubricsObject: function() {
+        return _skillIdToRubricsObject;
       },
 
       /**
@@ -351,6 +363,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
               topicBackendObject.topicDict,
               topicBackendObject.skillIdToDescriptionDict
             );
+            _updateSkillIdToRubricsObject(
+              topicBackendObject.skillIdToRubricsDict);
             var changeList = UndoRedoService.getCommittableChangeList();
             for (var i = 0; i < changeList.length; i++) {
               if (changeList[i].cmd === 'delete_canonical_story' ||

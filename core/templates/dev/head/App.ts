@@ -63,7 +63,7 @@ require(
   'top-navigation-bar.directive.ts');
 
 require('domain/user/UserInfoObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('app.constants.ajs.ts');
 
@@ -338,5 +338,21 @@ if (!Array.prototype.fill) {
       // Step 13.
       return O;
     }
+  });
+}
+
+
+// Add SVGElement.prototype.outerHTML polyfill for IE
+if (!('outerHTML' in SVGElement.prototype)) {
+  Object.defineProperty(SVGElement.prototype, 'outerHTML', {
+    get: function() {
+      var $node, $temp;
+      $temp = document.createElement('div');
+      $node = this.cloneNode(true);
+      $temp.appendChild($node);
+      return $temp.innerHTML;
+    },
+    enumerable: false,
+    configurable: true
   });
 }

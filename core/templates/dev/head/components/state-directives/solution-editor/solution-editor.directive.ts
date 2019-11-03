@@ -21,7 +21,7 @@ require(
   'solution-explanation-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +

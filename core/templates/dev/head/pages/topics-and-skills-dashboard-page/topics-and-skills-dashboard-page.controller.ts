@@ -34,9 +34,9 @@ require('components/rubrics-editor/rubrics-editor.directive.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardBackendApiService.ts'
+  'topics-and-skills-dashboard-backend-api.service.ts'
 );
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 
 require(
@@ -119,6 +119,71 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 }
               }
             );
+          };
+
+          ctrl.createTopic = function() {
+            TopicCreationService.createNewTopic();
+          };
+          ctrl.createSkill = function() {
+            var rubrics = [];
+            for (var idx in SKILL_DIFFICULTIES) {
+              rubrics.push(
+                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], 'N/A')
+              );
+            }
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topics-and-skills-dashboard-page/templates/' +
+                'create-new-skill-modal.template.html'),
+              backdrop: 'static',
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.newSkillDescription = '';
+                  $scope.rubrics = rubrics;
+                  $scope.allRubricsAdded = true;
+
+                  $scope.$watch('newSkillDescription', function() {
+                    $scope.rubrics[1].setExplanation(
+                      $scope.newSkillDescription);
+                  });
+
+                  var areAllRubricsPresent = function() {
+                    for (var idx in $scope.rubrics) {
+                      if ($scope.rubrics[idx].getExplanation() === '') {
+                        $scope.allRubricsAdded = false;
+                        return;
+                      }
+                    }
+                    $scope.allRubricsAdded = true;
+                  };
+
+
+                  $scope.onSaveRubric = function(difficulty, explanation) {
+                    for (var idx in $scope.rubrics) {
+                      if ($scope.rubrics[idx].getDifficulty() === difficulty) {
+                        $scope.rubrics[idx].setExplanation(explanation);
+                      }
+                    }
+                    areAllRubricsPresent();
+                  };
+
+                  $scope.createNewSkill = function() {
+                    $uibModalInstance.close({
+                      description: $scope.newSkillDescription,
+                      rubrics: $scope.rubrics
+                    });
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            }).result.then(function(result) {
+              SkillCreationService.createNewSkill(
+                result.description, result.rubrics, []);
+            });
           };
 
           ctrl.isTopicTabHelpTextVisible = function() {
