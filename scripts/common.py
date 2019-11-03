@@ -316,6 +316,7 @@ def check_blocking_bug_issue_count(repo):
 
     Raises:
         Exception: Number of unresolved blocking bugs is not zero.
+        Exception: The blocking bug milestone is closed.
     """
     blocking_bugs_milestone = repo.get_milestone(
         number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)

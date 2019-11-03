@@ -341,8 +341,12 @@ def execute_deployment():
     """Executes the deployment process after doing the prerequisite checks.
 
     Raises:
+        Exception: App name is invalid.
+        Exception: Custom version is used with production app.
+        Exception: App name is not specified.
         Exception: The deployment script is not run from a release branch.
         Exception: Current release version has '.' character.
+        Exception: Last commit message is invalid.
         Exception: The mailgun API key is not added before deployment.
         Exception: Could not find third party directory.
         Exception: Invalid directory accessed during deployment.
