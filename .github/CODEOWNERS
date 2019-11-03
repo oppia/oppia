@@ -288,6 +288,7 @@
 /core/domain/skill*.py @aks681
 /core/storage/skill/ @aks681
 /core/templates/dev/head/components/entity-creation-services/skill-creation.service.ts @aks681
+/core/templates/dev/head/components/review-material-editor/ @aks681
 /core/templates/dev/head/components/rubrics-editor/ @aks681
 /core/templates/dev/head/components/skill-selector/ @aks681
 /core/templates/dev/head/domain/skill/ @aks681
