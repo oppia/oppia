@@ -169,7 +169,7 @@ describe('Visiting user profile page', function() {
   });
 });
 
-describe('playing the exploration', function() {
+describe('Playing the exploration', function() {
   var TEST_USERNAME = 'testUser';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
 
