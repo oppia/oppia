@@ -33,8 +33,13 @@ angular.module('oppia').factory('EditableSkillBackendApiService', [
 
       $http.get(skillDataUrl).then(function(response) {
         var skill = angular.copy(response.data.skill);
+        var groupedSkillSummaryDicts = angular.copy(
+          response.data.grouped_skill_summaries);
         if (successCallback) {
-          successCallback(skill);
+          successCallback({
+            skill: skill,
+            groupedSkillSummaries: groupedSkillSummaryDicts
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {

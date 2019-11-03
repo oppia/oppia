@@ -58,7 +58,28 @@ describe('Skill editor state service', function() {
       updateSkill: null
     };
 
-    var _fetchOrUpdateSkill = function() {
+    var _fetchSkill = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve({
+            skill: self.newBackendSkillObject,
+            groupedSkillSummaries: {
+              Name: [{
+                id: 'skill_id_1',
+                description: 'Description 1'
+              }, {
+                id: 'skill_id_2',
+                description: 'Description 2'
+              }]
+            }
+          });
+        } else {
+          reject();
+        }
+      });
+    };
+
+    var _updateSkill = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
           resolve(self.newBackendSkillObject);
@@ -70,8 +91,8 @@ describe('Skill editor state service', function() {
 
     self.newBackendSkillObject = {};
     self.failure = null;
-    self.fetchSkill = _fetchOrUpdateSkill;
-    self.updateSkill = _fetchOrUpdateSkill;
+    self.fetchSkill = _fetchSkill;
+    self.updateSkill = _updateSkill;
 
     return self;
   };
@@ -225,6 +246,11 @@ describe('Skill editor state service', function() {
     SkillEditorStateService.loadSkill('1');
     expect(fakeEditableSkillBackendApiService.fetchSkill)
       .toHaveBeenCalled();
+    var groupedSkillSummaries =
+      SkillEditorStateService.getGroupedSkillSummaries();
+    expect(len(groupedSkillSummaries.Name), 2);
+    expect(groupedSkillSummaries.Name[0].id, 'skill_id_1');
+    expect(groupedSkillSummaries.Name[1].id, 'skill_id_2');
   });
 
   it('should track whether it is currently loading the skill', function() {
