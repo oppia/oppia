@@ -190,20 +190,23 @@ describe('Playing the exploration', function() {
   beforeAll(function() {
     users.createUser(TEST_EMAIL, TEST_USERNAME);
     users.login(TEST_EMAIL);
+  });
+
+  it('should change the cards on clicking next and back buttons', function() {
     workflow.createAndPublishTwoCardExploration(
       EXPLORATION.title,
       EXPLORATION.category,
       EXPLORATION.objective,
       EXPLORATION.language
     );
+
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION.title);
     libraryPage.playExploration(EXPLORATION.title);
-  });
 
-  it('should change the cards on clicking next and back buttons', function() {
     explorationPlayerPage.expectExplorationNameToBe(EXPLORATION.title);
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
 
