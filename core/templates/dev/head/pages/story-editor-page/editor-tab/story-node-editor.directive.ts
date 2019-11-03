@@ -157,7 +157,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
-                  $scope.skillsInSameTopicCount = 0;
+                  $scope.countOfSkillsToPrioritize = 0;
                   $scope.save = function() {
                     $uibModalInstance.close($scope.selectedSkillId);
                   };
@@ -192,7 +192,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
-                  $scope.skillsInSameTopicCount = 0;
+                  $scope.countOfSkillsToPrioritize = 0;
                   $scope.save = function() {
                     $uibModalInstance.close($scope.selectedSkillId);
                   };
