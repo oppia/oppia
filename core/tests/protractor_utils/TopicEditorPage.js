@@ -181,6 +181,19 @@ var TopicEditorPage = function() {
       dragAndDrop, toMove.getWebElement(), target.getWebElement());
   };
 
+  this.dragSkillBetweenSubtopics = function(
+      fromSubtopicIndex, skillCardIndex, toSubtopicIndex) {
+    var subtopicTitleElem = subtopicTitles.get(fromSubtopicIndex);
+    var subtopicCol = subtopicTitleElem.element(
+      by.xpath('..')).element(by.xpath('..'));
+    skillNamesElems = subtopicCol.all(
+      by.css('.protractor-test-assigned-skill-card-text'));
+    var toMove = skillNamesElems.get(skillCardIndex);
+    var target = subtopicTitles.get(toSubtopicIndex);
+    browser.executeScript(
+      dragAndDrop, toMove.getWebElement(), target.getWebElement());
+  };
+
   this.expectSubtopicToHaveSkills = function(subtopicIndex, skillNames) {
     var subtopicTitleElem = subtopicTitles.get(subtopicIndex);
     var subtopicCol = subtopicTitleElem.element(
