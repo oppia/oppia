@@ -48,7 +48,7 @@ angular.module('oppia').directive('questionsTab', [
         'SkillEditorStateService', 'QuestionCreationService', 'UrlService',
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'QuestionsListService', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'QuestionsListService',
         'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
         'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'NUM_QUESTIONS_PER_PAGE', function(
@@ -56,7 +56,7 @@ angular.module('oppia').directive('questionsTab', [
             SkillEditorStateService, QuestionCreationService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
-            QuestionsListService, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            QuestionsListService,
             StateEditorService, QuestionUndoRedoService, UndoRedoService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
             NUM_QUESTIONS_PER_PAGE) {
