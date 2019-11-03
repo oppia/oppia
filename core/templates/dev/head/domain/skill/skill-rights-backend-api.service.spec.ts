@@ -60,37 +60,6 @@ describe('Skill rights backend API service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully set a skill to be public', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/skill_editor_handler/publish_skill/0').respond(200);
-    SkillRightsBackendApiService.setSkillPublic('0', 1).then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  });
-
-  it('should call the provided fail handler on HTTP failure', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/skill_editor_handler/publish_skill/0').respond(
-      500, 'Error loading skill 0.');
-    SkillRightsBackendApiService.setSkillPublic('0', 1).then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  });
-
   it('should report a cached skill rights after caching it', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
