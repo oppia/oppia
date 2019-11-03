@@ -37,13 +37,7 @@ export class Misconception {
     this._mustBeAddressed = mustBeAddressed;
   }
 
-  toBackendDict(): {
-    id: string;
-    name: string;
-    notes: string;
-    feedback: string;
-    must_be_addressed: boolean;
-  } {
+  toBackendDict(): any {
     return {
       id: this._id,
       name: this._name,
@@ -94,13 +88,7 @@ export class Misconception {
   providedIn: 'root'
 })
 export class MisconceptionObjectFactory {
-  createFromBackendDict(misconceptionBackendDict: {
-    id: string;
-    name: string;
-    notes: string;
-    feedback: string;
-    must_be_addressed: boolean;
-  }): Misconception {
+  createFromBackendDict(misconceptionBackendDict: any): Misconception {
     return new Misconception(
       misconceptionBackendDict.id,
       misconceptionBackendDict.name,

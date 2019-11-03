@@ -220,7 +220,6 @@ angular.module('oppia').factory('SkillUpdateService', [
           misconception_id: misconceptionId
         };
         var oldMisconception = skill.findMisconceptionById(misconceptionId);
-        console.log(CMD_DELETE_SKILL_MISCONCEPTION);
         _applyChange(
           skill, CMD_DELETE_SKILL_MISCONCEPTION, params,
           function(changeDict, skill) {

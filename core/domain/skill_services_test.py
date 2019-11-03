@@ -804,7 +804,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'Updated misconception name.')
 
     def test_cannot_update_misconception_must_be_addressed_with_invalid_id(
-        self):
+            self):
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'property_name': (

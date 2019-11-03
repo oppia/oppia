@@ -1029,7 +1029,7 @@ class Skill(python_utils.OBJECT):
         self.misconceptions[index].name = name
 
     def update_misconception_must_be_addressed(
-        self, misconception_id, must_be_addressed):
+            self, misconception_id, must_be_addressed):
         """Updates the must_be_addressed value of the misconception with the
         given id.
 

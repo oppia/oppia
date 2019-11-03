@@ -74,7 +74,9 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                   break;
                 }
               }
-              if (topicName !== null) break;
+              if (topicName !== null) {
+                break;
+              }
             }
             // The loop is split into 2 so as to surface the other skills in the
             // same topic at the top.
@@ -82,14 +84,15 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
               allSkillSummaries.push(groupedSkillSummaries[topicName][idx]);
             }
             for (var name in groupedSkillSummaries) {
-              if (name === topicName) continue;
+              if (name === topicName) {
+                continue;
+              }
               var skillSummaries = groupedSkillSummaries[name];
               for (var idx in skillSummaries) {
                 allSkillSummaries.push(skillSummaries[idx]);
               }
             }
-            console.log(allSkillSummaries);
-            console.log(topicName);
+
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story-editor-page/modal-templates/' +
@@ -117,7 +120,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                 return;
               }
               for (var idx in $scope.skill.getPrerequisiteSkillIds()) {
-                if ($scope.skill.getPrerequisiteSkillIds()[idx] == skillId) {
+                if ($scope.skill.getPrerequisiteSkillIds()[idx] === skillId) {
                   AlertsService.addInfoMessage(
                     'Given skill is already a prerequisite skill', 5000);
                   return;
