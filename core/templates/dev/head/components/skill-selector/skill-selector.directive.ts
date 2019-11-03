@@ -24,7 +24,8 @@ angular.module('oppia').directive('selectSkill', [
       restrict: 'E',
       scope: {
         getSkillSummaries: '&skillSummaries',
-        selectedSkillId: '='
+        selectedSkillId: '=',
+        getSkillsInSameTopicCount: '&skillsInSameTopicCount'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/skill-selector/skill-selector.directive.html'),
@@ -33,6 +34,16 @@ angular.module('oppia').directive('selectSkill', [
         function(
             $scope, $uibModal, $rootScope) {
           $scope.skillSummaries = $scope.getSkillSummaries();
+          $scope.skillSummariesInitial = [];
+          $scope.skillSummariesFinal = [];
+
+          for (var idx in $scope.skillSummaries) {
+            if (idx < $scope.getSkillsInSameTopicCount()) {
+              $scope.skillSummariesInitial.push($scope.skillSummaries[idx]);
+            } else {
+              $scope.skillSummariesFinal.push($scope.skillSummaries[idx]);
+            }
+          }
           $scope.selectSkill = function(skillId) {
             $scope.selectedSkillId = skillId;
           };
