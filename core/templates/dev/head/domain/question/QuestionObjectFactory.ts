@@ -116,7 +116,6 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         }
       });
       if (pendingMisconceptionNamesToTag.length > 0) {
-       
         var returnString = 'Click on (or create) an answer ' +
           'that is neither marked correct nor is a default answer (marked ' +
           'above as [All other answers]) and tag the following misconceptions' +
