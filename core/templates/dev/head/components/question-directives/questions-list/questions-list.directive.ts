@@ -475,10 +475,10 @@ angular.module('oppia').directive('questionsList', [
                     $uibModalInstance.close();
                   };
                   // Checking if Question contains all requirement to enable Save and Publish Question
-                  $scope.toggleEnableButton = function(){
+                  $scope.toggleEnableButton = function() {
                     return $scope.question.validate(
                       $scope.misconceptionsBySkill);
-                  }
+                  };
 
                   $scope.cancel = function() {
                     if (QuestionUndoRedoService.hasChanges()) {
