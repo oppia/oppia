@@ -42,7 +42,7 @@ export class UrlService {
   /* This function returns an object which has dynamic keys
    since the keys generated depend on the URL being provided.
   So exact type of this function can not be determined
-  https://github.com/oppia/oppia/pull/7834 */
+  https://github.com/oppia/oppia/pull/7834#issuecomment-547896982 */
   getUrlParams(): Object {
     let params = {};
     let parts = this.getCurrentQueryString().replace(
