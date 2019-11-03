@@ -25,7 +25,6 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
@@ -33,6 +32,156 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+
+describe('Enable correctness feedback and set correctness', function() {
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
+  var explorationPlayerPage = null;
+  var currentExplorationIndex = 0;
+  var EXPLORATION_TITLE = 'Dummy Exploration';
+  var explorationTitle = null;
+  var libraryPage = null;
+  var correctOptions = [
+    ['MultipleChoiceInput', 'Correct!'],
+    ['TextInput', 'One'],
+    ['NumericInput', 3]
+  ];
+
+  var enableCorrectnessFeedbackSetting = function() {
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.enableCorrectnessFeedback();
+  };
+
+  var testEnableCorrectnessInPlayerPage = function() {
+    libraryPage.get();
+    libraryPage.findExploration(explorationTitle);
+    libraryPage.playExploration(explorationTitle);
+    explorationPlayerPage.submitAnswer.apply(
+      null, correctOptions[currentExplorationIndex]);
+    explorationPlayerPage.expectCorrectFeedback();
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
+  };
+
+  beforeAll(function() {
+    users.createUser('user@markCorrect.com', 'userMarkCorrect');
+    users.login('user@markCorrect.com');
+  });
+
+  beforeEach(function() {
+    explorationTitle = EXPLORATION_TITLE + String(currentExplorationIndex);
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle(explorationTitle);
+    explorationEditorSettingsTab.setCategory('Algorithm');
+    explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    explorationEditorSettingsTab.setLanguage('English');
+    explorationEditorPage.navigateToMainTab();
+  });
+
+  it('should allow selecting correct feedback from the response editor ' +
+     'after the interaction is created', function() {
+    explorationEditorMainTab.setStateName('First');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'Select the right option.'));
+
+    // Create interaction first.
+    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      forms.toRichText('Correct!'),
+      forms.toRichText('Wrong!')
+    ]);
+    explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', forms.toRichText('Good!'),
+      'End', true, 'Equals', 'Correct!');
+    responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('Wrong!'));
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    // Turn on correctness feedback.
+    enableCorrectnessFeedbackSetting();
+
+    // Go back to mark the solution as correct.
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.moveToState('First');
+    responseEditor = explorationEditorMainTab.getResponseEditor(0);
+    responseEditor.markAsCorrect();
+    explorationEditorMainTab.expectTickMarkIsDisplayed();
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+    testEnableCorrectnessInPlayerPage();
+  });
+
+  it('should allow selecting correct feedback from the response editor ' +
+     'during set the interaction', function() {
+    // Turn on correctness feedback first.
+    enableCorrectnessFeedbackSetting();
+
+    // Go to main tab to create interactions.
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.setStateName('First');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'Select the right option.'));
+
+    // Create interaction without closing the add response modal. Set
+    // correctness in the modal.
+    explorationEditorMainTab.setInteractionWithoutCloseAddResponse('TextInput');
+    responseEditor = explorationEditorMainTab.getResponseEditor('pop');
+    responseEditor.markAsCorrect();
+
+    // Set the response for this interaction and close it.
+    explorationEditorMainTab.setResponse(
+      'TextInput', forms.toRichText('Correct!'),
+      'End', true, 'Equals', 'One');
+
+    explorationEditorMainTab.expectTickMarkIsDisplayed();
+    responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('Wrong!'));
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+    testEnableCorrectnessInPlayerPage();
+  });
+
+  it('should allow selecting correct feedback from the default response editor',
+    function() {
+      // Turn on correctness feedback first.
+      enableCorrectnessFeedbackSetting();
+
+      // Go back to main tab to create interactions.
+      explorationEditorPage.navigateToMainTab();
+      explorationEditorMainTab.setStateName('First');
+      explorationEditorMainTab.setContent(forms.toRichText(
+        'Select the right option.'));
+      explorationEditorMainTab.setInteraction('NumericInput');
+
+      // Set correctness in response editor.
+      responseEditor = explorationEditorMainTab.getResponseEditor('default');
+      responseEditor.markAsCorrect();
+      responseEditor.setFeedback(forms.toRichText('Correct!'));
+      responseEditor.setDestination('End', true, true);
+      explorationEditorMainTab.expectTickMarkIsDisplayed();
+
+      explorationEditorMainTab.moveToState('End');
+      explorationEditorMainTab.setInteraction('EndExploration');
+      explorationEditorPage.saveChanges();
+      workflow.publishExploration();
+      testEnableCorrectnessInPlayerPage();
+    });
+
+  afterEach(function() {
+    libraryPage.get();
+    currentExplorationIndex += 1;
+    general.checkForConsoleErrors([]);
+  });
+});
 
 
 describe('Core exploration functionality', function() {

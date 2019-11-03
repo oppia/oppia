@@ -16,7 +16,7 @@
  * @fileoverview Directive for asking learner for answer details.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');

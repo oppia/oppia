@@ -24,7 +24,7 @@ require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/UrlService.ts');
 require('services/UserService.ts');
 require('services/DateTimeFormatService.ts');

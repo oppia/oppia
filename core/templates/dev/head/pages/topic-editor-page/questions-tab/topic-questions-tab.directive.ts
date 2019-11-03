@@ -21,13 +21,13 @@ require(
   'questions-list.directive.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
-require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/editor/undo_redo/question-undo-redo.service.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -52,7 +52,8 @@ angular.module('oppia').directive('questionsTab', [
         'QuestionObjectFactory', 'QuestionsListService',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
         'QuestionUndoRedoService', 'UndoRedoService',
-        'NUM_QUESTIONS_PER_PAGE', function(
+        'NUM_QUESTIONS_PER_PAGE', 'EVENT_TOPIC_INITIALIZED',
+        'EVENT_TOPIC_REINITIALIZED', function(
             $scope, $q, $uibModal, $window,
             AlertsService, TopicEditorStateService, QuestionCreationService,
             UrlService, EditableQuestionBackendApiService,
@@ -60,18 +61,20 @@ angular.module('oppia').directive('questionsTab', [
             QuestionObjectFactory, QuestionsListService,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
             QuestionUndoRedoService, UndoRedoService,
-            NUM_QUESTIONS_PER_PAGE) {
-          $scope.currentPage = 0;
+            NUM_QUESTIONS_PER_PAGE, EVENT_TOPIC_INITIALIZED,
+            EVENT_TOPIC_REINITIALIZED) {
           $scope.getQuestionSummariesAsync =
             QuestionsListService.getQuestionSummariesAsync;
           $scope.isLastQuestionBatch =
             QuestionsListService.isLastQuestionBatch;
-
+          $scope.selectedSkillId = null;
           var _initTab = function() {
             $scope.question = null;
             $scope.skillId = null;
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
+            $scope.skillIdToRubricsObject =
+              TopicEditorStateService.getSkillIdToRubricsObject();
             $scope.allSkillSummaries = [];
             $scope.allSkillSummaries = $scope.allSkillSummaries.concat(
               $scope.topic.getUncategorizedSkillSummaries());
@@ -87,6 +90,15 @@ angular.module('oppia').directive('questionsTab', [
             $scope.emptyMisconceptionsList = [];
           };
 
+          $scope.reinitializeQuestionsList = function(skillId) {
+            $scope.selectedSkillId = skillId;
+            QuestionsListService.resetPageNumber();
+            $scope.getQuestionSummariesAsync(
+              [skillId], true, true
+            );
+          };
+          $scope.$on(EVENT_TOPIC_INITIALIZED, _initTab);
+          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initTab);
           _initTab();
         }
       ]

@@ -16,7 +16,7 @@
  * @fileoverview Functionality for creating a new skill.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('services/AlertsService.ts');
 
 angular.module('oppia').factory('SkillCreationService', [

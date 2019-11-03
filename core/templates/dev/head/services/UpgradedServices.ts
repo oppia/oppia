@@ -16,13 +16,22 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 import { CsrfTokenService } from "./CsrfTokenService";
 import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
+import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
+import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
+import { DocumentAttributeCustomizationService } from
+  'services/contextual/DocumentAttributeCustomizationService';
+import { MetaTagCustomizationService } from
+  'services/contextual/MetaTagCustomizationService';
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UtilsService } from 'services/UtilsService';
-import { WindowDimensionsService } from './contextual/WindowDimensionsService';
+import { WindowDimensionsService } from
+  'services/contextual/WindowDimensionsService';
+import { WindowRef } from 'services/contextual/WindowRefService';
 
 
 @Injectable({
@@ -34,8 +43,17 @@ export class UpgradedServices {
     'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService(),
     'CsrfTokenService': new CsrfTokenService(),
+    'BackgroundMaskService': new BackgroundMaskService(),
+    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
+    'DocumentAttributeCustomizationService':
+        new DocumentAttributeCustomizationService(new WindowRef()),
+    'MetaTagCustomizationService': new MetaTagCustomizationService(
+      new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService())
+      new WindowDimensionsService()),
+    'UtilsService': new UtilsService(),
+    'WindowDimensionsService': new WindowDimensionsService()
   };
 }
 
