@@ -1599,7 +1599,8 @@ tags: []
     def save_new_skill(
             self, skill_id, owner_id,
             description, misconceptions=None, rubrics=None, skill_contents=None,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            prerequisite_skill_ids=None):
         """Creates an Oppia Skill and saves it.
 
         Args:
@@ -1614,6 +1615,8 @@ tags: []
                 explanation and examples of the skill.
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
+            prerequisite_skill_ids: list(str). The prerequisite skill IDs for
+                the skill.
 
         Returns:
             Skill. A newly-created skill.
@@ -1625,6 +1628,8 @@ tags: []
             skill.next_misconception_id = len(misconceptions) + 1
         if skill_contents is not None:
             skill.skill_contents = skill_contents
+        if prerequisite_skill_ids is not None:
+            skill.prerequisite_skill_ids = prerequisite_skill_ids
         if rubrics is not None:
             skill.rubrics = rubrics
         else:
