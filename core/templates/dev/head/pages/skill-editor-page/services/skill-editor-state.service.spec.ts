@@ -156,14 +156,16 @@ describe('Skill editor state service', function() {
       id: '2',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: true
     };
 
     var misconceptionDict2 = {
       id: '4',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: false
     };
 
     var rubricDict = {
@@ -202,7 +204,8 @@ describe('Skill editor state service', function() {
       rubrics: [rubricDict],
       skill_contents: skillContentsDict,
       language_code: 'en',
-      version: 3
+      version: 3,
+      prerequisite_skill_ids: []
     };
 
     skillRightsObject = {

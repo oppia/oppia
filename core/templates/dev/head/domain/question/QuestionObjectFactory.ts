@@ -106,6 +106,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
       var pendingMisconceptionNamesToTag = [];
       Object.keys(misconceptionsBySkill).forEach(function(skillId) {
         for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
+          if (!misconceptionsBySkill[skillId][i].isMandatory()) continue;
           var skillMisconceptionId =
             skillId + '-' + misconceptionsBySkill[skillId][i].getId();
           if (

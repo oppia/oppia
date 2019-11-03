@@ -25,21 +25,31 @@ export class Misconception {
   _name: string;
   _notes: string;
   _feedback: string;
+  _mustBeAddressed: boolean;
 
-  constructor(id: string, name: string, notes: string, feedback: string) {
+  constructor(
+      id: string, name: string, notes: string, feedback: string,
+      mustBeAddressed: boolean) {
     this._id = id;
     this._name = name;
     this._notes = notes;
     this._feedback = feedback;
+    this._mustBeAddressed = mustBeAddressed;
   }
 
   toBackendDict(): {
-    id: string; name: string; notes: string; feedback: string;} {
+    id: string;
+    name: string;
+    notes: string;
+    feedback: string;
+    must_be_addressed: boolean;
+  } {
     return {
       id: this._id,
       name: this._name,
       notes: this._notes,
-      feedback: this._feedback
+      feedback: this._feedback,
+      must_be_addressed: this._mustBeAddressed
     };
   }
 
@@ -63,6 +73,14 @@ export class Misconception {
     this._notes = newNotes;
   }
 
+  isMandatory(): boolean {
+    return this._mustBeAddressed;
+  }
+
+  setMustBeAddressed(newMustBeAddressed: boolean): void {
+    this._mustBeAddressed = newMustBeAddressed;
+  }
+
   getFeedback(): string {
     return this._feedback;
   }
@@ -77,18 +95,23 @@ export class Misconception {
 })
 export class MisconceptionObjectFactory {
   createFromBackendDict(misconceptionBackendDict: {
-      id: string; name: string; notes: string; feedback: string;
-    }): Misconception {
+    id: string;
+    name: string;
+    notes: string;
+    feedback: string;
+    must_be_addressed: boolean;
+  }): Misconception {
     return new Misconception(
       misconceptionBackendDict.id,
       misconceptionBackendDict.name,
       misconceptionBackendDict.notes,
-      misconceptionBackendDict.feedback);
+      misconceptionBackendDict.feedback,
+      misconceptionBackendDict.must_be_addressed);
   }
   create(
       id: string, name: string, notes: string,
-      feedback: string): Misconception {
-    return new Misconception(id, name, notes, feedback);
+      feedback: string, mustBeAddressed: boolean): Misconception {
+    return new Misconception(id, name, notes, feedback, mustBeAddressed);
   }
 }
 

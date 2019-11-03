@@ -24,6 +24,7 @@ describe('Misconception object factory', () => {
     let misconceptionObjectFactory: MisconceptionObjectFactory;
     let misconceptionDict: {
       id: string; name: string; notes: string; feedback: string;
+      mustBeAddressed: boolean;
     };
 
     beforeEach(() => {
@@ -32,7 +33,8 @@ describe('Misconception object factory', () => {
         id: '1',
         name: 'test name',
         notes: 'test notes',
-        feedback: 'test feedback'
+        feedback: 'test feedback',
+        must_be_addressed: true
       };
     });
 
@@ -43,6 +45,7 @@ describe('Misconception object factory', () => {
       expect(misconception.getName()).toEqual('test name');
       expect(misconception.getNotes()).toEqual('test notes');
       expect(misconception.getFeedback()).toEqual('test feedback');
+      expect(misconception.isMandatory()).toEqual(true);
     });
 
     it('should convert to a backend dictionary', () => {
