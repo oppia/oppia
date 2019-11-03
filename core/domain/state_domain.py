@@ -797,11 +797,8 @@ class WrittenTranslations(python_utils.OBJECT):
     """
 
     def __init__(self, translations_mapping):
-        """Initializes a WrittenTranslations domain object.
+        """Initializes a WrittenTranslations domain object."""
 
-        Args:
-            translations_mapping: WrittenTranslations. Written translations.
-        """
         self.translations_mapping = translations_mapping
 
     def to_dict(self):
@@ -966,6 +963,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
 
     def __init__(self, voiceovers_mapping):
         """Initializes a RecordedVoiceovers domain object."""
+
         self.voiceovers_mapping = voiceovers_mapping
 
     def to_dict(self):
@@ -1421,7 +1419,8 @@ class State(python_utils.OBJECT):
         """Retrieves training data from the State domain object.
 
         Returns:
-            list(dict). List of training data from state domain object.
+            list(dict). Each dict contains the index and the answers of
+            the answer group as key and value pairs respectively.
         """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
