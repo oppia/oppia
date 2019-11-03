@@ -100,7 +100,12 @@ var createAndLoginAdminUserMobile = function(email, username) {
   _completeSignup(username);
 };
 
+var isAdmin = function() {
+  return expect(
+    element(by.css('.protractor-test-admin-text')).isPresent()).toBe(true);
+};
 
+exports.isAdmin = isAdmin;
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;

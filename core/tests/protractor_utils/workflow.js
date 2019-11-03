@@ -18,6 +18,7 @@
  */
 
 var forms = require('./forms.js');
+var users = require('./users.js');
 var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
@@ -59,6 +60,18 @@ var createExplorationAndStartTutorial = function() {
   creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
   creatorDashboardPage.clickCreateActivityButton();
+  if (users.isAdmin()) {
+    var testCreateModal = element(by.css('.protractor-test-creation-modal'));
+    waitFor.visibilityOf(
+      testCreateModal,
+      'testCreateModal takes too long to be visible.');
+    var createExplorationButton = element(
+      by.css('.protractor-test-create-exploration'));
+    waitFor.elementToBeClickable(
+      createExplorationButton,
+      'createExplorationButton takes too long to be clickable.');
+    createExplorationButton.click();
+  }
 };
 
 /**
