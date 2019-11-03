@@ -69,6 +69,7 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-merge-skills-button'));
   var confirmSkillsMergeButton = element(
     by.css('.protractor-test-confirm-skills-merge-button'));
+  var searchSkillInput = element(by.css('.protractor-test-search-skill-input'));
 
   this.get = function() {
     browser.get(DASHBOARD_URL);
@@ -193,6 +194,13 @@ var TopicsAndSkillsDashboardPage = function() {
     skillsListItems.then(function(elems) {
       expect(elems.length).toBe(number);
     });
+  };
+
+  this.searchSkillByName = function(name) {
+    waitFor.visibilityOf(
+      searchSkillInput,
+      'searchSkillInput takes too long to be visible.');
+    searchSkillInput.sendKeys(name);
   };
 };
 

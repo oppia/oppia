@@ -23,6 +23,8 @@ var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
+var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+var SkillEditorPage = require('./SkillEditorPage.js');
 
 // check if the save roles button is clickable
 var canAddRolesToUsers = function() {
@@ -219,6 +221,19 @@ var getExplorationPlaytesters = function() {
   return _getExplorationRoles('viewer');
 };
 
+var createSkillAndAssignTopic = function(skillDescription, topicIndex) {
+  var topicsAndSkillsDashboardPage =
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+  topicsAndSkillsDashboardPage.get();
+  topicsAndSkillsDashboardPage.createSkillWithDescription(skillDescription);
+  var skillEditorPage = new SkillEditorPage.SkillEditorPage();
+  skillEditorPage.firstTimePublishSkill();
+  topicsAndSkillsDashboardPage.get();
+  topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+  topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
+  topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, topicIndex);
+};
+
 exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
 exports.publishExploration = publishExploration;
@@ -239,3 +254,4 @@ exports.getExplorationCollaborators = getExplorationCollaborators;
 exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
+exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
