@@ -19,9 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { CsrfTokenService } from "./CsrfTokenService";
-import { SidebarStatusService } from 'domain/sidebar/SidebarStatusService';
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
+import { CsrfTokenService } from 'services/CsrfTokenService';
 import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/DocumentAttributeCustomizationService';
@@ -40,17 +39,14 @@ import { WindowRef } from 'services/contextual/WindowRefService';
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
-    'UtilsService': new UtilsService(),
-    'WindowDimensionsService': new WindowDimensionsService(),
-    'CsrfTokenService': new CsrfTokenService(),
     'BackgroundMaskService': new BackgroundMaskService(),
+    'CsrfTokenService': new CsrfTokenService(),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
     'MetaTagCustomizationService': new MetaTagCustomizationService(
       new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
-      new WindowDimensionsService())
       new WindowDimensionsService()),
     'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService()

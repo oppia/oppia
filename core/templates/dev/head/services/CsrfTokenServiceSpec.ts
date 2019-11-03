@@ -16,18 +16,10 @@
  * @fileoverview Unit tests for the csrf service
  */
 
-// This needs to be imported first instead of using the global definition
-// because Angular doesn't support global definitions and every library used
-// needs to be imported explicitly.
 import $ from 'jquery';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-import {CsrfTokenService} from './CsrfTokenService';
-// ^^^ This block is to be removed.
+import { CsrfTokenService } from './CsrfTokenService';
 
-require('services/CsrfTokenService.ts');
 
 describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService ;
@@ -37,6 +29,8 @@ describe('Csrf Token Service', function() {
 
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
+    spyOn($, 'ajax').and.returnValue(Promise.resolve(
+      {token: 'sample-csrf-token'}));
     // spyOn($, 'ajax').and.returnValue($q);
   });
 
