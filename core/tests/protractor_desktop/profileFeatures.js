@@ -27,10 +27,11 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
-var ProfilePage = require('../protractor_utils/ProfilePage.js');
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
+var ProfilePage = require('../protractor_utils/ProfilePage.js');
+
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Un-customized profile page', function() {
@@ -206,18 +207,21 @@ describe('playing the exploration', function() {
   it('should change the cards on clicking next and back buttons', function() {
     explorationPlayerPage.expectExplorationNameToBe(EXPLORATION.title);
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
+
     // Test continue button
     waitFor.elementToBeClickable(
       continueButton, 'Continue button taking too long to be clickable');
     continueButton.click();
     waitFor.pageToFullyLoad();
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
+
     // Test back button
     waitFor.elementToBeClickable(
       backButton, 'Back button taking too long to be clickable');
     backButton.click();
     waitFor.pageToFullyLoad();
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
+
     // Test next button
     waitFor.elementToBeClickable(
       nextButton, 'Next button taking too long to be clickable');
