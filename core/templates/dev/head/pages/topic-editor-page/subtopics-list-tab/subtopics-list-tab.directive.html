@@ -5,7 +5,7 @@
       (Drag and drop skills to assign them to subtopics)
     </h4>
     <div class="subtopics-container">
-      <md-card class="subtopic"
+      <md-card class="subtopic protractor-test-subtopic-column"
                ng-repeat="(subtopicIndex, subtopic) in subtopics"
                dnd-list="subtopic.getSkillSummaries()"
                dnd-drop="endMoveSkill(subtopic.getId())">

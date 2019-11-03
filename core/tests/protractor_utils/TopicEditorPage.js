@@ -52,6 +52,8 @@ var TopicEditorPage = function() {
   var confirmSubtopicCreationButton = element(
     by.css('.protractor-test-confirm-subtopic-creation-button'));
   var subtopics = element.all(by.css('.protractor-test-subtopic'));
+  var subtopicColumns = element.all(
+    by.css('.protractor-test-subtopic-column'));
   var deleteSubtopicButtons = element.all(
     by.css('.protractor-test-delete-subtopic-button'));
   var skillCards = element.all(
@@ -185,22 +187,18 @@ var TopicEditorPage = function() {
 
   this.dragSkillBetweenSubtopics = function(
       fromSubtopicIndex, skillCardIndex, toSubtopicIndex) {
-    var subtopicTitleElem = subtopicTitles.get(fromSubtopicIndex);
-    var subtopicCol = subtopicTitleElem.element(
-      by.xpath('..')).element(by.xpath('..'));
+    var subtopicCol = subtopicColumns.get(fromSubtopicIndex);
     skillNamesElems = subtopicCol.all(
       by.css('.protractor-test-assigned-skill-card-text'));
     var toMove = skillNamesElems.get(skillCardIndex);
-    var target = subtopicTitles.get(toSubtopicIndex);
+    var target = subtopicColumns.get(toSubtopicIndex);
     browser.executeScript(
       dragAndDrop, toMove.getWebElement(), target.getWebElement());
   };
 
   this.dragSkillFromSubtopicToUncategorized = function(
       subtopicIndex, skillCardIndex) {
-    var subtopicTitleElem = subtopicTitles.get(subtopicIndex);
-    var subtopicCol = subtopicTitleElem.element(
-      by.xpath('..')).element(by.xpath('..'));
+    var subtopicCol = subtopicColumns.get(subtopicIndex);
     skillNamesElems = subtopicCol.all(
       by.css('.protractor-test-assigned-skill-card-text'));
     var toMove = skillNamesElems.get(skillCardIndex);
@@ -210,9 +208,7 @@ var TopicEditorPage = function() {
   };
 
   this.expectSubtopicToHaveSkills = function(subtopicIndex, skillNames) {
-    var subtopicTitleElem = subtopicTitles.get(subtopicIndex);
-    var subtopicCol = subtopicTitleElem.element(
-      by.xpath('..')).element(by.xpath('..'));
+    var subtopicCol = subtopicColumns.get(subtopicIndex);
     skillNamesElems = subtopicCol.all(
       by.css('.protractor-test-assigned-skill-card-text'));
     skillNamesElems.each(function(skillCardTextElem, index) {
