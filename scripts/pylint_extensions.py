@@ -658,6 +658,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
     def _handle_no_raise_doc(self, excs, node):
         """Checks whether the raised exception in a function has been
         documented, add a message otherwise.
+
         Args:
             excs: list(str). A list of exception types.
             node: astroid.scoped_nodes.Function. Node to access module content.
@@ -1010,7 +1011,6 @@ class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
 
             if file_content[line_num] == b'\n':
                 blank_line_counter += 1
-
             else:
                 blank_line_counter = 0
 
@@ -1018,6 +1018,59 @@ class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
                 line = file_content[line_num + 1].strip()
                 if line.startswith(b'def') or line.startswith(b'@'):
                     self.add_message('excessive-new-lines', line=line_num + 1)
+
+
+class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
+    """Checker for single space above args in python doc string."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'single-space-above-args'
+    priority = -1
+    msgs = {
+        'C0012': (
+            'Files must have a single newline above doc string.',
+            'single-space-above-args',
+            'Please enter a single newline above doc string.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that there is a single newline above args
+        in python doc string.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            if line == b'Args:' or line == b'Returns:':
+                if file_content[line_num - 1] != b'\n':
+                    self.add_message(
+                        'single-space-above-args', line=line_num + 1)
 
 
 def register(linter):
@@ -1036,3 +1089,4 @@ def register(linter):
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
     linter.register_checker(SingleSpaceAfterYieldChecker(linter))
     linter.register_checker(ExcessiveEmptyLinesChecker(linter))
+    linter.register_checker(SingleNewlineAboveArgsChecker(linter))
