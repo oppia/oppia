@@ -460,8 +460,8 @@ export = {
     "name": "Math",
     "interaction_ids": [
       "FractionInput",
-      "NumericInput",
-      "NumberWithUnits"
+      "NumberWithUnits",
+      "NumericInput"
     ]
   }],
 
