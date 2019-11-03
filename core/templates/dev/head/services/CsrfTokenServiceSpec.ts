@@ -23,15 +23,12 @@ import { CsrfTokenService } from './CsrfTokenService';
 
 describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService ;
-  // let $q: any = new Promise((resolve, reject) => {
-  //   resolve({token: 'sample-csrf-token'});
-  // });
 
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
+    // @ts-ignore
     spyOn($, 'ajax').and.returnValue(Promise.resolve(
       {token: 'sample-csrf-token'}));
-    // spyOn($, 'ajax').and.returnValue($q);
   });
 
   it('should correctly set the csrf token', (done) => {
@@ -50,6 +47,8 @@ describe('Csrf Token Service', function() {
   });
 
   it('should error if getTokenAsync is called before initialize', () => {
+    csrfTokenService.getTokenAsync();
+
     expect(csrfTokenService.getTokenAsync)
       .toThrowError('Token needs to be initialized');
   });
