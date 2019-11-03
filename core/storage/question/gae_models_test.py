@@ -144,7 +144,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(
-            question_models.QuestionSkillLinkModelUnitTests
+            question_models.QuestionSkillLinkModel
             .has_reference_to_user_id('any_id'))
 
     def test_create_question_skill_link(self):
