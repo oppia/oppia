@@ -161,9 +161,6 @@ var ExplorationEditorTranslationTab = function() {
   var translationTabUploadRecordingAccessibility = element(
     by.css('.protractor-test-accessibility-translation-upload-audio'));
 
-  var translationTabReuploadReacordingAccessibility = element(
-    by.css('.protractor-test-accessibility-translation-reupload-audio'));
-
   var translationTabPlayRecordingAccessibility = element(
     by.css('.protractor-test-accessibility-translation-play-recorded-audio'));
 
