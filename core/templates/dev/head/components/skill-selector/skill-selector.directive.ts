@@ -23,7 +23,10 @@ angular.module('oppia').directive('selectSkill', [
     return {
       restrict: 'E',
       scope: {
-        getSkillSummaries: '&skillSummaries',
+        // If skillsInSameTopicCount > 0, then sortedSkillSummaries should have
+        // the initial 'skillsInSameTopicCount' entries of skills belonging to
+        // the same topic.
+        getSortedSkillSummaries: '&sortedSkillSummaries',
         selectedSkillId: '=',
         getSkillsInSameTopicCount: '&skillsInSameTopicCount'
       },
@@ -33,15 +36,17 @@ angular.module('oppia').directive('selectSkill', [
         '$scope', '$uibModal', '$rootScope',
         function(
             $scope, $uibModal, $rootScope) {
-          $scope.skillSummaries = $scope.getSkillSummaries();
+          $scope.sortedSkillSummaries = $scope.getSortedSkillSummaries();
           $scope.skillSummariesInitial = [];
           $scope.skillSummariesFinal = [];
 
-          for (var idx in $scope.skillSummaries) {
+          for (var idx in $scope.sortedSkillSummaries) {
             if (idx < $scope.getSkillsInSameTopicCount()) {
-              $scope.skillSummariesInitial.push($scope.skillSummaries[idx]);
+              $scope.skillSummariesInitial.push(
+                $scope.sortedSkillSummaries[idx]);
             } else {
-              $scope.skillSummariesFinal.push($scope.skillSummaries[idx]);
+              $scope.skillSummariesFinal.push(
+                $scope.sortedSkillSummaries[idx]);
             }
           }
           $scope.selectSkill = function(skillId) {

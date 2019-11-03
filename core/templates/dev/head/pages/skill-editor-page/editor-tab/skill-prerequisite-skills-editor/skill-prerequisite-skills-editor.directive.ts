@@ -63,7 +63,9 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
           };
 
           $scope.addSkill = function() {
-            var allSkillSummaries = [];
+            // This contains the summaries of skill in the same topic as
+            // the current skill as the initial entries followed by the others.
+            var sortedSkillSummaries = [];
 
             var topicName = null;
             var skillsInSameTopicCount = 0;
@@ -83,7 +85,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
             // same topic at the top.
             for (var idx in groupedSkillSummaries[topicName]) {
               skillsInSameTopicCount++;
-              allSkillSummaries.push(groupedSkillSummaries[topicName][idx]);
+              sortedSkillSummaries.push(groupedSkillSummaries[topicName][idx]);
             }
             for (var name in groupedSkillSummaries) {
               if (name === topicName) {
@@ -91,7 +93,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
               }
               var skillSummaries = groupedSkillSummaries[name];
               for (var idx in skillSummaries) {
-                allSkillSummaries.push(skillSummaries[idx]);
+                sortedSkillSummaries.push(skillSummaries[idx]);
               }
             }
 
@@ -103,7 +105,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
-                  $scope.skillSummaries = allSkillSummaries;
+                  $scope.skillSummaries = sortedSkillSummaries;
                   $scope.selectedSkillId = null;
                   $scope.skillsInSameTopicCount = skillsInSameTopicCount;
                   $scope.save = function() {
