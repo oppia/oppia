@@ -16,11 +16,11 @@
  * @fileoverview Page object for the exploration editor's translation tab, for
  * use in Protractor tests.
  */
+var path = require('path');
+
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
-
-var path = require('path');
 
 var ExplorationEditorTranslationTab = function() {
   var dismissWelcomeModalButton = element(
@@ -209,9 +209,8 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-save-uploaded-audio-button'));
   var playPauseAudioButton = element(
     by.css('.protractor-test-play-pause-audio-button'));
-  var audioMaterialSliderDiv = element(
-    by.css('.md-slider-wrapper'));
-  var closeAudioUploaderModal = element(
+  var audioMaterialSliderDiv = element(by.css('.md-slider-wrapper'));
+  var closeAudioUploaderModalButton = element(
     by.css('.protractor-test-close-audio-upload-modal'));
 
   this.setTranslation = function(richTextInstructions) {
@@ -280,8 +279,9 @@ var ExplorationEditorTranslationTab = function() {
 
   this.closeUploadAudioModal = function() {
     waitFor.elementToBeClickable(
-      closeAudioUploaderModal, 'Close audio uploader modal is not clickable');
-    closeAudioUploaderModal.click();
+      closeAudioUploaderModalButton,
+      'Close audio uploader modal button is not clickable');
+    closeAudioUploaderModalButton.click();
   };
 
   this.playOrPauseAudioFile = function() {
@@ -289,10 +289,10 @@ var ExplorationEditorTranslationTab = function() {
       playPauseAudioButton,
       'Play or pause audio button is taking too long to appear');
     playPauseAudioButton.click();
-    return this.isAudioPlaying();
+    return this._isAudioPlaying();
   };
 
-  this.isAudioPlaying = function() {
+  this._isAudioPlaying = function() {
     return audioMaterialSliderDiv.getAttribute('aria-valuenow')
       .then(function(firstValue) {
         return new Promise(function(resolve, reject) {
@@ -303,7 +303,10 @@ var ExplorationEditorTranslationTab = function() {
       }).then(function(firstValue) {
         return audioMaterialSliderDiv.getAttribute('aria-valuenow')
           .then(function(secondValue) {
-            return +firstValue !== +secondValue;
+            if (firstValue && secondValue) {
+              return +firstValue < +secondValue;
+            }
+            return false;
           });
       }).then(function(isPlaying) {
         return isPlaying;

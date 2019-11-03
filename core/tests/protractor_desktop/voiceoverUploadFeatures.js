@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for the functionality of the upload files.
+ * @fileoverview End-to-end tests for the functionality of voiceover upload.
  */
 
 var forms = require('../protractor_utils/forms.js');
@@ -50,29 +50,26 @@ describe('Voiceover upload features', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
   });
 
-  it('should upload an audio file', function() {
+  beforeEach(function() {
     explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab
-      .exitTutorial();
-    explorationEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
-      'Upload voiceovered file');
+    explorationEditorTranslationTab.exitTutorial();
+  });
 
+  it('should upload an audio file', function() {
     explorationEditorTranslationTab.openUploadAudioModal();
     explorationEditorTranslationTab.uploadAudio(
       '../data/cafe.mp3');
   });
 
-  it('should play an uploaded audio file', function() {
+  it('should play and pause an uploaded audio file', function() {
     explorationEditorTranslationTab.playOrPauseAudioFile()
-      .then(function(isPlaying) {
-        expect(isPlaying).toBe(true);
-      });
-  });
+      .then(function(playClick) {
+        expect(playClick).toBe(true);
 
-  it('should pause an uploaded audio file', function() {
-    explorationEditorTranslationTab.playOrPauseAudioFile()
-      .then(function(isPlaying) {
-        expect(isPlaying).toBe(false);
+        explorationEditorTranslationTab.playOrPauseAudioFile()
+          .then(function(pauseClick) {
+            expect(pauseClick).toBe(false);
+          });
       });
   });
 
@@ -84,7 +81,7 @@ describe('Voiceover upload features', function() {
     explorationEditorTranslationTab.closeUploadAudioModal();
   });
 
-  it('should not let upload a five minutes longer video', function() {
+  it('should not let upload a five minutes longer audio', function() {
     explorationEditorTranslationTab.openUploadAudioModal();
     explorationEditorTranslationTab.expectAudioOverFiveMinutes(
       '../data/cafe-over-five-minutes.mp3');
@@ -97,8 +94,8 @@ describe('Voiceover upload features', function() {
     explorationEditorSettingsTab.setTitle('Upload audio file');
     explorationEditorSettingsTab.setCategory('Languages');
     explorationEditorSettingsTab.setLanguage('English');
-    explorationEditorSettingsTab
-      .setObjective('Upload an translation audio file.');
+    explorationEditorSettingsTab.setObjective(
+      'Upload an translation audio file.');
     explorationEditorPage.saveChanges('Adds audio file in translation tab.');
     workflow.publishExploration();
   });
