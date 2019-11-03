@@ -29,10 +29,9 @@ var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var ProfilePage = require('../protractor_utils/ProfilePage.js');
-
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Un-customized profile page', function() {
   var TEST_USERNAME = 'defaultProfileFeatures';
