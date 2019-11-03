@@ -40,19 +40,6 @@
       </ul>
     </div>
   </li>
-  <li ng-if="skillRights.isPrivate()" style="margin-right: 10px; margin-top: 8px;">
-    <button type="button"
-            class="btn btn-light oppia-editor-publish-button protractor-test-editor-publish-button"
-            ng-class="{'btn-success': isSkillPublishable()}"
-            ng-click="publishSkill()"
-            ng-disabled="!isSkillPublishable()">
-      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-         alt="Publish">
-        &#xE2C3;
-      </i>
-      <span class="oppia-save-publish-button-label">Publish</span>
-    </button>
-  </li>
   <li style="width: 40px;"
       ng-class="{'uib-dropdown': getWarningsCount(), 'active': getActiveTabName() === 'main'}"
       ng-attr-uib-dropdown="<[getWarningsCount()]>"

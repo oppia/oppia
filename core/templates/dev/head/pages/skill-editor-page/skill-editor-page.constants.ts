@@ -19,8 +19,6 @@
 export class SkillEditorPageConstants {
   public static SKILL_RIGHTS_URL_TEMPLATE =
     '/skill_editor_handler/rights/<skill_id>';
-  public static SKILL_PUBLISH_URL_TEMPLATE =
-    '/skill_editor_handler/publish_skill/<skill_id>';
   public static EVENT_SKILL_INITIALIZED = 'skillInitialized';
   public static EVENT_SKILL_REINITIALIZED = 'skillReinitialized';
 }

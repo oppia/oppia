@@ -107,12 +107,10 @@ describe('Topic editor functionality', function() {
   it('should create a question for a skill in the topic', function() {
     var skillId = null;
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 1');
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill 1', 'Concept card explanation');
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
-      skillEditorPage.editConceptCard('Concept card explanation');
-      skillEditorPage.saveOrPublishSkill('Added review material.');
-      skillEditorPage.firstTimePublishSkill();
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
       topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
