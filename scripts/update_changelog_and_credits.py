@@ -28,6 +28,7 @@ import argparse
 import collections
 import datetime
 import os
+import re
 import sys
 
 import python_utils
@@ -90,7 +91,7 @@ def update_sorted_file(filepath, new_list):
     # and then the sorted list. So, the start_index is the index of
     # last_comment_line plus 2.
     start_index = file_lines.index(last_comment_line) + 2
-    updated_list = new_list + file_lines[start_index:]
+    updated_list = list(set(new_list + file_lines[start_index:]))
     updated_list = sorted(updated_list, key=lambda s: s.lower())
     file_lines = file_lines[:start_index] + updated_list
     with python_utils.open_file(filepath, 'w') as f:
@@ -131,10 +132,45 @@ def check_ordering_of_sections(release_summary_lines):
                     section.strip(), next_section.strip()))
 
 
-def update_changelog(release_summary_lines, current_release_version):
+def get_previous_version(version):
+    """Finds previous version given the current version.
+
+    Args:
+        version: str. The current version.
+
+    Returns:
+        str. The previous version.
+
+    Raises:
+        Exception. The version format is invalid or there is no previous
+            version for the given version.
+    """
+    if not bool(re.match(r'^\d+\.\d+\.\d+$', version)):
+        raise Exception('Invalid Version String: %s' % version)
+    first_version_num = int(version[:version.find('.')])
+    second_version_num = int(version[version.find('.') + 1: version.rfind('.')])
+    third_version_num = int(version[version.rfind('.') + 1:])
+
+    if third_version_num != 0:
+        return '%s.%s.%s' % (
+            first_version_num, second_version_num, third_version_num - 1)
+    else:
+        if second_version_num != 0:
+            return '%s.%s.%s' % (
+                first_version_num, second_version_num - 1, 9)
+        elif first_version_num != 0:
+            return '%s.%s.%s' % (
+                first_version_num - 1, 9, 9)
+        else:
+            raise Exception('No version released before %s version.' % version)
+
+
+def update_changelog(
+        branch_name, release_summary_lines, current_release_version):
     """Updates CHANGELOG file.
 
     Args:
+        branch_name: str. The name of the current branch.
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
         current_release_version: str. The version of current release.
@@ -149,6 +185,18 @@ def update_changelog(release_summary_lines, current_release_version):
     changelog_lines = []
     with python_utils.open_file(CHANGELOG_FILEPATH, 'r') as changelog_file:
         changelog_lines = changelog_file.readlines()
+
+    if 'hotfix' in branch_name:
+        previous_release_version = get_previous_version(current_release_version)
+        current_version_start = 0
+        previous_version_start = 0
+        for index, line in enumerate(changelog_lines):
+            if 'v%s' % current_release_version in line:
+                current_version_start = index
+            if 'v%s' % previous_release_version in line:
+                previous_version_start = index
+        changelog_lines[current_version_start:previous_version_start] = []
+
     changelog_lines[2:2] = release_version_changelog
     with python_utils.open_file(CHANGELOG_FILEPATH, 'w') as changelog_file:
         for line in changelog_lines:
@@ -295,8 +343,8 @@ def update_developer_names(release_summary_lines):
                 '%s</ul>\n' % span_indent)
 
             old_developer_names = about_page_lines[start_index:end_index]
-            updated_developer_names = (
-                old_developer_names + developer_name_dict[char])
+            updated_developer_names = list(set((
+                old_developer_names + developer_name_dict[char])))
             updated_developer_names = sorted(
                 updated_developer_names, key=lambda s: s.lower())
             about_page_lines[start_index:end_index] = updated_developer_names
@@ -411,7 +459,7 @@ def main():
     check_ordering_of_sections(release_summary_lines)
 
     update_changelog(
-        release_summary_lines, current_release_version)
+        branch_name, release_summary_lines, current_release_version)
     update_authors(release_summary_lines)
     update_contributors(release_summary_lines)
     update_developer_names(release_summary_lines)

@@ -51,6 +51,8 @@ MOCK_ABOUT_PAGE_FILEPATH = os.path.join(
 
 MOCK_UPDATED_CHANGELOG_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CHANGELOG')
+MOCK_UPDATED_CHANGELOG_FOR_HOTFIX_FILEPATH = os.path.join(
+    RELEASE_TEST_DIR, 'UPDATED_CHANGELOG_FOR_HOTFIX')
 MOCK_UPDATED_AUTHORS_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_AUTHORS')
 MOCK_UPDATED_CONTRIBUTORS_FILEPATH = os.path.join(
@@ -111,61 +113,114 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         self.get_git_ref_swap = self.swap(
             github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
 
-    def test_update_changelog(self):
-        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
-        changelog_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
-        expected_filelines = read_from_file(MOCK_UPDATED_CHANGELOG_FILEPATH)
-        changelog_swap = self.swap(
-            update_changelog_and_credits, 'CHANGELOG_FILEPATH',
-            MOCK_CHANGELOG_FILEPATH)
-        date_swap = self.swap(
-            update_changelog_and_credits, 'CURRENT_DATE',
-            '29 Aug 2019')
-        with changelog_swap, date_swap:
-            update_changelog_and_credits.update_changelog(
-                release_summary_lines, '1.2.3')
-        actual_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
-        write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
-        self.assertEqual(actual_filelines, expected_filelines)
+    def test_get_previous_version_with_invalid_version(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid Version String: invalid'):
+            update_changelog_and_credits.get_previous_version('invalid')
+
+    def test_get_previous_version_with_no_previous_version(self):
+        with self.assertRaisesRegexp(
+            Exception, 'No version released before 0.0.0 version.'):
+            update_changelog_and_credits.get_previous_version('0.0.0')
+
+    def test_get_previous_version_with_correct_version(self):
+        self.assertEqual(
+            update_changelog_and_credits.get_previous_version('2.8.3'), '2.8.2')
+        self.assertEqual(
+            update_changelog_and_credits.get_previous_version('2.8.0'), '2.7.9')
+        self.assertEqual(
+            update_changelog_and_credits.get_previous_version('2.0.0'), '1.9.9')
+
+    def test_update_changelog_with_non_hotfix_branch(self):
+        try:
+            release_summary_lines = read_from_file(
+                MOCK_RELEASE_SUMMARY_FILEPATH)
+            changelog_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
+            expected_filelines = read_from_file(MOCK_UPDATED_CHANGELOG_FILEPATH)
+            changelog_swap = self.swap(
+                update_changelog_and_credits, 'CHANGELOG_FILEPATH',
+                MOCK_CHANGELOG_FILEPATH)
+            date_swap = self.swap(
+                update_changelog_and_credits, 'CURRENT_DATE',
+                '29 Aug 2019')
+            with changelog_swap, date_swap:
+                update_changelog_and_credits.update_changelog(
+                    'release-1.2.3', release_summary_lines, '1.2.3')
+            actual_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
+            self.assertEqual(actual_filelines, expected_filelines)
+        finally:
+            write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
+
+    def test_update_changelog_with_hotfix_branch(self):
+        try:
+            release_summary_lines = read_from_file(
+                MOCK_RELEASE_SUMMARY_FILEPATH)
+            changelog_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
+            expected_filelines = read_from_file(
+                MOCK_UPDATED_CHANGELOG_FOR_HOTFIX_FILEPATH)
+            changelog_swap = self.swap(
+                update_changelog_and_credits, 'CHANGELOG_FILEPATH',
+                MOCK_CHANGELOG_FILEPATH)
+            date_swap = self.swap(
+                update_changelog_and_credits, 'CURRENT_DATE',
+                '29 Aug 2019')
+            with changelog_swap, date_swap:
+                update_changelog_and_credits.update_changelog(
+                    'release-1.0.2-hotfix-1', release_summary_lines, '1.0.2')
+            actual_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
+            self.assertEqual(actual_filelines, expected_filelines)
+        finally:
+            write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
 
     def test_update_authors(self):
-        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
-        authors_filelines = read_from_file(MOCK_AUTHORS_FILEPATH)
-        expected_filelines = read_from_file(MOCK_UPDATED_AUTHORS_FILEPATH)
-        with self.swap(
-            update_changelog_and_credits, 'AUTHORS_FILEPATH',
-            MOCK_AUTHORS_FILEPATH):
-            update_changelog_and_credits.update_authors(
-                release_summary_lines)
-        actual_filelines = read_from_file(MOCK_AUTHORS_FILEPATH)
-        write_to_file(MOCK_AUTHORS_FILEPATH, authors_filelines)
-        self.assertEqual(actual_filelines, expected_filelines)
+        try:
+            release_summary_lines = read_from_file(
+                MOCK_RELEASE_SUMMARY_FILEPATH)
+            authors_filelines = read_from_file(MOCK_AUTHORS_FILEPATH)
+            expected_filelines = read_from_file(MOCK_UPDATED_AUTHORS_FILEPATH)
+            with self.swap(
+                update_changelog_and_credits, 'AUTHORS_FILEPATH',
+                MOCK_AUTHORS_FILEPATH):
+                update_changelog_and_credits.update_authors(
+                    release_summary_lines)
+            actual_filelines = read_from_file(MOCK_AUTHORS_FILEPATH)
+            self.assertEqual(actual_filelines, expected_filelines)
+        finally:
+            write_to_file(MOCK_AUTHORS_FILEPATH, authors_filelines)
 
     def test_update_contributors(self):
-        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
-        contributors_filelines = read_from_file(MOCK_CONTRIBUTORS_FILEPATH)
-        expected_filelines = read_from_file(MOCK_UPDATED_CONTRIBUTORS_FILEPATH)
-        with self.swap(
-            update_changelog_and_credits, 'CONTRIBUTORS_FILEPATH',
-            MOCK_CONTRIBUTORS_FILEPATH):
-            update_changelog_and_credits.update_contributors(
-                release_summary_lines)
-        actual_filelines = read_from_file(MOCK_CONTRIBUTORS_FILEPATH)
-        write_to_file(MOCK_CONTRIBUTORS_FILEPATH, contributors_filelines)
-        self.assertEqual(actual_filelines, expected_filelines)
+        try:
+            release_summary_lines = read_from_file(
+                MOCK_RELEASE_SUMMARY_FILEPATH)
+            contributors_filelines = read_from_file(MOCK_CONTRIBUTORS_FILEPATH)
+            expected_filelines = read_from_file(
+                MOCK_UPDATED_CONTRIBUTORS_FILEPATH)
+            with self.swap(
+                update_changelog_and_credits, 'CONTRIBUTORS_FILEPATH',
+                MOCK_CONTRIBUTORS_FILEPATH):
+                update_changelog_and_credits.update_contributors(
+                    release_summary_lines)
+            actual_filelines = read_from_file(MOCK_CONTRIBUTORS_FILEPATH)
+            self.assertEqual(actual_filelines, expected_filelines)
+        finally:
+            write_to_file(MOCK_CONTRIBUTORS_FILEPATH, contributors_filelines)
 
     def test_update_developer_names(self):
-        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
-        about_page_filelines = read_from_file(MOCK_ABOUT_PAGE_FILEPATH)
-        expected_filelines = read_from_file(MOCK_UPDATED_ABOUT_PAGE_FILEPATH)
-        with self.swap(
-            update_changelog_and_credits, 'ABOUT_PAGE_FILEPATH',
-            MOCK_ABOUT_PAGE_FILEPATH):
-            update_changelog_and_credits.update_developer_names(
-                release_summary_lines)
-        actual_filelines = read_from_file(MOCK_ABOUT_PAGE_FILEPATH)
-        write_to_file(MOCK_ABOUT_PAGE_FILEPATH, about_page_filelines)
-        self.assertEqual(actual_filelines, expected_filelines)
+        try:
+            release_summary_lines = read_from_file(
+                MOCK_RELEASE_SUMMARY_FILEPATH)
+            about_page_filelines = read_from_file(MOCK_ABOUT_PAGE_FILEPATH)
+            expected_filelines = read_from_file(
+                MOCK_UPDATED_ABOUT_PAGE_FILEPATH)
+            with self.swap(
+                update_changelog_and_credits, 'ABOUT_PAGE_FILEPATH',
+                MOCK_ABOUT_PAGE_FILEPATH):
+                update_changelog_and_credits.update_developer_names(
+                    release_summary_lines)
+            actual_filelines = read_from_file(MOCK_ABOUT_PAGE_FILEPATH)
+            self.assertEqual(actual_filelines, expected_filelines)
+        finally:
+            write_to_file(MOCK_ABOUT_PAGE_FILEPATH, about_page_filelines)
 
     def test_missing_section_in_release_summary(self):
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
@@ -376,7 +431,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             check_function_calls[
                 'remove_updates_and_delete_branch_gets_called'] = True
         def mock_update_changelog(
-                unused_release_summary_lines, unused_current_release_version):
+                unused_branch_name, unused_release_summary_lines,
+                unused_current_release_version):
             check_function_calls['update_changelog_gets_called'] = True
         def mock_update_authors(unused_release_summary_lines):
             check_function_calls['update_authors_gets_called'] = True
