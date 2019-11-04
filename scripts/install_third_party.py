@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Installation script for Oppia third-party libraries."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -254,7 +255,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
         python_utils.PRINT('------------------------------------------')
         python_utils.PRINT('There is syntax error in this dependency')
         python_utils.PRINT(dependency_dict)
-        python_utils.PRINT('This url  %s is invalid for %s file format.' % (
+        python_utils.PRINT('This url %s is invalid for %s file format.' % (
             dependency_url, dependency_type))
         python_utils.PRINT('Exiting.')
         sys.exit(1)
@@ -331,5 +332,7 @@ def main(args=None):
     download_manifest_files(MANIFEST_FILE_PATH)
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when install_third_party.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

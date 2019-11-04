@@ -102,45 +102,6 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                     'tokens and re-run the script')):
                 release_info.main()
 
-    def test_non_zero_blocking_bugs_count_results_in_exception(self):
-        def mock_get_blocking_bug_issue_count(unused_repo):
-            return 10
-        blocking_bug_swap = self.swap(
-            release_info, 'get_blocking_bug_issue_count',
-            mock_get_blocking_bug_issue_count)
-        with self.branch_name_swap, self.open_browser_swap:
-            with self.get_organization_swap, self.get_repo_swap:
-                with self.getpass_swap, blocking_bug_swap:
-                    with self.assertRaisesRegexp(
-                        Exception, (
-                            'There are 10 unresolved blocking bugs. Please '
-                            'ensure that they are resolved before release '
-                            'summary generation.')):
-                        release_info.main()
-
-    def test_unreleased_prs_result_in_exception(self):
-        def mock_get_blocking_bug_issue_count(unused_repo):
-            return 0
-        def mock_check_prs_for_current_release_are_released(unused_repo):
-            return False
-        blocking_bug_swap = self.swap(
-            release_info, 'get_blocking_bug_issue_count',
-            mock_get_blocking_bug_issue_count)
-        check_prs_swap = self.swap(
-            release_info, 'check_prs_for_current_release_are_released',
-            mock_check_prs_for_current_release_are_released)
-        with self.branch_name_swap, self.open_browser_swap:
-            with self.get_organization_swap, self.get_repo_swap:
-                with self.getpass_swap, blocking_bug_swap, check_prs_swap:
-                    with self.assertRaisesRegexp(
-                        Exception, (
-                            'There are PRs for current release which do not '
-                            'have a \'%s\' label. Please ensure that '
-                            'they are released before release summary '
-                            'generation.') % (
-                                release_constants.LABEL_FOR_RELEASED_PRS)):
-                        release_info.main()
-
     def test_get_current_version_tag(self):
         def mock_get_tags(unused_self):
             return ['tags']
@@ -311,111 +272,11 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             'core/storage/user/gae_models.py']
         self.assertEqual(actual_storgae_models, expected_storage_models)
 
-    def test_closed_blocking_bugs_milestone_results_in_exception(self):
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
-            return github.Milestone.Milestone(
-                requester='', headers='',
-                attributes={'state': 'closed'}, completed='')
-        # pylint: enable=unused-argument
-        get_milestone_swap = self.swap(
-            github.Repository.Repository, 'get_milestone', mock_get_milestone)
-        with get_milestone_swap, self.assertRaisesRegexp(
-            Exception, 'The blocking bug milestone is closed.'):
-            release_info.get_blocking_bug_issue_count(
-                self.mock_repo)
-
-    def test_get_blocking_bug_issue_count(self):
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
-            return github.Milestone.Milestone(
-                requester='', headers='',
-                attributes={'open_issues': 10, 'state': 'open'}, completed='')
-        # pylint: enable=unused-argument
-        with self.swap(
-            github.Repository.Repository, 'get_milestone', mock_get_milestone):
-            self.assertEqual(
-                release_info.get_blocking_bug_issue_count(self.mock_repo),
-                10)
-
-    def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
-            self):
-        pull1 = github.PullRequest.PullRequest(
-            requester='', headers='',
-            attributes={
-                'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
-            completed='')
-        pull2 = github.PullRequest.PullRequest(
-            requester='', headers='',
-            attributes={
-                'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
-            completed='')
-        label = github.Label.Label(
-            requester='', headers='',
-            attributes={
-                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
-            completed='')
-        # pylint: disable=unused-argument
-        def mock_get_issues(unused_self, state, labels):
-            return [pull1, pull2]
-        # pylint: enable=unused-argument
-        def mock_get_label(unused_self, unused_name):
-            return [label]
-
-        get_issues_swap = self.swap(
-            github.Repository.Repository, 'get_issues', mock_get_issues)
-        get_label_swap = self.swap(
-            github.Repository.Repository, 'get_label', mock_get_label)
-        with get_issues_swap, get_label_swap:
-            self.assertEqual(
-                release_info.check_prs_for_current_release_are_released(
-                    self.mock_repo), True)
-
-    def test_check_prs_for_current_release_are_released_with_unreleased_prs(
-            self):
-        pull1 = github.PullRequest.PullRequest(
-            requester='', headers='',
-            attributes={
-                'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
-            completed='')
-        pull2 = github.PullRequest.PullRequest(
-            requester='', headers='',
-            attributes={
-                'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
-            completed='')
-        label = github.Label.Label(
-            requester='', headers='',
-            attributes={
-                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
-            completed='')
-        # pylint: disable=unused-argument
-        def mock_get_issues(unused_self, state, labels):
-            return [pull1, pull2]
-        # pylint: enable=unused-argument
-        def mock_get_label(unused_self, unused_name):
-            return [label]
-
-        get_issues_swap = self.swap(
-            github.Repository.Repository, 'get_issues', mock_get_issues)
-        get_label_swap = self.swap(
-            github.Repository.Repository, 'get_label', mock_get_label)
-        with get_issues_swap, get_label_swap:
-            self.assertEqual(
-                release_info.check_prs_for_current_release_are_released(
-                    self.mock_repo), False)
-
     def test_release_summary_content(self):
-        def mock_get_blocking_bug_issue_count(unused_repo):
-            return 0
+        def mock_check_blocking_bug_issue_count(unused_repo):
+            pass
         def mock_check_prs_for_current_release_are_released(unused_repo):
-            return True
+            pass
         def mock_get_current_version_tag(unused_repo):
             return github.Tag.Tag(
                 requester='', headers='',
@@ -458,10 +319,10 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             return {'category': ['pr1', 'pr2']}
 
         blocking_bug_swap = self.swap(
-            release_info, 'get_blocking_bug_issue_count',
-            mock_get_blocking_bug_issue_count)
+            common, 'check_blocking_bug_issue_count',
+            mock_check_blocking_bug_issue_count)
         check_prs_swap = self.swap(
-            release_info, 'check_prs_for_current_release_are_released',
+            common, 'check_prs_for_current_release_are_released',
             mock_check_prs_for_current_release_are_released)
         version_tag_swap = self.swap(
             release_info, 'get_current_version_tag',

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Python execution environment setup for scripts that require GAE."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -29,6 +30,8 @@ from . import common
 _PARSER = argparse.ArgumentParser(description="""
 Python execution environment setup for scripts that require GAE.
 """)
+
+GAE_DOWNLOAD_ZIP_PATH = os.path.join('.', 'gae-download.zip')
 
 
 def main(args=None):
@@ -67,11 +70,11 @@ def main(args=None):
             python_utils.PRINT('Error downloading Google App Engine. Exiting.')
             raise Exception
         python_utils.PRINT('Download complete. Installing Google App Engine...')
-        with zipfile.ZipFile('gae-download.zip', 'r') as zip_ref:
+        with zipfile.ZipFile(GAE_DOWNLOAD_ZIP_PATH, 'r') as zip_ref:
             zip_ref.extractall(
                 path=os.path.join(
                     common.OPPIA_TOOLS_DIR, 'google_appengine_1.9.67/'))
-        os.remove('gae-download.zip')
+        os.remove(GAE_DOWNLOAD_ZIP_PATH)
 
 
     python_utils.PRINT(
@@ -98,5 +101,7 @@ def main(args=None):
         os.remove('gcloud-sdk.tar.gz')
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when setup_gae.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

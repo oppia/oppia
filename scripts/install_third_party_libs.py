@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Installation script for Oppia third-party libraries."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -61,6 +62,11 @@ _PARSER.add_argument(
     '--noskulpt',
     help='optional; if specified, skips installation of skulpt.',
     action='store_true')
+
+PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
+    common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
+PQ_CONFIGPARSER_FILEPATH = os.path.join(
+    common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
 
 
 def pip_install(package, version, install_path):
@@ -227,10 +233,8 @@ def main(args=None):
     # Do a little surgery on configparser in pylint-1.9.4 to remove dependency
     # on ConverterMapping, which is not implemented in some Python
     # distributions.
-    pylint_configparser_filepath = os.path.join(
-        common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
     pylint_newlines = []
-    with python_utils.open_file(pylint_configparser_filepath, 'r') as f:
+    with python_utils.open_file(PYLINT_CONFIGPARSER_FILEPATH, 'r') as f:
         for line in f.readlines():
             if line.strip() == 'ConverterMapping,':
                 continue
@@ -239,22 +243,20 @@ def main(args=None):
                     line[:line.find('"ConverterMapping"')] + '\n')
             else:
                 pylint_newlines.append(line)
-    with python_utils.open_file(pylint_configparser_filepath, 'w+') as f:
+    with python_utils.open_file(PYLINT_CONFIGPARSER_FILEPATH, 'w+') as f:
         f.writelines(pylint_newlines)
 
     # Do similar surgery on configparser in pylint-quotes-0.1.8 to remove
     # dependency on ConverterMapping.
-    pq_configparser_filepath = os.path.join(
-        common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
     pq_newlines = []
-    with python_utils.open_file(pq_configparser_filepath, 'r') as f:
+    with python_utils.open_file(PQ_CONFIGPARSER_FILEPATH, 'r') as f:
         for line in f.readlines():
             if line.strip() == 'ConverterMapping,':
                 continue
             if line.strip() == '"ConverterMapping",':
                 continue
             pq_newlines.append(line)
-    with python_utils.open_file(pq_configparser_filepath, 'w+') as f:
+    with python_utils.open_file(PQ_CONFIGPARSER_FILEPATH, 'w+') as f:
         f.writelines(pq_newlines)
 
     # Download and install required JS and zip files.
@@ -275,5 +277,7 @@ def main(args=None):
     pre_push_hook.main(args=['--install'])
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when install_third_party_libs.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

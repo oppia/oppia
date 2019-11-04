@@ -1,0 +1,6 @@
+  "DEV_MODE": true,
+  "GCS_RESOURCE_BUCKET_NAME": "None-resources",
+  "ANALYTICS_ID": "",
+  "SITE_NAME_FOR_ANALYTICS": "",
+  "SITE_FEEDBACK_FORM_URL": "",
+  "Testing": "Deploy-tests"
