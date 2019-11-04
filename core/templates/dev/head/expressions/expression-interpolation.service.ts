@@ -20,7 +20,7 @@ require('filters/convert-html-to-unicode.filter.ts');
 require('expressions/expression-evaluator.service.ts');
 require('expressions/expression-parser.service.js');
 require('expressions/expression-syntax-tree.service.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 // Interpolates an HTML or a unicode string containing expressions.
 // The input value is evaluated against the supplied environments.
