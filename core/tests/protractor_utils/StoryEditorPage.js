@@ -80,7 +80,18 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-skill-name-input'));
   var skillListItems = element.all(
     by.css('.protractor-test-skills-list-item'));
-
+  var initialChapterCheckButton = element.all(
+    by.css('.protractor-test-initial-chapter-check-box'));
+  var unreachableChapterWarning = element(
+    by.css('.protractor-test-unreachable-chapter'));
+  var deletePrerequisiteSkillButton = element.all(
+    by.css('.protractor-test-remove-prerequisite-skill'));
+  var deleteAcquiredSkillButton = element.all(
+    by.css('.protractor-test-remove-acquired-skill'));
+  var prerequisiteSkillDescriptionCard = element.all(
+    by.css('.protractor-test-prerequisite-skill-description-card'));
+  var acquiredSkillDescriptionCard = element.all(
+    by.css('.protractor-test-acquired-skill-description-card'));
 
   var nodeDiagramNavigator = function(id) {
     if (id === undefined) {
@@ -174,6 +185,15 @@ var StoryEditorPage = function() {
       'Close save modal button takes too long to be clickable');
     closeSaveModalButton.click();
     waitFor.pageToFullyLoad();
+  };
+
+  this.expectSaveStoryDisabled = function() {
+    return expect(
+      saveStoryButton.getAttribute('disabled')).toEqual('true');
+  };
+
+  this.expectDisplayUnreachableChapter = function() {
+    return expect(unreachableChapterWarning.isPresent()).toBe(true);
   };
 
   this.setChapterExplorationId = function(explorationId) {
@@ -295,6 +315,19 @@ var StoryEditorPage = function() {
 
   this.expectPrerequisiteSkillDescriptionCardNumber = function(number) {
     expect(prerequisiteSkillDescriptionCard.count()).toBe(number);
+  };
+
+  this.selectInitialChapterByIndex = function(index) {
+    initialChapterCheckButton.then(function(elements) {
+      var selectedInitial = elements[index];
+      waitFor.visibilityOf(
+        selectedInitial,
+        'selectedInitial takes too long to be visible');
+      waitFor.elementToBeClickable(
+        selectedInitial,
+        'selectedInitial takes too long to be clickable');
+      selectedInitial.click();
+    });
   };
 };
 

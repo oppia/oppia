@@ -43,6 +43,7 @@ fdescribe('-------', function() {
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
     'Dummy exploration', 'Algorithm', 'Lear more about oppia', 'English'];
+  var dummySkills = [];
   var allowedError = [];
 
   var createDummyExplorations = function(number) {
@@ -143,6 +144,19 @@ fdescribe('-------', function() {
     storyEditorPage.deletePrerequisiteSkillByIndex(0);
     storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(0);
   });
+
+  it('should select the chapter2 as initial chapter and get unreachable error',
+    function() {
+      storyEditorPage.selectInitialChapterByIndex(1);
+      storyEditorPage.expectDisplayUnreachableChapter();
+    }
+  );
+
+  it('should delete one chapter and save', function() {
+    storyEditorPage.deleteChapterWithIndex(1);
+    storyEditorPage.saveStory('Last');
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors(allowedError);
     allowedError = [];
