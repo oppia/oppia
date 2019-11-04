@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/AlertsService';
-import { LoggerService } from 'services/contextual/LoggerService';
+import { LoggerService } from 'services/contextual/logger.service';
 import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
 import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
 import { DocumentAttributeCustomizationService } from

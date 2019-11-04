@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { LoggerService } from 'services/contextual/LoggerService';
+import { LoggerService } from 'services/contextual/logger.service';
 
 export interface Warning {
   type: string;
@@ -101,7 +101,7 @@ export class AlertsService {
   /**
    * Clears all warnings.
    */
-  clearWarnings() {
+  clearWarnings(): void {
     this.warnings = [];
   }
 

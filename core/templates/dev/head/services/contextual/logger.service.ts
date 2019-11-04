@@ -25,26 +25,26 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class LoggerService {
   constructor() {}
 
-  debug(msg: string, optionalParams?: any[]) {
+  debug(msg: string) {
     // eslint-disable-next-line no-console
-    console.debug(msg, optionalParams);
+    console.debug(msg);
   }
 
-  info(msg: string, optionalParams?: any[]) {
+  info(msg: string) {
     // eslint-disable-next-line no-console
-    console.info(msg, optionalParams);
+    console.info(msg);
   }
 
-  warn(msg: string, optionalParams?: any[]) {
-    console.warn(msg, optionalParams);
+  warn(msg: string) {
+    console.warn(msg);
   }
 
-  error(msg: string, optionalParams?: any[]) {
-    console.error(msg, optionalParams);
+  error(msg: string) {
+    console.error(msg);
   }
 
-  log(msg: string, optionalParams?: any[]) {
+  log(msg: string) {
     // eslint-disable-next-line no-console
-    console.log(msg, optionalParams);
+    console.log(msg);
   }
 }
