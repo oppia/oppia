@@ -23,9 +23,9 @@ require(
   'fraction-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/HtmlEscaperService.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/html-escaper.service.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveFractionInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
