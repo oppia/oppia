@@ -27,7 +27,7 @@ require(
   'cyclic-transitions-issue.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/PlaythroughIssuesService.ts');
+require('services/playthrough-issues.service.ts');
 
 angular.module('oppia').directive('playthroughIssues', [
   'UrlInterpolationService', function(UrlInterpolationService) {
