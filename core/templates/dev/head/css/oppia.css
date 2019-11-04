@@ -607,6 +607,10 @@ textarea {
   Styles for the link to the site feedback form.
 */
 .oppia-site-feedback {
+  background-color: #fff;
+  border-radius: 2px;
+  bottom: 4px;
+  color: rgba(0,0,0,0.87);
   cursor: pointer;
   left: 4px;
   opacity: 0.5;

@@ -45,6 +45,7 @@ class FailedMLTest(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         config_property = config_domain.Registry.get_config_property(
             'notification_emails_for_failed_tasks')
@@ -1792,12 +1793,10 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
             # Make sure correct email models are stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
-            all_models.sort(key=lambda x: x.recipient_id)
-            sent_email_model = all_models[0]
+            sent_email_model = python_utils.NEXT(
+                m for m in all_models if m.recipient_id == self.moderator_id)
             self.assertEqual(
                 sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.moderator_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.MODERATOR_EMAIL)
             self.assertEqual(
@@ -1808,11 +1807,10 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
-            sent_email_model = all_models[1]
+            sent_email_model = python_utils.NEXT(
+                m for m in all_models if m.recipient_id == self.moderator2_id)
             self.assertEqual(
                 sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.moderator2_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.moderator2_email)
             self.assertEqual(
@@ -2302,15 +2300,17 @@ class BulkEmailsTests(test_utils.GenericTestBase):
 class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_can_users_receive_thread_email(self):
-        user_ids = ('someUser1', 'someUser2')
+        gae_ids = ('someUser1', 'someUser2')
         exp_id = 'someExploration'
         usernames = ('username1', 'username2')
         emails = ('user1@example.com', 'user2@example.com')
 
+        user_ids = []
         for user_id, username, user_email in python_utils.ZIP(
-                user_ids, usernames, emails):
-            user_services.create_new_user(user_id, user_email)
-            user_services.set_username(user_id, username)
+                gae_ids, usernames, emails):
+            user_settings = user_services.create_new_user(user_id, user_email)
+            user_ids.append(user_settings.user_id)
+            user_services.set_username(user_settings.user_id, username)
 
         # Both users can receive all emails in default setting.
         self.assertListEqual(email_manager.can_users_receive_thread_email(

@@ -18,7 +18,7 @@
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
-require('domain/topic/TopicUpdateService.ts');
+require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
