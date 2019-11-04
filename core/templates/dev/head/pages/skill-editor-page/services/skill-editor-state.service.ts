@@ -63,7 +63,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
     var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
       for (var name in groupedSkillSummaries) {
         _groupedSkillSummaries[name] = [];
-        summaryDicts = groupedSkillSummaries[name];
+        var summaryDicts = groupedSkillSummaries[name];
         for (var idx in summaryDicts) {
           _groupedSkillSummaries[name].push(summaryDicts[idx]);
         }

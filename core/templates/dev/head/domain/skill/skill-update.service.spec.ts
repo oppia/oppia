@@ -238,9 +238,9 @@ describe('Skill update service', function() {
       cmd: 'delete_prerequisite_skill',
       skill_id: 'skill_1'
     }]);
-    expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
-    UndoRedoService.undoChange(skill);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(0);
+    UndoRedoService.undoChange(skill);
+    expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
   });
 
   it('should update a rubric', function() {

@@ -97,7 +97,7 @@ describe('Editable skill backend API service', function() {
 
     sampleResponse = {
       skill: skillDict,
-      groupedSkillSummaries: {}
+      grouped_skill_summaries: {}
     };
 
     sampleResponse2 = {
@@ -124,7 +124,7 @@ describe('Editable skill backend API service', function() {
 
       expect(successHandler).toHaveBeenCalledWith({
         skill: sampleResponse.skill,
-        groupedSkillSummaries: sampleResponse.groupedSkillSummaries
+        groupedSkillSummaries: sampleResponse.grouped_skill_summaries
       });
       expect(failHandler).not.toHaveBeenCalled();
     });

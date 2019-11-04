@@ -246,11 +246,6 @@ describe('Skill editor state service', function() {
     SkillEditorStateService.loadSkill('1');
     expect(fakeEditableSkillBackendApiService.fetchSkill)
       .toHaveBeenCalled();
-    var groupedSkillSummaries =
-      SkillEditorStateService.getGroupedSkillSummaries();
-    expect(len(groupedSkillSummaries.Name), 2);
-    expect(groupedSkillSummaries.Name[0].id, 'skill_id_1');
-    expect(groupedSkillSummaries.Name[1].id, 'skill_id_2');
   });
 
   it('should track whether it is currently loading the skill', function() {
@@ -277,6 +272,11 @@ describe('Skill editor state service', function() {
     expect(SkillEditorStateService.hasLoadedSkill()).toBe(false);
     $rootScope.$apply();
     expect(SkillEditorStateService.hasLoadedSkill()).toBe(true);
+    var groupedSkillSummaries =
+      SkillEditorStateService.getGroupedSkillSummaries();
+    expect(groupedSkillSummaries.Name.length).toEqual(2);
+    expect(groupedSkillSummaries.Name[0].id).toEqual('skill_id_1');
+    expect(groupedSkillSummaries.Name[1].id).toEqual('skill_id_2');
   });
 
   it('should return the last skill loaded as the same object', function() {

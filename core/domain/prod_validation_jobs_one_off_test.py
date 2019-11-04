@@ -7984,7 +7984,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8209,7 +8210,8 @@ class SkillSnapshotMetadataModelValidatorTests(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8396,7 +8398,8 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8532,7 +8535,8 @@ class SkillRightsModelValidatorTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8678,7 +8682,8 @@ class SkillRightsSnapshotMetadataModelValidatorTests(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8843,7 +8848,8 @@ class SkillRightsSnapshotContentModelValidatorTests(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8974,7 +8980,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -9231,7 +9238,8 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
