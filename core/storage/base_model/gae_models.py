@@ -510,7 +510,7 @@ class VersionedModel(BaseModel):
     # previous versions is stored in the snapshot models.
     version = ndb.IntegerProperty(default=0)
 
-    def _require_not_marked_deleted(self):
+    def require_not_marked_deleted(self):
         """Checks whether the model instance is deleted."""
         if self.deleted:
             raise Exception('This model instance has been deleted.')
@@ -519,7 +519,7 @@ class VersionedModel(BaseModel):
         """Generates a snapshot (dict) from the model property values."""
         return self.to_dict(exclude=['created_on', 'last_updated'])
 
-    def _reconstitute(self, snapshot_dict):
+    def reconstitute(self, snapshot_dict):
         """Populates the model instance with the snapshot.
 
         Args:
@@ -533,7 +533,7 @@ class VersionedModel(BaseModel):
         self.populate(**snapshot_dict)
         return self
 
-    def _reconstitute_from_snapshot_id(self, snapshot_id):
+    def reconstitute_from_snapshot_id(self, snapshot_id):
         """Gets a reconstituted instance of this model class, based on the given
         snapshot id.
 
@@ -545,7 +545,7 @@ class VersionedModel(BaseModel):
         """
         snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
         snapshot_dict = snapshot_model.content
-        reconstituted_model = self._reconstitute(snapshot_dict)
+        reconstituted_model = self.reconstitute(snapshot_dict)
         # TODO(sll): The 'created_on' and 'last_updated' values here will be
         # slightly different from the values the entity model would have had,
         # since they correspond to the corresponding fields for the snapshot
@@ -558,7 +558,7 @@ class VersionedModel(BaseModel):
         return reconstituted_model
 
     @classmethod
-    def _get_snapshot_id(cls, instance_id, version_number):
+    def get_snapshot_id(cls, instance_id, version_number):
         """Gets a unique snapshot id for this instance and version.
 
         Args:
@@ -572,7 +572,7 @@ class VersionedModel(BaseModel):
         return '%s%s%s' % (
             instance_id, _VERSION_DELIMITER, version_number)
 
-    def _trusted_commit(
+    def trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Evaluates and executes commit. Main function for all commit types.
 
@@ -607,7 +607,7 @@ class VersionedModel(BaseModel):
         self.version += 1
 
         snapshot = self._compute_snapshot()
-        snapshot_id = self._get_snapshot_id(self.id, self.version)
+        snapshot_id = self.get_snapshot_id(self.id, self.version)
 
         snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS(  # pylint: disable=not-callable
             id=snapshot_id, committer_id=committer_id, commit_type=commit_type,
@@ -639,7 +639,7 @@ class VersionedModel(BaseModel):
                 python_utils.UNICODE(num + 1) for num in python_utils.RANGE(
                     current_version)]
             snapshot_ids = [
-                self._get_snapshot_id(self.id, version_number)
+                self.get_snapshot_id(self.id, version_number)
                 for version_number in version_numbers]
 
             metadata_keys = [
@@ -654,14 +654,14 @@ class VersionedModel(BaseModel):
 
             super(VersionedModel, self).delete()
         else:
-            self._require_not_marked_deleted()  # pylint: disable=protected-access
+            self.require_not_marked_deleted()  # pylint: disable=protected-access
             self.deleted = True
 
             commit_cmds = [{
                 'cmd': self.CMD_DELETE_COMMIT
             }]
 
-            self._trusted_commit(
+            self.trusted_commit(
                 committer_id, self._COMMIT_TYPE_DELETE, commit_message,
                 commit_cmds)
 
@@ -688,7 +688,7 @@ class VersionedModel(BaseModel):
             Exception: This model instance has been already deleted.
             Exception: commit_cmd is in invalid format.
         """
-        self._require_not_marked_deleted()
+        self.require_not_marked_deleted()
 
         for item in commit_cmds:
             if not isinstance(item, dict):
@@ -709,7 +709,7 @@ class VersionedModel(BaseModel):
             self._COMMIT_TYPE_CREATE if self.version == 0 else
             self._COMMIT_TYPE_EDIT)
 
-        self._trusted_commit(
+        self.trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
     @classmethod
@@ -726,7 +726,7 @@ class VersionedModel(BaseModel):
             Exception: This model instance has been deleted.
             Exception: Reverting is not allowed on this model.
         """
-        model._require_not_marked_deleted()  # pylint: disable=protected-access
+        model.require_not_marked_deleted()  # pylint: disable=protected-access
 
         if not model.ALLOW_REVERT:
             raise Exception(
@@ -751,12 +751,12 @@ class VersionedModel(BaseModel):
         # states_schema_version value from the latest exploration version.
 
         # pylint: disable=protected-access
-        snapshot_id = model._get_snapshot_id(model.id, version_number)
+        snapshot_id = model.get_snapshot_id(model.id, version_number)
         new_model = cls(id=model.id)
-        new_model._reconstitute_from_snapshot_id(snapshot_id)
+        new_model.reconstitute_from_snapshot_id(snapshot_id)
         new_model.version = current_version
 
-        new_model._trusted_commit(
+        new_model.trusted_commit(
             committer_id, cls._COMMIT_TYPE_REVERT, commit_message,
             commit_cmds)
         # pylint: enable=protected-access
@@ -779,13 +779,13 @@ class VersionedModel(BaseModel):
             Exception: This model instance has been deleted.
         """
         # pylint: disable=protected-access
-        cls.get(entity_id)._require_not_marked_deleted()
+        cls.get(entity_id).require_not_marked_deleted()
 
-        snapshot_id = cls._get_snapshot_id(entity_id, version_number)
+        snapshot_id = cls.get_snapshot_id(entity_id, version_number)
 
         return cls(
             id=entity_id,
-            version=version_number)._reconstitute_from_snapshot_id(snapshot_id)
+            version=version_number).reconstitute_from_snapshot_id(snapshot_id)
         # pylint: enable=protected-access
 
     @classmethod
@@ -821,7 +821,7 @@ class VersionedModel(BaseModel):
         snapshot_ids = []
         # pylint: disable=protected-access
         for version in version_numbers:
-            snapshot_id = cls._get_snapshot_id(entity_id, version)
+            snapshot_id = cls.get_snapshot_id(entity_id, version)
             snapshot_ids.append(snapshot_id)
 
         snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
@@ -830,7 +830,7 @@ class VersionedModel(BaseModel):
                 raise ValueError(
                     'At least one version number is invalid.')
             snapshot_dict = snapshot_model.content
-            reconstituted_model = cls(id=entity_id)._reconstitute(
+            reconstituted_model = cls(id=entity_id).reconstitute(
                 snapshot_dict)
             reconstituted_model.created_on = snapshot_model.created_on
             reconstituted_model.last_updated = snapshot_model.last_updated
@@ -900,10 +900,10 @@ class VersionedModel(BaseModel):
         """
         # pylint: disable=protected-access
         if not allow_deleted:
-            cls.get(model_instance_id)._require_not_marked_deleted()
+            cls.get(model_instance_id).require_not_marked_deleted()
 
         snapshot_ids = [
-            cls._get_snapshot_id(model_instance_id, version_number)
+            cls.get_snapshot_id(model_instance_id, version_number)
             for version_number in version_numbers]
         # pylint: enable=protected-access
         metadata_keys = [
