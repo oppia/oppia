@@ -54,8 +54,8 @@ angular.module('oppia').directive('editorNavigation', [
             ThreadDataService, UserService, WindowDimensionsService) {
           var taskCount;
           ImprovementTaskService.getOpenTaskCount().then((resp)=>{
-            taskCount=resp;
-          })
+            taskCount = resp;
+          });
 
           $scope.getOpenTaskCount = function() {
             return taskCount;

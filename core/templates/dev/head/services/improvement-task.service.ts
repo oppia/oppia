@@ -78,9 +78,9 @@ angular.module('oppia').factory('ImprovementTaskService', [
           return [].concat.apply([], tasksFromFactories);
         });
       },
-      getOpenTaskCount: function(){
+      getOpenTaskCount: function() {
         var isTaskOpen = function(task) {
-          return task.getStatus()==='open';
+          return task.getStatus() === 'open';
         };
         var fetchedTasks = [];
         return this.fetchTasks().then(function(tasks) {
