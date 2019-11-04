@@ -69,6 +69,7 @@ class MockCD(python_utils.OBJECT):
 
 class DeployTests(test_utils.GenericTestBase):
     """Test the methods for deploying release."""
+
     def setUp(self):
         super(DeployTests, self).setUp()
         # pylint: disable=unused-argument
