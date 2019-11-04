@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/SiteAnalyticsService.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('ExplorationEmbedButtonService', [
   '$uibModal', 'SiteAnalyticsService', 'UrlInterpolationService',
