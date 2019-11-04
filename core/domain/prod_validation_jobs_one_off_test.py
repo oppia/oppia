@@ -9322,9 +9322,9 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'check of SkillSummaryModel\', '
                 '[u"Entity id 0: Misconception count: 10 does not match '
                 'the number of misconceptions in skill model: '
-                '[{u\'notes\': u\'<p>notes</p>\', u\'feedback\': '
-                'u\'<p>default_feedback</p>\', u\'name\': u\'name\', '
-                'u\'id\': 0}]"]]'
+                '[{u\'id\': 0, u\'must_be_addressed\': True, '
+                'u\'notes\': u\'<p>notes</p>\', u\'name\': u\'name\', '
+                'u\'feedback\': u\'<p>default_feedback</p>\'}]"]]'
             ), u'[u\'fully-validated SkillSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
