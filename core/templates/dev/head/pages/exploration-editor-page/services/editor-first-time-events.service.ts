@@ -18,7 +18,7 @@
  * is opened for the first time for an exploration.
  */
 
-require('services/SiteAnalyticsService.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('EditorFirstTimeEventsService', [
   'SiteAnalyticsService',

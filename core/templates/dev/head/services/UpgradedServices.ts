@@ -19,18 +19,19 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
-import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
+import { BackgroundMaskService } from
+  'services/stateful/background-mask.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
-  'services/contextual/DocumentAttributeCustomizationService';
+  'services/contextual/document-attribute-customization.service';
 import { MetaTagCustomizationService } from
-  'services/contextual/MetaTagCustomizationService';
+  'services/contextual/meta-tag-customization.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
-import { UrlService } from 'services/contextual/UrlService';
-import { UtilsService } from 'services/UtilsService';
+import { UrlService } from 'services/contextual/url.service';
+import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from
-  'services/contextual/WindowDimensionsService';
-import { WindowRef } from 'services/contextual/WindowRefService';
+  'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'

@@ -25,11 +25,11 @@ require(
   'background-banner.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
-require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/AlertsService.ts');
-require('services/UserService.ts');
-require('services/UtilsService.ts');
+require('services/alerts.service.ts');
+require('services/user.service.ts');
+require('services/utils.service.ts');
 
 angular.module('oppia').directive('preferencesPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
