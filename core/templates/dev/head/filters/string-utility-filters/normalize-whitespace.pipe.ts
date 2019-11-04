@@ -16,7 +16,7 @@
  * @fileoverview NormalizeWhitespace pipe for Oppia.
  */
 
-import { UtilsService } from 'services/UtilsService';
+import { UtilsService } from 'services/utils.service';
 import { Pipe, PipeTransform } from '@angular/core';
 
 // Pipe that removes whitespace from the beginning and end of a string, and

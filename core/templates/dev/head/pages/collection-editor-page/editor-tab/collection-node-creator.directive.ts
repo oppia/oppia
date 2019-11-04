@@ -26,9 +26,9 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require(
   'pages/collection-editor-page/services/collection-linearizer.service.ts');
-require('services/AlertsService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/ValidatorsService.ts');
+require('services/alerts.service.ts');
+require('services/site-analytics.service.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').directive('collectionNodeCreator', [
   'UrlInterpolationService', function(UrlInterpolationService) {
