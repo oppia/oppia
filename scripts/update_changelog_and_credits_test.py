@@ -88,6 +88,7 @@ def write_to_file(filepath, filelines):
 
 class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
     """Test the methods for automatic update of changelog and credits."""
+
     def setUp(self):
         super(ChangelogAndCreditsUpdateTests, self).setUp()
         def mock_get_current_branch_name():
