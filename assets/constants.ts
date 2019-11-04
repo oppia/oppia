@@ -451,12 +451,16 @@ export = {
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
     "name": "General",
     "interaction_ids": [
+      "ImageClickInput",
+      "ItemSelectionInput",
       "MultipleChoiceInput",
       "TextInput"
     ]
   }, {
     "name": "Math",
     "interaction_ids": [
+      "FractionInput",
+      "NumberWithUnits",
       "NumericInput"
     ]
   }],
