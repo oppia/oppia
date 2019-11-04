@@ -209,6 +209,7 @@ class DeployTests(test_utils.GenericTestBase):
             return 'Update authors and changelog for v1.2.3'
         def mock_check_travis_and_circleci_tests(unused_current_branch_name):
             pass
+
         config_swap = self.swap(update_configs, 'main', mock_main)
         get_token_swap = self.swap(
             common, 'get_personal_access_token', mock_get_personal_access_token)
@@ -227,6 +228,7 @@ class DeployTests(test_utils.GenericTestBase):
         check_tests_swap = self.swap(
             deploy, 'check_travis_and_circleci_tests',
             mock_check_travis_and_circleci_tests)
+
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.run_swap, config_swap, get_token_swap, get_org_swap:
