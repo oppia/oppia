@@ -50,11 +50,11 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/EditabilityService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/GenerateContentIdService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/editability.service.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/generate-content-id.service.ts');
 
 require('components/state-editor/state-editor.constants.ajs.ts');
 

@@ -26,8 +26,8 @@ require('pages/exploration-editor-page/services/parameter-metadata.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'solution-validity.service.ts');
-require('services/ImprovementsService.ts');
-require('services/StateTopAnswersStatsService.ts');
+require('services/improvements.service.ts');
+require('services/state-top-answers-stats.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

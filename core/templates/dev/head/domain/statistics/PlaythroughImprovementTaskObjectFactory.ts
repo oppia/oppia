@@ -26,8 +26,8 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
-require('services/ExplorationFeaturesService.ts');
-require('services/PlaythroughIssuesService.ts');
+require('services/exploration-features.service.ts');
+require('services/playthrough-issues.service.ts');
 
 angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
   '$q', 'ExplorationFeaturesService', 'ImprovementActionButtonObjectFactory',

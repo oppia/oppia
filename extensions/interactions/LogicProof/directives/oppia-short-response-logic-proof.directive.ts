@@ -19,7 +19,7 @@
 require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponseLogicProof', [
   'HtmlEscaperService', 'UrlInterpolationService',

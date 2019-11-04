@@ -16,7 +16,7 @@
  * @fileoverview Service to get changes in human readable form.
  */
 
-require('services/UtilsService.ts');
+require('services/utils.service.ts');
 
 angular.module('oppia').factory('ChangesInHumanReadableFormService', [
   'UtilsService', function(UtilsService) {

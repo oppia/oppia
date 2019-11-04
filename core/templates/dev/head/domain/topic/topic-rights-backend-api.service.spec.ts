@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/topic/topic-rights-backend-api.service.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 describe('Topic rights backend API service', function() {
   var TopicRightsBackendApiService = null;

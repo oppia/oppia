@@ -22,7 +22,7 @@ require(
   'sharing-links.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/UrlService.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('collectionFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {

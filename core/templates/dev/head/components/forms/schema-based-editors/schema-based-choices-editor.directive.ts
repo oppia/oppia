@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
+require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedChoicesEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',

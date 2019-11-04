@@ -27,9 +27,9 @@ require(
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 
-require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
-require('services/PageTitleService.ts');
+require('services/alerts.service.ts');
+require('services/contextual/url.service.ts');
+require('services/page-title.service.ts');
 require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 

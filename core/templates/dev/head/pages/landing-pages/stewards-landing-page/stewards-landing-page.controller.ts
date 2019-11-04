@@ -19,9 +19,9 @@
 require('base-components/base-content.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('services/site-analytics.service.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('stewardsLandingPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

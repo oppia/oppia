@@ -27,7 +27,8 @@ require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-rights-backend-api.service.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
+require('services/questions-list.service.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 

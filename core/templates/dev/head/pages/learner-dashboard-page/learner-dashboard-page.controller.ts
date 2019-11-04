@@ -37,9 +37,9 @@ require(
   'pages/learner-dashboard-page/suggestion-modal/' +
   'suggestion-modal-for-learner-dashboard.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/AlertsService.ts');
-require('services/DateTimeFormatService.ts');
-require('services/UserService.ts');
+require('services/alerts.service.ts');
+require('services/date-time-format.service.ts');
+require('services/user.service.ts');
 
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 

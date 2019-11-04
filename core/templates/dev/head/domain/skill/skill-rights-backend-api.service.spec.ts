@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('App.ts');
 require('domain/skill/skill-rights-backend-api.service.ts');
 require('pages/skill-editor-page/skill-editor-page.controller.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 describe('Skill rights backend API service', function() {
   var SkillRightsBackendApiService = null;

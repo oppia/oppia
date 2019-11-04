@@ -17,7 +17,7 @@
  */
 
 require('domain/collection/read-only-collection-backend-api.service.ts');
-require('services/contextual/UrlService.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('collectionLocalNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {

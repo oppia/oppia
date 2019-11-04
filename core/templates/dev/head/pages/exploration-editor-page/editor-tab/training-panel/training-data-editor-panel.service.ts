@@ -43,10 +43,10 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').factory('TrainingDataEditorPanelService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',

@@ -30,12 +30,12 @@ require(
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
-require('services/ContextService.ts');
-require('services/ExplorationFeaturesBackendApiService.ts');
-require('services/ExplorationFeaturesService.ts');
-require('services/PlaythroughIssuesService.ts');
-require('services/PlaythroughService.ts');
-require('services/contextual/UrlService.ts');
+require('services/context.service.ts');
+require('services/exploration-features-backend-api.service.ts');
+require('services/exploration-features.service.ts');
+require('services/playthrough-issues.service.ts');
+require('services/playthrough.service.ts');
+require('services/contextual/url.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');

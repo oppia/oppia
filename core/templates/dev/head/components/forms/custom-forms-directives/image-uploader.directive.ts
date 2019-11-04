@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/IdGenerationService.ts');
+require('services/id-generation.service.ts');
 
 angular.module('oppia').directive('imageUploader', [
   'IdGenerationService', 'UrlInterpolationService',

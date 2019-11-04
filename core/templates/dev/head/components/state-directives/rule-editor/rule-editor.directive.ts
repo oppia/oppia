@@ -32,7 +32,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/ValidatorsService.ts');
+require('services/validators.service.ts');
 
 var DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 // This directive controls an editor for selecting the type and input parameters

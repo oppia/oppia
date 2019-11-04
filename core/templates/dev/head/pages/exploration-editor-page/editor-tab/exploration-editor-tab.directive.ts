@@ -49,9 +49,9 @@ require('components/state-editor/state-editor.directive.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/ExplorationFeaturesService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/exploration-features.service.ts');
 
 angular.module('oppia').directive('explorationEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

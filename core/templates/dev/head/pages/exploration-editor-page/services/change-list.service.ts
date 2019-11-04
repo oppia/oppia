@@ -20,7 +20,7 @@
 require(
   'pages/exploration-editor-page/services/autosave-info-modals.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').factory('ChangeListService', [
   '$log', '$rootScope', 'AlertsService', 'AutosaveInfoModalsService',

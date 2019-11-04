@@ -19,9 +19,9 @@
 require(
   'pages/exploration-player-page/services/' +
   'extract-image-filenames-from-state.service.ts');
-require('services/AssetsBackendApiService.ts');
-require('services/ComputeGraphService.ts');
-require('services/ContextService.ts');
+require('services/assets-backend-api.service.ts');
+require('services/compute-graph.service.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').factory('ImagePreloaderService', [
   '$q', 'AssetsBackendApiService', 'ComputeGraphService',

@@ -27,7 +27,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/' +
   'learner-answer-details-data.service.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 describe('Learner answer details service', function() {
   var expId = '12345';

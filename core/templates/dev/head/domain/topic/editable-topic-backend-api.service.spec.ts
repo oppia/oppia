@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 describe('Editable topic backend API service', function() {
   var EditableTopicBackendApiService = null;

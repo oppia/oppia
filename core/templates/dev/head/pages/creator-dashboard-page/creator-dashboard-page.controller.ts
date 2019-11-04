@@ -43,9 +43,9 @@ require(
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
-require('services/AlertsService.ts');
-require('services/DateTimeFormatService.ts');
-require('services/UserService.ts');
+require('services/alerts.service.ts');
+require('services/date-time-format.service.ts');
+require('services/user.service.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 

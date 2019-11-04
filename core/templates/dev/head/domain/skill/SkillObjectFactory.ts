@@ -20,7 +20,7 @@
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/RubricObjectFactory.ts');
-require('services/ValidatorsService.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').factory('SkillObjectFactory', [
   'ConceptCardObjectFactory', 'MisconceptionObjectFactory',

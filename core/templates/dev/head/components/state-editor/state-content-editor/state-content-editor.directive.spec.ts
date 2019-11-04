@@ -31,7 +31,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
-require('services/EditabilityService.ts');
+require('services/editability.service.ts');
 
 describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, rvo, srvos;

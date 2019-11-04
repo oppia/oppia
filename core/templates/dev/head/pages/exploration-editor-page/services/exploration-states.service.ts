@@ -34,9 +34,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/ValidatorsService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').factory('ExplorationStatesService', [
   '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',

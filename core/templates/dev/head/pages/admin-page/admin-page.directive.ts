@@ -35,8 +35,8 @@ require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
-require('services/CsrfTokenService.ts');
-require('services/UtilsService.ts');
+require('services/csrf-token.service.ts');
+require('services/utils.service.ts');
 
 angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
   function(UrlInterpolationService) {

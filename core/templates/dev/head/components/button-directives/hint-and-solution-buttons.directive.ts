@@ -25,8 +25,8 @@ require(
   'pages/exploration-player-page/services/hint-and-solution-modal.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
-require('services/ContextService.ts');
-require('services/contextual/DeviceInfoService.ts');
+require('services/context.service.ts');
+require('services/contextual/device-info.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');

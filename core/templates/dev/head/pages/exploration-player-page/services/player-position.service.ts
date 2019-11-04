@@ -17,7 +17,7 @@
  */
 
 require('pages/exploration-player-page/services/player-transcript.service.ts');
-require('services/ContextService.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').factory('PlayerPositionService', [
   'ContextService', 'PlayerTranscriptService', function(

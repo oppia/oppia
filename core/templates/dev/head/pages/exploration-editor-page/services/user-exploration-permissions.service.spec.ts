@@ -24,8 +24,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
-require('services/ContextService.ts');
-require('services/contextual/UrlService.ts');
+require('services/context.service.ts');
+require('services/contextual/url.service.ts');
 
 describe('User Exploration Permissions Service', function() {
   var ueps, ContextService, UrlService, $httpBackend;

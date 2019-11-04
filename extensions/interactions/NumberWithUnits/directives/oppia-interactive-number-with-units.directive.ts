@@ -23,7 +23,7 @@ require(
 require(
   'interactions/NumberWithUnits/directives/' +
   'number-with-units-rules.service.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
   'UrlInterpolationService',

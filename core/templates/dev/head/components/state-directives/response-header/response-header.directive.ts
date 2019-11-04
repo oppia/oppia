@@ -23,7 +23,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/EditabilityService.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').directive('responseHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {

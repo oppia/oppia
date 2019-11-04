@@ -58,8 +58,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
-require('services/AssetsBackendApiService.ts');
-require('services/ContextService.ts');
+require('services/assets-backend-api.service.ts');
+require('services/context.service.ts');
 
 describe('Image preloader service', function() {
   beforeEach(function() {

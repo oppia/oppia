@@ -18,7 +18,7 @@
 
 require('domain/learner_dashboard/learner-playlist.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';

@@ -20,7 +20,7 @@ require(
   'pages/exploration-editor-page/services/' +
   'exploration-init-state-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('services/ComputeGraphService.ts');
+require('services/compute-graph.service.ts');
 
 angular.module('oppia').factory('GraphDataService', [
   'ComputeGraphService', 'ExplorationInitStateNameService',

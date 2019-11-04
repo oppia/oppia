@@ -17,7 +17,7 @@
  */
 
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('services/CodeNormalizerService.ts');
+require('services/code-normalizer.service.ts');
 
 angular.module('oppia').factory('CodeReplRulesService', [
   '$filter', 'CodeNormalizerService',

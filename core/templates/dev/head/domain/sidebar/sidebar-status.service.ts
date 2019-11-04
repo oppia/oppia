@@ -20,7 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowDimensionsService } from
-  'services/contextual/WindowDimensionsService';
+  'services/contextual/window-dimensions.service';
 
 @Injectable({
   providedIn: 'root'

@@ -31,7 +31,7 @@ require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/ExplorationHtmlFormatterService.ts');
+require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').factory('ImprovementModalService', [
   '$uibModal', 'AlertsService', 'ChangeListService', 'DateTimeFormatService',

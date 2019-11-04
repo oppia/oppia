@@ -29,9 +29,9 @@ require(
   'music-phrase-player.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/AlertsService.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/alerts.service.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
   'AlertsService', 'CurrentInteractionService', 'HtmlEscaperService',

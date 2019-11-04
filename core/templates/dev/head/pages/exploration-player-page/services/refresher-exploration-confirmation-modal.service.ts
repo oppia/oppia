@@ -19,7 +19,7 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
-require('services/contextual/UrlService.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').factory(
   'RefresherExplorationConfirmationModalService', [

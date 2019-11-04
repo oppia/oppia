@@ -18,7 +18,7 @@
 
 require('base-components/base-content.directive.ts');
 
-require('services/DateTimeFormatService.ts');
+require('services/date-time-format.service.ts');
 
 angular.module('oppia').directive('notificationsDashboardPage', [
   'UrlInterpolationService', function(

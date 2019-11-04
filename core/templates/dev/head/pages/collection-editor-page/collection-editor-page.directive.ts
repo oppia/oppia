@@ -30,8 +30,8 @@ require(
 
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
-require('services/PageTitleService.ts');
-require('services/contextual/UrlService.ts');
+require('services/page-title.service.ts');
+require('services/contextual/url.service.ts');
 
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');

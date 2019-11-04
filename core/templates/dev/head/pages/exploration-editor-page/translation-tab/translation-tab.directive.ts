@@ -48,8 +48,8 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
-require('services/ContextService.ts');
-require('services/EditabilityService.ts');
+require('services/context.service.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
   function(UrlInterpolationService) {

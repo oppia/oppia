@@ -21,7 +21,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaResponseContinue', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -16,7 +16,7 @@
  * @fileoverview Converts unicode to HTML.
  */
 
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').filter('convertUnicodeToHtml', [
   '$sanitize', 'HtmlEscaperService',

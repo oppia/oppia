@@ -41,8 +41,8 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').factory('TrainingModalService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',

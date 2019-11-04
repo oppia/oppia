@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/email-dashboard-pages/email-dashboard-data.service.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 describe('Email Dashboard Services', function() {
   beforeEach(angular.mock.module('oppia'));

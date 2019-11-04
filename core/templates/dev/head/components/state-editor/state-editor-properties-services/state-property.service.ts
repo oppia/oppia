@@ -16,7 +16,7 @@
  * @fileoverview Standalone services for the general state editor page.
  */
 
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').factory('StatePropertyService', [
   'AlertsService',

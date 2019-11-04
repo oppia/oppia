@@ -24,7 +24,7 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require(
   'pages/collection-editor-page/services/collection-linearizer.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').directive('collectionNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -21,7 +21,7 @@ require('pages/exploration-player-page/services/player-transcript.service.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
-require('services/ExplorationHtmlFormatterService.ts');
+require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').directive('learnerAnswerInfoCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {

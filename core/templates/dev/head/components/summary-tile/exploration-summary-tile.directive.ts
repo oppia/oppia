@@ -24,10 +24,10 @@ require('filters/string-utility-filters/truncate.filter.ts');
 
 require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/DateTimeFormatService.ts');
-require('services/UserService.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('services/date-time-format.service.ts');
+require('services/user.service.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('explorationSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {

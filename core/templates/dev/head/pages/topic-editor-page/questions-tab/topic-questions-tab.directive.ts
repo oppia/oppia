@@ -32,9 +32,9 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
-require('services/QuestionsListService.ts');
+require('services/alerts.service.ts');
+require('services/contextual/url.service.ts');
+require('services/questions-list.service.ts');
 
 angular.module('oppia').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

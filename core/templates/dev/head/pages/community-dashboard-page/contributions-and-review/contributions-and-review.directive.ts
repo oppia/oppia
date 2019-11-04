@@ -22,7 +22,7 @@ require(
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-and-review.services.ts');
-require('services/SuggestionModalService.ts');
+require('services/suggestion-modal.service.ts');
 
 require('filters/format-rte-preview.filter.ts');
 

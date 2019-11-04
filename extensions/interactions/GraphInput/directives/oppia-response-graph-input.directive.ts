@@ -22,7 +22,7 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('interactions/GraphInput/directives/graph-detail.service.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 require('interactions/interactions-extension.constants.ajs.ts');
 

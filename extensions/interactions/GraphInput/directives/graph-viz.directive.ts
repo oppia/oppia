@@ -22,8 +22,8 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('interactions/GraphInput/directives/graph-detail.service.ts');
-require('services/contextual/DeviceInfoService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/contextual/device-info.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 require('interactions/interactions-extension.constants.ajs.ts');
 

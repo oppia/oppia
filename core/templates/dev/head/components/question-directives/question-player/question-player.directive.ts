@@ -105,9 +105,9 @@ require(
 require('domain/question/question-backend-api.service.ts');
 require('domain/skill/skill-mastery-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/AlertsService.ts');
-require('services/UserService.ts');
-require('services/contextual/UrlService.ts');
+require('services/alerts.service.ts');
+require('services/user.service.ts');
+require('services/contextual/url.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');
 

@@ -16,8 +16,8 @@
  * @fileoverview Directive for CK Editor.
  */
 
-require('services/ContextService.ts');
-require('services/RteHelperService.ts');
+require('services/context.service.ts');
+require('services/rte-helper.service.ts');
 
 angular.module('oppia').directive('ckEditor4Rte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',

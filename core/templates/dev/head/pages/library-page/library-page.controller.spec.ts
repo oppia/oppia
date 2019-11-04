@@ -21,7 +21,7 @@
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { WindowDimensionsService } from
-  'services/contextual/WindowDimensionsService';
+  'services/contextual/window-dimensions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.

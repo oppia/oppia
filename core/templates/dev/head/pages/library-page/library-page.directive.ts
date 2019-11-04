@@ -28,12 +28,12 @@ require(
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
 require('domain/learner_dashboard/learner-playlist.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/AlertsService.ts');
-require('services/PageTitleService.ts');
-require('services/SearchService.ts');
-require('services/UserService.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('services/alerts.service.ts');
+require('services/page-title.service.ts');
+require('services/search.service.ts');
+require('services/user.service.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 require('pages/library-page/library-page.constants.ajs.ts');
 

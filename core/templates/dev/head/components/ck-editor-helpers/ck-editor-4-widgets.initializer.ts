@@ -18,8 +18,8 @@
  */
 
 require('rich_text_components/richTextComponentsRequires.ts');
-require('services/HtmlEscaperService.ts');
-require('services/RteHelperService.ts');
+require('services/html-escaper.service.ts');
+require('services/rte-helper.service.ts');
 
 angular.module('oppia').run([
   '$timeout', '$compile', '$rootScope', 'RteHelperService',

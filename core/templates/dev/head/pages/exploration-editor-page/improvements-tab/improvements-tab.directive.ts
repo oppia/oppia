@@ -35,7 +35,7 @@ require(
 );
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/ImprovementTaskService.ts');
+require('services/improvement-task.service.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvements-display.service.ts');

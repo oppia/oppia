@@ -23,7 +23,7 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponseMultipleChoiceInput', [
   'HtmlEscaperService', 'UrlInterpolationService',

@@ -31,8 +31,8 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
+require('services/alerts.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('collectionEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {

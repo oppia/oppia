@@ -18,7 +18,7 @@
 
 require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/UrlService.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('collectionNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -22,7 +22,7 @@
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/ContextService.ts');
+require('services/context.service.ts');
 require('pages/exploration-player-page/services/' +
   'player-position.service.ts');
 require('pages/exploration-player-page/services/' +
