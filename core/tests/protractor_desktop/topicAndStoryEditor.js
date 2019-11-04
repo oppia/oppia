@@ -61,6 +61,16 @@ fdescribe('-------', function() {
     return ids;
   };
 
+  var createDummySkills = function(number) {
+    var skills = [];
+    for (var i = 0; i < number; i++) {
+      var skillName = 'skill' + i.toString();
+      workflow.createSkillAndAssignTopic(skillName, 0);
+      skills.push(skillName);
+    }
+    return skills;
+  };
+
   beforeAll(function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
@@ -77,6 +87,7 @@ fdescribe('-------', function() {
     topicEditorPage.createStory('Story 1');
     browser.getCurrentUrl().then(function(url) {
       storyId = url.split('/')[4];
+      dummySkills = createDummySkills(2);
     });
   });
 
@@ -110,6 +121,28 @@ fdescribe('-------', function() {
     }
   );
 
+  it('should add one prerequisite and acquired skill to chapter 1', function() {
+    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(0);
+    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(0);
+    storyEditorPage.addAcquiredSkill(dummySkills[0]);
+    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(1);
+    storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
+    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(1);
+    storyEditorPage.saveStory('Save');
+  });
+
+  it('should fail to add one prerequisite skill which is already added as' +
+    ' acquired skill', function() {
+    storyEditorPage.addAcquiredSkill(dummySkills[1]);
+    storyEditorPage.expectSaveStoryDisabled();
+  });
+
+  it('should delete prerequisite skill and acquired skill', function() {
+    storyEditorPage.deleteAcquiredSkillByIndex(0);
+    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(0);
+    storyEditorPage.deletePrerequisiteSkillByIndex(0);
+    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(0);
+  });
   afterEach(function() {
     general.checkForConsoleErrors(allowedError);
     allowedError = [];

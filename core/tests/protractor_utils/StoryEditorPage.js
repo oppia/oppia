@@ -70,6 +70,16 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-add-chapter-outline'));
   var nodeOutlineSaveButton = element(
     by.css('.protractor-test-node-outline-save-button'));
+  var addPrerequisitesSkillButton = element(
+    by.css('.protractor-test-add-prerequisite-skill'));
+  var addAcquiredSkillButton = element(
+    by.css('.protractor-test-add-acquired-skill'));
+  var selectSkillModalHeader = element(
+    by.css('.protractor-test-skill-select-header'));
+  var skillNameInputField = element(
+    by.css('.protractor-test-skill-name-input'));
+  var skillListItems = element.all(
+    by.css('.protractor-test-skills-list-item'));
 
 
   var nodeDiagramNavigator = function(id) {
@@ -204,6 +214,87 @@ var StoryEditorPage = function() {
       closeToastButton,
       'closeToastButton takes too long to be clickable.');
     closeToastButton.click();
+  };
+
+  this.getSelectSkillModal = function() {
+    waitFor.visibilityOf(
+      selectSkillModalHeader,
+      'selectSkillModalHeader takes too long to be visible.');
+    return {
+      _searchSkillByName: function(name) {
+        waitFor.visibilityOf(
+          skillNameInputField,
+          'skillNameInputField takes too long to be visible');
+        skillNameInputField.sendKeys(name);
+      },
+
+      _selectSkillBasedOnIndex: function(index) {
+        skillListItems.then(function(elements) {
+          var selectedSkill = elements[index];
+          waitFor.elementToBeClickable(
+            selectedSkill,
+            'selectedSkill takes too long to be clickable.'
+          );
+          selectedSkill.click();
+        });
+      },
+
+      selectSkill: function(name) {
+        this._searchSkillByName(name);
+        this._selectSkillBasedOnIndex(0);
+        var doneButton = element(by.css('.btn-success'));
+        waitFor.elementToBeClickable(
+          doneButton,
+          'doneButton takes too long to be clickable');
+        doneButton.click();
+      },
+    };
+  };
+
+  this.addAcquiredSkill = function(skillName) {
+    waitFor.visibilityOf(
+      addAcquiredSkillButton,
+      'addAcquiredSkillButton takes too long to be visible');
+    waitFor.elementToBeClickable(
+      addAcquiredSkillButton,
+      'addAcquiredSkillButton takes too long to be clickable');
+    addAcquiredSkillButton.click();
+    var selectSkillModal = this.getSelectSkillModal();
+    selectSkillModal.selectSkill(skillName);
+  };
+
+  this.addPrerequisiteSkill = function(skillName) {
+    waitFor.visibilityOf(
+      addPrerequisitesSkillButton,
+      'addPrerequisitesSkillButton takes too long to be visible');
+    waitFor.elementToBeClickable(
+      addPrerequisitesSkillButton,
+      'addPrerequisitesSkillButton takes too long to be clickable');
+    addPrerequisitesSkillButton.click();
+    var selectSkillModal = this.getSelectSkillModal();
+    selectSkillModal.selectSkill(skillName);
+  };
+
+  this.deleteAcquiredSkillByIndex = function(index) {
+    deleteAcquiredSkillButton.then(function(elements) {
+      var toDelete = elements[index];
+      toDelete.click();
+    });
+  };
+
+  this.deletePrerequisiteSkillByIndex = function(index) {
+    deletePrerequisiteSkillButton.then(function(elements) {
+      var toDelete = elements[index];
+      toDelete.click();
+    });
+  };
+
+  this.expectAcquiredSkillDescriptionCardNumber = function(number) {
+    expect(acquiredSkillDescriptionCard.count()).toBe(number);
+  };
+
+  this.expectPrerequisiteSkillDescriptionCardNumber = function(number) {
+    expect(prerequisiteSkillDescriptionCard.count()).toBe(number);
   };
 };
 
