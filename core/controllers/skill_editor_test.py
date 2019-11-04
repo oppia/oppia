@@ -210,6 +210,14 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             self.put_json(
                 self.url, self.put_payload, csrf_token=csrf_token,
                 expected_status_int=400)
+        self.put_payload['version'] = None
+        self.put_json(
+            self.url, self.put_payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.put_payload['version'] = -1
+        self.put_json(
+            self.url, self.put_payload, csrf_token=csrf_token,
+            expected_status_int=400)
         # Check PUT returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.put_json(
@@ -264,51 +272,4 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check GET returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
-        self.logout()
-
-
-class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
-    """Tests for SkillPublishHandler."""
-
-    def setUp(self):
-        super(SkillPublishHandlerTest, self).setUp()
-        self.url = '%s/%s' % (feconf.SKILL_PUBLISH_URL_PREFIX, self.skill_id)
-
-    def test_skill_publish_handler_succeeds(self):
-        self.login(self.ADMIN_EMAIL)
-        # Check that an admin can publish a skill.
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(self.url, {'version': 1}, csrf_token=csrf_token)
-        self.logout()
-
-    def test_skill_publish_handler_fails(self):
-
-        self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        # Check that a skill cannot be published when the payload has no
-        # version.
-        self.put_json(
-            self.url, {}, csrf_token=csrf_token,
-            expected_status_int=400)
-        # Check that a skill cannot be published when the payload's version
-        # is different from the skill's version.
-        self.put_json(
-            self.url, {'version': -1}, csrf_token=csrf_token,
-            expected_status_int=400)
-        # Check that a non-existing skill cannot be published.
-        url = '%s/non-existing-id' % (feconf.SKILL_PUBLISH_URL_PREFIX)
-        self.put_json(
-            url, {'version': 1}, csrf_token=csrf_token, expected_status_int=404)
-
-        # Check that the status is 401 when call to publish_skill raises an
-        # exception.
-        skill_services_swap = self.swap(
-            skill_services, 'publish_skill',
-            self._mock_publish_skill_raise_exception)
-        with skill_services_swap:
-            csrf_token = self.get_new_csrf_token()
-            self.put_json(
-                self.url, {'version': 1}, csrf_token=csrf_token,
-                expected_status_int=401)
-
         self.logout()

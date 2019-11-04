@@ -26,11 +26,11 @@ require(
   'topic-viewer-stories-list.directive.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
-require('domain/topic_viewer/TopicViewerBackendApiService.ts');
-require('services/AlertsService.ts');
-require('services/PageTitleService.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
+require('services/alerts.service.ts');
+require('services/page-title.service.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('topicViewerPage', [
   'UrlInterpolationService', function(

@@ -159,6 +159,14 @@ describe('Visiting user profile page', function() {
     profilePage.expectToHaveExplorationCardByName(EXPLORATION.title);
   });
 
+  it('should show created exploration stats for user', function() {
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+    users.login(TEST_EMAIL);
+
+    profilePage.get(ANOTHER_USERNAME);
+    profilePage.expectToHaveCreatedExplorationStat('1');
+  });
+
   afterEach(function() {
     users.logout();
     general.checkForConsoleErrors([]);

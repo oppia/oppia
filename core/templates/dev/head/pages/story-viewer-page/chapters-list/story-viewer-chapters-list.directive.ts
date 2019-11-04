@@ -23,10 +23,10 @@ require('components/summary-tile/exploration-summary-tile.directive.ts');
 
 require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/AlertsService.ts');
-require('services/PageTitleService.ts');
-require('services/UserService.ts');
-require('services/contextual/UrlService.ts');
+require('services/alerts.service.ts');
+require('services/page-title.service.ts');
+require('services/user.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').animation('.oppia-story-animate-slide', function() {
   return {

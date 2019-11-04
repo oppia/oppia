@@ -23,8 +23,8 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
-require('services/AlertsService.ts');
-require('services/SuggestionModalService.ts');
+require('services/alerts.service.ts');
+require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
