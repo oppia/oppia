@@ -359,7 +359,10 @@
 
 
 # Miscellaneous.
-__init__.py @nithusha21
+/__init__.py @nithusha21
+/core/__init__.py @nithusha21
+/core/controllers/__init__.py @nithusha21
+/core/domain/__init__.py @nithusha21
 /core/domain/config*.py @seanlip
 /core/domain/change_domain.py @ankita240796
 /core/templates/dev/head/tests/ @kevinlee12 @nithusha21
@@ -489,4 +492,4 @@ __init__.py @nithusha21
 /package.json @vojtechjelinek @kevinlee12
 /yarn.lock @vojtechjelinek @kevinlee12
 /scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
-/.github/ @seanlip
+/.github/ @kevinlee12
