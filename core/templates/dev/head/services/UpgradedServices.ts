@@ -19,14 +19,19 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
-import { DebouncerService } from 'services/DebouncerService';
-import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
+import { BackgroundMaskService } from
+  'services/stateful/background-mask.service';
+import { DebouncerService } from 'services/debouncer.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { DocumentAttributeCustomizationService } from
+  'services/contextual/document-attribute-customization.service';
+import { MetaTagCustomizationService } from
+  'services/contextual/meta-tag-customization.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
-import { UtilsService } from 'services/UtilsService';
+import { UtilsService } from './utils.service';
 import { WindowDimensionsService } from
-  'services/contextual/WindowDimensionsService';
-import { WindowRef } from 'services/contextual/WindowRefService';
+  'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +42,10 @@ export class UpgradedServices {
     'BackgroundMaskService': new BackgroundMaskService(),
     'DebouncerService': new DebouncerService(),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
+    'DocumentAttributeCustomizationService':
+        new DocumentAttributeCustomizationService(new WindowRef()),
+    'MetaTagCustomizationService': new MetaTagCustomizationService(
+      new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'UtilsService': new UtilsService(),

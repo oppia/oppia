@@ -31,6 +31,8 @@ var ProfilePage = function() {
     by.css('.protractor-test-profile-no-interest'));
   var allExplorationCardElements = element.all(
     by.css('.protractor-test-exploration-dashboard-card'));
+  var createdExplorationStat = element.all(
+    by.css('.protractor-test-profile-created-stat'));
 
   this.get = function(userName) {
     browser.get('/profile/' + userName);
@@ -99,6 +101,10 @@ var ProfilePage = function() {
       throw 'There is no exploration card with name ' + explorationName;
     }
     expect(explorationsCardByName.count()).toBeGreaterThanOrEqual(1);
+  };
+
+  this.expectToHaveCreatedExplorationStat = function(expectedStat) {
+    expect(createdExplorationStat.getText()).toMatch(expectedStat);
   };
 };
 

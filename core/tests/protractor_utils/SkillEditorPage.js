@@ -24,7 +24,7 @@ var SkillEditorPage = function() {
   var EDITOR_URL_PREFIX = '/skill_editor/';
   var confirmSkillDifficultyButton = element(
     by.css('.protractor-test-confirm-skill-difficulty-button'));
-  var EditConceptCardExplanationButton = element(
+  var editConceptCardExplanationButton = element(
     by.css('.protractor-test-edit-concept-card'));
   var saveConceptCardExplanationButton = element(
     by.css('.protractor-test-save-concept-card'));
@@ -65,9 +65,6 @@ var SkillEditorPage = function() {
   };
   var confirmDeleteMisconception =
     element(by.css('.protractor-test-confirm-delete-misconception-button'));
-  var publishButton = element(by.css('.protractor-test-editor-publish-button'));
-  var confirmSkillPublishButton = element(
-    by.css('.protractor-test-confirm-skill-publish-button'));
   var saveOrPublishSkillButton = element(
     by.css('.protractor-test-save-or-publish-skill')
   );
@@ -86,15 +83,11 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-question-list-item'));
   var questionItem = element(by.css('.protractor-test-question-list-item'));
 
-  var selectRubricDifficultyDropdown = element(
-    by.css('.protractor-test-select-rurbic-difficulty-dropdown'));
-  var rubricDifficulties = element.all(
-    by.css('.protractor-test-rubric-difficulty'));
-  var editRubricExplanationButton = element(
+  var editRubricExplanationButtons = element.all(
     by.css('.protractor-test-edit-rubric-explanation'));
   var saveRubricExplanationButton = element(
     by.css('.protractor-test-save-rubric-explanation-button'));
-  var rubricExplanation = element(
+  var rubricExplanations = element.all(
     by.css('.protractor-test-rubric-explanation'));
 
   this.get = function(skillId) {
@@ -103,33 +96,25 @@ var SkillEditorPage = function() {
   };
 
   this.editRubricExplanationWithIndex = function(index, explanation) {
-    selectRubricDifficultyDropdown.click();
-    rubricDifficulties.get(index).click();
-    waitFor.elementToBeClickable(
-      editRubricExplanationButton,
-      'Edit Rubric Explanation takes too long to be clickable');
-    editRubricExplanationButton.click();
-
-    var editor = element(
-      by.css('.protractor-test-rubric-explanation-text'));
-    waitFor.visibilityOf(
-      editor, 'Rubric explanation editor takes too long to appear');
-
-    browser.switchTo().activeElement().sendKeys(explanation);
-
-    waitFor.elementToBeClickable(
-      saveRubricExplanationButton,
-      'Save Rubric Explanation button takes too long to be clickable');
-    saveRubricExplanationButton.click();
-    waitFor.invisibilityOf(
-      editor, 'Rubric explanation editor takes too long to close');
+    editRubricExplanationButtons.then(function(buttons) {
+      buttons[index].click();
+      var editor = element(
+        by.css('.protractor-test-rubric-explanation-text'));
+      waitFor.visibilityOf(
+        editor, 'Rubric explanation editor takes too long to appear');
+      browser.switchTo().activeElement().sendKeys(explanation);
+      waitFor.elementToBeClickable(
+        saveRubricExplanationButton,
+        'Save Rubric Explanation button takes too long to be clickable');
+      saveRubricExplanationButton.click();
+    });
   };
 
   this.expectRubricExplanationToMatch = function(index, explanation) {
-    selectRubricDifficultyDropdown.click();
-    rubricDifficulties.get(index).click();
-    rubricExplanation.getText().then(function(text) {
-      expect(text).toMatch(explanation);
+    rubricExplanations.then(function(explanations) {
+      explanations[index].getText().then(function(text) {
+        expect(text).toMatch(explanation);
+      });
     });
   };
 
@@ -170,17 +155,6 @@ var SkillEditorPage = function() {
     expect(skillDescriptionField.getAttribute('value')).toEqual(description);
   };
 
-
-  this.firstTimePublishSkill = function() {
-    publishButton.click();
-
-    waitFor.elementToBeClickable(
-      confirmSkillPublishButton,
-      'Confirm skill publish button takes too long to be clickable');
-    confirmSkillPublishButton.click();
-    waitFor.pageToFullyLoad();
-  };
-
   this.saveOrPublishSkill = function(commitMessage) {
     saveOrPublishSkillButton.click();
 
@@ -193,7 +167,7 @@ var SkillEditorPage = function() {
   };
 
   this.editConceptCard = function(explanation) {
-    EditConceptCardExplanationButton.click();
+    editConceptCardExplanationButton.click();
 
     var editor = element(by.css('.protractor-test-concept-card-text'));
     waitFor.visibilityOf(

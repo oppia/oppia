@@ -21,8 +21,8 @@ require('pages/OppiaFooterDirective.ts');
 
 require('domain/sidebar/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/UrlService.ts');
-require('services/stateful/BackgroundMaskService.ts');
+require('services/contextual/url.service.ts');
+require('services/stateful/background-mask.service.ts');
 
 angular.module('oppia').directive('baseContent', [
   'UrlInterpolationService',

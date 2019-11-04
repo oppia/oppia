@@ -202,34 +202,3 @@ class SkillDataHandler(base.BaseHandler):
         })
 
         self.render_json(self.values)
-
-
-class SkillPublishHandler(base.BaseHandler):
-    """A handler for publishing skills."""
-
-    @acl_decorators.can_publish_skill
-    def put(self, skill_id):
-        """Publishes a skill."""
-        skill = skill_services.get_skill_by_id(skill_id)
-        version = self.payload.get('version')
-        _require_valid_version(version, skill.version)
-
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-
-        try:
-            skill_services.publish_skill(skill_id, self.user_id)
-        except Exception as e:
-            raise self.UnauthorizedUserException(e)
-
-        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-        can_edit_skill_description = check_can_edit_skill_description(
-            user_actions_info)
-
-        self.values.update({
-            'skill_is_private': skill_rights.skill_is_private,
-            'creator_id': skill_rights.creator_id,
-            'can_edit_skill_description': can_edit_skill_description
-        })
-
-        self.render_json(self.values)

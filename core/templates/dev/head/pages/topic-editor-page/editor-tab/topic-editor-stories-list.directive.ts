@@ -17,11 +17,11 @@
  */
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/topic/EditableTopicBackendApiService.ts');
-require('domain/topic/TopicUpdateService.ts');
+require('domain/topic/editable-topic-backend-api.service.ts');
+require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('services/contextual/UrlService.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {

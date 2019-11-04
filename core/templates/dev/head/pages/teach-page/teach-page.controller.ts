@@ -22,7 +22,7 @@ require(
   'background-banner.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/SiteAnalyticsService.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').directive('teachPage', [
   'UrlInterpolationService', function(

@@ -2,7 +2,7 @@
 <div class="oppia-topics-and-skills-dashboard" style="position: relative;">
   <div>
     <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"></h2>
-    <div class="create-buttons">
+    <div class="create-buttons" ng-if="!($ctrl.topicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0 && $ctrl.unpublishedSkillSummaries.length === 0)">
       <button ng-click="$ctrl.createTopic()" ng-if="$ctrl.userCanCreateTopic"
               class="btn oppia-navbar-button oppia-transition-200">
         <span class="oppia-navbar-tab-content">Create Topic</span>
@@ -26,13 +26,6 @@
         <a class="dashboard-tabs-text protractor-test-unused-skills-tab"
            ng-click="$ctrl.setActiveTab($ctrl.TAB_NAME_UNTRIAGED_SKILLS)">
            Unused Skills (<[$ctrl.untriagedSkillSummaries.length]>)
-        </a>
-      </li>
-      <li ng-if="$ctrl.unpublishedSkillSummaries.length > 0"
-          ng-class="{'dashboard-tabs-active': $ctrl.activeTab === $ctrl.TAB_NAME_UNPUBLISHED_SKILLS}">
-        <a class="dashboard-tabs-text protractor-test-unpublished-skills-tab"
-           ng-click="$ctrl.setActiveTab($ctrl.TAB_NAME_UNPUBLISHED_SKILLS)">
-           Unpublished Skills (<[$ctrl.unpublishedSkillSummaries.length]>)
         </a>
       </li>
     </ul>

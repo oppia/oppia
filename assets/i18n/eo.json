@@ -177,6 +177,7 @@
 	"I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION": "Ĝisdatigoj pri Prikomentado",
 	"I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE": "Respondi",
 	"I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE": "Stato ŝanĝiĝis al '<[threadStatus]>'",
+	"I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING": "Evitu diskonigon de persona informo, ĉar ĉi tiu diskuto estas publike videbla.",
 	"I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION": "Progresante",
 	"I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE": "Ŝajne vi ne jam provis ajnan nian esploron.",
 	"I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_TWO": "Ek al jena vigliganta vojaĝo!",

@@ -44,10 +44,10 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
-require('services/AlertsService.ts');
-require('services/EditabilityService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/alerts.service.ts');
+require('services/editability.service.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
