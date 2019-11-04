@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { HtmlEscaperService } from 'services/HtmlEscaperService';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 describe('HTML escaper service', () => {
   let ohe: HtmlEscaperService;
