@@ -54,17 +54,13 @@ angular.module('oppia').directive('editorNavigation', [
             ImprovementTaskService, RouterService,
             SiteAnalyticsService, StateTutorialFirstTimeService,
             ThreadDataService, UserService, WindowDimensionsService) {
-          var fetchedTasks = [];
-          ImprovementTaskService.fetchTasks().then(function(tasks) {
-            fetchedTasks = tasks;
-          });
-
-          var isTaskOpen = function(task) {
-            return ImprovementsDisplayService.isOpen(task.getStatus());
-          };
+          var taskCount;
+          ImprovementTaskService.getOpenTaskCount().then((resp)=>{
+            taskCount=resp;
+          })
 
           $scope.getOpenTaskCount = function() {
-            return fetchedTasks.filter(isTaskOpen).length;
+            return taskCount;
           };
 
           $scope.popoverControlObject = {
