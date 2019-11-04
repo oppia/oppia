@@ -33,10 +33,10 @@ require(
   'pages/community-dashboard-page/voiceover-opportunities/' +
   'voiceover-opportunities.directive.ts');
 
-require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/LocalStorageService.ts');
-require('services/UserService.ts');
+require('services/local-storage.service.ts');
+require('services/user.service.ts');
 
 require(
   'pages/community-dashboard-page/community-dashboard-page.constants.ajs.ts');

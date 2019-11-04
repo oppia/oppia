@@ -27,12 +27,11 @@ require(
   'state-tutorial-first-time.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
-require('services/ContextService.ts');
-require('services/ExplorationFeaturesService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/UserService.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/ImprovementTaskService.ts');
+require('services/context.service.ts');
+require('services/exploration-features.service.ts');
+require('services/site-analytics.service.ts');
+require('services/user.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {

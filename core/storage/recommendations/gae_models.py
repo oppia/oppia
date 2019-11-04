@@ -44,8 +44,8 @@ class ExplorationRecommendationsModel(
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
         """ExplorationRecommendationsModel doesn't reference any user_id
         directly.
 
@@ -80,8 +80,8 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
         """TopicSimilaritiesModel doesn't reference any user_id
         directly.
 

@@ -305,6 +305,10 @@ export = {
     "description": "Dutch",
     "relatedLanguages": ["nl"]
   }, {
+    "id": "ee",
+    "description": "Ewe",
+    "relatedLanguages": ["ee"]
+  }, {
     "id": "tl",
     "description": "Filipino",
     "relatedLanguages": ["tl"]
@@ -447,12 +451,16 @@ export = {
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
     "name": "General",
     "interaction_ids": [
+      "ImageClickInput",
+      "ItemSelectionInput",
       "MultipleChoiceInput",
       "TextInput"
     ]
   }, {
     "name": "Math",
     "interaction_ids": [
+      "FractionInput",
+      "NumberWithUnits",
       "NumericInput"
     ]
   }],

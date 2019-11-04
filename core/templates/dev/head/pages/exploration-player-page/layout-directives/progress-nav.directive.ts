@@ -26,8 +26,8 @@ require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
