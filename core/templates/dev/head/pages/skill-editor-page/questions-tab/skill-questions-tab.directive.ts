@@ -31,9 +31,9 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/AlertsService.ts');
-require('services/QuestionsListService.ts');
-require('services/contextual/UrlService.ts');
+require('services/alerts.service.ts');
+require('services/questions-list.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

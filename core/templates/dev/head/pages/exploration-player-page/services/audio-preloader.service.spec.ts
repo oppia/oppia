@@ -65,7 +65,7 @@ require('pages/exploration-player-page/services/audio-preloader.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-language.service.ts');
-require('services/ContextService.ts');
+require('services/context.service.ts');
 
 describe('Audio preloader service', function() {
   beforeEach(function() {

@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/DocumentAttributeCustomizationService.ts');
+require('services/contextual/document-attribute-customization.service.ts');
 
 angular.module('oppia').controller('Maintenance', [
   '$rootScope', '$scope', 'DocumentAttributeCustomizationService',

@@ -16,7 +16,7 @@
  * @fileoverview Service to extract image filenames in a State.
  */
 
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').factory('ExtractImageFilenamesFromStateService', [
   'HtmlEscaperService', function(HtmlEscaperService) {
