@@ -119,7 +119,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         var returnString = 'Click on (or create) an answer ' +
           'that is neither marked correct nor is a default answer (marked ' +
           'above as [All other answers]) and tag the following misconceptions' +
-          ' to that answer group: ';
+          ' to that answer group:';
         pendingMisconceptionNamesToTag.forEach(function(misconceptionName) {
           returnString = returnString + ' ' + misconceptionName + ',';
         });
