@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import getpass
 import os
+import subprocess
 import sys
 
 from core.tests import test_utils
@@ -114,23 +115,21 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         self.get_git_ref_swap = self.swap(
             github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
 
-    def test_get_previous_version_with_invalid_version(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Invalid Version String: invalid'):
-            update_changelog_and_credits.get_previous_version('invalid')
+    def test_get_previous_release_version_without_hotfix(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'v2.0.6\nv2.0.7\n'
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            self.assertEqual(
+                update_changelog_and_credits.get_previous_release_version(
+                    '2.0.8'), '2.0.7')
 
-    def test_get_previous_version_with_no_previous_version(self):
-        with self.assertRaisesRegexp(
-            Exception, 'No version released before 0.0.0 version.'):
-            update_changelog_and_credits.get_previous_version('0.0.0')
-
-    def test_get_previous_version_with_correct_version(self):
-        self.assertEqual(
-            update_changelog_and_credits.get_previous_version('2.8.3'), '2.8.2')
-        self.assertEqual(
-            update_changelog_and_credits.get_previous_version('2.8.0'), '2.7.9')
-        self.assertEqual(
-            update_changelog_and_credits.get_previous_version('2.0.0'), '1.9.9')
+    def test_get_previous_release_version_with_hotfix(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'v2.0.6\nv2.0.7\nv2.0.8\n'
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            self.assertEqual(
+                update_changelog_and_credits.get_previous_release_version(
+                    '2.0.8'), '2.0.7')
 
     def test_update_changelog_with_non_hotfix_branch(self):
         try:
@@ -153,6 +152,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
 
     def test_update_changelog_with_hotfix_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'v1.0.0\nv1.0.1\nv1.0.2\n'
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
         try:
             release_summary_lines = read_from_file(
                 MOCK_RELEASE_SUMMARY_FILEPATH)
@@ -165,7 +168,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             date_swap = self.swap(
                 update_changelog_and_credits, 'CURRENT_DATE',
                 '29 Aug 2019')
-            with changelog_swap, date_swap:
+            with changelog_swap, date_swap, check_output_swap:
                 update_changelog_and_credits.update_changelog(
                     'release-1.0.2-hotfix-1', release_summary_lines, '1.0.2')
             actual_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)

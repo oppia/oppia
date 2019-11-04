@@ -28,7 +28,7 @@ import argparse
 import collections
 import datetime
 import os
-import re
+import subprocess
 import sys
 
 import python_utils
@@ -132,11 +132,11 @@ def check_ordering_of_sections(release_summary_lines):
                     section.strip(), next_section.strip()))
 
 
-def get_previous_version(version):
+def get_previous_release_version(current_release_version):
     """Finds previous version given the current version.
 
     Args:
-        version: str. The current version.
+        current_release_version: str. The current release version.
 
     Returns:
         str. The previous version.
@@ -145,24 +145,14 @@ def get_previous_version(version):
         Exception. The version format is invalid or there is no previous
             version for the given version.
     """
-    if not bool(re.match(r'^\d+\.\d+\.\d+$', version)):
-        raise Exception('Invalid Version String: %s' % version)
-    first_version_num = int(version[:version.find('.')])
-    second_version_num = int(version[version.find('.') + 1: version.rfind('.')])
-    third_version_num = int(version[version.rfind('.') + 1:])
-
-    if third_version_num != 0:
-        return '%s.%s.%s' % (
-            first_version_num, second_version_num, third_version_num - 1)
-    else:
-        if second_version_num != 0:
-            return '%s.%s.%s' % (
-                first_version_num, second_version_num - 1, 9)
-        elif first_version_num != 0:
-            return '%s.%s.%s' % (
-                first_version_num - 1, 9, 9)
-        else:
-            raise Exception('No version released before %s version.' % version)
+    all_tags = subprocess.check_output(['git', 'tag'])[:-1].split('\n')
+    # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
+    # version.
+    previous_release_version = all_tags[-1][1:]
+    # This is for hotfixes.
+    if previous_release_version == current_release_version:
+        previous_release_version = all_tags[-2][1:]
+    return previous_release_version
 
 
 def update_changelog(
@@ -187,7 +177,8 @@ def update_changelog(
         changelog_lines = changelog_file.readlines()
 
     if 'hotfix' in branch_name:
-        previous_release_version = get_previous_version(current_release_version)
+        previous_release_version = get_previous_release_version(
+            current_release_version)
         current_version_start = 0
         previous_version_start = 0
         for index, line in enumerate(changelog_lines):
