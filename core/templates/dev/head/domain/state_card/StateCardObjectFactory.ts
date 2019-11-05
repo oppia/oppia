@@ -20,7 +20,7 @@
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-language.service.ts');
-require('services/ExplorationHtmlFormatterService.ts');
+require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').factory('StateCardObjectFactory', [
   'AudioTranslationLanguageService',

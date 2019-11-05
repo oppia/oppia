@@ -35,8 +35,8 @@ require(
   'state-editor.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/AlertsService.ts');
-require('services/EditabilityService.ts');
+require('services/alerts.service.ts');
+require('services/editability.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');
 
@@ -61,14 +61,14 @@ angular.module('oppia').directive('questionEditor', [
         '$scope', '$rootScope', '$uibModal',
         'AlertsService', 'QuestionCreationService',
         'EditabilityService', 'EditableQuestionBackendApiService',
-        'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'QuestionObjectFactory',
         'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
         'SolutionValidityService', 'QuestionUpdateService',
         function(
             $scope, $rootScope, $uibModal,
             AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
-            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            QuestionObjectFactory,
             INTERACTION_SPECS, StateEditorService, ResponsesService,
             SolutionValidityService, QuestionUpdateService) {
           var ctrl = this;
