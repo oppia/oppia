@@ -221,7 +221,7 @@ var getExplorationPlaytesters = function() {
 };
 
 var createSkillAndAssignTopic = function(
-    skillDescription, material, topicIndex) {
+    skillDescription, material, topicName) {
   var topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
   topicsAndSkillsDashboardPage.get();
@@ -230,7 +230,8 @@ var createSkillAndAssignTopic = function(
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
   topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
-  topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, topicIndex);
+  topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+    0, topicName);
 };
 
 exports.createExploration = createExploration;

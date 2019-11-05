@@ -71,6 +71,8 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-edit-concept-card'));
   var saveConceptCardExplanationButton = element(
     by.css('.protractor-test-save-concept-card'));
+  var topicNamesInTopicSelectModal = element.all(
+    by.css('.protractor-test-topic-name-in-topic-select-modal'));
 
   this.get = function() {
     browser.get(DASHBOARD_URL);
@@ -100,6 +102,24 @@ var TopicsAndSkillsDashboardPage = function() {
       topicsListItems.then(function(topics) {
         topics[index].click();
         confirmMoveButton.click();
+      });
+    });
+  };
+
+  this.assignSkillWithIndexToTopicByTopicName = function(index, topicName) {
+    assignSkillToTopicButtons.then(function(elems) {
+      elems[index].click();
+      topicNamesInTopicSelectModal.then(function(topics) {
+        for (var i = 0; i < topics.length; i++) {
+          (function(topic) {
+            topic.getText().then(function(isTarget) {
+              if (isTarget === topicName) {
+                topic.click();
+                confirmMoveButton.click();
+              }
+            });
+          })(topics[i]);
+        }
       });
     });
   };
