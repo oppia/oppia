@@ -32,138 +32,6 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
 
-describe('-------', function() {
-  var topicsAndSkillsDashboardPage = null;
-  var topicEditorPage = null;
-  var storyEditorPage = null;
-  var storyId = null;
-  var skillEditorPage = null;
-  var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
-  var dummyExplorationIds = [];
-  var dummyExplorationInfo = [
-    'Dummy exploration', 'Algorithm', 'Lear more about oppia', 'English'];
-  var dummySkills = [];
-  var allowedError = [];
-
-  var createDummyExplorations = function(number) {
-    var ids = [];
-    for (var i = 0; i < number; i++) {
-      (function(i) {
-        var info = dummyExplorationInfo.slice();
-        info[0] += i.toString();
-        workflow.createAndPublishExploration.apply(workflow, info);
-        browser.getCurrentUrl().then(function(url) {
-          var id = url.split('/')[4].replace('#', '');
-          ids.push(id);
-        });
-      })(i);
-    }
-    return ids;
-  };
-
-  var createDummySkills = function(number) {
-    var skills = [];
-    for (var i = 0; i < number; i++) {
-      var skillName = 'skill' + i.toString();
-      workflow.createSkillAndAssignTopic(skillName, 0);
-      skills.push(skillName);
-    }
-    return skills;
-  };
-
-  beforeAll(function() {
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
-    topicEditorPage = new TopicEditorPage.TopicEditorPage();
-    storyEditorPage = new StoryEditorPage.StoryEditorPage();
-    skillEditorPage = new SkillEditorPage.SkillEditorPage();
-    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAndLoginAdminUser(
-      'creator@chapterTest.com', 'creatorChapterTest');
-    dummyExplorationIds = createDummyExplorations(2);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopicWithTitle('Topic 1');
-    topicEditorPage.createStory('Story 1');
-    browser.getCurrentUrl().then(function(url) {
-      storyId = url.split('/')[4];
-      dummySkills = createDummySkills(2);
-    });
-  });
-
-  beforeEach(function() {
-    users.login('creator@chapterTest.com');
-    storyEditorPage.get(storyId);
-  });
-
-  it('should create a basic chapter.', function() {
-    storyEditorPage.createInitialChapter('Chapter 1');
-    storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
-    storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
-    storyEditorPage.saveStory('First save');
-  });
-
-  it('should add one more chapter to the story', function() {
-    storyEditorPage.createNewDestinationChapter('Chapter 2');
-    storyEditorPage.navigateToChapterByIndex(1);
-    storyEditorPage.changeNodeOutline(forms.toRichText('Second outline'));
-    storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
-    storyEditorPage.saveStory('First save');
-  });
-
-  it('should try to add one more chapter with existing exploration',
-    function() {
-      storyEditorPage.createNewDestinationChapter('Chapter 3');
-      storyEditorPage.navigateToChapterByIndex(2);
-      storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
-      storyEditorPage.expectExplorationIdAlreadyExistWarning();
-      allowedError = ['The given exploration already exists in the story.'];
-    }
-  );
-
-  it('should add one prerequisite and acquired skill to chapter 1', function() {
-    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(0);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(0);
-    storyEditorPage.addAcquiredSkill(dummySkills[0]);
-    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(1);
-    storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(1);
-    storyEditorPage.saveStory('Save');
-  });
-
-  it('should fail to add one prerequisite skill which is already added as' +
-    ' acquired skill', function() {
-    storyEditorPage.addAcquiredSkill(dummySkills[1]);
-    storyEditorPage.expectSaveStoryDisabled();
-  });
-
-  it('should delete prerequisite skill and acquired skill', function() {
-    storyEditorPage.deleteAcquiredSkillByIndex(0);
-    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(0);
-    storyEditorPage.deletePrerequisiteSkillByIndex(0);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(0);
-  });
-
-  it('should select the chapter2 as initial chapter and get unreachable error',
-    function() {
-      storyEditorPage.selectInitialChapterByIndex(1);
-      storyEditorPage.expectDisplayUnreachableChapter();
-    }
-  );
-
-  it('should delete one chapter and save', function() {
-    storyEditorPage.deleteChapterWithIndex(1);
-    storyEditorPage.saveStory('Last');
-  });
-
-  afterEach(function() {
-    general.checkForConsoleErrors(allowedError);
-    allowedError = [];
-  });
-});
-
-
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
@@ -328,6 +196,142 @@ describe('Topic editor functionality', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
+    users.logout();
+  });
+});
+
+
+describe('Chapter editor functionality', function() {
+  var topicsAndSkillsDashboardPage = null;
+  var topicEditorPage = null;
+  var storyEditorPage = null;
+  var storyId = null;
+  var skillEditorPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var dummyExplorationIds = [];
+  var dummyExplorationInfo = [
+    'Dummy exploration', 'Algorithm', 'Lear more about oppia', 'English'];
+  var dummySkills = [];
+  var allowedError = [];
+
+  var createDummyExplorations = function(number) {
+    var ids = [];
+    for (var i = 0; i < number; i++) {
+      (function(i) {
+        var info = dummyExplorationInfo.slice();
+        info[0] += i.toString();
+        workflow.createAndPublishExploration.apply(workflow, info);
+        browser.getCurrentUrl().then(function(url) {
+          var id = url.split('/')[4].replace('#', '');
+          ids.push(id);
+        });
+      })(i);
+    }
+    return ids;
+  };
+
+  var createDummySkills = function(number) {
+    var skills = [];
+    for (var i = 0; i < number; i++) {
+      var skillName = 'skill' + i.toString();
+      workflow.createSkillAndAssignTopic(skillName, 0);
+      skills.push(skillName);
+    }
+    return skills;
+  };
+
+  beforeAll(function() {
+    topicsAndSkillsDashboardPage =
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    users.createAndLoginAdminUser(
+      'creator@chapterTest.com', 'creatorChapterTest');
+    dummyExplorationIds = createDummyExplorations(2);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopicWithTitle('Topic 0');
+    topicEditorPage.createStory('Story 0');
+    browser.getCurrentUrl().then(function(url) {
+      storyId = url.split('/')[4];
+      dummySkills = createDummySkills(2);
+    });
+  });
+
+  beforeEach(function() {
+    users.login('creator@chapterTest.com');
+    storyEditorPage.get(storyId);
+  });
+
+  it('should create a basic chapter.', function() {
+    storyEditorPage.createInitialChapter('Chapter 1');
+    storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
+    storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
+    storyEditorPage.saveStory('First save');
+  });
+
+  it('should add one more chapter to the story', function() {
+    storyEditorPage.createNewDestinationChapter('Chapter 2');
+    storyEditorPage.navigateToChapterByIndex(1);
+    storyEditorPage.changeNodeOutline(forms.toRichText('Second outline'));
+    storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
+    storyEditorPage.saveStory('First save');
+  });
+
+  it('should try to add one more chapter with existing exploration',
+    function() {
+      storyEditorPage.createNewDestinationChapter('Chapter 3');
+      storyEditorPage.navigateToChapterByIndex(2);
+      storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
+      storyEditorPage.expectExplorationIdAlreadyExistWarning();
+      allowedError = ['The given exploration already exists in the story.'];
+    }
+  );
+
+  it('should add one prerequisite and acquired skill to chapter 1', function() {
+    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(0);
+    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(0);
+    storyEditorPage.addAcquiredSkill(dummySkills[0]);
+    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(1);
+    storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
+    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(1);
+    storyEditorPage.saveStory('Save');
+  });
+
+  it('should fail to add one prerequisite skill which is already added as' +
+    ' acquired skill', function() {
+    storyEditorPage.addAcquiredSkill(dummySkills[1]);
+    storyEditorPage.expectSaveStoryDisabled();
+  });
+
+  it('should delete prerequisite skill and acquired skill', function() {
+    storyEditorPage.deleteAcquiredSkillByIndex(0);
+    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(0);
+    storyEditorPage.deletePrerequisiteSkillByIndex(0);
+    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(0);
+  });
+
+  it('should select the chapter2 as initial chapter and get unreachable error',
+    function() {
+      storyEditorPage.selectInitialChapterByIndex(1);
+      storyEditorPage.expectDisplayUnreachableChapter();
+    }
+  );
+
+  it('should delete one chapter and save', function() {
+    storyEditorPage.deleteChapterWithIndex(1);
+    storyEditorPage.saveStory('Last');
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors(allowedError);
+    allowedError = [];
+  });
+
+  afterAll(function() {
     users.logout();
   });
 });

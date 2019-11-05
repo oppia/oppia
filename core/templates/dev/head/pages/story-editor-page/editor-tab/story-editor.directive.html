@@ -73,7 +73,7 @@
                    ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
                    ng-click="setNodeToEdit(node.getId())">
             <div class="story-editor-node-title">
-              <span class="protractor-test-chapter-title-{{$index}}"><[node.getTitle()]></span>
+              <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
             </div>
             <span class="protractor-test-unreachable-chapter" style="font-size: 0.8em; width: 15vw;" ng-if="disconnectedNodeIds.indexOf(node.getId()) !== -1">
               <i>This chapter is not reachable from any other chapter</i>

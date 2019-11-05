@@ -93,13 +93,6 @@ var StoryEditorPage = function() {
   var acquiredSkillDescriptionCard = element.all(
     by.css('.protractor-test-acquired-skill-description-card'));
 
-  var nodeDiagramNavigator = function(id) {
-    if (id === undefined) {
-      id = 0;
-    }
-    return element(by.css('.protractor-test-chapter-title-' + id.toString()));
-  };
-
   this.get = function(storyId) {
     browser.get(EDITOR_URL_PREFIX + storyId);
     return waitFor.pageToFullyLoad();
@@ -219,7 +212,9 @@ var StoryEditorPage = function() {
   };
 
   this.navigateToChapterByIndex = function(index) {
-    nodeDiagramNavigator(index).click();
+    chapterTitles.then(function(elements) {
+      elements[index].click();
+    });
   };
 
   this.expectExplorationIdAlreadyExistWarning = function() {
