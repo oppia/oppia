@@ -575,11 +575,16 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
                 author_id, status=suggestion_models.STATUS_REJECTED))
         self.assertEqual(applicant_models, [])
 
-    def test_get_in_review_voiceover_applications(self):
+    def test_get_reviewable_voiceover_applications(self):
         author_id = 'author'
+        reviewer_id = 'reviewer_id'
         applicant_models = (
             suggestion_models.GeneralVoiceoverApplicationModel
-            .get_in_review_voiceover_applications())
+            .get_reviewable_voiceover_applications(reviewer_id))
+        self.assertEqual(applicant_models, [])
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_reviewable_voiceover_applications(author_id))
         self.assertEqual(applicant_models, [])
 
         suggestion_models.GeneralVoiceoverApplicationModel(
@@ -595,6 +600,11 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             rejection_message=None).put()
         applicant_models = (
             suggestion_models.GeneralVoiceoverApplicationModel
-            .get_in_review_voiceover_applications())
+            .get_reviewable_voiceover_applications(reviewer_id))
         self.assertEqual(len(applicant_models), 1)
         self.assertEqual(applicant_models[0].id, 'application_id')
+
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_reviewable_voiceover_applications(author_id))
+        self.assertEqual(applicant_models, [])
