@@ -16,15 +16,16 @@
  * @fileoverview Tests for Truncate pipe for Oppia.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe';
 
 
 describe('Testing filters', function() {
   let truncatePipe: TruncatePipe = null;
   beforeEach(() => {
-    truncatePipe = TestBed.get(TruncatePipe);
+    truncatePipe = new TruncatePipe(new ConvertToPlainTextPipe());
   });
 
   it('should have all expected filters', () => {
