@@ -22,10 +22,8 @@ require(
   'contribution-opportunities-backend-api.service.ts');
 
 angular.module('oppia').factory('ContributionOpportunitiesService', [
-  'ContributionOpportunitiesBackendApiService', 'OPPORTUNITY_TYPE_SKILL',
-  'OPPORTUNITY_TYPE_TRANSLATION', 'OPPORTUNITY_TYPE_VOICEOVER',
-  function(ContributionOpportunitiesBackendApiService, OPPORTUNITY_TYPE_SKILL,
-      OPPORTUNITY_TYPE_TRANSLATION, OPPORTUNITY_TYPE_VOICEOVER) {
+  'ContributionOpportunitiesBackendApiService',
+  function(ContributionOpportunitiesBackendApiService) {
     var skillOpportunitiesCursor = null;
     var translationOpportunitiesCursor = null;
     var voiceoverOpportunitiesCursor = null;
@@ -34,11 +32,8 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     var moreVoiceoverOpportunitiesAvailable = true;
 
     var _getSkillOpportunities = function(cursor, successCallback) {
-      var params = {
-        cursor: cursor
-      };
-      ContributionOpportunitiesBackendApiService.fetchOpportunities(
-        OPPORTUNITY_TYPE_SKILL, params, function(data) {
+      ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
+        cursor, function(data) {
           moreSkillOpportunitiesAvailable = data.more;
           skillOpportunitiesCursor = data.next_cursor;
           successCallback(data.opportunities, data.more);
@@ -46,12 +41,8 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     };
     var _getTranslationOpportunities = function(
         languageCode, cursor, successCallback) {
-      var params = {
-        language_code: languageCode,
-        cursor: cursor
-      };
       ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-        OPPORTUNITY_TYPE_TRANSLATION, params, function(data) {
+        languageCode, cursor, function(data) {
           moreTranslationOpportunitiesAvailable = data.more;
           translationOpportunitiesCursor = data.next_cursor;
           successCallback(data.opportunities, data.more);
@@ -59,12 +50,8 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     };
     var _getVoiceoverOpportunities = function(
         languageCode, cursor, successCallback) {
-      var params = {
-        language_code: languageCode,
-        cursor: cursor
-      };
       ContributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-        OPPORTUNITY_TYPE_VOICEOVER, params, function(data) {
+        languageCode, cursor, function(data) {
           moreVoiceoverOpportunitiesAvailable = data.more;
           voiceoverOpportunitiesCursor = data.next_cursor;
           successCallback(data.opportunities, data.more);

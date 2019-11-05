@@ -18,18 +18,47 @@
  */
 
 angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
-  '$http', 'UrlInterpolationService', function($http, UrlInterpolationService) {
+  '$http', 'UrlInterpolationService', 'OPPORTUNITY_TYPE_SKILL',
+  'OPPORTUNITY_TYPE_TRANSLATION', 'OPPORTUNITY_TYPE_VOICEOVER', function($http,
+      UrlInterpolationService, OPPORTUNITY_TYPE_SKILL,
+      OPPORTUNITY_TYPE_TRANSLATION, OPPORTUNITY_TYPE_VOICEOVER) {
     var urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
+    var _fetchOpportunities = function(
+      opportunityType, params, successCallback) {
+      return $http.get(
+        UrlInterpolationService.interpolateUrl(
+          urlTemplate, {opportunityType: opportunityType}
+        ), {
+          params: params
+        }).then(function(response) {
+        successCallback(response.data);
+      });
+    };
     return {
-      fetchOpportunities: function(opportunityType, params, successCallback) {
-        return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            urlTemplate, {opportunityType: opportunityType}
-          ), {
-            params: params
-          }).then(function(response) {
-          successCallback(response.data);
-        });
+      fetchSkillOpportunities: function(cursor, successCallback) {
+        var params = {
+          cursor: cursor
+        };
+        return _fetchOpportunities(
+          OPPORTUNITY_TYPE_SKILL, params, successCallback);
+      },
+      fetchTranslationOpportunities: function(
+        languageCode, cursor, successCallback) {
+          var params = {
+            language_code: languageCode,
+            cursor: cursor
+          };
+          return _fetchOpportunities(
+            OPPORTUNITY_TYPE_TRANSLATION, params, successCallback);
+      },
+      fetchVoiceoverOpportunities: function(
+        languageCode, cursor, successCallback) {
+          var params = {
+            language_code: languageCode,
+            cursor: cursor
+          };
+          return _fetchOpportunities(
+            OPPORTUNITY_TYPE_VOICEOVER, params, successCallback);
       }
     };
   }]);

@@ -50,8 +50,17 @@ def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
             'Invalid suggestion_type: %s' % suggestion_type)
 
 
-def _target_id_to_opportunity_dict(suggestions):
-    """Returns a dict of target_id to exploration opportunity summary dict."""
+def _get_target_id_to_opportunity_dict(suggestions):
+    """Returns a dict of target_id to exploration opportunity summary dict.
+
+    Args:
+        suggestions: list(BaseSuggestion). A list of suggestions to retrieve
+            opportunity dicts.
+
+    Returns:
+        dict. Dict mapping target_id to corresponding exploration opportunity
+            summary dict.
+    """
     target_ids = set([s.target_id for s in suggestions])
     opportunities = (
         opportunity_services.get_exploration_opportunity_summaries_by_ids(
@@ -188,11 +197,11 @@ class ReviewableSuggestionsHandler(base.BaseHandler):
                 self.user_id, suggestion_type)
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_id_to_opportunity_dict = _target_id_to_opportunity_dict(
-                    suggestions)
+                target_id_to_opportunity_dict = (
+                    _get_target_id_to_opportunity_dict(suggestions))
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
-                    'target_ids_to_opportunity_dicts':
+                    'target_id_to_opportunity_dict':
                         target_id_to_opportunity_dict
                 })
             else:
@@ -219,11 +228,11 @@ class UserSubmittedSuggestionsHandler(base.BaseHandler):
                 self.user_id, suggestion_type)
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_id_to_opportunity_dict = _target_id_to_opportunity_dict(
-                    suggestions)
+                target_id_to_opportunity_dict = (
+                    _get_target_id_to_opportunity_dict(suggestions))
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
-                    'target_ids_to_opportunity_dicts':
+                    'target_id_to_opportunity_dict':
                         target_id_to_opportunity_dict
                 })
             else:
