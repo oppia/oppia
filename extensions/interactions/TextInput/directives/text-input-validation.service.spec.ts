@@ -19,10 +19,10 @@
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants'
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { TextInputValidationService } from 
+import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 import { TestBed } from '@angular/core/testing';
 

@@ -19,5 +19,5 @@
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 export class InteractionSpecsConstants {
-	public static INTERACTION_SPECS = INTERACTION_SPECS;
+  public static INTERACTION_SPECS = INTERACTION_SPECS;
 }
