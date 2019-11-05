@@ -231,9 +231,9 @@ describe('Chapter editor functionality', function() {
   var createDummySkills = function(number) {
     var skills = [];
     for (var i = 0; i < number; i++) {
-      var skillName = 'skill' + i.toString();
+      var skillName = 'skillFromChapterEditor' + i.toString();
       var material = 'material' + i.toString();
-      workflow.createSkillAndAssignTopic(skillName, material, 0);
+      workflow.createSkillAndAssignTopic(skillName, material, 'Topic 0');
       skills.push(skillName);
     }
     return skills;
@@ -249,7 +249,7 @@ describe('Chapter editor functionality', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       'creator@chapterTest.com', 'creatorChapterTest');
-    dummyExplorationIds = createDummyExplorations(2);
+    dummyExplorationIds = createDummyExplorations(3);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createTopicWithTitle('Topic 0');
     topicEditorPage.createStory('Story 0');
@@ -287,6 +287,28 @@ describe('Chapter editor functionality', function() {
       storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
       storyEditorPage.expectExplorationIdAlreadyExistWarning();
       allowedError = ['The given exploration already exists in the story.'];
+    }
+  );
+
+  it('should add one more chapter and change the chapters sequences',
+    function() {
+      storyEditorPage.navigateToChapterByIndex(1);
+      storyEditorPage.createNewDestinationChapter('Chapter 3');
+      storyEditorPage.navigateToChapterByIndex(2);
+      storyEditorPage.setChapterExplorationId(dummyExplorationIds[2]);
+      storyEditorPage.selectInitialChapterByName('Chapter 2');
+
+      // Now Chapter 2 is the initial chapter and its destination is
+      // Chapter 3. Make Chapter 2's destination to be Chapter 1
+      storyEditorPage.navigateToChapterByIndex(0);
+      storyEditorPage.removeDestination();
+      storyEditorPage.selectDestinationChapterByName('Chapter 1');
+      storyEditorPage.expectDestinationToBe('Chapter 1');
+
+      // Make chapter 1's destination to be Chapter 3
+      storyEditorPage.navigateToChapterByIndex(1);
+      storyEditorPage.selectDestinationChapterByName('Chapter 3');
+      storyEditorPage.expectDestinationToBe('Chapter 3');
     }
   );
 

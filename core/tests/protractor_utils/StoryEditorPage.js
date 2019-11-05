@@ -48,6 +48,10 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-confirm-chapter-creation-button'));
   var addDestinationChapterButton = element(
     by.css('.protractor-test-add-destination-chapter-button'));
+  var deleteDestinationChapterButton = element(
+    by.css('.protractor-test-remove-destination-button'));
+  var destinationSelect = element(
+    by.css('.protractor-test-destination-select'));
   var chapterTitles = element.all(by.css('.protractor-test-chapter-title'));
   var deleteChapterButtons = element.all(
     by.css('.protractor-test-delete-chapter-button'));
@@ -91,6 +95,7 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-prerequisite-skill-description-card'));
   var acquiredSkillDescriptionCard = element.all(
     by.css('.protractor-test-acquired-skill-description-card'));
+  var nextChapterCard = element(by.css('.protractor-test-next-chapter-card'));
 
   this.get = function(storyId) {
     browser.get(EDITOR_URL_PREFIX + storyId);
@@ -118,6 +123,21 @@ var StoryEditorPage = function() {
     newChapterTitleField.sendKeys(title);
     confirmChapterCreationButton.click();
     general.scrollToTop();
+  };
+
+  this.removeDestination = function() {
+    deleteDestinationChapterButton.click();
+  };
+
+  this.selectDestinationChapterByName = function(chapterName) {
+    var destinationOption = destinationSelect.element(
+      by.cssContainingText('option', chapterName));
+    destinationOption.click();
+  };
+
+  this.expectDestinationToBe = function(chapterName) {
+    var pattern = '\s*' + chapterName + '\s*';
+    return expect(nextChapterCard.getText()).toMatch(pattern);
   };
 
   this.expectNumberOfChaptersToBe = function(count) {

@@ -59,9 +59,9 @@
       <md-card class="destination-node-id"
                ng-repeat="nodeId in getDestinationNodeIds()"
                ng-click="viewNodeEditor(nodeId)">
-        <div class="repeating-card-wrapper">
+        <div class="repeating-card-wrapper protractor-test-next-chapter-card">
           <[nodeIdToTitleMap[nodeId]]>
-          <span style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
+          <span class="protractor-test-remove-destination-button" style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
             <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
           </span>
         </div>
@@ -70,7 +70,7 @@
     <div style="margin-top: 1em;" ng-if="getDestinationNodeIds().length === 0">
       <label> Select destination chapter </label>
       <div>
-        <select class="form-control"
+        <select class="form-control protractor-test-destination-select"
                 ng-model="newNodeId"
                 ng-if="availableNodes.length > 0"
                 ng-options="node.id as node.text for node in availableNodes"
