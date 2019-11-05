@@ -38,3 +38,6 @@ RELEASE_SUMMARY_FILEPATH = os.path.join(
     os.getcwd(), os.pardir, 'release_summary.md')
 
 REMOTE_URL = 'git@github.com:oppia/oppia.git'
+
+RELEASE_BRANCH_TYPE = 'release'
+HOTFIX_BRANCH_TYPE = 'hotfix'
