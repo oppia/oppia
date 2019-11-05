@@ -286,3 +286,9 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
             '/createhandler/started_translation_tutorial_event/%s'
             % self.EXP_ID, {}, csrf_token=self.csrf_token,
             expected_status_int=200)
+
+
+class VoicoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
+
+    def setUp(self):
+        pass

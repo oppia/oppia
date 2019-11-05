@@ -35,6 +35,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 import feconf
 import python_utils
@@ -2615,3 +2616,134 @@ def can_play_entity(handler):
     test_can_play_entity.__wrapped__ = True
 
     return test_can_play_entity
+
+
+def can_access_voiceover_application(handler):
+    """Decorator to check whether the user can access voiceover applications for
+    a given purpose.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if a
+            user has permission to access voiceover application for a given
+            purpose.
+    """
+
+    def test_can_access_voiceover_application(self, purpose, **kwargs):
+        """Checks if the user can access voiceover application for a given
+        purpose.
+
+        TODOOO
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to voiceover an exploration.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if purpose == feconf.VOICEOVER_APPLICATION_REVIEW:
+            user_actions_info = user_services.UserActionsInfo(self.user_id)
+            if (
+                    role_services.ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION not in
+                    user_actions_info.actions):
+                raise self.UnauthorizedUserException(
+                    'You do not have credentials to review voiceover '
+                    'applications.')
+
+        return handler(self, purpose, **kwargs)
+
+    test_can_access_voiceover_application.__wrapped__ = True
+
+    return test_can_access_voiceover_application
+
+
+def can_review_voiceover_application(handler):
+    """Decorator to check whether the user can review voiceover applications.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if a
+            user has permission to review voiceover application.
+    """
+
+    def test_can_review_voiceover_application(
+            self, voiceover_application_id, **kwargs):
+        """Checks if the user can review voiceover application.
+
+        TODOOO
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to voiceover an exploration.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        if (
+                role_services.ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION not in
+                user_actions_info.actions):
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to review voiceover '
+                'applications.')
+
+        return handler(self, voiceover_application_id, **kwargs)
+
+    test_can_review_voiceover_application.__wrapped__ = True
+
+    return test_can_review_voiceover_application
+
+
+def can_submit_voiceover_application(handler):
+    """Decorator to check whether a user can submit voiceover application.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if the user has permission to submit voiceover application.
+    """
+
+    def test_can_submit_voiceover_application(self, **kwargs):
+        """Checks if the user can submit voiceover application.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to submit voiceover application.
+        """
+        if role_services.ACTION_SUBMIT_VOICEOVER_APPLICATION in (
+                self.user.actions):
+            if voiceover_services.can_submit_new_voiceover_application(
+                    self.user_id):
+                return handler(self, **kwargs)
+            else:
+                raise base.UserFacingExceptions.UnauthorizedUserException(
+                'Currently, you cannot submit new voiceover applications. '
+                'Make sure you have no pending voiceover application in review '
+                'and the voiceover for assigned lessons are complete.')
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to submit voiceover application.')
+    test_can_submit_voiceover_application.__wrapped__ = True
+
+    return test_can_submit_voiceover_application

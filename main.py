@@ -226,6 +226,18 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/gettranslatabletexthandler',
         community_dashboard.TranslatableTextHandler),
     get_redirect_route(
+        r'/getvoiceoverapplicationtexthandler',
+        voice_artist.VoiceoverApplicationTextHandler),
+    get_redirect_route(
+        r'/createvoiceoverapplicationhandler',
+        voice_artist.VoicoverApplicationHandler),
+    get_redirect_route(
+        r'/getsubmittedvoiceoverapplication/<purpose>',
+        voice_artist.VoicoverApplicationHandler),
+    get_redirect_route(
+        r'/voiceoverappplicationactionhandler/<voiceover_application_id>',
+        voice_artist.VoicoverApplicationHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
