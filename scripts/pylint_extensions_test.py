@@ -1244,7 +1244,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
                         Returns:
                             returns_something
                         '''
-                        "Returns something"
+                        "Returns: something"
                         returns_something
                 """)
         node_with_return_in_comment.file = filename

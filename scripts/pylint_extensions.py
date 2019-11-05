@@ -1075,7 +1075,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
             if (line_num + 1 < file_length and (
                     blank_line_counter == 0 or blank_line_counter > 1)):
                 line = file_content[line_num + 1].strip()
-                if line == b'Args:' or line == b'Returns:':
+                if re.match(br'^[A-Z][a-z]+[:]', line):
                     self.add_message(
                         'single-space-above-args', line=line_num + 1)
 
