@@ -576,7 +576,7 @@ tags: []
             is_super_admin: bool. Whether the user is a super admin.
        """
         os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = self.get_user_id_from_email(email)
+        os.environ['USER_ID'] = self.get_gae_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
@@ -584,19 +584,6 @@ tags: []
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
-
-    # pylint: disable=invalid-name
-    def assertStaticMethod(self, clazz, method_name):
-        """Check if method is static in class.
-
-        Args:
-            clazz: class. The class in which the method belongs.
-            method_name: str. Name of the method that we need to check.
-
-        Returns:
-            bool. Whether method is static.
-        """
-        self.assertTrue(isinstance(clazz.__dict__[method_name], staticmethod))
 
     # pylint: enable=invalid-name
     def shortDescription(self):
@@ -927,6 +914,8 @@ tags: []
         # immediately once the signup is complete. This is done to avoid
         # external  calls being made to Gravatar when running the backend
         # tests.
+        gae_id = self.get_gae_id_from_email(email)
+        user_services.create_new_user(gae_id, email)
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
@@ -1019,15 +1008,28 @@ tags: []
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_user_id_from_email(self, email):
-        """Gets the user_id corresponding to the given email.
+        """Gets the user ID corresponding to the given email.
 
         Args:
             email: str. A valid email stored in the App Engine database.
 
         Returns:
-            user_id: str. ID of the user possessing the given email.
+            str. ID of the user possessing the given email.
         """
-        return current_user_services.get_user_id_from_email(email)
+        gae_id = self.get_gae_id_from_email(email)
+        return (
+            user_services.get_user_settings_by_gae_id(gae_id).user_id)
+
+    def get_gae_id_from_email(self, email):
+        """Gets the GAE user ID corresponding to the given email.
+
+        Args:
+            email: str. A valid email stored in the App Engine database.
+
+        Returns:
+            str. GAE ID of the user possessing the given email.
+        """
+        return current_user_services.get_gae_id_from_email(email)
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
@@ -1597,21 +1599,24 @@ tags: []
     def save_new_skill(
             self, skill_id, owner_id,
             description, misconceptions=None, rubrics=None, skill_contents=None,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            prerequisite_skill_ids=None):
         """Creates an Oppia Skill and saves it.
 
         Args:
             skill_id: str. ID for the skill to be created.
             owner_id: str. The user_id of the creator of the skill.
             description: str. The description of the skill.
-            misconceptions: list(Misconception). A list of Misconception objects
-                that contains the various misconceptions of the skill.
-            rubrics: list(Rubric). A list of Rubric objects that contain the
-                rubric for each difficulty of the skill.
-            skill_contents: SkillContents. A SkillContents object containing the
-                explanation and examples of the skill.
+            misconceptions: list(Misconception)|None. A list of Misconception
+                objects that contains the various misconceptions of the skill.
+            rubrics: list(Rubric)|None. A list of Rubric objects that contain
+                the rubric for each difficulty of the skill.
+            skill_contents: SkillContents|None. A SkillContents object
+                containing the explanation and examples of the skill.
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
+            prerequisite_skill_ids: list(str)|None. The prerequisite skill IDs
+                for the skill.
 
         Returns:
             Skill. A newly-created skill.
@@ -1623,6 +1628,8 @@ tags: []
             skill.next_misconception_id = len(misconceptions) + 1
         if skill_contents is not None:
             skill.skill_contents = skill_contents
+        if prerequisite_skill_ids is not None:
+            skill.prerequisite_skill_ids = prerequisite_skill_ids
         if rubrics is not None:
             skill.rubrics = rubrics
         else:

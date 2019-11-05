@@ -17,9 +17,9 @@
  * exploration editor.
  */
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/exploration/StatesObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -28,11 +28,11 @@ require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'state-improvement-suggestion.service.ts'
 );
-require('services/AlertsService.ts');
-require('services/ComputeGraphService.ts');
-require('services/DateTimeFormatService.ts');
-require('services/ExplorationFeaturesService.ts');
-require('services/StateRulesStatsService.ts');
+require('services/alerts.service.ts');
+require('services/compute-graph.service.ts');
+require('services/date-time-format.service.ts');
+require('services/exploration-features.service.ts');
+require('services/state-rules-stats.service.ts');
 require('visualizations/oppia-visualization-bar-chart.directive.ts');
 require(
   'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');

@@ -17,8 +17,8 @@
  * exploration.
  */
 
-require('services/ContextService.ts');
-require('services/contextual/UrlService.ts');
+require('services/context.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').factory('ExplorationRecommendationsService', [
   '$http', 'ContextService', 'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT',

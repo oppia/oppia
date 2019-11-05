@@ -24,7 +24,7 @@ require(
 angular.module('oppia').factory('ContributionOpportunitiesService', [
   'ContributionOpportunitiesBackendApiService',
   function(ContributionOpportunitiesBackendApiService) {
-    var translationOpprtunitiesCursor = null;
+    var translationOpportunitiesCursor = null;
     var voiceoverOpportunitiesCursor = null;
     var moreTranslationOpportunitiesAvailable = true;
     var moreVoiceoverOpportunitiesAvailable = true;
@@ -34,7 +34,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
       ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
         languageCode, cursor, function(data) {
           moreTranslationOpportunitiesAvailable = data.more;
-          translationOpprtunitiesCursor = data.next_cursor;
+          translationOpportunitiesCursor = data.next_cursor;
           successCallback(data.opportunities, data.more);
         });
     };
@@ -58,7 +58,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
       getMoreTranslationOpportunities: function(languageCode, successCallback) {
         if (moreTranslationOpportunitiesAvailable) {
           _getTranslationOpportunities(
-            languageCode, translationOpprtunitiesCursor, successCallback);
+            languageCode, translationOpportunitiesCursor, successCallback);
         }
       },
       getMoreVoiceoverOpportunities: function(languageCode, successCallback) {

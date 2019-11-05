@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // all the rules are upgraded to Angular 8.
-import { CodeNormalizerService } from 'services/CodeNormalizerService';
+import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -40,6 +40,10 @@ import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import { FractionInputRulesService } from
+  'interactions/FractionInput/directives/fraction-input-rules.service';
+import { GraphInputRulesService } from
+  'interactions/GraphInput/directives/graph-input-rules.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
@@ -70,6 +74,12 @@ describe('Rule spec services', function() {
       'MusicNotesInputRulesService', new MusicNotesInputRulesService());
     $provide.value(
       'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
+    $provide.value(
+      'FractionInputRulesService', new FractionInputRulesService(
+        new FractionObjectFactory()));
+    $provide.value(
+      'GraphInputRulesService', new GraphInputRulesService(
+        new GraphUtilsService()));
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The

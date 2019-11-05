@@ -18,10 +18,10 @@
  * retrieving the story, saving it, and listening for changes.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/story/editable-story-backend-api.service.ts');
 require('domain/story/StoryObjectFactory.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -39,6 +39,7 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _storyIsBeingSaved = false;
     var _topicName = null;
     var _storyIsPublished = false;
+    var _skillSummaries = [];
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
@@ -48,6 +49,10 @@ angular.module('oppia').factory('StoryEditorStateService', [
         $rootScope.$broadcast(EVENT_STORY_INITIALIZED);
         _storyIsInitialized = true;
       }
+    };
+
+    var _setSkillSummaries = function(skillSummaries) {
+      _skillSummaries = angular.copy(skillSummaries);
     };
 
     var _setTopicName = function(topicName) {
@@ -74,9 +79,10 @@ angular.module('oppia').factory('StoryEditorStateService', [
         EditableStoryBackendApiService.fetchStory(storyId).then(
           function(newBackendStoryObject) {
             _setTopicName(newBackendStoryObject.topicName);
-            _updateStory(newBackendStoryObject.story);
             _setStoryPublicationStatus(
               newBackendStoryObject.storyIsPublished);
+            _setSkillSummaries(newBackendStoryObject.skillSummaries);
+            _updateStory(newBackendStoryObject.story);
             _storyIsLoading = false;
           },
           function(error) {
@@ -112,6 +118,10 @@ angular.module('oppia').factory('StoryEditorStateService', [
        */
       getStory: function() {
         return _story;
+      },
+
+      getSkillSummaries: function() {
+        return _skillSummaries;
       },
 
       /**

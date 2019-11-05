@@ -20,10 +20,10 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/story/StoryUpdateService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -54,11 +54,17 @@ angular.module('oppia').directive('storyEditor', [
           var _initEditor = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyContents = $scope.story.getStoryContents();
-            $scope.disconnectedNodeIds = [];
-            if ($scope.storyContents) {
+            $scope.disconnectedNodes = [];
+            $scope.linearNodesList = [];
+            $scope.nodes = [];
+            if ($scope.storyContents &&
+                $scope.storyContents.getNodes().length > 0) {
               $scope.nodes = $scope.storyContents.getNodes();
-              $scope.disconnectedNodeIds =
-                $scope.storyContents.getDisconnectedNodeIds();
+              $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
+              $scope.linearNodesList =
+                $scope.storyContents.getLinearNodesList();
+              $scope.disconnectedNodes =
+                $scope.storyContents.getDisconnectedNodes();
             }
             $scope.notesEditorIsShown = false;
             $scope.storyTitleEditorIsShown = false;
@@ -92,7 +98,15 @@ angular.module('oppia').directive('storyEditor', [
               return;
             }
             StoryUpdateService.setInitialNodeId($scope.story, nodeId);
+            var nodes = this.storyContents.getNodes();
+            for (var i = 0; i < nodes.length; i++) {
+              if (nodes[i].getDestinationNodeIds().indexOf(nodeId) !== -1) {
+                StoryUpdateService.removeDestinationNodeIdFromNode(
+                  $scope.story, nodes[i].getId(), nodeId);
+              }
+            }
             _initEditor();
+            $scope.$broadcast('recalculateAvailableNodes');
           };
 
           $scope.deleteNode = function(nodeId) {
@@ -121,11 +135,13 @@ angular.module('oppia').directive('storyEditor', [
 
             modalInstance.result.then(function(title) {
               StoryUpdateService.deleteStoryNode($scope.story, nodeId);
+              _initEditor();
+              $scope.$broadcast('recalculateAvailableNodes');
             });
           };
 
           $scope.createNode = function() {
-            var nodeTitles = $scope.nodes.map(function(node) {
+            var nodeTitles = $scope.linearNodesList.map(function(node) {
               return node.getTitle();
             });
             var modalInstance = $uibModal.open({
@@ -169,6 +185,7 @@ angular.module('oppia').directive('storyEditor', [
                 $scope.setNodeToEdit(
                   $scope.story.getStoryContents().getInitialNodeId());
               }
+              $scope.$broadcast('recalculateAvailableNodes');
             });
           };
 

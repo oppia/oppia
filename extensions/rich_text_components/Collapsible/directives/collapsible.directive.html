@@ -1,4 +1,4 @@
-<uib-accordion>
+<uib-accordion class="collapsible-rte">
   <div uib-accordion-group is-open="$ctrl.isOpen">
     <uib-accordion-heading>
       <i class="material-icons float-right md-18" ng-hide="$ctrl.isOpen">&#xE147;</i>
@@ -11,3 +11,50 @@
     </div>
   </div>
 </uib-accordion>
+
+<!-- TODO(#7851): This styling is required since ui-bootstrap does not work correctly with bootstrap 4. We need to switch from ui-bootstrap to ng-bootstrap once we have upgraded the collapsible component to Angular 8.-->
+<style>
+  .collapsible-rte .panel {
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    margin-bottom: 20px;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  }
+  .collapsible-rte .panel-heading {
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 10px 15px;
+  }
+  .collapsible-rte .panel-group {
+    margin-bottom: 20px;
+  }
+  .collapsible-rte .panel-title {
+    color: inherit;
+    font-size: 16px;
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+  .collapsible-rte .panel-title>a,
+  .collapsible-rte .panel-title>small,
+  .collapsible-rte .panel-title>.small,
+  .collapsible-rte .panel-title>small>a,
+  .collapsible-rte .panel-title>.small>a {
+    color: inherit;
+  }
+  .collapsible-rte .panel-group .panel-heading {
+    border-bottom: 0;
+  }
+  .collapsible-rte .panel-group .panel {
+    border-radius: 4px;
+    margin-bottom: 0;
+  }
+  .collapsible-rte .collapse {
+    display: none;
+  }
+  .collapsible-rte .collapse.in {
+    display: block;
+  }
+</style>
