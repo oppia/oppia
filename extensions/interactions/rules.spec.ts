@@ -48,6 +48,11 @@ import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
+import { CodeNormalizerService } from 'services/code-normalizer.service';
+import { NormalizeWhitespacePunctuationAndCase } from
+  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
+import { PencilCodeEditorRulesService } from
+  'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { UtilsService } from 'services/utils.service';
 /* eslint-enable max-len */
@@ -87,6 +92,12 @@ describe('Rule spec services', function() {
         new GraphUtilsService()));
     $provide.value('TextInputRulesService', new TextInputRulesService(
       new NormalizeWhitespacePipe(new UtilsService())));
+    $provide.value(
+      'PencilCodeEditorRulesService',
+      new PencilCodeEditorRulesService(
+        new NormalizeWhitespacePipe(),
+        new NormalizeWhitespacePunctuationAndCase(),
+        new CodeNormalizerService()));
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The
