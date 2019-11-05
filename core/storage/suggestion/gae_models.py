@@ -54,9 +54,6 @@ SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
 SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
 SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
 
-# Constants to define voiceover application target type.
-VOICEOVER_APPLICATION_TO_EXPLORATION = 'voiceover_exploration'
-
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -447,7 +444,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         Args:
             author_id: str. The id of the user created the voiceover
                 application.
-            status: str|None. The status of the vocieover application.
+            status: str|None. The status of the voiceover application.
+                If the status is None, the query will fetch all the
+                voiceover applications.
 
         Returns:
             list(GeneralVoiceoverApplicationModel). The list of voiceover
@@ -460,11 +459,19 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             return cls.query(cls.author_id == author_id).fetch()
 
     @classmethod
-    def get_in_review_voiceover_applications(cls):
-        """Returns a list of voiceover application which needs review.
+    def get_reviewable_voiceover_applications(cls, user_id):
+        """Returns a list of voiceover application which a given user can
+        review.
+
+        Args:
+            user_id: str. The id of the user trying to make this query.
+                As a user cannot review their own voiceover application, so the
+                voiceover application created by the user will be excluded.
 
         Returns:
             list(GeneralVoiceoverApplicationModel). The list of voiceover
-                application  which needs review.
+                application which the given user can review.
         """
-        return cls.query(cls.status == STATUS_IN_REVIEW).fetch()
+        return cls.query(ndb.AND(
+            cls.author_id != user_id,
+            cls.status == STATUS_IN_REVIEW)).fetch()

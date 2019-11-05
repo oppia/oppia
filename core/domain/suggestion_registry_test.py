@@ -1439,7 +1439,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 question_domain.QuestionChange(change))
 
 
-
 class MockInvalidVoiceoverApplication(
         suggestion_registry.BaseVoiceoverApplication):
 
