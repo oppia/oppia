@@ -19,6 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AlertsService } from 'services/alerts.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -38,6 +40,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
+    'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
