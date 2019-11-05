@@ -25,7 +25,6 @@ require('directives/focus-on.directive.ts');
 
 require('pages/Base.ts');
 
-require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/navigation.service.ts');
