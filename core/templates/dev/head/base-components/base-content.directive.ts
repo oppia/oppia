@@ -46,7 +46,7 @@ angular.module('oppia').directive('baseContent', [
             SidebarStatusService, UrlService, SITE_FEEDBACK_FORM_URL) {
           // Mimic redirection behaviour in the backend (see issue #7867 for
           // details).
-          if ($window.location.hostname === 'localhost') {
+          if ($window.location.hostname === 'oppiaserver.appspot.com') {
             $window.location.href = (
               'https://oppiatestserver.appspot.com' +
               $window.location.pathname +
