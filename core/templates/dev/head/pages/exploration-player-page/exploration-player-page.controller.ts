@@ -32,9 +32,9 @@ require(
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
-require('services/ContextService.ts');
-require('services/PageTitleService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('services/context.service.ts');
+require('services/page-title.service.ts');
 
 angular.module('oppia').directive('explorationPlayerPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

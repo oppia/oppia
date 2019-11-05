@@ -16,8 +16,8 @@
  * @fileoverview Controllers for the error page.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/PageTitleService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/page-title.service.ts');
 
 angular.module('oppia').directive('errorPage', [
   'UrlInterpolationService', function(

@@ -21,7 +21,7 @@ require(
   'solution-explanation-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
@@ -32,9 +32,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').directive('solutionEditor', [
   'ExplorationHtmlFormatterService',

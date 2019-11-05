@@ -83,7 +83,7 @@ require('objects/objectComponentsRequires.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/autosave-info-modals.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -132,15 +132,15 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/ContextService.ts');
-require('services/EditabilityService.ts');
-require('services/ExplorationFeaturesBackendApiService.ts');
-require('services/ExplorationFeaturesService.ts');
-require('services/PageTitleService.ts');
-require('services/PlaythroughIssuesService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/StateTopAnswersStatsBackendApiService.ts');
-require('services/StateTopAnswersStatsService.ts');
+require('services/context.service.ts');
+require('services/editability.service.ts');
+require('services/exploration-features-backend-api.service.ts');
+require('services/exploration-features.service.ts');
+require('services/page-title.service.ts');
+require('services/playthrough-issues.service.ts');
+require('services/site-analytics.service.ts');
+require('services/state-top-answers-stats-backend-api.service.ts');
+require('services/state-top-answers-stats.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

@@ -24,15 +24,15 @@ require(
   'value-generator-editor.directive.ts');
 
 require('domain/exploration/ParamChangeObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/AlertsService.ts');
-require('services/EditabilityService.ts');
+require('services/alerts.service.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').directive('paramChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
