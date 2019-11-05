@@ -363,6 +363,7 @@ angular.module('oppia').directive('conversationSkin', [
         'WindowDimensionsService', 'COMPONENT_NAME_FEEDBACK',
         'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
+        'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_AUTOPLAY_AUDIO',
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_NEW_CARD_OPENED',
@@ -397,6 +398,7 @@ angular.module('oppia').directive('conversationSkin', [
             WindowDimensionsService, COMPONENT_NAME_FEEDBACK,
             CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
+            ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             EVENT_ACTIVE_CARD_CHANGED, EVENT_AUTOPLAY_AUDIO,
             EVENT_NEW_CARD_AVAILABLE, EVENT_NEW_CARD_OPENED,
@@ -796,7 +798,8 @@ angular.module('oppia').directive('conversationSkin', [
               }
 
               if (ExplorationPlayerStateService.isInStoryChapterMode() &&
-                $scope.nextCard.isTerminal()) {
+                $scope.nextCard.isTerminal() &&
+                ENABLE_NEW_STRUCTURE_VIEWER_UPDATES) {
                 var storyId = UrlService.getUrlParams().story_id;
                 var nodeId = UrlService.getUrlParams().node_id;
                 StoryViewerBackendApiService.recordStoryNodeCompletion(

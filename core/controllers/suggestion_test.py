@@ -675,7 +675,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/topic/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
@@ -775,7 +775,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
             self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX, self.topic_id,
@@ -811,7 +811,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -842,7 +842,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -872,7 +872,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -904,7 +904,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/topic/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_reject['target_id'],
@@ -939,7 +939,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/topic/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
