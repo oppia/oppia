@@ -160,7 +160,6 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
             topic_models.TopicSummaryModel.has_reference_to_user_id('any_id'))
 
 
-
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageModel class."""
     SUBTOPIC_PAGE_ID = 'subtopic_page_id'

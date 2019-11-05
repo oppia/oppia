@@ -225,7 +225,7 @@ class EmailModelsIndexesOneOffJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = (email_jobs_one_off.EmailModelsIndexesOneOffJob.create_new())
+        job_id = email_jobs_one_off.EmailModelsIndexesOneOffJob.create_new()
         email_jobs_one_off.EmailModelsIndexesOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
