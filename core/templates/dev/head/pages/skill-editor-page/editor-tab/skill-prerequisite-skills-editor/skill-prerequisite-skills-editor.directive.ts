@@ -20,7 +20,6 @@ require(
 require('domain/skill/skill-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
-require('services/AlertsService.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
