@@ -93,13 +93,13 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         with self.exists_swap, self.branch_check_swap, self.run_cmd_swap:
             with open_tab_swap, input_swap:
-                restore_backup.main(args=['--project_name=project_name'])
+                restore_backup.main(args=['--project_name=sample_project_name'])
 
         self.assertEqual(
             self.all_cmd_tokens,
             [
                 restore_backup.GCLOUD_PATH, 'config', 'set', 'project',
-                'project_name',
+                'sample_project_name',
                 restore_backup.GCLOUD_PATH, 'datastore', 'import',
                 'gs://export_metadata_filepath', '--async'])
         self.assertEqual(check_function_calls, expected_check_function_calls)

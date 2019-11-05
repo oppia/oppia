@@ -16,7 +16,10 @@
 
 This script should be run from the oppia root folder:
 
-    python -m scripts.restore_backup --project_name='Name of project'
+    python -m scripts.restore_backup --project_name={{name_of_project}}
+
+The name of the project can be checked in release process instructions doc in
+section 3.2 (Performing Migrations).
 
 If the status of a backup restoration is to be checked, run the script as:
 
