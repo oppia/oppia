@@ -348,7 +348,6 @@ def check_travis_and_circleci_tests(current_branch_name):
     Raises:
         Exception: The latest commit on release branch locally does not match
             the latest commit on local fork or upstream.
-        Exception: The travis or circleci local instance is not setup.
         Exception: The travis or circleci tests are failing.
     """
     local_sha = subprocess.check_output([
@@ -376,19 +375,14 @@ def check_travis_and_circleci_tests(current_branch_name):
         github_username)
 
     if requests.get(travis_url).status_code != 200:
-        raise Exception(
-            'Please setup local travis instance before deploying: https:'
-            '//github.com/oppia/oppia/wiki/Setup-your-own-Travis-instance')
+        travis_url = 'https://travis-ci.org/oppia/oppia/branches'
 
     if requests.get(circleci_url).status_code != 200:
-        raise Exception(
-            'Please setup local circleci instance before deploying: https://'
-            'github.com/oppia/oppia/wiki/Setup-your-own-CircleCI-instance')
+        circleci_url = 'https://circleci.com/gh/oppia/workflows/oppia'
 
     common.open_new_tab_in_browser_if_possible(travis_url)
     python_utils.PRINT(
-        'Are all travis tests passing on branch %s on your '
-        'local travis instance?\n' % current_branch_name)
+        'Are all travis tests passing on branch %s?\n' % current_branch_name)
     travis_tests_passing = python_utils.INPUT().lower()
     if travis_tests_passing not in release_constants.AFFIRMATIVE_CONFIRMATIONS:
         raise Exception(
@@ -396,8 +390,7 @@ def check_travis_and_circleci_tests(current_branch_name):
 
     common.open_new_tab_in_browser_if_possible(circleci_url)
     python_utils.PRINT(
-        'Are all circleci tests passing on branch %s on your '
-        'local circleci instance?\n' % current_branch_name)
+        'Are all circleci tests passing on branch %s?\n' % current_branch_name)
     circleci_tests_passing = python_utils.INPUT().lower()
     if circleci_tests_passing not in (
             release_constants.AFFIRMATIVE_CONFIRMATIONS):
