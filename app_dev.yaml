@@ -280,7 +280,6 @@ skip_files:
 # reduce deployed file count.
 # TODO(sll): Find a more structured way of doing this.
 - third_party/static/angular-audio-1.7.4
-- third_party/static/angular-drag-and-drop-lists-2.1.0
 - third_party/static/angular-scroll-1.0.0
 - third_party/static/angular-toastr-1.7.0
 - third_party/static/bootstrap-4.3.1
