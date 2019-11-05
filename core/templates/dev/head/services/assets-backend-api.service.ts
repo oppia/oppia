@@ -22,6 +22,9 @@ require('domain/utilities/FileDownloadRequestObjectFactory.ts');
 require('domain/utilities/ImageFileObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/csrf-token.service.ts');
+// Image file object factory is done,
+// FileDownloadRequestObjectFactory is done
+// Audio file object directory is done
 
 angular.module('oppia').factory('AssetsBackendApiService', [
   '$http', '$q', 'AudioFileObjectFactory', 'CsrfTokenService',

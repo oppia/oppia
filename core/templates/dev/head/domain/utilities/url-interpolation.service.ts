@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {UtilsService} from "../../services/utils.service";
+
 /**
  * @fileoverview Service to construct URLs by inserting variables within them as
  * necessary to have a fully-qualified URL.
@@ -25,6 +27,206 @@ require('app.constants.ajs.ts');
 
 const hashes = require('hashes.json');
 
+export class UrlInterpolationService {
+  constructor(private alertsService: , private urlService: UrlService, private utilsService: UtilsService) {}
+
+     validateResourcePath(resourcePath) {
+      if (!resourcePath) {
+        this.alertsService.fatalWarning('Empty path passed in method.');
+      }
+
+      const RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
+      // Ensure that resourcePath starts with a forward slash.
+      if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
+        this.alertsService.fatalWarning(
+            'Path must start with \'\/\': \'' + resourcePath + '\'.');
+      }
+    };
+
+    /**
+     * Given a resource path relative to subfolder in /,
+     * returns resource path with cache slug.
+     */
+    getUrlWithSlug(resourcePath) {
+      if (!DEV_MODE) {
+        if (hashes[resourcePath]) {
+          let index = resourcePath.lastIndexOf('.');
+          return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
+              resourcePath.slice(index));
+        }
+      }
+      return resourcePath;
+    };
+
+    /**
+     * Given a resource path relative to subfolder in /,
+     * returns complete resource path with cache slug and prefixed with url
+     * depending on dev/prod mode.
+     */
+    getCompleteUrl(prefix, path) {
+      if (DEV_MODE) {
+        return prefix + this.getUrlWithSlug(path);
+      } else {
+        return '/build' + prefix + this.getUrlWithSlug(path);
+      }
+    };
+
+    /**
+     * Given a resource path relative to extensions folder,
+     * returns the complete url path to that resource.
+     */
+    getExtensionResourceUrl(resourcePath) {
+      this.validateResourcePath(resourcePath);
+      return this.getCompleteUrl('/extensions', resourcePath);
+    };
+
+      /**
+       * Given a formatted URL, interpolates the URL by inserting values the URL
+       * needs using the interpolationValues object. For example, urlTemplate
+       * might be:
+       *
+       *   /createhandler/resolved_answers/<exploration_id>/<escaped_state_name>
+       *
+       * interpolationValues is an object whose keys are variables within the
+       * URL. For the above example, interpolationValues may look something
+       * like:
+       *
+       *   { 'exploration_id': '0', 'escaped_state_name': 'InputBinaryNumber' }
+       *
+       * If a URL requires a value which is not keyed within the
+       * interpolationValues object, this will return null.
+       */
+      interpolateUrl(urlTemplate, interpolationValues) {
+        if (!urlTemplate) {
+          this.alertsService.fatalWarning(
+              'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
+          return null;
+        }
+
+        // http://stackoverflow.com/questions/4775722
+        if (!(interpolationValues instanceof Object) || (
+            Object.prototype.toString.call(
+                interpolationValues) === '[object Array]')) {
+          this.alertsService.fatalWarning(
+              'Expected an object of interpolation values to be passed into ' +
+              'interpolateUrl.');
+          return null;
+        }
+
+        // Valid pattern: <alphanum>
+        var INTERPOLATION_VARIABLE_REGEX = /<(\w+)>/;
+
+        // Invalid patterns: <<stuff>>, <stuff>>>, <>
+        var EMPTY_VARIABLE_REGEX = /<>/;
+        var INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
+
+        if (urlTemplate.match(INVALID_VARIABLE_REGEX) ||
+            urlTemplate.match(EMPTY_VARIABLE_REGEX)) {
+          this.alertsService.fatalWarning(
+              'Invalid URL template received: \'' + urlTemplate + '\'');
+          return null;
+        }
+
+        var escapedInterpolationValues = {};
+        for (var varName in interpolationValues) {
+          var value = interpolationValues[varName];
+          if (!this.utilsService.isString(value)) {
+            this.alertsService.fatalWarning(
+                'Parameters passed into interpolateUrl must be strings.');
+            return null;
+          }
+
+          escapedInterpolationValues[varName] = encodeURIComponent(value);
+        }
+
+        // Ensure the URL has no nested brackets (which would lead to
+        // indirection in the interpolated variables).
+        var filledUrl = angular.copy(urlTemplate);
+        var match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
+        while (match) {
+          var currentVarName = match[1];
+          if (!escapedInterpolationValues.hasOwnProperty(currentVarName)) {
+            this.lertsService.fatalWarning('Expected variable \'' + currentVarName +
+                '\' when interpolating URL.');
+            return null;
+          }
+          filledUrl = filledUrl.replace(
+              INTERPOLATION_VARIABLE_REGEX,
+              escapedInterpolationValues[currentVarName]);
+          match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
+        }
+        return filledUrl;
+      }
+
+      /**
+       * Given an image path relative to /assets/images folder,
+       * returns the complete url path to that image.
+       */
+      getStaticImageUrl: function(imagePath) {
+        validateResourcePath(imagePath);
+        return getCompleteUrl('/assets', '/images' + imagePath);
+      },
+
+      /**
+       * Given a video path relative to /assets/videos folder,
+       * returns the complete url path to that image.
+       */
+      getStaticVideoUrl: function(videoPath) {
+        validateResourcePath(videoPath);
+        return getCompleteUrl('/assets', '/videos' + videoPath);
+      },
+
+      /**
+       * Given a path relative to /assets folder, returns the complete url path
+       * to that asset.
+       */
+      getStaticAssetUrl: function(assetPath) {
+        validateResourcePath(assetPath);
+        return getCompleteUrl('/assets', assetPath);
+      },
+
+      getFullStaticAssetUrl: function(path) {
+        validateResourcePath(path);
+        if (DEV_MODE) {
+          return UrlService.getOrigin() + path;
+        } else {
+          return UrlService.getOrigin() + '/build' + path;
+        }
+      },
+
+      /**
+       * Given an interaction id, returns the complete url path to
+       * the thumbnail image for the interaction.
+       */
+      getInteractionThumbnailImageUrl: function(interactionId) {
+        if (!interactionId) {
+          AlertsService.fatalWarning(
+              'Empty interactionId passed in getInteractionThumbnailImageUrl.');
+        }
+        return getExtensionResourceUrl('/interactions/' + interactionId +
+            '/static/' + interactionId + '.png');
+      },
+
+      /**
+       * Given a directive path relative to head folder,
+       * returns the complete url path to that directive.
+       */
+      getDirectiveTemplateUrl: function(path) {
+        validateResourcePath(path);
+        if (DEV_MODE) {
+          return '/templates/dev/head' + getUrlWithSlug(path);
+        } else {
+          return '/build/templates/head' + getUrlWithSlug(path);
+        }
+      },
+
+      getExtensionResourceUrl: getExtensionResourceUrl,
+
+      _getUrlWithSlug: getUrlWithSlug,
+      _getCompleteUrl: getCompleteUrl
+    };
+  }
+}
 angular.module('oppia').factory('UrlInterpolationService', [
   'AlertsService', 'UrlService', 'UtilsService', 'DEV_MODE',
   function(AlertsService, UrlService, UtilsService, DEV_MODE) {
