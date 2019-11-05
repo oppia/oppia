@@ -23,9 +23,11 @@ import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
+import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
@@ -42,9 +44,10 @@ export class UpgradedServices {
   upgradedServices = {
     'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
-    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
+    'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
+    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'MetaTagCustomizationService': new MetaTagCustomizationService(
       new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
