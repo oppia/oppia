@@ -59,7 +59,9 @@ angular.module('oppia').directive('outcomeEditor', [
             ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.editOutcomeForm = {};
-          ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
+          ctrl.isInQuestionMode = function() {
+            return StateEditorService.isInQuestionMode();
+          };
           ctrl.canAddPrerequisiteSkill = (
             ENABLE_PREREQUISITE_SKILLS &&
             StateEditorService.isExplorationWhitelisted());
