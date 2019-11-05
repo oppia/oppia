@@ -92,7 +92,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
         // Add external plugins.
         CKEDITOR.plugins.addExternal(
           'sharedspace',
-          '/third_party/static/ckeditor-sharedspace-4.12.1/', 'plugin.js');
+          '/third_party/static/ckeditor-4.12.1/plugins/sharedspace/',
+          'plugin.js');
         // Pre plugin is not available for 4.12.1 version of CKEditor. This is
         // a self created plugin (other plugins are provided by CKEditor).
         CKEDITOR.plugins.addExternal(
@@ -115,7 +116,10 @@ angular.module('oppia').directive('ckEditor4Rte', [
           sharedSpaces: {
             top: <HTMLElement>el[0].children[0].children[0]
           },
-          skin: 'bootstrapck,/third_party/static/ckeditor-bootstrapck-1.0/',
+          skin: (
+            'bootstrapck,' +
+            '/third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/'
+          ),
           toolbar: [
             {
               name: 'basicstyles',
