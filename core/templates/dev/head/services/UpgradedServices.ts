@@ -16,12 +16,21 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
+import { BackgroundMaskService } from
+  'services/stateful/background-mask.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { DocumentAttributeCustomizationService } from
+  'services/contextual/document-attribute-customization.service';
+import { MetaTagCustomizationService } from
+  'services/contextual/meta-tag-customization.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
-import { UtilsService } from 'services/UtilsService';
-import { WindowDimensionsService } from './contextual/WindowDimensionsService';
+import { UtilsService } from './utils.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,12 +38,17 @@ import { WindowDimensionsService } from './contextual/WindowDimensionsService';
 export class UpgradedServices {
   /* eslint-disable quote-props */
   upgradedServices = {
-    'UtilsService': new UtilsService(),
+    'BackgroundMaskService': new BackgroundMaskService(),
+    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
+    'DocumentAttributeCustomizationService':
+        new DocumentAttributeCustomizationService(new WindowRef()),
+    'MetaTagCustomizationService': new MetaTagCustomizationService(
+      new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService()
   };
-  /* eslint-enable quote-props */
 }
 
 angular.module('oppia').factory(

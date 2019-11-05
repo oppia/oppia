@@ -20,11 +20,10 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-
 require('App.ts');
 require('domain/skill/skill-rights-backend-api.service.ts');
 require('pages/skill-editor-page/skill-editor-page.controller.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 describe('Skill rights backend API service', function() {
   var SkillRightsBackendApiService = null;
@@ -59,37 +58,6 @@ describe('Skill rights backend API service', function() {
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
-  });
-
-  it('should successfully set a skill to be public', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/skill_editor_handler/publish_skill/0').respond(200);
-    SkillRightsBackendApiService.setSkillPublic('0', 1).then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  });
-
-  it('should call the provided fail handler on HTTP failure', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/skill_editor_handler/publish_skill/0').respond(
-      500, 'Error loading skill 0.');
-    SkillRightsBackendApiService.setSkillPublic('0', 1).then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
   });
 
   it('should report a cached skill rights after caching it', function() {

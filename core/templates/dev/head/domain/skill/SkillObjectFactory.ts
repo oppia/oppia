@@ -20,7 +20,7 @@
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/RubricObjectFactory.ts');
-require('services/ValidatorsService.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').factory('SkillObjectFactory', [
   'ConceptCardObjectFactory', 'MisconceptionObjectFactory',
@@ -55,7 +55,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
 
     Skill.prototype.getValidationIssues = function() {
       var issues = [];
-      if (this.getConceptCard().getExplanation() === '') {
+      if (this.getConceptCard().getExplanation().getHtml() === '') {
         issues.push(
           'There should be review material in the concept card.');
       }

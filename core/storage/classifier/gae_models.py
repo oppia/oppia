@@ -74,19 +74,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         """Classifier training job is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
-        """ClassifierTrainingJobModel doesn't reference any user_id.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
-
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the training job of the form
@@ -237,19 +224,6 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     def get_deletion_policy():
         """Training job exploration mapping is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
-        """TrainingJobExplorationMappingModel doesn't reference any user_id.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
