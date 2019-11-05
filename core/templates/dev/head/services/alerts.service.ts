@@ -16,85 +16,94 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
-angular.module('oppia').factory('AlertsService', ['$log', function($log) {
-  var AlertsService = {
-    /**
-     * Each element in each of the arrays here is an object with two keys:
-     *   - type:  a string specifying the type of message or warning.
-     *            Possible types - "warning", "info" or "success".
-     *   - content: a string containing the warning or message.
-     */
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-    /**
-     * Array of "warning" messages.
-     */
-    warnings: [],
-    /**
-     * Array of "success" or "info" messages.
-     */
-    messages: [],
+import { LoggerService } from 'services/contextual/logger.service';
 
-    addWarning: null,
-    fatalWarning: null,
-    deleteWarning: null,
-    clearWarnings: null,
-    addMessage: null,
-    deleteMessage: null,
-    addInfoMessage: null,
-    addSuccessMessage: null,
-    clearMessages: null
-  };
+export interface Warning {
+  type: string;
+  content: string;
+}
+
+export interface Message {
+    type:string;
+    content:string;
+    timeout:number;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AlertsService {
+  /**
+   * Each element in each of the arrays here is an object with two keys:
+   *   - type:  a string specifying the type of message or warning.
+   *            Possible types - "warning", "info" or "success".
+   *   - content: a string containing the warning or message.
+   */
+
+  /**
+   * Array of "warning" messages.
+   */
+  warnings: Warning[] = new Array<Warning>();
+  /**
+   * Array of "success" or "info" messages.
+   */
+  messages: Message[] = new Array<Message>();
 
   // This is to prevent infinite loops.
-  var MAX_TOTAL_WARNINGS = 10;
-  var MAX_TOTAL_MESSAGES = 10;
+  MAX_TOTAL_WARNINGS: number = 10;
+  MAX_TOTAL_MESSAGES: number = 10;
+
+  constructor(private log: LoggerService) {}
 
   /**
    * Adds a warning message.
    * @param {string} warning - The warning message to display.
    */
-  AlertsService.addWarning = function(warning) {
-    $log.error(warning);
-    if (AlertsService.warnings.length >= MAX_TOTAL_WARNINGS) {
+  addWarning(warning: string): void {
+    this.log.error(warning);
+    if (this.warnings.length >= this.MAX_TOTAL_WARNINGS) {
       return;
     }
-    AlertsService.warnings.push({
+    this.warnings.push({
       type: 'warning',
       content: warning
     });
-  };
+  }
 
   /**
    * Adds a warning in the same way as addWarning(), except it also throws an
    * exception to cause a hard failure in the frontend.
    * @param {string} warning - The warning message to display.
    */
-  AlertsService.fatalWarning = function(warning) {
-    AlertsService.addWarning(warning);
+  fatalWarning(warning: string): Error {
+    this.addWarning(warning);
     throw new Error(warning);
-  };
+  }
 
   /**
    * Deletes the warning from the warnings list.
    * @param {Object} warningObject - The warning message to be deleted.
    */
-  AlertsService.deleteWarning = function(warningObject) {
-    var warnings = AlertsService.warnings;
+  deleteWarning(warningObject: Warning): void {
+    var warnings = this.warnings;
     var newWarnings = [];
     for (var i = 0; i < warnings.length; i++) {
       if (warnings[i].content !== warningObject.content) {
         newWarnings.push(warnings[i]);
       }
     }
-    AlertsService.warnings = newWarnings;
-  };
+    this.warnings = newWarnings;
+  }
 
   /**
    * Clears all warnings.
    */
-  AlertsService.clearWarnings = function() {
-    AlertsService.warnings = [];
-  };
+  clearWarnings(): void {
+    this.warnings = [];
+  }
 
   /**
    * Adds a message, can be info messages or success messages.
@@ -102,23 +111,23 @@ angular.module('oppia').factory('AlertsService', ['$log', function($log) {
    * @param {string} message - Message content
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  AlertsService.addMessage = function(type, message, timeoutMilliseconds) {
-    if (AlertsService.messages.length >= MAX_TOTAL_MESSAGES) {
+  addMessage(type: string, message: string, timeoutMilliseconds: number): void {
+    if (this.messages.length >= this.MAX_TOTAL_MESSAGES) {
       return;
     }
-    AlertsService.messages.push({
+    this.messages.push({
       type: type,
       content: message,
       timeout: timeoutMilliseconds
     });
-  };
+  }
 
   /**
    * Deletes the message from the messages list.
    * @param {Object} messageObject - Message to be deleted.
    */
-  AlertsService.deleteMessage = function(messageObject) {
-    var messages = AlertsService.messages;
+  deleteMessage(messageObject: Message): void {
+    var messages = this.messages;
     var newMessages = [];
     for (var i = 0; i < messages.length; i++) {
       if (messages[i].type !== messageObject.type ||
@@ -126,39 +135,40 @@ angular.module('oppia').factory('AlertsService', ['$log', function($log) {
         newMessages.push(messages[i]);
       }
     }
-    AlertsService.messages = newMessages;
-  };
+    this.messages = newMessages;
+  }
 
   /**
    * Adds an info message.
    * @param {string} message - Info message to display.
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  AlertsService.addInfoMessage = function(message, timeoutMilliseconds) {
+  addInfoMessage(message: string, timeoutMilliseconds: number): void {
     if (timeoutMilliseconds === undefined) {
       timeoutMilliseconds = 1500;
     }
-    AlertsService.addMessage('info', message, timeoutMilliseconds);
-  };
+    this.addMessage('info', message, timeoutMilliseconds);
+  }
 
   /**
    * Adds a success message.
    * @param {string} message - Success message to display
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  AlertsService.addSuccessMessage = function(message, timeoutMilliseconds) {
+  addSuccessMessage(message: string, timeoutMilliseconds: number): void {
     if (timeoutMilliseconds === undefined) {
       timeoutMilliseconds = 1500;
     }
-    AlertsService.addMessage('success', message, timeoutMilliseconds);
-  };
+    this.addMessage('success', message, timeoutMilliseconds);
+  }
 
   /**
    * Clears all messages.
    */
-  AlertsService.clearMessages = function() {
-    AlertsService.messages = [];
-  };
+  clearMessages(): void {
+    this.messages = [];
+  }
+}
 
-  return AlertsService;
-}]);
+angular.module('oppia').factory(
+  'AlertsService', downgradeInjectable(AlertsService));
