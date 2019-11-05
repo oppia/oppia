@@ -225,11 +225,11 @@ describe('Question object factory', function() {
   it('should correctly validate question', function() {
     var interaction = _sampleQuestion.getStateData().interaction;
     var misconception1 = misconceptionObjectFactory.create(
-      'id', 'name', 'notes', 'feedback');
+      'id', 'name', 'notes', 'feedback', true);
     var misconception2 = misconceptionObjectFactory.create(
-      'id_2', 'name_2', 'notes', 'feedback');
+      'id_2', 'name_2', 'notes', 'feedback', true);
     var misconception3 = misconceptionObjectFactory.create(
-      'id_3', 'name_3', 'notes', 'feedback');
+      'id_3', 'name_3', 'notes', 'feedback', false);
     var misconceptionsDict = {
       skillId1: [misconception1],
       skillId2: [misconception2, misconception3]

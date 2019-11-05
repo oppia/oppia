@@ -37,6 +37,8 @@ export class SkillDomainConstants {
   public static SKILL_MISCONCEPTIONS_PROPERTY_NAME = 'name';
   public static SKILL_MISCONCEPTIONS_PROPERTY_NOTES = 'notes';
   public static SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK = 'feedback';
+  public static SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED =
+    'must_be_addressed';
 
   public static CMD_UPDATE_SKILL_PROPERTY =
     'update_skill_property';
@@ -49,6 +51,11 @@ export class SkillDomainConstants {
     'add_skill_misconception';
   public static CMD_DELETE_SKILL_MISCONCEPTION =
     'delete_skill_misconception';
+
+  public static CMD_ADD_PREREQUISITE_SKILL =
+    'add_prerequisite_skill';
+  public static CMD_DELETE_PREREQUISITE_SKILL =
+    'delete_prerequisite_skill';
 
   public static CMD_UPDATE_RUBRICS = 'update_rubrics';
 }

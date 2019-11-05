@@ -58,14 +58,16 @@ describe('Editable skill backend API service', function() {
       id: '2',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: true
     };
 
     var misconceptionDict2 = {
       id: '4',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: true
     };
 
     var skillContentsDict = {
@@ -79,7 +81,8 @@ describe('Editable skill backend API service', function() {
       misconceptions: [misconceptionDict1, misconceptionDict2],
       skill_contents: skillContentsDict,
       language_code: 'en',
-      version: 3
+      version: 3,
+      prerequisite_skill_ids: []
     };
 
     var skillDict2 = {
@@ -88,11 +91,13 @@ describe('Editable skill backend API service', function() {
       misconceptions: [misconceptionDict1],
       skill_contents: skillContentsDict,
       language_code: 'en',
-      version: 2
+      version: 2,
+      prerequisite_skill_ids: []
     };
 
     sampleResponse = {
-      skill: skillDict
+      skill: skillDict,
+      grouped_skill_summaries: {}
     };
 
     sampleResponse2 = {
@@ -117,7 +122,10 @@ describe('Editable skill backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleResponse.skill);
+      expect(successHandler).toHaveBeenCalledWith({
+        skill: sampleResponse.skill,
+        groupedSkillSummaries: sampleResponse.grouped_skill_summaries
+      });
       expect(failHandler).not.toHaveBeenCalled();
     });
 
@@ -147,7 +155,7 @@ describe('Editable skill backend API service', function() {
       var skillDict = null;
       EditableSkillBackendApiService.fetchSkill('1').then(
         function(data) {
-          skillDict = data;
+          skillDict = data.skill;
         });
       $httpBackend.flush();
 
