@@ -52,7 +52,8 @@ angular.module('oppia').directive('misconceptionEditor', [
           $scope.container = {
             misconceptionName: $scope.misconception.getName(),
             misconceptionNotes: $scope.misconception.getNotes(),
-            misconceptionFeedback: $scope.misconception.getFeedback()
+            misconceptionFeedback: $scope.misconception.getFeedback(),
+            misconceptionMustBeAddressed: $scope.misconception.isMandatory()
           };
 
           $scope.NOTES_FORM_SCHEMA = {
@@ -121,6 +122,14 @@ angular.module('oppia').directive('misconceptionEditor', [
                 $scope.container.misconceptionNotes);
               notesMemento = null;
             }
+          };
+
+          $scope.updateMustBeAddressed = function() {
+            SkillUpdateService.updateMisconceptionMustBeAddressed(
+              $scope.skill,
+              $scope.misconception.getId(),
+              !$scope.container.misconceptionMustBeAddressed,
+              $scope.container.misconceptionMustBeAddressed);
           };
 
           $scope.saveFeedback = function() {

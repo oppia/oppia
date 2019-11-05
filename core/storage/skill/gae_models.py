@@ -65,6 +65,8 @@ class SkillModel(base_models.VersionedModel):
         required=True, indexed=True)
     # A dict representing the skill contents.
     skill_contents = ndb.JsonProperty(indexed=False)
+    # The prerequisite skills for the skill.
+    prerequisite_skill_ids = ndb.StringProperty(repeated=True, indexed=False)
     # The id to be used by the next misconception added.
     next_misconception_id = ndb.IntegerProperty(required=True, indexed=False)
     # The id that the skill is merged into, in case the skill has been

@@ -43,6 +43,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
     var _skillIsInitialized = false;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
+    var _groupedSkillSummaries = {};
 
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
@@ -59,6 +60,16 @@ angular.module('oppia').factory('SkillEditorStateService', [
         newBackendSkillObject));
     };
 
+    var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
+      for (var name in groupedSkillSummaries) {
+        _groupedSkillSummaries[name] = [];
+        var summaryDicts = groupedSkillSummaries[name];
+        for (var idx in summaryDicts) {
+          _groupedSkillSummaries[name].push(summaryDicts[idx]);
+        }
+      }
+    };
+
     var _setSkillRights = function(skillRights) {
       _skillRights.copyFromSkillRights(skillRights);
     };
@@ -73,7 +84,9 @@ angular.module('oppia').factory('SkillEditorStateService', [
         EditableSkillBackendApiService.fetchSkill(
           skillId).then(
           function(newBackendSkillObject) {
-            _updateSkill(newBackendSkillObject);
+            _updateGroupedSkillSummaries(
+              newBackendSkillObject.groupedSkillSummaries);
+            _updateSkill(newBackendSkillObject.skill);
             QuestionsListService.getQuestionSummariesAsync(
               [skillId], true, false
             );
@@ -96,6 +109,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
 
       isLoadingSkill: function() {
         return _skillIsBeingLoaded;
+      },
+
+      getGroupedSkillSummaries: function() {
+        return angular.copy(_groupedSkillSummaries);
       },
 
       hasLoadedSkill: function() {

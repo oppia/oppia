@@ -92,14 +92,16 @@ describe('Skill update service', function() {
       id: '2',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: true
     };
 
     var misconceptionDict2 = {
       id: '4',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: true
     };
 
     var rubricDict = {
@@ -139,7 +141,8 @@ describe('Skill update service', function() {
       rubrics: [rubricDict],
       skill_contents: skillContentsDict,
       language_code: 'en',
-      version: 3
+      version: 3,
+      prerequisite_skill_ids: ['skill_1']
     };
   }));
 
@@ -189,7 +192,8 @@ describe('Skill update service', function() {
       id: '7',
       name: 'test name 3',
       notes: 'test notes 3',
-      feedback: 'test feedback 3'
+      feedback: 'test feedback 3',
+      must_be_addressed: true
     };
     var aNewMisconception =
       misconceptionObjectFactory.createFromBackendDict(aNewMisconceptionDict);
@@ -213,6 +217,30 @@ describe('Skill update service', function() {
     expect(skill.getMisconceptions().length).toEqual(1);
     UndoRedoService.undoChange(skill);
     expect(skill.getMisconceptions().length).toEqual(2);
+  });
+
+  it('should add a prerequisite skill', function() {
+    var skill = SkillObjectFactory.createFromBackendDict(skillDict);
+    SkillUpdateService.addPrerequisiteSkill(skill, 'skill_2');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'add_prerequisite_skill',
+      skill_id: 'skill_2'
+    }]);
+    expect(skill.getPrerequisiteSkillIds().length).toEqual(2);
+    UndoRedoService.undoChange(skill);
+    expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
+  });
+
+  it('should delete a prerequisite skill', function() {
+    var skill = SkillObjectFactory.createFromBackendDict(skillDict);
+    SkillUpdateService.deletePrerequisiteSkill(skill, 'skill_1');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'delete_prerequisite_skill',
+      skill_id: 'skill_1'
+    }]);
+    expect(skill.getPrerequisiteSkillIds().length).toEqual(0);
+    UndoRedoService.undoChange(skill);
+    expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
   });
 
   it('should update a rubric', function() {
@@ -283,6 +311,27 @@ describe('Skill update service', function() {
     UndoRedoService.undoChange(skill);
     expect(skill.findMisconceptionById('2').getFeedback())
       .toEqual('test feedback');
+  });
+
+  it('should update the feedback of a misconception', function() {
+    var skill = SkillObjectFactory.createFromBackendDict(skillDict);
+    SkillUpdateService.updateMisconceptionMustBeAddressed(
+      skill,
+      '2',
+      skill.findMisconceptionById('2').isMandatory(),
+      false);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_skill_misconceptions_property',
+      property_name: 'must_be_addressed',
+      old_value: true,
+      new_value: false,
+      misconception_id: '2'
+    }]);
+    expect(skill.findMisconceptionById('2').isMandatory())
+      .toEqual(false);
+    UndoRedoService.undoChange(skill);
+    expect(skill.findMisconceptionById('2').isMandatory())
+      .toEqual(true);
   });
 
   it('should add a worked example', function() {

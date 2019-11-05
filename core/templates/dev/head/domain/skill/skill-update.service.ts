@@ -23,7 +23,8 @@ require('domain/skill/skill-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('SkillUpdateService', [
   'ChangeObjectFactory',
-  'UndoRedoService', 'CMD_ADD_SKILL_MISCONCEPTION',
+  'UndoRedoService', 'CMD_ADD_PREREQUISITE_SKILL',
+  'CMD_ADD_SKILL_MISCONCEPTION', 'CMD_DELETE_PREREQUISITE_SKILL',
   'CMD_DELETE_SKILL_MISCONCEPTION', 'CMD_UPDATE_RUBRICS',
   'CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
   'CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
@@ -31,11 +32,13 @@ angular.module('oppia').factory('SkillUpdateService', [
   'SKILL_CONTENTS_PROPERTY_EXPLANATION',
   'SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'SKILL_DIFFICULTIES',
   'SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK',
+  'SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED',
   'SKILL_MISCONCEPTIONS_PROPERTY_NAME',
   'SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'SKILL_PROPERTY_DESCRIPTION',
   function(
       ChangeObjectFactory,
-      UndoRedoService, CMD_ADD_SKILL_MISCONCEPTION,
+      UndoRedoService, CMD_ADD_PREREQUISITE_SKILL,
+      CMD_ADD_SKILL_MISCONCEPTION, CMD_DELETE_PREREQUISITE_SKILL,
       CMD_DELETE_SKILL_MISCONCEPTION, CMD_UPDATE_RUBRICS,
       CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
       CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
@@ -43,6 +46,7 @@ angular.module('oppia').factory('SkillUpdateService', [
       SKILL_CONTENTS_PROPERTY_EXPLANATION,
       SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES, SKILL_DIFFICULTIES,
       SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
+      SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED,
       SKILL_MISCONCEPTIONS_PROPERTY_NAME,
       SKILL_MISCONCEPTIONS_PROPERTY_NOTES, SKILL_PROPERTY_DESCRIPTION) {
     var _applyChange = function(skill, command, params, apply, reverse) {
@@ -225,6 +229,32 @@ angular.module('oppia').factory('SkillUpdateService', [
           });
       },
 
+      addPrerequisiteSkill: function(skill, skillId) {
+        var params = {
+          skill_id: skillId
+        };
+        _applyChange(
+          skill, CMD_ADD_PREREQUISITE_SKILL, params,
+          function(changeDict, skill) {
+            skill.addPrerequisiteSkill(skillId);
+          }, function(changeDict, skill) {
+            skill.deletePrerequisiteSkill(skillId);
+          });
+      },
+
+      deletePrerequisiteSkill: function(skill, skillId) {
+        var params = {
+          skill_id: skillId
+        };
+        _applyChange(
+          skill, CMD_DELETE_PREREQUISITE_SKILL, params,
+          function(changeDict, skill) {
+            skill.deletePrerequisiteSkill(skillId);
+          }, function(changeDict, skill) {
+            skill.addPrerequisiteSkill(skillId);
+          });
+      },
+
       updateMisconceptionName: function(
           skill, misconceptionId, oldName, newName) {
         var misconception = skill.findMisconceptionById(misconceptionId);
@@ -236,6 +266,21 @@ angular.module('oppia').factory('SkillUpdateService', [
               misconception.setName(newName);
             }, function(changeDict, skill) {
               misconception.setName(oldName);
+            });
+        }
+      },
+
+      updateMisconceptionMustBeAddressed: function(
+          skill, misconceptionId, oldValue, newValue) {
+        var misconception = skill.findMisconceptionById(misconceptionId);
+        if (misconception) {
+          _applyMisconceptionPropertyChange(
+            skill, misconceptionId,
+            SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED, newValue, oldValue,
+            function(changeDict, skill) {
+              misconception.setMustBeAddressed(newValue);
+            }, function(changeDict, skill) {
+              misconception.setMustBeAddressed(oldValue);
             });
         }
       },

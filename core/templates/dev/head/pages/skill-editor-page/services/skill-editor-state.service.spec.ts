@@ -58,7 +58,28 @@ describe('Skill editor state service', function() {
       updateSkill: null
     };
 
-    var _fetchOrUpdateSkill = function() {
+    var _fetchSkill = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve({
+            skill: self.newBackendSkillObject,
+            groupedSkillSummaries: {
+              Name: [{
+                id: 'skill_id_1',
+                description: 'Description 1'
+              }, {
+                id: 'skill_id_2',
+                description: 'Description 2'
+              }]
+            }
+          });
+        } else {
+          reject();
+        }
+      });
+    };
+
+    var _updateSkill = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
           resolve(self.newBackendSkillObject);
@@ -70,8 +91,8 @@ describe('Skill editor state service', function() {
 
     self.newBackendSkillObject = {};
     self.failure = null;
-    self.fetchSkill = _fetchOrUpdateSkill;
-    self.updateSkill = _fetchOrUpdateSkill;
+    self.fetchSkill = _fetchSkill;
+    self.updateSkill = _updateSkill;
 
     return self;
   };
@@ -156,14 +177,16 @@ describe('Skill editor state service', function() {
       id: '2',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: true
     };
 
     var misconceptionDict2 = {
       id: '4',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: false
     };
 
     var rubricDict = {
@@ -202,7 +225,8 @@ describe('Skill editor state service', function() {
       rubrics: [rubricDict],
       skill_contents: skillContentsDict,
       language_code: 'en',
-      version: 3
+      version: 3,
+      prerequisite_skill_ids: []
     };
 
     skillRightsObject = {
@@ -248,6 +272,11 @@ describe('Skill editor state service', function() {
     expect(SkillEditorStateService.hasLoadedSkill()).toBe(false);
     $rootScope.$apply();
     expect(SkillEditorStateService.hasLoadedSkill()).toBe(true);
+    var groupedSkillSummaries =
+      SkillEditorStateService.getGroupedSkillSummaries();
+    expect(groupedSkillSummaries.Name.length).toEqual(2);
+    expect(groupedSkillSummaries.Name[0].id).toEqual('skill_id_1');
+    expect(groupedSkillSummaries.Name[1].id).toEqual('skill_id_2');
   });
 
   it('should return the last skill loaded as the same object', function() {

@@ -8,6 +8,7 @@
   <div ng-repeat="(skillId, misconceptions) in misconceptionsBySkill">
     <div ng-repeat="misconception in misconceptions">
       <button class="btn btn-secondary" style="width: 100%" ng-click="selectMisconception(misconception, skillId)">
+        <span ng-if="!misconception.isMandatory()"> (Optional) </span>
         <[misconception.getName()]>
       </button>
       <div ng-if="selectedMisconceptionSkillId === skillId && selectedMisconception.getId() === misconception.getId()">

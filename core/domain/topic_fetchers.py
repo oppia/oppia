@@ -225,3 +225,15 @@ def get_topic_by_name(topic_name):
 
     topic = get_topic_from_model(topic_model)
     return topic
+
+
+def get_all_topics():
+    """Returns all the topics present in the datastore.
+
+    Returns:
+        list(Topic). The list of topics present in the datastore.
+    """
+    backend_topic_models = topic_models.TopicModel.get_all()
+    topics = [
+        get_topic_from_model(topic) for topic in backend_topic_models]
+    return topics
