@@ -132,27 +132,56 @@ def check_ordering_of_sections(release_summary_lines):
                     section.strip(), next_section.strip()))
 
 
-def get_previous_release_version(current_release_version):
+def get_previous_release_version(branch_type, current_release_version):
     """Finds previous version given the current version.
 
     Args:
+        branch_type: str. The type of the branch: release or hotfix.
         current_release_version: str. The current release version.
 
     Returns:
         str. The previous version.
 
     Raises:
-        Exception. The version format is invalid or there is no previous
-            version for the given version.
+        Exception: Branch type is invalid.
+        Exception: Previous release version is same as current release version.
     """
     all_tags = subprocess.check_output(['git', 'tag'])[:-1].split('\n')
     # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
     # version.
-    previous_release_version = all_tags[-1][1:]
-    # This is for hotfixes.
-    if previous_release_version == current_release_version:
+    if branch_type == 'release':
+        previous_release_version = all_tags[-1][1:]
+    elif branch_type == 'hotfix':
         previous_release_version = all_tags[-2][1:]
+    else:
+        raise Exception('Invalid branch type: %s.' % branch_type)
+    assert previous_release_version != current_release_version
     return previous_release_version
+
+
+def remove_repetition_from_changelog(
+        current_release_version, previous_release_version, changelog_lines):
+    """Removes information about current version from changelog before
+    generation of changelog again.
+
+    Args:
+        current_release_version: str. The current release version.
+        previous_release_version: str. The previous release version.
+        changelog_lines: str. The lines of changelog file.
+
+    Returns:
+        list(str). Changelog lines with no information on current release
+            version.
+    """
+    current_version_start = 0
+    previous_version_start = 0
+    for index, line in enumerate(changelog_lines):
+        if 'v%s' % current_release_version in line:
+            current_version_start = index
+        if 'v%s' % previous_release_version in line:
+            previous_version_start = index
+    changelog_lines[current_version_start:previous_version_start] = []
+    return changelog_lines
 
 
 def update_changelog(
@@ -178,15 +207,21 @@ def update_changelog(
 
     if 'hotfix' in branch_name:
         previous_release_version = get_previous_release_version(
-            current_release_version)
-        current_version_start = 0
-        previous_version_start = 0
-        for index, line in enumerate(changelog_lines):
-            if 'v%s' % current_release_version in line:
-                current_version_start = index
-            if 'v%s' % previous_release_version in line:
-                previous_version_start = index
-        changelog_lines[current_version_start:previous_version_start] = []
+            'hotfix', current_release_version)
+        changelog_lines = remove_repetition_from_changelog(
+            current_release_version, previous_release_version, changelog_lines)
+    else:
+        previous_release_version = get_previous_release_version(
+            'release', current_release_version)
+        # Update only if changelog is generated before and contains info for
+        # current version.
+        if any(
+                line.startswith(
+                    'v%s' % current_release_version
+                    ) for line in changelog_lines):
+            changelog_lines = remove_repetition_from_changelog(
+                current_release_version, previous_release_version,
+                changelog_lines)
 
     changelog_lines[2:2] = release_version_changelog
     with python_utils.open_file(CHANGELOG_FILEPATH, 'w') as changelog_file:

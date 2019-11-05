@@ -52,8 +52,8 @@ MOCK_ABOUT_PAGE_FILEPATH = os.path.join(
 
 MOCK_UPDATED_CHANGELOG_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CHANGELOG')
-MOCK_UPDATED_CHANGELOG_FOR_HOTFIX_FILEPATH = os.path.join(
-    RELEASE_TEST_DIR, 'UPDATED_CHANGELOG_FOR_HOTFIX')
+MOCK_UPDATED_CHANGELOG_FILEPATH_FOR_REMOVAL_TEST = os.path.join(
+    RELEASE_TEST_DIR, 'UPDATED_CHANGELOG_FOR_REMOVAL_TEST')
 MOCK_UPDATED_AUTHORS_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_AUTHORS')
 MOCK_UPDATED_CONTRIBUTORS_FILEPATH = os.path.join(
@@ -121,7 +121,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
-                    '2.0.8'), '2.0.7')
+                    'release', '2.0.8'), '2.0.7')
 
     def test_get_previous_release_version_with_hotfix(self):
         def mock_check_output(unused_cmd_tokens):
@@ -129,7 +129,27 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
-                    '2.0.8'), '2.0.7')
+                    'hotfix', '2.0.8'), '2.0.7')
+
+    def test_get_previous_release_version_with_invalid_branch_type(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'v2.0.6\nv2.0.7\nv2.0.8\n'
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        with check_output_swap, self.assertRaisesRegexp(
+            Exception, 'Invalid branch type: invalid.'):
+            update_changelog_and_credits.get_previous_release_version(
+                'invalid', '2.0.8')
+
+    def test_get_previous_release_version_with_repeated_previous_version(
+            self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'v2.0.7\nv2.0.8\n'
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        with check_output_swap, self.assertRaises(AssertionError):
+            update_changelog_and_credits.get_previous_release_version(
+                'release', '2.0.8')
 
     def test_update_changelog_with_non_hotfix_branch(self):
         try:
@@ -151,6 +171,31 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         finally:
             write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
 
+    def test_update_changelog_with_current_version_changelog_present(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'v1.0.0\nv1.0.1\n'
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        try:
+            release_summary_lines = read_from_file(
+                MOCK_RELEASE_SUMMARY_FILEPATH)
+            changelog_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
+            expected_filelines = read_from_file(
+                MOCK_UPDATED_CHANGELOG_FILEPATH_FOR_REMOVAL_TEST)
+            changelog_swap = self.swap(
+                update_changelog_and_credits, 'CHANGELOG_FILEPATH',
+                MOCK_CHANGELOG_FILEPATH)
+            date_swap = self.swap(
+                update_changelog_and_credits, 'CURRENT_DATE',
+                '29 Aug 2019')
+            with changelog_swap, date_swap, check_output_swap:
+                update_changelog_and_credits.update_changelog(
+                    'release-1.0.2', release_summary_lines, '1.0.2')
+            actual_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
+            self.assertEqual(actual_filelines, expected_filelines)
+        finally:
+            write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
+
     def test_update_changelog_with_hotfix_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return 'v1.0.0\nv1.0.1\nv1.0.2\n'
@@ -161,7 +206,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 MOCK_RELEASE_SUMMARY_FILEPATH)
             changelog_filelines = read_from_file(MOCK_CHANGELOG_FILEPATH)
             expected_filelines = read_from_file(
-                MOCK_UPDATED_CHANGELOG_FOR_HOTFIX_FILEPATH)
+                MOCK_UPDATED_CHANGELOG_FILEPATH_FOR_REMOVAL_TEST)
             changelog_swap = self.swap(
                 update_changelog_and_credits, 'CHANGELOG_FILEPATH',
                 MOCK_CHANGELOG_FILEPATH)
