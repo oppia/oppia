@@ -181,7 +181,6 @@
 
 
 # Global frontend services
-/core/templates/dev/head/services/LoggerService*.ts @showtim3
 /core/templates/dev/head/services/promo-bar.service*.ts @ankita240796
 /core/templates/dev/head/services/html-escaper.service*.ts @ankita240796
 /core/templates/dev/head/services/debouncer.service*.ts @ankita240796
