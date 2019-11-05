@@ -265,44 +265,6 @@ def check_storage_models(current_release):
     return [item for item in diff_list if item.startswith('core/storage')]
 
 
-def get_blocking_bug_issue_count(repo):
-    """Returns the number of unresolved blocking bugs.
-
-    Args:
-        repo: github.Repository.Repository. The PyGithub object for the repo.
-
-    Returns:
-        int: Number of unresolved blocking bugs.
-    """
-    blocking_bugs_milestone = repo.get_milestone(
-        number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
-    if blocking_bugs_milestone.state == 'closed':
-        raise Exception('The blocking bug milestone is closed.')
-    return blocking_bugs_milestone.open_issues
-
-
-def check_prs_for_current_release_are_released(repo):
-    """Checks that all pull requests for current release have a
-    'PR: released' label.
-
-    Args:
-        repo: github.Repository.Repository. The PyGithub object for the repo.
-
-    Returns:
-        bool. Whether all pull requests for current release have a
-            PR: released label.
-    """
-    current_release_label = repo.get_label(
-        release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-    current_release_prs = repo.get_issues(
-        state='all', labels=[current_release_label])
-    for pr in current_release_prs:
-        label_names = [label.name for label in pr.labels]
-        if release_constants.LABEL_FOR_RELEASED_PRS not in label_names:
-            return False
-    return True
-
-
 def main():
     """Collects necessary info and dumps it to disk."""
     if not common.is_current_branch_a_release_branch():
@@ -312,24 +274,8 @@ def main():
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
-    blocking_bugs_count = get_blocking_bug_issue_count(repo)
-    if blocking_bugs_count:
-        common.open_new_tab_in_browser_if_possible(
-            'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
-            'is%3Aissue+milestone%3A%22Blocking+bugs%22')
-        raise Exception(
-            'There are %s unresolved blocking bugs. Please ensure '
-            'that they are resolved before release summary generation.' % (
-                blocking_bugs_count))
-
-    if not check_prs_for_current_release_are_released(repo):
-        common.open_new_tab_in_browser_if_possible(
-            'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
-            '+label%3A%22PR%3A+for+current+release%22+')
-        raise Exception(
-            'There are PRs for current release which do not have '
-            'a \'PR: released\' label. Please ensure that they are released '
-            'before release summary generation.')
+    common.check_blocking_bug_issue_count(repo)
+    common.check_prs_for_current_release_are_released(repo)
 
     current_release = get_current_version_tag(repo)
     current_release_tag = current_release.name

@@ -30,7 +30,7 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'answer-submit-action.directive.ts');
-require('services/ExplorationHtmlFormatterService.ts');
+require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
   '$sce', 'ExplorationStatesService',
