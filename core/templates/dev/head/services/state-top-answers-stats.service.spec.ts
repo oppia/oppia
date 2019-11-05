@@ -35,6 +35,8 @@ import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { NormalizeWhitespacePipe } from 
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
@@ -56,6 +58,9 @@ import { StateEditorService } from
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
+import { UtilsService } from 'services/utils.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -119,6 +124,8 @@ describe('StateTopAnswersStatsService', function() {
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
+    $provide.value('TextInputRulesService', new TextInputRulesService(
+      new NormalizeWhitespacePipe(new UtilsService())));
     $provide.value('AnswerStatsObjectFactory', {
       createFromBackendDict: function(backendDict) {
         var answerHtml = (typeof backendDict.answer === 'string') ?

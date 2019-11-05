@@ -22,15 +22,20 @@ import { Injectable } from '@angular/core';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { AppConstants } from 'app.constants';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants'
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+
+interface IWarning {
+  type: string,
+  message: string
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class TextInputValidationService {
   constructor(private bivs: baseInteractionValidationService) {}
-
-  getCustomizationArgsWarnings(customizationArgs) {
+  // TODO(#7165): Replace 'any' with the exact type.
+  getCustomizationArgsWarnings(customizationArgs: any): Array<IWarning> {
     var warningsList = [];
     this.bivs.requireCustomizationArguments(
       customizationArgs,
@@ -73,8 +78,10 @@ export class TextInputValidationService {
     }
     return warningsList;
   }
+  // TODO(#7165): Replace 'any' with the exact type.
   getAllWarnings(
-      stateName, customizationArgs, answerGroups, defaultOutcome) {
+      stateName: any, customizationArgs: any, answerGroups: any,
+      defaultOutcome: any): Array<IWarning> {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.bivs.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));

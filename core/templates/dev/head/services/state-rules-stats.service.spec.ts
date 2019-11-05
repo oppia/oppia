@@ -27,8 +27,13 @@ import { ClassifierObjectFactory } from
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
+import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -48,6 +53,8 @@ describe('State Rules Stats Service', function() {
       'FractionInputRulesService', new FractionInputRulesService(
         new FractionObjectFactory()));
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value('TextInputRulesService', new TextInputRulesService(
+      new NormalizeWhitespacePipe(new UtilsService())));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

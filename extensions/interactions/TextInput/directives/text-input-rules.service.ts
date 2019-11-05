@@ -18,7 +18,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { NormalizeWhitespacePipe } from 
+import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 
 @Injectable({
@@ -26,12 +26,12 @@ import { NormalizeWhitespacePipe } from
 })
 export class TextInputRulesService {
   constructor(private nws: NormalizeWhitespacePipe) {}
-  Equals(answer, inputs): boolean {
+  Equals(answer: string, inputs: {x: string}): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var normalizedInput = this.nws.transform(inputs.x);
     return normalizedAnswer.toLowerCase() === normalizedInput.toLowerCase();
   }
-  FuzzyEquals(answer, inputs): boolean {
+  FuzzyEquals(answer: string, inputs: {x: string}): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var answerString = normalizedAnswer.toLowerCase();
 
@@ -61,18 +61,18 @@ export class TextInputRulesService {
     }
     return editDistance[inputString.length][answerString.length] === 1;
   }
-  CaseSensitiveEquals(answer, inputs): boolean {
+  CaseSensitiveEquals(answer: string, inputs: {x: string}): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var normalizedInput = this.nws.transform(inputs.x);
     return normalizedAnswer === normalizedInput;
   }
-  StartsWith(answer, inputs): boolean {
+  StartsWith(answer: string, inputs: {x: string}): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var normalizedInput = this.nws.transform(inputs.x);
     return normalizedAnswer.toLowerCase().indexOf(
       normalizedInput.toLowerCase()) === 0;
   }
-  Contains(answer, inputs): boolean {
+  Contains(answer: string, inputs: {x: string}): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var normalizedInput = this.nws.transform(inputs.x);
     return normalizedAnswer.toLowerCase().indexOf(

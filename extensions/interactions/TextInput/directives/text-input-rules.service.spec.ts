@@ -17,6 +17,8 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { NormalizeWhitespacePipe } from 
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
@@ -24,6 +26,9 @@ describe('Text Input rules service', () => {
 
   var tirs: TextInputRulesService = null;
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [NormalizeWhitespacePipe]
+    });
     tirs = TestBed.get(TextInputRulesService);
   });
 
