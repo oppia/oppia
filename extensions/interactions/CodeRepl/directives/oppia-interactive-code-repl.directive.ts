@@ -26,8 +26,8 @@ require('domain/utilities/url-interpolation.service.ts');
 require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/HtmlEscaperService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('services/html-escaper.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
   'CodeReplRulesService', 'HtmlEscaperService', 'UrlInterpolationService',

@@ -24,7 +24,7 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
@@ -116,19 +116,6 @@ angular.module('oppia').directive('skillEditorNavbar', [
               $scope.getChangeListCount() === 0);
           };
 
-          var _publishSkill = function() {
-            SkillRightsBackendApiService.setSkillPublic(
-              $scope.skill.getId(), $scope.skill.getVersion()).then(
-              function() {
-                $scope.skillRights.setPublic();
-                SkillEditorStateService.setSkillRights(
-                  $scope.skillRights);
-                $window.location = '/topics_and_skills_dashboard';
-                AlertsService.addSuccessMessage(
-                  'Published Skill.', 1000);
-              });
-          };
-
           $scope.saveChanges = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -151,29 +138,6 @@ angular.module('oppia').directive('skillEditorNavbar', [
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
               AlertsService.addSuccessMessage('Changes Saved.');
-            });
-          };
-
-          $scope.publishSkill = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor-page/modal-templates/' +
-                'skill-editor-pre-publish-modal.directive.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function(
-                    $scope, $uibModalInstance) {
-                  $scope.save = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }]
-            }).result.then(function() {
-              _publishSkill();
             });
           };
         }]

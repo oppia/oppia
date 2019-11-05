@@ -194,9 +194,3 @@ def main():
 
     python_utils.PRINT(
         'Done! Please check manually to ensure all the changes are correct.')
-
-
-# The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when update_configs.py is used as a script.
-if __name__ == '__main__': # pragma: no cover
-    main()

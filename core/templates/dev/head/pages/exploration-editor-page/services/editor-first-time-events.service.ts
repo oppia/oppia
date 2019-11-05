@@ -22,7 +22,7 @@ import {WindowDimensionsService} from '../../../services/contextual/WindowDimens
  * is opened for the first time for an exploration.
  */
 
-require('services/SiteAnalyticsService.ts');
+require('services/site-analytics.service.ts');
 
 
 export class EditorFirstTimeEventsService {

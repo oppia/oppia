@@ -25,9 +25,9 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/UrlService.ts');
-require('services/UserService.ts');
-require('services/DateTimeFormatService.ts');
+require('services/contextual/url.service.ts');
+require('services/user.service.ts');
+require('services/date-time-format.service.ts');
 
 angular.module('oppia').directive('profilePage', [
   'UrlInterpolationService', function(

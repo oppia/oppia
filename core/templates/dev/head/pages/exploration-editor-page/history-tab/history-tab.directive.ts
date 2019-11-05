@@ -28,8 +28,8 @@ require(
   'compare-versions.service.ts');
 require(
   'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
-require('services/DateTimeFormatService.ts');
-require('services/EditabilityService.ts');
+require('services/date-time-format.service.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').directive('historyTab', [
   'UrlInterpolationService', function(
