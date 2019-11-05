@@ -31,7 +31,6 @@ var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
-
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
@@ -198,7 +197,6 @@ describe('Topic editor functionality', function() {
     users.logout();
   });
 });
-
 
 describe('Chapter editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;

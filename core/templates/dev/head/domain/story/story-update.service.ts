@@ -24,7 +24,7 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('StoryUpdateService', [
-  'ChangeObjectFactory', 'UndoRedoService',
+  'AlertsService', 'ChangeObjectFactory', 'UndoRedoService',
   'CMD_ADD_STORY_NODE', 'CMD_DELETE_STORY_NODE',
   'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS',
   'CMD_UPDATE_STORY_NODE_PROPERTY', 'CMD_UPDATE_STORY_PROPERTY',
@@ -34,8 +34,8 @@ angular.module('oppia').factory('StoryUpdateService', [
   'STORY_NODE_PROPERTY_OUTLINE', 'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
   'STORY_NODE_PROPERTY_TITLE', 'STORY_PROPERTY_DESCRIPTION',
   'STORY_PROPERTY_LANGUAGE_CODE', 'STORY_PROPERTY_NOTES',
-  'STORY_PROPERTY_TITLE', 'AlertsService', function(
-      ChangeObjectFactory, UndoRedoService,
+  'STORY_PROPERTY_TITLE', function(
+      AlertsService, ChangeObjectFactory, UndoRedoService,
       CMD_ADD_STORY_NODE, CMD_DELETE_STORY_NODE,
       CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
       CMD_UPDATE_STORY_NODE_PROPERTY, CMD_UPDATE_STORY_PROPERTY,
@@ -45,7 +45,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       STORY_NODE_PROPERTY_OUTLINE, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       STORY_NODE_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
       STORY_PROPERTY_LANGUAGE_CODE, STORY_PROPERTY_NOTES,
-      STORY_PROPERTY_TITLE, AlertsService) {
+      STORY_PROPERTY_TITLE) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // story.
@@ -55,7 +55,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
       try {
         UndoRedoService.applyChange(changeObj, story);
-      } catch(err) {
+      } catch (err) {
         AlertsService.addWarning(err.message);
         throw err;
       }
