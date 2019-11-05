@@ -31,7 +31,8 @@ import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
-import { UtilsService } from './utils.service';
+import { UrlService } from 'services/contextual/url.service';
+import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -52,8 +53,9 @@ export class UpgradedServices {
       new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'UrlService': new UrlService(new WindowRef()),
     'UtilsService': new UtilsService(),
-    'WindowDimensionsService': new WindowDimensionsService()
+    'WindowDimensionsService': new WindowDimensionsService(),
   };
 }
 
