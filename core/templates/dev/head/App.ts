@@ -25,25 +25,23 @@ require('directives/focus-on.directive.ts');
 
 require('pages/Base.ts');
 
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/CsrfTokenService.ts');
-require('services/NavigationService.ts');
-require('services/DebouncerService.ts');
-require('services/DateTimeFormatService.ts');
-require('services/IdGenerationService.ts');
-require('services/HtmlEscaperService.ts');
-require('services/TranslationFileHashLoaderService.ts');
-require('services/RteHelperService.ts');
-require('services/StateRulesStatsService.ts');
-require('services/ConstructTranslationIdsService.ts');
-require('services/UserService.ts');
-require('services/PromoBarService.ts');
-require('services/contextual/DeviceInfoService.ts');
-require('services/contextual/UrlService.ts');
-require('services/stateful/BackgroundMaskService.ts');
-require('services/stateful/FocusManagerService.ts');
-require('services/SiteAnalyticsService.ts');
+require('services/context.service.ts');
+require('services/csrf-token.service.ts');
+require('services/navigation.service.ts');
+require('services/debouncer.service.ts');
+require('services/date-time-format.service.ts');
+require('services/id-generation.service.ts');
+require('services/html-escaper.service.ts');
+require('services/translation-file-hash-loader.service.ts');
+require('services/rte-helper.service.ts');
+require('services/state-rules-stats.service.ts');
+require('services/construct-translation-ids.service.ts');
+require('services/user.service.ts');
+require('services/promo-bar.service.ts');
+require('services/contextual/device-info.service.ts');
+require('services/contextual/url.service.ts');
+require('services/stateful/focus-manager.service.ts');
+require('services/site-analytics.service.ts');
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -338,5 +336,21 @@ if (!Array.prototype.fill) {
       // Step 13.
       return O;
     }
+  });
+}
+
+
+// Add SVGElement.prototype.outerHTML polyfill for IE
+if (!('outerHTML' in SVGElement.prototype)) {
+  Object.defineProperty(SVGElement.prototype, 'outerHTML', {
+    get: function() {
+      var $node, $temp;
+      $temp = document.createElement('div');
+      $node = this.cloneNode(true);
+      $temp.appendChild($node);
+      return $temp.innerHTML;
+    },
+    enumerable: false,
+    configurable: true
   });
 }

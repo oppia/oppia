@@ -19,7 +19,7 @@
 require('components/summary-tile/story-summary-tile.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {

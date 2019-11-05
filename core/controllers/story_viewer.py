@@ -90,7 +90,7 @@ class StoryNodeCompletionHandler(base.BaseHandler):
 
     @acl_decorators.can_access_story_viewer_page
     def post(self, story_id, node_id):
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+        if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
             raise self.PageNotFoundException
 
         try:

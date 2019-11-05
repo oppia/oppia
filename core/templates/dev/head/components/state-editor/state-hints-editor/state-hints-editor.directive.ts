@@ -36,9 +36,9 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
 require('filters/format-rte-preview.filter.ts');
-require('services/AlertsService.ts');
-require('services/EditabilityService.ts');
-require('services/GenerateContentIdService.ts');
+require('services/alerts.service.ts');
+require('services/editability.service.ts');
+require('services/generate-content-id.service.ts');
 
 angular.module('oppia').directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -21,8 +21,8 @@ require(
   'components/forms/schema-based-editors/' +
   'schema-based-editor.directive.ts');
 
-require('services/AlertsService.ts');
-require('services/DateTimeFormatService.ts');
+require('services/alerts.service.ts');
+require('services/date-time-format.service.ts');
 
 angular.module('oppia').directive('moderatorPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
