@@ -23,7 +23,7 @@ require(
 
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/DeviceInfoService.ts');
+require('services/contextual/device-info.service.ts');
 
 angular.module('oppia').directive('schemaBasedUnicodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

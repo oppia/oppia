@@ -30,7 +30,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/stateful/focus-manager.service.ts');
 
 describe('Sidebar state name controller', function() {
   describe('SidebarStateName', function() {

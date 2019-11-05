@@ -28,9 +28,9 @@ angular.module('oppia').directive('sideNavigationBar', [
         '/components/common-layout-directives/navigation-bars/' +
         'side-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$timeout', function($timeout) {
+      controller: ['$timeout', '$window', function($timeout, $window) {
         var ctrl = this;
-        ctrl.currentUrl = window.location.pathname;
+        ctrl.currentUrl = $window.location.pathname;
         ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
       }]
     };

@@ -22,7 +22,7 @@ require(
   'pages/exploration-editor-page/services/' +
   'changes-in-human-readable-form.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/LocalStorageService.ts');
+require('services/local-storage.service.ts');
 
 angular.module('oppia').factory('AutosaveInfoModalsService', [
   '$log', '$timeout', '$uibModal', '$window',

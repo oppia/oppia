@@ -54,19 +54,6 @@ class FileMetadataModel(base_models.VersionedModel):
         """File metadata are not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
-        """FileMetadataModel doesn't reference any user_id.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
-
     @classmethod
     def get_new_id(cls, entity_name):
         """Base classmethod to be implemented in sub classes.
@@ -209,19 +196,6 @@ class FileModel(base_models.VersionedModel):
     def get_deletion_policy():
         """File is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
-        """FileModel doesn't reference any user_id.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     def _reconstitute(self, snapshot_blob):
         """Overrides the superclass method. Reconstitutes a FileModel
