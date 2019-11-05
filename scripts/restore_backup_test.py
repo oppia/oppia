@@ -68,6 +68,11 @@ class RestoreBackupTests(test_utils.GenericTestBase):
             'release branch.'):
             restore_backup.main(args=[])
 
+    def test_missing_project_name(self):
+        with self.exists_swap, self.branch_check_swap, self.assertRaisesRegexp(
+            Exception, 'Please provide project name for backup restoration.'):
+            restore_backup.main(args=[])
+
     def test_backup_restoration(self):
         check_function_calls = {
             'open_tab_is_called': False,
@@ -88,7 +93,8 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         with self.exists_swap, self.branch_check_swap, self.run_cmd_swap:
             with open_tab_swap, input_swap:
-                restore_backup.main(args=[])
+                restore_backup.main(
+                    args=['--project_name=oppiaserver-backup-migration'])
 
         self.assertEqual(
             self.all_cmd_tokens,

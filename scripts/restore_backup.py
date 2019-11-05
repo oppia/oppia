@@ -17,6 +17,7 @@
 This script should be run from the oppia root folder:
 
     python -m scripts.restore_backup
+    --project_name='oppiaserver-backup-migration'
 
 If the status of a backup restoration is to be checked, run the script as:
 
@@ -42,10 +43,15 @@ CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 GAE_DIR = os.path.join(
     OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
+LIST_OF_BUCKETS_URL = (
+    'https://console.cloud.google.com/storage/browser/'
+    'oppia-export-backups?project=oppiaserver')
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
-    '--check_status', action='store_true', default=False, dest='check_status')
+    '--project_name', help='name of the project to set for backup', type=str)
+_PARSER.add_argument(
+    '--check_status', action='store_true', default=False)
 
 
 def set_project(project_name):
@@ -57,12 +63,9 @@ def set_project(project_name):
     common.run_cmd([GCLOUD_PATH, 'config', 'set', 'project', project_name])
 
 
-def initiate_backup_restore_process():
+def initiate_backup_restoration_process():
     """Initiate the backup restoration process on backup migration server."""
-    list_of_buckets_url = (
-        'https://console.cloud.google.com/storage/browser/'
-        'oppia-export-backups?project=oppiaserver')
-    common.open_new_tab_in_browser_if_possible(list_of_buckets_url)
+    common.open_new_tab_in_browser_if_possible(LIST_OF_BUCKETS_URL)
     python_utils.PRINT(
         'Navigate into the newest backup folder. \n'
         'There should be a file here of the form '
@@ -86,6 +89,7 @@ def main(args=None):
     """Performs task to restore backup or check the status of
     backup restoration.
     """
+    common.require_cwd_to_be_oppia()
     if not os.path.exists(os.path.dirname(GAE_DIR)):
         raise Exception('Directory %s does not exist.' % GAE_DIR)
     sys.path.insert(0, GAE_DIR)
@@ -99,8 +103,11 @@ def main(args=None):
     if options.check_status:
         check_backup_restoration_status()
     else:
-        set_project('oppiaserver-backup-migration')
-        initiate_backup_restore_process()
+        if options.project_name is None:
+            raise Exception(
+                'Please provide project name for backup restoration.')
+        set_project(options.project_name)
+        initiate_backup_restoration_process()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
