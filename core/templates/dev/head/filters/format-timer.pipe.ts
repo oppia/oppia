@@ -13,13 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for question only interactions.
+ * @fileoverview FormatTime filter for Oppia.
  */
 
-require('interactions/FractionInput/FractionInput.ts');
-require('interactions/ImageClickInput/ImageClickInput.ts');
-require('interactions/ItemSelectionInput/ItemSelectionInput.ts');
-require('interactions/MultipleChoiceInput/MultipleChoiceInput.ts');
-require('interactions/NumberWithUnits/NumberWithUnits.ts');
-require('interactions/NumericInput/NumericInput.ts');
-require('interactions/TextInput/TextInput.ts');
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({name: 'formatTime'})
+export class FormatTimePipe implements PipeTransform {
+  transform(input: number): string {
+    let formatNum = function(n) {
+      return (n < 10 ? '0' : '') + n;
+    };
+
+    let seconds = input % 60;
+    let minutes = Math.floor(input / 60);
+    return (formatNum(minutes) + ':' + formatNum(seconds));
+  }
+}
