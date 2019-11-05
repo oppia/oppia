@@ -639,7 +639,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
         """Checks whether a class and corresponding  init() method are
         documented. If both of them are documented, it adds an error message.
 
-
         Args:
             class_doc: Docstring. Pylint docstring class instance representing
                 a class's docstring.
@@ -1028,7 +1027,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0012': (
-            'Files must have a single newline above doc string.',
+            'Files must have a single newline above args in doc string.',
             'single-space-above-args',
             'Please enter a single newline above doc string.'
         )
@@ -1046,6 +1045,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
         multi_line_indicator = b'"""'
         file_content = read_from_node(node)
         file_length = len(file_content)
+        blank_line_counter = 0
 
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].strip()

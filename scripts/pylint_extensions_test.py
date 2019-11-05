@@ -1160,10 +1160,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""def func0(arg1)
+                u"""def func(arg):
                         '''Returns something.
                         Args:
-                            arg1: argument
+                            arg: argument
                         Returns:
                             returns_something
                         '''
@@ -1179,11 +1179,50 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='single-space-above-args',
-                line=3
+                line=2
             ),
             testutils.Message(
                 msg_id='single-space-above-args',
-                line=5
+                line=4
+            ),
+        ):
+            temp_file.close()
+
+        node_with_two_newline = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func(arg):
+                        '''Returns something.
+
+
+                        Args:
+                            arg: argument
+
+
+                        Returns:
+                            returns_something
+                        '''
+                        returns something
+                """)
+        node_with_two_newline.file = filename
+        node_with_two_newline.path = filename
+
+        checker_test_object.checker.process_module(
+            node_with_two_newline)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-above-args',
+                line=4
+            ),
+            testutils.Message(
+                msg_id='single-space-above-args',
+                line=8
             ),
         ):
             temp_file.close()
@@ -1219,14 +1258,13 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
 
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
-            doc='Custom test'
-        )
+            doc='Custom test')
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""def func0():
+                u"""def func(arg):
                         '''Returns something.
 
                         Args:
