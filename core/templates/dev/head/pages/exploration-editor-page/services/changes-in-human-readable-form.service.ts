@@ -17,9 +17,10 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 
 import { UtilsService } from '../../../services/UtilsService';
+import {DOCUMENT} from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ export class ChangesInHumanReadableFormService {
   CMD_DELETE_STATE = 'delete_state';
   CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
 
-  constructor(private utilsService: UtilsService) {}
+  constructor(private utilsService: UtilsService, @Inject(DOCUMENT) private document: any) {}
 
   makeRulesListHumanReadable(answerGroupValue) {
     let rulesList = [];
