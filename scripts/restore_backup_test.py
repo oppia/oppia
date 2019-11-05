@@ -93,14 +93,13 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         with self.exists_swap, self.branch_check_swap, self.run_cmd_swap:
             with open_tab_swap, input_swap:
-                restore_backup.main(
-                    args=['--project_name=oppiaserver-backup-migration'])
+                restore_backup.main(args=['--project_name=project_name'])
 
         self.assertEqual(
             self.all_cmd_tokens,
             [
                 restore_backup.GCLOUD_PATH, 'config', 'set', 'project',
-                'oppiaserver-backup-migration',
+                'project_name',
                 restore_backup.GCLOUD_PATH, 'datastore', 'import',
                 'gs://export_metadata_filepath', '--async'])
         self.assertEqual(check_function_calls, expected_check_function_calls)

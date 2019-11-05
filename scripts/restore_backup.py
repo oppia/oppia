@@ -16,8 +16,7 @@
 
 This script should be run from the oppia root folder:
 
-    python -m scripts.restore_backup
-    --project_name='oppiaserver-backup-migration'
+    python -m scripts.restore_backup --project_name='Name of project'
 
 If the status of a backup restoration is to be checked, run the script as:
 
