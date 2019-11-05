@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,32 +13,38 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for logging data.
+ * @fileoverview Service for logging.
  */
 
-import { ErrorHandler, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoggerService {
-  constructor(private errorHandler: ErrorHandler) {}
+  constructor() {}
 
-  log(value: any, ...rest: any[]): void {
+  debug(msg: string) {
     // eslint-disable-next-line no-console
-    console.log(value, ...rest);
+    console.debug(msg);
   }
 
-  error(error: string): void {
-    this.errorHandler.handleError(error);
+  info(msg: string) {
+    // eslint-disable-next-line no-console
+    console.info(msg);
   }
 
-  warn(value: any, ...rest: any[]): void {
-    console.warn(value, ...rest);
+  warn(msg: string) {
+    console.warn(msg);
+  }
+
+  error(msg: string) {
+    console.error(msg);
+  }
+
+  log(msg: string) {
+    // eslint-disable-next-line no-console
+    console.log(msg);
   }
 }
-
-angular.module('oppia').factory(
-  'LoggerService',
-  downgradeInjectable(LoggerService));
