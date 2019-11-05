@@ -205,9 +205,7 @@ describe('Chapter editor functionality', function() {
   var topicEditorPage = null;
   var storyEditorPage = null;
   var storyId = null;
-  var skillEditorPage = null;
   var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
     'Dummy exploration', 'Algorithm', 'Lear more about oppia', 'English'];
@@ -234,7 +232,8 @@ describe('Chapter editor functionality', function() {
     var skills = [];
     for (var i = 0; i < number; i++) {
       var skillName = 'skill' + i.toString();
-      workflow.createSkillAndAssignTopic(skillName, 0);
+      var material = 'material' + i.toString();
+      workflow.createSkillAndAssignTopic(skillName, material, 0);
       skills.push(skillName);
     }
     return skills;
@@ -282,6 +281,7 @@ describe('Chapter editor functionality', function() {
 
   it('should try to add one more chapter with existing exploration',
     function() {
+      storyEditorPage.navigateToChapterByIndex(1);
       storyEditorPage.createNewDestinationChapter('Chapter 3');
       storyEditorPage.navigateToChapterByIndex(2);
       storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
@@ -315,7 +315,7 @@ describe('Chapter editor functionality', function() {
 
   it('should select the chapter2 as initial chapter and get unreachable error',
     function() {
-      storyEditorPage.selectInitialChapterByIndex(1);
+      storyEditorPage.selectInitialChapterByName('Chapter 2');
       storyEditorPage.expectDisplayUnreachableChapter();
     }
   );

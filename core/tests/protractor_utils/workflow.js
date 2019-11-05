@@ -24,7 +24,6 @@ var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
-var SkillEditorPage = require('./SkillEditorPage.js');
 
 // check if the save roles button is clickable
 var canAddRolesToUsers = function() {
@@ -221,13 +220,13 @@ var getExplorationPlaytesters = function() {
   return _getExplorationRoles('viewer');
 };
 
-var createSkillAndAssignTopic = function(skillDescription, topicIndex) {
+var createSkillAndAssignTopic = function(
+    skillDescription, material, topicIndex) {
   var topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
   topicsAndSkillsDashboardPage.get();
-  topicsAndSkillsDashboardPage.createSkillWithDescription(skillDescription);
-  var skillEditorPage = new SkillEditorPage.SkillEditorPage();
-  skillEditorPage.firstTimePublishSkill();
+  topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+    skillDescription, material);
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
   topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);

@@ -61,7 +61,8 @@ var StoryEditorPage = function() {
   /*
    * CHAPTER
    */
-
+  var initialChapterSelect = element(
+    by.css('.protractor-test-initial-chapter-select'));
   var explorationIdInput = element(
     by.css('.protractor-test-exploration-id-input'));
   var explorationIdSaveButton = element(
@@ -80,10 +81,8 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-skill-name-input'));
   var skillListItems = element.all(
     by.css('.protractor-test-skills-list-item'));
-  var initialChapterCheckButton = element.all(
-    by.css('.protractor-test-initial-chapter-check-box'));
-  var unreachableChapterWarning = element(
-    by.css('.protractor-test-unreachable-chapter'));
+  var disconnectedChapterWarning = element(
+    by.css('.protractor-test-disconnected-node-warning'));
   var deletePrerequisiteSkillButton = element.all(
     by.css('.protractor-test-remove-prerequisite-skill'));
   var deleteAcquiredSkillButton = element.all(
@@ -186,7 +185,7 @@ var StoryEditorPage = function() {
   };
 
   this.expectDisplayUnreachableChapter = function() {
-    return expect(unreachableChapterWarning.isPresent()).toBe(true);
+    return expect(disconnectedChapterWarning.isPresent()).toBe(true);
   };
 
   this.setChapterExplorationId = function(explorationId) {
@@ -312,17 +311,10 @@ var StoryEditorPage = function() {
     expect(prerequisiteSkillDescriptionCard.count()).toBe(number);
   };
 
-  this.selectInitialChapterByIndex = function(index) {
-    initialChapterCheckButton.then(function(elements) {
-      var selectedInitial = elements[index];
-      waitFor.visibilityOf(
-        selectedInitial,
-        'selectedInitial takes too long to be visible');
-      waitFor.elementToBeClickable(
-        selectedInitial,
-        'selectedInitial takes too long to be clickable');
-      selectedInitial.click();
-    });
+  this.selectInitialChapterByName = function(name) {
+    var initialChapterOption = initialChapterSelect.element(
+      by.cssContainingText('option', name));
+    initialChapterOption.click();
   };
 };
 
