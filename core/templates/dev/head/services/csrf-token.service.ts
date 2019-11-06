@@ -16,12 +16,13 @@
  * @fileoverview Service for managing CSRF tokens.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
 // This needs to be imported first instead of using the global definition
 // because Angular doesn't support global definitions and every library used
 // needs to be imported explicitly.
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import $ from 'jquery';
 
 @Injectable({

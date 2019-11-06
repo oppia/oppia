@@ -43,7 +43,6 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-
 @Injectable({
   providedIn: 'root'
 })
