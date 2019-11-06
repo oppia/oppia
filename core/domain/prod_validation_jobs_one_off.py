@@ -53,6 +53,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 import feconf
 import python_utils
@@ -3403,7 +3404,7 @@ class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
         Returns:
             *: A domain object to validate.
         """
-        return suggestion_services.get_voiceover_application(item.id)
+        return voiceover_services.get_voiceover_application_by_id(item.id)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

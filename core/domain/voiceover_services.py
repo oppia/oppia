@@ -45,7 +45,8 @@ def _get_voiceover_application_class(target_type):
     if target_type in target_type_to_classes:
         return target_type_to_classes[target_type]
     else:
-        raise Exception('Invalid target type for voiceover application.')
+        raise Exception(
+            'Invalid target type for voiceover application: %s' % target_type)
 
 
 def _get_voiceover_application_model(voiceover_application):
@@ -129,16 +130,19 @@ def get_voiceover_application_by_id(voiceover_application_id):
     return _get_voiceover_application_from_model(voiceover_application_model)
 
 
-def get_reviewable_voiceover_applications():
-    """Returns a list of voiceover applications which needs review.
+def get_reviewable_voiceover_applications(user_id):
+    """Returns a list of voiceover applications which the given user can review.
+
+    Args:
+        user_id: str. The user ID of the reviewer.
 
     Returns:
         list(BaseVoiceoverApplication). A list of voiceover application which
-        needs review.
+        the given user can review.
     """
     voiceover_application_models = (
         suggestion_models.GeneralVoiceoverApplicationModel
-        .get_in_review_voiceover_applications())
+        .get_reviewable_voiceover_applications(user_id))
 
     return [
         _get_voiceover_application_from_model(model) for model in (
@@ -218,6 +222,11 @@ def reject_voiceover_application(
     """
     voiceover_application = get_voiceover_application_by_id(
         voiceover_application_id)
+    if reviewer_id == voiceover_application.author_id:
+        raise Exception(
+            'Applicants are not allowed to review their own '
+            'voiceover application.')
+
     reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
 
     voiceover_application.reject(reviewer.user_id, rejection_message)
@@ -279,4 +288,4 @@ def get_text_to_create_voiceover_application(
             return state.written_translations.get_translated_content(
                 state.content.content_id, language_code)
     else:
-        raise Exception('Invalid entity type.')
+        raise Exception('Invalid target type: %s' % target_type)

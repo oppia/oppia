@@ -109,6 +109,29 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(user_voiceover_applications), 1)
         self.assertEqual(user_voiceover_applications[0].target_id, '0')
 
+    def test_get_voiceover_application_from_model_with_invalid_type_raise_error(
+            self):
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='0',
+            status='review',
+            author_id='author_id',
+            final_reviewer_id=None,
+            language_code='en',
+            filename='filename.mp3',
+            content='<p>content</p>',
+            rejection_message=None).put()
+        voiceover_application_model = (
+            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+                'application_id'))
+        voiceover_application_model.target_type = 'invalid_type'
+        voiceover_application_model.put()
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid target type for voiceover application: invalid_type'):
+            voiceover_services.get_voiceover_application_by_id('application_id')
+
     def test_newly_created_voiceover_application_have_in_review_status(self):
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(
@@ -125,6 +148,24 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(user_voiceover_applications), 1)
         self.assertEqual(
             user_voiceover_applications[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+
+    def test_get_reviewable_voiceover_applications(self):
+        voiceover_applications = (
+            voiceover_services.get_reviewable_voiceover_applications(
+                self.admin_id))
+        self.assertEqual(voiceover_applications, [])
+
+        voiceover_services.create_new_voiceover_application(
+            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            'audio_file.mp3', self.applicant_id)
+
+        voiceover_applications = (
+            voiceover_services.get_reviewable_voiceover_applications(
+                self.admin_id))
+        self.assertEqual(len(voiceover_applications), 1)
+        self.assertEqual(
+            voiceover_applications[0].status,
             suggestion_models.STATUS_IN_REVIEW)
 
     def test_accept_application_assigns_role_to_entity(self):
@@ -193,6 +234,21 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(opportunities), 0)
         self.assertFalse(more)
 
+    def test_author_accepts_own_voiceover_application_raise_exception(self):
+        voiceover_services.create_new_voiceover_application(
+            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            'audio_file.mp3', self.applicant_id)
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id))
+
+        with self.assertRaisesRegexp(
+            Exception, 'Applicants are not allowed to review their own '
+            'voiceover application.'):
+            voiceover_services.accept_voiceover_application(
+                user_voiceover_applications[0].voiceover_application_id,
+                self.applicant_id)
+
     def test_reject_voiceover_application(self):
         voiceover_services.create_new_voiceover_application(
             suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
@@ -228,6 +284,21 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(opportunities), 1)
         self.assertFalse(more)
 
+    def test_author_rejects_own_voiceover_application_raise_exception(self):
+        voiceover_services.create_new_voiceover_application(
+            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            'audio_file.mp3', self.applicant_id)
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id))
+
+        with self.assertRaisesRegexp(
+            Exception, 'Applicants are not allowed to review their own '
+            'voiceover application.'):
+            voiceover_services.reject_voiceover_application(
+                user_voiceover_applications[0].voiceover_application_id,
+                self.applicant_id, 'Testing rejection')
+
     def test_get_text_to_create_voiceover_application(self):
         exp_services.update_exploration(
             self.owner_id, '0', [
@@ -245,3 +316,34 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         content = voiceover_services.get_text_to_create_voiceover_application(
             suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en')
         self.assertEqual(content, '<p>The new content to voiceover</p>')
+
+    def test_get_text_to_create_voiceover_application_in_diff_language(self):
+        exp_services.update_exploration(
+            self.owner_id, '0', [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_CONTENT),
+                    'state_name': 'Introduction',
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': '<p>The new content to voiceover</p>'
+                    }
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'state_name': 'Introduction',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>The new content to voiceover</p>',
+                    'translation_html': '<p>Translation in Hindi</p>'
+                })], 'Adds new content to init state and its translation')
+
+        content = voiceover_services.get_text_to_create_voiceover_application(
+            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'hi')
+        self.assertEqual(content, '<p>Translation in Hindi</p>')
+
+    def test_get_text_to_create_voiceover_application_for_invalid_type(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid target type: invalid_type'):
+            voiceover_services.get_text_to_create_voiceover_application(
+                'invalid_type', '0', 'hi')
