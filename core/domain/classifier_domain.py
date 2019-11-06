@@ -295,8 +295,8 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         }
 
     def to_player_dict(self):
-        """Constructs a dict containing a training job domain object's algorithm_id,
-            classifier_data and data_schema_version.
+        """Constructs a dict containing a training job domain object's
+        algorithm_id, classifier_data and data_schema_version.
 
         Returns:
             A dict containing training job domain object's algorithm_id,
