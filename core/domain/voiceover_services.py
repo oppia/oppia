@@ -41,7 +41,7 @@ def _get_voiceover_application_class(target_type):
         Exception: The voiceover application target type is invalid.
     """
     target_type_to_classes = (
-        suggestion_registry.VOICEOVER_APPLICATION_TYPE_TO_DOMAIN_CLASSES)
+        suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
     if target_type in target_type_to_classes:
         return target_type_to_classes[target_type]
     else:
