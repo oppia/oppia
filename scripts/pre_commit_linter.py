@@ -2141,7 +2141,7 @@ class JsTsLintChecksManager(LintChecksManager):
             '%s -target %s -typeRoots %s %s typings/*') % (
                 dir_path, allow_js, lib, no_implicit_use_strict,
                 skip_lib_check, target, type_roots, filepath)
-        subprocess.check_call(cmd, shell=True, stdout=subprocess.PIPE)
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         compiled_js_filepath = os.path.join(
             dir_path, os.path.basename(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
