@@ -31,6 +31,7 @@ import { DocumentAttributeCustomizationService } from
 import { ExtensionTagAssemblerService }
   from 'services/extension-tag-assembler.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
@@ -57,6 +58,7 @@ export class UpgradedServices {
     'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
       new HtmlEscaperService(new LoggerService()),
       new CamelCaseToHyphensPipe()),
+    'GenerateContentIdService': new GenerateContentIdService(),
     'HtmlEscaperService': new HtmlEscaperService(
       new LoggerService()),
     'MetaTagCustomizationService': new MetaTagCustomizationService(
