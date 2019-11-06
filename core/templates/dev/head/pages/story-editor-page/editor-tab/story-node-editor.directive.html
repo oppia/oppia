@@ -30,6 +30,9 @@
     <button type="submit" class="btn btn-success btn-sm" ng-disabled="!canSaveExpId || (explorationId === currentExplorationId)">Save</button>
   </form>
   <label style="padding-top: 2em;" class="form-heading"> Prerequisite Skill IDs </label>
+  <div class="oppia-placeholder">
+    The skill should be one of the skills that are linked to this topic.
+  </div>
   <div>
     <md-card class="destination-node-id" ng-repeat="skillId in getPrerequisiteSkillIds()">
       <div class="skill-description-card">
@@ -42,6 +45,9 @@
     <button class="btn btn-success btn-sm" ng-click="addPrerequisiteSkillId()">Add Prerequisite Skill</button>
   </div>
   <label style="padding-top: 2em;" class="form-heading"> Acquired Skill IDs </label>
+  <div class="oppia-placeholder">
+    The skill should be one of the skills that are linked to this topic.
+  </div>
   <div>
     <md-card class="destination-node-id" ng-repeat="skillId in getAcquiredSkillIds()">
       <div class="skill-description-card">

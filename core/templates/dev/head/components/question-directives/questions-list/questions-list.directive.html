@@ -40,9 +40,10 @@
   <tr ng-repeat="questionSummary in $ctrl.getQuestionSummaries()"
       class="list-item protractor-test-question-list-item"
       style="height: 4em;"
-      ng-click="$ctrl.editQuestion(questionSummary.summary)">
+      ng-click="$ctrl.editQuestion(questionSummary.summary)"
+      ng-dblclick="$event.stopPropagation()">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
-    <td> <[questionSummary.summary.question_content]> </td>
+    <td class="question-content"> <[questionSummary.summary.question_content]> </td>
     <td> <[$ctrl.getDifficultyString(questionSummary.skill_difficulties[0])]> </td>
     <td class="edit-icon" ng-click="$event.stopPropagation()">
       <span ng-click="$ctrl.changeDifficulty(questionSummary.summary.id, questionSummary.skill_descriptions, questionSummary.skill_difficulties)"
@@ -97,6 +98,10 @@
     border-bottom: 2px solid #bbb;
     padding-bottom: 0.7em;
     text-align: center;
+  }
+
+  questions-list .dashboard-table .question-content {
+    text-align: left;
   }
 
   questions-list .dashboard-table .dashboard-table-headings p {
