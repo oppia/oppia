@@ -59,7 +59,9 @@ angular.module('oppia').directive('outcomeEditor', [
             ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.editOutcomeForm = {};
-          ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
+          ctrl.isInQuestionMode = function() {
+            return StateEditorService.isInQuestionMode();
+          };
           ctrl.canAddPrerequisiteSkill = (
             ENABLE_PREREQUISITE_SKILLS &&
             StateEditorService.isExplorationWhitelisted());
@@ -132,11 +134,12 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.isSelfLoopWithNoFeedback = function(outcome) {
-            if (!outcome) {
-              return false;
+            if (outcome && typeof outcome === 'object' &&
+              outcome.constructor.name === 'Outcome') {
+              return ctrl.isSelfLoop(outcome) &&
+                !outcome.hasNonemptyFeedback();
             }
-            return ctrl.isSelfLoop(outcome) &&
-              !outcome.hasNonemptyFeedback();
+            return false;
           };
 
           ctrl.invalidStateAfterFeedbackSave = function() {

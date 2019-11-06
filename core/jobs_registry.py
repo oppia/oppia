@@ -41,8 +41,10 @@ import python_utils
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
+    activity_jobs_one_off.SnapshotMetadataModelsIndexesJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    email_jobs_one_off.EmailModelsIndexesOneOffJob,
     email_jobs_one_off.GeneralFeedbackEmailReplyToIdOneOffJob,
     exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
@@ -176,7 +178,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ReviewerRotationTrackingModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSnapshotContentModelAuditOneOffJob,

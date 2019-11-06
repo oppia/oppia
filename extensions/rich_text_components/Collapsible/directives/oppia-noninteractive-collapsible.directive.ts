@@ -23,7 +23,7 @@
 require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveCollapsible', [
   'HtmlEscaperService', 'UrlInterpolationService',

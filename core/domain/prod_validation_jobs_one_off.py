@@ -3390,32 +3390,6 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
             cls._validate_final_reveiwer_id]
 
 
-class ReviewerRotationTrackingModelValidator(BaseModelValidator):
-    """Class for validating ReviewerRotationTrackingModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        # Valid id: same as score category.
-        regex_string = '^(%s)$' % ('|').join(ALLOWED_SCORE_CATEGORIES)
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        question_ids = []
-        split_id = item.id.split(suggestion_models.SCORE_CATEGORY_DELIMITER)
-        if len(split_id) == 2 and (
-                split_id[0] == suggestion_models.SCORE_TYPE_QUESTION):
-            question_ids = [split_id[1]]
-        return {
-            'user_ids': (
-                user_models.UserSettingsModel,
-                [item.current_position_in_rotation]),
-            'question_ids': (
-                question_models.QuestionModel,
-                question_ids)
-        }
-
-
 class TopicModelValidator(BaseModelValidator):
     """Class for validating TopicModel."""
 
@@ -5158,8 +5132,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
         StoryCommitLogEntryModelValidator),
     story_models.StorySummaryModel: StorySummaryModelValidator,
     suggestion_models.GeneralSuggestionModel: GeneralSuggestionModelValidator,
-    suggestion_models.ReviewerRotationTrackingModel: (
-        ReviewerRotationTrackingModelValidator),
     topic_models.TopicModel: TopicModelValidator,
     topic_models.TopicSnapshotMetadataModel: (
         TopicSnapshotMetadataModelValidator),
@@ -5796,14 +5768,6 @@ class GeneralSuggestionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [suggestion_models.GeneralSuggestionModel]
-
-
-class ReviewerRotationTrackingModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates ReviewerRotationTrackingModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [suggestion_models.ReviewerRotationTrackingModel]
 
 
 class TopicModelAuditOneOffJob(ProdValidationAuditOneOffJob):

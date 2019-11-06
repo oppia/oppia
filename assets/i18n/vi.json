@@ -239,6 +239,8 @@
 	"I18N_PREFERENCES_SUBJECT_INTERESTS_PLACEHOLDER": "Tìm kiếm những chủ đề yêu thích của bạn...",
 	"I18N_PREFERENCES_USERNAME": "Tên tài khoản",
 	"I18N_PREFERENCES_USERNAME_NOT_SELECTED": "Chưa lựa chọn tên tài khoản",
+	"I18N_QUESTION_PLAYER_TEST_FAILED": "Kiểm tra thất bại. Xin vui lòng xem lại các kỹ năng và thử lại",
+	"I18N_QUESTION_PLAYER_TEST_PASSED": "Hoàn thành kiểm tra. Làm tốt lắm!",
 	"I18N_SIDEBAR_ABOUT_LINK": "Về chúng tôi",
 	"I18N_SIDEBAR_BLOG": "Theo dõi Blog",
 	"I18N_SIDEBAR_CONTACT_US": "Liên lạc",

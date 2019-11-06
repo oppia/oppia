@@ -21,7 +21,7 @@ require(
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -157,6 +157,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
+                  $scope.countOfSkillsToPrioritize = 0;
                   $scope.save = function() {
                     $uibModalInstance.close($scope.selectedSkillId);
                   };
@@ -191,6 +192,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
+                  $scope.countOfSkillsToPrioritize = 0;
                   $scope.save = function() {
                     $uibModalInstance.close($scope.selectedSkillId);
                   };

@@ -68,12 +68,12 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/EditabilityService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/GenerateContentIdService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/editability.service.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/generate-content-id.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -226,10 +226,11 @@ angular.module('oppia').directive('stateResponses', [
           };
 
           $scope.isSelfLoopWithNoFeedback = function(outcome) {
-            if (!outcome) {
-              return false;
+            if (outcome && typeof outcome === 'object' &&
+              outcome.constructor.name === 'Outcome') {
+              return outcome.isConfusing($scope.stateName);
             }
-            return outcome.isConfusing($scope.stateName);
+            return false;
           };
 
           $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
@@ -273,11 +274,12 @@ angular.module('oppia').directive('stateResponses', [
           $scope.isLinearWithNoFeedback = function(outcome) {
             // Returns false if current interaction is linear and has no
             // feedback
-            if (!outcome) {
-              return false;
+            if (outcome && typeof outcome === 'object' &&
+              outcome.constructor.name === 'Outcome') {
+              return $scope.isCurrentInteractionLinear() &&
+                !outcome.hasNonemptyFeedback();
             }
-            return $scope.isCurrentInteractionLinear() &&
-              !outcome.hasNonemptyFeedback();
+            return false;
           };
 
           $scope.getOutcomeTooltip = function(outcome) {
