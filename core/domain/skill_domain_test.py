@@ -44,7 +44,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
-            '<p>default_feedback</p>')]
+            '<p>default_feedback</p>', True)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
@@ -57,7 +57,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
-            None, False
+            None, False, ['skill_id_2']
         )
 
     def _assert_validation_error(self, expected_error_substring):
@@ -91,6 +91,19 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'The length of misconception_name should '
             'be between 1 and 50 characters'
+        )
+
+    def test_valid_misconception_must_be_addressed(self):
+        self.skill.validate()
+        must_be_addressed = 'False'
+        with self.assertRaisesRegexp(
+            ValueError, 'must_be_addressed should be a bool value'):
+            self.skill.update_misconception_must_be_addressed(
+                0, must_be_addressed)
+
+        self.skill.misconceptions[0].must_be_addressed = 'False'
+        self._assert_validation_error(
+            'Expected must_be_addressed to be a bool'
         )
 
     def test_rubrics_validation(self):
@@ -157,6 +170,14 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.description = 0
         self._assert_validation_error('Description should be a string')
 
+    def test_prerequisite_skill_ids_validation(self):
+        self.skill.prerequisite_skill_ids = 0
+        self._assert_validation_error(
+            'Expected prerequisite_skill_ids to be a list')
+        self.skill.prerequisite_skill_ids = [0]
+        self._assert_validation_error(
+            'Expected each skill ID to be a string')
+
     def test_language_code_validation(self):
         self.skill.language_code = 0
         self._assert_validation_error('Expected language code to be a string')
@@ -183,7 +204,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconceptions schema version to be an integer')
 
-        self.skill.misconceptions_schema_version = 1
+        self.skill.misconceptions_schema_version = 2
         self.skill.rubric_schema_version = 100
         self._assert_validation_error(
             'Expected rubric schema version to be %s' %
@@ -238,10 +259,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.misconceptions = [
             skill_domain.Misconception(
                 self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
-                '<p>default_feedback</p>'),
+                '<p>default_feedback</p>', True),
             skill_domain.Misconception(
                 self.MISCONCEPTION_ID, 'name 2', '<p>notes 2</p>',
-                '<p>default_feedback</p>')]
+                '<p>default_feedback</p>', True)]
         self._assert_validation_error('Duplicate misconception ID found')
 
     def test_skill_migration_validation(self):
@@ -305,7 +326,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'next_misconception_id': 0,
             'version': 0,
             'superseding_skill_id': None,
-            'all_questions_merged': False
+            'all_questions_merged': False,
+            'prerequisite_skill_ids': []
         }
         self.assertEqual(skill.to_dict(), expected_skill_dict)
 
@@ -326,7 +348,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         misconceptions = skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'Tag Name', '<p>Description</p>',
-            '<p>Feedback</p>')
+            '<p>Feedback</p>', True)
         misconceptions_dict = misconceptions.to_dict()
         misconceptions_from_dict = skill_domain.Misconception.from_dict(
             misconceptions_dict)

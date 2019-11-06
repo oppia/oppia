@@ -50,7 +50,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
-            '<p>default_feedback</p>')]
+            '<p>default_feedback</p>', True)]
         self.SKILL_ID = skill_services.get_new_skill_id()
 
         self.signup('a@example.com', 'A')
@@ -68,7 +68,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, 'Description',
             misconceptions=misconceptions,
-            skill_contents=skill_contents)
+            skill_contents=skill_contents,
+            prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
     def test_apply_change_list_with_invalid_property_name(self):
         class MockSkillChange(python_utils.OBJECT):
@@ -229,7 +230,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                     'id': self.skill.next_misconception_id,
                     'name': 'test name',
                     'notes': '<p>test notes</p>',
-                    'feedback': '<p>test feedback</p>'
+                    'feedback': '<p>test feedback</p>',
+                    'must_be_addressed': True
                 }
             }),
             skill_domain.SkillChange({
@@ -239,6 +241,23 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'misconception_id': self.skill.next_misconception_id,
                 'old_value': 'test name',
                 'new_value': 'Name'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED
+                ),
+                'misconception_id': self.skill.next_misconception_id,
+                'old_value': True,
+                'new_value': False
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_ADD_PREREQUISITE_SKILL,
+                'skill_id': 'skill_id_3'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
+                'skill_id': 'skill_id_1'
             }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_RUBRICS,
@@ -259,7 +278,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.misconception_count, 2)
         self.assertEqual(skill_summary.version, 2)
         self.assertEqual(skill.version, 2)
+        self.assertEqual(
+            skill.prerequisite_skill_ids, ['skill_id_2', 'skill_id_3'])
         self.assertEqual(skill.misconceptions[1].name, 'Name')
+        self.assertEqual(skill.misconceptions[1].must_be_addressed, False)
         self.assertEqual(skill.rubrics[0].explanation, '<p>New Explanation</p>')
         self.assertEqual(skill.rubrics[1].explanation, '<p>Explanation</p>')
 
@@ -781,6 +803,45 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception name.')
 
+    def test_cannot_update_misconception_must_be_addressed_with_invalid_id(
+            self):
+        changelist = [skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+            'property_name': (
+                skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED),
+            'misconception_id': 'invalid_id',
+            'old_value': False,
+            'new_value': True
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception, 'There is no misconception with the given id.'):
+            skill_services.update_skill(
+                self.USER_ID, self.SKILL_ID, changelist,
+                'Updated misconception must_be_addressed.')
+
+    def test_cannot_add_already_existing_prerequisite_skill(self):
+        changelist = [skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_ADD_PREREQUISITE_SKILL,
+            'skill_id': 'skill_id_1'
+        })]
+        with self.assertRaisesRegexp(
+            Exception, 'The skill is already a prerequisite skill.'):
+            skill_services.update_skill(
+                self.USER_ID, self.SKILL_ID, changelist,
+                'Added prereq skill.')
+
+    def test_cannot_delete_non_existent_prerequisite_skill(self):
+        changelist = [skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
+            'skill_id': 'skill_id_5'
+        })]
+        with self.assertRaisesRegexp(
+            Exception, 'The skill to remove is not a prerequisite skill.'):
+            skill_services.update_skill(
+                self.USER_ID, self.SKILL_ID, changelist,
+                'Removed prereq skill.')
+
     def test_cannot_add_rubric_with_invalid_difficulty(self):
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_UPDATE_RUBRICS,
@@ -904,11 +965,6 @@ class MockSkillObject(skill_domain.Skill):
         return skill_contents
 
     @classmethod
-    def _convert_misconception_v1_dict_to_v2_dict(cls, misconceptions):
-        """Converts v1 misconceptions dict to v2."""
-        return misconceptions
-
-    @classmethod
     def _convert_rubric_v1_dict_to_v2_dict(cls, rubrics):
         """Converts v1 rubrics dict to v2."""
         return rubrics
@@ -980,16 +1036,19 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                     explanation_content_id: {}
                 }
             }))
-        misconception = skill_domain.Misconception(
-            1, 'name', 'description', 'default_feedback')
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
             language_code='en',
-            misconceptions=[misconception.to_dict()],
+            misconceptions=[{
+                'id': 1,
+                'name': 'name',
+                'notes': 'notes',
+                'feedback': 'default_feedback'
+            }],
             rubrics=[],
             skill_contents=skill_contents.to_dict(),
-            next_misconception_id=1,
+            next_misconception_id=2,
             misconceptions_schema_version=1,
             rubric_schema_version=1,
             skill_contents_schema_version=1,
@@ -999,14 +1058,14 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         model.commit(
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
-        swap_skill_object = self.swap(skill_domain, 'Skill', MockSkillObject)
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 2)
 
-        with swap_skill_object, current_schema_version_swap:
+        with current_schema_version_swap:
             skill = skill_services.get_skill_from_model(model)
 
         self.assertEqual(skill.misconceptions_schema_version, 2)
+        self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
 
     def test_migrate_rubrics_to_latest_schema(self):
         skill_services.create_new_skill_rights('skill_id', 'user_id_admin')

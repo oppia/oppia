@@ -43,6 +43,7 @@ MOCK_RELEASE_SUMMARY_FILEPATH = os.path.join(
 
 class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
     """Test the methods for generating release updates."""
+
     def setUp(self):
         super(GenerateReleaseUpdatesTests, self).setUp()
         def mock_get_current_branch_name():
