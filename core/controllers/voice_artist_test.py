@@ -20,6 +20,7 @@ import datetime
 
 from core.domain import rights_manager
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -286,3 +287,43 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
             '/createhandler/started_translation_tutorial_event/%s'
             % self.EXP_ID, {}, csrf_token=self.csrf_token,
             expected_status_int=200)
+
+
+class VoicoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
+    """Unit text for voiceover application handlers."""
+    applicant_username = 'applicant'
+    applicant_email = 'applicant@example.com'
+    reviewer_username = 'reviewer'
+    reviewer_email = 'reviewer@example.com'
+
+    def setUp(self):
+        super(VoicoverApplicationHandlerUnitTest, self).setUp()
+        self.signup(self.applicant_email, self.applicant_username)
+        self.signup(self.reviewer_email, self.reviewer_username)
+
+        self.set_admins([self.reviewer_username])
+        self.applicant_id = self.get_user_id_from_email(self.applicant_email)
+        voiceover_services.create_new_voiceover_application(
+            'exploration', 'exp_id', 'en', '<p>Some content</p>', 'audio.mp3',
+            self.applicant_id)
+        self.voiceover_application = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id)[0])
+
+    def test_get_voiceover_application_for_review_purpose(self):
+        self.login(self.reviewer_email)
+        response = self.get_json('/getsubmittedvoiceoverapplication/review')
+        self.assertEqual(len(response['voiceover_applications']), 1)
+        response_voiceover_application = response['voiceover_applications'][0]
+        self.assertEqual(
+            response_voiceover_application['voiceover_application_id'],
+            self.voiceover_application.voiceover_application_id)
+
+    def test_get_voiceover_application_for_status_purpose(self):
+        self.login(self.applicant_email)
+        response = self.get_json('/getsubmittedvoiceoverapplication/status')
+        self.assertEqual(len(response['voiceover_applications']), 1)
+        response_voiceover_application = response['voiceover_applications'][0]
+        self.assertEqual(
+            response_voiceover_application['voiceover_application_id'],
+            self.voiceover_application.voiceover_application_id)

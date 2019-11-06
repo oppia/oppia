@@ -2981,3 +2981,47 @@ class SaveExplorationTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
+
+
+class VoiceoverApplicationDecoratorTests(test_utils.GenericTestBase):
+    applicant_username = 'applicant'
+    applicant_email = 'applicant@example.com'
+    reviewer_username = 'reviewer'
+    reviewer_email = 'reviewer@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_access_voiceover_applications
+        def get(self, purpose):
+            self.render_json({'purpose': purpose})
+
+    def setUp(self):
+        super(VoiceoverApplicationDecoratorTests, self).setUp()
+        self.signup(self.applicant_email, self.applicant_username)
+        self.signup(self.reviewer_email, self.reviewer_username)
+
+        self.set_admins([self.reviewer_username])
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<purpose>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_unautheticated_user_cannot_access_applications_for_review(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/review', expected_status_int=401)
+
+    def test_unautheticated_user_cannot_access_applications_for_status(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/status', expected_status_int=401)
+
+    def test_non_admin_user_cannot_access_applications_for_review(self):
+        self.login(self.applicant_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/review', expected_status_int=401)
+
+    def test_admin_user_cannot_access_applications_for_review(self):
+        self.login(self.reviewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/review')
+        self.assertEqual(response['purpose'], 'review')
