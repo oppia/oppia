@@ -25,22 +25,20 @@ import Constants from '../../../../../../assets/constants';
  * @fileoverview Unit tests for UrlInterpolationService.
  */
 
-fdescribe('URL Interpolation Service', () => {
+describe('URL Interpolation Service', () => {
   let hashes = require('hashes.json');
   let uis = null;
   let urlService = null;
   let mockLocation = null;
 
   beforeEach(() => {
-
     mockLocation = {
       origin: 'http://sample.com'
     };
 
     uis = TestBed.get(UrlInterpolationService);
     urlService = TestBed.get(UrlService);
-
-    spyOn(uis, 'DEV_MODE').and.returnValue(false);
+    Constants.DEV_MODE = false;
     spyOn(urlService, 'getCurrentLocation').and.returnValue(mockLocation);
   });
 
