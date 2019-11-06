@@ -20,18 +20,17 @@ import $ from 'jquery';
 
 import { CsrfTokenService } from 'services/CsrfTokenService';
 
-
-fdescribe('Csrf Token Service', function() {
+describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService = null;
-
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
+    // changeDetection = new ChangeDetection(new ApplicationRef());
     // @ts-ignore
     spyOn($, 'ajax').and.returnValue(Promise.resolve(
       {token: 'sample-csrf-token'}));
   });
 
-  it('should correctly set the csrf token', (done) => {
+  it('should correctly set the csrf token', async(done) => {
     csrfTokenService.initializeToken();
 
     csrfTokenService.getTokenAsync().then(function(token) {
@@ -47,7 +46,10 @@ fdescribe('Csrf Token Service', function() {
   });
 
   it('should error if getTokenAsync is called before initialize', () => {
-    expect(csrfTokenService.getTokenAsync())
-      .toThrow(new Error('Token needs to be initialized'));
+    try {
+      csrfTokenService.getTokenAsync();
+    } catch (e) {
+      expect(e).toEqual(new Error('Token needs to be initialized'));
+    }
   });
 });
