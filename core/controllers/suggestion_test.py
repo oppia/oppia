@@ -1083,7 +1083,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/exploration/translate_content')
         self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(len(response['target_ids_to_opportunity_dicts']), 1)
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
         response = self.get_json(
             '/getsubmittedsuggestions/topic/translate_content')
         self.assertEqual(response, {})
@@ -1094,7 +1094,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/skill/add_question')
         self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(len(response['target_ids_to_opportunity_dicts']), 1)
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
         response = self.get_json(
             '/getsubmittedsuggestions/topic/add_question')
         self.assertEqual(response, {})
@@ -1255,7 +1255,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content')
         self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(len(response['target_ids_to_opportunity_dicts']), 1)
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
         response = self.get_json(
             '/getreviewablesuggestions/topic/translate_content')
         self.assertEqual(response, {})
@@ -1266,7 +1266,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getreviewablesuggestions/skill/add_question')
         self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(len(response['target_ids_to_opportunity_dicts']), 1)
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
         response = self.get_json(
             '/getreviewablesuggestions/topic/add_question')
         self.assertEqual(response, {})

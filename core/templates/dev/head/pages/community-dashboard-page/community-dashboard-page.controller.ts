@@ -27,6 +27,9 @@ require(
   'pages/community-dashboard-page/contributions-and-review/' +
   'contributions-and-review.directive.ts');
 require(
+  'pages/community-dashboard-page/question-opportunities/' +
+  'question-opportunities.directive.ts');
+require(
   'pages/community-dashboard-page/translation-opportunities/' +
   'translation-opportunities.directive.ts');
 require(
