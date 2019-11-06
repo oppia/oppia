@@ -38,6 +38,7 @@ MOCK_TMP_UNTAR_PATH = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.tar.gz')
 
 class SetupTests(test_utils.GenericTestBase):
     """Test the methods for setup script."""
+
     def setUp(self):
         super(SetupTests, self).setUp()
         self.check_function_calls = {

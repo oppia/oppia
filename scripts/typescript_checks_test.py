@@ -30,6 +30,7 @@ MOCK_COMPILED_JS_DIR = os.path.join(TEST_SOURCE_DIR, 'compiled_js_dir', '')
 
 class TypescriptChecksTests(test_utils.GenericTestBase):
     """Test the typescript checks."""
+
     def setUp(self):
         super(TypescriptChecksTests, self).setUp()
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
