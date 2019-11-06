@@ -33,6 +33,7 @@ from core.tests import test_utils
 
 class GcloudAdapterImportTests(test_utils.GenericTestBase):
     """Tests import of gcloud adapter."""
+
     def test_import_with_missing_gae_dir(self):
         def mock_exists(unused_path):
             return False

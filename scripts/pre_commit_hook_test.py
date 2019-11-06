@@ -32,6 +32,7 @@ from . import pre_commit_hook
 
 class PreCommitHookTests(test_utils.GenericTestBase):
     """Test the methods for pre commit hook script."""
+
     def setUp(self):
         super(PreCommitHookTests, self).setUp()
         self.print_arr = []

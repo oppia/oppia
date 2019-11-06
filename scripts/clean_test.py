@@ -29,6 +29,7 @@ from . import clean
 
 class CleanTests(test_utils.GenericTestBase):
     """Test the methods for clean script."""
+
     def test_delete_directory_with_missing_dir(self):
         check_function_calls = {
             'rmtree_is_called': False

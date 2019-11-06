@@ -36,3 +36,8 @@ LABEL_FOR_RELEASED_PRS = 'PR: released'
 # The path for generating release_summary.md file for the current release.
 RELEASE_SUMMARY_FILEPATH = os.path.join(
     os.getcwd(), os.pardir, 'release_summary.md')
+
+REMOTE_URL = 'git@github.com:oppia/oppia.git'
+
+RELEASE_BRANCH_TYPE = 'release'
+HOTFIX_BRANCH_TYPE = 'hotfix'

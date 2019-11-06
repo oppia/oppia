@@ -49,6 +49,7 @@ MOCK_FECONF_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
 
 class ReleaseInfoTests(test_utils.GenericTestBase):
     """Test the methods for generation of release summary."""
+
     def setUp(self):
         super(ReleaseInfoTests, self).setUp()
         self.mock_repo = github.Repository.Repository(

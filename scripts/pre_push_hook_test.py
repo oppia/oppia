@@ -34,6 +34,7 @@ from . import pre_push_hook
 
 class PrePushHookTests(test_utils.GenericTestBase):
     """Test the methods for pre push hook script."""
+
     def setUp(self):
         super(PrePushHookTests, self).setUp()
         process = subprocess.Popen(

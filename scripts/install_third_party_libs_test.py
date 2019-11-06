@@ -43,6 +43,7 @@ RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
 class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
     """Test the methods for installing third party libs."""
+
     def setUp(self):
         super(InstallThirdPartyLibsTests, self).setUp()
 

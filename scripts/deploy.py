@@ -50,6 +50,8 @@ import sys
 import python_utils
 import release_constants
 
+import requests
+
 from . import common
 from . import gcloud_adapter
 from . import install_third_party_libs
@@ -337,6 +339,65 @@ def check_breakage(app_name, current_release_version):
                 'version.')
 
 
+def check_travis_and_circleci_tests(current_branch_name):
+    """Checks if all travis and circleci tests are passing on release branch.
+
+    Args:
+        current_branch_name: str. The name of current branch.
+
+    Raises:
+        Exception: The latest commit on release branch locally does not match
+            the latest commit on local fork or upstream.
+        Exception: The travis or circleci tests are failing.
+    """
+    local_sha = subprocess.check_output([
+        'git', 'rev-parse', current_branch_name])
+    origin_sha = subprocess.check_output([
+        'git', 'rev-parse', 'origin/%s' % current_branch_name])
+    upstream_sha = subprocess.check_output([
+        'git', 'rev-parse', '%s/%s' % (
+            common.get_remote_alias(release_constants.REMOTE_URL),
+            current_branch_name)])
+    if local_sha != origin_sha:
+        raise Exception(
+            'The latest commit on release branch locally does '
+            'not match the latest commit on your local fork.')
+    if local_sha != upstream_sha:
+        raise Exception(
+            'The latest commit on release branch locally does '
+            'not match the latest commit on Oppia repo.')
+
+    python_utils.PRINT('Enter your GitHub username.\n')
+    github_username = python_utils.INPUT().lower()
+
+    travis_url = 'https://travis-ci.org/%s/oppia/branches' % github_username
+    circleci_url = 'https://circleci.com/gh/%s/workflows/oppia' % (
+        github_username)
+
+    if requests.get(travis_url).status_code != 200:
+        travis_url = 'https://travis-ci.org/oppia/oppia/branches'
+
+    if requests.get(circleci_url).status_code != 200:
+        circleci_url = 'https://circleci.com/gh/oppia/workflows/oppia'
+
+    common.open_new_tab_in_browser_if_possible(travis_url)
+    python_utils.PRINT(
+        'Are all travis tests passing on branch %s?\n' % current_branch_name)
+    travis_tests_passing = python_utils.INPUT().lower()
+    if travis_tests_passing not in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        raise Exception(
+            'Please fix the travis tests before deploying.')
+
+    common.open_new_tab_in_browser_if_possible(circleci_url)
+    python_utils.PRINT(
+        'Are all circleci tests passing on branch %s?\n' % current_branch_name)
+    circleci_tests_passing = python_utils.INPUT().lower()
+    if circleci_tests_passing not in (
+            release_constants.AFFIRMATIVE_CONFIRMATIONS):
+        raise Exception(
+            'Please fix the circleci tests before deploying.')
+
+
 def execute_deployment():
     """Executes the deployment process after doing the prerequisite checks.
 
@@ -403,6 +464,9 @@ def execute_deployment():
                     'Update authors and changelog for v%s' % release_version):
                 raise Exception(
                     'Invalid last commit message: %s.' % last_commit_message)
+
+            check_travis_and_circleci_tests(current_branch_name)
+
             personal_access_token = common.get_personal_access_token()
             g = github.Github(personal_access_token)
             repo = g.get_organization('oppia').get_repo('oppia')

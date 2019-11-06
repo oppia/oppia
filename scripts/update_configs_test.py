@@ -56,6 +56,7 @@ MOCK_LOCAL_FECONF_PATH = os.path.join(
 
 class UpdateConfigsTests(test_utils.GenericTestBase):
     """Test the methods for updating configs."""
+
     def setUp(self):
         super(UpdateConfigsTests, self).setUp()
         self.mock_repo = github.Repository.Repository(

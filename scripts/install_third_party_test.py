@@ -37,6 +37,7 @@ MOCK_TMP_UNZIP_PATH = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.zip')
 
 class InstallThirdPartyTests(test_utils.GenericTestBase):
     """Test the methods for installing third party."""
+
     def setUp(self):
         super(InstallThirdPartyTests, self).setUp()
         self.check_function_calls = {
