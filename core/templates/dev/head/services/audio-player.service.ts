@@ -16,58 +16,6 @@
  * @fileoverview Service to operate the playback of audio.
  */
 
-
-import {Injectable} from '@angular/core';
-
-import AssetsBackendApiService from 'services/assets-backend-api.service';
-@Injectable({
-  providedIn: 'root'
-})
-export class AudioPlayerService {
-   _currentTrackFilename = null;
-   _currentTrack = null;
-  _currentTrackDuration = null;
-
-  constructor(private assetsBackendApiService: AssetsBackendApiService, private contextService: ContextService) {}
-  _load(filename, successCallback, errorCallback) {
-    if (filename !== this._currentTrackFilename) {
-      AssetsBackendApiService.loadAudio(
-        ContextService.getExplorationId(), filename)
-        .then((loadedAudiofile) => {
-          let blobUrl = URL.createObjectURL(loadedAudiofile.data);
-          this._currentTrack = ngAudio.load(blobUrl);
-          this._currentTrackFilename = filename;
-
-          // ngAudio doesn't seem to provide any way of detecting
-          // when native audio object has finished loading -- see
-          // https://github.com/danielstern/ngAudio/issues/139. It seems
-          // that after creating an ngAudio object, the native audio
-          // object is asynchronously loaded. So we use a timeout
-          // to grab native audio.
-          // TODO(tjiang11): Look for a better way to handle this.
-          $timeout(function() {
-            // _currentTrack could be null if the learner stops audio
-            // shortly after loading a new card or language. In such
-            // cases, we do not want to attempt setting the 'onended'
-            // property of the audio.
-            if (_currentTrack !== null &&
-                  _currentTrack.audio !== undefined) {
-              _currentTrack.audio.onended = function() {
-                _currentTrack = null;
-                _currentTrackFilename = null;
-                AudioTranslationManagerService
-                  .clearSecondaryAudioTranslations();
-              };
-            }
-          }, 100);
-
-          successCallback();
-        }, function(reason) {
-          errorCallback(reason);
-        });
-    }
-  }
-}
 angular.module('oppia').factory('AudioPlayerService', [
   '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
   'ContextService', 'ngAudio',

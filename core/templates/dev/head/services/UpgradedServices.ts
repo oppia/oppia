@@ -23,6 +23,7 @@ import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
+import { ContextService } from 'services/context.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
@@ -32,6 +33,8 @@ import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
@@ -45,6 +48,7 @@ export class UpgradedServices {
   upgradedServices = {
     'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
+    'ContextService': new ContextService(new UrlService(new WindowRef())),
     'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
@@ -54,6 +58,9 @@ export class UpgradedServices {
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'UrlService': new UrlService(new WindowRef()),
+    'UrlInterpolationService': new UrlInterpolationService(new AlertsService(
+      new LoggerService()), new UrlService(
+      new WindowRef()), new UtilsService()),
     'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService(),
   };

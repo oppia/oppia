@@ -20,7 +20,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AppConstants } from '../app.constants';
 import { ServicesConstants } from 'services/services.constants';
+import { UrlService } from 'services/contextual/url.service';
 
 
 @Injectable({
@@ -127,24 +129,24 @@ export class ContextService {
 
   // add constants for entity type
   getEntityType() {
-    var pathnameArray = this.urlService.getPathname().split('/');
-    for (var i = 0; i < pathnameArray.length; i++) {
+    let pathnameArray = this.urlService.getPathname().split('/');
+    for (let i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore' ||
           (pathnameArray[i] === 'embed' &&
               pathnameArray[i + 1] === 'exploration')) {
-        return ENTITY_TYPE.EXPLORATION;
+        return AppConstants.ENTITY_TYPE.EXPLORATION;
       }
       if (pathnameArray[i] === 'topic_editor') {
-        return ENTITY_TYPE.TOPIC;
+        return AppConstants.ENTITY_TYPE.TOPIC;
       }
       if (pathnameArray[i] === 'subtopic') {
-        return ENTITY_TYPE.SUBTOPIC;
+        return AppConstants.ENTITY_TYPE.SUBTOPIC;
       }
       if (pathnameArray[i] === 'story_editor') {
-        return ENTITY_TYPE.STORY;
+        return AppConstants.ENTITY_TYPE.STORY;
       }
       if (pathnameArray[i] === 'skill_editor') {
-        return ENTITY_TYPE.SKILL;
+        return AppConstants.ENTITY_TYPE.SKILL;
       }
     }
   }
@@ -157,8 +159,8 @@ export class ContextService {
     } else if (!this.isInQuestionPlayerMode()) {
       // The pathname should be one of /explore/{exploration_id} or
       // /create/{exploration_id} or /embed/exploration/{exploration_id}.
-      var pathnameArray = this.urlService.getPathname().split('/');
-      for (var i = 0; i < pathnameArray.length; i++) {
+      let pathnameArray = this.urlService.getPathname().split('/');
+      for (let i = 0; i < pathnameArray.length; i++) {
         if (pathnameArray[i] === 'explore' ||
             pathnameArray[i] === 'create') {
           this.explorationId = pathnameArray[i + 1];
@@ -221,4 +223,3 @@ export class ContextService {
 
 angular.module('oppia').factory(
   'ContextService', downgradeInjectable(ContextService));
-
