@@ -24,6 +24,7 @@ import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {ComputeGraphService} from 'services/compute-graph.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -52,6 +53,7 @@ export class UpgradedServices {
   upgradedServices = {
     'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
+    'ComputeGraphService': new ComputeGraphService(),
     'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
     'DebouncerService': new DebouncerService(),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
