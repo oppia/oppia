@@ -53,8 +53,8 @@ export class UpgradedServices {
   upgradedServices = {
     'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
-    'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
     'CsrfTokenService': new CsrfTokenService(),
+    'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
