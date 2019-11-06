@@ -31,12 +31,22 @@ import tempfile
 
 from core.tests import test_utils
 import python_utils
+import release_constants
 
 from . import common
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
+
     def test_run_cmd(self):
         self.assertEqual(
             common.run_cmd(('echo Test for common.py ').split(' ')),
@@ -166,6 +176,13 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_release_branch_with_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return 'On branch release-1.2.3'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_release_branch(), True)
+
+    def test_is_current_branch_a_release_branch_with_hotfix_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch release-1.2.3-hotfix-1'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
@@ -375,3 +392,137 @@ class CommonTests(test_utils.GenericTestBase):
             'access token at https://github.com/settings/tokens and re-run '
             'the script'):
             common.get_personal_access_token()
+
+    def test_closed_blocking_bugs_milestone_results_in_exception(self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        # pylint: disable=unused-argument
+        def mock_get_milestone(unused_self, number):
+            return github.Milestone.Milestone(
+                requester='', headers='',
+                attributes={'state': 'closed'}, completed='')
+        # pylint: enable=unused-argument
+        get_milestone_swap = self.swap(
+            github.Repository.Repository, 'get_milestone', mock_get_milestone)
+        with get_milestone_swap, self.assertRaisesRegexp(
+            Exception, 'The blocking bug milestone is closed.'):
+            common.check_blocking_bug_issue_count(mock_repo)
+
+    def test_non_zero_blocking_bug_issue_count_results_in_exception(self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        def mock_open_tab(unused_url):
+            pass
+        # pylint: disable=unused-argument
+        def mock_get_milestone(unused_self, number):
+            return github.Milestone.Milestone(
+                requester='', headers='',
+                attributes={'open_issues': 10, 'state': 'open'}, completed='')
+        # pylint: enable=unused-argument
+        get_milestone_swap = self.swap(
+            github.Repository.Repository, 'get_milestone', mock_get_milestone)
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        with get_milestone_swap, open_tab_swap, self.assertRaisesRegexp(
+            Exception, (
+                'There are 10 unresolved blocking bugs. Please '
+                'ensure that they are resolved before release '
+                'summary generation.')):
+            common.check_blocking_bug_issue_count(mock_repo)
+
+    def test_zero_blocking_bug_issue_count_results_in_no_exception(self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        # pylint: disable=unused-argument
+        def mock_get_milestone(unused_self, number):
+            return github.Milestone.Milestone(
+                requester='', headers='',
+                attributes={'open_issues': 0, 'state': 'open'}, completed='')
+        # pylint: enable=unused-argument
+        with self.swap(
+            github.Repository.Repository, 'get_milestone', mock_get_milestone):
+            common.check_blocking_bug_issue_count(mock_repo)
+
+    def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
+            self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        pull1 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR1', 'number': 1, 'labels': [
+                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
+        pull2 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR2', 'number': 2, 'labels': [
+                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
+        label = github.Label.Label(
+            requester='', headers='',
+            attributes={
+                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+            completed='')
+        # pylint: disable=unused-argument
+        def mock_get_issues(unused_self, state, labels):
+            return [pull1, pull2]
+        # pylint: enable=unused-argument
+        def mock_get_label(unused_self, unused_name):
+            return [label]
+
+        get_issues_swap = self.swap(
+            github.Repository.Repository, 'get_issues', mock_get_issues)
+        get_label_swap = self.swap(
+            github.Repository.Repository, 'get_label', mock_get_label)
+        with get_issues_swap, get_label_swap:
+            common.check_prs_for_current_release_are_released(mock_repo)
+
+    def test_check_prs_for_current_release_are_released_with_unreleased_prs(
+            self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        def mock_open_tab(unused_url):
+            pass
+        pull1 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR1', 'number': 1, 'labels': [
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
+        pull2 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR2', 'number': 2, 'labels': [
+                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
+        label = github.Label.Label(
+            requester='', headers='',
+            attributes={
+                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+            completed='')
+        # pylint: disable=unused-argument
+        def mock_get_issues(unused_self, state, labels):
+            return [pull1, pull2]
+        # pylint: enable=unused-argument
+        def mock_get_label(unused_self, unused_name):
+            return [label]
+
+        get_issues_swap = self.swap(
+            github.Repository.Repository, 'get_issues', mock_get_issues)
+        get_label_swap = self.swap(
+            github.Repository.Repository, 'get_label', mock_get_label)
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        with get_issues_swap, get_label_swap, open_tab_swap:
+            with self.assertRaisesRegexp(
+                Exception, (
+                    'There are PRs for current release which do not '
+                    'have a \'%s\' label. Please ensure that '
+                    'they are released before release summary '
+                    'generation.') % (
+                        release_constants.LABEL_FOR_RELEASED_PRS)):
+                common.check_prs_for_current_release_are_released(mock_repo)

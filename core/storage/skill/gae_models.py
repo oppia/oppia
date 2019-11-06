@@ -65,6 +65,8 @@ class SkillModel(base_models.VersionedModel):
         required=True, indexed=True)
     # A dict representing the skill contents.
     skill_contents = ndb.JsonProperty(indexed=False)
+    # The prerequisite skills for the skill.
+    prerequisite_skill_ids = ndb.StringProperty(repeated=True, indexed=False)
     # The id to be used by the next misconception added.
     next_misconception_id = ndb.IntegerProperty(required=True, indexed=False)
     # The id that the skill is merged into, in case the skill has been
@@ -217,6 +219,19 @@ class SkillSummaryModel(base_models.BaseModel):
     def get_deletion_policy():
         """Skill summary should be kept if associated skill is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether SkillSummaryModel references the given user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+            be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
 
 
 class SkillRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
