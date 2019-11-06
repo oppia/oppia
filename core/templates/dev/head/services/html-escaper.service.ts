@@ -16,34 +16,46 @@
  * @fileoverview Service for HTML serialization and escaping.
  */
 
-angular.module('oppia').factory('HtmlEscaperService', ['$log', function($log) {
-  var htmlEscaper = {
-    objToEscapedJson: function(obj) {
-      return this.unescapedStrToEscapedStr(JSON.stringify(obj));
-    },
-    escapedJsonToObj: function(json) {
-      if (!json) {
-        $log.error('Empty string was passed to JSON decoder.');
-        return '';
-      }
-      return JSON.parse(this.escapedStrToUnescapedStr(json));
-    },
-    unescapedStrToEscapedStr: function(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-    },
-    escapedStrToUnescapedStr: function(value) {
-      return String(value)
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, '\'')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { LoggerService } from 'services/contextual/logger.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class HtmlEscaperService {
+  constructor(private loggerService: LoggerService) {}
+
+  objToEscapedJson(obj: Object): string {
+    return this.unescapedStrToEscapedStr(JSON.stringify(obj));
+  }
+
+  escapedJsonToObj(json: string): Object {
+    if (!json) {
+      this.loggerService.error('Empty string was passed to JSON decoder.');
+      return '';
     }
-  };
-  return htmlEscaper;
-}]);
+    return JSON.parse(this.escapedStrToUnescapedStr(json));
+  }
+
+  unescapedStrToEscapedStr(str: string): string {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+  escapedStrToUnescapedStr(value: string): string {
+    return String(value)
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, '\'')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&');
+  }
+}
+
+angular.module('oppia').factory(
+  'HtmlEscaperService', downgradeInjectable(HtmlEscaperService));
