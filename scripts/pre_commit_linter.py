@@ -886,7 +886,7 @@ def _is_path_ignored(path_to_check):
 
     # The "git check-ignore <path>" command returns 0 when the path is ignored
     # otherwise it returns 1. subprocess.call then returns this returncode.
-    if subprocess.call(command):
+    if subprocess.check_call(command):
         return False
     else:
         return True
@@ -2141,7 +2141,7 @@ class JsTsLintChecksManager(LintChecksManager):
             '%s -target %s -typeRoots %s %s typings/*') % (
                 dir_path, allow_js, lib, no_implicit_use_strict,
                 skip_lib_check, target, type_roots, filepath)
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        subprocess.check_call(cmd, shell=True, stdout=subprocess.PIPE)
         compiled_js_filepath = os.path.join(
             dir_path, os.path.basename(filepath).replace('.ts', '.js'))
         return compiled_js_filepath

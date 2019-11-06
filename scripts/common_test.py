@@ -342,8 +342,8 @@ class CommonTests(test_utils.GenericTestBase):
     def test_install_npm_library(self):
 
         def _mock_subprocess_call(unused_command):
-            """Mocks subprocess.call() to create a temporary file instead of the
-            actual npm library.
+            """Mocks subprocess.check_call() to create a temporary file instead
+            of the actual npm library.
             """
             temp_file = tempfile.NamedTemporaryFile()
             temp_file.name = 'temp_file'
@@ -355,7 +355,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
-        with self.swap(subprocess, 'call', _mock_subprocess_call):
+        with self.swap(subprocess, 'check_call', _mock_subprocess_call):
             common.install_npm_library('library_name', 'version', 'path')
 
     def test_ask_user_to_confirm(self):
