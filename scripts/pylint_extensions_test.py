@@ -1143,3 +1143,143 @@ class ExcessiveEmptyLinesCheckerTests(unittest.TestCase):
 
         with checker_test_object.assertNoMessages():
             temp_file.close()
+
+
+class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
+
+    def test_checks_newline_above_docstring(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.SingleNewlineAboveArgsChecker)
+        checker_test_object.setup_method()
+        node_single_newline_above_args = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func(arg):
+                        '''Returns something.
+                        Args:
+                            arg: argument
+                        Returns:
+                            returns_something
+                        '''
+
+                        return returns_something
+                """)
+        node_single_newline_above_args.file = filename
+        node_single_newline_above_args.path = filename
+
+        checker_test_object.checker.process_module(
+            node_single_newline_above_args)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-above-args',
+                line=2
+            ),
+            testutils.Message(
+                msg_id='single-space-above-args',
+                line=4
+            ),
+        ):
+            temp_file.close()
+
+        node_with_two_newline = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func(arg):
+                        '''Returns something.
+
+
+                        Args:
+                            arg: argument
+
+
+                        Returns:
+                            returns_something
+                        '''
+                        returns something
+                """)
+        node_with_two_newline.file = filename
+        node_with_two_newline.path = filename
+
+        checker_test_object.checker.process_module(
+            node_with_two_newline)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-above-args',
+                line=4
+            ),
+            testutils.Message(
+                msg_id='single-space-above-args',
+                line=8
+            ),
+        ):
+            temp_file.close()
+
+        node_with_return_in_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func(arg):
+                        '''Returns something.
+
+                        Args:
+                            arg: argument
+
+                        Returns:
+                            returns_something
+                        '''
+                        "Returns: something"
+                        returns_something
+                """)
+        node_with_return_in_comment.file = filename
+        node_with_return_in_comment.path = filename
+
+        checker_test_object.checker.process_module(
+            node_with_return_in_comment)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func(arg):
+                        '''Returns something.
+
+                        Args:
+                            arg: argument
+
+                        Returns:
+                            returns_something
+                        '''
+
+                        returns_something
+                """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        checker_test_object.checker.process_module(node_with_no_error_message)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
