@@ -24,7 +24,7 @@ import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {ComputeGraphService} from 'services/compute-graph.service';
+import { ComputeGraphService } from 'services/compute-graph.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
