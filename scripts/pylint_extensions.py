@@ -1029,7 +1029,17 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
         'C0012': (
             'Files must have a single newline above args in doc string.',
             'single-space-above-args',
-            'Please enter a single newline above doc string.'
+            'Please enter a single newline above args in doc string.'
+        ),
+        'C0013': (
+            'Files must have a single newline above returns in doc string.',
+            'single-space-above-returns',
+            'Please enter a single newline above returns in doc string.'
+        ),
+        'C0014': (
+            'Files must have a single newline above raises in doc string.',
+            'single-space-above-raises',
+            'Please enter a single newline above raises in doc string.'
         )
     }
 
@@ -1075,10 +1085,15 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
             if (line_num + 1 < file_length and (
                     blank_line_counter == 0 or blank_line_counter > 1)):
                 line = file_content[line_num + 1].strip()
-                if (len(line.split()) == 1 and
-                        re.match(br'^[A-Z][a-z]+[:]', line)):
+                if line == b'Args:':
                     self.add_message(
                         'single-space-above-args', line=line_num + 1)
+                elif line == b'Returns:':
+                    self.add_message(
+                        'single-space-above-returns', line=line_num + 1)
+                elif line == b'Raises:':
+                    self.add_message(
+                        'single-space-above-raises', line=line_num + 1)
 
 
 def register(linter):

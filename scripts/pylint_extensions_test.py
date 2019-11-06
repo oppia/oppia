@@ -1182,7 +1182,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
                 line=2
             ),
             testutils.Message(
-                msg_id='single-space-above-args',
+                msg_id='single-space-above-returns',
                 line=4
             ),
         ):
@@ -1221,8 +1221,66 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
                 line=4
             ),
             testutils.Message(
-                msg_id='single-space-above-args',
+                msg_id='single-space-above-returns',
                 line=8
+            ),
+        ):
+            temp_file.close()
+
+        node_with_no_space_above_return = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func():
+                    '''Returns something.
+                    Returns:
+                        returns_something
+                    '''
+                    returns_something
+                """)
+        node_with_no_space_above_return.file = filename
+        node_with_no_space_above_return.path = filename
+
+        checker_test_object.checker.process_module(
+            node_with_no_space_above_return)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-above-returns',
+                line=2
+            ),
+        ):
+            temp_file.close()
+
+        node_with_no_space_above_raises = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func():
+                    '''Raises exception.
+                    Raises:
+                        raises_exception
+                    '''
+                    raises_exception
+                """)
+        node_with_no_space_above_raises.file = filename
+        node_with_no_space_above_raises.path = filename
+
+        checker_test_object.checker.process_module(
+            node_with_no_space_above_raises)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-above-raises',
+                line=2
             ),
         ):
             temp_file.close()
@@ -1256,6 +1314,27 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with checker_test_object.assertNoMessages():
             temp_file.close()
 
+        node_with_no_args = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func():
+                    '''Do something.'''
+
+                    do something
+                """)
+        node_with_no_args.file = filename
+        node_with_no_args.path = filename
+
+        checker_test_object.checker.process_module(
+            node_with_no_args)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
+
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1272,8 +1351,11 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
 
                         Returns:
                             returns_something
-                        '''
 
+                        Raises:
+                            raises something
+                        '''
+                        raises_something
                         returns_something
                 """)
         node_with_no_error_message.file = filename
