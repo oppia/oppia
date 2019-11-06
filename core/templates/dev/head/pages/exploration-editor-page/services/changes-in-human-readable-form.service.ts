@@ -17,10 +17,10 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import {Inject, Injectable} from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 
-import { UtilsService } from '../../../services/UtilsService';
-import {DOCUMENT} from '@angular/common';
+import { UtilsService } from 'services/utils.service';
+import { DOCUMENT } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -31,12 +31,13 @@ export class ChangesInHumanReadableFormService {
   CMD_DELETE_STATE = 'delete_state';
   CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
 
-  constructor(private utilsService: UtilsService, @Inject(DOCUMENT) private document: any) {}
+  constructor(private utilsService: UtilsService,
+              @Inject(DOCUMENT) private document: any) {}
 
-  makeRulesListHumanReadable(answerGroupValue) {
+  makeRulesListHumanReadable(answerGroupValue: any) {
     let rulesList = [];
     answerGroupValue.rules.forEach((rule) => {
-      let ruleElm = angular.element('<li></li>');
+      let ruleElm = this.document.createElement('<li></li>');
       ruleElm.html('<p>Type: ' + rule.type + '</p>');
       ruleElm.append(
         '<p>Value: ' + (
@@ -52,7 +53,7 @@ export class ChangesInHumanReadableFormService {
   // An edit is represented either as an object or an array. If it's an
   // object, then simply return that object. In case of an array, return
   // the last item.
-  getStatePropertyValue(statePropertyValue) {
+  getStatePropertyValue(statePropertyValue: Array | Object) {
     return Array.isArray(statePropertyValue) ?
         statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   }
@@ -60,7 +61,7 @@ export class ChangesInHumanReadableFormService {
   // Detects whether an object of the type 'answer_group' or
   // 'default_outcome' has been added, edited or deleted.
   // Returns - 'addded', 'edited' or 'deleted' accordingly.
-  getRelativeChangeToGroups(changeObject) {
+  getRelativeChangeToGroups(changeObject: any) {
     let newValue = changeObject.new_value;
     let oldValue = changeObject.old_value;
     let result = '';
@@ -83,8 +84,8 @@ export class ChangesInHumanReadableFormService {
     return result;
   }
 
-  _makeHumanReadable(lostChanges) {
-    let outerHtml = angular.element('<ul></ul>');
+  _makeHumanReadable(lostChanges: Array<any>) {
+    let outerHtml = this.document.createElement('<ul></ul>');
     let stateWiseEditsMapping = {};
     // The letiable stateWiseEditsMapping stores the edits grouped by state.
     // For instance, you made the following edits:
@@ -103,18 +104,18 @@ export class ChangesInHumanReadableFormService {
       switch (lostChange.cmd) {
         case this.CMD_ADD_STATE:
           outerHtml.append(
-            angular.element('<li></li>').html(
+            this.document.createElement('<li></li>').html(
               'Added state: ' + lostChange.state_name));
           break;
         case this.CMD_RENAME_STATE:
           outerHtml.append(
-            angular.element('<li></li>').html(
+            this.document.createElement('<li></li>').html(
               'Renamed state: ' + lostChange.old_state_name + ' to ' +
                   lostChange.new_state_name));
           break;
         case this.CMD_DELETE_STATE:
           outerHtml.append(
-            angular.element('<li></li>').html(
+            this.document.createElement('<li></li>').html(
               'Deleted state: ' + lostChange.state_name));
           break;
         case this.CMD_EDIT_STATE_PROPERTY: {
@@ -130,7 +131,7 @@ export class ChangesInHumanReadableFormService {
               if (newValue !== null) {
                 // TODO(sll): Also add display of audio translations here.
                 stateWiseEditsMapping[stateName].push(
-                  angular.element('<div></div>').html(
+                  this.document.createElement('<div></div>').html(
                     '<strong>Edited content: </strong><div class="content">' +
                         newValue.html + '</div>')
                     .addClass('state-edit-desc'));
@@ -151,7 +152,7 @@ export class ChangesInHumanReadableFormService {
                     oldValue);
               }
               stateWiseEditsMapping[stateName].push(
-                angular.element('<div></div>').html(lostChangeValue)
+                this.document.createElement('<div></div>').html(lostChangeValue)
                   .addClass('state-edit-desc'));
               break;}
 
@@ -165,7 +166,7 @@ export class ChangesInHumanReadableFormService {
                 lostChangeValue = 'Edited Interaction Customizations';
               }
               stateWiseEditsMapping[stateName].push(
-                angular.element('<div></div>').html(lostChangeValue)
+                this.document.createElement('<div></div>').html(lostChangeValue)
                   .addClass('state-edit-desc'));
               break;
             }
@@ -186,15 +187,16 @@ export class ChangesInHumanReadableFormService {
                 if (rulesList.length > 0) {
                   answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
                   let rulesListHtml = (
-                    angular.element('<ol></ol>').addClass('rules-list'));
+                    this.document.createElement(
+                      '<ol></ol>').addClass('rules-list'));
                   for (let rule in rulesList) {
                     rulesListHtml.html(rulesList[rule][0].outerHTML);
                   }
                   answerGroupHtml += rulesListHtml[0].outerHTML;
                 }
                 stateWiseEditsMapping[stateName].push(
-                  angular.element('<div><strong>Added answer group: ' +
-                        '</strong></div>')
+                  this.document.createElement(
+                    '<div><strong>Added answer group: ' + '</strong></div>')
                     .append(answerGroupHtml)
                     .addClass('state-edit-desc answer-group'));
               } else if (answerGroupChanges === 'edited') {
@@ -217,8 +219,8 @@ export class ChangesInHumanReadableFormService {
                   if (rulesList.length > 0) {
                     answerGroupHtml += (
                       '<p class="sub-edit"><i>Rules: </i></p>');
-                    let rulesListHtml = (angular.element('<ol></ol>')
-                      .addClass('rules-list'));
+                    let rulesListHtml = (this.document.createElement(
+                      '<ol></ol>').addClass('rules-list'));
                     for (let rule in rulesList) {
                       rulesListHtml.html(rulesList[rule][0].outerHTML);
                     }
@@ -226,14 +228,14 @@ export class ChangesInHumanReadableFormService {
                   }
                 }
                 stateWiseEditsMapping[stateName].push(
-                  angular.element(
+                  this.document.createElement(
                     '<div><strong>Edited answer group: <strong>' +
                         '</div>')
                     .append(answerGroupHtml)
                     .addClass('state-edit-desc answer-group'));
               } else if (answerGroupChanges === 'deleted') {
                 stateWiseEditsMapping[stateName].push(
-                  angular.element('<div>Deleted answer group</div>')
+                  this.document.createElement('<div>Deleted answer group</div>')
                     .addClass('state-edit-desc'));
               }
               break;
@@ -252,7 +254,8 @@ export class ChangesInHumanReadableFormService {
                     '<div class="feedback">' + newValue.feedback.getHtml() +
                     '</div></div>');
                 stateWiseEditsMapping[stateName].push(
-                  angular.element('<div>Added default outcome: </div>')
+                  this.document.createElement(
+                    '<div>Added default outcome: </div>')
                     .append(defaultOutcomeHtml)
                     .addClass('state-edit-desc default-outcome'));
               } else if (defaultOutcomeChanges === 'edited') {
@@ -270,12 +273,14 @@ export class ChangesInHumanReadableFormService {
                       '</div></div>');
                 }
                 stateWiseEditsMapping[stateName].push(
-                  angular.element('<div>Edited default outcome: </div>')
+                  this.document.createElement(
+                    '<div>Edited default outcome: </div>')
                     .append(defaultOutcomeHtml)
                     .addClass('state-edit-desc default-outcome'));
               } else if (defaultOutcomeChanges === 'deleted') {
                 stateWiseEditsMapping[stateName].push(
-                  angular.element('<div>Deleted default outcome</div>')
+                  this.document.createElement(
+                    '<div>Deleted default outcome</div>')
                     .addClass('state-edit-desc'));
               }
             }
@@ -285,7 +290,7 @@ export class ChangesInHumanReadableFormService {
     });
 
     for (let stateName in stateWiseEditsMapping) {
-      let stateChangesEl = angular.element(
+      let stateChangesEl = this.document.createElement(
         '<li>Edits to state: ' + stateName + '</li>');
       for (let stateEdit in stateWiseEditsMapping[stateName]) {
         stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
@@ -301,7 +306,7 @@ export class ChangesInHumanReadableFormService {
     try {
       return this._makeHumanReadable(lostChanges);
     } catch (e) {
-      return angular.element(
+      return this.document.createElement(
         '<div>Error: Could not recover lost changes.</div>');
     }
   }
@@ -311,4 +316,3 @@ export class ChangesInHumanReadableFormService {
 angular.module('oppia').factory(
   'ChangesInHumanReadableFormService',
   downgradeInjectable(ChangesInHumanReadableFormService));
-

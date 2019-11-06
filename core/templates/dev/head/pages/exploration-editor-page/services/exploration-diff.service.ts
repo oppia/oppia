@@ -19,7 +19,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import INTERACTION_SPECS from '../../interaction-specs.constants.ajs';
+import isEqual from 'lodash/isEqual';
+
+import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
 
 
 @Injectable({
@@ -34,15 +36,15 @@ export class ExplorationDiffService {
 
 
   // Functions to assign ids to states
-  _resetMaxId() {
+  _resetMaxId(): void {
     this._maxId = 0;
   }
-  _generateNewId() {
+  _generateNewId(): number {
     this._maxId++;
     return this._maxId;
   }
 
-  _generateInitialStateIdsAndData(statesDict) {
+  _generateInitialStateIdsAndData(statesDict: Object): Object {
     let result = {
       stateIds: {},
       stateData: {}
@@ -69,7 +71,7 @@ export class ExplorationDiffService {
       if (stateData[stateId].stateProperty === this.STATE_PROPERTY_CHANGED &&
           v1States.hasOwnProperty(stateData[stateId].originalStateName) &&
           v2States.hasOwnProperty(stateData[stateId].newestStateName) &&
-          angular.equals(v1States[stateData[stateId].originalStateName],
+          isEqual(v1States[stateData[stateId].originalStateName],
             v2States[stateData[stateId].newestStateName])) {
         stateData[stateId].stateProperty = this.STATE_PROPERTY_UNCHANGED;
       }
@@ -288,4 +290,3 @@ export class ExplorationDiffService {
 angular.module('oppia').factory(
   'ExplorationDiffService',
   downgradeInjectable(ExplorationDiffService));
-
