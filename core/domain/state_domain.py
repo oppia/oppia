@@ -971,7 +971,8 @@ class RecordedVoiceovers(python_utils.OBJECT):
 
         Args:
         voiceovers_mapping: dict. Contains content_id and a list of language
-        codes to converted to voiceovers."""
+        codes to converted to voiceovers.
+        """
 
         self.voiceovers_mapping = voiceovers_mapping
 
