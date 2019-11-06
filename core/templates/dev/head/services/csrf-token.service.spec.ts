@@ -32,7 +32,7 @@ describe('Csrf Token Service', function() {
       {token: 'sample-csrf-token'}));
   });
 
-  it('should correctly set the csrf token', async(done) => {
+  it('should correctly set the csrf token', (done) => {
     csrfTokenService.initializeToken();
 
     csrfTokenService.getTokenAsync().then(function(token) {
