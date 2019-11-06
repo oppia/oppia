@@ -25,6 +25,7 @@ import { BackgroundMaskService } from
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
@@ -52,6 +53,7 @@ export class UpgradedServices {
     'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
     'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
+    'DebouncerService': new DebouncerService(),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
