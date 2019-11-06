@@ -21,6 +21,7 @@ from core.controllers import base
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 import feconf
 import utils
@@ -119,12 +120,24 @@ class EditableSkillDataHandler(base.BaseHandler):
         """Populates the data on the individual skill page."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
+
+        topics = topic_fetchers.get_all_topics()
+        grouped_skill_summary_dicts = {}
+
+        for topic in topics:
+            skill_summaries = skill_services.get_multi_skill_summaries(
+                topic.get_all_skill_ids())
+            skill_summary_dicts = [
+                summary.to_dict() for summary in skill_summaries]
+            grouped_skill_summary_dicts[topic.name] = skill_summary_dicts
+
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
         self.values.update({
-            'skill': skill.to_dict()
+            'skill': skill.to_dict(),
+            'grouped_skill_summaries': grouped_skill_summary_dicts
         })
 
         self.render_json(self.values)

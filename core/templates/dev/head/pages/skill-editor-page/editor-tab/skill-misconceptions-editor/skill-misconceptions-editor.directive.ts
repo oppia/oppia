@@ -129,6 +129,7 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                   $scope.misconceptionName = '';
                   $scope.misconceptionNotes = '';
                   $scope.misconceptionFeedback = '';
+                  $scope.misconceptionMustBeAddressed = true;
 
                   $scope.saveMisconception = function() {
                     var newMisconceptionId =
@@ -138,7 +139,8 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                         newMisconceptionId,
                         $scope.misconceptionName,
                         $scope.misconceptionNotes,
-                        $scope.misconceptionFeedback)
+                        $scope.misconceptionFeedback,
+                        $scope.misconceptionMustBeAddressed)
                     });
                   };
 

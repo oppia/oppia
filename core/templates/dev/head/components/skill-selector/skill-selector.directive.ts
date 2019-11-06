@@ -23,8 +23,12 @@ angular.module('oppia').directive('selectSkill', [
     return {
       restrict: 'E',
       scope: {
-        getSkillSummaries: '&skillSummaries',
-        selectedSkillId: '='
+        // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
+        // have the initial 'countOfSkillsToPrioritize' entries of skills with
+        // the same priority.
+        getSortedSkillSummaries: '&sortedSkillSummaries',
+        selectedSkillId: '=',
+        getCountOfSkillsToPrioritize: '&countOfSkillsToPrioritize'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/skill-selector/skill-selector.directive.html'),
@@ -32,7 +36,19 @@ angular.module('oppia').directive('selectSkill', [
         '$scope', '$uibModal', '$rootScope',
         function(
             $scope, $uibModal, $rootScope) {
-          $scope.skillSummaries = $scope.getSkillSummaries();
+          $scope.sortedSkillSummaries = $scope.getSortedSkillSummaries();
+          $scope.skillSummariesInitial = [];
+          $scope.skillSummariesFinal = [];
+
+          for (var idx in $scope.sortedSkillSummaries) {
+            if (idx < $scope.getCountOfSkillsToPrioritize()) {
+              $scope.skillSummariesInitial.push(
+                $scope.sortedSkillSummaries[idx]);
+            } else {
+              $scope.skillSummariesFinal.push(
+                $scope.sortedSkillSummaries[idx]);
+            }
+          }
           $scope.selectSkill = function(skillId) {
             $scope.selectedSkillId = skillId;
           };

@@ -1599,21 +1599,24 @@ tags: []
     def save_new_skill(
             self, skill_id, owner_id,
             description, misconceptions=None, rubrics=None, skill_contents=None,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            prerequisite_skill_ids=None):
         """Creates an Oppia Skill and saves it.
 
         Args:
             skill_id: str. ID for the skill to be created.
             owner_id: str. The user_id of the creator of the skill.
             description: str. The description of the skill.
-            misconceptions: list(Misconception). A list of Misconception objects
-                that contains the various misconceptions of the skill.
-            rubrics: list(Rubric). A list of Rubric objects that contain the
-                rubric for each difficulty of the skill.
-            skill_contents: SkillContents. A SkillContents object containing the
-                explanation and examples of the skill.
+            misconceptions: list(Misconception)|None. A list of Misconception
+                objects that contains the various misconceptions of the skill.
+            rubrics: list(Rubric)|None. A list of Rubric objects that contain
+                the rubric for each difficulty of the skill.
+            skill_contents: SkillContents|None. A SkillContents object
+                containing the explanation and examples of the skill.
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
+            prerequisite_skill_ids: list(str)|None. The prerequisite skill IDs
+                for the skill.
 
         Returns:
             Skill. A newly-created skill.
@@ -1625,6 +1628,8 @@ tags: []
             skill.next_misconception_id = len(misconceptions) + 1
         if skill_contents is not None:
             skill.skill_contents = skill_contents
+        if prerequisite_skill_ids is not None:
+            skill.prerequisite_skill_ids = prerequisite_skill_ids
         if rubrics is not None:
             skill.rubrics = rubrics
         else:
