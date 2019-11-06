@@ -119,7 +119,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         observed_training_job = self._get_training_job_from_dict(
             expected_training_job_player_dict)
         self.assertDictEqual(
-            expected_training_job_dict,
+            expected_training_job_player_dict,
             observed_training_job.to_player_dict())
 
     def test_validation_exp_id(self):
