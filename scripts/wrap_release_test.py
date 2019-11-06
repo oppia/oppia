@@ -40,6 +40,7 @@ import github # isort:skip
 
 class WrapReleaseTests(test_utils.GenericTestBase):
     """Test the methods for wrapping up the release."""
+
     def setUp(self):
         super(WrapReleaseTests, self).setUp()
         self.mock_repo = github.Repository.Repository(
