@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Injectable} from '@angular/core';
+import {ExplorationDraftObjectFactory} from
+  'domain/exploration/ExplorationDraftObjectFactory';
+
 /**
  * @fileoverview Utility service for saving data locally on the client machine.
  */
@@ -22,15 +26,19 @@ require('domain/exploration/ExplorationDraftObjectFactory.ts');
 //
 // Note that the draft is only saved if localStorage exists and works
 // (i.e. has storage capacity).
-angular.module('oppia').factory('LocalStorageService', [
-  'ExplorationDraftObjectFactory',
-  function(ExplorationDraftObjectFactory) {
+@Injectable({
+  providedIn: 'root'
+})
+export class LocalStorageService {
+  constructor(private explorationDraftObjectFactory:
+                  ExplorationDraftObjectFactory) {}
+
     // Check that local storage exists and works as expected.
     // If it does storage stores the localStorage object,
     // else storage is undefined or false.
-    var storage = (function() {
-      var test = 'test';
-      var result;
+    storage = (function() {
+      let test = 'test';
+      let result;
       try {
         localStorage.setItem(test, test);
         result = localStorage.getItem(test) === test;
@@ -39,27 +47,25 @@ angular.module('oppia').factory('LocalStorageService', [
       } catch (exception) {}
     }());
 
-    var LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = (
-      'last_selected_translation_lang');
+    LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = ('last_selected_translation_lang');
 
     /**
      * Create the key to access the changeList in localStorage
      * @param {String} explorationId - The exploration id of the changeList
      *   to be accessed.
      */
-    var _createExplorationDraftKey = function(explorationId) {
+    _createExplorationDraftKey(explorationId) {
       return 'draft_' + explorationId;
-    };
+    }
 
-    return {
-      /**
+    /**
        * Check that localStorage is available to the client.
        * @returns {boolean} true iff the client has access to localStorage.
        */
-      isStorageAvailable: function() {
-        return Boolean(storage);
-      },
-      /**
+    isStorageAvailable() {
+      return Boolean(this.storage);
+    }
+    /**
        * Save the given changeList to localStorage along with its
        * draftChangeListId
        * @param {String} explorationId - The id of the exploration
@@ -67,16 +73,16 @@ angular.module('oppia').factory('LocalStorageService', [
        * @param {List} changeList - The exploration change list to be saved.
        * @param {Integer} draftChangeListId - The id of the draft to be saved.
        */
-      saveExplorationDraft: function(
-          explorationId, changeList, draftChangeListId) {
-        var localSaveKey = _createExplorationDraftKey(explorationId);
-        if (storage) {
-          var draftDict = ExplorationDraftObjectFactory.toLocalStorageDict(
-            changeList, draftChangeListId);
-          storage.setItem(localSaveKey, JSON.stringify(draftDict));
-        }
-      },
-      /**
+    saveExplorationDraft(
+        explorationId, changeList, draftChangeListId) {
+      let localSaveKey = this._createExplorationDraftKey(explorationId);
+      if (this.storage) {
+        let draftDict = this.explorationDraftObjectFactory.toLocalStorageDict(
+          changeList, draftChangeListId);
+        this.storage.setItem(localSaveKey, JSON.stringify(draftDict));
+      }
+    }
+    /**
        * Retrieve the local save of the changeList associated with the given
        * exploration id.
        * @param {String} explorationId - The exploration id of the change list
@@ -84,50 +90,48 @@ angular.module('oppia').factory('LocalStorageService', [
        * @returns {Object} The local save draft object if it exists,
        *   else null.
        */
-      getExplorationDraft: function(explorationId) {
-        if (storage) {
-          var draftDict = JSON.parse(
-            storage.getItem(_createExplorationDraftKey(explorationId)));
-          if (draftDict) {
-            return ExplorationDraftObjectFactory.createFromLocalStorageDict(
-              draftDict);
-          }
+    getExplorationDraft(explorationId) {
+      if (this.storage) {
+        let draftDict = JSON.parse(
+          this.storage.getItem(this._createExplorationDraftKey(explorationId)));
+        if (draftDict) {
+          return this.explorationDraftObjectFactory.createFromLocalStorageDict(
+            draftDict);
         }
-        return null;
-      },
-      /**
+      }
+      return null;
+    }
+    /**
        * Remove the local save of the changeList associated with the given
        * exploration id.
        * @param {String} explorationId - The exploration id of the change list
        *   to be removed.
        */
-      removeExplorationDraft: function(explorationId) {
-        if (storage) {
-          storage.removeItem(_createExplorationDraftKey(explorationId));
-        }
-      },
-      /**
+    removeExplorationDraft(explorationId) {
+      if (this.storage) {
+        this.storage.removeItem(this._createExplorationDraftKey(explorationId));
+      }
+    }
+    /**
        * Save the given language code to localStorage along.
        * @param {List} changeList - The last selected language code to be saved.
        */
-      updateLastSelectedTranslationLanguageCode: function(languageCode) {
-        if (storage) {
-          storage.setItem(
-            LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
-        }
-      },
-      /**
+    updateLastSelectedTranslationLanguageCode(languageCode) {
+      if (this.storage) {
+        this.storage.setItem(
+          this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
+      }
+    }
+    /**
        * Retrieve the local save of the last selected language for translation.
        * @returns {String} The local save of the last selected language for
        *   translation if it exists, else null.
        */
-      getLastSelectedTranslationLanguageCode: function() {
-        if (storage) {
-          var languageCode = (
-            storage.getItem(LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
-          return languageCode;
-        }
-        return null;
-      },
-    };
-  }]);
+    getLastSelectedTranslationLanguageCode() {
+      if (this.storage) {
+        return (
+          this.storage.getItem(this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
+      }
+      return null;
+    }
+}
