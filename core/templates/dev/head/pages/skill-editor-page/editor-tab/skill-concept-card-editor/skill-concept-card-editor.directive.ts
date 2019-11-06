@@ -20,6 +20,8 @@ require(
   'components/state-directives/answer-group-editor/' +
   'summary-list-header.directive.ts');
 require(
+  'components/review-material-editor/review-material-editor.directive.ts');
+require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
@@ -27,23 +29,23 @@ require(
   'worked-example-editor.directive.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/skill/SkillUpdateService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/skill/skill-update.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/format-rte-preview.filter.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
-require('services/GenerateContentIdService.ts');
+require('services/generate-content-id.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
-  'COMPONENT_NAME_EXPLANATION', 'COMPONENT_NAME_WORKED_EXAMPLE',
+  'COMPONENT_NAME_WORKED_EXAMPLE',
   function(
       GenerateContentIdService, SkillEditorStateService, SkillUpdateService,
       SubtitledHtmlObjectFactory, UrlInterpolationService,
-      COMPONENT_NAME_EXPLANATION, COMPONENT_NAME_WORKED_EXAMPLE) {
+      COMPONENT_NAME_WORKED_EXAMPLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -56,9 +58,6 @@ angular.module('oppia').directive('skillConceptCardEditor', [
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
-          $scope.HTML_SCHEMA = {
-            type: 'html'
-          };
 
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
@@ -69,11 +68,16 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             };
           };
 
-          var explanationMemento = null;
           var workedExamplesMemento = null;
 
           $scope.isEditable = function() {
             return true;
+          };
+
+          $scope.onSaveExplanation = function(explanationObject) {
+            SkillUpdateService.setConceptCardExplanation(
+              $scope.skill, explanationObject);
+            initBindableFieldsDict();
           };
 
           initBindableFieldsDict();
@@ -110,32 +114,6 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             } else {
               $scope.activeWorkedExampleIndex = idx;
             }
-          };
-
-          $scope.conceptCardExplanationEditorIsShown = false;
-
-          $scope.openConceptCardExplanationEditor = function() {
-            $scope.conceptCardExplanationEditorIsShown = true;
-            explanationMemento =
-              $scope.bindableFieldsDict.displayedConceptCardExplanation;
-          };
-
-          $scope.closeConceptCardExplanationEditor = function() {
-            $scope.conceptCardExplanationEditorIsShown = false;
-            $scope.bindableFieldsDict.displayedConceptCardExplanation =
-              explanationMemento;
-          };
-
-          $scope.saveConceptCardExplanation = function() {
-            $scope.conceptCardExplanationEditorIsShown = false;
-            SkillUpdateService.setConceptCardExplanation(
-              $scope.skill,
-              SubtitledHtmlObjectFactory.createDefault(
-                $scope.bindableFieldsDict.displayedConceptCardExplanation,
-                COMPONENT_NAME_EXPLANATION));
-            explanationMemento = null;
-            $scope.displayedConceptCardExplanation =
-              $scope.skill.getConceptCard().getExplanation().getHtml();
           };
 
           $scope.deleteWorkedExample = function(index, evt) {
