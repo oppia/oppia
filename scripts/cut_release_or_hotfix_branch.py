@@ -85,11 +85,14 @@ else:
 # Construct the new branch name.
 HOTFIX_NUMBER = int(PARSED_ARGS.hotfix_number)
 if not HOTFIX_NUMBER:
-    NEW_BRANCH_NAME = 'release-%s' % TARGET_VERSION
-    NEW_BRANCH_TYPE = 'release'
+    NEW_BRANCH_NAME = '%s-%s' % (
+        release_constants.RELEASE_BRANCH_TYPE, TARGET_VERSION)
+    NEW_BRANCH_TYPE = release_constants.RELEASE_BRANCH_TYPE
 else:
-    NEW_BRANCH_NAME = 'release-%s-hotfix-%s' % (TARGET_VERSION, HOTFIX_NUMBER)
-    NEW_BRANCH_TYPE = 'hotfix'
+    NEW_BRANCH_NAME = '%s-%s-%s-%s' % (
+        release_constants.RELEASE_BRANCH_TYPE, TARGET_VERSION,
+        release_constants.HOTFIX_BRANCH_TYPE, HOTFIX_NUMBER)
+    NEW_BRANCH_TYPE = release_constants.HOTFIX_BRANCH_TYPE
 
 
 def _verify_target_branch_does_not_already_exist(remote_alias):
@@ -186,8 +189,9 @@ def _verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
         'git', 'branch', '-a'])[:-1].split('\n')
 
     last_hotfix_number = 0
-    hotfix_branch_name_regex = '^%s/release-%s-hotfix-\\d*$' % (
-        remote_alias, TARGET_VERSION)
+    hotfix_branch_name_regex = '^%s/%s-%s-%s-\\d*$' % (
+        remote_alias, release_constants.RELEASE_BRANCH_TYPE, TARGET_VERSION,
+        release_constants.HOTFIX_BRANCH_TYPE)
     for branch_name in all_branches:
         branch_name = branch_name.lstrip().rstrip()
         if re.match(hotfix_branch_name_regex, branch_name):
@@ -207,7 +211,7 @@ def _execute_branch_cut():
     common.verify_current_branch_name('develop')
 
     # Update the local repo.
-    remote_alias = common.get_remote_alias('git@github.com:oppia/oppia.git')
+    remote_alias = common.get_remote_alias(release_constants.REMOTE_URL)
     subprocess.call(['git', 'pull', remote_alias])
 
     _verify_target_branch_does_not_already_exist(remote_alias)
@@ -221,10 +225,12 @@ def _execute_branch_cut():
         if not HOTFIX_NUMBER:
             branch_to_check = 'develop'
         elif HOTFIX_NUMBER == 1:
-            branch_to_check = 'release-%s' % TARGET_VERSION
+            branch_to_check = '%s-%s' % (
+                release_constants.RELEASE_BRANCH_TYPE, TARGET_VERSION)
         else:
-            branch_to_check = 'release-%s-hotfix-%s' % (
-                TARGET_VERSION, HOTFIX_NUMBER - 1)
+            branch_to_check = '%s-%s-%s-%s' % (
+                release_constants.RELEASE_BRANCH_TYPE, TARGET_VERSION,
+                release_constants.HOTFIX_BRANCH_TYPE, HOTFIX_NUMBER - 1)
         python_utils.PRINT(
             'Please confirm: are Travis checks passing on %s? (y/n) ' % (
                 branch_to_check))
@@ -238,14 +244,16 @@ def _execute_branch_cut():
             sys.exit()
 
     # Cut a new release or hotfix branch.
-    if NEW_BRANCH_TYPE == 'hotfix':
+    if NEW_BRANCH_TYPE == release_constants.HOTFIX_BRANCH_TYPE:
         _verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             remote_alias)
         if HOTFIX_NUMBER == 1:
-            branch_to_cut_from = 'release-%s' % TARGET_VERSION
+            branch_to_cut_from = '%s-%s' % (
+                release_constants.RELEASE_BRANCH_TYPE, TARGET_VERSION)
         else:
-            branch_to_cut_from = 'release-%s-hotfix-%s' % (
-                TARGET_VERSION, HOTFIX_NUMBER - 1)
+            branch_to_cut_from = '%s-%s-%s-%s' % (
+                release_constants.RELEASE_BRANCH_TYPE, TARGET_VERSION,
+                release_constants.HOTFIX_BRANCH_TYPE, HOTFIX_NUMBER - 1)
         python_utils.PRINT('Cutting a new hotfix branch: %s' % NEW_BRANCH_NAME)
         subprocess.call([
             'git', 'checkout', '-b', NEW_BRANCH_NAME, branch_to_cut_from])

@@ -90,14 +90,16 @@ describe('Skill object factory', function() {
         id: 2,
         name: 'test name',
         notes: 'test notes',
-        feedback: 'test feedback'
+        feedback: 'test feedback',
+        must_be_addressed: true
       };
 
       misconceptionDict2 = {
         id: 4,
         name: 'test name',
         notes: 'test notes',
-        feedback: 'test feedback'
+        feedback: 'test feedback',
+        must_be_addressed: false
       };
 
       rubricDict = {
@@ -139,7 +141,8 @@ describe('Skill object factory', function() {
         version: 3,
         next_misconception_id: 6,
         superseding_skill_id: '2',
-        all_questions_merged: false
+        all_questions_merged: false,
+        prerequisite_skill_ids: ['skill_1']
       };
     }));
 
@@ -160,6 +163,7 @@ describe('Skill object factory', function() {
       expect(skill.getVersion()).toEqual(3);
       expect(skill.getSupersedingSkillId()).toEqual('2');
       expect(skill.getAllQuestionsMerged()).toEqual(false);
+      expect(skill.getPrerequisiteSkillIds()).toEqual(['skill_1']);
     });
 
     it('should delete a misconception given its id', function() {
@@ -210,6 +214,7 @@ describe('Skill object factory', function() {
           name: 'test name',
           notes: 'test notes',
           feedback: 'test feedback',
+          must_be_addressed: true
         });
 
       skill.appendMisconception(misconceptionToAdd1);
@@ -235,6 +240,7 @@ describe('Skill object factory', function() {
       expect(skill.getVersion()).toEqual(1);
       expect(skill.getSupersedingSkillId()).toEqual(null);
       expect(skill.getAllQuestionsMerged()).toEqual(false);
+      expect(skill.getPrerequisiteSkillIds()).toEqual([]);
     });
   });
 });

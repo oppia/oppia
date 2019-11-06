@@ -29,6 +29,8 @@ from core.tests import test_utils
 
 import python_utils
 
+import requests
+
 from . import common
 from . import deploy
 from . import gcloud_adapter
@@ -67,6 +69,7 @@ class MockCD(python_utils.OBJECT):
 
 class DeployTests(test_utils.GenericTestBase):
     """Test the methods for deploying release."""
+
     def setUp(self):
         super(DeployTests, self).setUp()
         # pylint: disable=unused-argument
@@ -87,14 +90,20 @@ class DeployTests(test_utils.GenericTestBase):
             return 'output'
         def mock_listdir(unused_dir):
             return ['dir1', 'dir2']
-        def mock_open_tab(unused_url):
-            pass
+        self.urls_to_open = []
+        def mock_open_tab(url):
+            self.urls_to_open.append(url)
         def mock_get_currently_served_version(unused_app_name):
             return '1.2.3'
         def mock_input():
             return 'y'
         def mock_run_cmd(unused_cmd_tokens):
             pass
+        def mock_get_remote_alias(unused_remote_url):
+            return 'upstream'
+        self.print_arr = []
+        def mock_print(msg):
+            self.print_arr.append(msg)
 
         self.install_swap = self.swap(
             install_third_party_libs, 'main', mock_main)
@@ -125,6 +134,9 @@ class DeployTests(test_utils.GenericTestBase):
             mock_get_currently_served_version)
         self.input_swap = self.swap(python_utils, 'INPUT', mock_input)
         self.run_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        self.get_remote_alias_swap = self.swap(
+            common, 'get_remote_alias', mock_get_remote_alias)
+        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_invalid_app_name(self):
         args_swap = self.swap(
@@ -201,6 +213,9 @@ class DeployTests(test_utils.GenericTestBase):
             pass
         def mock_check_output(unused_cmd_tokens):
             return 'Update authors and changelog for v1.2.3'
+        def mock_check_travis_and_circleci_tests(unused_current_branch_name):
+            pass
+
         config_swap = self.swap(update_configs, 'main', mock_main)
         get_token_swap = self.swap(
             common, 'get_personal_access_token', mock_get_personal_access_token)
@@ -216,15 +231,20 @@ class DeployTests(test_utils.GenericTestBase):
             mock_check_prs_for_current_release_are_released)
         out_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
+        check_tests_swap = self.swap(
+            deploy, 'check_travis_and_circleci_tests',
+            mock_check_travis_and_circleci_tests)
+
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.run_swap, config_swap, get_token_swap, get_org_swap:
                     with get_repo_swap, bug_check_swap, pr_check_swap, out_swap:
-                        with args_swap, feconf_swap, self.assertRaisesRegexp(
-                            Exception,
-                            'The mailgun API key must be added before '
-                            'deployment.'):
-                            deploy.execute_deployment()
+                        with args_swap, feconf_swap, check_tests_swap:
+                            with self.assertRaisesRegexp(
+                                Exception,
+                                'The mailgun API key must be added before '
+                                'deployment.'):
+                                deploy.execute_deployment()
 
     def test_missing_third_party_dir(self):
         third_party_swap = self.swap(deploy, 'THIRD_PARTY_DIR', 'INVALID_DIR')
@@ -596,3 +616,146 @@ class DeployTests(test_utils.GenericTestBase):
                 'file a blocking bug and switch to the last known good '
                 'version.'):
                 deploy.check_breakage('oppia-migration', '1.2.3')
+
+    def test_check_travis_and_circleci_tests_with_unmatching_commit_on_origin(
+            self):
+        def mock_check_output(cmd_tokens):
+            if 'origin/test-branch' in cmd_tokens:
+                return 'invalid'
+            return 'sha'
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        with self.get_remote_alias_swap, check_output_swap:
+            with self.assertRaisesRegexp(
+                Exception,
+                'The latest commit on release branch locally does '
+                'not match the latest commit on your local fork.'):
+                deploy.check_travis_and_circleci_tests('test-branch')
+
+    def test_check_travis_and_circleci_tests_with_unmatching_commit_on_oppia(
+            self):
+        def mock_check_output(cmd_tokens):
+            if 'upstream/test-branch' in cmd_tokens:
+                return 'invalid'
+            return 'sha'
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        with self.get_remote_alias_swap, check_output_swap:
+            with self.assertRaisesRegexp(
+                Exception,
+                'The latest commit on release branch locally does '
+                'not match the latest commit on Oppia repo.'):
+                deploy.check_travis_and_circleci_tests('test-branch')
+
+    def test_check_travis_and_circleci_tests_with_local_travis_not_setup(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'sha'
+        def mock_get(url):
+            res = requests.models.Response()
+            if 'travis' in url:
+                res.status_code = 404
+            else:
+                res.status_code = 200
+            return res
+        def mock_input():
+            if 'username' in self.print_arr[-1]:
+                return 'username'
+            return 'y'
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        get_swap = self.swap(requests, 'get', mock_get)
+        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        with self.get_remote_alias_swap, self.open_tab_swap, get_swap:
+            with self.print_swap, check_output_swap, input_swap:
+                deploy.check_travis_and_circleci_tests('test-branch')
+        self.assertEqual(
+            self.urls_to_open, [
+                'https://travis-ci.org/oppia/oppia/branches',
+                'https://circleci.com/gh/username/workflows/oppia'])
+
+    def test_check_travis_and_circleci_tests_with_local_circleci_not_setup(
+            self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'sha'
+        def mock_get(url):
+            res = requests.models.Response()
+            if 'circleci' in url:
+                res.status_code = 404
+            else:
+                res.status_code = 200
+            return res
+        def mock_input():
+            if 'username' in self.print_arr[-1]:
+                return 'username'
+            return 'y'
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        get_swap = self.swap(requests, 'get', mock_get)
+        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        with self.get_remote_alias_swap, self.open_tab_swap, get_swap:
+            with self.print_swap, check_output_swap, input_swap:
+                deploy.check_travis_and_circleci_tests('test-branch')
+        self.assertEqual(
+            self.urls_to_open, [
+                'https://travis-ci.org/username/oppia/branches',
+                'https://circleci.com/gh/oppia/workflows/oppia'])
+
+    def test_check_travis_and_circleci_tests_with_travis_tests_failing(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'sha'
+        def mock_get(unused_url):
+            res = requests.models.Response()
+            res.status_code = 200
+            return res
+        def mock_input():
+            if 'username' in self.print_arr[-1]:
+                return 'username'
+            if 'travis' in self.print_arr[-1]:
+                return 'n'
+            return 'y'
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        get_swap = self.swap(requests, 'get', mock_get)
+        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        with self.get_remote_alias_swap, check_output_swap, get_swap:
+            with self.open_tab_swap, self.print_swap, input_swap:
+                with self.assertRaisesRegexp(
+                    Exception, 'Please fix the travis tests before deploying.'):
+                    deploy.check_travis_and_circleci_tests('test-branch')
+        self.assertEqual(
+            self.urls_to_open,
+            ['https://travis-ci.org/username/oppia/branches'])
+
+    def test_check_travis_and_circleci_tests_with_circleci_tests_failing(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'sha'
+        def mock_get(unused_url):
+            res = requests.models.Response()
+            res.status_code = 200
+            return res
+        def mock_input():
+            if 'username' in self.print_arr[-1]:
+                return 'username'
+            if 'circleci' in self.print_arr[-1]:
+                return 'n'
+            return 'y'
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        get_swap = self.swap(requests, 'get', mock_get)
+        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        with self.get_remote_alias_swap, check_output_swap, get_swap:
+            with self.open_tab_swap, self.print_swap, input_swap:
+                with self.assertRaisesRegexp(
+                    Exception,
+                    'Please fix the circleci tests before deploying.'):
+                    deploy.check_travis_and_circleci_tests('test-branch')
+        self.assertEqual(
+            self.urls_to_open, [
+                'https://travis-ci.org/username/oppia/branches',
+                'https://circleci.com/gh/username/workflows/oppia'])
