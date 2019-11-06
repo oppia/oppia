@@ -21,13 +21,12 @@
 // needs to be imported explicitly.
 import $ from 'jquery';
 
-import { CsrfTokenService } from 'services/CsrfTokenService';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService = null;
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
-    // changeDetection = new ChangeDetection(new ApplicationRef());
     // @ts-ignore
     spyOn($, 'ajax').and.returnValue(Promise.resolve(
       {token: 'sample-csrf-token'}));

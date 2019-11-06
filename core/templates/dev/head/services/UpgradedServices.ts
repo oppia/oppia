@@ -19,14 +19,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { BackgroundMaskService } from 'services/stateful/BackgroundMaskService';
-import { CsrfTokenService } from 'services/CsrfTokenService';
-import { DeviceInfoService } from 'services/contextual/DeviceInfoService';
+
 import { AlertsService } from 'services/alerts.service';
 import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
