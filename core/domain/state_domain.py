@@ -800,8 +800,8 @@ class WrittenTranslations(python_utils.OBJECT):
         """Initializes a WrittenTranslations domain object.
 
         Args:
-        translations_mapping: dict. Contains content_id and a list of language codes
-        to be translated.
+        translations_mapping: dict. Contains content_id and a list of language
+        codes to be translated.
         """
 
         self.translations_mapping = translations_mapping
@@ -970,8 +970,8 @@ class RecordedVoiceovers(python_utils.OBJECT):
         """Initializes a RecordedVoiceovers domain object.
 
         Args:
-        voiceovers_mapping: dict. Contains content_id and a list of language codes
-        to converted to voiceovers."""
+        voiceovers_mapping: dict. Contains content_id and a list of language
+        codes to converted to voiceovers."""
 
         self.voiceovers_mapping = voiceovers_mapping
 
@@ -1297,8 +1297,7 @@ class SubtitledHtml(python_utils.OBJECT):
         """Returns a default SubtitledHtml domain object.
 
         Args:
-            content_id: str. A unique id referring to the other assets for this
-                content.
+            content_id: str. A unique id referring to the content field.
 
         Returns:
             SubtitledHtml. A default SubtitledHtml domain object.
