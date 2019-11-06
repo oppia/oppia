@@ -231,4 +231,8 @@ describe('Playing the exploration', function() {
     waitFor.pageToFullyLoad();
     explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
   });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
 });
