@@ -109,6 +109,10 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             story_models.StorySummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            story_models.StorySummaryModel.has_reference_to_user_id('any_id'))
+
     def test_story_summary_model(self):
         """Method to test the StorySummaryModel."""
 

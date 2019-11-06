@@ -68,3 +68,23 @@ class GeneralFeedbackEmailReplyToIdOneOffJob(
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
+
+
+class EmailModelsIndexesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that re-puts SentEmailModel and BulkEmailModel (in order to, e.g.,
+    ensure that indexed fields are properly indexed).
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [email_models.SentEmailModel, email_models.BulkEmailModel]
+
+    @staticmethod
+    def map(model_instance):
+        """Implements the map function for this job."""
+        model_instance.put(update_last_updated_time=False)
+        yield ('SUCCESS', model_instance.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

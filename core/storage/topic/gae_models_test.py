@@ -155,6 +155,10 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
             topic_models.TopicSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            topic_models.TopicSummaryModel.has_reference_to_user_id('any_id'))
+
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageModel class."""

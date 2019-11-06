@@ -215,3 +215,176 @@ class GeneralFeedbackEmailReplyToIdOneOffJobTests(test_utils.GenericTestBase):
 
         self._check_model_validity(user_id1, thread_id1, feedback_email_model1)
         self._check_model_validity(user_id2, thread_id2, feedback_email_model2)
+
+
+class EmailModelsIndexesOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for EmailModelsIndexesOneOffJob migrations."""
+
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        email_jobs_one_off.EmailModelsIndexesOneOffJob]
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = email_jobs_one_off.EmailModelsIndexesOneOffJob.create_new()
+        email_jobs_one_off.EmailModelsIndexesOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            email_jobs_one_off.EmailModelsIndexesOneOffJob.get_output(job_id))
+
+        eval_output = [ast.literal_eval(stringified_item)
+                       for stringified_item in stringified_output]
+        output = [(eval_item[0], int(eval_item[1]))
+                  for eval_item in eval_output]
+        return output
+
+    def _check_send_email_model_validity(self, original_model, migrated_model):
+        """Checks if the SentEmailModel was migrated correctly."""
+        self.assertEqual(
+            migrated_model.recipient_id,
+            original_model.recipient_id)
+        self.assertEqual(
+            migrated_model.recipient_email,
+            original_model.recipient_email)
+        self.assertEqual(
+            migrated_model.sender_id,
+            original_model.sender_id)
+        self.assertEqual(
+            migrated_model.sender_email,
+            original_model.sender_email)
+        self.assertEqual(
+            migrated_model.intent,
+            original_model.intent)
+        self.assertEqual(
+            migrated_model.subject,
+            original_model.subject)
+        self.assertEqual(
+            migrated_model.html_body,
+            original_model.html_body)
+        self.assertEqual(
+            migrated_model.sent_datetime,
+            original_model.sent_datetime)
+        self.assertEqual(
+            migrated_model.last_updated,
+            original_model.last_updated)
+
+    def _check_bulk_email_model_validity(self, original_model, migrated_model):
+        """Checks if the BulkEmailModel was migrated correctly."""
+        self.assertEqual(
+            migrated_model.recipient_ids,
+            original_model.recipient_ids)
+        self.assertEqual(
+            migrated_model.sender_id,
+            original_model.sender_id)
+        self.assertEqual(
+            migrated_model.sender_email,
+            original_model.sender_email)
+        self.assertEqual(
+            migrated_model.intent,
+            original_model.intent)
+        self.assertEqual(
+            migrated_model.subject,
+            original_model.subject)
+        self.assertEqual(
+            migrated_model.html_body,
+            original_model.html_body)
+        self.assertEqual(
+            migrated_model.sent_datetime,
+            original_model.sent_datetime)
+        self.assertEqual(
+            migrated_model.last_updated,
+            original_model.last_updated)
+
+    def test_send_email_model_successful_migration(self):
+        instance_id = 'id_1'
+        send_email_model = email_models.SentEmailModel(
+            id=instance_id,
+            recipient_id='recipient_1',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_MARKETING,
+            subject='subject',
+            html_body='message',
+            sent_datetime=datetime.datetime.utcnow())
+        send_email_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [(u'SUCCESS', 1)])
+
+        self._check_send_email_model_validity(
+            send_email_model,
+            email_models.SentEmailModel.get_by_id(instance_id))
+
+    def test_bulk_email_model_successful_migration(self):
+        instance_id = 'id_1'
+        bulk_email_model = email_models.BulkEmailModel(
+            id=instance_id,
+            recipient_ids=['recipient_1_id', 'recipient_2_id'],
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.BULK_EMAIL_INTENT_MARKETING,
+            subject='subject',
+            html_body='message',
+            sent_datetime=datetime.datetime.utcnow())
+        bulk_email_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [(u'SUCCESS', 1)])
+
+        self._check_bulk_email_model_validity(
+            bulk_email_model,
+            email_models.BulkEmailModel.get_by_id(instance_id))
+
+    def test_multiple_models(self):
+        instance_1_id = 'id_1'
+        send_email_model = email_models.SentEmailModel(
+            id=instance_1_id,
+            recipient_id='recipient_1',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_MARKETING,
+            subject='subject',
+            html_body='message',
+            sent_datetime=datetime.datetime.utcnow())
+        send_email_model.put()
+
+        instance_2_id = 'id_2'
+        bulk_email_model_1 = email_models.BulkEmailModel(
+            id=instance_2_id,
+            recipient_ids=['recipient_1_id', 'recipient_2_id'],
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.BULK_EMAIL_INTENT_MARKETING,
+            subject='subject',
+            html_body='message',
+            sent_datetime=datetime.datetime.utcnow())
+        bulk_email_model_1.put()
+
+        instance_3_id = 'id_3'
+        bulk_email_model_2 = email_models.BulkEmailModel(
+            id=instance_3_id,
+            recipient_ids=['recipient_3_id', 'recipient_4_id'],
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.BULK_EMAIL_INTENT_MARKETING,
+            subject='subject2',
+            html_body='message2',
+            sent_datetime=datetime.datetime.utcnow())
+        bulk_email_model_2.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [(u'SUCCESS', 3)])
+
+        self._check_send_email_model_validity(
+            send_email_model,
+            email_models.SentEmailModel.get_by_id(instance_1_id))
+        self._check_bulk_email_model_validity(
+            bulk_email_model_1,
+            email_models.BulkEmailModel.get_by_id(instance_2_id))
+        self._check_bulk_email_model_validity(
+            bulk_email_model_2,
+            email_models.BulkEmailModel.get_by_id(instance_3_id))

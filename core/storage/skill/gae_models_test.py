@@ -75,6 +75,10 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            skill_models.SkillSummaryModel.has_reference_to_user_id('any_id'))
+
 
 class SkillRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillRightsModel class."""

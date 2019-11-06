@@ -142,6 +142,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            question_models.QuestionSkillLinkModel
+            .has_reference_to_user_id('any_id'))
+
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
         skill_id = 'A Test Skill Id'

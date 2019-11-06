@@ -17,7 +17,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import unittest
 
 from core.platform import models
 from core.tests import test_utils
@@ -112,19 +111,22 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 with self.assertRaises(NotImplementedError):
                     clazz.get_deletion_policy()
 
-    # TODO(#7858): Remove this after has_reference_to_user_id is implemented
-    # where needed.
-    @unittest.skip(
-        'has_reference_to_user_id is not yet implemented on all models')
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
             self):
         for clazz in self._get_base_or_versioned_model_child_classes():
-            try:
-                self.assertIsNotNone(clazz.has_reference_to_user_id('any_id'))
-            except NotImplementedError:
-                self.fail(
-                    msg='has_reference_to_user_id is not defined for %s' % (
-                        clazz.__name__))
+            if (clazz.get_deletion_policy() ==
+                    base_models.DELETION_POLICY.NOT_APPLICABLE):
+                with self.assertRaises(NotImplementedError):
+                    clazz.has_reference_to_user_id('any_id')
+            else:
+                try:
+                    self.assertIsNotNone(
+                        clazz.has_reference_to_user_id('any_id'))
+                except NotImplementedError:
+                    self.fail(
+                        msg='has_reference_to_user_id is not defined for %s' % (
+                            clazz.__name__))
+
 
     def test_base_models_do_not_have_method_has_reference_to_user_id(self):
         for clazz in self._get_model_classes():

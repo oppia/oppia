@@ -208,26 +208,3 @@ class CronAcceptStaleSuggestionsHandler(base.BaseHandler):
                 suggestion_services.accept_suggestion(
                     suggestion, feconf.SUGGESTION_BOT_USER_ID,
                     suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)
-
-
-class CronMailReviewersInRotationHandler(base.BaseHandler):
-    """Handler to send emails notifying reviewers that there are suggestions
-    that need reviews.
-    """
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles get requests."""
-        if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
-            score_categories = (
-                suggestion_models.GeneralSuggestionModel
-                .get_all_score_categories())
-            for score_category in score_categories:
-                suggestions = suggestion_services.query_suggestions(
-                    [('score_category', score_category),
-                     ('status', suggestion_models.STATUS_ACCEPTED)])
-                if len(suggestions) > 0:
-                    reviewer_id = suggestion_services.get_next_user_in_rotation(
-                        score_category)
-                    email_manager.send_mail_to_notify_users_to_review(
-                        reviewer_id, score_category)

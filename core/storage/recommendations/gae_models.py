@@ -79,17 +79,3 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         codebase.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """TopicSimilaritiesModel doesn't reference any user_id
-        directly.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
