@@ -797,7 +797,12 @@ class WrittenTranslations(python_utils.OBJECT):
     """
 
     def __init__(self, translations_mapping):
-        """Initializes a WrittenTranslations domain object."""
+        """Initializes a WrittenTranslations domain object.
+
+        Args:
+        translations_mapping: dict. Contains content_id and a list of language codes
+        to be translated.
+        """
 
         self.translations_mapping = translations_mapping
 
@@ -962,7 +967,11 @@ class RecordedVoiceovers(python_utils.OBJECT):
     """
 
     def __init__(self, voiceovers_mapping):
-        """Initializes a RecordedVoiceovers domain object."""
+        """Initializes a RecordedVoiceovers domain object.
+
+        Args:
+        voiceovers_mapping: dict. Contains content_id and a list of language codes
+        to converted to voiceovers."""
 
         self.voiceovers_mapping = voiceovers_mapping
 
@@ -1419,8 +1428,10 @@ class State(python_utils.OBJECT):
         """Retrieves training data from the State domain object.
 
         Returns:
-            list(dict). Each dict contains the index and the answers from
-            the answer group as key and value pairs respectively.
+            list(dict). Each dict contains the following keys:
+                answer_group_index. int. The index of the answer group.
+                answers. InteractionInstance. The interactions from State
+                domain object.
         """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
