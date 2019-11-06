@@ -19,7 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-
 import { AlertsService } from 'services/alerts.service';
 import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
