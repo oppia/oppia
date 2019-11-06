@@ -16,7 +16,7 @@
  * @fileoverview Tests for TruncateAndCapitalize pipe for Oppia.
  */
 
-import {TruncateAndCapitalizePipe} from
+import { TruncateAndCapitalizePipe } from
   'filters/string-utility-filters/truncate-and-capitalize.pipe';
 
 

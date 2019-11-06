@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {TruncateAtFirstLinePipe} from "./truncate-at-first-line.pipe";
-
 /**
  * @fileoverview Tests for TruncateAtFirstLine filter for Oppia.
  */
 
-require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+import { TruncateAtFirstLinePipe } from "filters/string-utility-filters/truncate-at-first-line.pipe";
 
 describe('Testing filters', function() {
   let truncateAtFirstLinePipe: TruncateAtFirstLinePipe = null;

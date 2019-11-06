@@ -16,7 +16,7 @@
  * @fileoverview TruncateAtFirstLine pipe for Oppia.
  */
 
-import {Pipe, PipeTransform} from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
 
 @Pipe({name: 'truncateAtFirstLine'})
