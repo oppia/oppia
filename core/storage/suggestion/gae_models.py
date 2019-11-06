@@ -406,7 +406,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     # The HTML content written in the given language_code.
     # This will typically be a snapshot of the content of the initial card of
     # the target.
-    content = ndb.StringProperty(required=True, indexed=True)
+    content = ndb.TextProperty(required=True)
     # The filename of the voiceover audio. The filename will have
     # datetime-randomId(length 6)-language_code.mp3 pattern.
     filename = ndb.StringProperty(required=True, indexed=True)
@@ -416,7 +416,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     final_reviewer_id = ndb.StringProperty(indexed=True)
     # The plain text message submitted by the reviewer while rejecting the
     # application.
-    rejection_message = ndb.StringProperty(indexed=True)
+    rejection_message = ndb.TextProperty()
 
     @staticmethod
     def get_deletion_policy():
