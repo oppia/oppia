@@ -16,8 +16,8 @@
  * @fileoverview Directive for uploading images.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/IdGenerationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/id-generation.service.ts');
 
 angular.module('oppia').directive('imageUploader', [
   'IdGenerationService', 'UrlInterpolationService',

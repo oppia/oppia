@@ -34,6 +34,13 @@ EXPECTED_TERMINAL_INTERACTIONS_COUNT = 1
 class InteractionDependencyTests(test_utils.GenericTestBase):
     """Tests for the calculation of dependencies for interactions."""
 
+    def setUp(self):
+        super(InteractionDependencyTests, self).setUp()
+
+        # Register and login as an editor.
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+
     def test_deduplication_of_dependency_ids(self):
         self.assertItemsEqual(
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -64,11 +71,8 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
         response.mustcontain(no=['dependency_html.html'])
 
     def test_dependencies_loaded_in_exploration_editor(self):
-        exp_services.load_demo('0')
 
-        # Register and login as an editor.
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.login(self.EDITOR_EMAIL)
+        exp_services.load_demo('0')
 
         # Ensure that dependencies are added in the exploration editor page.
         response = self.get_html_response('/create/0')

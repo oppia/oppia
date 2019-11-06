@@ -17,10 +17,10 @@
  * modal.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
-require('services/CsrfTokenService.ts');
-require('services/SiteAnalyticsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
+require('services/csrf-token.service.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('ExplorationCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window',

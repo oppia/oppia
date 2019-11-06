@@ -153,6 +153,8 @@ export class AppConstants {
     STORY: 'story',
     SUBTOPIC: 'subtopic'
   };
+
+  public static MISCONCEPTION_NAME_CHAR_LIMIT = 100;
 }
 
 const constants = require('constants.ts');

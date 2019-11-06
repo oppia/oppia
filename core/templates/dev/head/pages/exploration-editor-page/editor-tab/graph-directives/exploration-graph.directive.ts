@@ -16,15 +16,15 @@
  * @fileoverview Directive for the exploration graph.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/AlertsService.ts');
-require('services/EditabilityService.ts');
+require('services/alerts.service.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').directive('explorationGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {

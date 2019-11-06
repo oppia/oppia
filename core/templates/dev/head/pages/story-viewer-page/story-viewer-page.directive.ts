@@ -27,10 +27,10 @@ require(
   'story-viewer-chapters-list.directive.ts');
 
 require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
-require('domain/story_viewer/StoryViewerBackendApiService.ts');
-require('services/AlertsService.ts');
-require('services/PageTitleService.ts');
-require('services/contextual/UrlService.ts');
+require('domain/story_viewer/story-viewer-backend-api.service.ts');
+require('services/alerts.service.ts');
+require('services/page-title.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('storyViewerPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
