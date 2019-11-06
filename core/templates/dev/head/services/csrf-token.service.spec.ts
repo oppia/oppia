@@ -27,6 +27,9 @@ describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService = null;
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
+
+    // This ts ignore is because returnValue is expecting a jqXHR<any>
+    // and wherease a Promise<{token: string}> is being provided.
     // @ts-ignore
     spyOn($, 'ajax').and.returnValue(Promise.resolve(
       {token: 'sample-csrf-token'}));
