@@ -147,6 +147,7 @@ angular.module('oppia').directive('questionsList', [
           ctrl.saveAndPublishQuestion = function() {
             var validationErrors = ctrl.question.validate(
               ctrl.misconceptionsBySkill);
+
             if (validationErrors) {
               AlertsService.addWarning(validationErrors);
               return;
@@ -601,6 +602,12 @@ angular.module('oppia').directive('questionsList', [
                       return;
                     }
                     $uibModalInstance.close();
+                  };
+                  // Checking if Question contains all requirement to enable
+                  // Save and Publish Question
+                  $scope.isSaveButtonDisabled = function() {
+                    return $scope.question.validate(
+                      $scope.misconceptionsBySkill);
                   };
 
                   $scope.cancel = function() {
