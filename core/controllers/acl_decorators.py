@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import functools
 
 from core.controllers import base
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
@@ -2729,18 +2730,38 @@ def can_submit_voiceover_application(handler):
         """
         if role_services.ACTION_SUBMIT_VOICEOVER_APPLICATION in (
                 self.user.actions):
-            if voiceover_services.can_submit_new_voiceover_application(
-                    self.user_id):
-                return handler(self, **kwargs)
-            else:
-                raise base.UserFacingExceptions.UnauthorizedUserException(
-                    'Currently, you cannot submit new voiceover applications. '
-                    'Make sure you have no pending voiceover application in '
-                    'review and the voiceover for assigned lessons are '
-                    'complete.')
+            # The voiceover_service returns user submitted voiceover
+            # applications in sorted oder of the date of submission.
+            voiceover_applications = (
+                voiceover_services.get_user_submitted_voiceover_applications(
+                    self.user_id))
+            if voiceover_applications:
+                latest_voiceover_application = voiceover_applications[0]
+                if latest_voiceover_application.status == (
+                        suggestion_models.STATUS_IN_REVIEW):
+                    raise self.UnauthorizedUserException(
+                        'You can only submit one application at a time. '
+                        'It looks like your latest application is not yet '
+                        'reviewed.')
+                elif latest_voiceover_application.status == (
+                        suggestion_models.STATUS_ACCEPTED):
+                    if latest_voiceover_application.target_type == (
+                            suggestion_models.TARGET_TYPE_EXPLORATION):
+                        exploration = exp_fetchers.get_exploration_by_id(
+                            latest_voiceover_application.target_id)
+                        if exploration.get_translation_progress(
+                                latest_voiceover_application.language_code):
+                            return handler(self, **kwargs)
+                        else:
+                            raise self.UnauthorizedUserException(
+                                'You can submit a new application until the '
+                                'lessons assigned to you has complete '
+                                'voiceover.')
+                else:
+                    return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to submit voiceover application.')
+                'You must be logged in to submit voiceover application.')
     test_can_submit_voiceover_application.__wrapped__ = True
 
     return test_can_submit_voiceover_application

@@ -189,24 +189,25 @@ class VoicoverApplicationHandler(base.BaseHandler):
 
     @acl_decorators.can_submit_voiceover_application
     def post(self):
+        raw_audio_file = self.request.get('raw_audio_file')
+
         target_type = self.payload.get('target_type')
         target_id = self.payload.get('target_id')
         language_code = self.payload.get('language_code')
         voiceover_content = self.payload.get('voiceover_content')
-        raw_audio_file = self.request.get('raw_audio_file')
-        filename = self.request.get('filename')
+        filename = self.payload.get('filename')
         try:
             _save_audio_file(
                 raw_audio_file, filename,
                 feconf.ENTITY_TYPE_VOICEOVER_APPLICATION, target_id,
                 self.user_id)
+            voiceover_services.create_new_voiceover_application(
+                target_type, target_id, language_code, voiceover_content,
+                filename, self.user_id)
         except Exception as e:
             raise self.InvalidInputException(e)
 
-        voiceover_services.create_new_voiceover_application(
-            target_type, target_id, language_code, voiceover_content,
-            filename, self.user_id)
-        self.render_json({'filename': filename})
+        self.render_json({})
 
 
 class VoiceoverApplicationTextHandler(base.BaseHandler):

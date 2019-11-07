@@ -17,6 +17,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
 
 from core.domain import rights_manager
 from core.domain import user_services
@@ -24,6 +25,7 @@ from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -295,6 +297,7 @@ class VoicoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
     applicant_email = 'applicant@example.com'
     reviewer_username = 'reviewer'
     reviewer_email = 'reviewer@example.com'
+    TEST_AUDIO_FILE_MP3 = 'cafe.mp3'
 
     def setUp(self):
         super(VoicoverApplicationHandlerUnitTest, self).setUp()
@@ -309,6 +312,51 @@ class VoicoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
         self.voiceover_application = (
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.applicant_id)[0])
+
+    def test_guest_cannot_submit_voiceover_application(self):
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+            mode='rb', encoding=None) as f:
+            raw_audio = f.read()
+
+        response = self.post_json(
+            '/createvoiceoverapplicationhandler', {
+                'target_type': 'exploration',
+                'target_id': '0',
+                'language_code': 'en',
+                'voiceover_content': '<p>Some content</p>',
+                'filename': 'audio.mp3'
+            }, csrf_token=csrf_token,
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)],
+            expected_status_int=401
+        )
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to submit voiceover application.')
+
+    def test_users_can_submit_voiceover_application(self):
+        self.signup('contributor@community.com', 'contributor')
+        self.login('contributor@community.com')
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+            mode='rb', encoding=None) as f:
+            raw_audio = f.read()
+
+        self.post_json(
+            '/createvoiceoverapplicationhandler', {
+                'target_type': 'exploration',
+                'target_id': '0',
+                'language_code': 'en',
+                'voiceover_content': '<p>Some content</p>',
+                'filename': self.TEST_AUDIO_FILE_MP3
+            }, csrf_token=csrf_token,
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
+        )
+        self.logout()
 
     def test_get_voiceover_application_for_review_purpose(self):
         self.login(self.reviewer_email)
