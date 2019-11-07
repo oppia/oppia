@@ -1024,7 +1024,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
 
         Args:
             expected_content_id_list: A list of content id which are expected to
-            be inside they RecordedVoiceovers.
+            be inside the RecordedVoiceovers.
 
         Raises:
             ValidationError: One or more attributes of the RecordedVoiceovers
