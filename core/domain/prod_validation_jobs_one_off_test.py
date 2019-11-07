@@ -10487,6 +10487,22 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                     self.model_instance.id, self.admin_id, self.admin_id)]
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_object_validation_failure(self):
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'GeneralVoiceoverApplicationModel\', '
+            '[u\'Entity id valid_id: Entity fails domain validation with '
+            'the error Invalid language_code: en\']]']
+        mock_supported_audio_languages = [{
+            'id': 'ar',
+            'description': 'Arabic',
+            'relatedLanguages': ['ar']
+            }]
+        with self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES',
+            mock_supported_audio_languages):
+            run_job_and_check_output(self, expected_output, sort=True)
+
 
 class TopicModelValidatorTests(test_utils.GenericTestBase):
 
