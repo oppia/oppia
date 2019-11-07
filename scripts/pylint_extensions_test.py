@@ -1161,14 +1161,11 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func(arg):
-                        '''Returns something.
+                        '''Do something.
                         Args:
                             arg: argument
-                        Returns:
-                            returns_something
                         '''
-
-                        return returns_something
+                        do something
                 """)
         node_single_newline_above_args.file = filename
         node_single_newline_above_args.path = filename
@@ -1181,9 +1178,163 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
                 msg_id='single-space-above-args',
                 line=2
             ),
+        ):
+            temp_file.close()
+
+        node_single_newline_above_raises = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func():
+                        '''Raises exception.
+                        Raises:
+                            raises_exception
+                        '''
+                        raises_exception
+                """)
+        node_single_newline_above_raises.file = filename
+        node_single_newline_above_raises.path = filename
+
+        checker_test_object.checker.process_module(
+            node_single_newline_above_raises)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-above-raises',
+                line=2
+            ),
+        ):
+            temp_file.close()
+
+        node_with_no_space_above_return = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func():
+                    '''Returns something.
+                    Returns:
+                        returns_something
+                    '''
+                    returns_something
+                """)
+        node_with_no_space_above_return.file = filename
+        node_with_no_space_above_return.path = filename
+
+        checker_test_object.checker.process_module(
+            node_with_no_space_above_return)
+
+        with checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='single-space-above-returns',
-                line=4
+                line=2
+            ),
+        ):
+            temp_file.close()
+
+        node_newline_above_args_raises = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func(arg):
+                    '''Raises exception.
+
+                    Args:
+                        arg: argument
+                    Raises:
+                        raises_something
+                    '''
+                    raises_exception
+                """)
+        node_newline_above_args_raises.file = filename
+        node_newline_above_args_raises.path = filename
+
+        checker_test_object.checker.process_module(
+            node_newline_above_args_raises)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-above-raises',
+                line=5
+            ),
+        ):
+            temp_file.close()
+
+        node_newline_above_args_returns = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func(arg):
+                    '''Returns Something.
+
+                    Args:
+                        arg: argument
+                    Returns:
+                        returns_something
+                    '''
+                    returns_something
+                """)
+        node_newline_above_args_returns.file = filename
+        node_newline_above_args_returns.path = filename
+
+        checker_test_object.checker.process_module(
+            node_newline_above_args_returns)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-above-returns',
+                line=5
+            ),
+        ):
+            temp_file.close()
+
+        node_newline_above_returns_raises = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func():
+                    '''Do something.
+
+
+
+                    Raises:
+                        raises_exception
+
+                    Returns:
+                        returns_something
+                    '''
+                    raises_exception
+                    returns_something
+                """)
+        node_newline_above_returns_raises.file = filename
+        node_newline_above_returns_raises.path = filename
+
+        checker_test_object.checker.process_module(
+            node_newline_above_returns_raises)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='single-space-above-raises',
+                line=5
             ),
         ):
             temp_file.close()
@@ -1223,64 +1374,6 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='single-space-above-returns',
                 line=8
-            ),
-        ):
-            temp_file.close()
-
-        node_with_no_space_above_return = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func():
-                    '''Returns something.
-                    Returns:
-                        returns_something
-                    '''
-                    returns_something
-                """)
-        node_with_no_space_above_return.file = filename
-        node_with_no_space_above_return.path = filename
-
-        checker_test_object.checker.process_module(
-            node_with_no_space_above_return)
-
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-above-returns',
-                line=2
-            ),
-        ):
-            temp_file.close()
-
-        node_with_no_space_above_raises = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func():
-                    '''Raises exception.
-                    Raises:
-                        raises_exception
-                    '''
-                    raises_exception
-                """)
-        node_with_no_space_above_raises.file = filename
-        node_with_no_space_above_raises.path = filename
-
-        checker_test_object.checker.process_module(
-            node_with_no_space_above_raises)
-
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-above-raises',
-                line=2
             ),
         ):
             temp_file.close()

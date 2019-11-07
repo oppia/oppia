@@ -1023,7 +1023,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
     """Checker for single space above args in python doc string."""
 
     __implements__ = interfaces.IRawChecker
-    name = 'single-space-above-args'
+    name = 'single-space-above-args-raises-returns'
     priority = -1
     msgs = {
         'C0012': (
@@ -1044,8 +1044,8 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
     }
 
     def process_module(self, node):
-        """Process a module to ensure that there is a single newline above args
-        in python doc string.
+        """Process a module to ensure that there is a single newline above args,
+        raises, returns in python doc string.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
