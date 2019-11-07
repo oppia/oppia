@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the WrapTextWithEllipsis wrapTextWithEllipsis.transform for Oppia.
+ * @fileoverview Tests for the WrapTextWithEllipsisPipe for Oppia.
  */
 
 import { TestBed } from '@angular/core/testing';

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for UnderscoresToCamelCase underscoresToCamelCase.transform for Oppia.
+ * @fileoverview Tests for UnderscoresToCamelCasePipe for Oppia.
  */
 
 import { UnderscoresToCamelCasePipe } from
