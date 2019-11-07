@@ -803,14 +803,13 @@ class Skill(python_utils.OBJECT):
         """Updates the worked examples list of the skill.
 
         Args:
-            worked_examples: list(dict). The new worked examples of the skill.
+            worked_examples: list(SubtitledHtml). The new worked examples of the skill.
         """
+
         old_content_ids = [worked_example.content_id for worked_example in (
             self.skill_contents.worked_examples)]
 
-        self.skill_contents.worked_examples = [
-            state_domain.SubtitledHtml.from_dict(worked_example)
-            for worked_example in worked_examples]
+        self.skill_contents.worked_examples = worked_examples
 
         new_content_ids = [worked_example.content_id for worked_example in (
             self.skill_contents.worked_examples)]
