@@ -403,9 +403,10 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         if status in STATUS_CHOICES:
             return cls.query(ndb.AND(
                 cls.author_id == author_id, cls.status == status)).order(
-                    -cls.created_on)
+                    -cls.created_on).fetch()
         else:
-            return cls.query(cls.author_id == author_id).order(-cls.created_on)
+            return cls.query(cls.author_id == author_id).order(
+                -cls.created_on).fetch()
 
     @classmethod
     def get_reviewable_voiceover_applications(cls, user_id):
