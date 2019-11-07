@@ -125,9 +125,13 @@ class AudioUploadHandler(base.BaseHandler):
         """Saves an audio file uploaded by a content creator."""
         raw_audio_file = self.request.get('raw_audio_file')
         filename = self.payload.get('filename')
-        _save_audio_file(
-            raw_audio_file, filename, feconf.ENTITY_TYPE_EXPLORATION,
-            exploration_id, self.user_id)
+        try:
+            _save_audio_file(
+                raw_audio_file, filename, feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id, self.user_id)
+        except Exception as e:
+            raise self.InvalidInputException(e)
+
         self.render_json({'filename': filename})
 
 
@@ -191,9 +195,14 @@ class VoicoverApplicationHandler(base.BaseHandler):
         voiceover_content = self.payload.get('voiceover_content')
         raw_audio_file = self.request.get('raw_audio_file')
         filename = self.request.get('filename')
-        _save_audio_file(
-            raw_audio_file, filename, feconf.ENTITY_TYPE_VOICEOVER_APPLICATION,
-            target_id, self.user_id)
+        try:
+            _save_audio_file(
+                raw_audio_file, filename,
+                feconf.ENTITY_TYPE_VOICEOVER_APPLICATION, target_id,
+                self.user_id)
+        except Exception as e:
+            raise self.InvalidInputException(e)
+
         voiceover_services.create_new_voiceover_application(
             target_type, target_id, language_code, voiceover_content,
             filename, self.user_id)
