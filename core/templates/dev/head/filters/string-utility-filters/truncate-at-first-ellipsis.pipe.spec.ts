@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Tests for TruncateAtFirstEllipsis pipe for Oppia.
  */
 
 import { TruncateAtFirstEllipsisPipe } from
   'filters/string-utility-filters/truncate-at-first-ellipsis.pipe';
-
 
 describe('Testing filters', function() {
   let truncateAtFirstEllipsisPipe: TruncateAtFirstEllipsisPipe = null;

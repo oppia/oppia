@@ -16,7 +16,6 @@
  * @fileoverview Truncate filter for Oppia.
  */
 
-
 import { Pipe, PipeTransform } from '@angular/core';
 import { ConvertToPlainTextPipe } from './convert-to-plain-text.pipe';
 

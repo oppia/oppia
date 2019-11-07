@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview WrapTextWithEllipsis filter for Oppia.
  */
@@ -22,8 +21,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { UtilsService } from 'services/utils.service';
-
-
 
 @Pipe({name: 'wrapTextWithEllipsis'})
 export class WrapTextWithEllipsisPipe implements PipeTransform {

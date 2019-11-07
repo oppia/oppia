@@ -18,7 +18,6 @@
 
 import { Pipe, PipeTransform } from '@angular/core';
 
-
 @Pipe({name: 'underscoresToCamelCase'})
 export class UnderscoresToCamelCasePipe implements PipeTransform {
   transform(input: string): string {

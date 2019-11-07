@@ -22,7 +22,6 @@ import { WrapTextWithEllipsisPipe } from
 import {NormalizeWhitespacePipe} from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 
-
 describe('Testing filters', function() {
   let wrapTextWithEllipsis: WrapTextWithEllipsisPipe = null;
   beforeEach(() => {
