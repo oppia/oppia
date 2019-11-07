@@ -24,18 +24,27 @@ import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ChangesInHumanReadableFormService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/services/changes-in-human-readable-form.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
+import { EditorFirstTimeEventsService } from
+  'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { ExplorationDiffService } from
+  'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExtensionTagAssemblerService }
   from 'services/extension-tag-assembler.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { IdGenerationService } from 'services/id-generation.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from
@@ -50,19 +59,26 @@ export class UpgradedServices {
   upgradedServices = {
     'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
+    'ChangesInHumanReadableFormService': new ChangesInHumanReadableFormService(
+      new UtilsService(), document),
     'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
+    'EditorFirstTimeEventsService': new EditorFirstTimeEventsService(
+      new SiteAnalyticsService(new WindowRef())),
+    'ExplorationDiffService': new ExplorationDiffService(),
     'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
       new HtmlEscaperService(new LoggerService()),
       new CamelCaseToHyphensPipe()),
     'HtmlEscaperService': new HtmlEscaperService(
       new LoggerService()),
+    'IdGenerationService': new IdGenerationService(),
     'MetaTagCustomizationService': new MetaTagCustomizationService(
       new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'SiteAnalyticsService': new SiteAnalyticsService(new WindowRef()),
     'UrlService': new UrlService(new WindowRef()),
     'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService(),

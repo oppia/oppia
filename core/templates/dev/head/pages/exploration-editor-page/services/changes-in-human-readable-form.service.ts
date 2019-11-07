@@ -34,7 +34,7 @@ export class ChangesInHumanReadableFormService {
   constructor(private utilsService: UtilsService,
               @Inject(DOCUMENT) private document: any) {}
 
-  makeRulesListHumanReadable(answerGroupValue: any) {
+  makeRulesListHumanReadable(answerGroupValue: any): Array<HTMLElement> {
     let rulesList = [];
     answerGroupValue.rules.forEach((rule) => {
       let ruleElm = this.document.createElement('<li></li>');
@@ -53,7 +53,7 @@ export class ChangesInHumanReadableFormService {
   // An edit is represented either as an object or an array. If it's an
   // object, then simply return that object. In case of an array, return
   // the last item.
-  getStatePropertyValue(statePropertyValue: Array | Object) {
+  getStatePropertyValue(statePropertyValue: Array<string> | Object) {
     return Array.isArray(statePropertyValue) ?
         statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   }
@@ -61,7 +61,7 @@ export class ChangesInHumanReadableFormService {
   // Detects whether an object of the type 'answer_group' or
   // 'default_outcome' has been added, edited or deleted.
   // Returns - 'addded', 'edited' or 'deleted' accordingly.
-  getRelativeChangeToGroups(changeObject: any) {
+  getRelativeChangeToGroups(changeObject: any): string {
     let newValue = changeObject.new_value;
     let oldValue = changeObject.old_value;
     let result = '';
@@ -84,7 +84,7 @@ export class ChangesInHumanReadableFormService {
     return result;
   }
 
-  _makeHumanReadable(lostChanges: Array<any>) {
+  _makeHumanReadable(lostChanges: Array<any>): HTMLElement {
     let outerHtml = this.document.createElement('<ul></ul>');
     let stateWiseEditsMapping = {};
     // The letiable stateWiseEditsMapping stores the edits grouped by state.
@@ -302,7 +302,7 @@ export class ChangesInHumanReadableFormService {
   }
 
 
-  makeHumanReadable(lostChanges) {
+  makeHumanReadable(lostChanges: Array<any>): HTMLElement {
     try {
       return this._makeHumanReadable(lostChanges);
     } catch (e) {

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview A Service registering analytics events for the editor
  * for events which are  only logged when they happen after the editor
@@ -23,7 +22,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-
 
 @Injectable({
   providedIn: 'root'
