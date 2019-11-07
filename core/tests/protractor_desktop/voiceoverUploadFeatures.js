@@ -59,9 +59,7 @@ describe('Voiceover upload features', function() {
     explorationEditorTranslationTab.openUploadAudioModal();
     explorationEditorTranslationTab.uploadAudio(
       '../data/cafe.mp3');
-  });
 
-  it('should play and pause an uploaded audio file', function() {
     explorationEditorTranslationTab.playOrPauseAudioFile()
       .then(function(playClick) {
         expect(playClick).toBe(true);
