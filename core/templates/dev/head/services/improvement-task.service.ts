@@ -52,7 +52,7 @@ angular.module('oppia').factory('ImprovementTaskService', [
       PlaythroughImprovementTaskObjectFactory,
       SuggestionImprovementTaskObjectFactory,
     ]);
-    var tasksPromise=null;
+    var tasksPromise = null;
     return {
       /** @returns {Object[]} */
       getImprovementTaskObjectFactoryRegistry: function() {
@@ -73,10 +73,10 @@ angular.module('oppia').factory('ImprovementTaskService', [
           tasksPromise = $q.all(
             improvementTaskObjectFactoryRegistry.map(
               taskFactory => taskFactory.fetchTasks())
-            ).then(tasksFromFactories => {
-              // Flatten the tasks into a single array before returning.
-              return [].concat.apply([], tasksFromFactories);
-            });
+          ).then(tasksFromFactories => {
+            // Flatten the tasks into a single array before returning.
+            return [].concat.apply([], tasksFromFactories);
+          });
         }
         return tasksPromise;
       },
