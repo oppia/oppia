@@ -359,6 +359,7 @@ if (!('outerHTML' in SVGElement.prototype)) {
 // Older browsers might not implement mediaDevices at all,
 // so we set an empty object first.
 if (navigator.mediaDevices === undefined) {
+  // @ts-ignore: mediaDevices is read-only error.
   navigator.mediaDevices = {};
 }
 
@@ -371,6 +372,8 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
   navigator.mediaDevices.getUserMedia = function(constraints) {
     // First get ahold of the legacy getUserMedia, if present.
     var getUserMedia = (
+      // @ts-ignore: 'webkitGetUserMedia' and 'mozGetUserMedia'
+      // property does not exist error.
       navigator.webkitGetUserMedia || navigator.mozGetUserMedia);
 
     // If getUserMedia is not implemented, return a rejected promise
