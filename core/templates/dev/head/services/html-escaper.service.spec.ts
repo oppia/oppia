@@ -16,47 +16,34 @@
  * @fileoverview Unit tests for HTML serialization and escaping services.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('services/html-escaper.service.ts');
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
-describe('HTML escaper', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
+describe('HTML escaper service', () => {
+  let ohe: HtmlEscaperService;
+
+  beforeEach(() => {
+    ohe = TestBed.get(HtmlEscaperService);
+  });
+
+  it('should correctly translate between escaped and unescaped strings',
+    () => {
+      let strs = ['abc', 'a&b<html>', '&&&&&'];
+      for (let i = 0; i < strs.length; i++) {
+        expect(ohe.escapedStrToUnescapedStr(
+          ohe.unescapedStrToEscapedStr(strs[i]))).toEqual(strs[i]);
+      }
     }
-  }));
+  );
 
-  describe('HTML escaper service', function() {
-    var ohe = null;
-
-    beforeEach(angular.mock.inject(function($injector) {
-      ohe = $injector.get('HtmlEscaperService');
-    }));
-
-    it('should correctly translate between escaped and unescaped strings',
-      function() {
-        var strs = ['abc', 'a&b<html>', '&&&&&'];
-        for (var i = 0; i < strs.length; i++) {
-          expect(ohe.escapedStrToUnescapedStr(
-            ohe.unescapedStrToEscapedStr(strs[i]))).toEqual(strs[i]);
-        }
-      }
-    );
-
-    it('should correctly escape and unescape JSON', function() {
-      var objs = [{
-        a: 'b'
-      }, ['a', 'b'], 2, true, 'abc'];
-      for (var i = 0; i < objs.length; i++) {
-        expect(ohe.escapedJsonToObj(
-          ohe.objToEscapedJson(objs[i]))).toEqual(objs[i]);
-      }
-    });
+  it('should correctly escape and unescape JSON', () => {
+    let objs = [{
+      a: 'b'
+    }, ['a', 'b'], 2, true, 'abc'];
+    for (let i = 0; i < objs.length; i++) {
+      expect(ohe.escapedJsonToObj(
+        ohe.objToEscapedJson(objs[i]))).toEqual(objs[i]);
+    }
   });
 });
