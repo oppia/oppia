@@ -350,8 +350,8 @@ class CommonTests(test_utils.GenericTestBase):
     def test_install_npm_library(self):
 
         def _mock_subprocess_call(unused_command):
-            """Mocks subprocess.call() to create a temporary file instead
-            of the actual npm library.
+            """Mocks subprocess.call() to create a temporary file instead of the
+            actual npm library.
             """
             temp_file = tempfile.NamedTemporaryFile()
             temp_file.name = 'temp_file'
