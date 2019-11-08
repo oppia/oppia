@@ -25,10 +25,9 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 
-describe('Undo/Redo Service', function() {
+fdescribe('Undo/Redo Service', function() {
   var UndoRedoService = null;
   var changeObjectFactory = null;
-
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());

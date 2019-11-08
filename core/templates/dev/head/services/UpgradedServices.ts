@@ -47,6 +47,11 @@ import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { UnitsObjectFactory } from
+  'domain/objects/UnitsObjectFactory';
+import {BaseUndoRedoService} from "../domain/editor/undo_redo/base-undo-redo.service";
+import {UndoRedoService} from "../domain/editor/undo_redo/undo-redo.service";
+import {EventService} from "./event-service";
 
 @Injectable({
   providedIn: 'root'
@@ -79,6 +84,11 @@ export class UpgradedServices {
       new WindowRef()), new UtilsService()),
     'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService(),
+    'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
+      new UnitsObjectFactory(), new FractionObjectFactory()),
+    'WindowDimensionsService': new WindowDimensionsService(),
+    'BaseUndoRedoService': new BaseUndoRedoService(new EventService()),
+    'UndoRedoService': new UndoRedoService(new EventService())
   };
 }
 
