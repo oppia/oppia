@@ -29,10 +29,10 @@ import feconf
 import utils
 
 (
-    user_models, collection_models, exploration_models, feedback_models,
-    suggestion_models, email_models) = models.Registry.import_models([
-        models.NAMES.user, models.NAMES.collection, models.NAMES.exploration,
-        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.email])
+    collection_models, email_models, exploration_models, feedback_models,
+    suggestion_models, user_models) = models.Registry.import_models([
+        models.NAMES.collection, models.NAMES.email, models.NAMES.exploration,
+        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user])
 
 
 class TakeoutServiceUnitTests(test_utils.GenericTestBase):
@@ -95,9 +95,25 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         suggestion_models.SCORE_TYPE_TRANSLATION +
         suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
 
-    def setUp(self):
-        """Set up all models for use in testing."""
-        super(TakeoutServiceUnitTests, self).setUp()
+    def setUpNontrivial(self):
+        """Set up all models for use in testing.
+        1) Simulates the creation of a user, user_1, and their stats model.
+        2) Simulates skill mastery of user_1 with two skills.
+        3) Simulates subscriptions to threads, activities, and collections.
+        4) Simulates creation and edit of an exploration by user_1.
+        5) Creates an ExplorationUserDataModel.
+        6) Simulates completion of some activities.
+        7) Simulates incomplete status of some activities.
+        8) Populates ExpUserLastPlaythroughModel of user.
+        9) Creates user LearnerPlaylsts.
+        10) Simulates collection progress of user.
+        11) Simulates story progress of user.
+        12) Creates new collection rights.
+        13) Simulates a general suggestion.
+        14) Creates new exploration rights.
+        15) Populates user settings.
+        16) Creates two reply-to ids for feedback. 
+        """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -263,15 +279,42 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.USER_ID_1, self.THREAD_ID_1).put()
 
-        user_two_fake_hash_lambda_two = (
+        user_two_deterministic_hash_lambda_two = (
             lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_2)
-        user_two_fake_hash_two = self.swap(
-            utils, 'convert_to_hash', user_two_fake_hash_lambda_two)
-        with user_two_fake_hash_two:
+        user_two_deterministic_hash_two = self.swap(
+            utils, 'convert_to_hash', user_two_deterministic_hash_lambda_two)
+        with user_two_deterministic_hash_two:
             email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.USER_ID_1, self.THREAD_ID_2).put()
 
+    def setUpTrivial(self):
+        user_models.UserSettingsModel(
+            id=self.USER_1_ID, email=self.USER_1_EMAIL, role=self.USER_1_ROLE
+        ).put()
+
+    def setUp(self):
+        super(TakeoutServiceUnitTests, self).setUp()
+
+    def test_export_data_trivial(self):
+        '''Trivial test of export_data functionality'''
+        exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        print(exported_data)
+
     def test_export_data_nontrivial(self):
+        '''Nontrivial test of export_data functionality'''
+        self.setUpNontrivial()
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            entity_type=self.THREAD_ENTITY_TYPE,
+            entity_id=self.THREAD_ENTITY_ID,
+            original_author_id=self.USER_ID_1,
+            status=self.THREAD_STATUS,
+            subject=self.THREAD_SUBJECT,
+            has_suggestion=self.THREAD_HAS_SUGGESTION,
+            summary=self.THREAD_SUMMARY,
+            message_count=self.THREAD_MESSAGE_COUNT
+        )
+        feedback_thread_model.put()
+
         stats_data = {
             'impact_score': self.USER_1_IMPACT_SCORE,
             'total_plays': self.USER_1_TOTAL_PLAYS,
@@ -325,19 +368,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         story_progress_data = {
             self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
         }
-
-        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
-            entity_type=self.THREAD_ENTITY_TYPE,
-            entity_id=self.THREAD_ENTITY_ID,
-            original_author_id=self.USER_ID_1,
-            status=self.THREAD_STATUS,
-            subject=self.THREAD_SUBJECT,
-            has_suggestion=self.THREAD_HAS_SUGGESTION,
-            summary=self.THREAD_SUMMARY,
-            message_count=self.THREAD_MESSAGE_COUNT
-        )
-        feedback_thread_model.put()
-
         thread_id = feedback_services.create_thread(
             self.THREAD_ENTITY_TYPE,
             self.THREAD_ENTITY_ID,

@@ -23,20 +23,24 @@ import re
 from core.platform import models
 
 (
-    user_models, collection_models, exploration_models, feedback_models,
-    suggestion_models, email_models) = models.Registry.import_models([
-        models.NAMES.user, models.NAMES.collection, models.NAMES.exploration,
-        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.email])
+    collection_models, email_models, exploration_models, feedback_models,
+    suggestion_models, user_models) = models.Registry.import_models([
+        models.NAMES.collection, models.NAMES.email, models.NAMES.exploration,
+        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user])
 
 
 def export_data_for_user(user_id):
     """Exports selected models according to model defined export_data functions.
 
     Args:
-        user_id: str. The user_id of the user to export.
+        user_id: str. The user_id of the user whose data is being exported.
 
     Returns:
-        dict. Dictionary containing all user data.
+        dict. Dictionary containing all user data in the following format:
+        {
+            <MODEL_NAME>_data: <dict of data in format as specified by 
+                                model export policy>
+        }
     """
     models_to_export = [
         user_models.UserStatsModel,
@@ -61,7 +65,9 @@ def export_data_for_user(user_id):
 
     exported_data = dict()
     for model in models_to_export:
+        # split the model name by uppercase characters
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
+        # join the split name with underscores and add _data for final name
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'
         exported_data[final_name] = model.export_data(user_id)
 
