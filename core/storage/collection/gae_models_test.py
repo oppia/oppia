@@ -210,6 +210,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_collection_ids, collection_ids)
 
+
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionCommitLogEntryModel class."""
 
