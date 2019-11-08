@@ -55,4 +55,6 @@ export class CommunityDashboardConstants {
   };
 
   public static DEFAULT_OPPORTUNITY_LANGUAGE_CODE= 'hi';
+
+  public static MAX_QUESTIONS_PER_SKILL = 50;
 }
