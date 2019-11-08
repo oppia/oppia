@@ -17,74 +17,83 @@
  * exploration.
  */
 
-angular.module('oppia').factory('ComputeGraphService', [
-  function() {
-    var _computeGraphData = function(initStateId, states) {
-      var nodes = {};
-      var links = [];
-      var finalStateIds = states.getFinalStateNames();
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-      states.getStateNames().forEach(function(stateName) {
-        var interaction = states.getState(stateName).interaction;
-        nodes[stateName] = stateName;
-        if (interaction.id) {
-          var groups = interaction.answerGroups;
-          for (var h = 0; h < groups.length; h++) {
-            links.push({
-              source: stateName,
-              target: groups[h].outcome.dest,
-            });
-          }
+@Injectable({
+  providedIn: 'root'
+})
+export class ComputeGraphService {
+  // TODO(#7176): Replace 'any' with exact type.As states.getFinalStateNames()
+  // is being called hence we can't just set the states type to Object
+  // since it will cause the typescript compilation to fail
+  _computeGraphData(initStateId: string, states: any): any {
+    let nodes = {};
+    let links = [];
+    let finalStateIds = states.getFinalStateNames();
 
-          if (interaction.defaultOutcome) {
-            links.push({
-              source: stateName,
-              target: interaction.defaultOutcome.dest,
-            });
-          }
+    states.getStateNames().forEach(function(stateName) {
+      let interaction = states.getState(stateName).interaction;
+      nodes[stateName] = stateName;
+      if (interaction.id) {
+        let groups = interaction.answerGroups;
+        for (let h = 0; h < groups.length; h++) {
+          links.push({
+            source: stateName,
+            target: groups[h].outcome.dest,
+          });
         }
-      });
 
-      return {
-        finalStateIds: finalStateIds,
-        initStateId: initStateId,
-        links: links,
-        nodes: nodes
-      };
-    };
-
-    var _computeBfsTraversalOfStates = function(
-        initStateId, states, sourceStateName) {
-      var stateGraph = _computeGraphData(initStateId, states);
-      var stateNamesInBfsOrder = [];
-      var queue = [];
-      var seen = {};
-      seen[sourceStateName] = true;
-      queue.push(sourceStateName);
-      while (queue.length > 0) {
-        var currStateName = queue.shift();
-        stateNamesInBfsOrder.push(currStateName);
-        for (var e = 0; e < stateGraph.links.length; e++) {
-          var edge = stateGraph.links[e];
-          var dest = edge.target;
-          if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
-            seen[dest] = true;
-            queue.push(dest);
-          }
+        if (interaction.defaultOutcome) {
+          links.push({
+            source: stateName,
+            target: interaction.defaultOutcome.dest,
+          });
         }
       }
-      return stateNamesInBfsOrder;
-    };
+    });
 
     return {
-      compute: function(initStateId, states) {
-        return _computeGraphData(initStateId, states);
-      },
-      computeBfsTraversalOfStates: function(
-          initStateId, states, sourceStateName) {
-        return _computeBfsTraversalOfStates(
-          initStateId, states, sourceStateName);
-      }
+      finalStateIds: finalStateIds,
+      initStateId: initStateId,
+      links: links,
+      nodes: nodes
     };
   }
-]);
+  // TODO(#7176): Replace 'any' with the exact type.
+  _computeBfsTraversalOfStates(initStateId: string, states: any,
+      sourceStateName: string): Array<any> {
+    let stateGraph = this._computeGraphData(initStateId, states);
+    let stateNamesInBfsOrder = [];
+    let queue = [];
+    let seen = {};
+    seen[sourceStateName] = true;
+    queue.push(sourceStateName);
+    while (queue.length > 0) {
+      let currStateName = queue.shift();
+      stateNamesInBfsOrder.push(currStateName);
+      for (let e = 0; e < stateGraph.links.length; e++) {
+        let edge = stateGraph.links[e];
+        let dest = edge.target;
+        if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
+          seen[dest] = true;
+          queue.push(dest);
+        }
+      }
+    }
+    return stateNamesInBfsOrder;
+  }
+  // TODO(#7176): Replace 'any' with the exact type.
+  compute(initStateId: string, states: any): Object {
+    return this._computeGraphData(initStateId, states);
+  }
+  // TODO(#7176): Replace 'any' with the exact type.
+  computeBfsTraversalOfStates(initStateId: string, states: any,
+      sourceStateName: any): Array<any> {
+    return this._computeBfsTraversalOfStates(
+      initStateId, states, sourceStateName);
+  }
+}
+
+angular.module('oppia').factory(
+  'ComputeGraphService', downgradeInjectable(ComputeGraphService));

@@ -17,40 +17,49 @@
  * SubtitledHtml domain objects.
  */
 
-angular.module('oppia').factory('GenerateContentIdService', [
-  'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
-  'COMPONENT_NAME_WORKED_EXAMPLE', function(
-      COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
-      COMPONENT_NAME_WORKED_EXAMPLE) {
-    var generateIdForComponent = function(existingComponentIds, componentName) {
-      var contentIdList = angular.copy(existingComponentIds);
-      var searchKey = componentName + '_';
-      var count = 0;
-      for (var contentId in contentIdList) {
-        if (contentIdList[contentId].indexOf(searchKey) === 0) {
-          var splitContentId = contentIdList[contentId].split('_');
-          var tempCount =
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { AppConstants } from 'app.constants';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class GenerateContentIdService {
+  generateIdForComponent(existingComponentIds: Array<string>,
+      componentName: string): string {
+    let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
+    let searchKey = componentName + '_';
+    let count = 0;
+    for (let contentId in contentIdList) {
+      if (contentIdList[contentId].indexOf(searchKey) === 0) {
+        let splitContentId = contentIdList[contentId].split('_');
+        let tempCount =
             parseInt(splitContentId[splitContentId.length - 1]);
-          if (tempCount > count) {
-            count = tempCount;
-          }
+        if (tempCount > count) {
+          count = tempCount;
         }
       }
-      return (searchKey + String(count + 1));
-    };
+    }
+    return (searchKey + String(count + 1));
+  }
 
-    var _getNextId = function(existingComponentIds, componentName) {
-      if (componentName === COMPONENT_NAME_FEEDBACK ||
-          componentName === COMPONENT_NAME_HINT ||
-          componentName === COMPONENT_NAME_WORKED_EXAMPLE) {
-        return generateIdForComponent(existingComponentIds, componentName);
-      } else {
-        throw Error('Unknown component name provided.');
-      }
-    };
-    return {
-      getNextId: function(existingComponentIds, componentName) {
-        return _getNextId(existingComponentIds, componentName);
-      }
-    };
-  }]);
+  _getNextId(existingComponentIds: Array<string>,
+      componentName: string): string {
+    if (componentName === AppConstants.COMPONENT_NAME_FEEDBACK ||
+        componentName === AppConstants.COMPONENT_NAME_HINT ||
+        componentName === AppConstants.COMPONENT_NAME_WORKED_EXAMPLE) {
+      return this.generateIdForComponent(existingComponentIds, componentName);
+    } else {
+      throw Error('Unknown component name provided.');
+    }
+  }
+
+  getNextId(existingComponentIds: Array<string>,
+      componentName: string): string {
+    return this._getNextId(existingComponentIds, componentName);
+  }
+}
+
+angular.module('oppia').factory(
+  'GenerateContentIdService', downgradeInjectable(GenerateContentIdService));

@@ -16,41 +16,48 @@
  * @fileoverview Service for debouncing function calls.
  */
 
-angular.module('oppia').factory('DebouncerService', [function() {
-  return {
-    // Returns a function that will not be triggered as long as it continues to
-    // be invoked. The function only gets executed after it stops being called
-    // for `wait` milliseconds.
-    debounce: function(func, millisecsToWait) {
-      var timeout;
-      var context = this;
-      var args = arguments;
-      var timestamp;
-      var result;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-      var later = function() {
-        var last = new Date().getTime() - timestamp;
-        if (last < millisecsToWait) {
-          timeout = setTimeout(later, millisecsToWait - last);
-        } else {
-          timeout = null;
-          result = func.apply(context, args);
-          if (!timeout) {
-            context = null;
-            args = null;
-          }
-        }
-      };
+@Injectable({
+  providedIn: 'root'
+})
+export class DebouncerService {
+  // Returns a function that will not be triggered as long as it continues to
+  // be invoked. The function only gets executed after it stops being called
+  // for `wait` milliseconds.
+  debounce(func: Function, millisecsToWait: number) {
+    let timeout;
+    let context = this;
+    let args = arguments;
+    let timestamp;
+    let result;
 
-      return function() {
-        context = this;
-        args = arguments;
-        timestamp = new Date().getTime();
+    let later = () => {
+      let last = new Date().getTime() - timestamp;
+      if (last < millisecsToWait) {
+        timeout = setTimeout(later, millisecsToWait - last);
+      } else {
+        timeout = null;
+        result = func.apply(context, args);
         if (!timeout) {
-          timeout = setTimeout(later, millisecsToWait);
+          context = null;
+          args = null;
         }
-        return result;
-      };
-    }
-  };
-}]);
+      }
+    };
+
+    return function() {
+      context = this;
+      args = arguments;
+      timestamp = new Date().getTime();
+      if (!timeout) {
+        timeout = setTimeout(later, millisecsToWait);
+      }
+      return result;
+    };
+  }
+}
+
+angular.module('oppia').factory(
+  'DebouncerService', downgradeInjectable(DebouncerService));
