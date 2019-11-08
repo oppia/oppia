@@ -60,19 +60,21 @@ var createExplorationAndStartTutorial = function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  creatorDashboardPage.clickCreateActivityButton();
-  if (users.isAdmin()) {
-    var testCreateModal = element(by.css('.protractor-test-creation-modal'));
-    waitFor.visibilityOf(
-      testCreateModal,
-      'testCreateModal takes too long to be visible.');
-    var createExplorationButton = element(
-      by.css('.protractor-test-create-exploration'));
-    waitFor.elementToBeClickable(
-      createExplorationButton,
-      'createExplorationButton takes too long to be clickable.');
-    createExplorationButton.click();
-  }
+  users.isAdmin().then(function(result) {
+    creatorDashboardPage.clickCreateActivityButton();
+    if (result) {
+      var testCreateModal = element(by.css('.protractor-test-creation-modal'));
+      waitFor.visibilityOf(
+        testCreateModal,
+        'testCreateModal takes too long to be visible.');
+      var createExplorationButton = element(
+        by.css('.protractor-test-create-exploration'));
+      waitFor.elementToBeClickable(
+        createExplorationButton,
+        'createExplorationButton takes too long to be clickable.');
+      createExplorationButton.click();
+    }
+  });
 };
 
 /**

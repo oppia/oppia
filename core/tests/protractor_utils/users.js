@@ -101,8 +101,7 @@ var createAndLoginAdminUserMobile = function(email, username) {
 };
 
 var isAdmin = function() {
-  return expect(
-    element(by.css('.protractor-test-admin-text')).isPresent()).toBe(true);
+  return element(by.css('.protractor-test-admin-text')).isPresent();
 };
 
 exports.isAdmin = isAdmin;
