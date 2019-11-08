@@ -800,8 +800,8 @@ class WrittenTranslations(python_utils.OBJECT):
         """Initializes a WrittenTranslations domain object.
 
         Args:
-            translations_mapping: dict. Contains content_id and a list of language
-                codes to be translated.
+            translations_mapping: dict. Contains content_id and a list
+                of language codes to be translated.
         """
 
         self.translations_mapping = translations_mapping
