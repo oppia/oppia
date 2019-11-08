@@ -800,8 +800,8 @@ class WrittenTranslations(python_utils.OBJECT):
         """Initializes a WrittenTranslations domain object.
 
         Args:
-        translations_mapping: dict. Contains content_id and a list of language
-        codes to be translated.
+            translations_mapping: dict. Contains content_id and a list of language
+                codes to be translated.
         """
 
         self.translations_mapping = translations_mapping
@@ -970,8 +970,8 @@ class RecordedVoiceovers(python_utils.OBJECT):
         """Initializes a RecordedVoiceovers domain object.
 
         Args:
-        voiceovers_mapping: dict. Contains content_id and a list of language
-        codes to converted to voiceovers.
+            voiceovers_mapping: dict. Contains content_id and a list of language
+                codes to be converted to voiceovers.
         """
 
         self.voiceovers_mapping = voiceovers_mapping
@@ -1024,7 +1024,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
 
         Args:
             expected_content_id_list: A list of content id which are expected to
-            be inside the RecordedVoiceovers.
+                be inside the RecordedVoiceovers.
 
         Raises:
             ValidationError: One or more attributes of the RecordedVoiceovers
