@@ -41,3 +41,16 @@ REMOTE_URL = 'git@github.com:oppia/oppia.git'
 
 RELEASE_BRANCH_TYPE = 'release'
 HOTFIX_BRANCH_TYPE = 'hotfix'
+
+RELEASE_DRIVE_URL = (
+    'https://drive.google.com/drive/folders/0B9KSjiibL_WDNjJyYlEtbTNvY3c')
+RELEASE_NOTES_URL = (
+    'https://docs.google.com/document/d/'
+    '1pmcDNfM2KtmkZeYipuInC48RE5JfkSJWQYdIQAkD0hQ/edit#')
+
+EXISTING_JOB_SPREADSHEETS_URL = (
+    'https://docs.google.com/spreadsheets/d/'
+    '1cSoVEwFyT-Q6d7yonbB0N-ElYGCFz5feMWXZXsv16_Y/edit#gid=1262496785')
+NEW_JOBS_SPREADSHEET_URL = (
+    'https://docs.google.com/spreadsheets/d/'
+    '1Wegd0rZhVOm3Q3VCIw0xMbLC7IWtRyrEahiPn61Fhoo/edit#gid=948463314')

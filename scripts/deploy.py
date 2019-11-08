@@ -319,9 +319,6 @@ def check_breakage(app_name, current_release_version):
     test_server_error_logs_url = (
         'https://console.cloud.google.com/logs/viewer?'
         'project=%s&key1=default&minLogLevel=500') % app_name
-    release_journal_url = (
-        'https://drive.google.com/drive/folders/'
-        '0B9KSjiibL_WDNjJyYlEtbTNvY3c')
     issue_filing_url = 'https://github.com/oppia/oppia/milestone/39'
 
     currently_served_version = (
@@ -331,7 +328,8 @@ def check_breakage(app_name, current_release_version):
         major_breakage = check_errors_in_a_page(
             test_server_error_logs_url, 'Is anything major broken?')
         if major_breakage:
-            common.open_new_tab_in_browser_if_possible(release_journal_url)
+            common.open_new_tab_in_browser_if_possible(
+                release_constants.RELEASE_DRIVE_URL)
             common.open_new_tab_in_browser_if_possible(issue_filing_url)
             raise Exception(
                 'Please note the issue in the release journal for this month, '
