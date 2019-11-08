@@ -21,6 +21,7 @@ from core.controllers import base
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 import feconf
 import utils
@@ -119,12 +120,24 @@ class EditableSkillDataHandler(base.BaseHandler):
         """Populates the data on the individual skill page."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
+
+        topics = topic_fetchers.get_all_topics()
+        grouped_skill_summary_dicts = {}
+
+        for topic in topics:
+            skill_summaries = skill_services.get_multi_skill_summaries(
+                topic.get_all_skill_ids())
+            skill_summary_dicts = [
+                summary.to_dict() for summary in skill_summaries]
+            grouped_skill_summary_dicts[topic.name] = skill_summary_dicts
+
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
         self.values.update({
-            'skill': skill.to_dict()
+            'skill': skill.to_dict(),
+            'grouped_skill_summaries': grouped_skill_summary_dicts
         })
 
         self.render_json(self.values)
@@ -199,37 +212,6 @@ class SkillDataHandler(base.BaseHandler):
         skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({
             'skills': skill_dicts
-        })
-
-        self.render_json(self.values)
-
-
-class SkillPublishHandler(base.BaseHandler):
-    """A handler for publishing skills."""
-
-    @acl_decorators.can_publish_skill
-    def put(self, skill_id):
-        """Publishes a skill."""
-        skill = skill_services.get_skill_by_id(skill_id)
-        version = self.payload.get('version')
-        _require_valid_version(version, skill.version)
-
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-
-        try:
-            skill_services.publish_skill(skill_id, self.user_id)
-        except Exception as e:
-            raise self.UnauthorizedUserException(e)
-
-        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-        can_edit_skill_description = check_can_edit_skill_description(
-            user_actions_info)
-
-        self.values.update({
-            'skill_is_private': skill_rights.skill_is_private,
-            'creator_id': skill_rights.creator_id,
-            'can_edit_skill_description': can_edit_skill_description
         })
 
         self.render_json(self.values)

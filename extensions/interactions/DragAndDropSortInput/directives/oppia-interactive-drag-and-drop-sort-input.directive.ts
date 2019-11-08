@@ -23,8 +23,8 @@ require(
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 
-require('services/HtmlEscaperService.ts');
-require('services/contextual/UrlService.ts');
+require('services/html-escaper.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
   'DragAndDropSortInputRulesService', 'HtmlEscaperService',

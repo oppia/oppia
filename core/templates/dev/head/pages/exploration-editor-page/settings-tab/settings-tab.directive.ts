@@ -65,9 +65,9 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
-require('services/AlertsService.ts');
-require('services/EditabilityService.ts');
-require('services/ExplorationFeaturesService.ts');
+require('services/alerts.service.ts');
+require('services/editability.service.ts');
+require('services/exploration-features.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

@@ -17,8 +17,8 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('answerSubmitAction', [
   'ExplorationHtmlFormatterService', 'HtmlEscaperService',

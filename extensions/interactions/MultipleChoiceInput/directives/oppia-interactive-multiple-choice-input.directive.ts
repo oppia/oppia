@@ -26,7 +26,7 @@ require(
 require(
   'interactions/MultipleChoiceInput/directives/' +
   'multiple-choice-input-rules.service.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
   'HtmlEscaperService', 'MultipleChoiceInputRulesService',

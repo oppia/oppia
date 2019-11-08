@@ -43,8 +43,8 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/ContextService.ts');
-require('services/ExplorationFeaturesService.ts');
+require('services/context.service.ts');
+require('services/exploration-features.service.ts');
 
 angular.module('oppia').directive('previewTab', [
   'UrlInterpolationService', function(

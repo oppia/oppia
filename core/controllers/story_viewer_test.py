@@ -179,10 +179,10 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
             self.post_json(
                 '%s/%s/%s' % (
                     feconf.STORY_NODE_COMPLETION_URL_PREFIX, 'story_id_1',
@@ -190,7 +190,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
                 {}, csrf_token=csrf_token, expected_status_int=404)
 
     def test_post_succeeds_when_story_and_node_exist(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -203,7 +203,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
         self.assertEqual(completed_nodes[1], self.NODE_ID_1)
 
     def test_post_fails_when_story_does_not_exist(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -213,7 +213,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
                 {}, csrf_token=csrf_token, expected_status_int=404)
 
     def test_post_fails_when_node_does_not_exist(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -228,7 +228,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
             new_story_id, 'Title', self.TOPIC_ID)
         story_services.save_new_story(self.admin_id, story)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
