@@ -106,32 +106,48 @@ class CommonTests(test_utils.GenericTestBase):
     def test_open_new_tab_in_browser_if_possible_with_url_opening_correctly(
             self):
         check_function_calls = {
-            'input_gets_called': False
+            'input_gets_called': False,
+            'check_call_gets_called': False
+        }
+        expected_check_function_calls = {
+            'input_gets_called': False,
+            'check_call_gets_called': True
         }
         def mock_call(unused_cmd_tokens):
             return 0
+        def mock_check_call(unused_cmd_tokens):
+            check_function_calls['check_call_gets_called'] = True
         def mock_input():
             check_function_calls['input_gets_called'] = True
         call_swap = self.swap(subprocess, 'call', mock_call)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with call_swap, input_swap:
+        with call_swap, check_call_swap, input_swap:
             common.open_new_tab_in_browser_if_possible('test-url')
-        self.assertEqual(check_function_calls, {'input_gets_called': False})
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_open_new_tab_in_browser_if_possible_with_url_not_opening_correctly(
             self):
         check_function_calls = {
-            'input_gets_called': False
+            'input_gets_called': False,
+            'check_call_gets_called': False
+        }
+        expected_check_function_calls = {
+            'input_gets_called': True,
+            'check_call_gets_called': False
         }
         def mock_call(unused_cmd_tokens):
             return 1
+        def mock_check_call(unused_cmd_tokens):
+            check_function_calls['check_call_gets_called'] = True
         def mock_input():
             check_function_calls['input_gets_called'] = True
         call_swap = self.swap(subprocess, 'call', mock_call)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with call_swap, input_swap:
+        with call_swap, check_call_swap, input_swap:
             common.open_new_tab_in_browser_if_possible('test-url')
-        self.assertEqual(check_function_calls, {'input_gets_called': True})
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_get_remote_alias_with_correct_alias(self):
         def mock_check_output(unused_cmd_tokens):
@@ -250,7 +266,7 @@ class CommonTests(test_utils.GenericTestBase):
         # pylint: enable=unused-argument
         def mock_communicate(unused_self):
             return ('Output', 'You\'ve successfully authenticated!')
-        def mock_call(unused_cmd_tokens):
+        def mock_check_call(unused_cmd_tokens):
             pass
         def mock_verify_local_repo_is_clean():
             pass
@@ -263,8 +279,8 @@ class CommonTests(test_utils.GenericTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         communicate_swap = self.swap(
             subprocess.Popen, 'communicate', mock_communicate)
-        call_swap = self.swap(
-            subprocess, 'call', mock_call)
+        check_call_swap = self.swap(
+            subprocess, 'check_call', mock_check_call)
         verify_local_repo_swap = self.swap(
             common, 'verify_local_repo_is_clean',
             mock_verify_local_repo_is_clean)
@@ -273,9 +289,9 @@ class CommonTests(test_utils.GenericTestBase):
             mock_verify_current_branch_name)
         get_remote_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
-        with isdir_swap, chdir_swap, popen_swap, communicate_swap, call_swap:
-            with verify_local_repo_swap, verify_current_branch_name_swap:
-                with get_remote_alias_swap:
+        with isdir_swap, chdir_swap, popen_swap, communicate_swap:
+            with check_call_swap, verify_local_repo_swap:
+                with verify_current_branch_name_swap, get_remote_alias_swap:
                     (
                         common
                         .ensure_release_scripts_folder_exists_and_is_up_to_date(
@@ -349,9 +365,9 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_install_npm_library(self):
 
-        def _mock_subprocess_call(unused_command):
-            """Mocks subprocess.call() to create a temporary file instead of the
-            actual npm library.
+        def _mock_subprocess_check_call(unused_command):
+            """Mocks subprocess.check_call() to create a temporary file instead
+            of the actual npm library.
             """
             temp_file = tempfile.NamedTemporaryFile()
             temp_file.name = 'temp_file'
@@ -363,7 +379,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
-        with self.swap(subprocess, 'call', _mock_subprocess_call):
+        with self.swap(subprocess, 'check_call', _mock_subprocess_check_call):
             common.install_npm_library('library_name', 'version', 'path')
 
     def test_ask_user_to_confirm(self):
