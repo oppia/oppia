@@ -238,4 +238,3 @@ export class SiteAnalyticsService {
 angular.module('oppia').factory(
   'SiteAnalyticsService',
   downgradeInjectable(SiteAnalyticsService));
-
