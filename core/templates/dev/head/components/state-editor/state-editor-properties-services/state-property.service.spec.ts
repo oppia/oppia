@@ -17,21 +17,37 @@
  *   editor page.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// state-property.service.ts is upgraded to Angular 8.
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
 
 describe('Change list service', function() {
-  describe('change list service', function() {
-    let cls = null;
-    let $httpBackend = null;
-    let mockWarningsData;
-    let mockExplorationData;
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
 
-    let autosaveDraftUrl = 'createhandler/autosave_draft/0';
-    let validAutosaveResponse = {
+  describe('change list service', function() {
+    var cls = null;
+    var $httpBackend = null;
+    var mockWarningsData;
+    var mockExplorationData;
+
+    var autosaveDraftUrl = 'createhandler/autosave_draft/0';
+    var validAutosaveResponse = {
       is_version_of_draft_valid: true
     };
 
@@ -39,13 +55,18 @@ describe('Change list service', function() {
       mockWarningsData = {
         addWarning: function() {}
       };
-
+      angular.mock.module(function($provide) {
+        $provide.value('AlertsService', [mockWarningsData][0]);
+      });
       spyOn(mockWarningsData, 'addWarning');
       mockExplorationData = {
         explorationId: 0,
         autosaveChangeList: function() {},
         discardDraft: function() {}
       };
+      angular.mock.module(function($provide) {
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
+      });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
@@ -206,19 +227,19 @@ describe('Exploration title service', function() {
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    let ugs = new UpgradedServices();
+    var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.upgradedServices)) {
       $provide.value(key, value);
     }
   }));
 
   describe('exploration title service', function() {
-    let ets = null;
-    let $httpBackend = null;
-    let mockExplorationData;
+    var ets = null;
+    var $httpBackend = null;
+    var mockExplorationData;
 
-    let autosaveDraftUrl = 'createhandler/autosave_draft/0';
-    let validAutosaveResponse = {
+    var autosaveDraftUrl = 'createhandler/autosave_draft/0';
+    var validAutosaveResponse = {
       is_version_of_draft_valid: true
     };
 
