@@ -18,7 +18,6 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-
 import isEqual from 'lodash/isEqual';
 import cloneDeep from 'lodash/cloneDeep';
 

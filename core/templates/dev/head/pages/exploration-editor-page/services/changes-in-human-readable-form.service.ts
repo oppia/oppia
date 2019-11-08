@@ -17,11 +17,11 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable } from '@angular/core';
 import isEqual from 'lodash/isEqual';
 
 import { UtilsService } from 'services/utils.service';
-import { DOCUMENT } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'

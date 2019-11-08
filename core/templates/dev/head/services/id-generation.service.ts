@@ -26,7 +26,7 @@ export class IdGenerationService {
   generateNewId(): string {
     // Generates random string using the last 10 digits of
     // the string for better entropy.
-    var randomString = Math.random().toString(36).slice(2);
+    let randomString = Math.random().toString(36).slice(2);
     while (randomString.length < 10) {
       randomString = randomString + '0';
     }
