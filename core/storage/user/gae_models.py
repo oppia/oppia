@@ -132,7 +132,7 @@ class UserSettingsModel(base_models.BaseModel):
         """
         try:
             user = UserSettingsModel.get(user_id)
-        except UserSettingsModel.EntityNotFoundError as e:
+        except UserSettingsModel.EntityNotFoundError:
             return {}
         return {
             'email': user.email,
