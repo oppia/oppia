@@ -33,6 +33,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import collections
 import os
+import platform
 import pprint
 import shutil
 import subprocess
@@ -320,12 +321,13 @@ def install_hook():
             python_utils.PRINT('Copied file to .git/hooks directory')
 
     python_utils.PRINT('Making pre-push hook file executable ...')
-    _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
+    if platform.uname()[0] != 'Windows':
+        _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
-    if not err_chmod_cmd:
-        python_utils.PRINT('pre-push hook file is now executable!')
-    else:
-        raise ValueError(err_chmod_cmd)
+        if not err_chmod_cmd:
+            python_utils.PRINT('pre-push hook file is now executable!')
+        else:
+            raise ValueError(err_chmod_cmd)
 
 
 def does_diff_include_js_or_ts_files(files_to_lint):

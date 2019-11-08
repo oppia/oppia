@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import fileinput
 import os
+import platform
 import shutil
 import subprocess
 
@@ -264,7 +265,11 @@ def main(args=None):
     install_third_party.main(args=[])
 
     # Install third-party node modules needed for the build process.
-    subprocess.check_call(['yarn'])
+    if platform.uname()[0] == 'Windows':
+        yarn_command = 'yarn.cmd'
+    else:
+        yarn_command = 'yarn'
+    subprocess.check_call([yarn_command])
 
     install_skulpt(parsed_args)
 

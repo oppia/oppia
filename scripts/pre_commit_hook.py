@@ -31,6 +31,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import platform 
 import shutil
 import subprocess
 import sys
@@ -75,12 +76,13 @@ def install_hook():
             python_utils.PRINT('Copied file to .git/hooks directory')
 
     python_utils.PRINT('Making pre-commit hook file executable ...')
-    _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
+    if platform.uname()[0] != 'Windows':
+        _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
-    if not err_chmod_cmd:
-        python_utils.PRINT('pre-commit hook file is now executable!')
-    else:
-        raise ValueError(err_chmod_cmd)
+        if not err_chmod_cmd:
+            python_utils.PRINT('pre-commit hook file is now executable!')
+        else:
+            raise ValueError(err_chmod_cmd)
 
 
 def start_subprocess_for_result(cmd):

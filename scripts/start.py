@@ -23,6 +23,7 @@ import argparse
 import atexit
 import fileinput
 import os
+import platform
 import re
 import subprocess
 import time
@@ -123,14 +124,19 @@ def main(args=None):
     # spam people accidentally.
     background_processes = []
     if not parsed_args.prod_env:
+        if platform.uname()[0] == 'Windows':
+            node_bin_path = [common.NODE_PATH, 'node']
+        else:
+            node_bin_path = [common.NODE_PATH, 'bin', 'node']
         background_processes.append(subprocess.Popen([
-            os.path.join(common.NODE_PATH, 'bin', 'node'),
+            os.path.join(*node_bin_path),
             os.path.join(common.NODE_MODULES_PATH, 'gulp', 'bin', 'gulp.js'),
             'watch']))
 
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
         background_processes.append(subprocess.Popen([
+            'node',
             os.path.join(
                 common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
             '--config', 'webpack.dev.config.ts', '--watch']))

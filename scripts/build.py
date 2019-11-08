@@ -1322,7 +1322,7 @@ def compile_typescript_files(project_dir):
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files...')
-    cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
+    cmd = ['node', './node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
 
 
@@ -1338,12 +1338,12 @@ def compile_typescript_files_continuously(project_dir):
         'kill `ps aux | grep "node_modules/typescript/bin/tsc --project . '
         '--watch" | awk \'{print $2}\'`'
     )
-    subprocess.check_call(kill_cmd, shell=True, stdout=subprocess.PIPE)
+    # subprocess.check_call(kill_cmd, shell=True, stdout=subprocess.PIPE)
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files in watch mode...')
     cmd = [
-        './node_modules/typescript/bin/tsc', '--project', project_dir,
+        'node', './node_modules/typescript/bin/tsc', '--project', project_dir,
         '--watch']
 
     with python_utils.open_file('tsc_output_log.txt', 'w') as out:
