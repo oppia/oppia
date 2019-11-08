@@ -205,7 +205,8 @@ export class SiteAnalyticsService {
   }
   registerNewCard(cardNum: number): void {
     if (cardNum <= 10 || cardNum % 10 === 0) {
-      this._sendEventToGoogleAnalytics('PlayerNewCard', 'click', cardNum);
+      this._sendEventToGoogleAnalytics('PlayerNewCard', 'click',
+        cardNum.toString());
     }
   }
   registerFinishExploration(): void {
