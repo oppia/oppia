@@ -27,9 +27,9 @@ require('objects/objectComponentsRequiresForPlayers.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('pages/review-test-page/review-test-page.constants.ajs.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
-require('services/AlertsService.ts');
-require('services/PageTitleService.ts');
-require('services/contextual/UrlService.ts');
+require('services/alerts.service.ts');
+require('services/page-title.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('reviewTestPage', [
   'UrlInterpolationService', function(

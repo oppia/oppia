@@ -17,14 +17,14 @@
  * in the skill editor.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/question/QuestionBackendApiService.ts');
-require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/question/question-backend-api.service.ts');
+require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/SkillRightsBackendApiService.ts');
+require('domain/skill/skill-rights-backend-api.service.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
-require('services/AlertsService.ts');
-require('services/QuestionsListService.ts');
+require('services/alerts.service.ts');
+require('services/questions-list.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
@@ -75,7 +75,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject);
             QuestionsListService.getQuestionSummariesAsync(
-              0, [skillId], true, false
+              [skillId], true, false
             );
             _skillIsBeingLoaded = false;
           }, function(error) {

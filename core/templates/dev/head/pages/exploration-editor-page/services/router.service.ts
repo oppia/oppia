@@ -23,7 +23,7 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/ExplorationFeaturesService.ts');
+require('services/exploration-features.service.ts');
 
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',

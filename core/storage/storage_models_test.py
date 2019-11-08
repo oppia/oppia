@@ -49,11 +49,14 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     if 'Model' in all_base_classes:
                         yield clazz
 
-    # List of model classes that can't have Wipeout related class methods
+    # List of model classes that don't have Wipeout related class methods
     # defined because they're not used directly but only as a base classes for
     # the other models.
+    #
+    # BaseCommitLogEntryModel is not included in this list because we implement
+    # has_reference_to_user_id inside it, since the children models don't differ
+    # that much.
     BASE_CLASSES = (
-        'BaseCommitLogEntryModel',
         'BaseMapReduceBatchResultsModel',
         'BaseModel',
         'BaseSnapshotContentModel',
@@ -109,6 +112,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 with self.assertRaises(NotImplementedError):
                     clazz.get_deletion_policy()
 
+    # TODO(#7858): Remove this after has_reference_to_user_id is implemented
+    # where needed.
     @unittest.skip(
         'has_reference_to_user_id is not yet implemented on all models')
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(

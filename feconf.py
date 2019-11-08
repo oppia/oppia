@@ -36,10 +36,6 @@ POST_COMMIT_STATUS_PRIVATE = 'private'
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# The path for generating release_summary.md file for the current release.
-RELEASE_SUMMARY_FILEPATH = os.path.join(
-    os.getcwd(), os.pardir, 'release_summary.md')
-
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.
@@ -357,7 +353,8 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# Committer id for system actions.
+# Committer id for system actions. The username for the system committer
+# (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
@@ -705,7 +702,6 @@ SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
-SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'

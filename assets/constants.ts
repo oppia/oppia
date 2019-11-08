@@ -305,6 +305,10 @@ export = {
     "description": "Dutch",
     "relatedLanguages": ["nl"]
   }, {
+    "id": "ee",
+    "description": "Ewe",
+    "relatedLanguages": ["ee"]
+  }, {
     "id": "tl",
     "description": "Filipino",
     "relatedLanguages": ["tl"]
@@ -447,12 +451,16 @@ export = {
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
     "name": "General",
     "interaction_ids": [
+      "ImageClickInput",
+      "ItemSelectionInput",
       "MultipleChoiceInput",
       "TextInput"
     ]
   }, {
     "name": "Math",
     "interaction_ids": [
+      "FractionInput",
+      "NumberWithUnits",
       "NumericInput"
     ]
   }],
@@ -533,11 +541,21 @@ export = {
 
   "ENABLE_PREREQUISITE_SKILLS": false,
 
+  // For the full new structures viewer features, both
+  // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has
+  // to be true. Only ENABLE_NEW_STRUCTURE_PLAYERS can be true if just the
+  // players need to be accessed, but without story progress updation.
+  // This is split up so as to access the viewers in production without
+  // exposing the POST and PUT endpoints just yet.
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
+
+  "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": false,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
 
   "MAX_SKILLS_PER_QUESTION": 3,
+
+  "MAX_QUESTIONS_PER_SKILL": 50,
 
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
