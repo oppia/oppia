@@ -58,6 +58,9 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
             StateEditorService.isExplorationWhitelisted());
 
           $scope.$on('saveOutcomeDestDetails', function() {
+            if (ctrl.isSelfLoop()) {
+              ctrl.outcome.dest = StateEditorService.getActiveStateName();
+            }
             // Create new state if specified.
             if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
               EditorFirstTimeEventsService

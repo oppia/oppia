@@ -172,6 +172,12 @@ angular.module('oppia').directive('outcomeEditor', [
               ctrl.outcome.feedback.getHtml());
             ctrl.savedOutcome.feedback = angular.copy(
               ctrl.outcome.feedback);
+            // If the stateName has changed and previously saved
+            // destination points to the older name, update it to
+            // the active state name.
+            if (ctrl.savedOutcome.dest === ctrl.outcome.dest) {
+              ctrl.savedOutcome.dest = StateEditorService.getActiveStateName();
+            }
             var feedbackContentId = ctrl.savedOutcome.feedback.getContentId();
             if (fromClickSaveFeedbackButton && contentHasChanged) {
               var contentId = ctrl.savedOutcome.feedback.getContentId();
