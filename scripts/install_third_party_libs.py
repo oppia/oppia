@@ -27,13 +27,13 @@ import subprocess
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 # Download and install pyyaml.
 if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
-    subprocess.call([
+    subprocess.check_call([
         'pip', 'install', 'pyyaml==5.1.2', '--target',
         os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
 # Download and install future.
 if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
-    subprocess.call([
+    subprocess.check_call([
         'pip', 'install', 'future==0.17.1', '--target',
         os.path.join('third_party', 'future-0.17.1')])
 
@@ -133,12 +133,12 @@ def install_skulpt(parsed_args):
             os.chdir(common.OPPIA_TOOLS_DIR)
             os.mkdir('skulpt-0.10.0')
             os.chdir('skulpt-0.10.0')
-            subprocess.call([
+            subprocess.check_call([
                 'git', 'clone', 'https://github.com/skulpt/skulpt'])
             os.chdir('skulpt')
 
             # Use a specific Skulpt release.
-            subprocess.call(['git', 'checkout', '0.10.0'])
+            subprocess.check_call(['git', 'checkout', '0.10.0'])
 
             python_utils.PRINT('Compiling Skulpt')
             # The Skulpt setup function needs to be tweaked. It fails without
@@ -179,7 +179,7 @@ def install_skulpt(parsed_args):
                     line.replace('ret = rununits(opt=True)', 'ret = 0'),
                     end='')
 
-            subprocess.call(['python', skulpt_filepath, 'dist'])
+            subprocess.check_call(['python', skulpt_filepath, 'dist'])
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
@@ -264,7 +264,7 @@ def main(args=None):
     install_third_party.main(args=[])
 
     # Install third-party node modules needed for the build process.
-    subprocess.call(['yarn'])
+    subprocess.check_call(['yarn'])
 
     install_skulpt(parsed_args)
 
