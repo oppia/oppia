@@ -129,7 +129,9 @@ angular.module('oppia').factory('ExplorationDataService', [
                     $window.location.reload();
                   });
                 } else {
-                  errorCallback(explorationId, draft.getChanges());
+                  if (errorCallback) {
+                    errorCallback(explorationId, draft.getChanges());
+                  }
                 }
               }
               return response;
