@@ -10381,6 +10381,129 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
 
 
+class GeneralVoiceoverApplicationModelValidatorTests(
+        test_utils.GenericTestBase):
+    def setUp(self):
+        super(GeneralVoiceoverApplicationModelValidatorTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0',
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.owner_id, exp)
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='valid_id',
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id='0',
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id=self.owner_id,
+            final_reviewer_id=self.admin_id,
+            language_code='en',
+            filename='audio.mp3',
+            content='<p>Text to voiceover</p>',
+            rejection_message=None).put()
+        self.model_instance = (
+            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+                'valid_id'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .GeneralVoiceoverApplicationModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of GeneralVoiceoverApplicationModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id,
+                self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'GeneralVoiceoverApplicationModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration_ids field '
+                'check of GeneralVoiceoverApplicationModel\', '
+                '[u"Entity id %s: based on field exploration_ids having value '
+                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                'exist"]]') % self.model_instance.id]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_author_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for author_ids field '
+                'check of GeneralVoiceoverApplicationModel\', '
+                '[u"Entity id %s: based on field author_ids having value '
+                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
+                'exist"]]') % (
+                    self.model_instance.id, self.owner_id, self.owner_id)]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_reviewer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final_reviewer_ids field '
+                'check of GeneralVoiceoverApplicationModel\', '
+                '[u"Entity id %s: based on field final_reviewer_ids having '
+                'value %s, expect model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
+                    self.model_instance.id, self.admin_id, self.admin_id)]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_object_validation_failure(self):
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'GeneralVoiceoverApplicationModel\', '
+            '[u\'Entity id valid_id: Entity fails domain validation with '
+            'the error Invalid language_code: en\']]']
+        mock_supported_audio_languages = [{
+            'id': 'ar',
+            'description': 'Arabic',
+            'relatedLanguages': ['ar']
+            }]
+        with self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES',
+            mock_supported_audio_languages):
+            run_job_and_check_output(self, expected_output, sort=True)
+
+
 class TopicModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
