@@ -71,13 +71,9 @@ export class UpgradedServices {
       new WindowDimensionsService()),
     'UrlService': new UrlService(new WindowRef()),
     'UtilsService': new UtilsService(),
-<<<<<<< HEAD
     'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
       new UnitsObjectFactory(), new FractionObjectFactory()),
     'WindowDimensionsService': new WindowDimensionsService()
-=======
-    'WindowDimensionsService': new WindowDimensionsService(),
->>>>>>> develop
   };
 }
 
