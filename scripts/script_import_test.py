@@ -51,15 +51,16 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     def setUp(self):
         super(InstallThirdPartyLibsImportTests, self).setUp()
         self.commands = []
-        def mock_call(cmd_tokens):
+        def mock_check_call(cmd_tokens):
             self.commands.extend(cmd_tokens)
-        self.call_swap = self.swap(subprocess, 'call', mock_call)
+        self.check_call_swap = self.swap(
+            subprocess, 'check_call', mock_check_call)
 
     def test_import_with_missing_packages(self):
         def mock_exists(unused_path):
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-        with self.call_swap, exists_swap:
+        with self.check_call_swap, exists_swap:
             from . import install_third_party_libs # pylint: disable=unused-variable
         self.assertEqual(
             self.commands, [
