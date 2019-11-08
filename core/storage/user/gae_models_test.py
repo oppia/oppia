@@ -110,6 +110,10 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user = user_models.UserSettingsModel.get_by_role(
             feconf.ROLE_ID_ADMIN)
         self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
+    
+    def test_export_data_nonexistent_user(self):
+        user_data = user_models.UserSettingsModel.export_data('fake_user')
+        self.assertEqual(user_data, {})
 
     def test_export_data_trivial(self):
         user = user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
@@ -985,6 +989,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             self.USER_1_ID, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)
+
+    def test_export_data_nonexistent_user(self):
+        user_data = user_models.ExplorationUserDataModel.export_data(
+            'fake_user')
+        self.assertEqual(user_data, {})
 
     def test_export_data_one_exploration(self):
         """Test export data when user has one exploration."""

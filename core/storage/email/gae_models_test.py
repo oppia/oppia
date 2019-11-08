@@ -474,3 +474,11 @@ class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
                 self.USER_ID_1))
         expected_data = {}
         self.assertEqual(expected_data, user_data)
+    
+    def test_export_data_on_nonexistent_user(self):
+        """Verify proper export data output on nonexistent user."""
+        user_data = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
+                'fake_user'))
+        expected_data = {}
+        self.assertEqual(expected_data, user_data) 

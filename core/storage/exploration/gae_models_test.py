@@ -203,6 +203,19 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'viewable_exploration_ids': []
         }
         self.assertEqual(expected_exploration_ids, exploration_ids)
+    
+    def test_export_data_on_nonexistent_user(self):
+        """Test for empty lists when user has no exploration involvement."""
+        exploration_ids = (
+            exploration_models.ExplorationRightsModel.export_data(
+                'fake_user'))
+        expected_exploration_ids = {
+            'owned_exploration_ids': [],
+            'editable_exploration_ids': [],
+            'voiced_exploration_ids': [],
+            'viewable_exploration_ids': []
+        }
+        self.assertEqual(expected_exploration_ids, exploration_ids) 
 
 
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
