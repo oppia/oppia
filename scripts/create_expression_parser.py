@@ -47,7 +47,7 @@ def main(args=None):
 
     common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
 
-    subprocess.call([
+    subprocess.check_call([
         os.path.join(common.NODE_MODULES_PATH, 'pegjs', 'bin', 'pegjs'),
         expression_parser_definition, expression_parser_js])
 
