@@ -29,6 +29,7 @@ from . import gcloud_adapter
 
 class GcloudAdapterTests(test_utils.GenericTestBase):
     """Test the methods for gcloud adapter."""
+
     def setUp(self):
         super(GcloudAdapterTests, self).setUp()
         self.check_function_calls = {

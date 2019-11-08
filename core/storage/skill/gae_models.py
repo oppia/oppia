@@ -220,6 +220,19 @@ class SkillSummaryModel(base_models.BaseModel):
         """Skill summary should be kept if associated skill is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether SkillSummaryModel references the given user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+            be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
 
 class SkillRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill rights snapshot."""
