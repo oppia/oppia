@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {ContributionOpportunitiesBackendApiService} from './contribution-opportunities-backend-api.service';
+
 /**
  * @fileoverview A service for handling contribution opportunities in different
  * fields.
@@ -21,51 +23,51 @@ require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities-backend-api.service.ts');
 
-angular.module('oppia').factory('ContributionOpportunitiesService', [
-  'ContributionOpportunitiesBackendApiService',
-  function(ContributionOpportunitiesBackendApiService) {
-    var translationOpportunitiesCursor = null;
-    var voiceoverOpportunitiesCursor = null;
-    var moreTranslationOpportunitiesAvailable = true;
-    var moreVoiceoverOpportunitiesAvailable = true;
 
-    var _getTranslationOpportunities = function(
+export class ContributionOpportunitiesService {
+  constructor(private contributionOpportunitiesBackendApiService:
+                  ContributionOpportunitiesBackendApiService) {}
+
+    translationOpportunitiesCursor = null;
+    voiceoverOpportunitiesCursor = null;
+    moreTranslationOpportunitiesAvailable = true;
+    moreVoiceoverOpportunitiesAvailable = true;
+
+    _getTranslationOpportunities(
         languageCode, cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-        languageCode, cursor, function(data) {
-          moreTranslationOpportunitiesAvailable = data.more;
-          translationOpportunitiesCursor = data.next_cursor;
+      this.contributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
+        languageCode, cursor, (data) => {
+          this.moreTranslationOpportunitiesAvailable = data.more;
+          this.translationOpportunitiesCursor = data.next_cursor;
           successCallback(data.opportunities, data.more);
         });
-    };
-    var _getVoiceoverOpportunities = function(
+    }
+    _getVoiceoverOpportunities(
         languageCode, cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-        languageCode, cursor, function(data) {
-          moreVoiceoverOpportunitiesAvailable = data.more;
-          voiceoverOpportunitiesCursor = data.next_cursor;
+      this.contributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
+        languageCode, cursor, (data) => {
+          this.moreVoiceoverOpportunitiesAvailable = data.more;
+          this.voiceoverOpportunitiesCursor = data.next_cursor;
           successCallback(data.opportunities, data.more);
         });
-    };
+    }
 
-    return {
-      getTranslationOpportunities: function(languageCode, successCallback) {
-        _getTranslationOpportunities(languageCode, '', successCallback);
-      },
-      getVoiceoverOpportunities: function(languageCode, successCallback) {
-        _getVoiceoverOpportunities(languageCode, '', successCallback);
-      },
-      getMoreTranslationOpportunities: function(languageCode, successCallback) {
-        if (moreTranslationOpportunitiesAvailable) {
-          _getTranslationOpportunities(
-            languageCode, translationOpportunitiesCursor, successCallback);
-        }
-      },
-      getMoreVoiceoverOpportunities: function(languageCode, successCallback) {
-        if (moreVoiceoverOpportunitiesAvailable) {
-          _getVoiceoverOpportunities(
-            languageCode, voiceoverOpportunitiesCursor, successCallback);
-        }
+    getTranslationOpportunities(languageCode, successCallback) {
+      this._getTranslationOpportunities(languageCode, '', successCallback);
+    }
+    getVoiceoverOpportunities(languageCode, successCallback) {
+      this._getVoiceoverOpportunities(languageCode, '', successCallback);
+    }
+    getMoreTranslationOpportunities(languageCode, successCallback) {
+      if (this.moreTranslationOpportunitiesAvailable) {
+        this._getTranslationOpportunities(
+          languageCode, this.translationOpportunitiesCursor, successCallback);
       }
-    };
-  }]);
+    }
+    getMoreVoiceoverOpportunities(languageCode, successCallback) {
+      if (this.moreVoiceoverOpportunitiesAvailable) {
+        this._getVoiceoverOpportunities(
+          languageCode, this.voiceoverOpportunitiesCursor, successCallback);
+      }
+    }
+}

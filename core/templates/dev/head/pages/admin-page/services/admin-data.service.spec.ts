@@ -16,43 +16,49 @@
  * @fileoverview Tests for AdminDataService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { AdminDataService } from './admin-data.service';
 
-require('pages/admin-page/services/admin-data.service.ts');
-
-describe('Admin Data Service', function() {
-  var AdminDataService = null;
-  var $httpBackend = null;
-  var sampleAdminData = {
+fdescribe('Admin Data Service', function() {
+  let adminDataService: AdminDataService = null;
+  let httpTestingController: HttpTestingController;
+  let sampleAdminData = {
     property: 'value'
   };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    $httpBackend = $injector.get('$httpBackend');
-    AdminDataService = $injector.get('AdminDataService');
-  }));
-
-  it('should return the correct admin data', function() {
-    $httpBackend.expect('GET', '/adminhandler').respond(
-      200, sampleAdminData);
-
-    AdminDataService.getDataAsync().then(function(response) {
-      expect(response).toEqual(sampleAdminData);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [AdminDataService]
     });
+
+    adminDataService = TestBed.get(AdminDataService);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
 
-  it('should cache the response and not make a second request', function() {
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  it('should return the correct admin data', fakeAsync( () => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    adminDataService.getDataAsync().then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleAdminData);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should cache the response and not make a second request', fakeAsync(() => {
     $httpBackend.expect('GET', '/adminhandler').respond(
       200, sampleAdminData);
     AdminDataService.getDataAsync();
@@ -66,5 +72,23 @@ describe('Admin Data Service', function() {
     });
 
     expect($httpBackend.flush).toThrow();
-  });
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush({property: 'another value'});
+
+    req = httpTestingController.expectOne('/adminhandler');
+    req.flush();
+
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let req = adminDataService.getDataAsync();
+    req.flush();
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

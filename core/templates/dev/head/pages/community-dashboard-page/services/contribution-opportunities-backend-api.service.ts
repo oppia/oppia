@@ -12,45 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {HttpClient} from '@angular/common/http';
+import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
+
 /**
  * @fileoverview Service for fetching the opportunities available for
  * contributors to contribute.
  */
 
-angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
-  '$http', 'UrlInterpolationService', 'OPPORTUNITY_TYPE_TRANSLATION',
-  'OPPORTUNITY_TYPE_VOICEOVER', function(
-      $http, UrlInterpolationService, OPPORTUNITY_TYPE_TRANSLATION,
-      OPPORTUNITY_TYPE_VOICEOVER) {
-    var urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
-    return {
-      fetchTranslationOpportunities: function(
-          languageCode, cursor, successCallback) {
-        return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            urlTemplate, {opportunityType: OPPORTUNITY_TYPE_TRANSLATION}
-          ), {
-            params: {
-              language_code: languageCode,
-              cursor: cursor
-            }
-          }).then(function(response) {
-          successCallback(response.data);
-        });
-      },
-      fetchVoiceoverOpportunities: function(
-          languageCode, cursor, successCallback) {
-        return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            urlTemplate, {opportunityType: OPPORTUNITY_TYPE_VOICEOVER}
-          ), {
-            params: {
-              language_code: languageCode,
-              cursor: cursor
-            }
-          }).then(function(response) {
-          successCallback(response.data);
-        });
-      },
-    };
-  }]);
+const Constants = require('../../../../../../../assets/constants');
+export class ContributionOpportunitiesBackendApiService {
+  constructor(private httpClient: HttpClient,
+              private urlInterpolationService: UrlInterpolationService) {}
+
+  urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
+
+  fetchTranslationOpportunities(
+      languageCode, cursor, successCallback) {
+    return this.httpClient.get(
+      this.urlInterpolationService.interpolateUrl(
+        this.urlTemplate, {opportunityType: Constants.OPPORTUNITY_TYPE_TRANSLATION}
+      ), {
+        params: {
+          language_code: languageCode,
+          cursor: cursor
+        }
+      }).toPromise().then((response: any) => {
+      successCallback(response.data);
+    });
+  }
+  fetchVoiceoverOpportunities(
+      languageCode, cursor, successCallback) {
+    return this.httpClient.get(
+      this.urlInterpolationService.interpolateUrl(
+        this.urlTemplate,
+        {opportunityType: Constants.OPPORTUNITY_TYPE_VOICEOVER}
+      ), {
+        params: {
+          language_code: languageCode,
+          cursor: cursor
+        }
+      }).toPromise().then((response: any) => {
+      successCallback(response.data);
+    });
+  }
+}

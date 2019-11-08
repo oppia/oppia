@@ -17,100 +17,107 @@
  * fields.
  */
 
-angular.module('oppia').factory('TranslateTextService', [
-  '$http', function($http) {
-    var stateWiseContents = null;
-    var stateWiseContentIds = {};
-    var activeStateName = null;
-    var activeContentId = null;
-    var stateNamesList = [];
-    var activeExpId = null;
-    var activeExpVersion = null;
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 
-    var getNextContentId = function() {
-      return stateWiseContentIds[activeStateName].pop();
-    };
-    var getNextState = function() {
-      var currentIndex = stateNamesList.indexOf(activeStateName);
-      return stateNamesList[currentIndex + 1];
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class TranslateTextService {
+  constructor(private httpClient: HttpClient) {}
 
-    var getNextText = function() {
-      activeContentId = getNextContentId();
-      if (!activeContentId) {
-        activeStateName = getNextState();
-        if (!activeStateName) {
+    stateWiseContents = null;
+    stateWiseContentIds = {};
+    activeStateName = null;
+    activeContentId = null;
+    stateNamesList = [];
+    activeExpId = null;
+    activeExpVersion = null;
+
+    getNextContentId() {
+      return this.stateWiseContentIds[this.activeStateName].pop();
+    }
+    getNextState() {
+      let currentIndex = this.stateNamesList.indexOf(this.activeStateName);
+      return this.stateNamesList[currentIndex + 1];
+    }
+
+    getNextText() {
+      this.activeContentId = this.getNextContentId();
+      if (!this.activeContentId) {
+        this.activeStateName = this.getNextState();
+        if (!this.activeStateName) {
           return null;
         }
-        activeContentId = getNextContentId();
+        this.activeContentId = this.getNextContentId();
       }
-      return stateWiseContents[activeStateName][activeContentId];
-    };
+      return this.stateWiseContents[this.activeStateName][this.activeContentId];
+    }
 
-    var isMoreTextAvailableForTranslation = function() {
+    isMoreTextAvailableForTranslation() {
       return !(
-        stateNamesList.indexOf(activeStateName) + 1 === stateNamesList.length &&
-          stateWiseContentIds[activeStateName].length === 0);
-    };
+        this.stateNamesList.indexOf(this.activeStateName) + 1 ===
+          this.stateNamesList.length &&
+          this.stateWiseContentIds[this.activeStateName].length === 0);
+    }
 
-    return {
-      init: function(expId, languageCode, successCallback) {
-        stateWiseContents = null;
-        stateWiseContentIds = {};
-        activeStateName = null;
-        activeContentId = null;
-        stateNamesList = [];
-        activeExpId = expId;
-        activeExpVersion = null;
-        $http.get(
-          '/gettranslatabletexthandler', {
-            params: {
-              exp_id: expId,
-              language_code: languageCode
-            }
-          }).then(
-          function(response) {
-            stateWiseContents = response.data.state_names_to_content_id_mapping;
-            activeExpVersion = response.data.version;
-            for (var stateName in stateWiseContents) {
-              stateNamesList.push(stateName);
-              var contentIds = [];
-              for (var contentId in stateWiseContents[stateName]) {
-                contentIds.push(contentId);
-              }
-              stateWiseContentIds[stateName] = contentIds;
-            }
-            activeStateName = stateNamesList[0];
-            successCallback();
-          });
-      },
-      getTextToTranslate: function() {
-        return {
-          text: getNextText(),
-          more: isMoreTextAvailableForTranslation()
-        };
-      },
-      suggestTranslatedText: function(
-          translationHtml, languageCode, successCallback) {
-        var url = '/suggestionhandler/';
-        var data = {
-          suggestion_type: 'translate_content',
-          target_type: 'exploration',
-          description: 'Adds translation',
-          target_id: activeExpId,
-          target_version_at_submission: activeExpVersion,
-          assigned_reviewer_id: null,
-          final_reviewer_id: null,
-          change: {
-            cmd: 'add_translation',
-            content_id: activeContentId,
-            state_name: activeStateName,
-            language_code: languageCode,
-            content_html: stateWiseContents[activeStateName][activeContentId],
-            translation_html: translationHtml
+    init(expId, languageCode, successCallback) {
+      this.stateWiseContents = null;
+      this.stateWiseContentIds = {};
+      this.activeStateName = null;
+      this.activeContentId = null;
+      this.stateNamesList = [];
+      this.activeExpId = expId;
+      this.activeExpVersion = null;
+      this.httpClient.get(
+        '/gettranslatabletexthandler', {
+          params: {
+            exp_id: expId,
+            language_code: languageCode
           }
-        };
-        $http.post(url, data).then(successCallback);
-      }
-    };
-  }]);
+        }).toPromise().then(
+        (response: any) => {
+          this.stateWiseContents = response.data.state_names_to_content_id_mapping;
+          this.activeExpVersion = response.data.version;
+          for (let stateName in this.stateWiseContents) {
+            this.stateNamesList.push(stateName);
+            let contentIds = [];
+            for (let contentId in this.stateWiseContents[stateName]) {
+              contentIds.push(contentId);
+            }
+            this.stateWiseContentIds[stateName] = contentIds;
+          }
+          this.activeStateName = this.stateNamesList[0];
+          successCallback();
+        });
+    }
+    getTextToTranslate() {
+      return {
+        text: this.getNextText(),
+        more: this.isMoreTextAvailableForTranslation()
+      };
+    }
+    suggestTranslatedText(
+        translationHtml, languageCode, successCallback) {
+      let url = '/suggestionhandler/';
+      let data = {
+        suggestion_type: 'translate_content',
+        target_type: 'exploration',
+        description: 'Adds translation',
+        target_id: this.activeExpId,
+        target_version_at_submission: this.activeExpVersion,
+        assigned_reviewer_id: null,
+        final_reviewer_id: null,
+        change: {
+          cmd: 'add_translation',
+          content_id: this.activeContentId,
+          state_name: this.activeStateName,
+          language_code: languageCode,
+          // eslint-disable-next-line max-len
+          content_html: this.stateWiseContents[this.activeStateName][this.activeContentId],
+          translation_html: translationHtml
+        }
+      };
+      this.httpClient.post(url, data).toPromise().then(successCallback);
+    }
+}

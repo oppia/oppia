@@ -23,6 +23,7 @@
 // turned on. This flag must be turned on explicitly by the application
 // owner in feconf.py.
 
+<<<<<<< Updated upstream
 angular.module('oppia').factory('SiteAnalyticsService', [
   '$window', 'CAN_SEND_ANALYTICS_EVENTS', function(
       $window, CAN_SEND_ANALYTICS_EVENTS) {
@@ -213,3 +214,209 @@ angular.module('oppia').factory('SiteAnalyticsService', [
       }
     };
   }]);
+=======
+@Injectable({
+  providedIn: 'root'
+})
+export class SiteAnalyticsService {
+  constructor(private windowRef: WindowRef) {}
+
+  // For definitions of the various arguments, please see:
+  // developers.google.com/analytics/devguides/collection/analyticsjs/events
+  _sendEventToGoogleAnalytics(
+      eventCategory: string, eventAction: string, eventLabel: string): void {
+    if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
+      this.windowRef.nativeWindow.ga('send', 'event',
+        eventCategory, eventAction, eventLabel);
+    }
+  }
+
+  // For definitions of the various arguments, please see:
+  // developers.google.com/analytics/devguides/collection/analyticsjs/
+  //   social-interactions
+  // TODO(#7176): Replace 'any' with the exact type.
+  __sendSocialEventToGoogleAnalytics(
+      network: any, action: any, targetUrl: any): void {
+    if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
+      this.windowRef.nativeWindow.ga('send', 'social',
+        network, action, targetUrl);
+    }
+  }
+
+  // The srcElement refers to the element on the page that is clicked.
+  // TODO(#7176): Replace 'any' with the exact type.
+  registerStartLoginEvent(srcElement: any): void {
+    this._sendEventToGoogleAnalytics(
+      'LoginButton', 'click',
+      this.windowRef.nativeWindow.location.pathname + ' ' + srcElement);
+  }
+  registerNewSignupEvent(): void {
+    this._sendEventToGoogleAnalytics('SignupButton', 'click', '');
+  }
+  registerClickBrowseLibraryButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'BrowseLibraryButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerGoToDonationSiteEvent(donationSiteName): void {
+    this._sendEventToGoogleAnalytics(
+      'GoToDonationSite', 'click', donationSiteName);
+  }
+  registerApplyToTeachWithOppiaEvent(): void {
+    this._sendEventToGoogleAnalytics('ApplyToTeachWithOppia', 'click', '');
+  }
+  registerClickCreateExplorationButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'CreateExplorationButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerCreateNewExplorationEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics('NewExploration', 'create', explorationId);
+  }
+  registerCreateNewExplorationInCollectionEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'NewExplorationFromCollection', 'create', explorationId);
+  }
+  registerCreateNewCollectionEvent(collectionId: string): void {
+    this._sendEventToGoogleAnalytics('NewCollection', 'create', collectionId);
+  }
+  registerCommitChangesToPrivateExplorationEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'CommitToPrivateExploration', 'click', explorationId);
+  }
+  registerShareExplorationEvent(network: string): void {
+    this.__sendSocialEventToGoogleAnalytics(
+      network, 'share', this.windowRef.nativeWindow.location.pathname);
+  }
+  registerShareCollectionEvent(network: string): void {
+    this.__sendSocialEventToGoogleAnalytics(
+      network, 'share', this.windowRef.nativeWindow.location.pathname);
+  }
+  registerOpenEmbedInfoEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics('EmbedInfoModal', 'open', explorationId);
+  }
+  registerCommitChangesToPublicExplorationEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'CommitToPublicExploration', 'click', explorationId);
+  }
+  // Metrics for tutorial on first creating exploration
+  registerTutorialModalOpenEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'TutorialModalOpen', 'open', explorationId);
+  }
+  registerDeclineTutorialModalEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'DeclineTutorialModal', 'click', explorationId);
+  }
+  registerAcceptTutorialModalEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'AcceptTutorialModal', 'click', explorationId);
+  }
+  // Metrics for visiting the help center
+  registerClickHelpButtonEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ClickHelpButton', 'click', explorationId);
+  }
+  registerVisitHelpCenterEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'VisitHelpCenter', 'click', explorationId);
+  }
+  registerOpenTutorialFromHelpCenterEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'OpenTutorialFromHelpCenter', 'click', explorationId);
+  }
+  // Metrics for exiting the tutorial
+  registerSkipTutorialEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'SkipTutorial', 'click', explorationId);
+  }
+  registerFinishTutorialEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'FinishTutorial', 'click', explorationId);
+  }
+  // Metrics for first time editor use
+  registerEditorFirstEntryEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'FirstEnterEditor', 'open', explorationId);
+  }
+  registerFirstOpenContentBoxEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'FirstOpenContentBox', 'open', explorationId);
+  }
+  registerFirstSaveContentEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'FirstSaveContent', 'click', explorationId);
+  }
+  registerFirstClickAddInteractionEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'FirstClickAddInteraction', 'click', explorationId);
+  }
+  registerFirstSelectInteractionTypeEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'FirstSelectInteractionType', 'click', explorationId);
+  }
+  registerFirstSaveInteractionEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'FirstSaveInteraction', 'click', explorationId);
+  }
+  registerFirstSaveRuleEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'FirstSaveRule', 'click', explorationId);
+  }
+  registerFirstCreateSecondStateEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'FirstCreateSecondState', 'create', explorationId);
+  }
+  // Metrics for publishing explorations
+  registerSavePlayableExplorationEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'SavePlayableExploration', 'save', explorationId);
+  }
+  registerOpenPublishExplorationModalEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'PublishExplorationModal', 'open', explorationId);
+  }
+  registerPublishExplorationEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'PublishExploration', 'click', explorationId);
+  }
+  registerVisitOppiaFromIframeEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'VisitOppiaFromIframe', 'click', explorationId);
+  }
+  registerNewCard(cardNum: number): void {
+    if (cardNum <= 10 || cardNum % 10 === 0) {
+      this._sendEventToGoogleAnalytics('PlayerNewCard', 'click',
+        cardNum.toString());
+    }
+  }
+  registerFinishExploration(): void {
+    this._sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
+  }
+  registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'OpenFractionsFromLandingPage', 'click', collectionId);
+  }
+  registerStewardsLandingPageEvent(viewerType: string,
+      buttonText: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ClickButtonOnStewardsPage', 'click', viewerType + ':' + buttonText);
+  }
+  registerSaveRecordedAudioEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'SaveRecordedAudio', 'click', explorationId);
+  }
+  registerStartAudioRecordingEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'StartAudioRecording', 'click', explorationId);
+  }
+  registerUploadAudioEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'UploadRecordedAudio', 'click', explorationId);
+  }
+}
+
+angular.module('oppia').factory(
+  'SiteAnalyticsService',
+  downgradeInjectable(SiteAnalyticsService));
+>>>>>>> Stashed changes

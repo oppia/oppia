@@ -12,26 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Injectable} from '@angular/core';
+
 /**
  * @fileoverview Service that manages admin data.
  */
 
 require('pages/admin-page/admin-page.constants.ajs.ts');
+import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
+import {HttpClient} from '@angular/common/http';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-angular.module('oppia').factory('AdminDataService', [
-  '$http', 'ADMIN_HANDLER_URL',
-  function($http, ADMIN_HANDLER_URL) {
-    var dataPromise = null;
-    return {
-      getDataAsync: function() {
-        if (dataPromise) {
-          return dataPromise;
-        }
-        dataPromise = $http.get(ADMIN_HANDLER_URL).then(function(response) {
-          return response.data;
-        });
-        return dataPromise;
-      }
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class AdminDataService {
+  dataPromise = null;
+  constructor(private httpClient: HttpClient) {}
+
+  getDataAsync() {
+    if (this.dataPromise) {
+      return this.dataPromise;
+    }
+
+    this.dataPromise = this.httpClient.get(AdminPageConstants.ADMIN_HANDLER_URL)
+      .toPromise().then((response: any) => {
+        return response.data;
+      });
+    return this.dataPromise;
   }
-]);
+}
+
+
+angular.module('oppia').factory(
+  'AdminDataService',
+  downgradeInjectable(AdminDataService));
