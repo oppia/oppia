@@ -54,7 +54,8 @@ export class NumberWithUnitsRulesService {
     }
     return true;
   }
-  IsEqualTo(answer, inputs): boolean {
+  // TODO(#7165): Replace 'any' with the exact type.
+  IsEqualTo(answer: any, inputs: any): boolean {
     // Returns true only if input is exactly equal to answer.
     answer = this.nwuof.fromDict(answer);
     inputs = this.nwuof.fromDict(inputs.f);
@@ -68,7 +69,8 @@ export class NumberWithUnitsRulesService {
       inputsString).toDict();
     return this.isEquivalent(answerList, inputsList);
   }
-  IsEquivalentTo(answer, inputs): boolean {
+  // TODO(#7165): Replace 'any' with the exact type.
+  IsEquivalentTo(answer: any, inputs: any): boolean {
     answer = this.nwuof.fromDict(answer);
     inputs = this.nwuof.fromDict(inputs.f);
     if (answer.type === 'fraction') {

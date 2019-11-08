@@ -35,11 +35,14 @@ export class NumberWithUnitsValidationService {
   constructor(
     private nwuof: NumberWithUnitsObjectFactory,
     private bivs: baseInteractionValidationService) {}
-  getCustomizationArgsWarnings(customizationArgs) {
+  // TODO(#7165): Replace 'any' with the exact type.
+  getCustomizationArgsWarnings(customizationArgs: any): any {
     return [];
   }
+  // TODO(#7165): Replace 'any' with the exact type.
   getAllWarnings(
-      stateName, customizationArgs, answerGroups, defaultOutcome) {
+      stateName: any,
+      customizationArgs: any, answerGroups: any, defaultOutcome: any): any {
     var warningsList = [];
 
     warningsList = warningsList.concat(

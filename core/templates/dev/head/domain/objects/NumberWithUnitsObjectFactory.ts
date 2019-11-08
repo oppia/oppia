@@ -19,6 +19,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import { ObjectsDomainConstants } from
