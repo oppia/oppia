@@ -146,8 +146,8 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
         self.render_json({})
 
 
-class VoicoverApplicationHandler(base.BaseHandler):
-    """Handler for the voiceover applications."""
+class UserVoicoverApplicationsHandler(base.BaseHandler):
+    """Handler for the voiceover applications submitted by the user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -171,6 +171,10 @@ class VoicoverApplicationHandler(base.BaseHandler):
                 v_a.to_dict() for v_a in voiceover_applications]
         }
         self.render_json(self.values)
+
+
+class VoicoverApplicationHandler(base.BaseHandler):
+    """Handler for the voiceover application."""
 
     @acl_decorators.can_review_voiceover_application
     def put(self, voiceover_application_id):
@@ -212,6 +216,7 @@ class VoicoverApplicationHandler(base.BaseHandler):
 
 class VoiceoverApplicationTextHandler(base.BaseHandler):
     """Handler for voiceover application content."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_submit_voiceover_application

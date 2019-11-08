@@ -233,7 +233,7 @@ URLS = MAPREDUCE_HANDLERS + [
         voice_artist.VoicoverApplicationHandler),
     get_redirect_route(
         r'/getsubmittedvoiceoverapplication/<purpose>',
-        voice_artist.VoicoverApplicationHandler),
+        voice_artist.UserVoicoverApplicationsHandler),
     get_redirect_route(
         r'/voiceoverappplicationactionhandler/<voiceover_application_id>',
         voice_artist.VoicoverApplicationHandler),

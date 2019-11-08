@@ -2759,6 +2759,8 @@ def can_submit_voiceover_application(handler):
                                 'voiceover.')
                 else:
                     return handler(self, **kwargs)
+            else:
+                return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You must be logged in to submit voiceover application.')
