@@ -1052,3 +1052,39 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             suggestion_services.check_if_email_has_been_sent_to_user(
                 self.user_a_id, 'category_a'))
+
+
+class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
+    """Tests for the ExplorationVoiceoverApplication class."""
+
+    def setUp(self):
+        super(VoiceoverApplicationServiceUnitTest, self).setUp()
+        self.signup('author@example.com', 'author')
+        self.author_id = self.get_user_id_from_email('author@example.com')
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='0',
+            status='review',
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            language_code='en',
+            filename='filename.mp3',
+            content='<p>content</p>',
+            rejection_message=None).put()
+        self.voiceover_application_model = (
+            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+                'application_id'))
+
+    def test_get_voiceover_application_from_model_with_invalid_type_raise_error(
+            self):
+        suggestion_services.get_voiceover_application(
+            self.voiceover_application_model.id)
+
+        self.voiceover_application_model.target_type = 'invalid_type'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid target type for voiceover application: invalid_type'):
+            suggestion_services.get_voiceover_application(
+                self.voiceover_application_model.id)

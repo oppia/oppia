@@ -334,3 +334,92 @@ class GeneralSuggestionModel(base_models.BaseModel):
             }
 
         return user_data
+
+
+class GeneralVoiceoverApplicationModel(base_models.BaseModel):
+    """A general model for voiceover application of an entity.
+
+    The ID of the voiceover application will be a random hashed value.
+    """
+    # The type of entity to which the user will be assigned as a voice artist
+    # once the application will get approved.
+    target_type = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the entity to which the application belongs.
+    target_id = ndb.StringProperty(required=True, indexed=True)
+    # The language code for the voiceover audio.
+    language_code = ndb.StringProperty(required=True, indexed=True)
+    # The status of the application. One of: accepted, rejected, in-review.
+    status = ndb.StringProperty(
+        required=True, indexed=True, choices=STATUS_CHOICES)
+    # The HTML content written in the given language_code.
+    # This will typically be a snapshot of the content of the initial card of
+    # the target.
+    content = ndb.TextProperty(required=True)
+    # The filename of the voiceover audio. The filename will have
+    # datetime-randomId(length 6)-language_code.mp3 pattern.
+    filename = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the author of the voiceover application.
+    author_id = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the reviewer who accepted/rejected the voiceover application.
+    final_reviewer_id = ndb.StringProperty(indexed=True)
+    # The plain text message submitted by the reviewer while rejecting the
+    # application.
+    rejection_message = ndb.TextProperty()
+
+    @staticmethod
+    def get_deletion_policy():
+        """General voiceover application needs to be pseudonymized for the
+        user.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralVoiceoverApplicationModel exists for the user.
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
+        ).get() is not None
+
+    @classmethod
+    def get_user_voiceover_applications(cls, author_id, status=None):
+        """Returns a list of voiceover application submitted by the given user.
+
+        Args:
+            author_id: str. The id of the user created the voiceover
+                application.
+            status: str|None. The status of the voiceover application.
+                If the status is None, the query will fetch all the
+                voiceover applications.
+
+        Returns:
+            list(GeneralVoiceoverApplicationModel). The list of voiceover
+                application submitted by the given user.
+        """
+        if status in STATUS_CHOICES:
+            return cls.query(ndb.AND(
+                cls.author_id == author_id, cls.status == status)).fetch()
+        else:
+            return cls.query(cls.author_id == author_id).fetch()
+
+    @classmethod
+    def get_reviewable_voiceover_applications(cls, user_id):
+        """Returns a list of voiceover application which a given user can
+        review.
+
+        Args:
+            user_id: str. The id of the user trying to make this query.
+                As a user cannot review their own voiceover application, so the
+                voiceover application created by the user will be excluded.
+
+        Returns:
+            list(GeneralVoiceoverApplicationModel). The list of voiceover
+                application which the given user can review.
+        """
+        return cls.query(ndb.AND(
+            cls.author_id != user_id,
+            cls.status == STATUS_IN_REVIEW)).fetch()
