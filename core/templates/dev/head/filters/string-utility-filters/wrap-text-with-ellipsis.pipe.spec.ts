@@ -17,10 +17,11 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { WrapTextWithEllipsisPipe } from
   'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import {NormalizeWhitespacePipe} from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
 
 describe('Testing filters', function() {
   let wrapTextWithEllipsis: WrapTextWithEllipsisPipe = null;
