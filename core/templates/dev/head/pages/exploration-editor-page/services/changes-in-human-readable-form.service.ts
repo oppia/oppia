@@ -18,6 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Inject, Injectable } from '@angular/core';
+import isEqual from 'lodash/isEqual';
 
 import { UtilsService } from 'services/utils.service';
 import { DOCUMENT } from '@angular/common';
@@ -33,7 +34,7 @@ export class ChangesInHumanReadableFormService {
 
   constructor(private utilsService: UtilsService,
               @Inject(DOCUMENT) private document: any) {}
-
+  // TODO(#7176): Replace 'any' with the exact type.
   makeRulesListHumanReadable(answerGroupValue: any): Array<HTMLElement> {
     let rulesList = [];
     answerGroupValue.rules.forEach((rule) => {
@@ -53,7 +54,8 @@ export class ChangesInHumanReadableFormService {
   // An edit is represented either as an object or an array. If it's an
   // object, then simply return that object. In case of an array, return
   // the last item.
-  getStatePropertyValue(statePropertyValue: Array<string> | Object) {
+  // TODO(#7176): Replace 'any' with the exact type.
+  getStatePropertyValue(statePropertyValue: Array<string> | Object): any {
     return Array.isArray(statePropertyValue) ?
         statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   }
@@ -61,6 +63,7 @@ export class ChangesInHumanReadableFormService {
   // Detects whether an object of the type 'answer_group' or
   // 'default_outcome' has been added, edited or deleted.
   // Returns - 'addded', 'edited' or 'deleted' accordingly.
+  // TODO(#7176): Replace 'any' with the exact type.
   getRelativeChangeToGroups(changeObject: any): string {
     let newValue = changeObject.new_value;
     let oldValue = changeObject.old_value;
@@ -83,7 +86,7 @@ export class ChangesInHumanReadableFormService {
     }
     return result;
   }
-
+  // TODO(#7176): Replace 'any' with the exact type.
   _makeHumanReadable(lostChanges: Array<any>): HTMLElement {
     let outerHtml = this.document.createElement('<ul></ul>');
     let stateWiseEditsMapping = {};
@@ -205,7 +208,7 @@ export class ChangesInHumanReadableFormService {
                     '<p class="sub-edit"><i>Destination: </i>' +
                       newValue.outcome.dest + '</p>');
                 }
-                if (!angular.equals(
+                if (isEqual(
                   newValue.outcome.feedback.getHtml(),
                   oldValue.outcome.feedback.getHtml())) {
                   answerGroupHtml += (
@@ -214,7 +217,7 @@ export class ChangesInHumanReadableFormService {
                       newValue.outcome.feedback.getHtml() +
                       '</div></div>');
                 }
-                if (!angular.equals(newValue.rules, oldValue.rules)) {
+                if (isEqual(newValue.rules, oldValue.rules)) {
                   let rulesList = this.makeRulesListHumanReadable(newValue);
                   if (rulesList.length > 0) {
                     answerGroupHtml += (
@@ -265,7 +268,7 @@ export class ChangesInHumanReadableFormService {
                       newValue.dest +
                       '</p>');
                 }
-                if (!angular.equals(newValue.feedback.getHtml(),
+                if (isEqual(newValue.feedback.getHtml(),
                   oldValue.feedback.getHtml())) {
                   defaultOutcomeHtml += (
                     '<div class="sub-edit"><i>Feedback: </i>' +

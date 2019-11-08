@@ -18,18 +18,18 @@
 
 import { IdGenerationService } from 'services/id-generation.service';
 
-describe('IdGenerationService', function() {
+describe('IdGenerationService', () => {
   let idGenerationService = null;
 
   beforeEach(() => {
     idGenerationService = new IdGenerationService();
   });
 
-  it('should generate a random id of fixed length', function() {
+  it('should generate a random id of fixed length', () => {
     expect(idGenerationService.generateNewId()).toMatch(/^[a-z0-9]{10}$/);
   });
 
-  it('should generate two different ids', function() {
+  it('should generate two different ids', () => {
     let id1 = idGenerationService.generateNewId();
     let id2 = idGenerationService.generateNewId();
     expect(id1).not.toEqual(id2);

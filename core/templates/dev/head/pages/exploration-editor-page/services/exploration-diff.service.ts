@@ -20,9 +20,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import isEqual from 'lodash/isEqual';
+import cloneDeep from 'lodash/cloneDeep';
 
 import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
-
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +34,6 @@ export class ExplorationDiffService {
   STATE_PROPERTY_UNCHANGED = 'unchanged';
   _maxId = 0;
 
-
   // Functions to assign ids to states
   _resetMaxId(): void {
     this._maxId = 0;
@@ -44,7 +43,9 @@ export class ExplorationDiffService {
     return this._maxId;
   }
 
-  _generateInitialStateIdsAndData(statesDict: Object): Object {
+  // TODO(#7176): Replace 'any' with the exact type.
+  _generateInitialStateIdsAndData(statesDict: Object):
+      {stateIds: any, stateData: any} {
     let result = {
       stateIds: {},
       stateData: {}
@@ -63,9 +64,16 @@ export class ExplorationDiffService {
     }
     return result;
   }
-
+  // TODO(#7176): Replace 'any' with the exact type.
   _postprocessStateIdsAndData(
-      originalStateIds, stateIds, stateData, v1States, v2States) {
+      originalStateIds: Array<string>, stateIds: Array<string>,
+      stateData: any, v1States: any, v2States: any): {
+        nodes: any,
+        links: any,
+        originalStateIds: Array<string>
+        stateIds: Array<string>
+        finalStateIds: Array<string>
+      } {
     // Ignore changes that were canceled out by later changes
     for (let stateId in stateData) {
       if (stateData[stateId].stateProperty === this.STATE_PROPERTY_CHANGED &&
@@ -137,11 +145,12 @@ export class ExplorationDiffService {
    * - directionForwards: true if changes are compared in increasing version
    * number, and false if changes are compared in decreasing version number.
    */
-  _getDiffGraphData(v1States, v2States, changeListData) {
+  // TODO(#7176): Replace 'any' with the exact type.
+  _getDiffGraphData(v1States: any, v2States: any, changeListData: any) {
     let v1Info = this._generateInitialStateIdsAndData(v1States);
     let stateData = v1Info.stateData;
     let stateIds = v1Info.stateIds;
-    let originalStateIds = angular.copy(stateIds);
+    let originalStateIds = cloneDeep(stateIds);
 
     changeListData.forEach((changeListDatum) => {
       let changeList = changeListDatum.changeList;
@@ -222,7 +231,8 @@ export class ExplorationDiffService {
    *     ids.
    * - maxId: the maximum id in states and stateIds.
    */
-  _getAdjMatrix(states, stateIds, maxId) {
+  // TODO(#7176): Replace 'any' with the exact type.
+  _getAdjMatrix(states: any, stateIds: Array<string>, maxId: number): Object {
     let adjMatrix = {};
     for (let stateId = 1; stateId <= maxId; stateId++) {
       adjMatrix[stateId] = {};
@@ -254,8 +264,10 @@ export class ExplorationDiffService {
    *  - 'target': target state of link
    *  - 'linkProperty': 'added', 'deleted' or 'unchanged'
    */
+  // TODO(#7176): Replace 'any' with the exact type.
   _compareLinks(
-      v1States, originalStateIds, v2States, newestStateIds) {
+      v1States: any, originalStateIds: Array<string>,
+      v2States: any, newestStateIds: Array<string>) {
     let links = [];
     let adjMatrixV1 = this._getAdjMatrix(v1States, originalStateIds,
       this._maxId);
@@ -278,8 +290,8 @@ export class ExplorationDiffService {
 
     return links;
   }
-
-  getDiffGraphData(oldStates, newStates, changeListData) {
+  // TODO(#7176): Replace 'any' with the exact type.
+  getDiffGraphData(oldStates: any, newStates: any, changeListData: any) {
     return this._getDiffGraphData(
       oldStates,
       newStates,
