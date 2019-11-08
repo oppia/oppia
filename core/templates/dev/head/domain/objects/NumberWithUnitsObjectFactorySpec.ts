@@ -15,31 +15,47 @@
 /**
  * @fileoverview unit tests for number with units object type factory service.
  */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// NumberWithUnitsObjectFactory.ts is upgraded to Angular 8.
 import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
-import {NumberWithUnitsObjectFactory} from './NumberWithUnitsObjectFactory';
-import {TestBed} from '@angular/core/testing';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('domain/objects/UnitsObjectFactory.ts');
 
-fdescribe('NumberWithUnitsObjectFactory', function() {
+describe('NumberWithUnitsObjectFactory', function() {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      $provide.value(key, value);
+    }
+  }));
+
   describe('number with units object factory', function() {
-    let NumberWithUnits = null;
-    let units = null;
-    let fraction = null;
-    let errors = null;
+    var NumberWithUnits = null;
+    var units = null;
+    var fraction = null;
+    var errors = null;
 
-    beforeEach(() => {
-      NumberWithUnits = TestBed.get(NumberWithUnitsObjectFactory);
-      units = TestBed.get(UnitsObjectFactory);
-      fraction = TestBed.get(FractionObjectFactory);
-      errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS;
-    });
+    beforeEach(angular.mock.inject(function($injector) {
+      NumberWithUnits = $injector.get('NumberWithUnitsObjectFactory');
+      units = $injector.get('UnitsObjectFactory');
+      fraction = $injector.get('FractionObjectFactory');
+      errors = $injector.get('NUMBER_WITH_UNITS_PARSING_ERRORS');
+    }));
 
-    it('should convert units to list format', () => {
+    it('should convert units to list format', function() {
       expect(units.fromStringToList('kg / kg^2 K mol / (N m s^2) K s')).toEqual(
         [{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
           {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
@@ -54,20 +70,20 @@ fdescribe('NumberWithUnitsObjectFactory', function() {
         {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]);
     });
 
-    it('should convert units from list to string format', () => {
-      expect( units(
+    it('should convert units from list to string format', function() {
+      expect(new Units(
         [{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
           {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
           {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]
       ).toString()).toBe('kg^-1 K^2 mol N^-1 m^-1 s^-1');
-      expect( units(
+      expect(new Units(
         [{exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'kg'},
           {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
           {exponent: -2, unit: 's'}]).toString()).toBe(
         'mol kg^-1 N m s^-2');
     });
 
-    it('should convert units from string to lexical format', () => {
+    it('should convert units from string to lexical format', function() {
       expect(units.stringToLexical('kg per kg^2 K mol / (N m s^2) K s'
       )).toEqual(
         ['kg', '/', 'kg^2', '*', 'K', '*', 'mol', '/', '(', 'N', '*', 'm', '*',
@@ -82,91 +98,91 @@ fdescribe('NumberWithUnitsObjectFactory', function() {
           'K', ')']);
     });
 
-    it('should convert number with units object to a string', () => {
-      expect(NumberWithUnits('real', 2.02, fraction(false, 0, 0, 1
+    it('should convert number with units object to a string', function() {
+      expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
       ), units.fromRawInputString('m / s^2')).toString()).toBe('2.02 m s^-2');
-      expect( NumberWithUnits('real', 2.02, fraction(false, 0, 0, 1
+      expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
       ), units.fromRawInputString('Rs')).toString()).toBe('Rs 2.02');
-      expect( NumberWithUnits('real', 2, fraction(false, 0, 0, 1
+      expect(new NumberWithUnits('real', 2, new Fraction(false, 0, 0, 1
       ), units.fromRawInputString('')).toString()).toBe('2');
-      expect( NumberWithUnits('fraction', 0, fraction(true, 0, 4, 3
+      expect(new NumberWithUnits('fraction', 0, new Fraction(true, 0, 4, 3
       ), units.fromRawInputString('m / s^2')).toString()).toBe('-4/3 m s^-2');
-      expect( NumberWithUnits('fraction', 0, fraction(
+      expect(new NumberWithUnits('fraction', 0, new Fraction(
         false, 0, 4, 3), units.fromRawInputString('$ per hour')).toString(
       )).toBe('$ 4/3 hour^-1');
-      expect( NumberWithUnits('real', 40, fraction(
+      expect(new NumberWithUnits('real', 40, new Fraction(
         false, 0, 0, 1), units.fromRawInputString('Rs per hour')).toString(
       )).toBe('Rs 40 hour^-1');
     });
 
-    it('should parse valid units strings', () => {
+    it('should parse valid units strings', function() {
       expect(units.fromRawInputString('kg per (K mol^-2)')).toEqual(
-        units(units.fromStringToList('kg / (K mol^-2)')));
+        new Units(units.fromStringToList('kg / (K mol^-2)')));
       expect(units.fromRawInputString('kg / (K mol^-2) N / m^2')).toEqual(
-        units(units.fromStringToList('kg / (K mol^-2) N / m^2')));
+        new Units(units.fromStringToList('kg / (K mol^-2) N / m^2')));
     });
 
-    it('should parse valid number with units strings', () => {
+    it('should parse valid number with units strings', function() {
       expect(NumberWithUnits.fromRawInputString('2.02 kg / m^3')).toEqual(
-        NumberWithUnits('real', 2.02, fraction(
+        new NumberWithUnits('real', 2.02, new Fraction(
           false, 0, 0, 1), units.fromRawInputString('kg / m^3')));
       expect(NumberWithUnits.fromRawInputString('2 / 3 kg / m^3')).toEqual(
-        NumberWithUnits('fraction', 0, fraction(
+        new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), units.fromRawInputString('kg / m^3')));
       expect(NumberWithUnits.fromRawInputString('2')).toEqual(
-        NumberWithUnits('real', 2, fraction(
+        new NumberWithUnits('real', 2, new Fraction(
           false, 0, 0, 1), units.fromRawInputString('')));
       expect(NumberWithUnits.fromRawInputString('2 / 3')).toEqual(
-        NumberWithUnits('fraction', 0, fraction(
+        new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), units.fromRawInputString('')));
       expect(NumberWithUnits.fromRawInputString('$ 2.02')).toEqual(
-        NumberWithUnits('real', 2.02, fraction(
+        new NumberWithUnits('real', 2.02, new Fraction(
           false, 0, 0, 1), units.fromRawInputString('$')));
       expect(NumberWithUnits.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
-        NumberWithUnits('fraction', 0, fraction(
+        new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), units.fromRawInputString('Rs / hour')));
     });
 
-    it('should throw errors for invalid number with units', () => {
+    it('should throw errors for invalid number with units', function() {
       expect(function() {
         NumberWithUnits.fromRawInputString('3* kg');
-      }).toThrow( Error(errors.INVALID_VALUE));
+      }).toThrow(new Error(errors.INVALID_VALUE));
       expect(function() {
         NumberWithUnits.fromRawInputString('$ 3*');
-      }).toThrow( Error(errors.INVALID_VALUE));
+      }).toThrow(new Error(errors.INVALID_VALUE));
       expect(function() {
         NumberWithUnits.fromRawInputString('Rs 3^');
-      }).toThrow( Error(errors.INVALID_VALUE));
+      }).toThrow(new Error(errors.INVALID_VALUE));
       expect(function() {
         NumberWithUnits.fromRawInputString('3# m/s');
-      }).toThrow( Error(errors.INVALID_VALUE));
+      }).toThrow(new Error(errors.INVALID_VALUE));
       expect(function() {
         NumberWithUnits.fromRawInputString('3 $');
-      }).toThrow( Error(errors.INVALID_CURRENCY_FORMAT));
+      }).toThrow(new Error(errors.INVALID_CURRENCY_FORMAT));
       expect(function() {
         NumberWithUnits.fromRawInputString('Rs5');
-      }).toThrow( Error(errors.INVALID_CURRENCY));
+      }).toThrow(new Error(errors.INVALID_CURRENCY));
       expect(function() {
         NumberWithUnits.fromRawInputString('$');
-      }).toThrow( Error(errors.INVALID_CURRENCY));
+      }).toThrow(new Error(errors.INVALID_CURRENCY));
       expect(function() {
         NumberWithUnits.fromRawInputString('kg 2 s^2');
-      }).toThrow( Error(errors.INVALID_CURRENCY));
+      }).toThrow(new Error(errors.INVALID_CURRENCY));
       expect(function() {
         NumberWithUnits.fromRawInputString('2 m/s#');
-      }).toThrow( Error(errors.INVALID_UNIT_CHARS));
+      }).toThrow(new Error(errors.INVALID_UNIT_CHARS));
       expect(function() {
         NumberWithUnits.fromRawInputString('@ 2');
-      }).toThrow( Error(errors.INVALID_CURRENCY));
+      }).toThrow(new Error(errors.INVALID_CURRENCY));
       expect(function() {
         NumberWithUnits.fromRawInputString('2 / 3 kg&^-2');
-      }).toThrow( Error(errors.INVALID_UNIT_CHARS));
+      }).toThrow(new Error(errors.INVALID_UNIT_CHARS));
       expect(function() {
         NumberWithUnits.fromRawInputString('2 m**2');
-      }).toThrow( Error('SyntaxError: Unexpected "*" in "m**2" at index 2'));
+      }).toThrow(new Error('SyntaxError: Unexpected "*" in "m**2" at index 2'));
       expect(function() {
         NumberWithUnits.fromRawInputString('2 kg / m^(2)');
-      }).toThrow( Error('SyntaxError: In "kg / m^(2)", "^" must be ' +
+      }).toThrow(new Error('SyntaxError: In "kg / m^(2)", "^" must be ' +
       'followed by a floating-point number'));
     });
   });
