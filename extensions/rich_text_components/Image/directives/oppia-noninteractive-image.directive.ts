@@ -89,7 +89,7 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
               ContextService.getEntityType(), ContextService.getEntityId(),
               ctrl.filepath);
-          } catch(e) {
+          } catch (e) {
             var additionalInfo = (
               '\nExploration ID: ' + ContextService.getExplorationId() +
               '\nEntity type: ' + ContextService.getEntityType() +
@@ -97,7 +97,7 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
               '\nFilepath: ' + ctrl.filepath);
             e.message += additionalInfo;
             throw e;
-          } 
+          }
         }
 
         ctrl.imageCaption = '';
