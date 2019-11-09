@@ -83,7 +83,7 @@ def download_and_install_package(url_to_retrieve, filename):
     """
     python_utils.url_retrieve(url_to_retrieve, filename=filename)
     _, extension = os.path.splitext(filename)
-    if extension == '.gz':
+    if extension == '.gz' or extension == '.tgz':
         tar = tarfile.open(name=filename)
         tar.extractall(path=common.OPPIA_TOOLS_DIR)
         tar.close()
@@ -127,29 +127,32 @@ def main(args=None):
     if not os.path.exists(common.NODE_PATH):
         python_utils.PRINT('Installing Node.js')
         downloaded_file_name = 'node-download.tgz'
+        extension = '.tar.gz'
         if os_info[0] == 'Darwin':
             if os_info[4] == 'x86_64':
-                node_file_name = 'node-v10.15.3-darwin-x64.tar.gz'
+                node_file_name = 'node-v10.15.3-darwin-x64'
             else:
-                node_file_name = 'node-v10.15.3-darwin-x86.tar.gz'
+                node_file_name = 'node-v10.15.3-darwin-x86'
         elif os_info[0] == 'Linux':
             if os_info[4] == 'x86_64':
-                node_file_name = 'node-v10.15.3-linux-x64.tar.gz'
+                node_file_name = 'node-v10.15.3-linux-x64'
             else:
-                node_file_name = 'node-v10.15.3-linux-x86.tar.gz'
+                node_file_name = 'node-v10.15.3-linux-x86'
         elif os_info[0] == 'Windows':
+            extension = '.zip'
             if os_info[4] == 'AMD64':
-                node_file_name = 'node-v10.15.3-win-x64.zip'
+                node_file_name = 'node-v10.15.3-win-x64'
             else:
-                node_file_name = 'node-v10.15.3-win-x86.zip'
+                node_file_name = 'node-v10.15.3-win-x86'
             downloaded_file_name = 'node-download.zip'
-
+        download_link = 'https://nodejs.org/dist/v10.15.3/%s%s' % (
+            node_file_name, extension)
         download_and_install_package(
-            'https://nodejs.org/dist/v10.15.3/%s' % node_file_name,
+            download_link,
             downloaded_file_name)
         shutil.move(
             os.path.join(
-                common.OPPIA_TOOLS_DIR, os.path.splitext(node_file_name)[0]),
+                common.OPPIA_TOOLS_DIR, node_file_name),
             common.NODE_PATH)
 
     # Change ownership of node_modules.
