@@ -17,7 +17,7 @@
  * in Protractor tests.
  */
 
-const dragAndDrop = require('html-dnd').code;
+var dragAndDropScript = require('html-dnd').code;
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
@@ -87,6 +87,10 @@ var TopicEditorPage = function() {
   var questionItem = element(by.css('.protractor-test-question-list-item'));
   var selectSkillDropdown = element(
     by.css('.protractor-test-select-skill-dropdown'));
+
+  var dragAndDrop = function(fromElement, toElement) {
+    browser.executeScript(dragAndDropScript, fromElement, toElement);
+  };
 
   this.get = function(topicId) {
     browser.get(EDITOR_URL_PREFIX + topicId);
@@ -186,8 +190,7 @@ var TopicEditorPage = function() {
   this.dragSkillToSubtopic = function(skillIndex, subtopicIndex) {
     var target = subtopicTitles.get(subtopicIndex);
     var toMove = skillCards.get(skillIndex);
-    browser.executeScript(
-      dragAndDrop, toMove.getWebElement(), target.getWebElement());
+    dragAndDrop(toMove.getWebElement(), target.getWebElement());
   };
 
   this.dragSkillBetweenSubtopics = function(
@@ -197,8 +200,7 @@ var TopicEditorPage = function() {
       by.css('.protractor-test-assigned-skill-card-text'));
     var toMove = skillNamesElems.get(skillCardIndex);
     var target = subtopicColumns.get(toSubtopicIndex);
-    browser.executeScript(
-      dragAndDrop, toMove.getWebElement(), target.getWebElement());
+    dragAndDrop(toMove.getWebElement(), target.getWebElement());
   };
 
   this.dragSkillFromSubtopicToUncategorized = function(
