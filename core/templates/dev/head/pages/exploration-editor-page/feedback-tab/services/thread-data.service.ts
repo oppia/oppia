@@ -75,8 +75,9 @@ angular.module('oppia').factory('ThreadDataService', [
             return thread;
           });
 
+        onSuccess();
         return _data;
-      }).then(onSuccess);
+      });
     };
 
     var _fetchMessages = function(threadId) {
