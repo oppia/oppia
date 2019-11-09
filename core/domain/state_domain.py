@@ -1430,7 +1430,7 @@ class State(python_utils.OBJECT):
         Returns:
             list(dict). Each dict contains the following keys:
                     answer_group_index: int. The index of the answer group.
-                    answers. InteractionInstance. The interactions from State
+                    answers: InteractionInstance. The interactions from State
                         domain object.
         """
         state_training_data_by_answer_group = []
