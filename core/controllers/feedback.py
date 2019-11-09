@@ -16,13 +16,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import itertools
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
-import itertools
 
 transaction_services = models.Registry.import_transaction_services()
 
