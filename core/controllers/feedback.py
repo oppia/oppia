@@ -22,6 +22,7 @@ from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
+import itertools
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -31,15 +32,37 @@ class ThreadListHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_play_exploration
+    @acl_decorators.can_view_feedback_thread
     def get(self, exploration_id):
+        feedback_thread_dicts = [
+            thread.to_dict() for thread in feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)
+        ]
+
+        for thread_dict in feedback_thread_dicts:
+            thread_dict['messages'] = [
+                message.to_dict() for message in feedback_services.get_messages(
+                    thread_dict['thread_id'])
+            ]
+
+        suggestion_thread_dicts = [
+            thread.to_dict() for thread in feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)
+        ]
+
+        for thread_dict in suggestion_thread_dicts:
+            thread_dict['messages'] = [
+                message.to_dict() for message in feedback_services.get_messages(
+                    thread_dict['thread_id'])
+            ]
+            suggestion = suggestion_services.get_suggestion_by_id(
+                thread_dict['thread_id'])
+            thread_dict['suggestion_dict'] = (
+                suggestion.to_dict() if suggestion is not None else None)
+
         self.values.update({
-            'feedback_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]),
-            'suggestion_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
+            'feedback_thread_dicts': feedback_thread_dicts,
+            'suggestion_thread_dicts': suggestion_thread_dicts,
         })
         self.render_json(self.values)
 

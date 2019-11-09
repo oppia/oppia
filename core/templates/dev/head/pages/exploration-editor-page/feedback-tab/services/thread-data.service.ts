@@ -73,36 +73,20 @@ angular.module('oppia').factory('ThreadDataService', [
     var _openThreadsCount = 0;
 
     var _fetchThreads = function(onSuccess = () => {}) {
-      var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
-      var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-        params: {target_type: 'exploration', target_id: _expId}
-      });
-
-      return $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
-        _data.feedbackThreads = res[0].data.feedback_thread_dicts.map(
-          FeedbackThreadObjectFactory.createFromBackendDict);
-
-        _data.suggestionThreads = [];
-        var suggestionThreads = res[0].data.suggestion_thread_dicts;
-        if (suggestionThreads.length !== res[1].data.suggestions.length) {
-          $log.error('Number of suggestion threads doesn\'t match number of' +
-                     'suggestion objects');
-        }
-        // TODO(brianrodri@): Move this pairing logic into the backend.
-        for (var i = 0; i < suggestionThreads.length; i++) {
-          for (var j = 0; j < res[1].data.suggestions.length; j++) {
-            var suggestion = (
-              SuggestionObjectFactory.createFromBackendDict(
-                res[1].data.suggestions[j]));
-            if (suggestionThreads[i].thread_id === suggestion.getThreadId()) {
-              var suggestionThread = (
-                SuggestionThreadObjectFactory.createFromBackendDicts(
-                  suggestionThreads[i], res[1].data.suggestions[j]));
-              _data.suggestionThreads.push(suggestionThread);
-              break;
-            }
-          }
-        }
+      return $http.get(_THREAD_LIST_HANDLER_URL).then(res => {
+        _data.feedbackThreads = res.data.feedback_thread_dicts.map(dict => {
+          var feedbackThread =
+	    FeedbackThreadObjectFactory.createFromBackendDict(dict);
+	  feedbackThread.setMessages(dict['messages']);
+          return feedbackThread;
+	});
+        _data.suggestionThreads = res.data.suggestion_thread_dicts.map(dict => {
+	  var suggestionThread =
+	    SuggestionThreadObjectFactory.createFromBackendDicts(
+              dict, dict['suggestion_dict']);
+	  suggestionThread.setMessages(dict['messages']);
+	  return suggestionThread;
+	  });
       }).then(onSuccess);
     };
 
