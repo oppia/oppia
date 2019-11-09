@@ -71,15 +71,13 @@ export class FeedbackThreadObjectFactory {
   // camelCasing.
   createFromBackendDict(feedbackThreadBackendDict: any): FeedbackThread {
     return new FeedbackThread(
-      feedbackThreadBackendDict.status,
-      feedbackThreadBackendDict.subject,
+      feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,
       feedbackThreadBackendDict.original_author_username,
       feedbackThreadBackendDict.last_updated,
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
-      feedbackThreadBackendDict.thread_id,
-      feedbackThreadBackendDict.messages);
+      feedbackThreadBackendDict.thread_id, feedbackThreadBackendDict.messages);
   }
 }
 angular.module('oppia').factory(

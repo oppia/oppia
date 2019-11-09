@@ -109,15 +109,12 @@ angular.module('oppia').factory('ThreadDataService', [
           state_name: null,
           subject: newSubject,
           text: newText
-        }).then(
-          () => {
-            _openThreadsCount += 1;
-            return _fetchThreads();
-          },
-          () => {
-            AlertsService.addWarning('Error creating new thread.');
-          }
-        ).then(onSuccess);
+        }).then(() => {
+          _openThreadsCount += 1;
+          return _fetchThreads();
+        }, () => {
+          AlertsService.addWarning('Error creating new thread.');
+        }).then(onSuccess);
       },
       markThreadAsSeen: function(threadId) {
         return $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
