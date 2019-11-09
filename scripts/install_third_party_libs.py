@@ -180,7 +180,7 @@ def install_skulpt(parsed_args):
                     line.replace('ret = rununits(opt=True)', 'ret = 0'),
                     end='')
 
-            p = subprocess.Popen(['python', skulpt_filepath, 'dist'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+            p = subprocess.Popen(['python', skulpt_filepath, 'dist'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output, err = p.communicate()
             print output
             print err
