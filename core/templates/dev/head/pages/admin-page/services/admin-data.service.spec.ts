@@ -20,6 +20,7 @@ import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { AdminDataService } from './admin-data.service';
+import {HttpErrorResponse} from '@angular/common/http';
 
 fdescribe('Admin Data Service', function() {
   let adminDataService: AdminDataService = null;
@@ -58,37 +59,26 @@ fdescribe('Admin Data Service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should cache the response and not make a second request', fakeAsync(() => {
-    $httpBackend.expect('GET', '/adminhandler').respond(
-      200, sampleAdminData);
-    AdminDataService.getDataAsync();
-    $httpBackend.flush();
+  it('should cache the response and not make a second request',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.whenGET('/adminhandler').respond(
-      200, {property: 'another value'});
+      adminDataService.getDataAsync().then(successHandler,
+        (error: HttpErrorResponse) => {
+          failHandler(error.error);
+        });
 
-    AdminDataService.getDataAsync().then(function(response) {
-      expect(response).toEqual(sampleAdminData);
-    });
+      let req = httpTestingController.expectOne('/adminhandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading admin handler', {
+        status: 500, statusText: 'Invalid Request'
+      });
 
-    expect($httpBackend.flush).toThrow();
+      flushMicrotasks();
 
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush({property: 'another value'});
-
-    req = httpTestingController.expectOne('/adminhandler');
-    req.flush();
-
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    let req = adminDataService.getDataAsync();
-    req.flush();
-
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error loading admin handler');
+    }));
 });
