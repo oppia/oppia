@@ -16,40 +16,49 @@
  * @fileoverview Service for managing CSRF tokens.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
 // This needs to be imported first instead of using the global definition
 // because Angular doesn't support global definitions and every library used
 // needs to be imported explicitly.
+
 import $ from 'jquery';
 
-angular.module('oppia').factory('CsrfTokenService', [function() {
-  var tokenPromise = null;
+@Injectable({
+  providedIn: 'root'
+})
+export class CsrfTokenService {
+  tokenPromise = null;
 
-  return {
-    initializeToken: function() {
-      if (tokenPromise !== null) {
-        throw new Error('Token request has already been made');
-      }
-      // We use jQuery here instead of Angular's $http, since the latter creates
-      // a circular dependency.
-      tokenPromise = $.ajax({
-        url: '/csrfhandler',
-        type: 'GET',
-        dataType: 'text',
-        dataFilter: function(data) {
-          // Remove the protective XSSI (cross-site scripting inclusion) prefix.
-          var actualData = data.substring(5);
-          return JSON.parse(actualData);
-        },
-      }).then(function(response) {
-        return response.token;
-      });
-    },
-
-    getTokenAsync: function() {
-      if (tokenPromise === null) {
-        throw new Error('Token needs to be initialized');
-      }
-      return tokenPromise;
+  initializeToken() {
+    if (this.tokenPromise !== null) {
+      throw new Error('Token request has already been made');
     }
-  };
-}]);
+
+    // We use jQuery here instead of Angular's $http, since the latter creates
+    // a circular dependency.
+    this.tokenPromise = $.ajax({
+      url: '/csrfhandler',
+      type: 'GET',
+      dataType: 'text',
+      dataFilter: function(data: any) {
+      // Remove the protective XSSI (cross-site scripting inclusion) prefix.
+        let actualData = data.substring(5);
+        return JSON.parse(actualData);
+      },
+    }).then(function(response: any) {
+      return response.token;
+    });
+  }
+
+  getTokenAsync() {
+    if (this.tokenPromise === null) {
+      throw new Error('Token needs to be initialized');
+    }
+    return this.tokenPromise;
+  }
+}
+
+angular.module('oppia').factory(
+  'CsrfTokenService', downgradeInjectable(CsrfTokenService));

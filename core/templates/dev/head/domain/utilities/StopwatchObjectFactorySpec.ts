@@ -19,40 +19,37 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import {TestBed} from '@angular/core/testing';
+import {LoggerService} from '../../services/contextual/logger.service';
+import {StopwatchObjectFactory} from './StopwatchObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/utilities/StopwatchObjectFactory.ts');
 
 describe('Stopwatch object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-
   describe('stopwatch object factory', function() {
-    var StopwatchObjectFactory = null;
-    var errorLog = [];
+    let stopwatchObjectFactory: StopwatchObjectFactory = null;
+    let errorLog = [];
+    let log: LoggerService = null;
 
-    beforeEach(angular.mock.inject(function($injector) {
-      StopwatchObjectFactory = $injector.get('StopwatchObjectFactory');
-      spyOn($injector.get('$log'), 'error').and.callFake(
+    beforeEach(() => {
+      stopwatchObjectFactory = TestBed.get(StopwatchObjectFactory);
+      log = TestBed.get(LoggerService);
+      spyOn(log, 'error').and.callFake(
         function(errorMessage) {
           errorLog.push(errorMessage);
         }
       );
-    }));
+    });
 
-    var changeCurrentTime = function(stopwatch, desiredCurrentTime) {
+    let changeCurrentTime = function(stopwatch, desiredCurrentTime) {
       stopwatch._getCurrentTime = function() {
         return desiredCurrentTime;
       };
     };
 
     it('should correctly record time intervals', function() {
-      var stopwatch = StopwatchObjectFactory.create();
+      let stopwatch = stopwatchObjectFactory.create();
       changeCurrentTime(stopwatch, 0);
       stopwatch.reset();
       changeCurrentTime(stopwatch, 500);
@@ -60,7 +57,7 @@ describe('Stopwatch object factory', function() {
     });
 
     it('should not reset stopwatch when current time is retrieved', function() {
-      var stopwatch = StopwatchObjectFactory.create();
+      let stopwatch = stopwatchObjectFactory.create();
       changeCurrentTime(stopwatch, 0);
       stopwatch.reset();
       changeCurrentTime(stopwatch, 500);
@@ -69,7 +66,7 @@ describe('Stopwatch object factory', function() {
     });
 
     it('should correctly reset the stopwatch', function() {
-      var stopwatch = StopwatchObjectFactory.create();
+      let stopwatch = stopwatchObjectFactory.create();
       changeCurrentTime(stopwatch, 0);
       stopwatch.reset();
       changeCurrentTime(stopwatch, 500);
@@ -81,7 +78,7 @@ describe('Stopwatch object factory', function() {
     });
 
     it('should error if getTimeInSecs() is called before reset()', function() {
-      var stopwatch = StopwatchObjectFactory.create();
+      let stopwatch = stopwatchObjectFactory.create();
       changeCurrentTime(stopwatch, 29);
       expect(stopwatch.getTimeInSecs()).toBeNull();
       expect(errorLog).toEqual([
@@ -89,8 +86,8 @@ describe('Stopwatch object factory', function() {
     });
 
     it('should instantiate independent stopwatches', function() {
-      var stopwatch1 = StopwatchObjectFactory.create();
-      var stopwatch2 = StopwatchObjectFactory.create();
+      let stopwatch1 = stopwatchObjectFactory.create();
+      let stopwatch2 = stopwatchObjectFactory.create();
 
       changeCurrentTime(stopwatch1, 0);
       changeCurrentTime(stopwatch2, 0);

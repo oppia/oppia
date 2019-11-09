@@ -12,33 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HttpClient} from '@angular/common/http';
-import {AudioFileObjectFactory} from '../domain/utilities/AudioFileObjectFactory';
-import {ImageFileObjectFactory} from '../domain/utilities/ImageFileObjectFactory';
-import {UrlInterpolationService} from '../domain/utilities/url-interpolation.service';
-import {FileDownloadRequestObjectFactory} from '../domain/utilities/FileDownloadRequestObjectFactory';
-import Constants from '../../../../../assets/constants';
-import {ServicesConstants} from './services.constants';
-import { Observable } from "rxjs/Rx";
-
-import {AppConstants} from '../app.constants';
-import {timeout} from "rxjs/operators";
 /**
  * @fileoverview Service to serve as the interface for fetching and uploading
  * assets from Google Cloud Storage.
  */
 
-require('domain/utilities/AudioFileObjectFactory.ts');
-require('domain/utilities/FileDownloadRequestObjectFactory.ts');
-require('domain/utilities/ImageFileObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/csrf-token.service.ts');
-
+import {HttpClient} from '@angular/common/http';
+import {AudioFileObjectFactory} from 'domain/utilities/AudioFileObjectFactory';
+import {ImageFileObjectFactory} from 'domain/utilities/ImageFileObjectFactory';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {FileDownloadRequestObjectFactory} from 'domain/utilities/FileDownloadRequestObjectFactory';
+import Constants from '../../../../../assets/constants';
+import {AppConstants} from 'app.constants';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ConstructTranslationIdsService} from './construct-translation-ids.service';
 
 export class AssetsBackendApiService {
   constructor(private httpClient: HttpClient, private audioFileObjectFactory: AudioFileObjectFactory,
-              private fileDownloadRequestObjectFactory: FileDownloadRequestObjectFactory,
-              private csrfTokenService: CsrfTokenService, private imageFileObjectFactory: ImageFileObjectFactory,
+              private fileDownloadRequestObjectFactory:
+                  FileDownloadRequestObjectFactory, private csrfTokenService: CsrfTokenService,
+              private imageFileObjectFactory: ImageFileObjectFactory,
               private urlInterpolationService: UrlInterpolationService) {}
 
   _audioFilesCurrentlyBeingRequested = [];
@@ -303,3 +297,8 @@ export class AssetsBackendApiService {
       entityType, entityId, filename, this.ASSET_TYPE_IMAGE);
   }
 }
+
+
+angular.module('oppia').factory(
+  'AssetsBackendApiService',
+  downgradeInjectable(AssetsBackendApiService));

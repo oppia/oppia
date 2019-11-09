@@ -61,6 +61,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {ExplorationDraftObjectFactory} from
   'domain/exploration/ExplorationDraftObjectFactory';
+import {CsrfTokenService} from "./csrf-token.service";
 
 @Injectable({
   providedIn: 'root'
@@ -109,7 +110,8 @@ export class UpgradedServices {
       })),
     'SiteAnalyticsService': new SiteAnalyticsService(new WindowRef()),
     'LocalStorageService': new LocalStorageService(
-      new ExplorationDraftObjectFactory())
+      new ExplorationDraftObjectFactory()),
+    'CsrfTokenService': new CsrfTokenService()
   };
 }
 
