@@ -156,7 +156,7 @@ def main(args=None):
     while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
 
-    os_info = os.uname()
+    os_info = platform.uname()
     # Launch a browser window.
     if os_info[0] == 'Linux' and not parsed_args.no_browser:
         detect_virtualbox_pattern = re.compile('.*VBOX.*')

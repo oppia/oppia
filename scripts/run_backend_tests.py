@@ -267,7 +267,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
         """
         class_names = []
         test_target_path = os.path.relpath(
-            path, os.getcwd())[:-3].replace('/', '.')
+            path, os.getcwd())[:-3].replace('/', '.').replace('\\', '.')
         python_module = importlib.import_module(test_target_path)
         for name, clazz in inspect.getmembers(
                 python_module, predicate=inspect.isclass):
