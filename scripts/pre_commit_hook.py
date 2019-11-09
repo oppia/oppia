@@ -31,7 +31,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
-import platform 
+import platform
 import shutil
 import subprocess
 import sys
@@ -68,11 +68,13 @@ def install_hook():
         python_utils.PRINT('Symlink already exists')
     else:
         try:
-            os.symlink(os.path.abspath(__file__), pre_commit_file)
+            # On Windows, it will try to copy the pyc file instead the py file.
+            this_file = __file__.replace('pyc', 'py')
+            os.symlink(os.path.abspath(this_file), pre_commit_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
         except (OSError, AttributeError):
-            shutil.copy(__file__, pre_commit_file)
+            shutil.copy(this_file, pre_commit_file)
             python_utils.PRINT('Copied file to .git/hooks directory')
 
     python_utils.PRINT('Making pre-commit hook file executable ...')
