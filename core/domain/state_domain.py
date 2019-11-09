@@ -1298,7 +1298,7 @@ class SubtitledHtml(python_utils.OBJECT):
         """Returns a default SubtitledHtml domain object.
 
         Args:
-            content_id: str. A unique id referring to the content field.
+            content_id: str. The id referring to the content field.
 
         Returns:
             SubtitledHtml. A default SubtitledHtml domain object.
@@ -1429,9 +1429,9 @@ class State(python_utils.OBJECT):
 
         Returns:
             list(dict). Each dict contains the following keys:
-                answer_group_index. int. The index of the answer group.
-                answers. InteractionInstance. The interactions from State
-                domain object.
+                    answer_group_index: int. The index of the answer group.
+                    answers. InteractionInstance. The interactions from State
+                        domain object.
         """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
