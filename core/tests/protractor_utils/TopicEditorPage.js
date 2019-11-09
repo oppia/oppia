@@ -209,8 +209,8 @@ var TopicEditorPage = function() {
     skillNamesElems = subtopicCol.all(
       by.css('.protractor-test-assigned-skill-card-text'));
     var toMove = skillNamesElems.get(skillCardIndex);
-    browser.executeScript(
-      dragAndDrop, toMove.getWebElement(),
+    dragAndDrop(
+      toMove.getWebElement(),
       uncategorizedSkillsContainer.getWebElement());
   };
 
