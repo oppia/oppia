@@ -180,7 +180,11 @@ def install_skulpt(parsed_args):
                     line.replace('ret = rununits(opt=True)', 'ret = 0'),
                     end='')
 
-            subprocess.check_call(['python', skulpt_filepath, 'dist'])
+            p = subprocess.Popen(['python', skulpt_filepath, 'dist'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+            output, err = p.communicate()
+            print output
+            print err
+
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
