@@ -191,9 +191,7 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
 
   describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
-      spyOn(ThreadDataService, 'fetchThreads').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'fetchMessages').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'getData').and.returnValue({
+      spyOn(ThreadDataService, 'fetchThreads').and.returnValue($q.resolve({
         suggestionThreads: [{threadId: 'abc1'}, {threadId: 'def2'}]
       });
 
