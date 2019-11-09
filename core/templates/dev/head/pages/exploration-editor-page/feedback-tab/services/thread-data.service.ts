@@ -37,7 +37,6 @@ angular.module('oppia').factory('ThreadDataService', [
     var _expId = ExplorationDataService.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
-    var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
     var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
         'exploration/' + _expId + '/';
     var _THREAD_HANDLER_PREFIX = '/threadhandler/';
@@ -49,47 +48,40 @@ angular.module('oppia').factory('ThreadDataService', [
     // is updated lazily.
     var _data = {
       feedbackThreads: [],
-      suggestionThreads: []
+      suggestionThreads: [],
     };
-
-    // TODO(brianrodri@): Use a helper-object to give this function O(1)
-    // complexity instead of O(N).
-    var getThreadById = function(threadId) {
-      var thread = null;
-      var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
-      for (var i = 0; i < allThreads.length; i++) {
-        if (allThreads[i].threadId === threadId) {
-          thread = allThreads[i];
-          break;
-        }
-      }
-      return thread;
-    };
+    var _threadsById = {};
 
     // Number of open threads that need action
     var _openThreadsCount = 0;
 
     var _fetchThreads = function(onSuccess = () => {}) {
-      return $http.get(_THREAD_LIST_HANDLER_URL).then(res => {
-        _data.feedbackThreads = res.data.feedback_thread_dicts.map(dict => {
-          var feedbackThread =
-            FeedbackThreadObjectFactory.createFromBackendDict(dict);
-          feedbackThread.setMessages(dict.messages);
-          return feedbackThread;
-        });
-        _data.suggestionThreads = res.data.suggestion_thread_dicts.map(dict => {
-          var suggestionThread =
-            SuggestionThreadObjectFactory.createFromBackendDicts(
-              dict, dict.suggestion_dict);
-          suggestionThread.setMessages(dict.messages);
-          return suggestionThread;
-        });
+      return $http.get(_THREAD_LIST_HANDLER_URL).then(response => {
+        _threadsById = {};
+
+        _data.feedbackThreads =
+          response.data.feedback_thread_dicts.map(thread_dict => {
+            var thread = FeedbackThreadObjectFactory.createFromBackendDict(
+              thread_dict);
+            _threadsById[thread.threadId] = thread;
+            return thread;
+          });
+
+        _data.suggestionThreads =
+          response.data.suggestion_thread_dicts.map(thread_dict => {
+            var thread = SuggestionThreadObjectFactory.createFromBackendDicts(
+              thread_dict, thread_dict.suggestion_dict);
+            _threadsById[thread.threadId] = thread;
+            return thread;
+          });
+
+        return _data;
       }).then(onSuccess);
     };
 
     var _fetchMessages = function(threadId) {
-      return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(res) {
-        getThreadById(threadId).setMessages(res.data.messages);
+      return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(response => {
+        _threadsById[threadId].setMessages(response.data.messages);
       });
     };
 
@@ -105,7 +97,7 @@ angular.module('oppia').factory('ThreadDataService', [
         return _fetchMessages(threadId);
       },
       fetchFeedbackStats: function() {
-        return $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
+        return $http.get(_FEEDBACK_STATS_HANDLER_URL).then(response => {
           _openThreadsCount = response.data.num_open_threads;
         });
       },
@@ -117,12 +109,15 @@ angular.module('oppia').factory('ThreadDataService', [
           state_name: null,
           subject: newSubject,
           text: newText
-        }).then(function() {
-          _openThreadsCount += 1;
-          return _fetchThreads();
-        }, function() {
-          AlertsService.addWarning('Error creating new thread.');
-        }).then(onSuccess);
+        }).then(
+          () => {
+            _openThreadsCount += 1;
+            return _fetchThreads();
+          },
+          () => {
+            AlertsService.addWarning('Error creating new thread.');
+          }
+        ).then(onSuccess);
       },
       markThreadAsSeen: function(threadId) {
         return $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
@@ -131,8 +126,8 @@ angular.module('oppia').factory('ThreadDataService', [
       },
       addNewMessage: function(
           threadId, newMessage, newStatus, onSuccess, onFailure) {
-        var thread = getThreadById(threadId);
-        if (thread === null) {
+        var thread = _threadsById[threadId];
+        if (!thread) {
           return $q.reject('Can not add message to nonexistent thread.');
         }
 
@@ -143,7 +138,7 @@ angular.module('oppia').factory('ThreadDataService', [
           updated_status: updatedStatus,
           updated_subject: null,
           text: newMessage
-        }).then(function() {
+        }).then(() => {
           thread.status = newStatus;
           if (updatedStatus) {
             if (oldStatus === _THREAD_STATUS_OPEN) {
@@ -158,8 +153,8 @@ angular.module('oppia').factory('ThreadDataService', [
       resolveSuggestion: function(
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
-        var thread = getThreadById(threadId);
-        if (thread === null) {
+        var thread = _threadsById[threadId];
+        if (!thread) {
           return $q.reject('Can not add message to nonexistent thread.');
         }
 
@@ -167,7 +162,7 @@ angular.module('oppia').factory('ThreadDataService', [
           action: action,
           review_message: reviewMsg,
           commit_message: action === ACTION_ACCEPT_SUGGESTION ? commitMsg : null
-        }).then(function() {
+        }).then(() => {
           thread.status =
             action === ACTION_ACCEPT_SUGGESTION ? STATUS_FIXED : STATUS_IGNORED;
           _openThreadsCount -= 1;

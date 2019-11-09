@@ -37,7 +37,7 @@ export class FeedbackThread {
   constructor(
       status: string, subject: string, summary: string,
       originalAuthorName: string, lastUpdated: number, messageCount: number,
-      stateName: string, threadId: string) {
+      stateName: string, threadId: string, messages: any[] = []) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -46,7 +46,7 @@ export class FeedbackThread {
     this.messageCount = messageCount;
     this.stateName = stateName;
     this.threadId = threadId;
-    this.messages = [];
+    this.messages = messages;
   }
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
@@ -71,13 +71,15 @@ export class FeedbackThreadObjectFactory {
   // camelCasing.
   createFromBackendDict(feedbackThreadBackendDict: any): FeedbackThread {
     return new FeedbackThread(
-      feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
+      feedbackThreadBackendDict.status,
+      feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,
       feedbackThreadBackendDict.original_author_username,
       feedbackThreadBackendDict.last_updated,
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
-      feedbackThreadBackendDict.thread_id);
+      feedbackThreadBackendDict.thread_id,
+      feedbackThreadBackendDict.messages);
   }
 }
 angular.module('oppia').factory(

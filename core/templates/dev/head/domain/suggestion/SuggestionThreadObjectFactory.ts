@@ -23,7 +23,7 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
   'SuggestionObjectFactory', function(SuggestionObjectFactory) {
     var SuggestionThread = function(
         status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-        threadId, suggestion) {
+        threadId, suggestion, messages = []) {
       this.status = status;
       this.subject = subject;
       this.summary = summary;
@@ -32,7 +32,7 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
       this.messageCount = messageCount;
       this.threadId = threadId;
       this.suggestion = suggestion;
-      this.messages = [];
+      this.messages = messages;
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
@@ -52,7 +52,8 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
         suggestionThreadBackendDict.original_author_username,
         suggestionThreadBackendDict.last_updated,
         suggestionThreadBackendDict.message_count,
-        suggestionThreadBackendDict.thread_id, suggestion);
+        suggestionThreadBackendDict.thread_id, suggestion,
+        suggestionThreadBackendDict.messages);
     };
 
     SuggestionThread.prototype.setMessages = function(messages) {
