@@ -60,8 +60,8 @@ class ThreadListHandler(base.BaseHandler):
                 suggestion.to_dict() if suggestion is not None else None)
 
         self.values.update({
-            'feedback_thread_dicts': feedback_thread_dicts,
-            'suggestion_thread_dicts': suggestion_thread_dicts,
+            'feedbackThreadDicts': feedback_thread_dicts,
+            'suggestionThreadDicts': suggestion_thread_dicts,
         })
         self.render_json(self.values)
 

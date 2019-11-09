@@ -60,7 +60,7 @@ angular.module('oppia').factory('ThreadDataService', [
         _threadsById = {};
 
         _data.feedbackThreads =
-          response.data.feedback_thread_dicts.map(thread_dict => {
+          response.data.feedbackThreadDicts.map(thread_dict => {
             var thread = FeedbackThreadObjectFactory.createFromBackendDict(
               thread_dict);
             _threadsById[thread.threadId] = thread;
@@ -68,7 +68,7 @@ angular.module('oppia').factory('ThreadDataService', [
           });
 
         _data.suggestionThreads =
-          response.data.suggestion_thread_dicts.map(thread_dict => {
+          response.data.suggestionThreadDicts.map(thread_dict => {
             var thread = SuggestionThreadObjectFactory.createFromBackendDicts(
               thread_dict, thread_dict.suggestion_dict);
             _threadsById[thread.threadId] = thread;
