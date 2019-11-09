@@ -231,7 +231,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
 
     describe('.getDirectiveType', function() {
       it('returns feedback as directive type', function() {
-        expect(this.task.getDirectiveType())
+         expect(this.task.getDirectiveType())
           .toEqual(FEEDBACK_IMPROVEMENT_TASK_TYPE);
       });
     });
