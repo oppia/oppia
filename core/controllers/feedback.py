@@ -31,7 +31,7 @@ class ThreadListHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_view_feedback_thread
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         feedback_thread_dicts = [
             thread.to_dict() for thread in feedback_services.get_all_threads(
