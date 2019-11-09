@@ -178,6 +178,8 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skill']['id'])
+        self.assertEqual(
+            1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
 
     def test_editable_skill_handler_get_fails(self):

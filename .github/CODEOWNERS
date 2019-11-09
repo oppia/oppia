@@ -12,6 +12,7 @@
 #   can be optimized further.
 
 # Angular Migration team
+/core/templates/dev/head/services/contextual/logger.service.ts @bansalnitish
 /core/templates/dev/head/services/UpgradedServices.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
@@ -59,7 +60,7 @@
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
-/core/templates/dev/head/pages/about-page/ @DubeySandeep
+/core/templates/dev/head/pages/about-page/ @seanlip
 /core/templates/dev/head/pages/privacy-page/ @seanlip
 /core/templates/dev/head/pages/terms-page/ @seanlip
 
@@ -103,53 +104,53 @@
 
 
 # Exploration project.
-/core/controllers/editor*.py @DubeySandeep
+/core/controllers/editor*.py @aks681
 /core/controllers/reader*.py @aks681
 /core/controllers/resources*.py @vojtechjelinek
-/core/domain/exp*.py @DubeySandeep
+/core/domain/exp*.py @aks681
 /core/domain/fs*.py @aks681
 /core/domain/param_domain*.py @aks681
-/core/domain/rating_services*.py @DubeySandeep
+/core/domain/rating_services*.py @aks681
 /core/domain/state_domain*.py @aks681
 /core/domain/summary_services*.py @aks681
 /core/domain/value_generators_domain*.py @vojtechjelinek
 /core/storage/exploration/ @aks681
-/core/templates/dev/head/components/entity-creation-services/exploration-creation.service*.ts @DubeySandeep
+/core/templates/dev/head/components/entity-creation-services/exploration-creation.service*.ts @aks681
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive*.ts @aks681
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive.html @aks681
 /core/templates/dev/head/components/state-directives/ @aks681
-/core/templates/dev/head/components/graph-services/ @DubeySandeep
-/core/templates/dev/head/components/version-diff-visualization/version-diff-visualization.directive.html @DubeySandeep
-/core/templates/dev/head/components/version-diff-visualization/version-diff-visualization.directive.ts @DubeySandeep
-/core/templates/dev/head/domain/editor/ @DubeySandeep
-/core/templates/dev/head/domain/exploration/ @DubeySandeep
+/core/templates/dev/head/components/graph-services/ @aks681
+/core/templates/dev/head/components/version-diff-visualization/version-diff-visualization.directive.html @aks681
+/core/templates/dev/head/components/version-diff-visualization/version-diff-visualization.directive.ts @aks681
+/core/templates/dev/head/domain/editor/ @aks681
+/core/templates/dev/head/domain/exploration/ @aks681
 /core/templates/dev/head/domain/state/ @aks681
 /core/templates/dev/head/domain/summary/ @aks681
 /core/templates/dev/head/domain/state_card/ @aks681
-/core/templates/dev/head/pages/exploration-editor-page/ @DubeySandeep
+/core/templates/dev/head/pages/exploration-editor-page/ @aks681
 /core/templates/dev/head/pages/exploration-player-page/ @aks681
 /core/templates/dev/head/components/state-editor/ @aks681
-/core/templates/dev/head/services/compute-graph.service.ts @DubeySandeep
+/core/templates/dev/head/services/compute-graph.service.ts @aks681
 /core/templates/dev/head/services/context.service*.ts @aks681
-/core/templates/dev/head/services/editability.service*.ts @DubeySandeep
+/core/templates/dev/head/services/editability.service*.ts @aks681
 /core/templates/dev/head/services/exploration-features*.ts @aks681
 /core/templates/dev/head/services/exploration-html-formatter.service*.ts @aks681
-/core/templates/dev/head/services/validators.service*.ts @DubeySandeep
+/core/templates/dev/head/services/validators.service*.ts @aks681
 
 
 # Forms pages.
-/core/templates/dev/head/components/forms/ @DubeySandeep
-/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @DubeySandeep
-/core/templates/dev/head/components/ck-editor-helpers/customize-rte-component-modal.template.html @DubeySandeep
-/core/templates/dev/head/services/schema-default-value.service.ts @DubeySandeep
-/core/templates/dev/head/services/schema-undefined-last-element.service.ts @DubeySandeep
+/core/templates/dev/head/components/forms/ @bansalnitish
+/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @bansalnitish
+/core/templates/dev/head/components/ck-editor-helpers/customize-rte-component-modal.template.html @bansalnitish
+/core/templates/dev/head/services/schema-default-value.service.ts @bansalnitish
+/core/templates/dev/head/services/schema-undefined-last-element.service.ts @bansalnitish
 
 
 # Google-app-engine configurations
 /appengine_config.py @nithusha21
 /cron.yaml @nithusha21
 /dispatch.yaml @seanlip
-/index.yaml @DubeySandeep
+/index.yaml @seanlip
 /queue.yaml @seanlip
 /main_taskqueue.py @seanlip
 
@@ -205,14 +206,14 @@
 
 
 # Interaction project.
-/core/domain/customization_args_util*.py @DubeySandeep
+/core/domain/customization_args_util*.py @seanlip
 /core/domain/interaction_registry*.py @aks681
 /core/domain/obj_services*.py @aks681
 /core/templates/dev/head/components/version-diff-visualization/codemirror-mergeview.directive.ts @kevinlee12
 /core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
 /core/templates/dev/head/services/code-normalizer.service*.ts @kevinlee12
-/extensions/domain*.py @DubeySandeep
+/extensions/domain*.py @seanlip
 /extensions/interactions/ @kevinlee12 @vojtechjelinek
 /extensions/objects/ @aks681
 /extensions/value_generators/ @vojtechjelinek
@@ -334,8 +335,8 @@
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
 /main_mail.py @aks681
-/main.py @nithusha21 @DubeySandeep
-/feconf.py @nithusha21 @DubeySandeep
+/main.py @nithusha21 @seanlip
+/feconf.py @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/incoming_emails*.py @aks681
@@ -344,41 +345,41 @@
 /core/domain/prod_validation_jobs_one_off*.py @ankita240796
 /core/domain/storage_model_audit_jobs_test.py @ankita240796
 /core/jobs*.py @seanlip
-/core/platform/ @DubeySandeep
+/core/platform/ @seanlip
 /core/templates/dev/head/App*.ts @ankita240796
 /core/templates/dev/head/app.constants.ts @ankita240796
 /core/templates/dev/head/app.constants.ajs.ts @ankita240796
 /core/templates/dev/head/combined-tests.spec.ts @ankita240796
 /core/templates/dev/head/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @Jamesjay4199
-/core/templates/dev/head/I18nFooter.ts @DubeySandeep
-/core/templates/dev/head/i18n-footer.directive.html @DubeySandeep
+/core/templates/dev/head/I18nFooter.ts @nithusha21
+/core/templates/dev/head/i18n-footer.directive.html @nithusha21
 /core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @YashJipkate
 /core/templates/dev/head/services/contextual/meta-tag-customization.service.ts @YashJipkate
-/core/templates/dev/head/services/translation-file-hash-loader.service.ts @DubeySandeep
-/release_constants.py @ankita240796 @nithusha21 @DubeySandeep @seanlip
+/core/templates/dev/head/services/translation-file-hash-loader.service.ts @nithusha21
+/release_constants.py @ankita240796 @nithusha21 @seanlip
 
 
 # Miscellaneous.
-/__init__.py @DubeySandeep
-/core/__init__.py @DubeySandeep
-/core/controllers/__init__.py @DubeySandeep
-/core/domain/__init__.py @DubeySandeep
-/core/domain/config*.py @DubeySandeep
-/core/domain/change_domain.py @DubeySandeep
-/core/templates/dev/head/tests/ @DubeySandeep
-/core/templates/dev/head/domain/utilities/ @DubeySandeep
-/schema_utils*.py @DubeySandeep
+/__init__.py @nithusha21
+/core/__init__.py @nithusha21
+/core/controllers/__init__.py @nithusha21
+/core/domain/__init__.py @nithusha21
+/core/domain/config*.py @seanlip
+/core/domain/change_domain.py @ankita240796
+/core/templates/dev/head/tests/ @kevinlee12 @nithusha21
+/core/templates/dev/head/domain/utilities/ @bansalnitish
+/schema_utils*.py @seanlip
 /utils*.py @aks681
 /python_utils*.py @lilithxxx
 
 
 # Restricted pages.
-/core/controllers/admin*.py @DubeySandeep @nithusha21
-/core/controllers/moderator*.py @DubeySandeep
-/core/controllers/recent_commits*.py @DubeySandeep
-/core/domain/moderator_services*.py @DubeySandeep
-/core/templates/dev/head/pages/admin-page/ @DubeySandeep @nithusha21
-/core/templates/dev/head/pages/moderator-page/ @DubeySandeep
+/core/controllers/admin*.py @seanlip @nithusha21
+/core/controllers/moderator*.py @seanlip
+/core/controllers/recent_commits*.py @seanlip
+/core/domain/moderator_services*.py @seanlip
+/core/templates/dev/head/pages/admin-page/ @seanlip @nithusha21
+/core/templates/dev/head/pages/moderator-page/ @seanlip @nithusha21
 
 
 # QA team.
@@ -492,4 +493,4 @@
 /package.json @vojtechjelinek @kevinlee12
 /yarn.lock @vojtechjelinek @kevinlee12
 /scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
-/.github/ @DubeySandeep
+/.github/ @kevinlee12

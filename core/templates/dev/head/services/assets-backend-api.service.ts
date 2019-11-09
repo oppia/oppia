@@ -196,7 +196,6 @@ angular.module('oppia').factory('AssetsBackendApiService', [
           // Remove the XSSI prefix.
           var transformedData = data.responseText.substring(5);
           var parsedResponse = angular.fromJson(transformedData);
-          console.error(parsedResponse);
           if (errorCallback) {
             errorCallback(parsedResponse);
           }
