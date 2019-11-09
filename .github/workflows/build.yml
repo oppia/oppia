@@ -19,6 +19,6 @@ jobs:
       - name: Set up virtual environment 
         run: python -m pip install virtualenv && python -m virtualenv ../venv 
       - name: list files 
-        run: ls
+        run: ls -al
       - name: Run setup 
         run: . ../venv/bin/activate && ls && pwd && python --version && python -m scripts.setup
