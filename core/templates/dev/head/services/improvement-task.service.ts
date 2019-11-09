@@ -38,11 +38,13 @@ require('domain/statistics/SuggestionImprovementTaskObjectFactory.ts');
 angular.module('oppia').factory('ImprovementTaskService', [
   '$q', 'AnswerDetailsImprovementTaskObjectFactory',
   'FeedbackImprovementTaskObjectFactory',
+  'ImprovementsDisplayService',
   'PlaythroughImprovementTaskObjectFactory',
   'SuggestionImprovementTaskObjectFactory',
   function(
       $q, AnswerDetailsImprovementTaskObjectFactory,
       FeedbackImprovementTaskObjectFactory,
+      ImprovementsDisplayService,
       PlaythroughImprovementTaskObjectFactory,
       SuggestionImprovementTaskObjectFactory) {
     /** @type {Object[]} */
@@ -80,12 +82,12 @@ angular.module('oppia').factory('ImprovementTaskService', [
         }
         return tasksPromise;
       },
-      getOpenTaskCount: function() {
+      fetchOpenTaskCount: function() {
         var isTaskOpen = function(task) {
-          return task.getStatus() === 'open';
+          return ImprovementsDisplayService.isOpen(task.getStatus());
         };
-        return this.fetchTasks().then(allTasks=> {
-          return allTasks.filter(task=>isTaskOpen(task)).length;
+        return this.fetchTasks().then(allTasks => {
+          return allTasks.filter(task => isTaskOpen(task)).length;
         });
       }
     };
