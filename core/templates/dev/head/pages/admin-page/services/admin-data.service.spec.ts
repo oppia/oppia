@@ -22,7 +22,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { AdminDataService } from './admin-data.service';
 import {HttpErrorResponse} from '@angular/common/http';
 
-fdescribe('Admin Data Service', function() {
+describe('Admin Data Service', function() {
   let adminDataService: AdminDataService = null;
   let httpTestingController: HttpTestingController;
   let sampleAdminData = {

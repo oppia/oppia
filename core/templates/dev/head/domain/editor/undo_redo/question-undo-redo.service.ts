@@ -17,10 +17,10 @@
  * domain object.
  */
 
-import {Injectable} from '@angular/core';
-import {BaseUndoRedoService} from './base-undo-redo.service';
-import {downgradeInjectable} from '@angular/upgrade/static';
-import {UndoRedoService} from './undo-redo.service';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { BaseUndoRedoService } from './base-undo-redo.service';
 
 @Injectable({
   providedIn: 'root'

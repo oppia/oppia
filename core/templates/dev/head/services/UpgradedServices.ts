@@ -47,11 +47,20 @@ import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { UnitsObjectFactory } from
-  'domain/objects/UnitsObjectFactory';
-import {BaseUndoRedoService} from "../domain/editor/undo_redo/base-undo-redo.service";
-import {UndoRedoService} from "../domain/editor/undo_redo/undo-redo.service";
-import {EventService} from "./event-service";
+import { BaseUndoRedoService } from
+  'domain/editor/undo_redo/base-undo-redo.service';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {EventService} from 'services/event-service';
+import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
+import {HttpClient, HttpEvent, HttpHandler, HttpRequest} from
+  '@angular/common/http';
+import {Observable} from 'rxjs';
+import {TranslateTextService} from
+  'pages/community-dashboard-page/services/translate-text.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {ExplorationDraftObjectFactory} from
+  'domain/exploration/ExplorationDraftObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -84,11 +93,23 @@ export class UpgradedServices {
       new WindowRef()), new UtilsService()),
     'UtilsService': new UtilsService(),
     'WindowDimensionsService': new WindowDimensionsService(),
-    'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
-      new UnitsObjectFactory(), new FractionObjectFactory()),
-    'WindowDimensionsService': new WindowDimensionsService(),
     'BaseUndoRedoService': new BaseUndoRedoService(new EventService()),
-    'UndoRedoService': new UndoRedoService(new EventService())
+    'UndoRedoService': new UndoRedoService(new EventService()),
+    'AdminDataService': new AdminDataService(
+      new HttpClient(<HttpHandler> new class extends HttpHandler {
+        handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+          return undefined;
+        }
+      })),
+    'TranslateTextService': new TranslateTextService(
+      new HttpClient(new class extends HttpHandler {
+        handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+          return undefined;
+        }
+      })),
+    'SiteAnalyticsService': new SiteAnalyticsService(new WindowRef()),
+    'LocalStorageService': new LocalStorageService(
+      new ExplorationDraftObjectFactory())
   };
 }
 

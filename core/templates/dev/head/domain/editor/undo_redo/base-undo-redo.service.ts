@@ -28,7 +28,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
-import {EditorDomainConstants} from "../editor-domain.constants";
+import { EditorDomainConstants } from "domain/editor/editor-domain.constants";
 import { EventService } from 'services/event-service';
 
 @Injectable({
