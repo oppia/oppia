@@ -24,13 +24,16 @@ import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ComputeGraphService } from 'services/compute-graph.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 import { ExtensionTagAssemblerService }
   from 'services/extension-tag-assembler.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
@@ -50,13 +53,16 @@ export class UpgradedServices {
   upgradedServices = {
     'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
+    'ComputeGraphService': new ComputeGraphService(),
     'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
+    'DebouncerService': new DebouncerService(),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
     'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
       new HtmlEscaperService(new LoggerService()),
       new CamelCaseToHyphensPipe()),
+    'GenerateContentIdService': new GenerateContentIdService(),
     'HtmlEscaperService': new HtmlEscaperService(
       new LoggerService()),
     'MetaTagCustomizationService': new MetaTagCustomizationService(
