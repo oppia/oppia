@@ -34,7 +34,7 @@ jobs:
         run: . ../venv/Scripts/activate
         if: matrix.os == 'windows-latest'
       - name: Install chrome (macos)
-        run: brew cask install google-chrome
+        run: brew update && brew cask install google-chrome
         if: matrix.os == 'macos-latest'
       - name: Install third party
         run: python -m scripts.install_third_party_libs 
