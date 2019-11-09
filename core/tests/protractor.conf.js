@@ -69,6 +69,10 @@ var suites = {
       'protractor_desktop/extensions.js'
     ],
 
+    fileUploadFeatures: [
+      'protractor_desktop/voiceoverUploadFeatures.js'
+    ],
+
     learnerDashboard: [
       'protractor_desktop/learnerDashboard.js'
     ],

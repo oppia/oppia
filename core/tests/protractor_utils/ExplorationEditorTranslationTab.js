@@ -16,6 +16,8 @@
  * @fileoverview Page object for the exploration editor's translation tab, for
  * use in Protractor tests.
  */
+var path = require('path');
+
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
@@ -194,6 +196,20 @@ var ExplorationEditorTranslationTab = function() {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
 
+  var audioUploadInputElement = element(
+    by.css('.protractor-test-upload-audio'));
+  var audioOverFiveMinutesErrorMessageElement = element(
+    by.css('.protractor-test-audio-file-upload-field-error-message'));
+  var uploadAudioButton = element.all(
+    by.css('.protractor-test-upload-audio-button')).last();
+  var saveUploadedAudioButton = element(
+    by.css('.protractor-test-save-uploaded-audio-button'));
+  var playPauseAudioButton = element(
+    by.css('.protractor-test-play-pause-audio-button'));
+  var audioMaterialSliderDiv = element(by.css('.md-slider-wrapper'));
+  var closeAudioUploaderModalButton = element(
+    by.css('.protractor-test-close-audio-upload-modal'));
+
   this.setTranslation = function(richTextInstructions) {
     waitFor.elementToBeClickable(
       editTranslationButtton,
@@ -214,6 +230,84 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.invisibilityOf(
       saveTranslationButton,
       'State translation editor takes too long to disappear');
+  };
+
+  this.expectSaveUploadedAudioButtonToBeDisabled = function() {
+    expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
+  };
+
+  this.uploadAudio = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    waitFor.elementToBeClickable(
+      saveUploadedAudioButton, 'Save button is not clickable');
+    saveUploadedAudioButton.click();
+    waitFor.invisibilityOf(saveUploadedAudioButton,
+      'Upload Audio modal takes too long to disappear');
+  };
+
+  this.expectWrongFileType = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    expect(element(by.css('div.error-message')).getText())
+      .toContain('This file is not recognized as an audio file.');
+  };
+
+  this.expectAudioOverFiveMinutes = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    waitFor.elementToBeClickable(
+      saveUploadedAudioButton, 'Save button is not clickable');
+    saveUploadedAudioButton.click();
+    waitFor.visibilityOf(audioOverFiveMinutesErrorMessageElement,
+      'Error element is not visible');
+    expect(audioOverFiveMinutesErrorMessageElement.getText()).toContain(
+      'Audio files must be under 300 seconds in length.');
+  };
+
+  this.openUploadAudioModal = function() {
+    waitFor.elementToBeClickable(
+      uploadAudioButton, 'Upload Audio button is not clickable');
+    uploadAudioButton.click();
+  };
+
+  this.closeUploadAudioModal = function() {
+    waitFor.elementToBeClickable(
+      closeAudioUploaderModalButton,
+      'Close audio uploader modal button is not clickable');
+    closeAudioUploaderModalButton.click();
+  };
+
+  this.playOrPauseAudioFile = function() {
+    waitFor.visibilityOf(
+      playPauseAudioButton,
+      'Play or pause audio button is taking too long to appear');
+    playPauseAudioButton.click();
+    return this._isAudioPlaying();
+  };
+
+  this._isAudioPlaying = function() {
+    return audioMaterialSliderDiv.getAttribute('aria-valuenow')
+      .then(function(firstValue) {
+        return new Promise(function(resolve, reject) {
+          setTimeout(function() {
+            resolve(firstValue);
+          }, 2000);
+        });
+      }).then(function(firstValue) {
+        return audioMaterialSliderDiv.getAttribute('aria-valuenow')
+          .then(function(secondValue) {
+            if (firstValue && secondValue) {
+              return +firstValue < +secondValue;
+            }
+            return false;
+          });
+      }).then(function(isPlaying) {
+        return isPlaying;
+      });
   };
 
   this.expectTranslationToMatch = function(richTextInstructions) {
