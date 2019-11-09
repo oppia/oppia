@@ -588,11 +588,12 @@ def get_closed_threads(entity_type, entity_id, has_suggestion):
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
     threads = get_threads(entity_type, entity_id)
-    def is_closed(thread):
-        """Helper predicate for identifying closed threads."""
-        return (thread.has_suggestion == has_suggestion and
-                thread.status != feedback_models.STATUS_CHOICES_OPEN)
-    return [thread for thread in threads if is_closed(thread)]
+    closed_threads = []
+    for thread in threads:
+        if (thread.has_suggestion == has_suggestion and
+                thread.status != feedback_models.STATUS_CHOICES_OPEN):
+            closed_threads.append(thread)
+    return closed_threads
 
 
 def get_all_threads(entity_type, entity_id, has_suggestion):
@@ -610,8 +611,11 @@ def get_all_threads(entity_type, entity_id, has_suggestion):
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
     threads = get_threads(entity_type, entity_id)
-    return [thread for thread in threads
-            if thread.has_suggestion == has_suggestion]
+    all_threads = []
+    for thread in threads:
+        if thread.has_suggestion == has_suggestion:
+            all_threads.append(thread)
+    return all_threads
 
 
 def get_all_thread_participants(thread_id):
