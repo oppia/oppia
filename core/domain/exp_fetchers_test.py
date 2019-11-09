@@ -24,6 +24,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -38,8 +39,9 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ExplorationRetrievalTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_retrieval_of_explorations(self):
         """Test the get_exploration_by_id() method."""
@@ -239,8 +241,8 @@ title: Old Title
         super(ExplorationConversionPipelineTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
 
         # Create exploration that uses a states schema version of 0 and ensure
         # it is properly converted.

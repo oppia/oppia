@@ -39,9 +39,8 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(DatastoreBackedFileSystemUnitTests, self).setUp()
-        self.USER_EMAIL = 'abc@example.com'
-        self.signup(self.USER_EMAIL, 'username')
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.user_email = 'abc@example.com'
+        self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
@@ -175,9 +174,8 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(GcsFileSystemUnitTests, self).setUp()
-        self.USER_EMAIL = 'abc@example.com'
-        self.signup(self.USER_EMAIL, 'username')
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.user_email = 'abc@example.com'
+        self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
 
@@ -265,9 +263,8 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(DirectoryTraversalTests, self).setUp()
-        self.USER_EMAIL = 'abc@example.com'
-        self.signup(self.USER_EMAIL, 'username')
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.user_email = 'abc@example.com'
+        self.user_id = self.get_user_id_from_email(self.user_email)
 
     def test_invalid_filepaths_are_caught(self):
         fs = fs_domain.AbstractFileSystem(
