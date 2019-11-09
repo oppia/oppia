@@ -17,22 +17,12 @@ jobs:
       - uses: actions/setup-python@v1
         with: 
           python-version: '2.7'
-      - name: install virtualenv
-        run: python -m pip install virtualenv 
-      - name: setup virtual env
-        run: python -m virtualenv ../venv
       - name: sudo ln
         run: cd /lib/x86_64-linux-gnu && sudo ln -s libreadline.so.7.0 libreadline.so.6 && cd -
         if: matrix.os == 'ubuntu-18.04'
       - name: install pre
         run: bash scripts/install_prerequisites.sh 
         if: matrix.os != 'windows-latest'
-      - name: Activate virtualenv
-        run:  . ../venv/bin/activate 
-        if: matrix.os != 'windows-latest'
-      - name: Activate virtual env (windows) 
-        run: . ../venv/Scripts/activate
-        if: matrix.os == 'windows-latest'
       - name: Install chrome (macos)
         run: brew update && brew cask install google-chrome
         if: matrix.os == 'macos-latest'
