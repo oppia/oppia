@@ -93,7 +93,7 @@ def download_and_install_package(url_to_retrieve, filename):
                 ['powershell', 'Expand-Archive',
                  filename, common.OPPIA_TOOLS_DIR],
                 stdout=sys.stdout)
-        p.communicate()
+            p.communicate()
 
     os.remove(filename)
 
@@ -126,6 +126,7 @@ def main(args=None):
         'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.NODE_PATH):
         python_utils.PRINT('Installing Node.js')
+        downloaded_file_name = 'node-download.tgz'
         if os_info[0] == 'Darwin':
             if os_info[4] == 'x86_64':
                 node_file_name = 'node-v10.15.3-darwin-x64.tar.gz'
@@ -141,10 +142,11 @@ def main(args=None):
                 node_file_name = 'node-v10.15.3-win-x64.zip'
             else:
                 node_file_name = 'node-v10.15.3-win-x86.zip'
+            downloaded_file_name = 'node-download.zip'
 
         download_and_install_package(
             'https://nodejs.org/dist/v10.15.3/%s' % node_file_name,
-            'node-download.tgz')
+            downloaded_file_name)
         shutil.move(
             os.path.join(
                 common.OPPIA_TOOLS_DIR, os.path.splitext(node_file_name)[0]),

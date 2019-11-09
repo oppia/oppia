@@ -266,6 +266,12 @@ def main(args=None):
 
     # Install third-party node modules needed for the build process.
     if platform.uname()[0] == 'Windows':
+        # Rename the one without extension, otherwise it will be executed.
+        origin_yarn_bin = os.path.join(common.YARN_PATH, 'bin', 'yarn')
+        if os.path.exists(origin_yarn_bin):
+            os.rename(
+                origin_yarn_bin,
+                os.path.join(common.YARN_PATH, 'bin', 'yarn.sh'))
         yarn_command = 'yarn.cmd'
     else:
         yarn_command = 'yarn'
