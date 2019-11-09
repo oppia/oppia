@@ -194,10 +194,8 @@ describe('Topic editor functionality', function() {
 
   it('should assign a skill to, between, and from subtopics', function() {
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 2');
-    skillEditorPage.editConceptCard('Concept card explanation');
-    skillEditorPage.saveOrPublishSkill('Added review material.');
-    skillEditorPage.firstTimePublishSkill();
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill 2', 'Concept card explanation');
 
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
@@ -212,7 +210,7 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectSubtopicToHaveSkills(0, []);
     topicEditorPage.expectSubtopicToHaveSkills(1, []);
 
-    topicEditorPage.dragSkillToSubtopic(0, 0);
+    topicEditorPage.dragSkillToSubtopic(1, 0);
     topicEditorPage.expectSubtopicToHaveSkills(0, ['Skill 2']);
     topicEditorPage.expectSubtopicToHaveSkills(1, []);
 
