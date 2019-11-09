@@ -1322,7 +1322,8 @@ def compile_typescript_files(project_dir):
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files...')
-    cmd = ['node', './node_modules/typescript/bin/tsc', '--project', project_dir]
+    cmd = [
+        'node', './node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
 
 

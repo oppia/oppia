@@ -18,11 +18,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
-import platform 
 import os
-import sys
-import subprocess
+import platform
 import shutil
+import subprocess
+import sys
 import tarfile
 
 import python_utils
@@ -82,17 +82,17 @@ def download_and_install_package(url_to_retrieve, filename):
         filename: string. The name of the tar file.
     """
     python_utils.url_retrieve(url_to_retrieve, filename=filename)
-    basename, extension = os.path.splitext(filename)
+    _, extension = os.path.splitext(filename)
     if extension == '.gz':
         tar = tarfile.open(name=filename)
         tar.extractall(path=common.OPPIA_TOOLS_DIR)
         tar.close()
     elif platform.uname()[0] == 'Windows':
         if extension == '.zip':
-            p = subprocess.Popen(['powershell', 'Expand-Archive', filename, common.OPPIA_TOOLS_DIR], stdout=sys.stdout)
-        elif extension == '.msi':
-            installPath = os.path.join(common.OPPIA_TOOLS_DIR, basename)
-            p = subprocess.Popen(['msiexec', '/i', filename, 'INSTALLDIR=%s' % installPath, '/q'])
+            p = subprocess.Popen(
+                ['powershell', 'Expand-Archive',
+                 filename, common.OPPIA_TOOLS_DIR],
+                stdout=sys.stdout)
         p.communicate()
 
     os.remove(filename)
@@ -122,19 +122,6 @@ def main(args=None):
     create_directory(common.NODE_MODULES_PATH)
 
     os_info = platform.uname()
-    # if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
-    #     # Node is a requirement for all installation scripts. Here, we check if
-    #     # the OS supports node.js installation; if not, we exit with an error.
-    #     common.print_each_string_after_two_new_lines([
-    #         'WARNING: Unsupported OS for installation of node.js.',
-    #         'If you are running this script on Windows, see the instructions',
-    #         'here regarding installation of node.js:',
-    #         'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows'
-    #         '%29',
-    #         'STATUS: Installation completed except for node.js. Exiting.'])
-    #     raise Exception
-
-    # Download and install node.js.
     python_utils.PRINT(
         'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.NODE_PATH):
@@ -155,11 +142,12 @@ def main(args=None):
             else:
                 node_file_name = 'node-v10.15.3-win-x86.zip'
 
-        # download_and_install_package(
-        #     'https://nodejs.org/dist/v10.15.3/%s' % node_file_name,
-        #     'node-download.tgz')
+        download_and_install_package(
+            'https://nodejs.org/dist/v10.15.3/%s' % node_file_name,
+            'node-download.tgz')
         shutil.move(
-            os.path.join(common.OPPIA_TOOLS_DIR, os.path.splitext(node_file_name)[0]),
+            os.path.join(
+                common.OPPIA_TOOLS_DIR, os.path.splitext(node_file_name)[0]),
             common.NODE_PATH)
 
     # Change ownership of node_modules.
@@ -203,8 +191,9 @@ def main(args=None):
         chrome_bin = (
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
     elif os.path.isfile(
-        'c:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'):
-        chrome_bin = ('c:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe')
+            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'):
+        chrome_bin = (
+            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe')
     elif os.path.isfile(
             '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
         # WSL.

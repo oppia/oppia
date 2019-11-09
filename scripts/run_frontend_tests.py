@@ -67,7 +67,7 @@ def main(args=None):
     build.main(args=[])
 
     cmd = [
-        "node",
+        'node',
         os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
         'start', os.path.join('core', 'tests', 'karma.conf.ts')]
 

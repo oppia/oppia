@@ -41,7 +41,8 @@ YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-v1.17.3')
 # Add path for node which is required by the node_modules.
 
 os.environ['PATH'] = os.pathsep.join([
-    NODE_PATH, os.path.join(NODE_PATH, 'bin'), os.path.join(YARN_PATH, 'bin'), os.environ['PATH']])
+    NODE_PATH, os.path.join(NODE_PATH, 'bin'),
+    os.path.join(YARN_PATH, 'bin'), os.environ['PATH']])
 
 
 def run_cmd(cmd_tokens):
