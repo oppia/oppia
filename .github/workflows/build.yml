@@ -8,7 +8,7 @@ jobs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-18.04]
+        os: [windows-latest, ubuntu-18.04, macos-latest]
 #         os: [ubuntu-18.04]
     # This job runs on Linux
     steps:
@@ -27,8 +27,15 @@ jobs:
       - name: install pre
         run: bash scripts/install_prerequisites.sh 
         if: matrix.os != 'windows-latest'
-      - name: Activate 
+      - name: Activate virtualenv
         run:  . ../venv/bin/activate 
+        if: matrix.os != 'windows-latest'
+      - name: Activate virtual env (windows) 
+        run: . ../venv/Scripts/activate
+        if: matrix.os == 'windows-latest'
+      - name: Install chrome (macos)
+        run: brew cask install google-chrome
+        if: matrix.os == 'macos-latest'
       - name: Install third party
         run: python -m scripts.install_third_party_libs 
       - name: run frontend 
