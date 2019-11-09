@@ -37,6 +37,7 @@ env:
     - RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB=true
     - RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB=true
     - RUN_E2E_TESTS_EXTENSIONS=true
+    - RUN_E2E_TESTS_FILE_UPLOAD_FEATURES=true
     - RUN_E2E_TESTS_LEARNER_DASHBOARD=true
     - RUN_E2E_TESTS_LEARNER=true
     - RUN_E2E_TESTS_LIBRARY=true
@@ -110,6 +111,7 @@ script:
 - if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="explorationStatisticsTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="explorationTranslationTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_FILE_UPLOAD_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="fileUploadFeatures"; fi
 - if [ "$RUN_E2E_TESTS_LEARNER_DASHBOARD" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="learnerDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="learner" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_LIBRARY" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="library" --prod_env; fi
