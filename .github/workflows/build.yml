@@ -8,7 +8,8 @@ jobs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-18.04]
+#         os: [macos-latest, windows-latest, ubuntu-18.04]
+        os: [ubuntu-18.04]
     # This job runs on Linux
     steps:
       # This step uses GitHub's hello-world-javascript-action: https://github.com/actions/hello-world-javascript-action
@@ -17,6 +18,7 @@ jobs:
           python-version: '2.7'
       - name: Set up virtual environment 
         run: python -m pip install virtualenv && python -m virtualenv ../venv 
-
+      - name: list files 
+        run: ls
       - name: Run setup 
         run: . ../venv/bin/activate && ls && pwd && python --version && python -m scripts.setup
