@@ -28,12 +28,12 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ThreadDataService', [
-  '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
+  '$http', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',
   'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED',
   'STATUS_IGNORED',
   function(
-      $http, $log, $q, AlertsService, ExplorationDataService,
+      $http, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionObjectFactory,
       SuggestionThreadObjectFactory, ACTION_ACCEPT_SUGGESTION, STATUS_FIXED,
       STATUS_IGNORED) {
@@ -76,17 +76,17 @@ angular.module('oppia').factory('ThreadDataService', [
       return $http.get(_THREAD_LIST_HANDLER_URL).then(res => {
         _data.feedbackThreads = res.data.feedback_thread_dicts.map(dict => {
           var feedbackThread =
-	    FeedbackThreadObjectFactory.createFromBackendDict(dict);
-	  feedbackThread.setMessages(dict['messages']);
+            FeedbackThreadObjectFactory.createFromBackendDict(dict);
+          feedbackThread.setMessages(dict['messages']);
           return feedbackThread;
-	});
+        });
         _data.suggestionThreads = res.data.suggestion_thread_dicts.map(dict => {
-	  var suggestionThread =
-	    SuggestionThreadObjectFactory.createFromBackendDicts(
+          var suggestionThread =
+            SuggestionThreadObjectFactory.createFromBackendDicts(
               dict, dict['suggestion_dict']);
-	  suggestionThread.setMessages(dict['messages']);
-	  return suggestionThread;
-	  });
+          suggestionThread.setMessages(dict['messages']);
+          return suggestionThread;
+        });
       }).then(onSuccess);
     };
 
