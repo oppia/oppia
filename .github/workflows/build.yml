@@ -40,6 +40,7 @@ jobs:
         run: python -m scripts.install_third_party_libs 
       - name: run frontend 
         run: python -m scripts.run_frontend_tests 
+        if: matrix.os != 'ubuntu-18.04'
       - name: run backend 
         run: python -m scripts.run_backend_tests 
       - name: run linter 
