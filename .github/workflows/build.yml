@@ -20,4 +20,4 @@ jobs:
       - name: Set up virtual environment 
         run: python -m pip install virtualenv && python -m virtualenv ../venv 
       - name: Run setup 
-        run: . ../venv/bin/activate && python -m scripts.setup
+        run: . ../venv/bin/activate && python -m scripts.start
