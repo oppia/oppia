@@ -20,18 +20,27 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { LoggerService } from 'services/contextual/logger.service';
 import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ComputeGraphService } from 'services/compute-graph.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
+import { ExtensionTagAssemblerService }
+  from 'services/extension-tag-assembler.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
-import { UtilsService } from './utils.service';
+import { UrlService } from 'services/contextual/url.service';
+import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -44,16 +53,25 @@ export class UpgradedServices {
   upgradedServices = {
     'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
+    'ComputeGraphService': new ComputeGraphService(),
     'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
+    'DebouncerService': new DebouncerService(),
+    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
-    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
+    'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
+      new HtmlEscaperService(new LoggerService()),
+      new CamelCaseToHyphensPipe()),
+    'GenerateContentIdService': new GenerateContentIdService(),
+    'HtmlEscaperService': new HtmlEscaperService(
+      new LoggerService()),
     'MetaTagCustomizationService': new MetaTagCustomizationService(
       new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'UrlService': new UrlService(new WindowRef()),
     'UtilsService': new UtilsService(),
-    'WindowDimensionsService': new WindowDimensionsService()
+    'WindowDimensionsService': new WindowDimensionsService(),
   };
 }
 

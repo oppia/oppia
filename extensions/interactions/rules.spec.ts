@@ -48,7 +48,7 @@ import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
-import { NormalizeWhitespacePunctuationAndCase } from
+import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
@@ -95,7 +95,7 @@ describe('Rule spec services', function() {
       'PencilCodeEditorRulesService',
       new PencilCodeEditorRulesService(
         new NormalizeWhitespacePipe(new UtilsService()),
-        new NormalizeWhitespacePunctuationAndCase(),
+        new NormalizeWhitespacePunctuationAndCasePipe(),
         new CodeNormalizerService()));
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since

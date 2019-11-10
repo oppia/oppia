@@ -13,39 +13,39 @@
 // limitations under the License.
 
 /**
- * @fileoverview NormalizeWhitespacePunctuationAndCase filter for Oppia.
+ * @fileoverview NormalizeWhitespacePunctuationAndCase pipe for Oppia.
  */
+
+import { Pipe, PipeTransform } from '@angular/core';
 
 // Filter that takes a string, trims and normalizes spaces within each
 // line, and removes blank lines. Note that any spaces whose removal does not
 // result in two alphanumeric "words" being joined together are also removed,
 // so "hello ? " becomes "hello?".
-import { Pipe, PipeTransform } from '@angular/core';
 
-// Pipe that removes whitespace from the beginning and end of a string, and
-// replaces interior whitespace with a single space character.
 @Pipe({name: 'normalizeWhitespacePunctuationAndCase'})
-export class NormalizeWhitespacePunctuationAndCase implements PipeTransform {
+export class NormalizeWhitespacePunctuationAndCasePipe
+implements PipeTransform {
   transform(input: any): any {
     if (typeof input === 'string' || input instanceof String) {
-      var isAlphanumeric = function(character) {
+      let isAlphanumeric = function(character) {
         return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
           character.toLowerCase()) !== -1;
       };
 
       input = input.trim();
-      var inputLines = input.split('\n');
-      var resultLines = [];
-      for (var i = 0; i < inputLines.length; i++) {
-        var result = '';
+      let inputLines = input.split('\n');
+      let resultLines = [];
+      for (let i = 0; i < inputLines.length; i++) {
+        let result = '';
 
-        var inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
-        for (var j = 0; j < inputLine.length; j++) {
-          var currentChar = inputLine.charAt(j).toLowerCase();
+        let inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
+        for (let j = 0; j < inputLine.length; j++) {
+          let currentChar = inputLine.charAt(j).toLowerCase();
           if (currentChar === ' ') {
             if (j > 0 && j < inputLine.length - 1 &&
-                isAlphanumeric(inputLine.charAt(j - 1)) &&
-                isAlphanumeric(inputLine.charAt(j + 1))) {
+                                isAlphanumeric(inputLine.charAt(j - 1)) &&
+                                isAlphanumeric(inputLine.charAt(j + 1))) {
               result += currentChar;
             }
           } else {

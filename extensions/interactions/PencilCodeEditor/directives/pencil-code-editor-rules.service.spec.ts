@@ -19,7 +19,7 @@
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 /* eslint-disable max-len */
-import { NormalizeWhitespacePunctuationAndCase } from
+import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 /* eslint-enable max-len */
 import { PencilCodeEditorRulesService } from
@@ -31,7 +31,7 @@ describe('Pencil Code Editor rules service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        NormalizeWhitespacePipe, NormalizeWhitespacePunctuationAndCase]
+        NormalizeWhitespacePipe, NormalizeWhitespacePunctuationAndCasePipe]
     });
     pcers = TestBed.get(PencilCodeEditorRulesService);
   });

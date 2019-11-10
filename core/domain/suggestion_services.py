@@ -504,63 +504,6 @@ def create_new_user_contribution_scoring_model(user_id, score_category, score):
         user_id, score_category, score)
 
 
-def get_next_user_in_rotation(score_category):
-    """Gets the id of the next user in the reviewer rotation for the given
-    score_category. The order is alphabetical, and the next user in the
-    alphabetical order is returned.
-
-    Args:
-        score_category: str. The score category.
-
-    Returns:
-        str|None. The user id of the next user in the reviewer rotation, if
-            there are reviewers for the given category. Else None.
-    """
-    reviewer_ids = get_all_user_ids_who_are_allowed_to_review(score_category)
-    reviewer_ids.sort()
-
-    if len(reviewer_ids) == 0:
-        # No reviewers available for the given category.
-        return None
-
-    position_tracking_model = (
-        suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-            score_category))
-
-    next_user_id = None
-    if position_tracking_model is None:
-        # No rotation has started yet, start rotation at index 0.
-        next_user_id = reviewer_ids[0]
-    else:
-        current_position_user_id = (
-            position_tracking_model.current_position_in_rotation)
-
-        for reviewer_id in reviewer_ids:
-            if reviewer_id > current_position_user_id:
-                next_user_id = reviewer_id
-                break
-
-        if next_user_id is None:
-            # All names are lexicographically smaller than or equal to the
-            # current position username. Hence, Rotating back to the front.
-            next_user_id = reviewer_ids[0]
-
-    update_position_in_rotation(score_category, next_user_id)
-    return next_user_id
-
-
-def update_position_in_rotation(score_category, user_id):
-    """Updates the current position in the rotation to the given user_id.
-
-    Args:
-        score_category: str. The score category.
-        user_id: str. The ID of the user who completed their turn in the
-            rotation for the given category.
-    """
-    suggestion_models.ReviewerRotationTrackingModel.update_position_in_rotation(
-        score_category, user_id)
-
-
 def check_can_resubmit_suggestion(suggestion_id, user_id):
     """Checks whether the given user can resubmit the suggestion.
 
@@ -575,3 +518,52 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
     suggestion = get_suggestion_by_id(suggestion_id)
 
     return suggestion.author_id == user_id
+
+
+def _get_voiceover_application_class(target_type):
+    """Returns the voiceover application class for a given target type.
+
+    Args:
+        target_type: str. The target type of the voiceover application.
+
+    Returns:
+        class. The voiceover application class for the given target type.
+
+    Raises:
+        Exception: The voiceover application target type is invalid.
+    """
+    target_type_to_classes = (
+        suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
+    if target_type in target_type_to_classes:
+        return target_type_to_classes[target_type]
+    else:
+        raise Exception(
+            'Invalid target type for voiceover application: %s' % target_type)
+
+
+def get_voiceover_application(voiceover_application_id):
+    """Returns the BaseVoiceoverApplication object for the give
+    voiceover application model object.
+
+    Args:
+        voiceover_application_id: str. The ID of the voiceover application.
+
+    Returns:
+        BaseVoiceoverApplication. The domain object out of the given voiceover
+        application model object.
+    """
+    voiceover_application_model = (
+        suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+            voiceover_application_id))
+    voiceover_application_class = _get_voiceover_application_class(
+        voiceover_application_model.target_type)
+    return voiceover_application_class(
+        voiceover_application_model.id,
+        voiceover_application_model.target_id,
+        voiceover_application_model.status,
+        voiceover_application_model.author_id,
+        voiceover_application_model.final_reviewer_id,
+        voiceover_application_model.language_code,
+        voiceover_application_model.filename,
+        voiceover_application_model.content,
+        voiceover_application_model.rejection_message)

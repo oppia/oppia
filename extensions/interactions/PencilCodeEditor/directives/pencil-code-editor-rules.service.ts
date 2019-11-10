@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 /* eslint-disable max-len */
-import { NormalizeWhitespacePunctuationAndCase } from
+import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 /* eslint-enable max-len */
 import { CodeNormalizerService } from 'services/code-normalizer.service';
@@ -32,7 +32,7 @@ import { CodeNormalizerService } from 'services/code-normalizer.service';
 export class PencilCodeEditorRulesService {
   constructor(
     private nwp: NormalizeWhitespacePipe,
-    private nwpac: NormalizeWhitespacePunctuationAndCase,
+    private nwpac: NormalizeWhitespacePunctuationAndCasePipe,
     private cn: CodeNormalizerService) {}
 
   CodeEquals(answer: {code: string}, inputs: {x: string}): boolean {
