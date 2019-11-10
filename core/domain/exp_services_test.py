@@ -858,15 +858,22 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
             msg='There must be at least one demo exploration.')
 
         for exp_id in demo_exploration_ids:
+            python_utils.PRINT('-----------------------id----------')
+            python_utils.PRINT(exp_id)
+            python_utils.PRINT('before get start time ')
             start_time = datetime.datetime.utcnow()
-
+            python_utils.PRINT('before load demo')
             exp_services.load_demo(exp_id)
+            python_utils.PRINT('before fetchers ')
             exploration = exp_fetchers.get_exploration_by_id(exp_id)
+            python_utils.PRINT('before validate')
             exploration.validate(strict=True)
-
+            python_utils.PRINT('before duration ')
             duration = datetime.datetime.utcnow() - start_time
+            python_utils.PRINT('before processing time ')
             processing_time = duration.seconds + python_utils.divide(
                 duration.microseconds, 1E6)
+            python_utils.PRINT('before log line')
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)' %
                 (exploration.title, processing_time))
