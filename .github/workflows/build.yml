@@ -15,27 +15,25 @@ jobs:
       # This step uses GitHub's hello-world-javascript-action: https://github.com/actions/hello-world-javascript-action
       - uses: actions/checkout@v1
       - uses: actions/setup-python@v1
-        with: 
+        with:
           python-version: '2.7'
       - name: sudo ln
         run: cd /lib/x86_64-linux-gnu && sudo ln -s libreadline.so.7.0 libreadline.so.6 && cd -
         if: matrix.os == 'ubuntu-18.04'
       - name: install pre
-        run: bash scripts/install_prerequisites.sh 
+        run: bash scripts/install_prerequisites.sh
         if: matrix.os != 'windows-latest'
       - name: Install chrome (macos)
         run: brew update && brew cask install google-chrome
         if: matrix.os == 'macos-latest'
       - name: Install third party
-        run: python -m scripts.install_third_party_libs 
-      - name: run frontend 
-        run: python -m scripts.run_frontend_tests 
-        if: matrix.os != 'ubuntu-18.04'
-        continue-on-error: true
+        run: python -m scripts.install_third_party_libs
       - name: install requests (macos)
         run: python -m pip install requests
         if: matrix.os == 'macos-latest'
-        continue-on-error: true 
-      - name: run backend 
-        run: python -m scripts.run_backend_tests 
-        continue-on-error: true 
+        continue-on-error: true
+      - name: test
+        run: python -m scripts.run_backend_tests --test_target core.domain.exp_services_test.LoadingAndDeletionOfExplorationDemosTests
+      - name: run backend
+        run: python -m scripts.run_backend_tests
+        continue-on-error: true
