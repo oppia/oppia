@@ -1,18 +1,13 @@
 name: Setup
-# This workflow is triggered on pushes to the repository.
 on: [push]
 
 jobs:
   build:
-    # Job name is Greeting
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-18.04, macos-latest]
-#         os: [ubuntu-18.04]
-    # This job runs on Linux
     steps:
-      # This step uses GitHub's hello-world-javascript-action: https://github.com/actions/hello-world-javascript-action
       - uses: actions/checkout@v1
       - uses: actions/setup-python@v1
         with:
@@ -22,7 +17,7 @@ jobs:
         if: matrix.os == 'ubuntu-18.04'
       - name: install pre
         run: bash scripts/install_prerequisites.sh
-        if: matrix.os != 'windows-latest'
+        if: matrix.os == 'ubuntu-18.04'
       - name: Install chrome (macos)
         run: brew update && brew cask install google-chrome
         if: matrix.os == 'macos-latest'
@@ -31,16 +26,6 @@ jobs:
       - name: install requests (macos)
         run: python -m pip install requests
         if: matrix.os == 'macos-latest'
-        continue-on-error: true
-      - name: test
-        run: python -m scripts.run_backend_tests --test_target core.domain.exp_services_test.LoadingAndDeletionOfExplorationDemosTests.test_loading_and_validation_and_deletion_of_demo_explorations
-        continue-on-error: true
-      - name: test
-        run: python -m scripts.run_backend_tests --test_target core.domain.exp_services_test.LoadingAndDeletionOfExplorationDemosTests.test_load_demo_with_invalid_demo_exploration_id_raises_error
-        continue-on-error: true
-      - name: test
-        run: python -m scripts.run_backend_tests --test_target core.domain.exp_services_test.LoadingAndDeletionOfExplorationDemosTests.test_delete_demo_with_invalid_demo_exploration_id_raises_error
-        continue-on-error: true
       - name: run backend
-        run: python -m scripts.run_backend_tests
+        run: python -m scripts.run_backend_tests --exclude_load_tests
         continue-on-error: true
