@@ -248,7 +248,7 @@ describe('Assets Backend API Service', function() {
         filename: 'myfile.mp3'
       });
 
-    $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
+    $httpBackend.expect('GET', requestUrl).respond(201, {type: 'audio/mpeg'});
     AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
       successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
