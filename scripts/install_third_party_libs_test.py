@@ -31,13 +31,13 @@ from core.tests import test_utils
 
 import python_utils
 
+from . import common
 from . import install_third_party
 from . import install_third_party_libs
 from . import pre_commit_hook
 from . import pre_push_hook
 from . import setup
 from . import setup_gae
-from . import common
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
@@ -80,7 +80,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                         'package', 'version', 'path')
         finally:
             sys.modules['pip'] = pip
-        print self.print_arr
         self.assertTrue(
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
             'OS%29' in self.print_arr)

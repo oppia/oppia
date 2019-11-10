@@ -28,9 +28,6 @@ jobs:
         if: matrix.os == 'macos-latest'
       - name: Install third party
         run: python -m scripts.install_third_party_libs 
-      - name: run linter 
-        run: python -m scripts.pre_commit_linter --path=. --verbose
-        continue-on-error: true 
       - name: run frontend 
         run: python -m scripts.run_frontend_tests 
         if: matrix.os != 'ubuntu-18.04'
