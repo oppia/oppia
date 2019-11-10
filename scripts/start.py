@@ -124,7 +124,7 @@ def main(args=None):
     # spam people accidentally.
     background_processes = []
     if not parsed_args.prod_env:
-        if platform.uname()[0] == 'Windows':
+        if common.OS_NAME == 'Windows':
             node_bin_path = [common.NODE_PATH, 'node']
         else:
             node_bin_path = [common.NODE_PATH, 'bin', 'node']
@@ -156,9 +156,8 @@ def main(args=None):
     while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
 
-    os_info = platform.uname()
     # Launch a browser window.
-    if os_info[0] == 'Linux' and not parsed_args.no_browser:
+    if common.OS_NAME == 'Linux' and not parsed_args.no_browser:
         detect_virtualbox_pattern = re.compile('.*VBOX.*')
         if list(filter(
                 detect_virtualbox_pattern.match,
@@ -180,7 +179,7 @@ def main(args=None):
                 subprocess.Popen([
                     'xdg-open', 'http://localhost:%s/'
                     % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
-    elif os_info[0] == 'Darwin' and not parsed_args.no_browser:
+    elif common.OS_NAME == 'Darwin' and not parsed_args.no_browser:
         common.print_each_string_after_two_new_lines([
             'INFORMATION',
             'Setting up a local development server at localhost:%s. '

@@ -21,6 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import os
+import platform
+import subprocess
 import sys
 import tarfile
 
@@ -85,7 +87,7 @@ class SetupTests(test_utils.GenericTestBase):
             common, 'recursive_chown', mock_recursive_chown)
         self.chmod_swap = self.swap(
             common, 'recursive_chmod', mock_recursive_chmod)
-        self.uname_swap = self.swap(os, 'uname', mock_uname)
+        self.uname_swap = self.swap(platform, 'uname', mock_uname)
         self.rename_swap = self.swap(os, 'rename', mock_rename)
         self.isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         self.delete_swap = self.swap(clean, 'delete_file', mock_delete_file)
@@ -130,46 +132,16 @@ class SetupTests(test_utils.GenericTestBase):
         print_arr = []
         def mock_print(msg_list):
             print_arr.extend(msg_list)
-        def mock_uname():
-            return ['Linux']
         print_swap = self.swap(
             common, 'print_each_string_after_two_new_lines', mock_print)
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_swap = self.swap(common, 'OS_NAME', 'Linux')
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor'])
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4))
-        with print_swap, uname_swap, version_swap, self.assertRaises(Exception):
+        with print_swap, os_swap, version_swap, self.assertRaises(Exception):
             setup.test_python_version()
         self.assertEqual(print_arr, [])
-
-    def test_python_version_testing_with_incorrect_version_and_windows_os(self):
-        print_arr = []
-        def mock_print(msg_list):
-            print_arr.extend(msg_list)
-        def mock_uname():
-            return ['Windows']
-        print_swap = self.swap(
-            common, 'print_each_string_after_two_new_lines', mock_print)
-        uname_swap = self.swap(os, 'uname', mock_uname)
-        version_info = collections.namedtuple(
-            'version_info', ['major', 'minor'])
-        version_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=4))
-        with print_swap, uname_swap, version_swap, self.assertRaises(Exception):
-            setup.test_python_version()
-        self.assertEqual(
-            print_arr, [
-                'It looks like you are using Windows. If you have Python '
-                'installed,',
-                'make sure it is in your PATH and that PYTHONPATH is set.',
-                'If you have two versions of Python (ie, Python 2.7 and 3), '
-                'specify 2.7 before other versions of Python when setting the '
-                'PATH.',
-                'Here are some helpful articles:',
-                'http://docs.python-guide.org/en/latest/starting/install/win/',
-                'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
-                'pythonpath-in-windows-7'])
 
     def test_download_and_install_package(self):
         check_function_calls = {
@@ -209,8 +181,50 @@ class SetupTests(test_utils.GenericTestBase):
         remove_swap = self.swap(os, 'remove', mock_remove)
 
         with url_retrieve_swap, open_swap, extract_swap, close_swap:
-            with remove_swap:
-                setup.download_and_install_package('url', 'filename')
+            with remove_swap, self.uname_swap:
+                setup.download_and_install_package('url', 'filename.tgz')
+        print check_function_calls
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_download_and_install_package_on_windows(self):
+        check_function_calls = {
+            'url_retrieve_is_called': False,
+            'popen_is_called': False,
+            'communicate_is_called': False,
+            'remove_is_called': False
+        }
+        expected_check_function_calls = {
+            'url_retrieve_is_called': True,
+            'popen_is_called': True,
+            'communicate_is_called': True,
+            'remove_is_called': True
+        }
+        # pylint: disable=unused-argument
+        def mock_url_retrieve(unused_url, filename):
+            check_function_calls['url_retrieve_is_called'] = True
+        temp_popen = subprocess.Popen(
+            ['python', '--version'], stdout=sys.stdout)
+        def mock_popen(command, stdout):
+            check_function_calls['popen_is_called'] = True
+            return temp_popen
+        # pylint: enable=unused-argument
+        def mock_communicate(p):
+            check_function_calls['communicate_is_called'] = True
+        def mock_remove(unused_path):
+            check_function_calls['remove_is_called'] = True
+        os_mock = self.swap(common, 'OS_NAME', 'Windows')
+
+        url_retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        communicate_swap = self.swap(
+            subprocess.Popen, 'communicate', mock_communicate)
+        remove_swap = self.swap(os, 'remove', mock_remove)
+
+        with url_retrieve_swap, popen_swap, communicate_swap:
+            with remove_swap, os_mock:
+                setup.download_and_install_package('url', 'filename.zip')
+        print check_function_calls
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_invalid_dir(self):
@@ -231,46 +245,22 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertTrue(
             self.check_function_calls['test_python_version_is_called'])
 
-    def test_invalid_os(self):
-        print_arr = []
-        def mock_print(msg_list):
-            print_arr.extend(msg_list)
-        def mock_uname():
-            return ['Windows']
-        print_swap = self.swap(
-            common, 'print_each_string_after_two_new_lines', mock_print)
-        uname_swap = self.swap(os, 'uname', mock_uname)
-
-        with self.test_py_swap, self.create_swap, print_swap, uname_swap:
-            with self.assertRaises(Exception):
-                setup.main(args=[])
-        self.assertEqual(
-            print_arr, [
-                'WARNING: Unsupported OS for installation of node.js.',
-                'If you are running this script on Windows, see the '
-                'instructions',
-                'here regarding installation of node.js:',
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-                'Windows%29',
-                'STATUS: Installation completed except for node.js. Exiting.'])
-        self.assertTrue(
-            self.check_function_calls['test_python_version_is_called'])
-        self.assertTrue(
-            self.check_function_calls['create_directory_is_called'])
-
     def test_package_install_with_darwin_x64(self):
-        def mock_uname():
-            return ['Darwin', 'info1', 'info2', 'info3', 'x86_64']
         def mock_exists(unused_path):
             return False
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        def mock_getuid():
+            return 1000
+        os_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        architect_swap = self.swap(common, 'ARCHITECTURE', 'x86_64')
         exists_swap = self.swap(os.path, 'exists', mock_exists)
+        getuid_swap = self.swap(os, 'getuid', mock_getuid)
 
-        with self.test_py_swap, self.create_swap, uname_swap, exists_swap:
-            with self.download_swap, self.rename_swap, self.chown_swap:
-                with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    setup.main(args=[])
-        for _, item in self.check_function_calls.items():
+        with self.test_py_swap, self.create_swap:
+            with os_swap, exists_swap, getuid_swap, architect_swap:
+                with self.download_swap, self.rename_swap, self.chown_swap:
+                    with self.chmod_swap, self.delete_swap, self.isfile_swap:
+                        setup.main(args=[])
+        for n, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
@@ -280,17 +270,20 @@ class SetupTests(test_utils.GenericTestBase):
                 'v1.17.3/yarn-v1.17.3.tar.gz'])
 
     def test_package_install_with_darwin_x86(self):
-        def mock_uname():
-            return ['Darwin', 'info1', 'info2', 'info3', 'x86']
         def mock_exists(unused_path):
             return False
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        def mock_getuid():
+            return 10000
+        os_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86')
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-
-        with self.test_py_swap, self.create_swap, uname_swap, exists_swap:
-            with self.download_swap, self.rename_swap, self.chown_swap:
+        getuid_swap = self.swap(os, 'getuid', mock_getuid)
+        with self.test_py_swap, self.create_swap, os_swap, exists_swap:
+            with architecture_swap, self.download_swap, self.rename_swap:
                 with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    setup.main(args=[])
+                    with self.chown_swap, getuid_swap:
+                        setup.main(args=[])
+        print self.check_function_calls.items()
         for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
@@ -301,17 +294,20 @@ class SetupTests(test_utils.GenericTestBase):
                 'v1.17.3/yarn-v1.17.3.tar.gz'])
 
     def test_package_install_with_linux_x64(self):
-        def mock_uname():
-            return ['Linux', 'info1', 'info2', 'info3', 'x86_64']
         def mock_exists(unused_path):
             return False
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        def mock_getuid():
+            return 10000
+        os_swap = self.swap(common, 'OS_NAME', 'Linux')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86_64')
         exists_swap = self.swap(os.path, 'exists', mock_exists)
+        getuid_swap = self.swap(os, 'getuid', mock_getuid)
 
-        with self.test_py_swap, self.create_swap, uname_swap, exists_swap:
+        with self.test_py_swap, self.create_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.chown_swap:
                 with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    setup.main(args=[])
+                    with os_swap, getuid_swap, architecture_swap:
+                        setup.main(args=[])
         for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
@@ -322,17 +318,20 @@ class SetupTests(test_utils.GenericTestBase):
                 'v1.17.3/yarn-v1.17.3.tar.gz'])
 
     def test_package_install_with_linux_x86(self):
-        def mock_uname():
-            return ['Linux', 'info1', 'info2', 'info3', 'x86']
         def mock_exists(unused_path):
             return False
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        def mock_getuid():
+            return 10000
+        os_swap = self.swap(common, 'OS_NAME', 'Linux')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86')
         exists_swap = self.swap(os.path, 'exists', mock_exists)
+        getuid_swap = self.swap(os, 'getuid', mock_getuid)
 
-        with self.test_py_swap, self.create_swap, uname_swap, exists_swap:
+        with self.test_py_swap, self.create_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.chown_swap:
                 with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    setup.main(args=[])
+                    with os_swap, getuid_swap, architecture_swap:
+                        setup.main(args=[])
         for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(

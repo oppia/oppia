@@ -235,7 +235,6 @@ def build_scripts():
             break
         python_utils.PRINT(line)
     # Wait for process to terminate, then check return code.
-    build_process.communicate()
     if build_process.returncode > 0:
         raise Exception('Build failed.')
 

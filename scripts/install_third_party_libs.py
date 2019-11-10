@@ -89,12 +89,11 @@ def pip_install(package, version, install_path):
             'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
             'page:'])
 
-        os_info = os.uname()
-        if os_info[0] == 'Darwin':
+        if common.OS_NAME == 'Darwin':
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
                 'OS%29')
-        elif os_info[0] == 'Linux':
+        elif common.OS_NAME == 'Linux':
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
                 '%29')
@@ -266,7 +265,7 @@ def main(args=None):
     install_third_party.main(args=[])
 
     # Install third-party node modules needed for the build process.
-    if platform.uname()[0] == 'Windows':
+    if common.OS_NAME == 'Windows':
         # Rename the one without extension, otherwise it will be executed.
         origin_yarn_bin = os.path.join(common.YARN_PATH, 'bin', 'yarn')
         if os.path.exists(origin_yarn_bin):

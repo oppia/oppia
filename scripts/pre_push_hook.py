@@ -35,6 +35,7 @@ import collections
 import os
 import platform
 import pprint
+import re
 import shutil
 import subprocess
 import sys
@@ -115,7 +116,10 @@ def get_remote_name():
     task = subprocess.Popen(get_remotes_name_cmd, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     out, err = task.communicate()
-    remotes = python_utils.UNICODE(out)[:-1].split('\n')
+
+    # Get rid of Windows new line symbol.
+    out = python_utils.UNICODE(out)[:-1].replace('\r', '')
+    remotes = re.split('\n|\t', out)
     if not err:
         for remote in remotes:
             get_remotes_url_cmd = (
@@ -124,6 +128,8 @@ def get_remote_name():
                                     stderr=subprocess.PIPE)
             remote_url, err = task.communicate()
             if not err:
+                remote_url = remote_url.replace('\r', '')
+                print repr(remote_url)
                 if remote_url.endswith('oppia/oppia.git\n'):
                     remote_num += 1
                     remote_name = remote

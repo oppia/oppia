@@ -137,7 +137,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
 
     def test_start_subprocess_for_result(self):
         process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            ['python', '--version'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # pylint: disable=unused-argument
         def mock_popen(
                 unused_cmd_tokens, stdout=subprocess.PIPE,

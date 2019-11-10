@@ -1773,12 +1773,15 @@ tags: []
         the generator will immediately raise StopIteration, and contextlib will
         raise a RuntimeError.
         """
-        original = getattr(obj, attr)
+        original = getattr(obj, attr, 'NO SUCH ATTRIBUTE')
         setattr(obj, attr, newvalue)
         try:
             yield
         finally:
-            setattr(obj, attr, original)
+            if original == 'NO SUCH ATTRIBUTE':
+                delattr(obj, attr)
+            else:
+                setattr(obj, attr, original)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):

@@ -56,8 +56,7 @@ def test_python_version():
         python_utils.PRINT('Please use Python2.7. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
-        os_info = platform.uname()
-        if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
+        if common.OS_NAME == 'Windows':
             common.print_each_string_after_two_new_lines([
                 'It looks like you are using Windows. If you have Python '
                 'installed,',
@@ -87,13 +86,12 @@ def download_and_install_package(url_to_retrieve, filename):
         tar = tarfile.open(name=filename)
         tar.extractall(path=common.OPPIA_TOOLS_DIR)
         tar.close()
-    elif platform.uname()[0] == 'Windows':
-        if extension == '.zip':
-            p = subprocess.Popen(
-                ['powershell', 'Expand-Archive',
-                 filename, common.OPPIA_TOOLS_DIR],
-                stdout=sys.stdout)
-            p.communicate()
+    elif common.OS_NAME == 'Windows' and extension == '.zip':
+        p = subprocess.Popen(
+            ['powershell', 'Expand-Archive',
+             filename, common.OPPIA_TOOLS_DIR],
+            stdout=sys.stdout)
+        p.communicate()
 
     os.remove(filename)
 
@@ -121,26 +119,25 @@ def main(args=None):
     create_directory(common.THIRD_PARTY_DIR)
     create_directory(common.NODE_MODULES_PATH)
 
-    os_info = platform.uname()
     python_utils.PRINT(
         'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.NODE_PATH):
         python_utils.PRINT('Installing Node.js')
         downloaded_file_name = 'node-download.tgz'
         extension = '.tar.gz'
-        if os_info[0] == 'Darwin':
-            if os_info[4] == 'x86_64':
+        if common.OS_NAME == 'Darwin':
+            if common.ARCHITECTURE == 'x86_64':
                 node_file_name = 'node-v10.15.3-darwin-x64'
             else:
                 node_file_name = 'node-v10.15.3-darwin-x86'
-        elif os_info[0] == 'Linux':
-            if os_info[4] == 'x86_64':
+        elif common.OS_NAME == 'Linux':
+            if common.ARCHITECTURE == 'x86_64':
                 node_file_name = 'node-v10.15.3-linux-x64'
             else:
                 node_file_name = 'node-v10.15.3-linux-x86'
-        elif os_info[0] == 'Windows':
+        elif common.OS_NAME == 'Windows':
             extension = '.zip'
-            if os_info[4] == 'AMD64':
+            if common.ARCHITECTURE == 'AMD64':
                 node_file_name = 'node-v10.15.3-win-x64'
             else:
                 node_file_name = 'node-v10.15.3-win-x86'
@@ -157,7 +154,7 @@ def main(args=None):
 
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
-    if os_info[0] != 'Windows':
+    if common.OS_NAME != 'Windows':
         common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
         common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
 
