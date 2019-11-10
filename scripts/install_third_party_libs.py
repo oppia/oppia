@@ -179,8 +179,6 @@ def install_skulpt(parsed_args):
                     end='')
 
             subprocess.check_call(['python', skulpt_filepath, 'dist'])
-
-
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
 

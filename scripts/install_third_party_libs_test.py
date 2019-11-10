@@ -37,6 +37,7 @@ from . import pre_commit_hook
 from . import pre_push_hook
 from . import setup
 from . import setup_gae
+from . import common
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
@@ -68,19 +69,18 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_darwin_os(self):
-        def mock_uname():
-            return ['Darwin']
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_swap = self.swap(common, 'OS_NAME', 'Darwin')
 
         import pip
         try:
             sys.modules['pip'] = None
-            with uname_swap, self.print_swap, self.check_call_swap:
+            with os_swap, self.print_swap, self.check_call_swap:
                 with self.assertRaises(Exception):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
         finally:
             sys.modules['pip'] = pip
+        print self.print_arr
         self.assertTrue(
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
             'OS%29' in self.print_arr)
@@ -106,13 +106,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertFalse(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_windows_os(self):
-        def mock_uname():
-            return ['Windows']
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_swap = self.swap(common, 'OS_NAME', 'Windows')
         import pip
         try:
             sys.modules['pip'] = None
-            with uname_swap, self.print_swap, self.check_call_swap:
+            with os_swap, self.print_swap, self.check_call_swap:
                 with self.assertRaises(Exception):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')

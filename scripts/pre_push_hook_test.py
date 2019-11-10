@@ -38,7 +38,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def setUp(self):
         super(PrePushHookTests, self).setUp()
         process = subprocess.Popen(
-            ['python', '--version'],
+            ['python', '-c', 'print \"test\"'],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # pylint: disable=unused-argument
         def mock_popen(
@@ -94,8 +94,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_start_subprocess_for_result(self):
         with self.popen_swap:
+            out, err = pre_push_hook.start_subprocess_for_result('cmd')
+            out = out.replace('\r', '')
             self.assertEqual(
-                pre_push_hook.start_subprocess_for_result('cmd'),
+                (out, err),
                 ('test\n', ''))
 
     def test_get_remote_name_without_errors(self):
