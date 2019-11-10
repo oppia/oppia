@@ -576,7 +576,7 @@ tags: []
             is_super_admin: bool. Whether the user is a super admin.
        """
         os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = self.get_gae_id_from_email(email)
+        os.environ['USER_ID'] = self.get_user_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
@@ -914,8 +914,6 @@ tags: []
         # immediately once the signup is complete. This is done to avoid
         # external  calls being made to Gravatar when running the backend
         # tests.
-        gae_id = self.get_gae_id_from_email(email)
-        user_services.create_new_user(gae_id, email)
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
@@ -1008,28 +1006,15 @@ tags: []
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_user_id_from_email(self, email):
-        """Gets the user ID corresponding to the given email.
+        """Gets the user_id corresponding to the given email.
 
         Args:
             email: str. A valid email stored in the App Engine database.
 
         Returns:
-            str. ID of the user possessing the given email.
+            user_id: str. ID of the user possessing the given email.
         """
-        gae_id = self.get_gae_id_from_email(email)
-        return (
-            user_services.get_user_settings_by_gae_id(gae_id).user_id)
-
-    def get_gae_id_from_email(self, email):
-        """Gets the GAE user ID corresponding to the given email.
-
-        Args:
-            email: str. A valid email stored in the App Engine database.
-
-        Returns:
-            str. GAE ID of the user possessing the given email.
-        """
-        return current_user_services.get_gae_id_from_email(email)
+        return current_user_services.get_user_id_from_email(email)
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
