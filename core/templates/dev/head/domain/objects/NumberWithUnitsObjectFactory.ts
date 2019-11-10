@@ -21,9 +21,9 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
@@ -42,6 +42,7 @@ export class NumberWithUnits {
   real;
   fraction;
   units;
+
   constructor(type, real, fractionObj, unitsObj) {
     this.type = type;
     this.real = real;
@@ -119,8 +120,8 @@ export class NumberWithUnitsObjectFactory {
       this.uof.createCurrencyUnits();
     } catch (parsingError) {}
   }
-
-  fromRawInputString(rawInput) {
+  // TODO(#7165): Replace any with exact type.
+  fromRawInputString(rawInput: any): NumberWithUnits {
     rawInput = rawInput.trim();
     var type = '';
     var real = 0.0;
@@ -242,8 +243,8 @@ export class NumberWithUnitsObjectFactory {
     var unitsObj = this.uof.fromRawInputString(units);
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
-
-  fromDict(numberWithUnitsDict) {
+  // TODO(#7165): Replace any with correct type.
+  fromDict(numberWithUnitsDict: any): NumberWithUnits {
     return new NumberWithUnits(
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,

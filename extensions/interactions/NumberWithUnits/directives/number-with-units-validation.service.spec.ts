@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for number with units validation service.
  */
 
+import { TestBed } from '@angular/core/testing';
+
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
@@ -26,7 +28,6 @@ import { NumberWithUnitsValidationService } from
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { TestBed } from '@angular/core/testing';
 
 describe('NumberWithUnitsValidationService', () => {
   var validatorService, WARNING_TYPES;

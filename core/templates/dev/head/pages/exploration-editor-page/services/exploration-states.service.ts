@@ -475,6 +475,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         _states.renameState(oldStateName, newStateName);
 
         StateEditorService.setActiveStateName(newStateName);
+        StateEditorService.setStateNames(_states.getStateNames());
         // The 'rename state' command must come before the 'change
         // init_state_name' command in the change list, otherwise the backend
         // will raise an error because the new initial state name does not
