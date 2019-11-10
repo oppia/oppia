@@ -86,14 +86,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertFalse(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_linux_os(self):
-        def mock_uname():
-            return ['Linux']
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_swap = self.swap(common, 'OS_NAME', 'Linux')
 
         import pip
         try:
             sys.modules['pip'] = None
-            with uname_swap, self.print_swap, self.check_call_swap:
+            with os_swap, self.print_swap, self.check_call_swap:
                 with self.assertRaises(Exception):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
