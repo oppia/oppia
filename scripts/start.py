@@ -23,7 +23,6 @@ import argparse
 import atexit
 import fileinput
 import os
-import platform
 import re
 import subprocess
 import time

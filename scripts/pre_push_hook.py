@@ -129,7 +129,6 @@ def get_remote_name():
             remote_url, err = task.communicate()
             if not err:
                 remote_url = remote_url.replace('\r', '')
-                print repr(remote_url)
                 if remote_url.endswith('oppia/oppia.git\n'):
                     remote_num += 1
                     remote_name = remote

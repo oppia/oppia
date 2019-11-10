@@ -183,7 +183,6 @@ class SetupTests(test_utils.GenericTestBase):
         with url_retrieve_swap, open_swap, extract_swap, close_swap:
             with remove_swap, self.uname_swap:
                 setup.download_and_install_package('url', 'filename.tgz')
-        print check_function_calls
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_download_and_install_package_on_windows(self):
@@ -207,9 +206,9 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_popen(command, stdout):
             check_function_calls['popen_is_called'] = True
             return temp_popen
-        # pylint: enable=unused-argument
         def mock_communicate(p):
             check_function_calls['communicate_is_called'] = True
+        # pylint: enable=unused-argument
         def mock_remove(unused_path):
             check_function_calls['remove_is_called'] = True
         os_mock = self.swap(common, 'OS_NAME', 'Windows')
@@ -224,7 +223,6 @@ class SetupTests(test_utils.GenericTestBase):
         with url_retrieve_swap, popen_swap, communicate_swap:
             with remove_swap, os_mock:
                 setup.download_and_install_package('url', 'filename.zip')
-        print check_function_calls
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_invalid_dir(self):
@@ -260,7 +258,7 @@ class SetupTests(test_utils.GenericTestBase):
                 with self.download_swap, self.rename_swap, self.chown_swap:
                     with self.chmod_swap, self.delete_swap, self.isfile_swap:
                         setup.main(args=[])
-        for n, item in self.check_function_calls.items():
+        for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
@@ -283,7 +281,6 @@ class SetupTests(test_utils.GenericTestBase):
                 with self.chmod_swap, self.delete_swap, self.isfile_swap:
                     with self.chown_swap, getuid_swap:
                         setup.main(args=[])
-        print self.check_function_calls.items()
         for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
