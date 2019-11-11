@@ -31,7 +31,7 @@ angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
       ImprovementActionButtonObjectFactory, ImprovementModalService,
       ThreadDataService, FEEDBACK_IMPROVEMENT_TASK_TYPE) {
     var FeedbackImprovementTask = function(feedbackThread) {
-      this._feedbackThread = feedbackThread;
+      this._threadId = feedbackThread.threadId;
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
           'Review Thread', 'btn-primary',
@@ -41,12 +41,12 @@ angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
 
     /** @returns {string} - The actionable status of this task. */
     FeedbackImprovementTask.prototype.getStatus = function() {
-      return this._feedbackThread.status;
+      return ThreadDataService.getThread(this._threadId).status;
     };
 
     /** @returns {string} - A simple summary of the feedback thread. */
     FeedbackImprovementTask.prototype.getTitle = function() {
-      return this._feedbackThread.subject;
+      return ThreadDataService.getThread(this._threadId).subject;
     };
 
     /**
@@ -70,7 +70,7 @@ angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
      *    rendering.
      */
     FeedbackImprovementTask.prototype.getDirectiveData = function() {
-      return this._feedbackThread;
+      return ThreadDataService.getThread(this._threadId);
     };
 
     /**

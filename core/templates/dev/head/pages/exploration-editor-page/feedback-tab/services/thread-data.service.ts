@@ -88,6 +88,9 @@ angular.module('oppia').factory('ThreadDataService', [
       getData: function() {
         return _data;
       },
+      getThread: function(threadId) {
+        return _threadsById[threadId];
+      },
       fetchThreads: function(onSuccess) {
         return _fetchThreads().then(onSuccess).then(this.getData);
       },

@@ -34,17 +34,17 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
       ImprovementActionButtonObjectFactory, ImprovementModalService,
       ThreadDataService, SUGGESTION_IMPROVEMENT_TASK_TYPE) {
     var SuggestionImprovementTask = function(suggestionThread) {
+      this._threadId = suggestionThread.threadId;
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
           'Review Thread', 'btn-primary',
           () => ImprovementModalService.openSuggestionThread(suggestionThread)),
       ];
-      this._suggestionThread = suggestionThread;
     };
 
     /** @returns {string} - The actionable status of this task. */
     SuggestionImprovementTask.prototype.getStatus = function() {
-      return this._suggestionThread.status;
+      return ThreadDataService.getThread(this._threadId).status;
     };
 
     /**
@@ -58,7 +58,7 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
     /** @returns {string} - A simple summary of the suggestion thread. */
     SuggestionImprovementTask.prototype.getTitle = function() {
       return 'Suggestion for the card "' +
-        this._suggestionThread.suggestion.stateName + '"';
+        ThreadDataService.getThread(this._threadId).suggestion.stateName + '"';
     };
 
     /**
@@ -66,7 +66,7 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
      *    this task's data.
      */
     SuggestionImprovementTask.prototype.getDirectiveData = function() {
-      return this._suggestionThread;
+      return ThreadDataService.getThread(this._threadId);
     };
 
     /**
