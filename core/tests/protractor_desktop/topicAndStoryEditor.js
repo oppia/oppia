@@ -206,32 +206,32 @@ describe('Chapter editor functionality', function() {
   var explorationEditorPage = null;
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
-    'Dummy exploration', 'Algorithm', 'Lear more about oppia', 'English'];
+    'Dummy exploration', 'Algorithm', 'Learn more about oppia', 'English'];
   var dummySkills = [];
-  var allowedError = [];
+  var allowedErrors = [];
+  var topicName = 'Topic 0';
+  var userEmail = 'creator@chapterTest.com';
 
-  var createDummyExplorations = function(number) {
+  var createDummyExplorations = function(numExplorations) {
     var ids = [];
-    for (var i = 0; i < number; i++) {
-      (function(i) {
-        var info = dummyExplorationInfo.slice();
-        info[0] += i.toString();
-        workflow.createAndPublishExploration.apply(workflow, info);
-        browser.getCurrentUrl().then(function(url) {
-          var id = url.split('/')[4].replace('#', '');
-          ids.push(id);
-        });
-      })(i);
+    for (var i = 0; i < numExplorations; i++) {
+      var info = dummyExplorationInfo.slice();
+      info[0] += i.toString();
+      workflow.createAndPublishExploration.apply(workflow, info);
+      browser.getCurrentUrl().then(function(url) {
+        var id = url.split('/')[4].replace('#', '');
+        ids.push(id);
+      });
     }
     return ids;
   };
 
-  var createDummySkills = function(number) {
+  var createDummySkills = function(numSkills) {
     var skills = [];
-    for (var i = 0; i < number; i++) {
+    for (var i = 0; i < numSkills; i++) {
       var skillName = 'skillFromChapterEditor' + i.toString();
       var material = 'material' + i.toString();
-      workflow.createSkillAndAssignTopic(skillName, material, 'Topic 0');
+      workflow.createSkillAndAssignTopic(skillName, material, topicName);
       skills.push(skillName);
     }
     return skills;
@@ -246,10 +246,10 @@ describe('Chapter editor functionality', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
-      'creator@chapterTest.com', 'creatorChapterTest');
+      userEmail, 'creatorChapterTest');
     dummyExplorationIds = createDummyExplorations(3);
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopicWithTitle('Topic 0');
+    topicsAndSkillsDashboardPage.createTopicWithTitle(topicName);
     topicEditorPage.createStory('Story 0');
     browser.getCurrentUrl().then(function(url) {
       storyId = url.split('/')[4];
@@ -258,7 +258,7 @@ describe('Chapter editor functionality', function() {
   });
 
   beforeEach(function() {
-    users.login('creator@chapterTest.com');
+    users.login(userEmail);
     storyEditorPage.get(storyId);
   });
 
@@ -274,17 +274,17 @@ describe('Chapter editor functionality', function() {
     storyEditorPage.navigateToChapterByIndex(1);
     storyEditorPage.changeNodeOutline(forms.toRichText('Second outline'));
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
-    storyEditorPage.saveStory('First save');
+    storyEditorPage.saveStory('Second save');
   });
 
-  it('should try to add one more chapter with existing exploration',
+  it('should fail to add one more chapter with existing exploration',
     function() {
       storyEditorPage.navigateToChapterByIndex(1);
       storyEditorPage.createNewDestinationChapter('Chapter 3');
       storyEditorPage.navigateToChapterByIndex(2);
       storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
-      storyEditorPage.expectExplorationIdAlreadyExistWarning();
-      allowedError = ['The given exploration already exists in the story.'];
+      storyEditorPage.expectExplorationIdAlreadyExistWarningAndCloseIt();
+      allowedErrors.push('The given exploration already exists in the story.');
     }
   );
 
@@ -311,12 +311,12 @@ describe('Chapter editor functionality', function() {
   );
 
   it('should add one prerequisite and acquired skill to chapter 1', function() {
-    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(0);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(0);
+    storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
+    storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
     storyEditorPage.addAcquiredSkill(dummySkills[0]);
-    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(1);
+    storyEditorPage.expectAcquiredSkillDescriptionCardCount(1);
     storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(1);
+    storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(1);
     storyEditorPage.saveStory('Save');
   });
 
@@ -328,26 +328,29 @@ describe('Chapter editor functionality', function() {
 
   it('should delete prerequisite skill and acquired skill', function() {
     storyEditorPage.deleteAcquiredSkillByIndex(0);
-    storyEditorPage.expectAcquiredSkillDescriptionCardNumber(0);
+    storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
     storyEditorPage.deletePrerequisiteSkillByIndex(0);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardNumber(0);
+    storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
   });
 
-  it('should select the chapter2 as initial chapter and get unreachable error',
-    function() {
-      storyEditorPage.selectInitialChapterByName('Chapter 2');
-      storyEditorPage.expectDisplayUnreachableChapter();
-    }
-  );
+  it('should select the "Chapter 2" as initial chapter and get unreachable' +
+    ' error', function() {
+    storyEditorPage.selectInitialChapterByName('Chapter 2');
+    storyEditorPage.expectDisplayUnreachableChapterWarning();
+  });
 
   it('should delete one chapter and save', function() {
+    storyEditorPage.expectNumberOfChaptersToBe(2);
     storyEditorPage.deleteChapterWithIndex(1);
+    storyEditorPage.expectNumberOfChaptersToBe(1);
     storyEditorPage.saveStory('Last');
   });
 
   afterEach(function() {
-    general.checkForConsoleErrors(allowedError);
-    allowedError = [];
+    general.checkForConsoleErrors(allowedErrors);
+    while (allowedErrors.length !== 0) {
+      allowedErrors.pop();
+    }
   });
 
   afterAll(function() {

@@ -106,9 +106,10 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.assignSkillWithIndexToTopicByTopicName = function(index, topicName) {
+  this.assignSkillWithIndexToTopicByTopicName = function(
+      skillIndex, topicName) {
     assignSkillToTopicButtons.then(function(elems) {
-      elems[index].click();
+      elems[skillIndex].click();
       topicNamesInTopicSelectModal.then(function(topics) {
         for (var i = 0; i < topics.length; i++) {
           (function(topic) {

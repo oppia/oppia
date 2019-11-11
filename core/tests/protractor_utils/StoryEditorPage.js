@@ -75,7 +75,7 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-add-chapter-outline'));
   var nodeOutlineSaveButton = element(
     by.css('.protractor-test-node-outline-save-button'));
-  var addPrerequisitesSkillButton = element(
+  var addPrerequisiteSkillButton = element(
     by.css('.protractor-test-add-prerequisite-skill'));
   var addAcquiredSkillButton = element(
     by.css('.protractor-test-add-acquired-skill'));
@@ -204,7 +204,7 @@ var StoryEditorPage = function() {
       saveStoryButton.getAttribute('disabled')).toEqual('true');
   };
 
-  this.expectDisplayUnreachableChapter = function() {
+  this.expectDisplayUnreachableChapterWarning = function() {
     return expect(disconnectedChapterWarning.isPresent()).toBe(true);
   };
 
@@ -217,7 +217,7 @@ var StoryEditorPage = function() {
     explorationIdInput.sendKeys(explorationId);
     waitFor.elementToBeClickable(
       explorationIdSaveButton,
-      'ExplorationIdSaveButton takes too long to be visible'
+      'ExplorationIdSaveButton takes too long to be clickable'
     );
     explorationIdSaveButton.click();
   };
@@ -236,7 +236,7 @@ var StoryEditorPage = function() {
     });
   };
 
-  this.expectExplorationIdAlreadyExistWarning = function() {
+  this.expectExplorationIdAlreadyExistWarningAndCloseIt = function() {
     var warningToast = element(by.css('.toast-message'));
     waitFor.visibilityOf(
       warningToast,
@@ -299,12 +299,12 @@ var StoryEditorPage = function() {
 
   this.addPrerequisiteSkill = function(skillName) {
     waitFor.visibilityOf(
-      addPrerequisitesSkillButton,
+      addPrerequisiteSkillButton,
       'addPrerequisitesSkillButton takes too long to be visible');
     waitFor.elementToBeClickable(
-      addPrerequisitesSkillButton,
+      addPrerequisiteSkillButton,
       'addPrerequisitesSkillButton takes too long to be clickable');
-    addPrerequisitesSkillButton.click();
+    addPrerequisiteSkillButton.click();
     var selectSkillModal = this.getSelectSkillModal();
     selectSkillModal.selectSkill(skillName);
   };
@@ -323,11 +323,11 @@ var StoryEditorPage = function() {
     });
   };
 
-  this.expectAcquiredSkillDescriptionCardNumber = function(number) {
+  this.expectAcquiredSkillDescriptionCardCount = function(number) {
     expect(acquiredSkillDescriptionCard.count()).toBe(number);
   };
 
-  this.expectPrerequisiteSkillDescriptionCardNumber = function(number) {
+  this.expectPrerequisiteSkillDescriptionCardCount = function(number) {
     expect(prerequisiteSkillDescriptionCard.count()).toBe(number);
   };
 

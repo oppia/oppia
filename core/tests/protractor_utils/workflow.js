@@ -60,13 +60,14 @@ var createExplorationAndStartTutorial = function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  users.isAdmin().then(function(result) {
+  users.isAdmin().then(function(isAdmin) {
     creatorDashboardPage.clickCreateActivityButton();
-    if (result) {
-      var testCreateModal = element(by.css('.protractor-test-creation-modal'));
+    if (isAdmin) {
+      var activityCreationModal = element(
+        by.css('.protractor-test-creation-modal'));
       waitFor.visibilityOf(
-        testCreateModal,
-        'testCreateModal takes too long to be visible.');
+        activityCreationModal,
+        'ActivityCreationModal takes too long to be visible.');
       var createExplorationButton = element(
         by.css('.protractor-test-create-exploration'));
       waitFor.elementToBeClickable(
