@@ -302,7 +302,7 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict(str, str). Key-value pairs to encode in the download.
             filename: str. The name of the file to be sent.
-            content_type: str. Indicates the content type of the resource.
+            content_type: str. The content type of the resource.
         """
         self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
             content_type)

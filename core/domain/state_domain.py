@@ -801,7 +801,8 @@ class WrittenTranslations(python_utils.OBJECT):
 
         Args:
             translations_mapping: dict. Contains content_id and a list
-                of language codes to be translated.
+                of language codes which the contents have been translated
+                    into.
         """
 
         self.translations_mapping = translations_mapping
@@ -1430,8 +1431,7 @@ class State(python_utils.OBJECT):
         Returns:
             list(dict). Each dict contains the following keys:
                     answer_group_index: int. The index of the answer group.
-                    answers: InteractionInstance. The interactions from State
-                        domain object.
+                    answers: str. The answers from the interaction.
         """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
