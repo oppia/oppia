@@ -1147,11 +1147,14 @@ class ExcessiveEmptyLinesCheckerTests(unittest.TestCase):
 
 class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
 
-    def test_checks_newline_above_docstring(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
+    def setUp(self):
+        super(SingleNewlineAboveArgsCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.SingleNewlineAboveArgsChecker)
-        checker_test_object.setup_method()
+        self.checker_test_object.setup_method()
+
+    def test_no_newline_above_args(self):
         node_single_newline_above_args = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1170,10 +1173,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         node_single_newline_above_args.file = filename
         node_single_newline_above_args.path = filename
 
-        checker_test_object.checker.process_module(
+        self.checker_test_object.checker.process_module(
             node_single_newline_above_args)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='single-space-above-args',
                 line=2
@@ -1181,6 +1184,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
+    def test_no_newline_above_raises(self):
         node_single_newline_above_raises = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1199,10 +1203,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         node_single_newline_above_raises.file = filename
         node_single_newline_above_raises.path = filename
 
-        checker_test_object.checker.process_module(
+        self.checker_test_object.checker.process_module(
             node_single_newline_above_raises)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='single-space-above-raises',
                 line=2
@@ -1210,6 +1214,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
+    def test_no_newline_above_return(self):
         node_with_no_space_above_return = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1228,10 +1233,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         node_with_no_space_above_return.file = filename
         node_with_no_space_above_return.path = filename
 
-        checker_test_object.checker.process_module(
+        self.checker_test_object.checker.process_module(
             node_with_no_space_above_return)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='single-space-above-returns',
                 line=2
@@ -1239,6 +1244,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
+    def test_varying_combination_of_newline_above_args(self):
         node_newline_above_args_raises = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1260,10 +1266,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         node_newline_above_args_raises.file = filename
         node_newline_above_args_raises.path = filename
 
-        checker_test_object.checker.process_module(
+        self.checker_test_object.checker.process_module(
             node_newline_above_args_raises)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='single-space-above-raises',
                 line=5
@@ -1292,10 +1298,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         node_newline_above_args_returns.file = filename
         node_newline_above_args_returns.path = filename
 
-        checker_test_object.checker.process_module(
+        self.checker_test_object.checker.process_module(
             node_newline_above_args_returns)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='single-space-above-returns',
                 line=5
@@ -1328,10 +1334,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         node_newline_above_returns_raises.file = filename
         node_newline_above_returns_raises.path = filename
 
-        checker_test_object.checker.process_module(
+        self.checker_test_object.checker.process_module(
             node_newline_above_returns_raises)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='single-space-above-raises',
                 line=5
@@ -1339,6 +1345,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
+    def test_excessive_newline_above_args(self):
         node_with_two_newline = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1363,10 +1370,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         node_with_two_newline.file = filename
         node_with_two_newline.path = filename
 
-        checker_test_object.checker.process_module(
+        self.checker_test_object.checker.process_module(
             node_with_two_newline)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='single-space-above-args',
                 line=4
@@ -1378,6 +1385,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
+    def test_return_in_comment(self):
         node_with_return_in_comment = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1401,12 +1409,13 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         node_with_return_in_comment.file = filename
         node_with_return_in_comment.path = filename
 
-        checker_test_object.checker.process_module(
+        self.checker_test_object.checker.process_module(
             node_with_return_in_comment)
 
-        with checker_test_object.assertNoMessages():
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_function_with_no_args(self):
         node_with_no_args = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1422,12 +1431,13 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         node_with_no_args.file = filename
         node_with_no_args.path = filename
 
-        checker_test_object.checker.process_module(
+        self.checker_test_object.checker.process_module(
             node_with_no_args)
 
-        with checker_test_object.assertNoMessages():
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_well_placed_newline(self):
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1454,7 +1464,8 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
-        checker_test_object.checker.process_module(node_with_no_error_message)
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
 
-        with checker_test_object.assertNoMessages():
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
