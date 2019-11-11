@@ -25,7 +25,7 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-third-party-${{ hashFiles('**/manifest.json') }}
             ${{ runner.OS }}-third-party
-        if: runner.OS != "windows-latest"
+        if: matrix.os != "windows-latest"
       - name: Use third party cache (Windows)
         uses: actions/cache@v1
         with:
