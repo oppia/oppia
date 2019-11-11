@@ -59,22 +59,22 @@ angular.module('oppia').factory('ThreadDataService', [
       return $http.get(_THREAD_LIST_HANDLER_URL).then(response => {
         _threadsById = {};
 
-        _data.feedbackThreads =
-          response.data.feedback_thread_dicts.map(threadDict => {
-            var thread = FeedbackThreadObjectFactory.createFromBackendDict(
-              threadDict);
-            _threadsById[thread.threadId] = thread;
-            return thread;
-          });
+        var feedbackThreadDicts = response.data.feedback_thread_dicts;
+        _data.feedbackThreads = feedbackThreadDicts.map(threadDict => {
+          var thread = FeedbackThreadObjectFactory.createFromBackendDict(
+            threadDict);
+          _threadsById[thread.threadId] = thread;
+          return thread;
+        });
 
-        _data.suggestionThreads =
-          response.data.suggestion_thread_dicts.map(threadDict => {
-            var thread = SuggestionThreadObjectFactory.createFromBackendDicts(
-              threadDict, threadDict.suggestion_dict);
-            _threadsById[thread.threadId] = thread;
-            return thread;
-          });
-      }).then(onSuccess);
+        var suggestionThreadDicts = response.data.suggestion_thread_dicts;
+        _data.suggestionThreads = suggestionThreadDicts.map(threadDict => {
+          var thread = SuggestionThreadObjectFactory.createFromBackendDicts(
+            threadDict, threadDict.suggestion_dict);
+          _threadsById[thread.threadId] = thread;
+          return thread;
+        });
+      });
     };
 
     var _fetchMessages = function(threadId) {
