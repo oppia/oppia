@@ -1,8 +1,7 @@
-name: Setup
+name: Backend Test
 on:
-  [push]
-#   pull_request:
-#     types: [opened, synchronize, reopened]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
@@ -16,6 +15,8 @@ jobs:
         with:
           python-version: '2.7'
         
+# The following if statements in the cache actions is due to the `hashFile` function is not working correctly with `/` on Windows
+# https://github.com/actions/cache/issues/39
         
       - name: Use third party cache
         uses: actions/cache@v1
