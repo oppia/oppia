@@ -146,7 +146,7 @@ describe('Answer Details Improvements', function() {
 });
 
 
-fdescribe('Feedback Improvements', function() {
+describe('Feedback Improvements', function() {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
   var EXPLORATION_TITLE_2 = 'Exploration for testing feedback status';
   var EXPLORATION_OBJECTIVE = 'To explore something';
