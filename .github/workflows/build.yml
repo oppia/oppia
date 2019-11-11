@@ -1,0 +1,26 @@
+name: Setup
+on: [push]
+
+jobs:
+  build:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '2.7'
+      - name: sudo ln
+        run: cd /lib/x86_64-linux-gnu && sudo ln -s libreadline.so.7.0 libreadline.so.6 && cd -
+        if: matrix.os == 'ubuntu-18.04'
+      - name: install pre
+        run: bash scripts/install_prerequisites.sh
+        if: matrix.os == 'ubuntu-18.04'
+        if: matrix.os == 'macos-latest'
+      - name: Install third party
+        run: python -m scripts.install_third_party_libs
+      - name: run backend
+        run: python -m scripts.run_backend_tests --exclude_load_tests
+        continue-on-error: true
