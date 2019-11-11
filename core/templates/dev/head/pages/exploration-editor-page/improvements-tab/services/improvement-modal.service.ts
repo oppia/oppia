@@ -113,9 +113,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                   $scope.learnerAnswerDetails.interactionId,
                   $scope.learnerAnswerDetails.customizationArgs);
               };
-              $scope.close = function() {
-                $uibModalInstance.close();
-              };
+              $scope.close = $uibModalInstance.dismiss;
             }
           ]
         });
