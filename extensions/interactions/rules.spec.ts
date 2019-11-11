@@ -85,7 +85,6 @@ describe('Rule spec services', function() {
     $provide.value(
       'FractionInputRulesService', new FractionInputRulesService(
         new FractionObjectFactory()));
-
     $provide.value(
       'GraphInputRulesService', new GraphInputRulesService(
         new GraphUtilsService()));

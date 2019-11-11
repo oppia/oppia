@@ -33,8 +33,8 @@ import { NumberWithUnitsObjectFactory } from
 })
 export class NumberWithUnitsValidationService {
   constructor(
-    private nwuof: NumberWithUnitsObjectFactory,
-    private bivs: baseInteractionValidationService) {}
+    private unitObjectFactory: NumberWithUnitsObjectFactory,
+    private baseInteraction: baseInteractionValidationService) {}
   // TODO(#7165): Replace 'any' with the exact type.
   getCustomizationArgsWarnings(customizationArgs: any): any {
     return [];
@@ -49,30 +49,30 @@ export class NumberWithUnitsValidationService {
       this.getCustomizationArgsWarnings(customizationArgs));
 
     try {
-      this.nwuof.createCurrencyUnits();
+      this.unitObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}
 
     var checkEquality = (earlierRule, laterRule) => {
-      var answer = this.nwuof.fromDict(
+      var answer = this.unitObjectFactory.fromDict(
         earlierRule.inputs.f);
-      var inputs = this.nwuof.fromDict(
+      var inputs = this.unitObjectFactory.fromDict(
         laterRule.inputs.f);
 
       var answerString = answer.toMathjsCompatibleString();
       var inputsString = inputs.toMathjsCompatibleString();
 
-      var answerList = this.nwuof.fromRawInputString(
+      var answerList = this.unitObjectFactory.fromRawInputString(
         answerString).toDict();
-      var inputsList = this.nwuof.fromRawInputString(
+      var inputsList = this.unitObjectFactory.fromRawInputString(
         inputsString).toDict();
       return JSON.stringify(answerList).toLowerCase() === JSON.stringify(
         inputsList).toLowerCase();
     };
 
     var checkEquivalency = (earlierRule, laterRule) => {
-      var earlierInput = this.nwuof.fromDict(
+      var earlierInput = this.unitObjectFactory.fromDict(
         earlierRule.inputs.f);
-      var laterInput = this.nwuof.fromDict(
+      var laterInput = this.unitObjectFactory.fromDict(
         laterRule.inputs.f);
       if (earlierInput.type === 'fraction') {
         earlierInput.type = 'real';
@@ -146,7 +146,7 @@ export class NumberWithUnitsValidationService {
     }
 
     warningsList = warningsList.concat(
-      this.bivs.getAllOutcomeWarnings(
+      this.baseInteraction.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
     return warningsList;
