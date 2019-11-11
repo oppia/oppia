@@ -29,9 +29,9 @@ import { NumberWithUnitsObjectFactory } from
   providedIn: 'root'
 })
 export class NumberWithUnitsRulesService {
-  constructor(private nwuof: NumberWithUnitsObjectFactory) {
+  constructor(private unitsObjectFactory: NumberWithUnitsObjectFactory) {
     try {
-      this.nwuof.createCurrencyUnits();
+      this.unitsObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}
   }
   // Checks if a === b.
@@ -57,22 +57,22 @@ export class NumberWithUnitsRulesService {
   // TODO(#7165): Replace 'any' with the exact type.
   IsEqualTo(answer: any, inputs: any): boolean {
     // Returns true only if input is exactly equal to answer.
-    answer = this.nwuof.fromDict(answer);
-    inputs = this.nwuof.fromDict(inputs.f);
+    answer = this.unitsObjectFactory.fromDict(answer);
+    inputs = this.unitsObjectFactory.fromDict(inputs.f);
 
     var answerString = answer.toMathjsCompatibleString();
     var inputsString = inputs.toMathjsCompatibleString();
 
-    var answerList = this.nwuof.fromRawInputString(
+    var answerList = this.unitsObjectFactory.fromRawInputString(
       answerString).toDict();
-    var inputsList = this.nwuof.fromRawInputString(
+    var inputsList = this.unitsObjectFactory.fromRawInputString(
       inputsString).toDict();
     return this.isEquivalent(answerList, inputsList);
   }
   // TODO(#7165): Replace 'any' with the exact type.
   IsEquivalentTo(answer: any, inputs: any): boolean {
-    answer = this.nwuof.fromDict(answer);
-    inputs = this.nwuof.fromDict(inputs.f);
+    answer = this.unitsObjectFactory.fromDict(answer);
+    inputs = this.unitsObjectFactory.fromDict(inputs.f);
     if (answer.type === 'fraction') {
       answer.type = 'real';
       answer.real = answer.fraction.toFloat();

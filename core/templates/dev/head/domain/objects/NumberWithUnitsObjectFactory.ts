@@ -114,10 +114,11 @@ export class NumberWithUnits {
 })
 export class NumberWithUnitsObjectFactory {
   constructor(
-    private uof: UnitsObjectFactory, private fof: FractionObjectFactory) {}
+    private unitsFactory: UnitsObjectFactory,
+    private fractionFactory: FractionObjectFactory) {}
   createCurrencyUnits() {
     try {
-      this.uof.createCurrencyUnits();
+      this.unitsFactory.createCurrencyUnits();
     } catch (parsingError) {}
   }
   // TODO(#7165): Replace any with exact type.
@@ -126,7 +127,7 @@ export class NumberWithUnitsObjectFactory {
     var type = '';
     var real = 0.0;
     // Default fraction value.
-    var fractionObj = this.fof.fromRawInputString('0/1');
+    var fractionObj = this.fractionFactory.fromRawInputString('0/1');
     var units = '';
     var value = '';
     var unitObj = [];
@@ -225,7 +226,7 @@ export class NumberWithUnitsObjectFactory {
 
       if (value.includes('/')) {
         type = 'fraction';
-        fractionObj = this.fof.fromRawInputString(value);
+        fractionObj = this.fractionFactory.fromRawInputString(value);
       } else {
         type = 'real';
         real = parseFloat(value);
@@ -240,7 +241,7 @@ export class NumberWithUnitsObjectFactory {
       }
     }
 
-    var unitsObj = this.uof.fromRawInputString(units);
+    var unitsObj = this.unitsFactory.fromRawInputString(units);
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
   // TODO(#7165): Replace any with correct type.
@@ -248,8 +249,8 @@ export class NumberWithUnitsObjectFactory {
     return new NumberWithUnits(
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,
-      this.fof.fromDict(numberWithUnitsDict.fraction),
-      this.uof.fromList(numberWithUnitsDict.units));
+      this.fractionFactory.fromDict(numberWithUnitsDict.fraction),
+      this.unitsFactory.fromList(numberWithUnitsDict.units));
   }
 }
 
