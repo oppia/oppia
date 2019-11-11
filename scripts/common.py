@@ -86,7 +86,7 @@ def open_new_tab_in_browser_if_possible(url):
     browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
-            subprocess.call([cmd, url])
+            subprocess.check_call([cmd, url])
             return
     python_utils.PRINT(
         '******************************************************************')
@@ -151,7 +151,10 @@ def is_current_branch_a_release_branch():
         bool. Whether the current branch is a release branch.
     """
     current_branch_name = get_current_branch_name()
-    return bool(re.match(r'release-\d+\.\d+\.\d+$', current_branch_name))
+    return (
+        bool(re.match(r'release-\d+\.\d+\.\d+$', current_branch_name)) or bool(
+            re.match(
+                r'release-\d+\.\d+\.\d+-hotfix-[1-9]+$', current_branch_name)))
 
 
 def verify_current_branch_name(expected_branch_name):
@@ -183,7 +186,7 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
                     'instructions: '
                     'https://help.github.com/articles/'
                     'error-repository-not-found/#check-your-ssh-access')
-            subprocess.call([
+            subprocess.check_call([
                 'git', 'clone',
                 'git@github.com:oppia/release-scripts.git'])
 
@@ -194,7 +197,7 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         # Update the local repo.
         remote_alias = get_remote_alias(
             'git@github.com:oppia/release-scripts.git')
-        subprocess.call(['git', 'pull', remote_alias])
+        subprocess.check_call(['git', 'pull', remote_alias])
 
 
 def is_port_open(port):
@@ -265,7 +268,7 @@ def install_npm_library(library_name, version, path):
         'Checking whether %s is installed in %s' % (library_name, path))
     if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
         python_utils.PRINT('Installing %s' % library_name)
-        subprocess.call([
+        subprocess.check_call([
             'yarn', 'add', '%s@%s' % (library_name, version)])
 
 

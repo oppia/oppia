@@ -42,18 +42,6 @@ def create_login_url(slug):
             feconf.SIGNUP_URL, 'return_url', slug))
 
 
-def create_logout_url(url_to_redirect):
-    """Creates a logout url.
-
-    Args:
-        url_to_redirect: str. The URL to redirect to after logout.
-
-    Returns:
-        str. The correct logout URL that includes the page to redirect to.
-    """
-    return users.create_logout_url(url_to_redirect)
-
-
 def get_current_user():
     """Returns the current user."""
     return users.get_current_user()
@@ -64,8 +52,8 @@ def is_current_user_super_admin():
     return users.is_current_user_admin()
 
 
-def get_gae_id_from_email(email):
-    """Given an email address, returns a gae id.
+def get_user_id_from_email(email):
+    """Given an email address, returns a user id.
 
     Returns None if the email address does not correspond to a valid user id.
     """
@@ -85,13 +73,11 @@ def get_gae_id_from_email(email):
 
     key = _FakeUser(id=email, user=fake_user).put()
     obj = _FakeUser.get_by_id(key.id())
-    # GAE uses the naming 'user_id' internally, we call the GAE user_id just a
-    # gae_id in our code.
-    gae_id = obj.user.user_id()
-    return python_utils.convert_to_bytes(gae_id) if gae_id else None
+    user_id = obj.user.user_id()
+    return python_utils.convert_to_bytes(user_id) if user_id else None
 
 
-def get_current_gae_id():
+def get_current_user_id():
     """Gets the user_id of current user.
 
     Returns:
