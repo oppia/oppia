@@ -55,7 +55,7 @@ angular.module('oppia').factory('ThreadDataService', [
     // Number of open threads that need action
     var _openThreadsCount = 0;
 
-    var _fetchThreads = function(onSuccess = () => {}) {
+    var _fetchThreads = function() {
       return $http.get(_THREAD_LIST_HANDLER_URL).then(response => {
         _threadsById = {};
 
@@ -74,10 +74,7 @@ angular.module('oppia').factory('ThreadDataService', [
             _threadsById[thread.threadId] = thread;
             return thread;
           });
-
-        onSuccess();
-        return _data;
-      });
+      }).then(onSuccess);
     };
 
     var _fetchMessages = function(threadId) {
@@ -92,7 +89,7 @@ angular.module('oppia').factory('ThreadDataService', [
         return _data;
       },
       fetchThreads: function(onSuccess) {
-        return _fetchThreads(onSuccess);
+        return _fetchThreads().then(onSuccess).then(this.getData);
       },
       fetchMessages: function(threadId) {
         return _fetchMessages(threadId);
