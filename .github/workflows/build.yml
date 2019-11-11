@@ -1,7 +1,8 @@
 name: Setup
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  [push]
+#   pull_request:
+#     types: [opened, synchronize, reopened]
 
 jobs:
   build:
