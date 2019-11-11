@@ -131,6 +131,7 @@ ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10

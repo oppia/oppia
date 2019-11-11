@@ -191,7 +191,6 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
 
     _save_voiceover_application(voiceover_application)
 
-
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
         rights_manager.assign_role_for_exploration(
             reviewer, voiceover_application.target_id,
@@ -206,7 +205,8 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
             voiceover_application.author_id, opportunity['0'].chapter_title,
             voiceover_application.language_code)
     # Need to reject all other voiceover application for the same entity?
-    # Add notification?
+    # TODO(#7969): Add notification to the user's dashboard for the accepted
+    # voiceover application.
 
 
 def reject_voiceover_application(
@@ -232,7 +232,6 @@ def reject_voiceover_application(
     voiceover_application.reject(reviewer.user_id, rejection_message)
     _save_voiceover_application(voiceover_application)
 
-
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
         opportunity = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids([
@@ -240,6 +239,8 @@ def reject_voiceover_application(
         email_manager.send_rejected_voiceover_application_email(
             voiceover_application.author_id, opportunity['0'].chapter_title,
             voiceover_application.language_code, rejection_message)
+    # TODO(#7969): Add notification to the user's dashboard for the accepted
+    # voiceover application.
 
 
 def create_new_voiceover_application(
