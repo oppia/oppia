@@ -127,13 +127,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         check_function_calls = {
             'chdir_is_called': False,
             'mkdir_is_called': False,
-            'call_is_called': False,
+            'check_call_is_called': False,
             'copytree_is_called': False
         }
         expected_check_function_calls = {
             'chdir_is_called': True,
             'mkdir_is_called': True,
-            'call_is_called': True,
+            'check_call_is_called': True,
             'copytree_is_called': True
         }
         expected_lines_in_print_arr = [
@@ -147,8 +147,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             check_function_calls['chdir_is_called'] = True
         def mock_mkdir(unused_path):
             check_function_calls['mkdir_is_called'] = True
-        def mock_call(unused_cmd_tokens):
-            check_function_calls['call_is_called'] = True
+        def mock_check_call(unused_cmd_tokens):
+            check_function_calls['check_call_is_called'] = True
         def mock_copytree(unused_path1, unused_path2):
             check_function_calls['copytree_is_called'] = True
         # pylint: disable=unused-argument
@@ -163,12 +163,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         chdir_swap = self.swap(os, 'chdir', mock_chdir)
         mkdir_swap = self.swap(os, 'mkdir', mock_mkdir)
-        call_swap = self.swap(subprocess, 'call', mock_call)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         copytree_swap = self.swap(shutil, 'copytree', mock_copytree)
         input_swap = self.swap(fileinput, 'input', mock_input)
 
-        with exists_swap, chdir_swap, mkdir_swap, call_swap, copytree_swap:
-            with input_swap, self.print_swap:
+        with exists_swap, chdir_swap, mkdir_swap, check_call_swap:
+            with copytree_swap, input_swap, self.print_swap:
                 install_third_party_libs.install_skulpt(
                     argparse.Namespace(nojsrepl=False, noskulpt=False))
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -219,7 +219,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 'ensure_pip_library_is_installed_is_called'] = True
         def mock_install_skulpt(unused_parsed_args):
             check_function_calls['install_skulpt_is_called'] = True
-        def mock_call(unused_cmd_tokens):
+        def mock_check_call(unused_cmd_tokens):
             pass
         # pylint: disable=unused-argument
         def mock_main_for_install_third_party(args):
@@ -239,7 +239,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             mock_ensure_pip_library_is_installed)
         install_skulpt_swap = self.swap(
             install_third_party_libs, 'install_skulpt', mock_install_skulpt)
-        call_swap = self.swap(subprocess, 'call', mock_call)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         install_third_party_main_swap = self.swap(
             install_third_party, 'main', mock_main_for_install_third_party)
         setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
@@ -272,7 +272,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             install_third_party_libs, 'PQ_CONFIGPARSER_FILEPATH',
             temp_pq_config_file)
 
-        with ensure_pip_install_swap, install_skulpt_swap, call_swap:
+        with ensure_pip_install_swap, install_skulpt_swap, check_call_swap:
             with install_third_party_main_swap, setup_main_swap:
                 with setup_gae_main_swap, pre_commit_hook_main_swap:
                     with pre_push_hook_main_swap, py_config_swap:
