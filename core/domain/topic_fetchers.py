@@ -231,7 +231,7 @@ def get_all_topics_with_skills():
     """Returns a list of topics with linked skills.
 
     Returns:
-        list(Topic|None). A list of topics with skills.
+        list(Topic). A list of topics with skills.
     """
     all_topic_models = topic_models.TopicModel.get_all()
     topics_with_skills = []

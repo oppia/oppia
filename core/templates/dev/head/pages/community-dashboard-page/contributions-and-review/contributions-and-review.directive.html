@@ -4,7 +4,7 @@
       <div class="oppia-contributions-navbar-items-list" navbar-label="Things to do">
         <div class="oppia-contributions-navbar-item">
           <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToReviewTab()"
+                  ng-click="$ctrl.switchToReviewTab($ctrl.SUGGESTION_TYPE_TRANSLATE)"
                   ng-class="$ctrl.reviewTabActive ? 'oppia-contributions-active-navbar': ''"> Review Translations
           </button>
         </div>
@@ -14,7 +14,7 @@
       <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions">
         <div class="oppia-contributions-navbar-item">
           <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToContributionsTab()"
+                  ng-click="$ctrl.switchToContributionsTab($ctrl.SUGGESTION_TYPE_TRANSLATE)"
                   ng-class="$ctrl.reviewTabActive ? '' : 'oppia-contributions-active-navbar'">Translations
           </button>
         </div>

@@ -22,8 +22,6 @@ require(
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
-require(
-  'pages/community-dashboard-page/community-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').directive('questionOpportunities', [
   'UrlInterpolationService', 'MAX_QUESTIONS_PER_SKILL',
