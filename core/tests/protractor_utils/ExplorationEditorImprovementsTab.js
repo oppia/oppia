@@ -146,7 +146,8 @@ var ExplorationEditorImprovementsTab = function() {
   this.clickTaskActionButton = (task, buttonText) => {
     var buttonElement = task.element(by.buttonText(buttonText));
     waitFor.elementToBeClickable(
-      buttonElement, 'Action button takes too long to become clickable');
+      buttonElement,
+      '"' + buttonText + '" action button takes too long to become clickable');
     buttonElement.click();
   };
 
