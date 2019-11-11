@@ -35,10 +35,7 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
       this.messages = messages;
     };
 
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SuggestionThread['createFromBackendDicts'] = function(
-    /* eslint-enable dot-notation */
+    var createFromBackendDicts = function(
         suggestionThreadBackendDict, suggestionBackendDict) {
       var suggestion;
       if (suggestionBackendDict.suggestion_type ===
@@ -56,9 +53,13 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
         suggestionThreadBackendDict.messages);
     };
 
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    SuggestionThread['createFromBackendDicts'] = createFromBackendDicts;
+
     SuggestionThread.prototype.copyFromBackendDicts = function(
         suggestionThreadBackendDict, suggestionBackendDict) {
-      var source = SuggestionThread['createFromBackendDicts'](
+      var source = createFromBackendDicts(
         suggestionThreadBackendDict, suggestionBackendDict);
       this.status = source.status;
       this.subject = source.subject;
