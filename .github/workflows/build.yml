@@ -19,7 +19,7 @@ jobs:
         
       - name: Use third party cache
         uses: actions/cache@v1
-        if: matrix.os != windows-latest
+        if: matrix.os != "windows-latest"
         
         with:
           path: third_party
