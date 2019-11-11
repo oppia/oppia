@@ -70,7 +70,7 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
       this.threadId = source.threadId;
       this.suggestion = source.suggestion;
       this.messages = source.messages;
-    }
+    };
 
     SuggestionThread.prototype.setMessages = function(messages) {
       this.messages = messages;
