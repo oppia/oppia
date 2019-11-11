@@ -38,9 +38,12 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
+import { ValidatorsService } from 'services/validators.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -71,6 +74,9 @@ export class UpgradedServices {
       new WindowDimensionsService()),
     'UrlService': new UrlService(new WindowRef()),
     'UtilsService': new UtilsService(),
+    'ValidatorsService': new ValidatorsService(
+      new AlertsService(new LoggerService()), new NormalizeWhitespacePipe(
+        new UtilsService())),
     'WindowDimensionsService': new WindowDimensionsService(),
   };
 }
