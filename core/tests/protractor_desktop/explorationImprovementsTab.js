@@ -178,7 +178,7 @@ describe('Feedback Improvements', function() {
       'Boolean', (element) => element.setValue(true));
   });
 
-  fit('should add feedback to an exploration', function() {
+  it('should add feedback to an exploration', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
