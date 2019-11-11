@@ -27,6 +27,8 @@ require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
+require('domain/objects/objects-domain.constants.ajs.ts');
+
 angular.module('oppia').directive('oppiaInteractiveFractionInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {

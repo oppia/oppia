@@ -25,6 +25,8 @@ require(
   'number-with-units-rules.service.ts');
 require('services/html-escaper.service.ts');
 
+require('domain/objects/objects-domain.constants.ajs.ts');
+
 angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {

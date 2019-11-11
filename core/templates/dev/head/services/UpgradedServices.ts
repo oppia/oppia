@@ -33,14 +33,20 @@ import { DocumentAttributeCustomizationService } from
 import { ExtensionTagAssemblerService }
   from 'services/extension-tag-assembler.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
+import { FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
+import { UnitsObjectFactory } from
+  'domain/objects/UnitsObjectFactory';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -71,7 +77,9 @@ export class UpgradedServices {
       new WindowDimensionsService()),
     'UrlService': new UrlService(new WindowRef()),
     'UtilsService': new UtilsService(),
-    'WindowDimensionsService': new WindowDimensionsService(),
+    'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
+      new UnitsObjectFactory(), new FractionObjectFactory()),
+    'WindowDimensionsService': new WindowDimensionsService()
   };
 }
 

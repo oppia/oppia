@@ -40,6 +40,10 @@ import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import { NumberWithUnitsRulesService } from
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory.ts';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
@@ -74,6 +78,10 @@ describe('Rule spec services', function() {
       'MusicNotesInputRulesService', new MusicNotesInputRulesService());
     $provide.value(
       'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
+    $provide.value(
+      'NumberWithUnitsRulesService', new NumberWithUnitsRulesService(
+        new NumberWithUnitsObjectFactory(
+          new UnitsObjectFactory(), new FractionObjectFactory())));
     $provide.value(
       'FractionInputRulesService', new FractionInputRulesService(
         new FractionObjectFactory()));
