@@ -50,7 +50,7 @@ def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
             'Invalid suggestion_type: %s' % suggestion_type)
 
 
-def _get_target_id_to_opportunity_dict(suggestions):
+def _get_target_id_to_exploration_opportunity_dict(suggestions):
     """Returns a dict of target_id to exploration opportunity summary dict.
 
     Args:
@@ -198,7 +198,7 @@ class ReviewableSuggestionsHandler(base.BaseHandler):
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
                 target_id_to_opportunity_dict = (
-                    _get_target_id_to_opportunity_dict(suggestions))
+                    _get_target_id_to_exploration_opportunity_dict(suggestions))
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
                     'target_id_to_opportunity_dict':
@@ -229,7 +229,7 @@ class UserSubmittedSuggestionsHandler(base.BaseHandler):
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
                 target_id_to_opportunity_dict = (
-                    _get_target_id_to_opportunity_dict(suggestions))
+                    _get_target_id_to_exploration_opportunity_dict(suggestions))
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
                     'target_id_to_opportunity_dict':

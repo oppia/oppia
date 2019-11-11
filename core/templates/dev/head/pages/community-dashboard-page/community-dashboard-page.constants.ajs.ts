@@ -29,7 +29,3 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
   CommunityDashboardConstants.DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
-
-angular.module('oppia').constant(
-  'MAX_QUESTIONS_PER_SKILL',
-  CommunityDashboardConstants.MAX_QUESTIONS_PER_SKILL);
