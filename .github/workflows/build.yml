@@ -34,7 +34,7 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-third-party-${{ hashFiles('**\manifest.json') }}
             ${{ runner.OS }}-third-party
-        if: runner.OS == "windows-latest"
+        if: matrix.os == "windows-latest"
         
       - name: Use node_modules cache 
         uses: actions/cache@v1
@@ -44,7 +44,7 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-node-modules-${{ hashFiles('**/manifest.json') }}
             ${{ runner.OS }}-node-modules
-        if: runner.OS != "windows-latest"
+        if: matrix.os != "windows-latest"
       - name: Use node modules cache (Windows)
         uses: actions/cache@v1
         with:
@@ -53,7 +53,7 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-node-modules-${{ hashFiles('**\manifest.json') }}
             ${{ runner.OS }}-node-modules
-        if: runner.OS == "windows-latest"
+        if: matrix.os == "windows-latest"
         
       - name: Use tools cache 
         uses: actions/cache@v1
@@ -63,7 +63,7 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-oppia-tools-${{ hashFiles('**/manifest.json') }}
             ${{ runner.OS }}-oppia-tools
-        if: runner.OS != "windows-latest"
+        if: matrix.os != "windows-latest"
       - name: Use tools cache (Windows)
         uses: actions/cache@v1
         with:
@@ -72,21 +72,21 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-oppia-tools-${{ hashFiles('**\manifest.json') }}
             ${{ runner.OS }}-oppia-tools
-        if: runner.OS == "windows-latest"
+        if: matrix.os == "windows-latest"
   
       - name: Soft link libreadline.so.7.0 and libreadline.so.6 for ubuntu to compile skulpt 
         run: cd /lib/x86_64-linux-gnu && sudo ln -s libreadline.so.7.0 libreadline.so.6 && cd -
-        if: runner.OS == 'ubuntu-18.04'
+        if: matrix.os == 'ubuntu-18.04'
       - name: Install prerequisites 
         run: bash scripts/install_prerequisites.sh
-        if: runner.OS == 'ubuntu-18.04'
+        if: matrix.os == 'ubuntu-18.04'
       - name: Install chrome for macos 
         run: brew update && brew cask install google-chrome
-        if: runner.OS == 'macos-latest'
+        if: matrix.os == 'macos-latest'
       - name: Install third party
         run: python -m scripts.install_third_party_libs
       - name: Install requests for Macos
         run: python -m pip install requests
-        if: runner.OS == 'macos-latest'
+        if: matrix.os == 'macos-latest'
       - name: Run backend test
         run: python -m scripts.run_backend_tests --exclude_load_tests
