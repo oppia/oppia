@@ -146,7 +146,7 @@ describe('Answer Details Improvements', function() {
 });
 
 
-describe('Feedback Improvements', function() {
+fdescribe('Feedback Improvements', function() {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
   var EXPLORATION_TITLE_2 = 'Exploration for testing feedback status';
   var EXPLORATION_OBJECTIVE = 'To explore something';
@@ -178,7 +178,7 @@ describe('Feedback Improvements', function() {
       'Boolean', (element) => element.setValue(true));
   });
 
-  it('should add feedback to an exploration', function() {
+  fit('should add feedback to an exploration', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 

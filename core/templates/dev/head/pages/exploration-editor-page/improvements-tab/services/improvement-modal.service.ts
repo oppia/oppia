@@ -175,7 +175,9 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.messageSendingInProgress = false;
                   }, function() {
                     $scope.messageSendingInProgress = false;
-                  }).then($uibModalInstance.close);
+                  })
+                  .then(() => ThreadDataService.fetchMessages(threadId))
+                  .then($uibModalInstance.close);
               };
               $scope.close = function() {
                 $uibModalInstance.close();
@@ -246,7 +248,9 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.messageSendingInProgress = false;
                   }, function() {
                     $scope.messageSendingInProgress = false;
-                  }).then($uibModalInstance.close);
+                  })
+                  .then(() => ThreadDataService.fetchMessages(threadId))
+                  .then($uibModalInstance.close);
               };
               $scope.close = function() {
                 $uibModalInstance.close();
