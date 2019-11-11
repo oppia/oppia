@@ -25,6 +25,7 @@ import itertools
 import json
 import os
 import unittest
+import datetime
 
 from constants import constants
 from core.domain import collection_domain
@@ -1730,6 +1731,31 @@ tags: []
         slash.
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
+
+    @contextlib.contextmanager
+    def mock_datetime_utcnow(self, mocked_datetime):
+        original_datetime_type = datetime.datetime
+
+        class PatchedDatetimeType(type):
+            """Validates the datetime instances."""
+            def __instancecheck__(cls, other):
+                """Validates whether the given instance is a datatime
+                instance.
+                """
+                return isinstance(other, original_datetime_type)
+
+        class MockDatetime( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
+            @classmethod
+            def utcnow(cls):
+                """Returns the current date and time 11 hours ahead of UTC."""
+                return mocked_datetime
+        setattr(datetime, 'datetime', MockDatetime)
+        try:
+            yield
+        finally:
+            setattr(datetime, 'datetime', original_datetime_type)
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):

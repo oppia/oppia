@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import logging
 import os
+import time
 
 from constants import constants
 from core.domain import collection_services
@@ -948,7 +949,6 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         user_services.update_subject_interests(
             self.user_id, ['singleword', 'has spaces'])
 
-
 class LastLoginIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for testing that the last login time for a user updates
     correctly.
@@ -956,7 +956,9 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Create exploration with two versions."""
+        current_datetime = datetime.datetime.utcnow()
         super(LastLoginIntegrationTests, self).setUp()
+
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -965,17 +967,17 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         last-login check was introduced.
         """
         # Set up a 'previous-generation' user.
-        user_settings = user_services.get_user_settings(self.viewer_id)
-        user_settings.last_logged_in = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
-
-        self.assertIsNone(
-            user_services.get_user_settings(self.viewer_id).last_logged_in)
-        # After logging in and requesting a URL, the last_logged_in property is
-        # set.
         self.login(self.VIEWER_EMAIL)
+        mocked_datetime_utcnow = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+            user_services.record_user_logged_in(self.viewer_id)
+            user_settings = user_services.get_user_settings(self.viewer_id)
+            last_logged_in_prev = user_settings.last_logged_in
+
+        # After logging in and requesting a URL, the last_logged_in property is
+        # changed.
         self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        self.assertIsNotNone(
+        self.assertLess(last_logged_in_prev,
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.logout()
 
@@ -986,36 +988,10 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        original_datetime_type = datetime.datetime
         current_datetime = datetime.datetime.utcnow()
 
-        # Without explicitly defining the type of the patched datetimes, NDB
-        # validation checks for datetime.datetime instances fail.
-        class PatchedDatetimeType(type):
-            """Validates the datetime instances."""
-            def __instancecheck__(cls, other):
-                """Validates whether the given instance is a datatime
-                instance.
-                """
-                return isinstance(other, original_datetime_type)
-
-        class MockDatetime11Hours( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
-            @classmethod
-            def utcnow(cls):
-                """Returns the current date and time 11 hours ahead of UTC."""
-                return current_datetime + datetime.timedelta(hours=11)
-
-        class MockDatetime13Hours( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
-            @classmethod
-            def utcnow(cls):
-                """Returns the current date and time 13 hours ahead of UTC."""
-                return current_datetime + datetime.timedelta(hours=13)
-
-        with self.swap(datetime, 'datetime', MockDatetime11Hours):
+        mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=11)
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertEqual(
@@ -1023,7 +999,8 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
                 previous_last_logged_in_datetime)
             self.logout()
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours):
+        mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=13)
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertGreater(
