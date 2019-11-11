@@ -49,6 +49,20 @@ export class FeedbackThread {
     this.messages = messages;
   }
 
+  copyFromBackendDict(feedbackThreadBackendDict: any): void {
+    var source = new FeedbackThreadObjectFactory().createFromBackendDict(
+      feedbackThreadBackendDict);
+    this.status = source.status;
+    this.subject = source.subject;
+    this.summary = source.summary;
+    this.originalAuthorName = source.originalAuthorName;
+    this.lastUpdated = source.lastUpdated;
+    this.messageCount = source.messageCount;
+    this.stateName = source.stateName;
+    this.threadId = source.threadId;
+    this.messages = source.messages;
+  }
+
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'messages' is an array of dicts with underscore_cased keys
   // which give tslint errors against underscore_casing in favor of camelCasing.

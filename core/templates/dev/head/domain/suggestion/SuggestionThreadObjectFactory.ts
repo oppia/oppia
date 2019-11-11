@@ -56,6 +56,21 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
         suggestionThreadBackendDict.messages);
     };
 
+    SuggestionThread.prototype.copyFromBackendDicts = function(
+        suggestionThreadBackendDict, suggestionBackendDict) {
+      var source = SuggestionThread['createFromBackendDicts'](
+        suggestionThreadBackendDict, suggestionBackendDict);
+      this.status = source.status;
+      this.subject = source.subject;
+      this.summary = source.summary;
+      this.originalAuthorName = source.originalAuthorName;
+      this.lastUpdated = source.lastUpdated;
+      this.messageCount = source.messageCount;
+      this.threadId = source.threadId;
+      this.suggestion = source.suggestion;
+      this.messages = source.messages;
+    }
+
     SuggestionThread.prototype.setMessages = function(messages) {
       this.messages = messages;
     };

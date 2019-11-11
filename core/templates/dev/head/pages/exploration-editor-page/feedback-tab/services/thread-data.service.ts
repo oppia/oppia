@@ -59,23 +59,27 @@ angular.module('oppia').factory('ThreadDataService', [
       return $http.get(_THREAD_LIST_HANDLER_URL).then(response => {
         var feedbackThreadDicts = response.data.feedback_thread_dicts;
         _data.feedbackThreads = feedbackThreadDicts.map(threadDict => {
-          if (_threadsById[threadDict.thread_id]) {
-            return _threadsById[threadDict.thread_id];
+          var thread = _threadsById[threadDict.thread_id];
+          if (thread) {
+            thread.copyFromBackendDict(threadDict);
+          } else {
+            thread = FeedbackThreadObjectFactory.createFromBackendDict(
+              threadDict);
+            _threadsById[thread.threadId] = thread;
           }
-          var thread = FeedbackThreadObjectFactory.createFromBackendDict(
-            threadDict);
-          _threadsById[thread.threadId] = thread;
           return thread;
         });
 
         var suggestionThreadDicts = response.data.suggestion_thread_dicts;
         _data.suggestionThreads = suggestionThreadDicts.map(threadDict => {
-          if (_threadsById[threadDict.thread_id]) {
-            return _threadsById[threadDict.thread_id];
+          var thread = _threadsById[threadDict.thread_id];
+          if (thread) {
+            thread.copyFromBackendDicts(threadDict, threadDict.suggestion_dict);
+          } else {
+            thread = SuggestionThreadObjectFactory.createFromBackendDicts(
+              threadDict, threadDict.suggestion_dict);
+            _threadsById[thread.threadId] = thread;
           }
-          var thread = SuggestionThreadObjectFactory.createFromBackendDicts(
-            threadDict, threadDict.suggestion_dict);
-          _threadsById[thread.threadId] = thread;
           return thread;
         });
       });
