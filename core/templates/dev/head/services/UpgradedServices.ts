@@ -30,6 +30,8 @@ import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
+import { ExplorationHtmlFormatterService } from
+  'services/exploration-html-formatter.service';
 import { ExtensionTagAssemblerService }
   from 'services/extension-tag-assembler.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
@@ -62,6 +64,11 @@ export class UpgradedServices {
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
+    'ExplorationHtmlFormatterService': new ExplorationHtmlFormatterService(
+      new CamelCaseToHyphensPipe(), new ExtensionTagAssemblerService(
+        new HtmlEscaperService(new LoggerService()),
+        new CamelCaseToHyphensPipe()), new HtmlEscaperService(
+        new LoggerService())),
     'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
       new HtmlEscaperService(new LoggerService()),
       new CamelCaseToHyphensPipe()),
