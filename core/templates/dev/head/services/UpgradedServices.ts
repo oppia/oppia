@@ -66,7 +66,6 @@ import {StopwatchObjectFactory} from '../domain/utilities/StopwatchObjectFactory
 import {ContributionAndReviewServices} from '../pages/community-dashboard-page/services/contribution-and-review.services';
 import {ContributionOpportunitiesBackendApiService} from '../pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
 import {ContributionOpportunitiesService} from '../pages/community-dashboard-page/services/contribution-opportunities.service';
-import {AssetsBackendApiService} from "./assets-backend-api.service";
 
 @Injectable({
   providedIn: 'root'
