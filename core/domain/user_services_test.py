@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import logging
 import os
-import time
 
 from constants import constants
 from core.domain import collection_services
