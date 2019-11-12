@@ -1032,10 +1032,6 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         after the last edited time check was introduced.
         """
         # Set up a 'previous-generation' user.
-        user_settings = user_services.get_user_settings(self.editor_id)
-        user_settings.last_edited_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
-
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNone(editor_settings.last_edited_an_exploration)
 
