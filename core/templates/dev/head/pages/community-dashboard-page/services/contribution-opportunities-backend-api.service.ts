@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {HttpClient} from '@angular/common/http';
-import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 /**
  * @fileoverview Service for fetching the opportunities available for
@@ -57,3 +58,7 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 }
+
+angular.module('oppia').factory(
+  'ContributionOpportunitiesBackendApiService',
+  downgradeInjectable(ContributionOpportunitiesBackendApiService));

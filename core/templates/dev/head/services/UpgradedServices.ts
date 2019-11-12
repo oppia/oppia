@@ -57,11 +57,16 @@ import {HttpClient, HttpEvent, HttpHandler, HttpRequest} from
 import {Observable} from 'rxjs';
 import {TranslateTextService} from
   'pages/community-dashboard-page/services/translate-text.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {ExplorationDraftObjectFactory} from
   'domain/exploration/ExplorationDraftObjectFactory';
-import {CsrfTokenService} from "./csrf-token.service";
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {QuestionUndoRedoService} from '../domain/editor/undo_redo/question-undo-redo.service';
+import {StopwatchObjectFactory} from '../domain/utilities/StopwatchObjectFactory';
+import {ContributionAndReviewServices} from '../pages/community-dashboard-page/services/contribution-and-review.services';
+import {ContributionOpportunitiesBackendApiService} from '../pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+import {ContributionOpportunitiesService} from '../pages/community-dashboard-page/services/contribution-opportunities.service';
+import {AssetsBackendApiService} from "./assets-backend-api.service";
 
 @Injectable({
   providedIn: 'root'
@@ -108,10 +113,38 @@ export class UpgradedServices {
           return undefined;
         }
       })),
-    'SiteAnalyticsService': new SiteAnalyticsService(new WindowRef()),
     'LocalStorageService': new LocalStorageService(
       new ExplorationDraftObjectFactory()),
-    'CsrfTokenService': new CsrfTokenService()
+    'CsrfTokenService': new CsrfTokenService(),
+    'QuestionUndoRedoService': new QuestionUndoRedoService(new EventService()),
+    'StopwatchObjectFactory': new StopwatchObjectFactory(),
+    'ContributionAndReviewServices': new ContributionAndReviewServices(
+      new UrlInterpolationService(new AlertsService(
+        new LoggerService()), new UrlService(
+        new WindowRef()), new UtilsService()), new HttpClient(
+        new class extends HttpHandler {
+          handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+            return undefined;
+          }
+        })),
+    'ContributionOpportunitiesBackendApiService':
+        new ContributionOpportunitiesBackendApiService(
+          new HttpClient(new class extends HttpHandler {
+            handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+              return undefined;
+            }
+          }), new UrlInterpolationService(new AlertsService(
+            new LoggerService()), new UrlService(
+            new WindowRef()), new UtilsService()) ),
+    'ContributionOpportunitiesService': new ContributionOpportunitiesService(
+      new ContributionOpportunitiesBackendApiService(
+        new HttpClient(new class extends HttpHandler {
+          handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+            return undefined;
+          }
+        }), new UrlInterpolationService(new AlertsService(
+          new LoggerService()), new UrlService(
+          new WindowRef()), new UtilsService()) )),
   };
 }
 

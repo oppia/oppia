@@ -26,8 +26,12 @@ import Constants from '../../../../../assets/constants';
 import {AppConstants} from 'app.constants';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {downgradeInjectable} from '@angular/upgrade/static';
-import {ConstructTranslationIdsService} from './construct-translation-ids.service';
+import {Injectable} from "@angular/core";
 
+
+@Injectable({
+  providedIn: 'root'
+})
 export class AssetsBackendApiService {
   constructor(private httpClient: HttpClient, private audioFileObjectFactory: AudioFileObjectFactory,
               private fileDownloadRequestObjectFactory:

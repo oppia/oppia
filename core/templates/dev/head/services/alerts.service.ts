@@ -80,7 +80,10 @@ export class AlertsService {
    */
   fatalWarning(warning: string): Error {
     this.addWarning(warning);
+    console.log('Error thrown');
     throw new Error(warning);
+    console.log('Error thrown2');
+
   }
 
   /**

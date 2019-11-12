@@ -20,6 +20,7 @@
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {HttpClient} from '@angular/common/http';
 import {ExplorationEditorPageConstants} from '../../exploration-editor-page/exploration-editor-page.constants';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 export class ContributionAndReviewServices {
   constructor(private urlInterpolationService: UrlInterpolationService, private httpClient: HttpClient) {}
@@ -81,3 +82,7 @@ export class ContributionAndReviewServices {
     });
   }
 }
+
+angular.module('oppia').factory(
+  'ContributionAndReviewServices',
+  downgradeInjectable(ContributionAndReviewServices));

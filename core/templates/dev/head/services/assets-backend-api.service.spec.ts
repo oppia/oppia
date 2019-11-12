@@ -23,26 +23,25 @@ import {TestBed} from '@angular/core/testing';
 import {UrlInterpolationService} from
   'domain/utilities/url-interpolation.service';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import {LearnerDashboardBackendApiService} from '../domain/learner_dashboard/learner-dashboard-backend-api.service';
 
-describe('Assets Backend API Service', function() {
+fdescribe('Assets Backend API Service', function() {
   let assetsBackendApiService: AssetsBackendApiService = null;
   let fileDownloadRequestObjectFactory = null;
   let urlInterpolationService = null;
-  let $httpBackend = null;
   let ENTITY_TYPE = null;
   let httpTestingController: HttpTestingController;
 
 
   beforeEach(() => {
+      TestBed.configureTestingModule({
+          imports: [HttpClientTestingModule],
+          providers: [AssetsBackendApiService]
+      });
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
     fileDownloadRequestObjectFactory = TestBed.get(
       FileDownloadRequestObjectFactory);
     urlInterpolationService = TestBed.get(UrlInterpolationService);
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [LearnerDashboardBackendApiService]
-    });
+
 
     httpTestingController = TestBed.get(HttpTestingController);
   });
@@ -72,10 +71,8 @@ describe('Assets Backend API Service', function() {
       });
 
     const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET')
-    expect(req.request).
-
-        .respond(201, 'audio data');
+    expect(req.request.method).toEqual('GET');
+    req.flush('audio data');
     expect(assetsBackendApiService.isCached('myfile.mp3')).toBe(false);
 
 
@@ -83,13 +80,12 @@ describe('Assets Backend API Service', function() {
       successHandler, failHandler);
     expect((assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .audio.length).toBe(1);
-    $httpBackend.flush();
+
     expect((assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .audio.length).toBe(0);
     expect(assetsBackendApiService.isCached('myfile.mp3')).toBe(true);
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-    $httpBackend.verifyNoOutstandingExpectation();
   });
 
   it('should successfully fetch and cache image', function() {
@@ -103,7 +99,9 @@ describe('Assets Backend API Service', function() {
         filename: 'myfile.png'
       });
 
-    $httpBackend.expect('GET', requestUrl).respond(201, 'image data');
+    let req = httpTestingController.expectOne( requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush('image data');
     expect(assetsBackendApiService.isCached('myfile.png')).toBe(false);
 
 
@@ -112,13 +110,12 @@ describe('Assets Backend API Service', function() {
       successHandler, failHandler);
     expect((assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .image.length).toBe(1);
-    $httpBackend.flush();
+    // $httpBackend.flush();
     expect((assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .image.length).toBe(0);
     expect(assetsBackendApiService.isCached('myfile.png')).toBe(true);
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-    $httpBackend.verifyNoOutstandingExpectation();
   });
 
   it('should call the provided failure handler on HTTP failure for an audio',
@@ -133,14 +130,14 @@ describe('Assets Backend API Service', function() {
           filename: 'myfile.mp3'
         });
 
-      $httpBackend.expect('GET', requestUrl).respond(500, 'MutagenError');
+      let req = httpTestingController.expectOne( requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush('MutagenError');
       assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
-      $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-      $httpBackend.verifyNoOutstandingExpectation();
     });
 
   it('should call the provided failure handler on HTTP failure for an image',
@@ -155,15 +152,15 @@ describe('Assets Backend API Service', function() {
           filename: 'myfile.png'
         });
 
-      $httpBackend.expect('GET', requestUrl).respond(500, 'Error');
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error');
       assetsBackendApiService.loadImage(
         ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         successHandler, failHandler);
-      $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-      $httpBackend.verifyNoOutstandingExpectation();
     });
 
   it('should successfully abort the download of all the audio files',
@@ -178,8 +175,10 @@ describe('Assets Backend API Service', function() {
           filename: 'myfile.mp3'
         });
 
-      $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
 
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush('audio data');
       assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
 
@@ -187,7 +186,6 @@ describe('Assets Backend API Service', function() {
         .audio.length).toBe(1);
 
       assetsBackendApiService.abortAllCurrentAudioDownloads();
-      $httpBackend.verifyNoOutstandingRequest();
       expect(assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .audio.length).toBe(0);
       expect(assetsBackendApiService.isCached('myfile.mp3')).toBe(false);
@@ -205,7 +203,10 @@ describe('Assets Backend API Service', function() {
           filename: 'myfile.png'
         });
 
-      $httpBackend.expect('GET', requestUrl).respond(201, 'image data');
+
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush('image data');
 
       assetsBackendApiService.loadImage(
         ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
@@ -215,7 +216,6 @@ describe('Assets Backend API Service', function() {
         .image.length).toBe(1);
 
       assetsBackendApiService.abortAllCurrentImageDownloads();
-      $httpBackend.verifyNoOutstandingRequest();
       expect(assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .image.length).toBe(0);
       expect(assetsBackendApiService.isCached('myfile.png')).toBe(false);
@@ -232,18 +232,18 @@ describe('Assets Backend API Service', function() {
         filename: 'myfile.mp3'
       });
 
-    $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush('audio data');
     assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
       successHandler, failHandler);
     expect((assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .audio.length).toBe(1);
-    $httpBackend.flush();
     expect((assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .audio.length).toBe(0);
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
     expect(successHandler.calls.first().args[0].data.type).toBe('audio/mpeg');
-    $httpBackend.verifyNoOutstandingExpectation();
   });
 });

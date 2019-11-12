@@ -104,7 +104,8 @@ export class UrlInterpolationService {
   interpolateUrl(urlTemplate, interpolationValues) {
     if (!urlTemplate) {
       this.alertsService.fatalWarning(
-        'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
+        'Invalid or empty URL template passed');
+      console.log('Returning null');
       return null;
     }
 

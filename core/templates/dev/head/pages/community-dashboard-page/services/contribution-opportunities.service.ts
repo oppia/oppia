@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ContributionOpportunitiesBackendApiService} from './contribution-opportunities-backend-api.service';
-
 /**
  * @fileoverview A service for handling contribution opportunities in different
  * fields.
  */
 
-require(
-  'pages/community-dashboard-page/services/' +
-  'contribution-opportunities-backend-api.service.ts');
-
+import {ContributionOpportunitiesBackendApiService} from './contribution-opportunities-backend-api.service';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 export class ContributionOpportunitiesService {
   constructor(private contributionOpportunitiesBackendApiService:
@@ -71,3 +67,7 @@ export class ContributionOpportunitiesService {
       }
     }
 }
+
+angular.module('oppia').factory(
+  'ContributionOpportunitiesService',
+  downgradeInjectable(ContributionOpportunitiesService));

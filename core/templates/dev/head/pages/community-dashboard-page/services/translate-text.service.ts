@@ -19,6 +19,8 @@
 
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ContributionOpportunitiesBackendApiService} from './contribution-opportunities-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -121,3 +123,6 @@ export class TranslateTextService {
       this.httpClient.post(url, data).toPromise().then(successCallback);
     }
 }
+angular.module('oppia').factory(
+  'TranslateTextService',
+  downgradeInjectable(TranslateTextService));
