@@ -16,51 +16,35 @@
  * @fileoverview Unit tests for GenerateContentIdService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
-require('services/generate-content-id.service.ts');
+describe('GenerateContentIdService', () => {
+  let gcis: GenerateContentIdService;
 
-describe('GenerateContentIdService', function() {
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('COMPONENT_NAME_FEEDBACK', 'feedback');
-    $provide.value('COMPONENT_NAME_HINT', 'hint');
-    $provide.value('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-  var gcis = null;
+  beforeEach(() => {
+    gcis = new GenerateContentIdService();
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    gcis = $injector.get('GenerateContentIdService');
-  }));
-
-  it('should generate content id for new feedbacks', function() {
+  it('should generate content id for new feedbacks', () => {
     expect(
       gcis.getNextId(['feedback_1'], 'feedback')).toEqual(
       'feedback_2');
   });
 
-  it('should generate content id for new hint', function() {
+  it('should generate content id for new hint', () => {
     expect(
       gcis.getNextId(['hint_1'], 'hint')).toEqual(
       'hint_2');
   });
 
-  it('should generate content id for new worked example', function() {
+  it('should generate content id for new worked example', () => {
     expect(gcis.getNextId(['worked_example_1'], 'worked_example')).toEqual(
       'worked_example_2');
   });
 
-  it('should throw error for unknown content id', function() {
+  it('should throw error for unknown content id', () => {
     expect(function() {
-      gcis.getNextId('xyz');
+      gcis.getNextId(['xyz'], 'random_component_name');
     }).toThrowError('Unknown component name provided.');
   });
 });
