@@ -93,8 +93,13 @@ OriginalDatetimeType = datetime.datetime
 class PatchedDatetimeType(type):
     """Validates the datetime instances."""
     def __instancecheck__(cls, other):
-        """Validates whether the given instance is a datatime
-        instance.
+        """Validates whether the given instance is a datatime instance.
+
+        Args:
+            other: *. The instance to check.
+
+        Returns:
+            bool. Whether or not the instance is an OriginalDateTimeType.
         """
         return isinstance(other, OriginalDatetimeType)
 
@@ -103,13 +108,23 @@ class MockDatetime13Hours( # pylint: disable=inherit-non-class
         python_utils.with_metaclass(PatchedDatetimeType, datetime.datetime)):
     @classmethod
     def utcnow(cls):
-        """Returns the current date and time 13 hours behind UTC."""
+        """Returns the current date and time 13 hours behind UTC.
+
+        Returns:
+            datetime. A datetime that is 13 hours behind the current time.
+        """
         return CURRENT_DATETIME - datetime.timedelta(hours=13)
 
 
 def run_job_and_check_output(
         self, expected_output, sort=False, literal_eval=False):
-    """Helper function to run job and compare output."""
+    """Helper function to run job and compare output.
+
+    Args:
+        expected_output: list(*). The expected result of the job.
+        sort: bool. Whether to sort the outputs before comparison.
+        literal_eval: bool. Whether to use ast.literal_eval before comparison.
+    """
     job_id = self.job_class.create_new()
     self.assertEqual(
         self.count_jobs_in_taskqueue(
