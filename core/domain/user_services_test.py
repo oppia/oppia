@@ -956,7 +956,6 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Create exploration with two versions."""
-        current_datetime = datetime.datetime.utcnow()
         super(LastLoginIntegrationTests, self).setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
