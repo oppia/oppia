@@ -948,6 +948,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         user_services.update_subject_interests(
             self.user_id, ['singleword', 'has spaces'])
 
+
 class LastLoginIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for testing that the last login time for a user updates
     correctly.
@@ -975,7 +976,8 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         # After logging in and requesting a URL, the last_logged_in property is
         # changed.
         self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        self.assertLess(last_logged_in_prev,
+        self.assertLess(
+            last_logged_in_prev,
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.logout()
 
