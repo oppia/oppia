@@ -832,7 +832,38 @@ def add_dimensions_to_image_tags(exp_id, html_string):
             oppia-noninteractive-image tags.
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
-    modify_image_filename(exp_id, soup)
+    
+    for image in soup.findAll(name='oppia-noninteractive-image'):
+        if (not image.has_attr('filepath-with-value') or
+                image['filepath-with-value'] == ''):
+            image.decompose()
+            continue
+
+        try:
+            filename = json.loads(unescape_html(image['filepath-with-value'].replace('\\"', '')))
+            image['filepath-with-value'] = escape_html(json.dumps(
+                get_filename_with_dimensions(filename, exp_id)))
+        except Exception as e:
+            logging.error(
+                'Exploration %s failed to load image: %s' %
+                (exp_id, image['filepath-with-value'].encode('utf-8')))
+            raise e
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
+
+
+def add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(exp_id, html_string):
+    """Adds dimensions to all oppia-noninteractive-image tags inside tabs and
+    collapsible blocks. Removes image tags that have no filepath.
+
+    Args:
+        exp_id: str. Exploration id.
+        html_string: str. HTML string to modify.
+
+    Returns:
+        str. Updated HTML string with the dimensions for all
+            oppia-noninteractive-image tags.
+    """
+    soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
     
     # To add dimensions to images inside the collapsible component.
     for collapsible_component in soup.findAll(
@@ -844,16 +875,9 @@ def add_dimensions_to_image_tags(exp_id, html_string):
         collapsible_component_html_string = unescape_html(
             collapsible_component['content-with-value'])
         collapsible_component_soup = bs4.BeautifulSoup(
-            collapsible_component_html_string, 'html.parser')
+            collapsible_component_html_string, 'html.parser')   
         modify_image_filename(exp_id, collapsible_component_soup)
-        # print('pytho_utils UNICODE: ' )
-        # print('\n')
-        print('collapsible_component_soup: ' + collapsible_component_soup.encode('unicode-escape'))
-        print('\n')
-        print('unicode-escape: ' + escape_html(str(collapsible_component_soup)))#.encode('unicode-escape').encode('utf-8'))
-        print('\n')
-        collapsible_component['content-with-value'] = escape_html(str(collapsible_component_soup))
-        #     "&amp;quot;&amp;lt;oppia-noninteractive-image alt-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;abc2_height_32_width_32.png&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;")
+        collapsible_component['content-with-value'] = escape_html(python_utils.UNICODE(collapsible_component_soup).replace('\'',''))
 
     # To add dimensions to images inside the tab component.
     for tab_component in soup.findAll(
@@ -865,13 +889,9 @@ def add_dimensions_to_image_tags(exp_id, html_string):
         tab_component_html_string = unescape_html(
             tab_component['tab_contents-with-value'])
         tab_component_soup = bs4.BeautifulSoup(
-            tab_component_html_string.decode(
-                'unicode-escape'), 'html.parser')
+            tab_component_html_string, 'html.parser')
         modify_image_filename(exp_id, tab_component_soup)
-        # tab_component['tab_contents-with-value'] = (
-        #     escape_html(
-        #         python_utils.UNICODE(tab_component_soup)
-        #         .replace('<br/>', '<br>')))
+        tab_component['tab_contents-with-value'] = escape_html(python_utils.UNICODE(tab_component_soup).replace('\'',''))
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
@@ -883,10 +903,8 @@ def modify_image_filename(exp_id, soup):
             continue
 
         try:
-            print(image['filepath-with-value'].replace('\\"', ''))
             filename = json.loads(unescape_html(image['filepath-with-value'].replace('\\"', '')))
-            image['filepath-with-value'] = escape_html(json.dumps(
-                get_filename_with_dimensions(filename, exp_id)))
+            image['filepath-with-value'] = '\\"' + escape_html(json.dumps(get_filename_with_dimensions(filename, exp_id))) + '\\"'
         except Exception as e:
             logging.error(
                 'Exploration %s failed to load image: %s' %
