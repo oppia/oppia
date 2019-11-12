@@ -2332,6 +2332,31 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v30_dict_to_v31_dict(cls, exp_id, states_dict):
+        """Converts from version 30 to 31. Version 31 adds
+        dimensions to images in the oppia-noninteractive-image tags
+        located inside tabs and collapsible blocks.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for key, state_dict in states_dict.items():
+            add_dimensions_to_image_tags = functools.partial(
+                html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks, # pylint: disable=line-too-long
+                exp_id)
+            states_dict[key] = state_domain.State.convert_html_fields_in_state(
+                state_dict,
+                add_dimensions_to_image_tags)
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2366,7 +2391,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 35
+    CURRENT_EXP_SCHEMA_VERSION = 36
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3004,6 +3029,21 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v35_dict_to_v36_dict(cls, exp_id, exploration_dict):
+        """Converts a v35 exploration dict into a v36 exploration dict.
+
+        Adds dimensions to all oppia-noninteractive-image tags located
+        inside tabs and collapsible blocks.
+        """
+        exploration_dict['schema_version'] = 36
+
+        exploration_dict['states'] = cls._convert_states_v30_dict_to_v31_dict(
+            exp_id, exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 31
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3210,6 +3250,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v34_dict_to_v35_dict(
                 exploration_dict)
             exploration_schema_version = 35
+
+        if exploration_schema_version == 35:
+            exploration_dict = cls._convert_v35_dict_to_v36_dict(
+                exp_id, exploration_dict)
+            exploration_schema_version = 36
 
         return (exploration_dict, initial_schema_version)
 

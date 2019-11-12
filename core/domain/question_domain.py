@@ -22,11 +22,13 @@ import datetime
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import html_validation_service
 from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
 import feconf
+import functools
 import python_utils
 import utils
 
@@ -224,6 +226,30 @@ class Question(python_utils.OBJECT):
         for answer_group in answer_groups:
             answer_group['tagged_skill_misconception_id'] = None
             del answer_group['tagged_misconception_id']
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v30_dict_to_v31_dict(cls, question_state_dict):
+        """Converts from version 30 to 31. Version 31 replaces
+        tagged_misconception_id with tagged_skill_misconception_id, which
+        is default to None.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initalize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        for key, state_dict in question_state_dict.items():
+            add_dimensions_to_image_tags = functools.partial(
+                html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks, # pylint: disable=line-too-long
+                exp_id)
+            states_dict[key] = state_domain.State.convert_html_fields_in_state(
+                state_dict,
+                add_dimensions_to_image_tags)
 
         return question_state_dict
 
