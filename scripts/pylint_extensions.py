@@ -969,7 +969,7 @@ class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0011': (
-            'Excessive new lines between function definations.',
+            'Excessive new lines between function definitions.',
             'excessive-new-lines',
             'Remove extra newlines.'
         )

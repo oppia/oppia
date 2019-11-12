@@ -880,7 +880,8 @@ def add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(
             collapsible_component['content-with-value'])
         collapsible_component_soup = bs4.BeautifulSoup(
             collapsible_component_html_string, 'html.parser')
-        modify_image_filename(is_question, entity_id, collapsible_component_soup)
+        modify_image_filename(
+            is_question, entity_id, collapsible_component_soup)
         collapsible_component['content-with-value'] = (
             escape_html(python_utils.UNICODE(collapsible_component_soup)
                         .replace('\'', '')))
@@ -931,7 +932,7 @@ def modify_image_filename(is_question, entity_id, soup):
         except Exception as e:
             logging.error(
                 'Exploration %s failed to load image: %s' %
-                (identity_id, image['filepath-with-value'].encode('utf-8')))
+                (entity_id, image['filepath-with-value'].encode('utf-8')))
             raise e
 
 

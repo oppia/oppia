@@ -291,7 +291,6 @@ class Question(python_utils.OBJECT):
                 versioned_question_state['state'])
 
 
-
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the
         object to contain an ID and a version. To be used to validate the
