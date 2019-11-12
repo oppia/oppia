@@ -472,14 +472,14 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.call(['python', COVERAGE_PATH, 'combine'])
-        subprocess.call([
+        subprocess.check_call(['python', COVERAGE_PATH, 'combine'])
+        subprocess.check_call([
             'python', COVERAGE_PATH, 'report',
             '--omit="%s*","third_party/*","/usr/share/*"'
             % common.OPPIA_TOOLS_DIR, '--show-missing'])
 
         python_utils.PRINT('Generating xml coverage report...')
-        subprocess.call(['python', COVERAGE_PATH, 'xml'])
+        subprocess.check_call(['python', COVERAGE_PATH, 'xml'])
 
     python_utils.PRINT('')
     python_utils.PRINT('Done!')

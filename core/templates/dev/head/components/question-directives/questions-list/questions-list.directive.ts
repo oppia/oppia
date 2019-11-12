@@ -88,6 +88,7 @@ angular.module('oppia').directive('questionsList', [
           ctrl.getQuestionSummaries =
             QuestionsListService.getCachedQuestionSummaries;
           ctrl.getCurrentPageNumber = QuestionsListService.getCurrentPageNumber;
+          ctrl.editorIsOpen = false;
 
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
@@ -146,6 +147,7 @@ angular.module('oppia').directive('questionsList', [
           ctrl.saveAndPublishQuestion = function() {
             var validationErrors = ctrl.question.validate(
               ctrl.misconceptionsBySkill);
+
             if (validationErrors) {
               AlertsService.addWarning(validationErrors);
               return;
@@ -311,6 +313,9 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.editQuestion = function(questionSummary) {
+            if (ctrl.editorIsOpen) {
+              return;
+            }
             ctrl.misconceptionsBySkill = {};
             EditableQuestionBackendApiService.fetchQuestion(
               questionSummary.id).then(function(response) {
@@ -559,6 +564,7 @@ angular.module('oppia').directive('questionsList', [
             var canEditQuestion = ctrl.canEditQuestion();
             var misconceptionsBySkill = ctrl.misconceptionsBySkill;
             QuestionUndoRedoService.clearChanges();
+            ctrl.editorIsOpen = true;
 
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -597,6 +603,12 @@ angular.module('oppia').directive('questionsList', [
                     }
                     $uibModalInstance.close();
                   };
+                  // Checking if Question contains all requirement to enable
+                  // Save and Publish Question
+                  $scope.isSaveButtonDisabled = function() {
+                    return $scope.question.validate(
+                      $scope.misconceptionsBySkill);
+                  };
 
                   $scope.cancel = function() {
                     if (QuestionUndoRedoService.hasChanges()) {
@@ -631,7 +643,10 @@ angular.module('oppia').directive('questionsList', [
             });
 
             modalInstance.result.then(function() {
+              ctrl.editorIsOpen = false;
               ctrl.saveAndPublishQuestion();
+            }, function() {
+              ctrl.editorIsOpen = false;
             });
           };
 

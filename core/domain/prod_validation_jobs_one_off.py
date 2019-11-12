@@ -3390,30 +3390,34 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
             cls._validate_final_reveiwer_id]
 
 
-class ReviewerRotationTrackingModelValidator(BaseModelValidator):
-    """Class for validating ReviewerRotationTrackingModels."""
+class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
+    """Class for validating GeneralVoiceoverApplicationModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        # Valid id: same as score category.
-        regex_string = '^(%s)$' % ('|').join(ALLOWED_SCORE_CATEGORIES)
-        return regex_string
+    def _get_model_domain_object_instance(cls, item):
+        """Returns a domain object instance created from the model.
+
+        Args:
+            item: GeneralVoiceoverApplicationModel. Entity to validate.
+
+        Returns:
+            *: A domain object to validate.
+        """
+        return suggestion_services.get_voiceover_application(item.id)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        question_ids = []
-        split_id = item.id.split(suggestion_models.SCORE_CATEGORY_DELIMITER)
-        if len(split_id) == 2 and (
-                split_id[0] == suggestion_models.SCORE_TYPE_QUESTION):
-            question_ids = [split_id[1]]
-        return {
-            'user_ids': (
-                user_models.UserSettingsModel,
-                [item.current_position_in_rotation]),
-            'question_ids': (
-                question_models.QuestionModel,
-                question_ids)
+        external_instance_details = {
+            'author_ids': (user_models.UserSettingsModel, [item.author_id]),
         }
+        if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
+            external_instance_details['%s_ids' % item.target_type] = (
+                TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
+                [item.target_id])
+        if item.final_reviewer_id is not None:
+            external_instance_details['final_reviewer_ids'] = (
+                user_models.UserSettingsModel, [item.final_reviewer_id])
+        return external_instance_details
 
 
 class TopicModelValidator(BaseModelValidator):
@@ -5158,8 +5162,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         StoryCommitLogEntryModelValidator),
     story_models.StorySummaryModel: StorySummaryModelValidator,
     suggestion_models.GeneralSuggestionModel: GeneralSuggestionModelValidator,
-    suggestion_models.ReviewerRotationTrackingModel: (
-        ReviewerRotationTrackingModelValidator),
+    suggestion_models.GeneralVoiceoverApplicationModel: (
+        GeneralVoiceoverApplicationModelValidator),
     topic_models.TopicModel: TopicModelValidator,
     topic_models.TopicSnapshotMetadataModel: (
         TopicSnapshotMetadataModelValidator),
@@ -5798,12 +5802,13 @@ class GeneralSuggestionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [suggestion_models.GeneralSuggestionModel]
 
 
-class ReviewerRotationTrackingModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates ReviewerRotationTrackingModel."""
+class GeneralVoiceoverApplicationModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates GeneralVoiceoverApplicationModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [suggestion_models.ReviewerRotationTrackingModel]
+        return [suggestion_models.GeneralVoiceoverApplicationModel]
 
 
 class TopicModelAuditOneOffJob(ProdValidationAuditOneOffJob):
