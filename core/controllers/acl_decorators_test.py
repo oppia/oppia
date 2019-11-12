@@ -3185,6 +3185,23 @@ class SubmitVoiceoverApplicationDecoratorTests(test_utils.GenericTestBase):
             'You cannot submit a new application until the lessons assigned '
             'to you has complete voiceover.')
 
+    def test_user_can_submit_new_application_after_rejected_application(
+            self):
+        voiceover_services.create_new_voiceover_application(
+            'exploration', '0', 'en', '', 'audio_file.mp3', self.applicant_id)
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id))
+        voiceover_services.reject_voiceover_application(
+            user_voiceover_applications[0].voiceover_application_id,
+            self.reviewer_id, 'Review message')
+        self.login(self.applicant_email)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/createvoiceoverapplicationhandler', {}, csrf_token=csrf_token)
+
     def test_user_after_complete_voiceover_can_submit_new_application(self):
         voiceover_services.create_new_voiceover_application(
             'exploration', '0', 'en', '', 'audio_file.mp3', self.applicant_id)

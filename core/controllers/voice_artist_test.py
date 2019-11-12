@@ -351,6 +351,28 @@ class VoiceoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.applicant_id)[0])
 
+    def test_get_text_for_voiceover_application(self):
+        self.login(self.reviewer_email)
+        response = self.get_json(
+            '/voiceoverapplicationtext/exploration/exp_id',
+            params={
+                'language_code': 'en'
+            })
+        self.assertEqual(response['text'], '')
+
+    def test_get_text_for_voiceover_application_for_invalid_lang_raise_error(
+            self):
+        self.login(self.reviewer_email)
+        response = self.get_json(
+            '/voiceoverapplicationtext/exploration/exp_id',
+            params={
+                'language_code': 'invalid'
+            }, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Translation for the give content_id content does not exist'
+            ' in invalid language code')
+
     def test_guest_cannot_submit_voiceover_application(self):
         csrf_token = self.get_new_csrf_token()
 

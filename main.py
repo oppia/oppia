@@ -226,7 +226,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/gettranslatabletexthandler',
         community_dashboard.TranslatableTextHandler),
     get_redirect_route(
-        r'/getvoiceoverapplicationtexthandler',
+        r'/voiceoverapplicationtext/<target_type>/<target_id>',
         voice_artist.VoiceoverApplicationTextHandler),
     get_redirect_route(
         r'/createvoiceoverapplicationhandler',

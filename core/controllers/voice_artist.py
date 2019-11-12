@@ -222,17 +222,9 @@ class VoiceoverApplicationTextHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_submit_voiceover_application
-    def get(self):
-        target_type = self.request.get('target_type')
-        target_id = self.request.get('target_id')
+    def get(self, target_type, target_id):
         language_code = self.request.get('language_code')
-        if target_type is None:
-            raise self.InvalidInputException(
-                'Invalid target type: %d' % target_type)
-        if target_id is None and not isinstance(
-                target_id, python_utils.BASESTRING):
-            raise self.InvalidInputException(
-                'Invalid target id: %d' % target_id)
+
         try:
             text = voiceover_services.get_text_to_create_voiceover_application(
                 target_type, target_id, language_code)
