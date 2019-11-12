@@ -20,12 +20,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import copy
+import datetime
 import inspect
 import itertools
 import json
 import os
 import unittest
-import datetime
 
 from constants import constants
 from core.domain import collection_domain
