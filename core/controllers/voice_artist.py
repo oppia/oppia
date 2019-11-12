@@ -191,6 +191,8 @@ class VoicoverApplicationHandler(base.BaseHandler):
         else:
             raise self.InvalidInputException('Invalid action.')
 
+        self.render_json({})
+
     @acl_decorators.can_submit_voiceover_application
     def post(self):
         raw_audio_file = self.request.get('raw_audio_file')
