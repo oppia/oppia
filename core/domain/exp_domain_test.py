@@ -38,7 +38,7 @@ import utils
 
 
 def mock_get_filename_with_dimensions(
-    unused_is_question, filename, unused_exp_id):
+        unused_is_question, filename, unused_exp_id):
     return html_validation_service.regenerate_image_filename_using_dimensions(
         filename, 490, 120)
 

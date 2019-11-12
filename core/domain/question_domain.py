@@ -237,6 +237,7 @@ class Question(python_utils.OBJECT):
         is default to None.
 
         Args:
+            question_id: str. Question id.
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
                 initalize a State domain object.
@@ -248,7 +249,7 @@ class Question(python_utils.OBJECT):
             add_dimensions_to_image_tags = functools.partial(
                 html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks, # pylint: disable=line-too-long
                 True, question_id)
-            question_state_dict[key] = state_domain.State.convert_html_fields_in_state(
+            question_state_dict[key] = state_domain.State.convert_html_fields_in_state( # pylint: disable=line-too-long
                 state_dict,
                 add_dimensions_to_image_tags)
 
@@ -256,7 +257,8 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def update_state_from_model(
-            cls, question_id, versioned_question_state, current_state_schema_version):
+            cls, question_id, versioned_question_state,
+            current_state_schema_version):
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.
@@ -264,8 +266,8 @@ class Question(python_utils.OBJECT):
         in-place.
 
         Args:
+            question_id: str. Question id.
             versioned_question_state: dict. A dict with two keys:
-                - question_id: str. The question id.
                 - state_schema_version: int. The state schema version for the
                     question.
                 - state: The State domain object representing the question
@@ -277,19 +279,18 @@ class Question(python_utils.OBJECT):
         versioned_question_state['state_schema_version'] = (
             next_state_schema_version)
 
-        if (current_state_schema_version == 30):
-            conversion_fn = (
-                getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
-                    question_id, 
-                    current_state_schema_version, 
-                    next_state_schema_version)))
-        else:
-            conversion_fn = (
+        conversion_fn = (
                 getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
                     current_state_schema_version, next_state_schema_version)))
 
-        versioned_question_state['state'] = conversion_fn(
-            versioned_question_state['state'])
+        if current_state_schema_version == 30:
+            versioned_question_state['state'] = conversion_fn(
+                question_id, versioned_question_state['state'])
+        else:
+            versioned_question_state['state'] = conversion_fn(
+                versioned_question_state['state'])
+
+        
 
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the

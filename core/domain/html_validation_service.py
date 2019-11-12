@@ -824,7 +824,7 @@ def add_dimensions_to_image_tags(is_question, exp_id, html_string):
     tags that have no filepath.
 
     Args:
-        is_question: bool. Whether entity is a Question. 
+        is_question: bool. Whether entity is a Question.
         exp_id: str. Exploration id.
         html_string: str. HTML string to modify.
 
@@ -883,7 +883,7 @@ def add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(
         modify_image_filename(is_question, id, collapsible_component_soup)
         collapsible_component['content-with-value'] = (
             escape_html(python_utils.UNICODE(collapsible_component_soup)
-            .replace('\'', '')))
+                        .replace('\'', '')))
 
     # To add dimensions to images inside the tab component.
     for tab_component in soup.findAll(
@@ -899,8 +899,9 @@ def add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(
         modify_image_filename(is_question, id, tab_component_soup)
         tab_component['tab_contents-with-value'] = (
             escape_html(python_utils.UNICODE(tab_component_soup)
-            .replace('\'', '')))
+                        .replace('\'', '')))
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
+
 
 def modify_image_filename(is_question, id, soup):
     """Modifies filenames of images. This is a helper method for
@@ -909,10 +910,8 @@ def modify_image_filename(is_question, id, soup):
     Args:
         is_question: bool. Whether entity is a Question.
         id: str. Exploration id or Question id.
-        soup: bs4.BeautifulSoup. The html soup whose image file is 
+        soup: bs4.BeautifulSoup. The html soup whose image file is
             to be renamed.
-    Yields:
-        Error message if the image fails to load.
     """
     for image in soup.findAll(name='oppia-noninteractive-image'):
         if (not image.has_attr('filepath-with-value') or
@@ -923,7 +922,7 @@ def modify_image_filename(is_question, id, soup):
         try:
             filename = (
                 json.loads(unescape_html(image['filepath-with-value']
-                .replace('\\"', ''))))
+                                         .replace('\\"', ''))))
             escaped_filename = escape_html(
                 json.dumps(
                     get_filename_with_dimensions(is_question, filename, id)))
@@ -934,25 +933,26 @@ def modify_image_filename(is_question, id, soup):
                 (id, image['filepath-with-value'].encode('utf-8')))
             raise e
 
-def get_filename_with_dimensions(is_question, old_filename, id):
+
+def get_filename_with_dimensions(is_question, old_filename, entity_id):
     """Gets the filename with dimensions of the image file in it.
 
     Args:
         is_question: bool. Whether entity is a Question.
         old_filename: str. Name of the file whose dimensions need to be
             calculated.
-        id: str. Exploration id or Question id.
+        entity_id: str. Exploration id or Question id.
 
     Returns:
         str. The new filename of the image file.
     """
     file_system_class = fs_services.get_entity_file_system_class()
-    if (is_question == True):
+    if is_question:
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_QUESTION, id))
+            feconf.ENTITY_TYPE_QUESTION, entity_id))
     else:
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, id))
+            feconf.ENTITY_TYPE_EXPLORATION, entity_id))
     filepath = 'image/%s' % old_filename
     try:
         content = fs.get(filepath.encode('utf-8'))

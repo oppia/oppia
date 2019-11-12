@@ -131,6 +131,7 @@ def _migrate_state_schema(question_id, versioned_question_state):
     to account for that new version.
 
     Args:
+        question_id: str. Question id.
         versioned_question_state: dict. A dict with two keys:
             state_schema_version: int. the state schema version for the
                 question.
