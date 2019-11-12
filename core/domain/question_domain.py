@@ -280,8 +280,8 @@ class Question(python_utils.OBJECT):
             next_state_schema_version)
 
         conversion_fn = (
-                getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
-                    current_state_schema_version, next_state_schema_version)))
+            getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
+                current_state_schema_version, next_state_schema_version)))
 
         if current_state_schema_version == 30:
             versioned_question_state['state'] = conversion_fn(
@@ -290,7 +290,7 @@ class Question(python_utils.OBJECT):
             versioned_question_state['state'] = conversion_fn(
                 versioned_question_state['state'])
 
-        
+
 
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the
