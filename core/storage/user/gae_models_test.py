@@ -113,7 +113,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
 
     def test_export_data_nonexistent_user(self):
         with self.assertRaises(user_models.UserSettingsModel
-                                          .EntityNotFoundError):
+                               .EntityNotFoundError):
             user_models.UserSettingsModel.export_data('fake_user')
 
     def test_export_data_trivial(self):
