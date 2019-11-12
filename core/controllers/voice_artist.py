@@ -27,6 +27,7 @@ from core.domain import voiceover_services
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 import mutagen
 from mutagen import mp3
@@ -201,7 +202,9 @@ class VoicoverApplicationHandler(base.BaseHandler):
         target_id = self.payload.get('target_id')
         language_code = self.payload.get('language_code')
         voiceover_content = self.payload.get('voiceover_content')
-        filename = self.payload.get('filename')
+        filename = (
+            self.user_id + utils.generate_random_string(6) + '.mp3')
+
         try:
             _save_audio_file(
                 raw_audio_file, filename,
