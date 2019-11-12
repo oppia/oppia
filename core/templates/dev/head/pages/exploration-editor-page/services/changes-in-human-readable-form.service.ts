@@ -102,8 +102,8 @@ export class ChangesInHumanReadableFormService {
     //   - 'Added Interaction: Continue',
     //   - 'Added interaction customizations']
     // - 'End': ['Ended exploration']
-
-    lostChanges.forEach((lostChange) => {
+    // TODO(#7176): Replace 'any' with the exact type.
+    lostChanges.forEach((lostChange: any) => {
       switch (lostChange.cmd) {
         case this.CMD_ADD_STATE:
           outerHtml.append(

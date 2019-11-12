@@ -44,7 +44,7 @@ export class ExplorationDiffService {
 
   // TODO(#7176): Replace 'any' with the exact type.
   _generateInitialStateIdsAndData(statesDict: Object):
-      {stateIds: any, stateData: any} {
+      { stateIds: any, stateData: any } {
     let result = {
       stateIds: {},
       stateData: {}
@@ -154,8 +154,8 @@ export class ExplorationDiffService {
     changeListData.forEach((changeListDatum) => {
       let changeList = changeListDatum.changeList;
       let directionForwards = changeListDatum.directionForwards;
-
-      changeList.forEach((change) => {
+      // TODO(#7176): Replace 'any' with the exact type.
+      changeList.forEach((change: any) => {
         if ((directionForwards && change.cmd === 'add_state') ||
             (!directionForwards && change.cmd === 'delete_state')) {
           if (!stateIds.hasOwnProperty(change.state_name)) {
