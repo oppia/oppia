@@ -1055,10 +1055,11 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
         # Decrease last exploration edited time by 13 hours.
         user_settings = user_services.get_user_settings(self.editor_id)
-        user_settings.last_edited_an_exploration = (
+        mocked_datetime_utcnow = (
             user_settings.last_edited_an_exploration -
             datetime.timedelta(hours=13))
-        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+            user_services.record_user_edited_an_exploration(self.editor_id)
 
         editor_settings = user_services.get_user_settings(self.editor_id)
         previous_last_edited_an_exploration = (
