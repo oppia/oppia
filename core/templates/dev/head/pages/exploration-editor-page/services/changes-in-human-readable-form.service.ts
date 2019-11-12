@@ -16,9 +16,10 @@
  * @fileoverview Service to get changes in human readable form.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { DOCUMENT } from '@angular/common';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { Inject, Injectable } from '@angular/core';
+
 import isEqual from 'lodash/isEqual';
 
 import { UtilsService } from 'services/utils.service';
