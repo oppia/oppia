@@ -1,0 +1,98 @@
+<div class="oppia-voiceover-application-header-container">
+  <div class="oppia-voiceover-application-header">
+    <div class="oppia-opportunities-details">
+      <div class="oppia-opportunities-subheading"><[subheading]></div>
+      <div class="oppia-opportunities-heading"><[heading]></div>
+    </div>
+  </div>
+</div>
+<div class="modal-body">
+  <div ng-if="!errorMessage">
+    <strong>Please voiceover the given content in <[languageDescription]> and upload the recorded audio file below:</strong>
+    <div class="oppia-voiceover-text-section">
+      <div class="oppia-loading-text" ng-if="loadingData">
+        <div class="oppia-loading-text1 oppia-animate-fadein">
+          <lazy-loading></lazy-loading>
+        </div>
+        <div class="oppia-loading-text2 oppia-animate-fadein">
+          <lazy-loading></lazy-loading>
+        </div>
+      </div>
+      <div ng-if="!loadingData">
+        <angular-html-bind html-data="textToVoiceover"
+                           class="oppia-rte-editor">
+        </angular-html-bind>
+      </div>
+    </div>
+    <div class="oppia-voiceover-upload-container">
+      <audio-file-uploader id="audioTranslationFileField"
+                           dropped-file="droppedFile"
+                           on-file-changed="updateUploadedFile"
+                           on-file-cleared="clearUploadedFile">
+      </audio-file-uploader>
+    </div>
+    <div class="oppia-login-required-message-container" ng-if="!userIsLoggedIn">
+      <div class="oppia-login-required-message">
+        Oops! You haven't logged in yet.
+        <br>
+        Log in <a style="color: #009688;" ng-click="$ctrl.onLoginButtonClicked()">here</a> to start contributing!
+      </div>
+    </div>
+  </div>
+  <div ng-if="errorMessage">
+    <[errorMessage]>
+  </div>
+</div>
+<div class="modal-footer" ng-if="userIsLoggedIn">
+  <button class="btn btn-light" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success oppia-submit-voiceover-application-button"
+          ng-if="!errorMessage"
+          ng-disabled="loadingData || uploadingVoiceoverApplication || !isAudioValid()"
+          ng-click="submitVoiceoverApplication()">
+    <i ng-show="uploadingVoiceoverApplication" class="fa fa-spinner"></i>
+    <span ng-show="!uploadingVoiceoverApplication">Submit</span>
+  </button>
+</div>
+<style>
+  .oppia-voiceover-application-header-container {
+    border-bottom: 1px solid #e5e5e5;
+    padding-left: 15px;
+  }
+  .oppia-voiceover-application-header,
+  .oppia-voiceover-text-section {
+    display: flex;
+    justify-content: space-between;
+  }
+  .oppia-voiceover-text-section {
+    border: 2px solid #aaa;
+    padding: 5px;
+  }
+  .oppia-loading-text {
+    height: 40px;
+    width: 100%;
+  }
+  .oppia-loading-text1 {
+    height: 50%;
+    width: 60%;
+  }
+  .oppia-loading-text2 {
+    height: 50%;
+    width: 40%;
+  }
+  .oppia-login-required-message-container {
+    padding: 50px;
+    text-align: center;
+  }
+  .oppia-login-required-message {
+    font-size: 28px;
+    color: #4a4a4a;
+  }
+  .oppia-submit-voiceover-application-button {
+    min-width: 75px;
+  }
+  .oppia-voiceover-upload-container {
+    padding: 5px;
+    margin-top: 10px;
+    min-height: 100px;
+  }
+</style>

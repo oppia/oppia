@@ -5,7 +5,15 @@
         <div class="oppia-contributions-navbar-item">
           <button class="oppia-contributions-navbar-button"
                   ng-click="$ctrl.switchToReviewTab()"
-                  ng-class="$ctrl.reviewTabActive ? 'oppia-contributions-active-navbar': ''"> Review Translations
+                  ng-class="$ctrl.reviewTabActive ? 'oppia-contributions-active-navbar': ''">
+            Review Translations
+          </button>
+        </div>
+        <div class="oppia-contributions-navbar-item">
+          <button class="oppia-contributions-navbar-button"
+                  ng-click="$ctrl.switchToReviewTab()"
+                  ng-class="$ctrl.reviewTabActive ? 'oppia-contributions-active-navbar': ''">
+            Review Voiceover Applications
           </button>
         </div>
       </div>
@@ -75,7 +83,7 @@
 
   contributions-and-review .oppia-contributions-side-navbar-part {
     height: 50%;
-    padding-top: 20%;
+    padding-top: 50px;
     width: 100%;
   }
 
@@ -86,6 +94,7 @@
   contributions-and-review .oppia-contributions-navbar-item {
     display: flex;
     flex-direction: column;
+    margin-top: 10px;
   }
 
   contributions-and-review .oppia-contributions-navbar-button {
@@ -94,13 +103,13 @@
     border-bottom-right-radius: 10px;
     border-top-right-radius: 10px;
     color: white;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     height: 28px;
-    margin-right: 20%;
-    padding-left: 20%;
+    margin-right: 15%;
+    padding-left: 15%;
     text-align: left;
-    width: 80%;
+    width: 85%;
   }
 
   contributions-and-review .oppia-contributions-active-navbar,
@@ -110,14 +119,13 @@
 
   contributions-and-review .oppia-contributions-navbar-items-list::before {
     border-bottom: 1px solid #fff;
-    bottom: 35px;
+    bottom: 10px;
     color: #fff;
     content: attr(navbar-label);
     font-size: 20px;
     font-weight: bold;
     margin-left: 10%;
-    position: absolute;
-    width: 90%;
+    position: relative;
   }
 
   contributions-and-review .oppia-login-required {

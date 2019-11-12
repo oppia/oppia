@@ -17,6 +17,8 @@
  */
 
 require(
+  'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
+require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
 
@@ -26,6 +28,9 @@ require(
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
+require(
+  'pages/community-dashboard-page/services/voiceover-application.service.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').directive('voiceoverOpportunities', [
   'UrlInterpolationService', function(
@@ -39,15 +44,32 @@ angular.module('oppia').directive('voiceoverOpportunities', [
       'translation-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ContributionOpportunitiesService',
-        'TranslationLanguageService', function(
-            $scope, ContributionOpportunitiesService,
-            TranslationLanguageService) {
+        '$scope', '$uibModal', 'AlertsService',
+        'ContributionOpportunitiesService', 'TranslationLanguageService',
+        'UserService', 'VoiceoverApplicationService', function(
+            $scope, $uibModal, AlertsService,
+            ContributionOpportunitiesService, TranslationLanguageService,
+            UserService, VoiceoverApplicationService) {
           var ctrl = this;
+          var userIsLoggedIn = false;
           ctrl.opportunities = [];
           ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
           ctrl.progressBarRequired = false;
+
+
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            userIsLoggedIn = userInfo.isLoggedIn();
+          });
+
+          var getOpportunitySummary = function(expId) {
+            for (var index in ctrl.opportunities) {
+              if (ctrl.opportunities[index].id === expId) {
+                return ctrl.opportunities[index];
+              }
+            }
+          };
+
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
               var opportunity = opportunities[index];
@@ -56,6 +78,7 @@ angular.module('oppia').directive('voiceoverOpportunities', [
               var heading = opportunity.chapter_title;
 
               ctrl.opportunities.push({
+                id: opportunity.id,
                 heading: heading,
                 subheading: subheading,
                 actionButtonTitle: 'Request to Voiceover'
@@ -82,6 +105,98 @@ angular.module('oppia').directive('voiceoverOpportunities', [
                 TranslationLanguageService.getActiveLanguageCode(),
                 updateWithNewOpportunities);
             }
+          };
+
+          ctrl.onClickButton = function(expId) {
+            var opportunity = getOpportunitySummary(expId);
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/community-dashboard-page/modal-templates/' +
+                'voiceover-application-modal.directive.html'),
+              backdrop: 'static',
+              size: 'lg',
+              resolve: {
+                opportunity: function() {
+                  return opportunity;
+                },
+                userIsLoggedIn: function() {
+                  return userIsLoggedIn;
+                }
+              },
+              controller: [
+                '$scope', '$uibModalInstance', 'opportunity', 'userIsLoggedIn',
+                function(
+                    $scope, $uibModalInstance, opportunity, userIsLoggedIn) {
+                  var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
+                    'There was an error uploading the audio file.');
+                  var uploadedFile = null;
+                  // Whether there was an error uploading the audio file.
+                  $scope.errorMessage = null;
+                  $scope.droppedFile = null;
+                  $scope.errorMessage = null;
+                  $scope.userIsLoggedIn = userIsLoggedIn;
+                  $scope.uploadingVoiceoverApplication = false;
+                  $scope.subheading = opportunity.subheading;
+                  $scope.heading = opportunity.heading;
+                  $scope.loadingData = true;
+                  $scope.languageDescription = (
+                    TranslationLanguageService.getActiveLanguageDescription());
+
+                  VoiceoverApplicationService.getTextToVoiceover(
+                    opportunity.id,
+                    TranslationLanguageService.getActiveLanguageCode())
+                    .then(function(text) {
+                      $scope.textToVoiceover = text;
+                      $scope.loadingData = false;
+                    }, function(error) {
+                      $scope.loadingData = false;
+                      $scope.errorMessage = error.data.error;
+                    });
+
+                  $scope.isAudioValid = function() {
+                    return (
+                      uploadedFile !== null &&
+                      uploadedFile.size !== null &&
+                      uploadedFile.size > 0);
+                  };
+
+                  $scope.updateUploadedFile = function(file) {
+                    $scope.errorMessage = null;
+                    uploadedFile = file;
+                  };
+
+                  $scope.clearUploadedFile = function() {
+                    $scope.errorMessage = null;
+                    uploadedFile = null;
+                  };
+
+                  $scope.submitVoiceoverApplication = function() {
+                    if ($scope.isAudioValid()) {
+                      $scope.uploadingVoiceoverApplication = true;
+
+                      VoiceoverApplicationService.submitApplication(
+                        'exploration', opportunity.id, $scope.textToVoiceover,
+                        TranslationLanguageService.getActiveLanguageCode(),
+                        uploadedFile
+                      ).then(function() {
+                        AlertsService.addSuccessMessage(
+                          'Your application got submitted successfully!');
+                        $uibModalInstance.close();
+                      }, function(errorResponse) {
+                        $scope.errorMessage = (
+                          errorResponse.error || ERROR_MESSAGE_BAD_FILE_UPLOAD);
+                        uploadedFile = null;
+                      });
+                    }
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                    AlertsService.clearWarnings();
+                  };
+                }
+              ]
+            });
           };
 
           ContributionOpportunitiesService.getVoiceoverOpportunities(
