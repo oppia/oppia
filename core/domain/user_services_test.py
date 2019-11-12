@@ -1099,12 +1099,10 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         after the last edited time check was introduced.
         """
         # Set up a 'previous-generation' user.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        user_settings.last_created_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
-
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertIsNone(owner_settings.last_created_an_exploration)
+
+        user_services.record_user_created_an_exploration(self.owner_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID_A, self.owner_id, end_state_name='End')
