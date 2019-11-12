@@ -155,9 +155,10 @@ angular.module('oppia').directive('learnerViewInfo', [
                     'background-color': expInfo.thumbnail_bg_color
                   };
                   $scope.titleWrapper = function(){
-                     var titleHeight = document.querySelectorAll(".oppia-info-card-logo-thumbnail")[0].clientWidth - 20;
+                     var titleHeight = document.querySelectorAll(".oppia-info-card-logo-thumbnail")[0].clientWidth-20;
                      var titleCss = {
-                        'word-wrap': 'break-word'; 'width':titleHeight.toString();
+                        'word-wrap': 'break-word',
+                        'width':titleHeight.toString()
                      };
                      return titleCss;
                   };
