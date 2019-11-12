@@ -20,14 +20,18 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_services
+from core.domain import story_domain
 from core.domain import story_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.tests import test_utils
 import feconf
 
@@ -2981,3 +2985,263 @@ class SaveExplorationTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
+
+
+class AccessVoiceoverApplicationsDecoratorTests(test_utils.GenericTestBase):
+    applicant_username = 'applicant'
+    applicant_email = 'applicant@example.com'
+    reviewer_username = 'reviewer'
+    reviewer_email = 'reviewer@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_access_voiceover_applications
+        def get(self, purpose):
+            self.render_json({'purpose': purpose})
+
+    def setUp(self):
+        super(AccessVoiceoverApplicationsDecoratorTests, self).setUp()
+        self.signup(self.applicant_email, self.applicant_username)
+        self.signup(self.reviewer_email, self.reviewer_username)
+
+        self.set_admins([self.reviewer_username])
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<purpose>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_unautheticated_user_cannot_access_applications_for_review(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/review', expected_status_int=401)
+
+    def test_unautheticated_user_cannot_access_applications_for_status(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/status', expected_status_int=401)
+
+    def test_non_admin_user_cannot_access_applications_for_review(self):
+        self.login(self.applicant_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/review', expected_status_int=401)
+
+    def test_admin_user_cannot_access_applications_for_review(self):
+        self.login(self.reviewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/review')
+        self.assertEqual(response['purpose'], 'review')
+
+
+class ReviewVoiceoverApplicationDecoratorTests(test_utils.GenericTestBase):
+    applicant_username = 'applicant'
+    applicant_email = 'applicant@example.com'
+    reviewer_username = 'reviewer'
+    reviewer_email = 'reviewer@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_review_voiceover_application
+        def get(self, voiceover_application_id):
+            self.render_json({'id': voiceover_application_id})
+
+    def setUp(self):
+        super(ReviewVoiceoverApplicationDecoratorTests, self).setUp()
+        self.signup(self.applicant_email, self.applicant_username)
+        self.signup(self.reviewer_email, self.reviewer_username)
+
+        self.set_admins([self.reviewer_username])
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/voiceoverappplicationactionhandler/'
+                '<voiceover_application_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_unautheticated_user_cannot_review_application(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/voiceoverappplicationactionhandler/123',
+                expected_status_int=401)
+
+    def test_non_admin_user_cannot_review_voiceover_application(self):
+        self.login(self.applicant_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/voiceoverappplicationactionhandler/123',
+                expected_status_int=401)
+
+    def test_admin_user_can_review_voiceover_application(self):
+        self.login(self.reviewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/voiceoverappplicationactionhandler/123')
+        self.assertEqual(response['id'], '123')
+
+
+class SubmitVoiceoverApplicationDecoratorTests(test_utils.GenericTestBase):
+    applicant_username = 'applicant'
+    applicant_email = 'applicant@example.com'
+    reviewer_username = 'reviewer'
+    reviewer_email = 'reviewer@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_submit_voiceover_application
+        def post(self):
+            self.render_json({'success': True})
+
+    def setUp(self):
+        super(SubmitVoiceoverApplicationDecoratorTests, self).setUp()
+        self.signup(self.applicant_email, self.applicant_username)
+        self.signup(self.reviewer_email, self.reviewer_username)
+
+        self.applicant_id = self.get_user_id_from_email(self.applicant_email)
+        self.reviewer_id = self.get_user_id_from_email(self.reviewer_email)
+        self.set_admins([self.reviewer_username])
+
+        self.TOPIC_ID = 'topic'
+        self.STORY_ID = 'story'
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            '0', title='title', category='category')
+        exp_services.save_new_exploration(self.reviewer_id, exploration)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id=self.TOPIC_ID, name='topic')
+        topic_services.save_new_topic(self.reviewer_id, topic)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, title='A story',
+            corresponding_topic_id=self.TOPIC_ID)
+        story_services.save_new_story(self.reviewer_id, story)
+        topic_services.add_canonical_story(
+            self.reviewer_id, self.TOPIC_ID, self.STORY_ID)
+        story_services.update_story(
+            self.reviewer_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/createvoiceoverapplicationhandler', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_guest_user_cannot_submit_application(self):
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/createvoiceoverapplicationhandler', {}, csrf_token=csrf_token,
+                expected_status_int=401)
+
+    def test_user_can_submit_voiceover_application(self):
+        self.login(self.applicant_email)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/createvoiceoverapplicationhandler', {}, csrf_token=csrf_token)
+
+    def test_user_cannot_submit_multiple_voiceover_application_at_a_time(self):
+        voiceover_services.create_new_voiceover_application(
+            'exploration', '0', 'en', '', 'audio_file.mp3', self.applicant_id)
+        self.login(self.applicant_email)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/createvoiceoverapplicationhandler', {}, csrf_token=csrf_token,
+                expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You can only submit one application at a time. '
+            'It looks like your latest application is not yet reviewed.')
+
+    def test_user_need_to_complete_voiceover_exploration_for_new_application(
+            self):
+        voiceover_services.create_new_voiceover_application(
+            'exploration', '0', 'en', '', 'audio_file.mp3', self.applicant_id)
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id))
+        voiceover_services.accept_voiceover_application(
+            user_voiceover_applications[0].voiceover_application_id,
+            self.reviewer_id)
+        self.login(self.applicant_email)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/createvoiceoverapplicationhandler', {}, csrf_token=csrf_token,
+                expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You cannot submit a new application until the lessons assigned '
+            'to you has complete voiceover.')
+
+    def test_user_can_submit_new_application_after_rejected_application(
+            self):
+        voiceover_services.create_new_voiceover_application(
+            'exploration', '0', 'en', '', 'audio_file.mp3', self.applicant_id)
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id))
+        voiceover_services.reject_voiceover_application(
+            user_voiceover_applications[0].voiceover_application_id,
+            self.reviewer_id, 'Review message')
+        self.login(self.applicant_email)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/createvoiceoverapplicationhandler', {}, csrf_token=csrf_token)
+
+    def test_user_after_complete_voiceover_can_submit_new_application(self):
+        voiceover_services.create_new_voiceover_application(
+            'exploration', '0', 'en', '', 'audio_file.mp3', self.applicant_id)
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id))
+        voiceover_services.accept_voiceover_application(
+            user_voiceover_applications[0].voiceover_application_id,
+            self.reviewer_id)
+
+        exp_services.update_exploration(
+            self.applicant_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                'state_name': 'Introduction',
+                'new_value': {
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'filename': 'audio.mp3',
+                                'needs_update': False,
+                                'file_size_bytes': 100
+                            }
+                        },
+                        'default_outcome': {
+                            'en': {
+                                'filename': 'audio2.mp3',
+                                'needs_update': False,
+                                'file_size_bytes': 100
+                            }
+                        }
+                    }
+                }
+            })], 'Complete voiceover in English')
+
+        self.login(self.applicant_email)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/createvoiceoverapplicationhandler', {}, csrf_token=csrf_token)
+        self.assertEqual(response['success'], True)

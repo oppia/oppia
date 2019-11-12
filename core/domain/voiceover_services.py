@@ -41,11 +41,12 @@ def _get_voiceover_application_class(target_type):
         Exception: The voiceover application target type is invalid.
     """
     target_type_to_classes = (
-        suggestion_registry.VOICEOVER_APPLICATION_TYPE_TO_DOMAIN_CLASSES)
+        suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
     if target_type in target_type_to_classes:
         return target_type_to_classes[target_type]
     else:
-        raise Exception('Invalid target type for voiceover application.')
+        raise Exception(
+            'Invalid target type for voiceover application: %s' % target_type)
 
 
 def _get_voiceover_application_model(voiceover_application):
@@ -129,16 +130,19 @@ def get_voiceover_application_by_id(voiceover_application_id):
     return _get_voiceover_application_from_model(voiceover_application_model)
 
 
-def get_reviewable_voiceover_applications():
-    """Returns a list of voiceover applications which needs review.
+def get_reviewable_voiceover_applications(user_id):
+    """Returns a list of voiceover applications which the given user can review.
+
+    Args:
+        user_id: str. The user ID of the reviewer.
 
     Returns:
         list(BaseVoiceoverApplication). A list of voiceover application which
-        needs review.
+        the given user can review.
     """
     voiceover_application_models = (
         suggestion_models.GeneralVoiceoverApplicationModel
-        .get_in_review_voiceover_applications())
+        .get_reviewable_voiceover_applications(user_id))
 
     return [
         _get_voiceover_application_from_model(model) for model in (
@@ -199,7 +203,8 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
             opportunity_services.get_exploration_opportunity_summaries_by_ids([
                 voiceover_application.target_id]))
         email_manager.send_accepted_voiceover_application_email(
-            voiceover_application.author_id, opportunity['0'].chapter_title,
+            voiceover_application.author_id,
+            opportunity[voiceover_application.target_id].chapter_title,
             voiceover_application.language_code)
     # Need to reject all other voiceover application for the same entity?
     # Add notification?
@@ -218,6 +223,11 @@ def reject_voiceover_application(
     """
     voiceover_application = get_voiceover_application_by_id(
         voiceover_application_id)
+    if reviewer_id == voiceover_application.author_id:
+        raise Exception(
+            'Applicants are not allowed to review their own '
+            'voiceover application.')
+
     reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
 
     voiceover_application.reject(reviewer.user_id, rejection_message)
@@ -229,7 +239,8 @@ def reject_voiceover_application(
             opportunity_services.get_exploration_opportunity_summaries_by_ids([
                 voiceover_application.target_id]))
         email_manager.send_rejected_voiceover_application_email(
-            voiceover_application.author_id, opportunity['0'].chapter_title,
+            voiceover_application.author_id,
+            opportunity[voiceover_application.target_id].chapter_title,
             voiceover_application.language_code, rejection_message)
 
 
@@ -279,4 +290,4 @@ def get_text_to_create_voiceover_application(
             return state.written_translations.get_translated_content(
                 state.content.content_id, language_code)
     else:
-        raise Exception('Invalid entity type.')
+        raise Exception('Invalid target type: %s' % target_type)

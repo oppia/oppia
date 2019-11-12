@@ -24,29 +24,45 @@ from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import user_services
 from core.domain import voiceover_services
+from core.platform import models
 import feconf
 import python_utils
+import utils
 
 import mutagen
 from mutagen import mp3
 
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
-def _save_audio_file(raw_audio_file, filename, entity_type, entity_id):
-    """
+
+def _save_audio_file(
+        raw_audio_file, filename, entity_type, entity_id, user_id):
+    """Saves the given audio file in file system.
+
+    Args:
+        raw_audio_file: *. The raw audio data.
+        filename: str. The filename of the audio.
+        entity_type: str. The type of entity to which the audio belongs.
+        entity_id: str. The id of the entity to which the audio belongs.
+        user_id: str. The ID of the user saving the audio.
+
+    Raises:
+        Exception: If audio not supplied.
+        Exception: If the filename extension is unsupported.
     """
     allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
     if not raw_audio_file:
-        raise self.InvalidInputException('No audio supplied')
+        raise Exception('No audio supplied')
     dot_index = filename.rfind('.')
     extension = filename[dot_index + 1:].lower()
 
     if dot_index == -1 or dot_index == 0:
-        raise self.InvalidInputException(
+        raise Exception(
             'No filename extension: it should have '
             'one of the following extensions: %s' % allowed_formats)
     if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
-        raise self.InvalidInputException(
+        raise Exception(
             'Invalid filename extension: it should have '
             'one of the following extensions: %s' % allowed_formats)
 
@@ -68,21 +84,19 @@ def _save_audio_file(raw_audio_file, filename, entity_type, entity_id):
         # seems to return None. It's not clear if this is always
         # the case. Occasionally, mutagen.File() also seems to
         # raise a MutagenError.
-        raise self.InvalidInputException('Audio not recognized '
-                                         'as a %s file' % extension)
+        raise Exception('Audio not recognized as a %s file' % extension)
     tempbuffer.close()
 
     if audio is None:
-        raise self.InvalidInputException('Audio not recognized '
-                                         'as a %s file' % extension)
+        raise Exception('Audio not recognized as a %s file' % extension)
     if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
-        raise self.InvalidInputException(
+        raise Exception(
             'Audio files must be under %s seconds in length. The uploaded '
             'file is %.2f seconds long.' % (
                 feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
     if len(set(audio.mime).intersection(
             set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
-        raise self.InvalidInputException(
+        raise Exception(
             'Although the filename extension indicates the file '
             'is a %s file, it was not recognized as one. '
             'Found mime types: %s' % (extension, audio.mime))
@@ -99,8 +113,7 @@ def _save_audio_file(raw_audio_file, filename, entity_type, entity_id):
     # in production.
     file_system_class = fs_services.get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
-    fs.commit(
-        self.user_id, 'audio/%s' % filename, raw_audio_file, mimetype=mimetype)
+    fs.commit(user_id, 'audio/%s' % filename, raw_audio_file, mimetype=mimetype)
 
 
 class AudioUploadHandler(base.BaseHandler):
@@ -113,9 +126,13 @@ class AudioUploadHandler(base.BaseHandler):
         """Saves an audio file uploaded by a content creator."""
         raw_audio_file = self.request.get('raw_audio_file')
         filename = self.payload.get('filename')
-        _save_audio_file(
-            raw_audio_file, filename, feconf.ENTITY_TYPE_EXPLORATION,
-            exploration_id)
+        try:
+            _save_audio_file(
+                raw_audio_file, filename, feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id, self.user_id)
+        except Exception as e:
+            raise self.InvalidInputException(e)
+
         self.render_json({'filename': filename})
 
 
@@ -130,21 +147,23 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
         self.render_json({})
 
 
-class VoicoverApplicationHandler(base.BaseHandler):
+class UserVoicoverApplicationsHandler(base.BaseHandler):
+    """Handler for the voiceover applications submitted by the user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_voiceover_application
+    @acl_decorators.can_access_voiceover_applications
     def get(self, purpose):
         """Handles GET requests."""
         if purpose == feconf.VOICEOVER_APPLICATION_REVIEW:
             voiceover_applications = (
-                voiceover_services.get_reviewable_voiceover_applications())
+                voiceover_services.get_reviewable_voiceover_applications(
+                    self.user_id))
         elif purpose == feconf.VOICEOVER_APPLICATION_STATUS:
             status = self.request.get('status')
             voiceover_applications = (
                 voiceover_services.get_user_submitted_voiceover_applications(
-                    self.user_id, status))
+                    self.user_id, status=status))
         else:
             raise self.PageNotFoundException
 
@@ -154,14 +173,18 @@ class VoicoverApplicationHandler(base.BaseHandler):
         }
         self.render_json(self.values)
 
+
+class VoicoverApplicationHandler(base.BaseHandler):
+    """Handler for the voiceover application."""
+
     @acl_decorators.can_review_voiceover_application
     def put(self, voiceover_application_id):
 
-        action = self.request.get('action')
+        action = self.payload.get('action')
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
             voiceover_services.accept_voiceover_application(
-                voiceover_application_id, self.user)
+                voiceover_application_id, self.user_id)
         elif action == suggestion_models.ACTION_TYPE_REJECT:
             review_message = self.payload.get('review_message')
             voiceover_services.reject_voiceover_application(
@@ -169,41 +192,45 @@ class VoicoverApplicationHandler(base.BaseHandler):
         else:
             raise self.InvalidInputException('Invalid action.')
 
+        self.render_json({})
+
     @acl_decorators.can_submit_voiceover_application
     def post(self):
-        target_type = self.request.get('target_type')
-        target_id = self.request.get('target_id')
-        language_code = self.request.get('language_code')
         raw_audio_file = self.request.get('raw_audio_file')
-        filename = self.payload.get('filename')
-        voiceover_application = (
+
+        target_type = self.payload.get('target_type')
+        target_id = self.payload.get('target_id')
+        language_code = self.payload.get('language_code')
+        voiceover_content = self.payload.get('voiceover_content')
+        filename = (
+            self.user_id + utils.generate_random_string(6) + '.mp3')
+
+        try:
+            _save_audio_file(
+                raw_audio_file, filename,
+                feconf.ENTITY_TYPE_VOICEOVER_APPLICATION, target_id,
+                self.user_id)
             voiceover_services.create_new_voiceover_application(
-                target_type, target_id, language_code, content, filename,
-                self.user_id))
-        _save_audio_file(
-            raw_audio_file, filename, feconf.ENTITY_TYPE_VOICEOVER_APPLICATION,
-            exploration_id)
-        voiceover_services.save_voiceover_application(voiceover_application)
+                target_type, target_id, language_code, voiceover_content,
+                filename, self.user_id)
+        except Exception as e:
+            raise self.InvalidInputException(e)
+
+        self.render_json({})
 
 
 class VoiceoverApplicationTextHandler(base.BaseHandler):
+    """Handler for voiceover application content."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_submit_voiceover_application
-    def get(self):
-        target_type = self.request.get('target_type')
-        target_id = self.request.get('target_id')
-        if target_type is None:
-            raise self.InvalidInputException(
-                'Invalid target type: %d' % target_type)
-        if target_id is None and not isinstance(
-                target_id, python_utils.BASESTRING):
-            raise self.InvalidInputException(
-                'Invalid target id: %d' % target_id)
+    def get(self, target_type, target_id):
+        language_code = self.request.get('language_code')
+
         try:
             text = voiceover_services.get_text_to_create_voiceover_application(
-                target_type, target_id)
+                target_type, target_id, language_code)
         except Exception as e:
             raise self.InvalidInputException(e)
         self.render_json({'text': text})

@@ -336,58 +336,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return user_data
 
 
-class ReviewerRotationTrackingModel(base_models.BaseModel):
-    """Model to keep track of the position in the reviewer rotation. This model
-    is keyed by the score category.
-    """
-
-    # The ID of the user whose turn is just completed in the rotation.
-    current_position_in_rotation = ndb.StringProperty(
-        required=True, indexed=False)
-
-    @staticmethod
-    def get_deletion_policy():
-        """Reviewer rotation tracking is going to be reworked. Thus, using
-        not applicable for now.
-        """
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @classmethod
-    def create(cls, score_category, user_id):
-        """Creates a new ReviewerRotationTrackingModel instance.
-
-        Args:
-            score_category: str. The score category.
-            user_id: str. The ID of the user who completed their turn in the
-                rotation for the given category.
-
-        Raises:
-            Exception: There is already an instance with the given id.
-        """
-        if cls.get_by_id(score_category):
-            raise Exception(
-                'There already exists an instance with the given id: %s' % (
-                    score_category))
-        cls(id=score_category, current_position_in_rotation=user_id).put()
-
-    @classmethod
-    def update_position_in_rotation(cls, score_category, user_id):
-        """Updates current position in rotation for the given score_category.
-
-        Args:
-            score_category: str. The score category.
-            user_id: str. The ID of the user who completed their turn in the
-                rotation for the given category.
-        """
-        instance = cls.get_by_id(score_category)
-
-        if instance is None:
-            cls.create(score_category, user_id)
-        else:
-            instance.current_position_in_rotation = user_id
-            instance.put()
-
-
 class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     """A general model for voiceover application of an entity.
 
@@ -406,7 +354,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     # The HTML content written in the given language_code.
     # This will typically be a snapshot of the content of the initial card of
     # the target.
-    content = ndb.StringProperty(required=True, indexed=True)
+    content = ndb.TextProperty(required=True)
     # The filename of the voiceover audio. The filename will have
     # datetime-randomId(length 6)-language_code.mp3 pattern.
     filename = ndb.StringProperty(required=True, indexed=True)
@@ -416,7 +364,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     final_reviewer_id = ndb.StringProperty(indexed=True)
     # The plain text message submitted by the reviewer while rejecting the
     # application.
-    rejection_message = ndb.StringProperty(indexed=True)
+    rejection_message = ndb.TextProperty()
 
     @staticmethod
     def get_deletion_policy():
@@ -454,9 +402,11 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         """
         if status in STATUS_CHOICES:
             return cls.query(ndb.AND(
-                cls.author_id == author_id, cls.status == status)).fetch()
+                cls.author_id == author_id, cls.status == status)).order(
+                    -cls.created_on).fetch()
         else:
-            return cls.query(cls.author_id == author_id).fetch()
+            return cls.query(cls.author_id == author_id).order(
+                -cls.created_on).fetch()
 
     @classmethod
     def get_reviewable_voiceover_applications(cls, user_id):

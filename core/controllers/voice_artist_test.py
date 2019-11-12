@@ -17,12 +17,21 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
 
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import story_domain
+from core.domain import story_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -288,7 +297,205 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
             expected_status_int=200)
 
 
-class VoicoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
+class VoiceoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
+    """Unit text for voiceover application handlers."""
+    applicant_username = 'applicant'
+    applicant_email = 'applicant@example.com'
+    reviewer_username = 'reviewer'
+    reviewer_email = 'reviewer@example.com'
+    TEST_AUDIO_FILE_MP3 = 'cafe.mp3'
 
     def setUp(self):
-        pass
+        super(VoiceoverApplicationHandlerUnitTest, self).setUp()
+        self.signup(self.applicant_email, self.applicant_username)
+        self.signup(self.reviewer_email, self.reviewer_username)
+
+        self.set_admins([self.reviewer_username])
+        self.applicant_id = self.get_user_id_from_email(self.applicant_email)
+        self.reviewer_id = self.get_user_id_from_email(self.reviewer_email)
+
+        self.TOPIC_ID = 'topic'
+        self.STORY_ID = 'story'
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', title='title', category='category')
+        exp_services.save_new_exploration(self.reviewer_id, exploration)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id=self.TOPIC_ID, name='topic')
+        topic_services.save_new_topic(self.reviewer_id, topic)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, title='A story',
+            corresponding_topic_id=self.TOPIC_ID)
+        story_services.save_new_story(self.reviewer_id, story)
+        topic_services.add_canonical_story(
+            self.reviewer_id, self.TOPIC_ID, self.STORY_ID)
+        story_services.update_story(
+            self.reviewer_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': 'exp_id'
+            })], 'Changes.')
+
+        voiceover_services.create_new_voiceover_application(
+            'exploration', 'exp_id', 'en', '<p>Some content</p>', 'audio.mp3',
+            self.applicant_id)
+        self.voiceover_application = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id)[0])
+
+    def test_get_text_for_voiceover_application(self):
+        self.login(self.reviewer_email)
+        response = self.get_json(
+            '/voiceoverapplicationtext/exploration/exp_id',
+            params={
+                'language_code': 'en'
+            })
+        self.assertEqual(response['text'], '')
+
+    def test_get_text_for_voiceover_application_for_invalid_lang_raise_error(
+            self):
+        self.login(self.reviewer_email)
+        response = self.get_json(
+            '/voiceoverapplicationtext/exploration/exp_id',
+            params={
+                'language_code': 'invalid'
+            }, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Translation for the give content_id content does not exist'
+            ' in invalid language code')
+
+    def test_guest_cannot_submit_voiceover_application(self):
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+            mode='rb', encoding=None) as f:
+            raw_audio = f.read()
+
+        response = self.post_json(
+            '/createvoiceoverapplicationhandler', {
+                'target_type': 'exploration',
+                'target_id': '0',
+                'language_code': 'en',
+                'voiceover_content': '<p>Some content</p>',
+            }, csrf_token=csrf_token,
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)],
+            expected_status_int=401
+        )
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to submit voiceover application.')
+
+    def test_users_can_submit_voiceover_application(self):
+        self.signup('contributor@community.com', 'contributor')
+        self.login('contributor@community.com')
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+            mode='rb', encoding=None) as f:
+            raw_audio = f.read()
+
+        self.post_json(
+            '/createvoiceoverapplicationhandler', {
+                'target_type': 'exploration',
+                'target_id': '0',
+                'language_code': 'en',
+                'voiceover_content': '<p>Some content</p>',
+            }, csrf_token=csrf_token,
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
+        )
+        self.logout()
+
+    def test_users_cannot_submit_voiceover_application_for_invalid_lang(self):
+        self.signup('contributor@community.com', 'contributor')
+        self.login('contributor@community.com')
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+            mode='rb', encoding=None) as f:
+            raw_audio = f.read()
+
+        response = self.post_json(
+            '/createvoiceoverapplicationhandler', {
+                'target_type': 'exploration',
+                'target_id': '0',
+                'language_code': 'invalid',
+                'voiceover_content': '<p>Some content</p>',
+            }, csrf_token=csrf_token,
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)],
+            expected_status_int=400
+        )
+        self.assertEqual(response['error'], 'Invalid language_code: invalid')
+
+    def test_admin_can_accept_voiceover_application(self):
+        self.login(self.reviewer_email)
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '/voiceoverappplicationactionhandler/%s' % (
+                self.voiceover_application.voiceover_application_id),
+            {'action': 'accept'}, csrf_token=csrf_token)
+
+        voiceover_application = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id)[0])
+        self.assertEqual(voiceover_application.status, 'accepted')
+
+    def test_admin_can_reject_voiceover_application(self):
+        self.login(self.reviewer_email)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/voiceoverappplicationactionhandler/%s' % (
+                self.voiceover_application.voiceover_application_id), {
+                    'action': 'reject',
+                    'review_message': 'Rejected'
+                }, csrf_token=csrf_token)
+        voiceover_application = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id)[0])
+        self.assertEqual(voiceover_application.status, 'rejected')
+        self.assertEqual(voiceover_application.rejection_message, 'Rejected')
+
+    def test_admin_cannot_perform_invalid_action_on_voiceover_application(self):
+        self.login(self.reviewer_email)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/voiceoverappplicationactionhandler/%s' % (
+                self.voiceover_application.voiceover_application_id),
+            {'action': 'invalid'}, csrf_token=csrf_token,
+            expected_status_int=400)
+
+    def test_get_voiceover_application_for_review_purpose(self):
+        self.login(self.reviewer_email)
+        response = self.get_json('/getsubmittedvoiceoverapplication/review')
+        self.assertEqual(len(response['voiceover_applications']), 1)
+        response_voiceover_application = response['voiceover_applications'][0]
+        self.assertEqual(
+            response_voiceover_application['voiceover_application_id'],
+            self.voiceover_application.voiceover_application_id)
+
+    def test_get_voiceover_application_for_status_purpose(self):
+        self.login(self.applicant_email)
+        response = self.get_json('/getsubmittedvoiceoverapplication/status')
+        self.assertEqual(len(response['voiceover_applications']), 1)
+        response_voiceover_application = response['voiceover_applications'][0]
+        self.assertEqual(
+            response_voiceover_application['voiceover_application_id'],
+            self.voiceover_application.voiceover_application_id)
+
+    def test_get_voiceover_application_for_unknown_purpose(self):
+        self.login(self.reviewer_email)
+        self.get_json(
+            '/getsubmittedvoiceoverapplication/invalid',
+            expected_status_int=404)

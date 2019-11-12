@@ -79,11 +79,11 @@ def run_performance_test(test_name, xvfb_prefix):
         xvfb_prefix: str. The XVFB prefix.
     """
     if xvfb_prefix:
-        subprocess.call([
+        subprocess.check_call([
             xvfb_prefix, 'python', '-m', 'scripts.run_backend_tests',
             '--test_target=core.tests.performance_tests.%s' % test_name])
     else:
-        subprocess.call([
+        subprocess.check_call([
             'python', '-m', 'scripts.run_backend_tests',
             '--test_target=core.tests.performance_tests.%s' % test_name])
 
@@ -138,7 +138,7 @@ def main(args=None):
         # This installs xvfb for systems with apt-get installer like Ubuntu, and
         # will fail for other systems.
         # TODO(gvishal): Install/provide xvfb for other systems.
-        subprocess.call(['sudo', 'apt-get', 'install', 'xvfb'])
+        subprocess.check_call(['sudo', 'apt-get', 'install', 'xvfb'])
         xvfb_prefix = '/usr/bin/xvfb-run'
 
     # If an argument is present then run test for that specific page. Otherwise

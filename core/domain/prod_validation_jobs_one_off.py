@@ -53,6 +53,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 import feconf
 import python_utils
@@ -3403,7 +3404,7 @@ class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
         Returns:
             *: A domain object to validate.
         """
-        return suggestion_services.get_voiceover_application(item.id)
+        return voiceover_services.get_voiceover_application_by_id(item.id)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -3418,32 +3419,6 @@ class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
             external_instance_details['final_reviewer_ids'] = (
                 user_models.UserSettingsModel, [item.final_reviewer_id])
         return external_instance_details
-
-
-class ReviewerRotationTrackingModelValidator(BaseModelValidator):
-    """Class for validating ReviewerRotationTrackingModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        # Valid id: same as score category.
-        regex_string = '^(%s)$' % ('|').join(ALLOWED_SCORE_CATEGORIES)
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        question_ids = []
-        split_id = item.id.split(suggestion_models.SCORE_CATEGORY_DELIMITER)
-        if len(split_id) == 2 and (
-                split_id[0] == suggestion_models.SCORE_TYPE_QUESTION):
-            question_ids = [split_id[1]]
-        return {
-            'user_ids': (
-                user_models.UserSettingsModel,
-                [item.current_position_in_rotation]),
-            'question_ids': (
-                question_models.QuestionModel,
-                question_ids)
-        }
 
 
 class TopicModelValidator(BaseModelValidator):
@@ -5190,8 +5165,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
     suggestion_models.GeneralSuggestionModel: GeneralSuggestionModelValidator,
     suggestion_models.GeneralVoiceoverApplicationModel: (
         GeneralVoiceoverApplicationModelValidator),
-    suggestion_models.ReviewerRotationTrackingModel: (
-        ReviewerRotationTrackingModelValidator),
     topic_models.TopicModel: TopicModelValidator,
     topic_models.TopicSnapshotMetadataModel: (
         TopicSnapshotMetadataModelValidator),
@@ -5837,14 +5810,6 @@ class GeneralVoiceoverApplicationModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [suggestion_models.GeneralVoiceoverApplicationModel]
-
-
-class ReviewerRotationTrackingModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates ReviewerRotationTrackingModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [suggestion_models.ReviewerRotationTrackingModel]
 
 
 class TopicModelAuditOneOffJob(ProdValidationAuditOneOffJob):

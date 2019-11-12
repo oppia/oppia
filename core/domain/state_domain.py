@@ -1063,6 +1063,21 @@ class RecordedVoiceovers(python_utils.OBJECT):
 
         return cls(voiceovers_mapping)
 
+    def has_complete_voiceover(self, language_code):
+        """Whether there exist complete voiceover in the given language.
+
+        Args:
+            language_code: str. The code of the language.
+
+        Returns:
+            bool. Returns true if the object has complete voiceover in the give
+            language.
+        """
+        for content_id in self.voiceovers_mapping:
+            if not language_code in self.voiceovers_mapping[content_id]:
+                return False
+        return True
+
     def validate(self, expected_content_id_list):
         """Validates properties of the RecordedVoiceovers.
 
