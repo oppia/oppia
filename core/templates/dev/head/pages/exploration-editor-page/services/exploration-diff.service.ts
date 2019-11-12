@@ -146,7 +146,7 @@ export class ExplorationDiffService {
    * number, and false if changes are compared in decreasing version number.
    */
   // TODO(#7176): Replace 'any' with the exact type.
-  _getDiffGraphData(v1States: any, v2States: any, changeListData: any) {
+  _getDiffGraphData(v1States: any, v2States: any, changeListData: any): any {
     let v1Info = this._generateInitialStateIdsAndData(v1States);
     let stateData = v1Info.stateData;
     let stateIds = v1Info.stateIds;
@@ -267,7 +267,7 @@ export class ExplorationDiffService {
   // TODO(#7176): Replace 'any' with the exact type.
   _compareLinks(
       v1States: any, originalStateIds: Array<string>,
-      v2States: any, newestStateIds: Array<string>) {
+      v2States: any, newestStateIds: Array<string>): Array<any> {
     let links = [];
     let adjMatrixV1 = this._getAdjMatrix(v1States, originalStateIds,
       this._maxId);
@@ -291,7 +291,7 @@ export class ExplorationDiffService {
     return links;
   }
   // TODO(#7176): Replace 'any' with the exact type.
-  getDiffGraphData(oldStates: any, newStates: any, changeListData: any) {
+  getDiffGraphData(oldStates: any, newStates: any, changeListData: any): any {
     return this._getDiffGraphData(
       oldStates,
       newStates,
