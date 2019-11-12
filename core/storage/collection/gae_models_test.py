@@ -197,6 +197,19 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_collection_ids, collection_ids)
 
+    def test_export_data_on_invalid_user(self):
+        """Test for empty lists when the user_id is invalid."""
+        collection_ids = (
+            collection_models.CollectionRightsModel.export_data(
+                'fake_user'))
+        expected_collection_ids = {
+            'owned_collection_ids': [],
+            'editable_collection_ids': [],
+            'voiced_collection_ids': [],
+            'viewable_collection_ids': []
+        }
+        self.assertEqual(expected_collection_ids, collection_ids)
+
 
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionCommitLogEntryModel class."""
