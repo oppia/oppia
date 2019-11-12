@@ -202,7 +202,8 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
             opportunity_services.get_exploration_opportunity_summaries_by_ids([
                 voiceover_application.target_id]))
         email_manager.send_accepted_voiceover_application_email(
-            voiceover_application.author_id, opportunity['0'].chapter_title,
+            voiceover_application.author_id,
+            opportunity[voiceover_application.target_id].chapter_title,
             voiceover_application.language_code)
     # Need to reject all other voiceover application for the same entity?
     # TODO(#7969): Add notification to the user's dashboard for the accepted
