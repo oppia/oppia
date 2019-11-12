@@ -20,7 +20,7 @@ import {TestBed} from '@angular/core/testing';
 import {LoggerService} from '../../services/contextual/logger.service';
 import {StopwatchObjectFactory} from './StopwatchObjectFactory';
 
-describe('Stopwatch object factory', function() {
+fdescribe('Stopwatch object factory', function() {
   describe('stopwatch object factory', function() {
     let stopwatchObjectFactory: StopwatchObjectFactory = null;
     let errorLog = [];
@@ -30,7 +30,6 @@ describe('Stopwatch object factory', function() {
       stopwatchObjectFactory = TestBed.get(StopwatchObjectFactory);
       log = TestBed.get(LoggerService);
       spyOn(log, 'error').and.callFake((errorMessage) => {
-        console.log('Spy triggered', errorMessage);
         errorLog.push(errorMessage);
         return errorMessage;
       });
