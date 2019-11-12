@@ -967,7 +967,8 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         """
         # Set up a 'previous-generation' user.
         self.login(self.VIEWER_EMAIL)
-        mocked_datetime_utcnow = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        current_datetime = datetime.datetime.utcnow()
+        mocked_datetime_utcnow = current_datetime - datetime.timedelta(days=1)
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             user_services.record_user_logged_in(self.viewer_id)
             user_settings = user_services.get_user_settings(self.viewer_id)
