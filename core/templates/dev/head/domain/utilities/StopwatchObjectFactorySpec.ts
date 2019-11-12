@@ -20,7 +20,7 @@ import {TestBed} from '@angular/core/testing';
 import {LoggerService} from '../../services/contextual/logger.service';
 import {StopwatchObjectFactory} from './StopwatchObjectFactory';
 
-fdescribe('Stopwatch object factory', function() {
+describe('Stopwatch object factory', function() {
   describe('stopwatch object factory', function() {
     let stopwatchObjectFactory: StopwatchObjectFactory = null;
     let errorLog = [];
