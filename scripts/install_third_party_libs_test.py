@@ -122,13 +122,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         check_function_calls = {
             'chdir_is_called': False,
             'mkdir_is_called': False,
-            'check_call_is_called': False,
+            'call_is_called': False,
             'copytree_is_called': False
         }
         expected_check_function_calls = {
             'chdir_is_called': True,
             'mkdir_is_called': True,
-            'check_call_is_called': True,
+            'call_is_called': True,
             'copytree_is_called': True
         }
         expected_lines_in_print_arr = [
@@ -142,8 +142,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             check_function_calls['chdir_is_called'] = True
         def mock_mkdir(unused_path):
             check_function_calls['mkdir_is_called'] = True
-        def mock_check_call(unused_cmd_tokens):
-            check_function_calls['check_call_is_called'] = True
+        def mock_call(unused_cmd_tokens):
+            check_function_calls['call_is_called'] = True
         def mock_copytree(unused_path1, unused_path2):
             check_function_calls['copytree_is_called'] = True
         # pylint: disable=unused-argument
@@ -158,7 +158,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         chdir_swap = self.swap(os, 'chdir', mock_chdir)
         mkdir_swap = self.swap(os, 'mkdir', mock_mkdir)
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        check_call_swap = self.swap(subprocess, 'call', mock_call)
         copytree_swap = self.swap(shutil, 'copytree', mock_copytree)
         input_swap = self.swap(fileinput, 'input', mock_input)
 
