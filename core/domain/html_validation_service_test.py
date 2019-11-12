@@ -120,7 +120,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags(
-                    exp_id, test_case['html_content']),
+                    False, exp_id, test_case['html_content']),
                 test_case['expected_output'])
 
     # pylint: disable=anomalous-backslash-in-string
@@ -230,7 +230,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
-                    exp_id, test_case['html_content']),
+                    False, exp_id, test_case['html_content']),
                 test_case['expected_output'])
 
     def test_add_dimensions_to_image_tags_with_invalid_filepath_with_value(
@@ -265,7 +265,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         with assert_raises_context_manager, logging_swap:
             html_validation_service.add_dimensions_to_image_tags(
-                exp_id, html_content)
+                False, exp_id, html_content)
 
         self.assertEqual(len(observed_log_messages), 1)
         self.assertEqual(
@@ -334,7 +334,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags(
-                    exp_id, test_case['html_content']),
+                    False, exp_id, test_case['html_content']),
                 test_case['expected_output'])
 
     def test_regenerate_image_filename_using_dimensions(self):

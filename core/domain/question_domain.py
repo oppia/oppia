@@ -19,16 +19,16 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import functools
 
 from constants import constants
 from core.domain import change_domain
-from core.domain import html_validation_service
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
 import feconf
-import functools
 import python_utils
 import utils
 
@@ -230,7 +230,8 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v30_dict_to_v31_dict(cls, question_state_dict):
+    def _convert_state_v30_dict_to_v31_dict(
+            cls, question_id, question_state_dict):
         """Converts from version 30 to 31. Version 31 replaces
         tagged_misconception_id with tagged_skill_misconception_id, which
         is default to None.
@@ -246,8 +247,8 @@ class Question(python_utils.OBJECT):
         for key, state_dict in question_state_dict.items():
             add_dimensions_to_image_tags = functools.partial(
                 html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks, # pylint: disable=line-too-long
-                exp_id)
-            states_dict[key] = state_domain.State.convert_html_fields_in_state(
+                True, question_id)
+            question_state_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags)
 
@@ -255,7 +256,7 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def update_state_from_model(
-            cls, versioned_question_state, current_state_schema_version):
+            cls, question_id, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.
@@ -264,6 +265,7 @@ class Question(python_utils.OBJECT):
 
         Args:
             versioned_question_state: dict. A dict with two keys:
+                - question_id: str. The question id.
                 - state_schema_version: int. The state schema version for the
                     question.
                 - state: The State domain object representing the question
@@ -271,11 +273,20 @@ class Question(python_utils.OBJECT):
             current_state_schema_version: int. The current state
                 schema version.
         """
+        next_state_schema_version = current_state_schema_version + 1
         versioned_question_state['state_schema_version'] = (
-            current_state_schema_version + 1)
+            next_state_schema_version)
 
-        conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
-            current_state_schema_version, current_state_schema_version + 1))
+        if (current_state_schema_version == 30):
+            conversion_fn = (
+                getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
+                    question_id, 
+                    current_state_schema_version, 
+                    next_state_schema_version)))
+        else:
+            conversion_fn = (
+                getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
+                    current_state_schema_version, next_state_schema_version)))
 
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])

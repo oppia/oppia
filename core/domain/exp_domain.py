@@ -2160,7 +2160,7 @@ class Exploration(python_utils.OBJECT):
         for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
                 html_validation_service.add_dimensions_to_image_tags, # pylint: disable=line-too-long
-                exp_id)
+                False, exp_id)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags)
@@ -2170,7 +2170,7 @@ class Exploration(python_utils.OBJECT):
                 state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath'] = (
                         html_validation_service.get_filename_with_dimensions(
-                            filename, exp_id))
+                            False, filename, exp_id))
 
         return states_dict
 
@@ -2349,7 +2349,7 @@ class Exploration(python_utils.OBJECT):
         for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
                 html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks, # pylint: disable=line-too-long
-                exp_id)
+                False, exp_id)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags)
