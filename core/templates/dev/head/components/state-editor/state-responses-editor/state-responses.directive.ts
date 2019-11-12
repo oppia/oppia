@@ -565,7 +565,8 @@ angular.module('oppia').directive('stateResponses', [
 
           $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {
             ResponsesService.updateDefaultOutcome({
-              feedback: updatedOutcome.feedback
+              feedback: updatedOutcome.feedback,
+              dest: updatedOutcome.dest
             }, function(newDefaultOutcome) {
               $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
             });
