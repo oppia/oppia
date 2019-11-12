@@ -179,7 +179,9 @@ def install_skulpt(parsed_args):
                     line.replace('ret = rununits(opt=True)', 'ret = 0'),
                     end='')
 
-            subprocess.check_call(['python', skulpt_filepath, 'dist'])
+            # NB: Check call cannot be used because the commands above make the
+            # git tree for skulpt dirty.
+            subprocess.call(['python', skulpt_filepath, 'dist'])
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)

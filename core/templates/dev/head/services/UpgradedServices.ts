@@ -35,6 +35,8 @@ import { ExplorationHtmlFormatterService } from
 import { ExtensionTagAssemblerService }
   from 'services/extension-tag-assembler.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
+import { FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -42,11 +44,15 @@ import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from
+  'domain/objects/UnitsObjectFactory';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -81,6 +87,8 @@ export class UpgradedServices {
       new LoggerService()),
     'MetaTagCustomizationService': new MetaTagCustomizationService(
       new WindowRef()),
+    'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
+      new UnitsObjectFactory(), new FractionObjectFactory()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
     'SolutionObjectFactory': new SolutionObjectFactory(
@@ -94,7 +102,7 @@ export class UpgradedServices {
     'ValidatorsService': new ValidatorsService(
       new AlertsService(new LoggerService()), new NormalizeWhitespacePipe(
         new UtilsService())),
-    'WindowDimensionsService': new WindowDimensionsService(),
+    'WindowDimensionsService': new WindowDimensionsService()
   };
 }
 
