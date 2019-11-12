@@ -43,6 +43,10 @@ import { MetaTagCustomizationService } from
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
+import { SolutionObjectFactory } from
+  'domain/exploration/SolutionObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -79,6 +83,12 @@ export class UpgradedServices {
       new WindowRef()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'SolutionObjectFactory': new SolutionObjectFactory(
+      new SubtitledHtmlObjectFactory(), new ExplorationHtmlFormatterService(
+        new CamelCaseToHyphensPipe(), new ExtensionTagAssemblerService(
+          new HtmlEscaperService(new LoggerService()),
+          new CamelCaseToHyphensPipe()), new HtmlEscaperService(
+          new LoggerService()))),
     'UrlService': new UrlService(new WindowRef()),
     'UtilsService': new UtilsService(),
     'ValidatorsService': new ValidatorsService(
