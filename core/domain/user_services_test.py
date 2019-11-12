@@ -1116,10 +1116,10 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
 
         # Decrease last exploration created time by 13 hours.
         user_settings = user_services.get_user_settings(self.owner_id)
-        user_settings.last_created_an_exploration = (
+        with self.mock_datetime_utcnow(
             user_settings.last_created_an_exploration -
-            datetime.timedelta(hours=13))
-        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+            datetime.timedelta(hours=13)):
+            user_services.record_user_created_an_exploration(self.owner_id)
 
         owner_settings = user_services.get_user_settings(self.owner_id)
         previous_last_created_an_exploration = (
