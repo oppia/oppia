@@ -1049,6 +1049,23 @@ class Exploration(python_utils.OBJECT):
         state_names = list(self.states.keys())
         return state_name in state_names
 
+    def has_complete_voiceover(self, language_code):
+        """Whether the exploration has complete voiceover in the given language.
+
+        Args:
+            language_code: str. The code of the language.
+
+        Returns:
+            bool. Returns true if the exploration has complete voiceover in the
+            give language.
+        """
+        for state in self.states.values():
+            if not state.recorded_voiceovers.has_complete_voiceover(
+                    language_code):
+                return False
+
+        return True
+
     def get_interaction_id_by_state_name(self, state_name):
         """Returns the interaction id of the state.
 

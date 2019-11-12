@@ -375,3 +375,9 @@ class VoicoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             response_voiceover_application['voiceover_application_id'],
             self.voiceover_application.voiceover_application_id)
+
+    def test_get_voiceover_application_for_unknown_purpose(self):
+        self.login(self.reviewer_email)
+        self.get_json(
+            '/getsubmittedvoiceoverapplication/invalid',
+            expected_status_int=404)

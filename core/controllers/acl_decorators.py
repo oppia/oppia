@@ -2749,12 +2749,12 @@ def can_submit_voiceover_application(handler):
                             suggestion_models.TARGET_TYPE_EXPLORATION):
                         exploration = exp_fetchers.get_exploration_by_id(
                             latest_voiceover_application.target_id)
-                        if exploration.get_translation_progress(
+                        if exploration.has_complete_voiceover(
                                 latest_voiceover_application.language_code):
                             return handler(self, **kwargs)
                         else:
                             raise self.UnauthorizedUserException(
-                                'You can submit a new application until the '
+                                'You cannot submit a new application until the '
                                 'lessons assigned to you has complete '
                                 'voiceover.')
                 else:
