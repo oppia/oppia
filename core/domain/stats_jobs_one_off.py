@@ -170,8 +170,9 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     'Details: %s.' % (key, audit_data['reference_error']),)
 
 
-class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job to regenerate missing stats models for explorations with
+class RegenerateMissingV1StatsModelsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to regenerate missing v1 stats models for explorations with
     correct v1 stats from previous versions.
 
     Note that job RecomputeStatisticsOneOffJob must be run immediately after
@@ -1238,8 +1239,9 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                         key, state_name, all_state_hit[state_name]),)
 
 
-class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job to regenerate stats models which were missing due to
+class RegenerateMissingV2StatsModelsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to regenerate v2 stats models which were missing due to
     incorrect handling of exploration reverts. If a model is missing at version
     x, we will regenerate all models from version x-1 till the max version of
     the exploration.

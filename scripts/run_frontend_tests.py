@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import os
 import subprocess
+import sys
 
 import python_utils
 
@@ -54,8 +55,9 @@ def main(args=None):
     setup.main(args=[])
     setup_gae.main(args=[])
 
-    install_third_party_libs.maybe_install_dependencies(
-        parsed_args.skip_install, parsed_args.run_minified_tests)
+    if not parsed_args.skip_install:
+        install_third_party_libs.main()
+
     common.print_each_string_after_two_new_lines([
         'View interactive frontend test coverage reports by navigating to',
         '../karma_coverage_reports',
@@ -64,21 +66,26 @@ def main(args=None):
 
     build.main(args=[])
 
-    subprocess.call([
+    cmd = [
         os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-        'start', os.path.join('core', 'tests', 'karma.conf.ts')])
+        'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+
+    task = subprocess.Popen(cmd)
+    task.communicate()
+    task.wait()
 
     if parsed_args.run_minified_tests is True:
         python_utils.PRINT('Running test in production environment')
 
         build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
-        subprocess.call([
+        subprocess.check_call([
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
             '--prodEnv'])
 
     python_utils.PRINT('Done!')
+    sys.exit(task.returncode)
 
 
 if __name__ == '__main__':

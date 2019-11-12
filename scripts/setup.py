@@ -13,12 +13,12 @@
 # limitations under the License.
 
 """Python execution environent set up for all scripts."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
-import shutil
 import sys
 import tarfile
 
@@ -30,18 +30,6 @@ from . import common
 _PARSER = argparse.ArgumentParser(description="""
 Python execution environent set up for all scripts.
 """)
-
-
-def delete_directory_tree(directory_path):
-    """Recursively delete an existing directory tree. Does not do anything if
-    directory does not exists.
-
-    Args:
-        directory_path: str. Directory path to be deleted.
-    """
-    if not os.path.exists(directory_path):
-        return
-    shutil.rmtree(directory_path)
 
 
 def create_directory(directory_path):
@@ -80,6 +68,21 @@ def test_python_version():
                 'pythonpath-in-windows-7'])
         # Exit when no suitable Python environment can be found.
         raise Exception
+
+
+def download_and_install_package(url_to_retrieve, filename):
+    """Downloads and installs package in Oppia tools directory.
+
+    Args:
+        url_to_retrieve: string. The url from which package is to be
+            downloaded.
+        filename: string. The name of the tar file.
+    """
+    python_utils.url_retrieve(url_to_retrieve, filename=filename)
+    tar = tarfile.open(name=filename)
+    tar.extractall(path=common.OPPIA_TOOLS_DIR)
+    tar.close()
+    os.remove(filename)
 
 
 def main(args=None):
@@ -134,13 +137,9 @@ def main(args=None):
             else:
                 node_file_name = 'node-v10.15.3-linux-x86'
 
-        python_utils.url_retrieve(
+        download_and_install_package(
             'https://nodejs.org/dist/v10.15.3/%s.tar.gz' % node_file_name,
-            filename='node-download.tgz')
-        tar = tarfile.open(name='node-download.tgz')
-        tar.extractall(path=common.OPPIA_TOOLS_DIR)
-        tar.close()
-        os.remove('node-download.tgz')
+            'node-download.tgz')
         os.rename(
             os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
             common.NODE_PATH)
@@ -162,16 +161,12 @@ def main(args=None):
             'do *NOT* use npm. For more information on how to use yarn,',
             'visit https://yarnpkg.com/en/docs/usage.'])
 
+        # NB: Update .yarnrc if the yarn version below is changed.
         yarn_version = 'v1.17.3'
         yarn_file_name = 'yarn-%s.tar.gz' % yarn_version
-        python_utils.url_retrieve(
+        download_and_install_package(
             'https://github.com/yarnpkg/yarn/releases/download/%s/%s'
-            % (yarn_version, yarn_file_name),
-            filename=yarn_file_name)
-        tar = tarfile.open(name=yarn_file_name)
-        tar.extractall(path=common.OPPIA_TOOLS_DIR)
-        tar.close()
-        os.remove(yarn_file_name)
+            % (yarn_version, yarn_file_name), yarn_file_name)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.
@@ -206,5 +201,7 @@ def main(args=None):
     python_utils.PRINT('Environment setup completed.')
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when setup.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

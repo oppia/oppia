@@ -29,6 +29,10 @@ var ProfilePage = function() {
     by.css('.protractor-test-profile-interest'));
   var interestPlaceholder = element(
     by.css('.protractor-test-profile-no-interest'));
+  var allExplorationCardElements = element.all(
+    by.css('.protractor-test-exploration-dashboard-card'));
+  var createdExplorationStat = element.all(
+    by.css('.protractor-test-profile-created-stat'));
 
   this.get = function(userName) {
     browser.get('/profile/' + userName);
@@ -72,6 +76,35 @@ var ProfilePage = function() {
 
   this.expectUserToNotHaveInterestPlaceholder = function() {
     expect(interestPlaceholder.isPresent()).toBe(false);
+  };
+
+  this.expectToHaveExplorationCards = function() {
+    allExplorationCardElements.then(function(cards) {
+      if (cards.length === 0) {
+        throw 'There is no exploration card on this profile';
+      }
+      expect(cards.length).toBeGreaterThan(0);
+    });
+  };
+
+  this.expectToHaveExplorationCardByName = function(explorationName) {
+    var explorationsCardByName = allExplorationCardElements.filter(
+      function(card) {
+        var cardTitle = card.element(
+          by.css('.protractor-test-exp-summary-tile-title'));
+        return cardTitle.getText().then(function(title) {
+          return (title === explorationName);
+        });
+      });
+
+    if (explorationsCardByName.length === 0) {
+      throw 'There is no exploration card with name ' + explorationName;
+    }
+    expect(explorationsCardByName.count()).toBeGreaterThanOrEqual(1);
+  };
+
+  this.expectToHaveCreatedExplorationStat = function(expectedStat) {
+    expect(createdExplorationStat.getText()).toMatch(expectedStat);
   };
 };
 

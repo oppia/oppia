@@ -27,14 +27,18 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import question_fetchers
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import skill_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -138,6 +142,32 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_cannot_load_new_structures_data_in_production_mode(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'Cannot load new structures data in production.')
+        with assert_raises_regexp_context_manager, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_new_structures_data'
+                }, csrf_token=csrf_token)
+        self.logout()
+
+    def test_non_admins_cannot_load_new_structures_data(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        assert_raises_regexp = self.assertRaisesRegexp(
+            Exception, 'User does not have enough rights to generate data.')
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_new_structures_data'
+                }, csrf_token=csrf_token)
+        self.logout()
+
     def test_cannot_reload_collection_in_production_mode(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -187,6 +217,35 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             ]
         )
 
+        self.logout()
+
+    def test_load_new_structures_data(self):
+        self.set_admins([self.ADMIN_USERNAME])
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_new_structures_data'
+            }, csrf_token=csrf_token)
+        topic_summaries = topic_services.get_all_topic_summaries()
+        self.assertEqual(len(topic_summaries), 2)
+        for summary in topic_summaries:
+            if summary.name == 'Dummy Topic 1':
+                topic_id = summary.id
+        story_id = (
+            topic_fetchers.get_topic_by_id(
+                topic_id).canonical_story_references[0].story_id)
+        self.assertIsNotNone(
+            story_fetchers.get_story_by_id(story_id, strict=False))
+        skill_summaries = skill_services.get_all_skill_summaries()
+        self.assertEqual(len(skill_summaries), 3)
+        questions, _, _ = (
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+                10, [
+                    skill_summaries[0].id, skill_summaries[1].id,
+                    skill_summaries[2].id], '')
+        )
+        self.assertEqual(len(questions), 3)
         self.logout()
 
     def test_flush_migration_bot_contributions_action(self):

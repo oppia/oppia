@@ -16,8 +16,8 @@
  * @fileoverview Directive for warning_loader.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').directive('warningLoader', [
   'UrlInterpolationService',

@@ -3,13 +3,11 @@
 </div>
 
 <div class="modal-body">
-  <p>
-    Merging into skill: <[selectedSkill.description]>
-  </p>
   <div class="skills">
-    <skills-list skill-summaries="skillSummaries" in-modal="true"
-                 selected-skill="selectedSkill">
-    </skills-list>
+    <select-skill sorted-skill-summaries="skillSummaries"
+                  selected-skill-id="selectedSkillId"
+                  count-of-skills-to-prioritize="0">
+    </select-skill>
   </div>
 </div>
 

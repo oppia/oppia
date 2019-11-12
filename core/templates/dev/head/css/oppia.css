@@ -607,6 +607,10 @@ textarea {
   Styles for the link to the site feedback form.
 */
 .oppia-site-feedback {
+  background-color: #fff;
+  border-radius: 2px;
+  bottom: 4px;
+  color: rgba(0,0,0,0.87);
   cursor: pointer;
   left: 4px;
   opacity: 0.5;
@@ -1806,6 +1810,14 @@ pre.oppia-pre-wrapped-text {
   max-width: 550px;
 }
 
+.toast-success {
+  background-color: #28a745;
+}
+
+.toast-info {
+  background-color: #337ab7;
+}
+
 .tooltip {
   font-size: 12px;
 }
@@ -2986,7 +2998,7 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
-.oppia-improvement-card {
+.oppia-improvement-task {
   background-color: #fff;
   margin-bottom: 30px;
   margin-left: auto;
@@ -2995,7 +3007,7 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 32px 32px 24px 32px;
 }
 
-.oppia-improvement-closed-card {
+.oppia-improvement-closed-task {
   background-color: #dadada;
   margin-bottom: 30px;
   margin-left: auto;
@@ -3004,29 +3016,29 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 32px 32px 24px 32px;
 }
 
-.oppia-improvement-card-header {
+.oppia-improvement-task-header {
   padding: 0 0 24px 0;
   display: flex;
 }
 
-.oppia-improvement-closed-card-header {
+.oppia-improvement-closed-task-header {
   padding: 0;
   display: flex;
 }
 
-.oppia-improvement-card-header-title {
+.oppia-improvement-task-header-title {
   flex-grow: 1;
   padding: 0;
   padding-right: 32px;
   margin: 0;
 }
 
-.oppia-improvement-card-header-status-pill {
+.oppia-improvement-task-header-status-pill {
   flex-grow: 0;
   text-align: right;
 }
 
-.oppia-improvement-card-footer {
+.oppia-improvement-task-footer {
   padding: 24px 0 0 0;
   text-align: right;
 }

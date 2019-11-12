@@ -18,7 +18,7 @@
  */
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
@@ -143,6 +143,21 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
           }).then(function() {
             ctrl.setStatusMessage(
               'Dummy explorations generated successfully.');
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+          AdminTaskManagerService.finishTask();
+        };
+
+        ctrl.loadNewStructuresData = function() {
+          AdminTaskManagerService.startTask();
+          ctrl.setStatusMessage('Processing...');
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'generate_dummy_new_structures_data'
+          }).then(function() {
+            ctrl.setStatusMessage(
+              'Dummy new structures data generated successfully.');
           }, function(errorResponse) {
             ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);

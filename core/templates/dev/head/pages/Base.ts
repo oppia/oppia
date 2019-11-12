@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('domain/sidebar/SidebarStatusService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
-require('services/CsrfTokenService.ts');
-require('services/contextual/DocumentAttributeCustomizationService.ts');
-require('services/contextual/MetaTagCustomizationService.ts');
-require('services/contextual/UrlService.ts');
-require('services/stateful/BackgroundMaskService.ts');
+require('domain/sidebar/sidebar-status.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
+require('services/csrf-token.service.ts');
+require('services/contextual/document-attribute-customization.service.ts');
+require('services/contextual/meta-tag-customization.service.ts');
+require('services/contextual/url.service.ts');
+require('services/stateful/background-mask.service.ts');
 
 require('app.constants.ajs.ts');
 

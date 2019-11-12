@@ -19,12 +19,13 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
-require('domain/editor/undo_redo/BaseUndoRedoService.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/editor/undo_redo/base-undo-redo.service.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/summary/exploration-summary-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
+require('services/alerts.service.ts');
+require('services/contextual/url.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -36,12 +37,14 @@ angular.module('oppia').directive('storyEditorNavbar', [
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'UndoRedoService', 'StoryEditorStateService', 'UrlService',
+        'ExplorationSummaryBackendApiService', 'UndoRedoService',
+        'StoryEditorStateService', 'UrlService',
         'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
-            UndoRedoService, StoryEditorStateService, UrlService,
+            ExplorationSummaryBackendApiService, UndoRedoService,
+            StoryEditorStateService, UrlService,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.story = StoryEditorStateService.getStory();
@@ -70,6 +73,30 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           var _validateStory = function() {
             $scope.validationIssues = $scope.story.validate();
+            _validateExplorations();
+          };
+
+          var _validateExplorations = function() {
+            var nodes = $scope.story.getStoryContents().getNodes();
+            var explorationIds = [];
+            for (var i = 0; i < nodes.length; i++) {
+              if (
+                nodes[i].getExplorationId() !== null &&
+                nodes[i].getExplorationId() !== '') {
+                explorationIds.push(nodes[i].getExplorationId());
+              } else {
+                $scope.validationIssues.push(
+                  'Some chapters don\'t have exploration IDs provided.');
+              }
+            }
+
+            ExplorationSummaryBackendApiService.loadPublicExplorationSummaries(
+              explorationIds).then(function(summaries) {
+              if (summaries.length !== explorationIds.length) {
+                $scope.validationIssues.push(
+                  'Some explorations in story are not published.');
+              }
+            });
           };
 
           $scope.saveChanges = function() {
