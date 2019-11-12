@@ -37,7 +37,7 @@ angular.module('oppia').factory('UrlInterpolationService', [
       // Ensure that resourcePath starts with a forward slash.
       if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
         AlertsService.fatalWarning(
-            'Path must start with \'\/\': \'' + resourcePath + '\'.');
+          'Path must start with \'\/\': \'' + resourcePath + '\'.');
       }
     };
 
@@ -50,7 +50,7 @@ angular.module('oppia').factory('UrlInterpolationService', [
         if (hashes[resourcePath]) {
           var index = resourcePath.lastIndexOf('.');
           return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
-              resourcePath.slice(index));
+                  resourcePath.slice(index));
         }
       }
       return resourcePath;
@@ -98,17 +98,17 @@ angular.module('oppia').factory('UrlInterpolationService', [
       interpolateUrl: function(urlTemplate, interpolationValues) {
         if (!urlTemplate) {
           AlertsService.fatalWarning(
-              'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
+            'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
           return null;
         }
 
         // http://stackoverflow.com/questions/4775722
         if (!(interpolationValues instanceof Object) || (
-            Object.prototype.toString.call(
-                interpolationValues) === '[object Array]')) {
+          Object.prototype.toString.call(
+            interpolationValues) === '[object Array]')) {
           AlertsService.fatalWarning(
-              'Expected an object of interpolation values to be passed into ' +
-              'interpolateUrl.');
+            'Expected an object of interpolation values to be passed into ' +
+            'interpolateUrl.');
           return null;
         }
 
@@ -122,7 +122,7 @@ angular.module('oppia').factory('UrlInterpolationService', [
         if (urlTemplate.match(INVALID_VARIABLE_REGEX) ||
             urlTemplate.match(EMPTY_VARIABLE_REGEX)) {
           AlertsService.fatalWarning(
-              'Invalid URL template received: \'' + urlTemplate + '\'');
+            'Invalid URL template received: \'' + urlTemplate + '\'');
           return null;
         }
 
@@ -131,7 +131,7 @@ angular.module('oppia').factory('UrlInterpolationService', [
           var value = interpolationValues[varName];
           if (!UtilsService.isString(value)) {
             AlertsService.fatalWarning(
-                'Parameters passed into interpolateUrl must be strings.');
+              'Parameters passed into interpolateUrl must be strings.');
             return null;
           }
 
@@ -146,12 +146,12 @@ angular.module('oppia').factory('UrlInterpolationService', [
           var currentVarName = match[1];
           if (!escapedInterpolationValues.hasOwnProperty(currentVarName)) {
             AlertsService.fatalWarning('Expected variable \'' + currentVarName +
-                '\' when interpolating URL.');
+              '\' when interpolating URL.');
             return null;
           }
           filledUrl = filledUrl.replace(
-              INTERPOLATION_VARIABLE_REGEX,
-              escapedInterpolationValues[currentVarName]);
+            INTERPOLATION_VARIABLE_REGEX,
+            escapedInterpolationValues[currentVarName]);
           match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
         }
         return filledUrl;
@@ -200,10 +200,10 @@ angular.module('oppia').factory('UrlInterpolationService', [
       getInteractionThumbnailImageUrl: function(interactionId) {
         if (!interactionId) {
           AlertsService.fatalWarning(
-              'Empty interactionId passed in getInteractionThumbnailImageUrl.');
+            'Empty interactionId passed in getInteractionThumbnailImageUrl.');
         }
         return getExtensionResourceUrl('/interactions/' + interactionId +
-            '/static/' + interactionId + '.png');
+          '/static/' + interactionId + '.png');
       },
 
       /**

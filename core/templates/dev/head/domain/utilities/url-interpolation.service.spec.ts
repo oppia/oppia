@@ -68,7 +68,7 @@ describe('URL Interpolation Service', function() {
     expect(
       uis._getCompleteUrl('/test_folder', '/path_test/hash_test.html')).toBe(
       '/build/test_folder/path_test/hash_test.' +
-        hashes['/path_test/hash_test.html'] + '.html'
+      hashes['/path_test/hash_test.html'] + '.html'
     );
     expect(uis._getCompleteUrl('/test_folder', '/hash_test.min.js')).toBe(
       '/build/test_folder/hash_test.min.' + hashes['/hash_test.min.js'] + '.js'
@@ -94,20 +94,20 @@ describe('URL Interpolation Service', function() {
   it('should throw an error for erroneous interpolation values', function() {
     expect(uis.interpolateUrl.bind(null, 'url', null)).toThrow(
       new Error('Expected an object of interpolation values to be passed ' +
-            'into interpolateUrl.'));
+        'into interpolateUrl.'));
     expect(uis.interpolateUrl.bind(null, 'url', undefined)).toThrow(
       new Error('Expected an object of interpolation values to be passed ' +
-            'into interpolateUrl.'));
+        'into interpolateUrl.'));
     expect(
       uis.interpolateUrl.bind(null, '/test_url/<param>', 'value')
     ).toThrow(new Error(
       'Expected an object of interpolation values to be passed into ' +
-        'interpolateUrl.'));
+      'interpolateUrl.'));
     expect(
       uis.interpolateUrl.bind(null, '/test_url/<param>', ['value'])
     ).toThrow(new Error(
       'Expected an object of interpolation values to be passed into ' +
-        'interpolateUrl.'));
+      'interpolateUrl.'));
   });
 
   it('should interpolate URLs not requiring parameters', function() {
@@ -142,7 +142,7 @@ describe('URL Interpolation Service', function() {
   });
 
   it('should interpolate parameters within words or adjacent to other ' +
-      'parameters', function() {
+     'parameters', function() {
     // It also doesn't need to have '/' prefixing the URL.
     expect(uis.interpolateUrl('word<with_param>', {
       with_param: '_with_value'
@@ -154,7 +154,7 @@ describe('URL Interpolation Service', function() {
   });
 
   it('should interpolate parameters beginning, ending, or composing ' +
-      'the URL', function() {
+     'the URL', function() {
     expect(uis.interpolateUrl('<prefix>_with_words', {
       prefix: 'Signs'
     })).toBe('Signs_with_words');
@@ -265,7 +265,7 @@ describe('URL Interpolation Service', function() {
       '/build/assets/images/test_url/test.png');
     expect(uis.getStaticImageUrl('/hash_test.png')).toBe(
       '/build/assets/images/hash_test.' + hashes['/images/hash_test.png'] +
-        '.png');
+      '.png');
 
     expect(uis.getStaticVideoUrl('/test.mp4')).toBe(
       '/build/assets/videos/test.mp4');
@@ -273,13 +273,13 @@ describe('URL Interpolation Service', function() {
       '/build/assets/videos/test_url/test.mp4');
     expect(uis.getStaticVideoUrl('/hash_test.mp4')).toBe(
       '/build/assets/videos/hash_test.' + hashes['/videos/hash_test.mp4'] +
-        '.mp4');
+      '.mp4');
 
     expect(uis.getInteractionThumbnailImageUrl('LogicProof')).toBe(
       '/build/extensions/interactions/LogicProof/static/LogicProof.png');
     expect(uis.getInteractionThumbnailImageUrl('interTest')).toBe(
       '/build/extensions/interactions/interTest/static/interTest.' +
-        hashes['/interactions/interTest/static/interTest.png'] + '.png');
+      hashes['/interactions/interTest/static/interTest.png'] + '.png');
 
     expect(uis.getDirectiveTemplateUrl('/test.html')).toBe(
       '/build/templates/head/test.html');
@@ -287,7 +287,7 @@ describe('URL Interpolation Service', function() {
       '/build/templates/head/test_url/test.html');
     expect(uis.getDirectiveTemplateUrl('/pages_test/hash_test.html')).toBe(
       '/build/templates/head/pages_test/hash_test.' +
-        hashes['/pages_test/hash_test.html'] + '.html');
+      hashes['/pages_test/hash_test.html'] + '.html');
 
     expect(uis.getStaticAssetUrl('/test.json')).toBe(
       '/build/assets/test.json');
@@ -295,7 +295,7 @@ describe('URL Interpolation Service', function() {
       '/build/assets/test_url/test.json');
     expect(uis.getStaticAssetUrl('/assets_test/hash_test.json')).toBe(
       '/build/assets/assets_test/hash_test.' +
-        hashes['/assets_test/hash_test.json'] + '.json');
+      hashes['/assets_test/hash_test.json'] + '.json');
 
     expect(uis.getFullStaticAssetUrl(
       '/assets/msapplication-large.png')).toBe(
@@ -313,7 +313,7 @@ describe('URL Interpolation Service', function() {
       '/build/extensions/test_url/test.html');
     expect(uis.getExtensionResourceUrl('/path_test/hash_test.html')).toBe(
       '/build/extensions/path_test/hash_test.' +
-        hashes['/path_test/hash_test.html'] + '.html');
+      hashes['/path_test/hash_test.html'] + '.html');
   });
 
   it('should throw an error for empty path', function() {

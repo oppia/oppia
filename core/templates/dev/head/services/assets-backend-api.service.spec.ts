@@ -144,7 +144,7 @@ describe('Assets Backend API Service', function() {
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
         '/assetsdevhandler/exploration/<exploration_id>/assets/audio/' +
-                '<filename>', {
+        '<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
@@ -166,7 +166,7 @@ describe('Assets Backend API Service', function() {
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
         '/assetsdevhandler/exploration/<exploration_id>/assets/image/' +
-                '<filename>', {
+        '<filename>', {
           exploration_id: '0',
           filename: 'myfile.png'
         });
@@ -189,7 +189,7 @@ describe('Assets Backend API Service', function() {
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
         '/assetsdevhandler/exploration/<exploration_id>/assets/audio/' +
-                '<filename>', {
+        '<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
