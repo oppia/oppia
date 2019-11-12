@@ -130,10 +130,7 @@ class UserSettingsModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from UserSettingsModel.
         """
-        try:
-            user = UserSettingsModel.get(user_id)
-        except UserSettingsModel.EntityNotFoundError:
-            return {}
+        user = UserSettingsModel.get(user_id)
         return {
             'email': user.email,
             'role': user.role,

@@ -112,8 +112,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
 
     def test_export_data_nonexistent_user(self):
-        user_data = user_models.UserSettingsModel.export_data('fake_user')
-        self.assertEqual(user_data, {})
+        with self.assertRaises(user_models.UserSettingsModel.EntityNotFoundError):
+            user_data = user_models.UserSettingsModel.export_data('fake_user')
 
     def test_export_data_trivial(self):
         user = user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
