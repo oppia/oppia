@@ -20,6 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { CamelCaseToHyphensPipe } from
@@ -38,7 +40,10 @@ import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
@@ -46,6 +51,8 @@ import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
@@ -85,6 +92,18 @@ export class UpgradedServices {
     'GenerateContentIdService': new GenerateContentIdService(),
     'HtmlEscaperService': new HtmlEscaperService(
       new LoggerService()),
+    'InteractionObjectFactory': new InteractionObjectFactory(
+      new AnswerGroupObjectFactory(new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()),
+      new RuleObjectFactory()), new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()), new SolutionObjectFactory(
+        new SubtitledHtmlObjectFactory(), new ExplorationHtmlFormatterService(
+          new CamelCaseToHyphensPipe(), new ExtensionTagAssemblerService(
+            new HtmlEscaperService(new LoggerService()),
+            new CamelCaseToHyphensPipe()), new HtmlEscaperService(
+            new LoggerService()))), new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory())
+    ),
     'MetaTagCustomizationService': new MetaTagCustomizationService(
       new WindowRef()),
     'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
