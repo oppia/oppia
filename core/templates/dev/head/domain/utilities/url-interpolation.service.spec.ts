@@ -216,13 +216,13 @@ fdescribe('URL Interpolation Service', () => {
   //     name: 'value\nmultiple lines'
   //   })).toEqual('/test_url/value%0Amultiple%20lines');
   // });
-  //
-  // it('should throw an error for missing parameters', () => {
-  //   expect(uis.interpolateUrl(null, '/test_url/<page>')).toThrow(
-  //     new Error('Expected variable \'page\' when interpolating URL.'));
-  //   expect(uis.interpolateUrl(null, '/test_url/<page1>')).toThrow(new Error(
-  //     'Expected variable \'page1\' when interpolating URL.'));
-  // });
+
+  it('should throw an error for missing parameters', () => {
+    expect(uis.interpolateUrl(null, '/test_url/<page>')).toThrow(
+      new Error('Expected variable \'page\' when interpolating URL.'));
+    expect(uis.interpolateUrl(null, '/test_url/<page1>')).toThrow(new Error(
+      'Expected variable \'page1\' when interpolating URL.'));
+  });
   //
   // it('should throw an error for non-string parameters', () => {
   //   expect(uis.interpolateUrl(null, '/test_url/<page>')).toThrow(new Error(
@@ -330,44 +330,44 @@ fdescribe('URL Interpolation Service', () => {
   //   expect(uis.getExtensionResourceUrl(null)).toThrow(
   //     new Error('Empty path passed in method.'));
   // });
-
-  it('should throw an error for path not beginning with forward slash',
-    () => {
-      expect(uis.getStaticImageUrl(null)).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
-      expect(uis.getStaticImageUrl(null)).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
-
-      expect(uis.getStaticVideoUrl(null)).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
-      expect(uis.getStaticVideoUrl(null)).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
-
-      expect(uis.getDirectiveTemplateUrl(null)).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
-      expect(
-        uis.getDirectiveTemplateUrl(null)).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
-
-      expect(uis.getStaticAssetUrl(null)).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
-      expect(uis.getStaticAssetUrl(null)).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
-
-      expect(uis.getExtensionResourceUrl(null)).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
-      expect(
-        uis.getExtensionResourceUrl(null)).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
-    });
+  //
+  // it('should throw an error for path not beginning with forward slash',
+  //   () => {
+  //     expect(uis.getStaticImageUrl(null)).toThrow(
+  //       new Error(
+  //         'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
+  //     expect(uis.getStaticImageUrl(null)).toThrow(
+  //       new Error(
+  //         'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
+  //
+  //     expect(uis.getStaticVideoUrl(null)).toThrow(
+  //       new Error(
+  //         'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
+  //     expect(uis.getStaticVideoUrl(null)).toThrow(
+  //       new Error(
+  //         'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
+  //
+  //     expect(uis.getDirectiveTemplateUrl(null)).toThrow(
+  //       new Error(
+  //         'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
+  //     expect(
+  //       uis.getDirectiveTemplateUrl(null)).toThrow(
+  //       new Error(
+  //         'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
+  //
+  //     expect(uis.getStaticAssetUrl(null)).toThrow(
+  //       new Error(
+  //         'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
+  //     expect(uis.getStaticAssetUrl(null)).toThrow(
+  //       new Error(
+  //         'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
+  //
+  //     expect(uis.getExtensionResourceUrl(null)).toThrow(
+  //       new Error(
+  //         'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
+  //     expect(
+  //       uis.getExtensionResourceUrl(null)).toThrow(
+  //       new Error(
+  //         'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
+  //   });
 });

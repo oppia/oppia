@@ -34,16 +34,22 @@ import { DocumentAttributeCustomizationService } from
 import { ExtensionTagAssemblerService }
   from 'services/extension-tag-assembler.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
+import { FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UtilsService } from 'services/utils.service';
+import { UnitsObjectFactory } from
+  'domain/objects/UnitsObjectFactory';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -61,11 +67,16 @@ import {LocalStorageService} from 'services/local-storage.service';
 import {ExplorationDraftObjectFactory} from
   'domain/exploration/ExplorationDraftObjectFactory';
 import {CsrfTokenService} from 'services/csrf-token.service';
-import {QuestionUndoRedoService} from '../domain/editor/undo_redo/question-undo-redo.service';
-import {StopwatchObjectFactory} from '../domain/utilities/StopwatchObjectFactory';
-import {ContributionAndReviewServices} from '../pages/community-dashboard-page/services/contribution-and-review.services';
-import {ContributionOpportunitiesBackendApiService} from '../pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
-import {ContributionOpportunitiesService} from '../pages/community-dashboard-page/services/contribution-opportunities.service';
+import {QuestionUndoRedoService} from
+  'domain/editor/undo_redo/question-undo-redo.service';
+import {StopwatchObjectFactory} from
+  'domain/utilities/StopwatchObjectFactory';
+import {ContributionAndReviewServices} from
+  'pages/community-dashboard-page/services/contribution-and-review.services';
+import {ContributionOpportunitiesBackendApiService} from
+  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+import {ContributionOpportunitiesService} from
+  'pages/community-dashboard-page/services/contribution-opportunities.service';
 
 @Injectable({
   providedIn: 'root'
@@ -97,6 +108,8 @@ export class UpgradedServices {
       new LoggerService()), new UrlService(
       new WindowRef()), new UtilsService()),
     'UtilsService': new UtilsService(),
+    'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
+      new UnitsObjectFactory(), new FractionObjectFactory()),
     'WindowDimensionsService': new WindowDimensionsService(),
     'BaseUndoRedoService': new BaseUndoRedoService(new EventService()),
     'UndoRedoService': new UndoRedoService(new EventService()),
@@ -143,7 +156,7 @@ export class UpgradedServices {
           }
         }), new UrlInterpolationService(new AlertsService(
           new LoggerService()), new UrlService(
-          new WindowRef()), new UtilsService()) )),
+          new WindowRef()), new UtilsService()) ))
   };
 }
 

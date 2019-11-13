@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Service to construct URLs by inserting variables within them as
+ * necessary to have a fully-qualified URL.
+ */
+
 import {UtilsService} from '../../services/utils.service';
 import {AlertsService} from '../../services/alerts.service';
 import {UrlService} from '../../services/contextual/url.service';
 import Constants from '../../../../../../assets/constants';
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
-
-/**
- * @fileoverview Service to construct URLs by inserting variables within them as
- * necessary to have a fully-qualified URL.
- */
-
 
 const hashes = require('hashes.json');
 
@@ -225,7 +224,6 @@ export class UrlInterpolationService {
     }
   }
 }
-
 
 angular.module('oppia').factory(
   'UrlInterpolationService',
