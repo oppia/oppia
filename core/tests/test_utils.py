@@ -1734,6 +1734,27 @@ tags: []
 
     @contextlib.contextmanager
     def mock_datetime_utcnow(self, mocked_datetime):
+        """Mocks response from datetime.datetime.utcnow method
+
+        Args:
+            mocked_datetime: datetime.datetime.
+                The datetime which will be used instead of current
+
+        Yields:
+            nothing
+
+        Example usage:
+            import datetime
+            mocked_datetime_utcnow = datetime.datetime.utcnow() -
+                datetime.timedelta(days=1)
+            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+                print datetime.datetime.utcnow() # prints time reduced by 1 day
+            print datetime.datetime.utcnow()  # prints current time.
+        """
+        if not isinstance(mocked_datetime, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected mocked_datetime to be datetime.datetime, got %s' % (
+                    type(mocked_datetime)))
         original_datetime_type = datetime.datetime
 
         class PatchedDatetimeType(type):
