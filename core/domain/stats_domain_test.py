@@ -601,15 +601,6 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         self.exp_issue = stats_domain.ExplorationIssue(
             'EarlyQuit', {}, [], 1, True)
 
-    def _dummy_convert_issue_v1_dict_to_v2_dict(self, issue_dict):
-        """A test implementation of schema conversion function."""
-        issue_dict['schema_version'] = 2
-        if issue_dict['issue_type'] == 'EarlyQuit':
-            issue_dict['issue_type'] = 'EarlyQuit1'
-            issue_dict['issue_customization_args']['new_key'] = 5
-
-        return issue_dict
-
     def test_to_dict(self):
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
@@ -630,7 +621,33 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
                 'is_valid': True
             })
 
-    def test_from_backend_dict(self):
+    def test_from_dict(self):
+        expected_customization_args = {
+            'time_spent_in_exp_in_msecs': {
+                'value': 0
+            },
+            'state_name': {
+                'value': ''
+            }
+        }
+        exp_issue = stats_domain.ExplorationIssue.from_dict({
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': expected_customization_args,
+            'playthrough_ids': [],
+            'schema_version': 1,
+            'is_valid': True
+        })
+        exp_issue_dict = exp_issue.to_dict()
+        self.assertEqual(
+            exp_issue_dict, {
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': expected_customization_args,
+                'playthrough_ids': [],
+                'schema_version': 1,
+                'is_valid': True
+            })
+
+    def test_from_dict_raises_exception(self):
         """Test the from_backend_dict() method."""
         # Test that an exploration issue dict without 'issue_type' key raises
         # exception.
@@ -643,60 +660,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'issue_type not in exploration issue dict.'):
-            stats_domain.ExplorationIssue.from_backend_dict(exp_issue_dict)
-
-    def test_update_exp_issue_from_model(self):
-        """Test the migration of exploration issue domain objects."""
-        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
-        exp_issue_dict = exp_issue.to_dict()
-        stats_models.ExplorationIssuesModel.create(
-            'exp_id', 1, [exp_issue_dict])
-
-        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
-            'exp_id', 1)
-
-        current_issue_schema_version_swap = self.swap(
-            stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 2)
-        convert_issue_dict_swap = self.swap(
-            stats_domain.ExplorationIssue,
-            '_convert_issue_v1_dict_to_v2_dict',
-            self._dummy_convert_issue_v1_dict_to_v2_dict)
-
-        with convert_issue_dict_swap, current_issue_schema_version_swap:
-            exp_issue_from_model = stats_services.get_exp_issues_from_model(
-                exp_issues_model)
-
-        self.assertEqual(
-            exp_issue_from_model.unresolved_issues[0].issue_type, 'EarlyQuit1')
-        self.assertEqual(
-            exp_issue_from_model.unresolved_issues[0].issue_customization_args[
-                'new_key'], 5)
-
-        # For other issue types, no changes happen during migration.
-        exp_issue1 = stats_domain.ExplorationIssue(
-            'MultipleIncorrectSubmissions', {}, [], 1, True)
-        exp_issue_dict1 = exp_issue1.to_dict()
-
-        stats_models.ExplorationIssuesModel.create(
-            'exp_id_1', 1, [exp_issue_dict1])
-
-        exp_issues_model1 = stats_models.ExplorationIssuesModel.get_model(
-            'exp_id_1', 1)
-
-        current_issue_schema_version_swap = self.swap(
-            stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 2)
-        convert_issue_dict_swap = self.swap(
-            stats_domain.ExplorationIssue,
-            '_convert_issue_v1_dict_to_v2_dict',
-            self._dummy_convert_issue_v1_dict_to_v2_dict)
-
-        with convert_issue_dict_swap, current_issue_schema_version_swap:
-            exp_issue_from_model1 = stats_services.get_exp_issues_from_model(
-                exp_issues_model1)
-
-        self.assertEqual(
-            exp_issue_from_model1.unresolved_issues[0].issue_type,
-            'MultipleIncorrectSubmissions')
+            stats_domain.ExplorationIssue.from_dict(exp_issue_dict)
 
     def test_cannot_update_exp_issue_from_invalid_schema_version_model(self):
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 4, True)
