@@ -32,7 +32,6 @@ import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 import { ExtensionTagAssemblerService }
   from 'services/extension-tag-assembler.service';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
@@ -60,7 +59,7 @@ export class UpgradedServices {
     'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
     'ComputeGraphService': new ComputeGraphService(),
-    'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
+    'DateTimeFormatService': new DateTimeFormatService(),
     'DebouncerService': new DebouncerService(),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
