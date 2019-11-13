@@ -23,11 +23,6 @@ import { Injectable } from '@angular/core';
 const constants = require('constants.ts');
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-declare global {
-  interface Window {
-    ga: any;
-  }
-}
 // Service for sending events to Google Analytics.
 //
 // Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
@@ -52,7 +47,7 @@ export class SiteAnalyticsService {
 
   // For definitions of the various arguments, please see:
   // developers.google.com/analytics/devguides/collection/analyticsjs/
-  //   social-interactions
+  // social-interactions
   // TODO(#7176): Replace 'any' with the exact type.
   __sendSocialEventToGoogleAnalytics(
       network: any, action: any, targetUrl: any): void {
@@ -77,7 +72,7 @@ export class SiteAnalyticsService {
       'BrowseLibraryButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
-  registerGoToDonationSiteEvent(donationSiteName): void {
+  registerGoToDonationSiteEvent(donationSiteName: string): void {
     this._sendEventToGoogleAnalytics(
       'GoToDonationSite', 'click', donationSiteName);
   }
@@ -216,8 +211,8 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'OpenFractionsFromLandingPage', 'click', collectionId);
   }
-  registerStewardsLandingPageEvent(viewerType: string,
-      buttonText: string): void {
+  registerStewardsLandingPageEvent(
+      viewerType: string, buttonText: string): void {
     this._sendEventToGoogleAnalytics(
       'ClickButtonOnStewardsPage', 'click', viewerType + ':' + buttonText);
   }
