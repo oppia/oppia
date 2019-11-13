@@ -1053,40 +1053,38 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             suggestion_services.check_if_email_has_been_sent_to_user(
                 self.user_a_id, 'category_a'))
 
-    def test_get_next_user_in_rotation(self):
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_a_id, 'category_a', 15)
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_b_id, 'category_a', 15)
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_c_id, 'category_a', 15)
 
-        user_ids = [self.user_a_id, self.user_b_id, self.user_c_id]
-        user_ids.sort()
-        self.assertEqual(suggestion_services.get_next_user_in_rotation(
-            'category_a'), user_ids[0])
-        self.assertEqual(
-            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-                'category_a').current_position_in_rotation, user_ids[0])
+class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
+    """Tests for the ExplorationVoiceoverApplication class."""
 
-        self.assertEqual(suggestion_services.get_next_user_in_rotation(
-            'category_a'), user_ids[1])
-        self.assertEqual(
-            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-                'category_a').current_position_in_rotation, user_ids[1])
+    def setUp(self):
+        super(VoiceoverApplicationServiceUnitTest, self).setUp()
+        self.signup('author@example.com', 'author')
+        self.author_id = self.get_user_id_from_email('author@example.com')
 
-        self.assertEqual(suggestion_services.get_next_user_in_rotation(
-            'category_a'), user_ids[2])
-        self.assertEqual(
-            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-                'category_a').current_position_in_rotation, user_ids[2])
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='0',
+            status='review',
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            language_code='en',
+            filename='filename.mp3',
+            content='<p>content</p>',
+            rejection_message=None).put()
+        self.voiceover_application_model = (
+            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+                'application_id'))
 
-        # Rotates back.
-        self.assertEqual(suggestion_services.get_next_user_in_rotation(
-            'category_a'), user_ids[0])
-        self.assertEqual(
-            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-                'category_a').current_position_in_rotation, user_ids[0])
+    def test_get_voiceover_application_from_model_with_invalid_type_raise_error(
+            self):
+        suggestion_services.get_voiceover_application(
+            self.voiceover_application_model.id)
 
-        self.assertEqual(suggestion_services.get_next_user_in_rotation(
-            'category_invalid'), None)
+        self.voiceover_application_model.target_type = 'invalid_type'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid target type for voiceover application: invalid_type'):
+            suggestion_services.get_voiceover_application(
+                self.voiceover_application_model.id)
