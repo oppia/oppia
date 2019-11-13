@@ -22,6 +22,7 @@ import datetime
 import json
 import numbers
 import sys
+import warnings
 
 from constants import constants
 from core.domain import action_registry
@@ -544,51 +545,55 @@ class Playthrough(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, playthrough_dict):
-        """Returns a Playthrough object from a dict.
+    def validate_input_data(cls, playthrough_data):
+        """Validates incoming playthrough data
 
         Args:
-            playthrough_dict: dict. A dict mapping of all fields of Playthrough
+            playthrough_data: dict. A dict mapping of all fields of Playthrough
                 object.
 
-        Returns:
-            Playthrough. The corresponding Playthrough domain object.
-        """
-        actions = [
-            LearnerAction.from_dict(action_dict)
-            for action_dict in playthrough_dict['actions']]
-        return cls(
-            playthrough_dict['exp_id'],
-            playthrough_dict['exp_version'],
-            playthrough_dict['issue_type'],
-            playthrough_dict['issue_customization_args'],
-            actions)
-
-    @classmethod
-    def from_backend_dict(cls, playthrough_data):
-        """Checks whether the playthrough dict has the correct keys and then
-        returns a domain object instance.
-
-        Args:
-            playthrough_data: dict. Dict representing a playthrough.
-
-        Returns:
-            Playthrough. A playthrough domain object.
+        Raises:
+            ValidationError in case one of required properties is missed.
         """
         playthrough_properties = [
             'exp_id', 'exp_version', 'issue_type',
             'issue_customization_args', 'actions']
-
         for playthrough_property in playthrough_properties:
             if playthrough_property not in playthrough_data:
                 raise utils.ValidationError(
                     '%s not in playthrough data dict.' % (
                         playthrough_property))
 
-        actions = [
-            LearnerAction.from_dict(action_dict)
-            for action_dict in playthrough_data['actions']]
+    @classmethod
+    def get_actions(cls, actions):
+        """Generates list of actions from input list
 
+        Args:
+            actions: dict. A list of dict mappings of all fields of
+                LearnerAction object.
+
+        Returns:
+            list. A list of LearnerAction.
+        """
+        return [
+            LearnerAction.from_dict(action_dict)
+            for action_dict in actions]
+
+    @classmethod
+    def from_dict(cls, playthrough_data):
+        """Checks whether the playthrough dict has the correct keys and then
+        returns a domain object instance.
+
+        Args:
+            playthrough_data: dict. A dict mapping of all fields of Playthrough
+                object.
+
+        Returns:
+            Playthrough. The corresponding Playthrough domain object.
+        """
+        cls.validate_input_data(playthrough_data)
+
+        actions = cls.get_actions(playthrough_data['actions'])
         playthrough = cls(
             playthrough_data['exp_id'],
             playthrough_data['exp_version'],
@@ -598,6 +603,23 @@ class Playthrough(python_utils.OBJECT):
 
         playthrough.validate()
         return playthrough
+
+    @classmethod
+    def from_backend_dict(cls, playthrough_data):
+        """Deprecated, use from_dict instead
+        Checks whether the playthrough dict has the correct keys and then
+        returns a domain object instance.
+
+        Args:
+            playthrough_data: dict. Dict representing a playthrough.
+
+        Returns:
+            Playthrough. A playthrough domain object.
+        """
+        warnings.warn(
+            'Playthrough.from_backend_dict is deprecated ' +
+            '(see https://github.com/oppia/oppia/issues/5145)')
+        return cls.from_dict(playthrough_data)
 
     def validate(self):
         """Validates the Playthrough domain object."""
