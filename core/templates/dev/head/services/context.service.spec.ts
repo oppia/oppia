@@ -17,9 +17,10 @@
  *   editor page.
  */
 
-import {UrlService} from './contextual/url.service';
-import {ContextService} from './context.service';
-import {TestBed} from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { ContextService } from 'services/context.service';
+import { UrlService } from 'services/contextual/url.service';
 
 describe('Context service', () => {
   let ecs: ContextService = null;
@@ -234,16 +235,14 @@ describe('Context service', () => {
       }
     );
 
-    it('should throw an error when trying to retrieve the question id',
-      () => {
-        expect(ecs.getQuestionId).toThrow();
-      }
+    it('should throw an error when trying to retrieve the question id', () => {
+      expect(ecs.getQuestionId).toThrow();
+    }
     );
 
-    it('should retrieve other as page context',
-      () => {
-        expect(ecs.getPageContext()).toBe('other');
-      }
+    it('should retrieve other as page context', () => {
+      expect(ecs.getPageContext()).toBe('other');
+    }
     );
   });
 });

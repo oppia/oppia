@@ -20,7 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { BaseUndoRedoService } from './base-undo-redo.service';
+import { BaseUndoRedoService } from
+  'domain/editor/undo_redo/base-undo-redo.service';
 
 @Injectable({
   providedIn: 'root'

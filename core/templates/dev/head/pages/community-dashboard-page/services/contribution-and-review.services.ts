@@ -12,18 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-
 /**
  * @fileoverview Service for fetching and resolving suggestions.
  */
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {HttpClient} from '@angular/common/http';
-import {ExplorationEditorPageConstants} from '../../exploration-editor-page/exploration-editor-page.constants';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+import { ExplorationEditorPageConstants } from
+  'pages/exploration-editor-page/exploration-editor-page.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+@Injectable({
+  providedIn: 'root'
+})
 export class ContributionAndReviewServices {
-  constructor(private urlInterpolationService: UrlInterpolationService, private httpClient: HttpClient) {}
+  constructor(private urlInterpolationService: UrlInterpolationService,
+              private httpClient: HttpClient) {}
 
   _SUBMITTED_SUGGESTION_LIST_HANDLER_URL_TEMPLATE = (
       '/getsubmittedsuggestions/<target_type>/<suggestion_type>');
@@ -32,7 +39,7 @@ export class ContributionAndReviewServices {
   _SUGGESTION_ACTION_HANDLER_URL = (
       '/suggestionactionhandler/exploration/<exp_id>/<thread_id>');
 
-  _fetchSuggestions(url, onSuccess) {
+  _fetchSuggestions(url: string, onSuccess: Function): Promise<void> {
     let suggestionsPromise = this.httpClient.get(url).toPromise();
 
     return suggestionsPromise.then((res: any) => {
@@ -48,7 +55,8 @@ export class ContributionAndReviewServices {
     });
   }
 
-  getUserCreatedTranslationSuggestions(username, onSuccess) {
+  getUserCreatedTranslationSuggestions(
+      username: string, onSuccess: Function): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL_TEMPLATE, {
         target_type: 'exploration',
@@ -56,7 +64,8 @@ export class ContributionAndReviewServices {
       });
     return this._fetchSuggestions(url, onSuccess);
   }
-  getReviewableTranslationSuggestions(onSuccess) {
+
+  getReviewableTranslationSuggestions(onSuccess: Function): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._REVIEWABLE_SUGGESTIONS_HANDLER_URL_TEMPLATE, {
         target_type: 'exploration',
@@ -64,8 +73,10 @@ export class ContributionAndReviewServices {
       });
     return this._fetchSuggestions(url, onSuccess);
   }
+  // TODO(#7176): Replace 'any' with the exact type.
   resolveSuggestion(
-      targetId, threadId, action, reviewMessage, commitMessage, onSuccess) {
+      targetId: string, threadId: string, action: any, reviewMessage: string,
+      commitMessage: string, onSuccess: Function): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._SUGGESTION_ACTION_HANDLER_URL, {
         exp_id: targetId,

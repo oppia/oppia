@@ -17,10 +17,9 @@
  * fields.
  */
 
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {downgradeInjectable} from '@angular/upgrade/static';
-import {ContributionOpportunitiesBackendApiService} from './contribution-opportunities-backend-api.service';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -36,15 +35,16 @@ export class TranslateTextService {
     activeExpId = null;
     activeExpVersion = null;
 
-    getNextContentId() {
+    getNextContentId(): string {
       return this.stateWiseContentIds[this.activeStateName].pop();
     }
-    getNextState() {
+
+    getNextState(): string {
       let currentIndex = this.stateNamesList.indexOf(this.activeStateName);
       return this.stateNamesList[currentIndex + 1];
     }
 
-    getNextText() {
+    getNextText(): any {
       this.activeContentId = this.getNextContentId();
       if (!this.activeContentId) {
         this.activeStateName = this.getNextState();
@@ -56,14 +56,14 @@ export class TranslateTextService {
       return this.stateWiseContents[this.activeStateName][this.activeContentId];
     }
 
-    isMoreTextAvailableForTranslation() {
+    isMoreTextAvailableForTranslation(): boolean {
       return !(
         this.stateNamesList.indexOf(this.activeStateName) + 1 ===
           this.stateNamesList.length &&
           this.stateWiseContentIds[this.activeStateName].length === 0);
     }
 
-    init(expId, languageCode, successCallback) {
+    init(expId: string, languageCode: string, successCallback: Function) {
       this.stateWiseContents = null;
       this.stateWiseContentIds = {};
       this.activeStateName = null;
@@ -77,30 +77,32 @@ export class TranslateTextService {
             exp_id: expId,
             language_code: languageCode
           }
-        }).toPromise().then(
-        (response: any) => {
-          this.stateWiseContents = response.data.state_names_to_content_id_mapping;
-          this.activeExpVersion = response.data.version;
-          for (let stateName in this.stateWiseContents) {
-            this.stateNamesList.push(stateName);
-            let contentIds = [];
-            for (let contentId in this.stateWiseContents[stateName]) {
-              contentIds.push(contentId);
-            }
-            this.stateWiseContentIds[stateName] = contentIds;
+        }).toPromise().then((response: any) => {
+        this.stateWiseContents =
+            response.data.state_names_to_content_id_mapping;
+        this.activeExpVersion = response.data.version;
+        for (let stateName in this.stateWiseContents) {
+          this.stateNamesList.push(stateName);
+          let contentIds = [];
+          for (let contentId in this.stateWiseContents[stateName]) {
+            contentIds.push(contentId);
           }
-          this.activeStateName = this.stateNamesList[0];
-          successCallback();
-        });
+          this.stateWiseContentIds[stateName] = contentIds;
+        }
+        this.activeStateName = this.stateNamesList[0];
+        successCallback();
+      });
     }
-    getTextToTranslate() {
+    // TODO(#7176): Replace 'any' with the exact type.
+    getTextToTranslate(): {text: any, more: boolean} {
       return {
         text: this.getNextText(),
         more: this.isMoreTextAvailableForTranslation()
       };
     }
     suggestTranslatedText(
-        translationHtml, languageCode, successCallback) {
+        translationHtml: any, languageCode: string,
+        successCallback: Function): void {
       let url = '/suggestionhandler/';
       let data = {
         suggestion_type: 'translate_content',
@@ -120,7 +122,7 @@ export class TranslateTextService {
           translation_html: translationHtml
         }
       };
-      this.httpClient.post(url, data).toPromise().then(successCallback);
+      this.httpClient.post(url, data).toPromise().then(successCallback());
     }
 }
 angular.module('oppia').factory(

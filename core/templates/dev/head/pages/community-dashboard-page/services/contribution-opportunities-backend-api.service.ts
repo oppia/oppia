@@ -12,16 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HttpClient} from '@angular/common/http';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {downgradeInjectable} from '@angular/upgrade/static';
-
 /**
  * @fileoverview Service for fetching the opportunities available for
  * contributors to contribute.
  */
 
-const Constants = require('../../../../../../../assets/constants');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+import Constants from 'assets/constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+@Injectable({
+  providedIn: 'root'
+})
 export class ContributionOpportunitiesBackendApiService {
   constructor(private httpClient: HttpClient,
               private urlInterpolationService: UrlInterpolationService) {}
@@ -32,7 +38,8 @@ export class ContributionOpportunitiesBackendApiService {
       languageCode, cursor, successCallback) {
     return this.httpClient.get(
       this.urlInterpolationService.interpolateUrl(
-        this.urlTemplate, {opportunityType: Constants.OPPORTUNITY_TYPE_TRANSLATION}
+        this.urlTemplate,
+        {opportunityType: Constants.OPPORTUNITY_TYPE_TRANSLATION}
       ), {
         params: {
           language_code: languageCode,

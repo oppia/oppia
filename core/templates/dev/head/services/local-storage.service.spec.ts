@@ -17,13 +17,13 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { LocalStorageService } from 'services/local-storage.service';
+
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
+import { LocalStorageService } from 'services/local-storage.service';
 
-
-describe('LocalStorageService', function() {
-  describe('behavior in editor', function() {
+describe('LocalStorageService', () => {
+  describe('behavior in editor', () => {
     let localStorageService = null;
     let explorationDraftObjectFactory = null;
     let explorationIdOne = '100';

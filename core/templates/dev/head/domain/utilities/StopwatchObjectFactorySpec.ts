@@ -16,12 +16,14 @@
  * @fileoverview Unit tests for StopwatchObjectFactory.
  */
 
-import {TestBed} from '@angular/core/testing';
-import {LoggerService} from '../../services/contextual/logger.service';
-import {StopwatchObjectFactory} from './StopwatchObjectFactory';
+import { TestBed } from '@angular/core/testing';
 
-describe('Stopwatch object factory', function() {
-  describe('stopwatch object factory', function() {
+import { LoggerService } from 'services/contextual/logger.service';
+import { StopwatchObjectFactory } from
+  'domain/utilities/StopwatchObjectFactory';
+
+describe('Stopwatch object factory', () => {
+  describe('stopwatch object factory', () => {
     let stopwatchObjectFactory: StopwatchObjectFactory = null;
     let errorLog = [];
     let log: LoggerService = null;

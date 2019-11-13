@@ -31,15 +31,15 @@ export class Stopwatch {
     this.startTime = null;
   }
 
-  _getCurrentTime() {
+  _getCurrentTime(): number {
     return Date.now();
   }
 
-  reset() {
+  reset(): void {
     this.startTime = this._getCurrentTime();
   }
 
-  getTimeInSecs() {
+  getTimeInSecs(): number | null {
     if (this.startTime === null) {
       this.log.error(
         'Tried to retrieve the elapsed time, but no start time was set.');
@@ -53,7 +53,7 @@ export class Stopwatch {
   providedIn: 'root'
 })
 export class StopwatchObjectFactory {
-  create() {
+  create(): Stopwatch {
     return new Stopwatch(new LoggerService());
   }
 }

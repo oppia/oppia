@@ -16,11 +16,12 @@
  * @fileoverview Tests for AdminDataService.
  */
 
-import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { AdminDataService } from './admin-data.service';
-import {HttpErrorResponse} from '@angular/common/http';
+
+import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 
 describe('Admin Data Service', function() {
   let adminDataService: AdminDataService = null;

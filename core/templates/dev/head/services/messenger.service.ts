@@ -25,18 +25,17 @@ import { Injectable } from '@angular/core';
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class MessengerService {
   constructor(private log: LoggerService, private windowRef: WindowRef) {}
 
-  isPositiveInteger(n) {
+  isPositiveInteger(n: any): boolean {
     return (typeof n === 'number' && n % 1 === 0 && n > 0);
   }
 
-  isBoolean(b) {
+  isBoolean(b: any): boolean {
     return typeof b === 'boolean';
   }
 
@@ -175,7 +174,6 @@ export class MessengerService {
     }
   };
 }
-
 
 angular.module('oppia').factory(
   'MessengerService',

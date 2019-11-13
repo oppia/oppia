@@ -23,12 +23,12 @@
  * not currently supported.
  */
 
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+
 import cloneDeep from 'lodash/cloneDeep';
 
-import { EditorDomainConstants } from "domain/editor/editor-domain.constants";
+import { EditorDomainConstants } from 'domain/editor/editor-domain.constants';
 import { EventService } from 'services/event-service';
 
 @Injectable({
@@ -39,22 +39,22 @@ export class BaseUndoRedoService {
     _appliedChanges = [];
     _undoneChanges = [];
 
-    _dispatchMutation() {
+    _dispatchMutation(): void {
       this.eventService.BroadcastEvent(
         EditorDomainConstants.EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
     }
-
-    _applyChange(changeObject, domainObject) {
+    // TODO(#7176): Replace 'any' with the exact type.
+    _applyChange(changeObject: any, domainObject: any): void {
       changeObject.applyChange(domainObject);
       this._dispatchMutation();
     }
-
-    _reverseChange(changeObject, domainObject) {
+    // TODO(#7176): Replace 'any' with the exact type.
+    _reverseChange(changeObject: any, domainObject: any): void {
       changeObject.reverseChange(domainObject);
       this._dispatchMutation();
     }
 
-    init() {
+    init(): void {
       this._appliedChanges = [];
       this._undoneChanges = [];
     }
@@ -65,7 +65,8 @@ export class BaseUndoRedoService {
      * are lost and cannot be redone. This will fire an event as defined by the
      * constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    applyChange(changeObject, domainObject) {
+    // TODO(#7176): Replace 'any' with the exact type.
+    applyChange(changeObject: any, domainObject: any): void {
       this._applyChange(changeObject, domainObject);
       this._appliedChanges.push(changeObject);
       this._undoneChanges = [];
@@ -77,7 +78,8 @@ export class BaseUndoRedoService {
      * will fire an event as defined by the constant
      * EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    undoChange(domainObject) {
+    // TODO(#7176): Replace 'any' with the exact type.
+    undoChange(domainObject: any): boolean {
       if (this._appliedChanges.length !== 0) {
         let change = this._appliedChanges.pop();
         this._undoneChanges.push(change);
@@ -92,7 +94,8 @@ export class BaseUndoRedoService {
      * if there are no changes to redo, and true if otherwise. This will fire an
      * event as defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    redoChange(domainObject) {
+    // TODO(#7176): Replace 'any' with the exact type.
+    redoChange(domainObject: any): boolean {
       if (this._undoneChanges.length !== 0) {
         let change = this._undoneChanges.pop();
         this._appliedChanges.push(change);
@@ -107,7 +110,8 @@ export class BaseUndoRedoService {
      * object. This list will not contain undone actions. Changes to the
      * returned list will not be reflected in this service.
      */
-    getChangeList() {
+    // TODO(#7176): Replace 'any' with the exact type.
+    getChangeList(): Array<any> {
       // TODO(bhenning): Consider integrating something like Immutable.js to
       // avoid the slice here and ensure the returned object is truly an
       // immutable copy.
@@ -119,7 +123,8 @@ export class BaseUndoRedoService {
      * this service. Changes to the returned list will not affect this service.
      * Furthermore, the returned list is ready to be sent to the backend.
      */
-    getCommittableChangeList() {
+    // TODO(#7176): Replace 'any' with the exact type.
+    getCommittableChangeList(): Array<any> {
       let committableChangeList = [];
       for (let i = 0; i < this._appliedChanges.length; i++) {
         committableChangeList[i] =
@@ -128,8 +133,8 @@ export class BaseUndoRedoService {
       return committableChangeList;
     }
 
-
-    setChangeList(changeList) {
+    // TODO(#7176): Replace 'any' with the exact type.
+    setChangeList(changeList: any): void {
       this._appliedChanges = cloneDeep(changeList);
     }
 
@@ -137,14 +142,14 @@ export class BaseUndoRedoService {
      * Returns the number of changes that have been applied to the domain
      * object.
      */
-    getChangeCount() {
+    getChangeCount(): number {
       return this._appliedChanges.length;
     }
 
     /**
      * Returns whether this service has any applied changes.
      */
-    hasChanges() {
+    hasChanges(): boolean {
       /* eslint-enable dot-notation */
       return this._appliedChanges.length !== 0;
     }
@@ -155,7 +160,7 @@ export class BaseUndoRedoService {
      * defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
 
-    clearChanges() {
+    clearChanges(): void {
       this._appliedChanges = [];
       this._undoneChanges = [];
       this._dispatchMutation();

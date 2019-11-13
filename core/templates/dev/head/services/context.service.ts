@@ -20,10 +20,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AppConstants } from '../app.constants';
+import { AppConstants } from 'app.constants';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlService } from 'services/contextual/url.service';
-
 
 @Injectable({
   providedIn: 'root'
@@ -36,20 +35,20 @@ export class ContextService {
   questionId = null;
   editorContext = null;
 
-  init(editorName) {
+  init(editorName: string): void {
     this.editorContext = editorName;
   }
   // Following method helps to know the whether the context of editor is
   // question editor or exploration editor. The variable editorContext is
   // set from the init function that is called upon initialization in the
   // respective editors.
-  getEditorContext() {
+  getEditorContext(): string {
     return this.editorContext;
   }
   // Returns a string representing the current tab of the editor (either
   // 'editor' or 'preview'), or null if the current tab is neither of these,
   // or the current page is not the editor.
-  getEditorTabContext() {
+  getEditorTabContext(): string | null {
     let hash = this.urlService.getHash();
     if (hash.indexOf('#/gui') === 0) {
       return ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR;
@@ -64,7 +63,7 @@ export class ContextService {
   // PAGE_CONTEXT.EXPLORATION_PLAYER or PAGE_CONTEXT.QUESTION_EDITOR.
   // If the current page is not one in either EXPLORATION_EDITOR or
   // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER
-  getPageContext() {
+  getPageContext(): string {
     if (this.pageContext) {
       return this.pageContext;
     } else {
@@ -105,19 +104,19 @@ export class ContextService {
     }
   }
 
-  isInExplorationContext() {
+  isInExplorationContext(): boolean {
     return (this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
         this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
-  isInQuestionContext() {
+  isInQuestionContext(): boolean {
     return (
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR);
   }
 
-  getEntityId() {
+  getEntityId(): string {
     let pathnameArray = this.urlService.getPathname().split('/');
     for (let i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'embed') {
@@ -128,7 +127,7 @@ export class ContextService {
   }
 
   // add constants for entity type
-  getEntityType() {
+  getEntityType(): string {
     let pathnameArray = this.urlService.getPathname().split('/');
     for (let i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore' ||
@@ -153,7 +152,7 @@ export class ContextService {
 
   // Returns a string representing the explorationId (obtained from the
   // URL).
-  getExplorationId() {
+  getExplorationId(): string {
     if (this.explorationId) {
       return this.explorationId;
     } else if (!this.isInQuestionPlayerMode()) {
@@ -180,7 +179,7 @@ export class ContextService {
 
   // Returns a string representing the questionId (obtained from the
   // URL).
-  getQuestionId() {
+  getQuestionId(): string {
     if (this.questionId) {
       return this.questionId;
     } else {
@@ -201,25 +200,24 @@ export class ContextService {
 
   // Following method helps to know whether exploration editor is
   // in main editing mode or preview mode.
-  isInExplorationEditorMode() {
+  isInExplorationEditorMode(): boolean {
     return (this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
         this.getEditorTabContext() === (
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
   }
 
-  isInQuestionPlayerMode() {
+  isInQuestionPlayerMode(): boolean {
     return (
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER);
   }
 
-  isInExplorationEditorPage() {
+  isInExplorationEditorPage(): boolean {
     return (
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
   }
 }
-
 
 angular.module('oppia').factory(
   'ContextService', downgradeInjectable(ContextService));

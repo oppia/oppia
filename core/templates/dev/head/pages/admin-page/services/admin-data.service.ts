@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Injectable} from '@angular/core';
-
 /**
  * @fileoverview Service that manages admin data.
  */
 
-require('pages/admin-page/admin-page.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
-import {HttpClient} from '@angular/common/http';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root'
@@ -29,8 +28,8 @@ import {downgradeInjectable} from '@angular/upgrade/static';
 export class AdminDataService {
   dataPromise = null;
   constructor(private httpClient: HttpClient) {}
-
-  getDataAsync() {
+  // TODO(#7176): Replace 'any' with the exact type.
+  getDataAsync(): any {
     if (this.dataPromise) {
       return this.dataPromise;
     }

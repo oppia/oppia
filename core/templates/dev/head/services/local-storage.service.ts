@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Injectable} from '@angular/core';
-import {ExplorationDraftObjectFactory} from
-  'domain/exploration/ExplorationDraftObjectFactory';
-
 /**
  * @fileoverview Utility service for saving data locally on the client machine.
  */
-
-require('domain/exploration/ExplorationDraftObjectFactory.ts');
 
 // Service for saving exploration draft changes to local storage.
 //
 // Note that the draft is only saved if localStorage exists and works
 // (i.e. has storage capacity).
+
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -54,7 +55,7 @@ export class LocalStorageService {
      * @param {String} explorationId - The exploration id of the changeList
      *   to be accessed.
      */
-    _createExplorationDraftKey(explorationId) {
+    _createExplorationDraftKey(explorationId: string): string {
       return 'draft_' + explorationId;
     }
 
@@ -62,7 +63,7 @@ export class LocalStorageService {
        * Check that localStorage is available to the client.
        * @returns {boolean} true iff the client has access to localStorage.
        */
-    isStorageAvailable() {
+    isStorageAvailable(): boolean {
       return Boolean(this.storage);
     }
     /**
@@ -73,8 +74,10 @@ export class LocalStorageService {
        * @param {List} changeList - The exploration change list to be saved.
        * @param {Integer} draftChangeListId - The id of the draft to be saved.
        */
+    // TODO(#7176): Replace 'any' with the exact type.
     saveExplorationDraft(
-        explorationId, changeList, draftChangeListId) {
+        explorationId: string, changeList: any,
+        draftChangeListId: number): void {
       let localSaveKey = this._createExplorationDraftKey(explorationId);
       if (this.storage) {
         let draftDict = this.explorationDraftObjectFactory.toLocalStorageDict(
@@ -90,7 +93,8 @@ export class LocalStorageService {
        * @returns {Object} The local save draft object if it exists,
        *   else null.
        */
-    getExplorationDraft(explorationId) {
+    // TODO(#7176): Replace 'any' with the exact type.
+    getExplorationDraft(explorationId: string): any {
       if (this.storage) {
         let draftDict = JSON.parse(
           this.storage.getItem(this._createExplorationDraftKey(explorationId)));
@@ -107,16 +111,18 @@ export class LocalStorageService {
        * @param {String} explorationId - The exploration id of the change list
        *   to be removed.
        */
-    removeExplorationDraft(explorationId) {
+    // TODO(#7176): Replace 'any' with the exact type.
+    removeExplorationDraft(explorationId: string): void {
       if (this.storage) {
         this.storage.removeItem(this._createExplorationDraftKey(explorationId));
       }
     }
+
     /**
-       * Save the given language code to localStorage along.
-       * @param {List} changeList - The last selected language code to be saved.
-       */
-    updateLastSelectedTranslationLanguageCode(languageCode) {
+   * Save the given language code to localStorage along.
+   * @param languageCode
+   */
+    updateLastSelectedTranslationLanguageCode(languageCode: string): void {
       if (this.storage) {
         this.storage.setItem(
           this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
@@ -127,7 +133,7 @@ export class LocalStorageService {
        * @returns {String} The local save of the last selected language for
        *   translation if it exists, else null.
        */
-    getLastSelectedTranslationLanguageCode() {
+    getLastSelectedTranslationLanguageCode(): string | null {
       if (this.storage) {
         return (
           this.storage.getItem(this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
@@ -135,3 +141,7 @@ export class LocalStorageService {
       return null;
     }
 }
+
+angular.module('oppia').factory(
+  'LocalStorageService',
+  downgradeInjectable(LocalStorageService));
