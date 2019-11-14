@@ -17,10 +17,10 @@
  * necessary to have a fully-qualified URL.
  */
 
-import {UtilsService} from '../../services/utils.service';
-import {AlertsService} from '../../services/alerts.service';
-import {UrlService} from '../../services/contextual/url.service';
-import Constants from '../../../../../../assets/constants';
+import {UtilsService} from 'services/utils.service';
+import {AlertsService} from 'services/alerts.service';
+import {UrlService} from 'services/contextual/url.service';
+const Constants = require('constants.ts');
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 

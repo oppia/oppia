@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import Constants from 'assets/constants';
+const Constants = require('constants.ts');
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 

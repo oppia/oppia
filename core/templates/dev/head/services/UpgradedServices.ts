@@ -38,6 +38,9 @@ import { ContributionOpportunitiesBackendApiService } from
   'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { ContributionOpportunitiesService } from
   'pages/community-dashboard-page/services/contribution-opportunities.service';
+import { ChangesInHumanReadableFormService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/services/changes-in-human-readable-form.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -45,6 +48,10 @@ import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
+import { EditorFirstTimeEventsService } from
+  'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { ExplorationDiffService } from
+  'pages/exploration-editor-page/services/exploration-diff.service';
 import { EventService } from 'services/event-service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
@@ -55,6 +62,7 @@ import { FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { IdGenerationService } from 'services/id-generation.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
@@ -64,6 +72,9 @@ import { NumberWithUnitsObjectFactory } from
 import { QuestionUndoRedoService } from
   'domain/editor/undo_redo/question-undo-redo.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UrlService } from 'services/contextual/url.service';
+import { UtilsService } from 'services/utils.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { TranslateTextService } from
@@ -71,10 +82,8 @@ import { TranslateTextService } from
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
-import { UrlService } from 'services/contextual/url.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -98,6 +107,8 @@ export class UpgradedServices {
     'BackgroundMaskService': new BackgroundMaskService(),
     'BaseUndoRedoService': new BaseUndoRedoService(new EventService()),
     'ComputeGraphService': new ComputeGraphService(),
+    'ChangesInHumanReadableFormService': new ChangesInHumanReadableFormService(
+      new UtilsService(), document),
     'ContextService': new ContextService(new UrlService(new WindowRef())),
     'ContributionAndReviewServices': new ContributionAndReviewServices(
       new UrlInterpolationService(new AlertsService(
@@ -119,12 +130,16 @@ export class UpgradedServices {
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
+    'EditorFirstTimeEventsService': new EditorFirstTimeEventsService(
+      new SiteAnalyticsService(new WindowRef())),
+    'ExplorationDiffService': new ExplorationDiffService(),
     'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
       new HtmlEscaperService(new LoggerService()),
       new CamelCaseToHyphensPipe()),
     'GenerateContentIdService': new GenerateContentIdService(),
     'HtmlEscaperService': new HtmlEscaperService(
       new LoggerService()),
+    'IdGenerationService': new IdGenerationService(),
     'LocalStorageService': new LocalStorageService(
       new ExplorationDraftObjectFactory()),
     'MetaTagCustomizationService': new MetaTagCustomizationService(
@@ -134,6 +149,7 @@ export class UpgradedServices {
     'QuestionUndoRedoService': new QuestionUndoRedoService(new EventService()),
     'SidebarStatusService': new SidebarStatusService(
       new WindowDimensionsService()),
+    'SiteAnalyticsService': new SiteAnalyticsService(new WindowRef()),
     'StopwatchObjectFactory': new StopwatchObjectFactory(),
     'TranslateTextService': new TranslateTextService(HttpDependency),
     'UndoRedoService': new UndoRedoService(new EventService()),

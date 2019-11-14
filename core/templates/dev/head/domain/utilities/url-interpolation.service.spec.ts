@@ -15,16 +15,17 @@
 import {UrlInterpolationService} from './url-interpolation.service';
 import {TestBed} from '@angular/core/testing';
 import {UrlService} from 'services/contextual/url.service';
-import Constants from '../../../../../../assets/constants';
+const Constants = require('constants.ts');
+
 
 /**
  * @fileoverview Unit tests for UrlInterpolationService.
  */
 
-fdescribe('URL Interpolation Service', () => {
+describe('URL Interpolation Service', () => {
   let hashes = require('hashes.json');
   let uis: UrlInterpolationService = null;
-  let urlService = null;
+  let urlService: UrlService = null;
   let mockLocation = null;
 
   beforeEach(() => {
@@ -34,7 +35,7 @@ fdescribe('URL Interpolation Service', () => {
 
     uis = TestBed.get(UrlInterpolationService);
     urlService = TestBed.get(UrlService);
-    Constants.DEV_MODE = false;
+    // Constants.DEV_MODE = false;
     spyOn(urlService, 'getCurrentLocation').and.returnValue(mockLocation);
   });
 
