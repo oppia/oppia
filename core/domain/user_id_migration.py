@@ -177,7 +177,7 @@ class UserIdJob(jobs.BaseMapReduceOneOffJobManager):
         for model_type in UserIdJob.MODEL_TYPES_TO_BE_COPIED_PART_ID:
             UserIdJob._copy_model_with_new_id_and_user_id(
                 model_type, old_user_id, new_user_id)
-        for field_name, model_types in UserIdJob.MODEL_TYPES_ONE_USER_ID_FIELD:
+        for field_name, model_types in UserIdJob.MODEL_TYPES_ONE_USER_ID_FIELD.items():
             for model_type in model_types:
                 UserIdJob._change_model_with_one_user_id_field(
                     model_type, old_user_id, new_user_id, field_name)

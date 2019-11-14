@@ -157,3 +157,33 @@ class UserIdJobTests(test_utils.GenericTestBase):
             original_model.created_on, migrated_model.created_on)
         self.assertEqual(
             original_model.last_updated, migrated_model.last_updated)
+
+    def test_change_user_contribution_scoring_model(self):
+        original_model = user_models.UserContributionScoringModel(
+            id='%s.%s' % ('score_category', self.user_a_id),
+            user_id=self.user_a_id,
+            score_category='score_category',
+            score=2,
+            has_email_been_sent=False)
+        original_model.put()
+
+        output = self._run_one_off_job()
+
+        migrated_model = (
+            user_models.UserContributionScoringModel.get_by_id(
+                '%s.%s' % ('score_category', output[0][1][0])))
+        self.assertNotEqual(
+            original_model.id, migrated_model.id)
+        self.assertNotEqual(
+            original_model.user_id, migrated_model.user_id)
+        self.assertEqual(
+            original_model.score_category, migrated_model.score_category)
+        self.assertEqual(original_model.score, migrated_model.score)
+        self.assertEqual(
+            original_model.has_email_been_sent,
+            migrated_model.has_email_been_sent)
+        self.assertEqual(
+            original_model.created_on, migrated_model.created_on)
+        self.assertEqual(
+            original_model.last_updated, migrated_model.last_updated)
+
