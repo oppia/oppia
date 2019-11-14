@@ -404,7 +404,8 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
             're-running the script' % target_branch)
 
 
-def create_branch(repo_fork, target_branch, github_username):
+def create_branch(
+        repo_fork, target_branch, github_username, current_release_version):
     """Creates a new branch with updates to AUTHORS, CHANGELOG,
     CONTRIBUTORS and about-page.
 
@@ -413,6 +414,7 @@ def create_branch(repo_fork, target_branch, github_username):
             forked repo.
         target_branch: str. The name of the target branch.
         github_username: str. The github username of the user.
+        current_release_version: str. The version of current release.
     """
     python_utils.PRINT(
         'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
@@ -435,7 +437,11 @@ def create_branch(repo_fork, target_branch, github_username):
         'expand=1' % (github_username, target_branch))
     python_utils.PRINT(
         'Pushed changes to Github. '
-        'Please create a pull request from the %s branch' % target_branch)
+        'Please create a pull request from the %s branch\n\n'
+        'Note: PR title should be exactly: '
+        '"Update authors and changelog for v%s" '
+        'otherwise deployment will fail.' % (
+            target_branch, current_release_version))
 
 
 def main():
@@ -468,11 +474,25 @@ def main():
 
     remove_updates_and_delete_branch(repo_fork, target_branch)
 
+    # Opens Credit Form.
+    common.open_new_tab_in_browser_if_possible(
+        'https://docs.google.com/forms/d/'
+        '1yH6ZO2UiD_VspgKJR40byRSjUP1AaBF9ARSe814p8K0/edit#responses')
     message = (
-        'Please update %s to:\n- have a correct changelog for '
-        'updating the CHANGELOG file\n- have a correct list of new '
-        'authors and contributors to update AUTHORS, CONTRIBUTORS '
-        'and developer_names section in about-page.directive.html\n' % (
+        'Note: Make following changes directly to %s and make sure to '
+        'save the file after making these changes.\n\n'
+        '1. Check emails and names for authors and contributors and '
+        'verify that the emails are '
+        'correct through welcome emails sent from welcome@oppia.org '
+        '(Confirm from Sean in case of doubt).\n\n'
+        '2. Check the credits form and add any non technical contributors '
+        'to the contributor list in release summary file.\n\n'
+        '3. Categorize the terms in uncategorized section and arrange '
+        'the changelog to have user facing categories on top.\n\n'
+        '4. Verify each item is in correct section and remove '
+        'trivial changes like "Fix lint errors" from the changelog.\n\n'
+        '5. Ensure that all items in changelog start with a '
+        'verb in simple present tense\n\n' % (
             release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(message)
 
@@ -497,7 +517,8 @@ def main():
             ABOUT_PAGE_FILEPATH))
     common.ask_user_to_confirm(message)
 
-    create_branch(repo_fork, target_branch, github_username)
+    create_branch(
+        repo_fork, target_branch, github_username, current_release_version)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

@@ -453,7 +453,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with get_branch_swap, git_ref_swap, get_contents_swap, update_file_swap:
             with run_cmd_swap, open_tab_swap:
                 update_changelog_and_credits.create_branch(
-                    self.mock_repo, 'target_branch', 'username')
+                    self.mock_repo, 'target_branch', 'username', '1.2.3')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls(self):
@@ -493,7 +493,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             check_function_calls[
                 'check_ordering_of_sections_gets_called'] = True
         def mock_create_branch(
-                unused_repo_fork, unused_target_branch, unused_github_username):
+                unused_repo_fork, unused_target_branch, unused_github_username,
+                unused_current_release_version):
             check_function_calls['create_branch_gets_called'] = True
         # pylint: disable=unused-argument
         def mock_getpass(prompt):
