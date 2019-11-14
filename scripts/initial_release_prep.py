@@ -21,14 +21,20 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import os
+import sys
 
 import python_utils
 import release_constants
 
-import pygsheets
-
 from . import common
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PYGSHEETS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pygsheets-2.0.2')
+sys.path.insert(0, _PYGSHEETS_PATH)
+
+# pylint: disable=wrong-import-position
+import pygsheets # isort:skip
+# pylint: enable=wrong-import-position
 
 RELEASE_CREDENTIALS_FILEPATH = os.path.join(
     os.getcwd(), 'oppia-release-credentials.json')
@@ -88,13 +94,13 @@ def get_mail_message_template(job_details):
 
     for job_detail in job_details:
         job_names_with_instructions_and_author += (
-            '%s (instructions: %s) (Author: %s)\n' % (
+            '%s (Instructions: %s) (Author: %s)\n' % (
                 job_detail['job_name'], job_detail['instruction_doc'],
                 job_detail['author_name']))
     mail_message_template = (
         'Hi Sean,\n\n'
         'You will need to run these jobs on the backup server:\n\n'
-        '%s\n\n'
+        '%s\n'
         'The specific instructions for jobs are linked with them. '
         'The general instructions are as follows:\n\n'
         '1. Login as admin\n'
