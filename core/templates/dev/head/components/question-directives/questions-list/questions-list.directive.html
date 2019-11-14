@@ -40,7 +40,7 @@
   <tr ng-repeat="questionSummary in $ctrl.getQuestionSummaries()"
       class="list-item protractor-test-question-list-item"
       style="height: 4em;"
-      ng-click="$ctrl.editQuestion(questionSummary.summary)"
+      ng-click="$ctrl.editQuestion(questionSummary.summary, questionSummary.skill_difficulties[0])"
       ng-dblclick="$event.stopPropagation()">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
     <td class="question-content"> <[questionSummary.summary.question_content]> </td>

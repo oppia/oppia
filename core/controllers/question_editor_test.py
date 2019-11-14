@@ -346,7 +346,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
-            ), {'new_difficulty': 0.6}, csrf_token=csrf_token,
+            ), {'new_difficulty': 0.6, 'action': 'update_difficulty'},
+            csrf_token=csrf_token,
             expected_status_int=401)
         self.logout()
 
@@ -367,7 +368,14 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
-            ), {'new_difficulty': 0.9}, csrf_token=csrf_token)
+            ), {'new_difficulty': 0.9, 'action': 'update_difficulty'},
+            csrf_token=csrf_token)
+
+        _ = self.put_json(
+            '%s/%s/skill_2' % (
+                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
+            ), {'difficulty': 0.9, 'action': 'add_skill'},
+            csrf_token=csrf_token)
         (
             question_summaries, merged_question_skill_links, _) = (
                 question_services.get_displayable_question_skill_link_details(
@@ -387,7 +395,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
-            ), {'new_difficulty': 0.6}, csrf_token=csrf_token)
+            ), {'new_difficulty': 0.6, 'action': 'update_difficulty'},
+            csrf_token=csrf_token)
         (
             question_summaries, merged_question_skill_links, _) = (
                 question_services.get_displayable_question_skill_link_details(
