@@ -363,8 +363,9 @@ angular.module('oppia').directive('questionsList', [
             var skillId = null;
             // For the case when, it is in the skill editor.
             if (ctrl.getAllSkillSummaries().length === 0) {
-              EditableQuestionBackendApiService.deleteQuestionFromSkills(
-                questionId, [ctrl.selectedSkillId]).then(function() {
+              EditableQuestionBackendApiService.editQuestionSkillLinks(
+                questionId, [{id: ctrl.selectedSkillId, task: 'remove'}]
+              ).then(function() {
                 QuestionsListService.resetPageNumber();
                 ctrl.getQuestionSummariesAsync(
                   ctrl.selectedSkillIds, true, true
@@ -374,8 +375,9 @@ angular.module('oppia').directive('questionsList', [
             } else {
               ctrl.getAllSkillSummaries().forEach(function(summary) {
                 if (summary.getDescription() === skillDescriptions[0]) {
-                  EditableQuestionBackendApiService.deleteQuestionFromSkills(
-                    questionId, [summary.getId()]).then(function() {
+                  EditableQuestionBackendApiService.editQuestionSkillLinks(
+                    questionId, [{id: summary.getId(), task: 'remove'}]
+                  ).then(function() {
                     QuestionsListService.resetPageNumber();
                     ctrl.getQuestionSummariesAsync(
                       ctrl.selectedSkillIds, true, true
@@ -508,8 +510,7 @@ angular.module('oppia').directive('questionsList', [
                 function(
                     $scope, $uibModalInstance, StateEditorService,
                     UndoRedoService) {
-                  var skillsToRemove = [];
-                  var skillsToAdd = [];
+                  var returnArray = [];
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
                   $scope.associatedSkillSummaries =
@@ -534,7 +535,15 @@ angular.module('oppia').directive('questionsList', [
                     $scope.removeErrors();
                   };
                   $scope.removeSkill = function(skillId) {
-                    skillsToRemove.push(skillId);
+                    if ($scope.associatedSkillSummaries.length === 1) {
+                      AlertsService.addInfoMessage(
+                        'A question should be linked to at least one skill.');
+                      return;
+                    }
+                    returnArray.push({
+                      id: skillId,
+                      task: 'remove'
+                    });
                     $scope.associatedSkillSummaries =
                       $scope.associatedSkillSummaries.filter(function(summary) {
                         return summary.getId() !== skillId;
@@ -542,8 +551,7 @@ angular.module('oppia').directive('questionsList', [
                   };
                   $scope.undo = function() {
                     $scope.associatedSkillSummaries = associatedSkillSummaries;
-                    skillsToRemove = [];
-                    skillsToAdd = [];
+                    returnArray = [];
                   };
                   $scope.addSkill = function() {
                     var sortedSkillSummaries = [];
@@ -619,7 +627,10 @@ angular.module('oppia').directive('questionsList', [
                       $scope.associatedSkillSummaries.push(
                         SkillSummaryObjectFactory.create(
                           summary.id, summary.description));
-                      skillsToAdd.push(summary.id);
+                      returnArray.push({
+                        id: summary.id,
+                        task: 'add'
+                      });
                     });
                   };
 
@@ -635,10 +646,7 @@ angular.module('oppia').directive('questionsList', [
                         'correspond to a correct answer';
                       return;
                     }
-                    $uibModalInstance.close({
-                      skillsToRemove: skillsToRemove,
-                      skillsToAdd: skillsToAdd
-                    });
+                    $uibModalInstance.close(returnArray);
                   };
                   // Checking if Question contains all requirement to enable
                   // Save and Publish Question
@@ -679,39 +687,21 @@ angular.module('oppia').directive('questionsList', [
               ]
             });
 
-            modalInstance.result.then(function(obj) {
+            modalInstance.result.then(function(array) {
               ctrl.editorIsOpen = false;
-              if (obj.skillsToAdd.length > 0) {
-                EditableQuestionBackendApiService.addSkillsToQuestion(
-                  questionId, obj.skillsToAdd, questionDifficulty).then(
+              if (array.length > 0) {
+                EditableQuestionBackendApiService.editQuestionSkillLinks(
+                  questionId, array, questionDifficulty).then(
                   data => {
-                    if (obj.skillsToRemove.length > 0) {
-                      EditableQuestionBackendApiService.
-                        deleteQuestionFromSkills(
-                          questionId, obj.skillsToRemove).then(data => {
-                          $timeout(function() {
-                            QuestionsListService.resetPageNumber();
-                            _reInitializeSelectedSkillIds();
-                            ctrl.getQuestionSummariesAsync(
-                              ctrl.selectedSkillIds, true, true
-                            );
-                            ctrl.saveAndPublishQuestion();
-                          }, 500);
-                        });
-                    }
+                    $timeout(function() {
+                      QuestionsListService.resetPageNumber();
+                      _reInitializeSelectedSkillIds();
+                      ctrl.getQuestionSummariesAsync(
+                        ctrl.selectedSkillIds, true, true
+                      );
+                      ctrl.saveAndPublishQuestion();
+                    }, 500);
                   });
-              } else if (obj.skillsToRemove.length > 0) {
-                EditableQuestionBackendApiService.deleteQuestionFromSkills(
-                  questionId, obj.skillsToRemove).then(data => {
-                  $timeout(function() {
-                    QuestionsListService.resetPageNumber();
-                    _reInitializeSelectedSkillIds();
-                    ctrl.getQuestionSummariesAsync(
-                      ctrl.selectedSkillIds, true, true
-                    );
-                    ctrl.saveAndPublishQuestion();
-                  }, 500);
-                });
               } else {
                 ctrl.saveAndPublishQuestion();
               }

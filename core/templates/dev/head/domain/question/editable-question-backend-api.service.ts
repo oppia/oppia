@@ -104,34 +104,17 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       });
     };
 
-    var _deleteQuestionFromSkills = function(
-        questionId, skillIds, successCallback, errorCallback) {
-      var deleteQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
+    var _editQuestionSkillLinks = function(
+        questionId, skillIdsTaskArray, difficulty,
+        successCallback, errorCallback) {
+      var editQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
-          question_id: questionId,
-          comma_separated_skill_ids: skillIds.join(',')
+          question_id: questionId
         });
-      $http['delete'](deleteQuestionSkillLinkUrl).then(function(response) {
-        if (successCallback) {
-          successCallback();
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _addSkillsToQuestion = function(
-        questionId, skillIds, difficulty, successCallback, errorCallback) {
-      var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
-        QUESTION_SKILL_LINK_URL_TEMPLATE, {
-          question_id: questionId,
-          comma_separated_skill_ids: skillIds.join(',')
-        });
-      $http.put(addQuestionSkillLinkUrl, {
-        action: 'add_skill',
-        difficulty: difficulty
+      $http.put(editQuestionSkillLinkUrl, {
+        action: 'edit_links',
+        difficulty: difficulty,
+        skill_ids_task_list: skillIdsTaskArray
       }).then(function(response) {
         if (successCallback) {
           successCallback();
@@ -147,12 +130,12 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
         questionId, skillId, newDifficulty, successCallback, errorCallback) {
       var changeDifficultyUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
-          question_id: questionId,
-          comma_separated_skill_ids: skillId + ','
+          question_id: questionId
         });
       var putData = {
         new_difficulty: newDifficulty,
-        action: 'update_difficulty'
+        action: 'update_difficulty',
+        skill_id: skillId
       };
       $http.put(changeDifficultyUrl, putData).then(function(response) {
         if (successCallback) {
@@ -179,16 +162,11 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
         });
       },
 
-      deleteQuestionFromSkills: function(questionId, skillIds) {
+      editQuestionSkillLinks: function(
+          questionId, skillIdsTaskArray, difficulty) {
         return $q(function(resolve, reject) {
-          _deleteQuestionFromSkills(questionId, skillIds, resolve, reject);
-        });
-      },
-
-      addSkillsToQuestion: function(questionId, skillIds, difficulty) {
-        return $q(function(resolve, reject) {
-          _addSkillsToQuestion(
-            questionId, skillIds, difficulty, resolve, reject);
+          _editQuestionSkillLinks(
+            questionId, skillIdsTaskArray, difficulty, resolve, reject);
         });
       },
 
