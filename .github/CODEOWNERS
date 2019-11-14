@@ -388,6 +388,31 @@
 /data/ @nithusha21
 
 
+# Release team.
+/scripts/cut_release_or_hotfix_branch.py @ankita240796
+/scripts/cut_release_or_hotfix_branch_test.py @ankita240796
+/scripts/deploy.py @ankita240796
+/scripts/deploy_test.py @ankita240796
+/scripts/gcloud_adapter.py @ankita240796
+/scripts/gcloud_adapter_test.py @ankita240796
+/scripts/generate_release_updates.py @ankita240796
+/scripts/generate_release_updates_test.py @ankita240796
+/scripts/initial_release_prep.py @ankita240796
+/scripts/initial_release_prep_test.py @ankita240796
+/scripts/release_info.py @ankita240796
+/scripts/release_info_test.py @ankita240796
+/scripts/restore_backup.py @ankita240796
+/scripts/restore_backup_test.py @ankita240796
+/scripts/update_changelog_and_credits.py @ankita240796
+/scripts/update_changelog_and_credits_test.py @ankita240796
+/scripts/update_configs.py @ankita240796
+/scripts/update_configs_test.py @ankita240796
+/scripts/update_indexes.py @ankita240796
+/scripts/update_indexes_test.py @ankita240796
+/scripts/wrap_release.py @ankita240796
+/scripts/wrap_release_test.py @ankita240796
+
+
 # Rich text editor team.
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
 /core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
@@ -408,6 +433,7 @@
 /core/storage/suggestion/ @nithusha21
 /core/templates/dev/head/domain/suggestion/ @nithusha21
 /core/templates/dev/head/services/suggestion-modal.service.ts @nithusha21
+
 
 # Feedback project.
 /core/controllers/feedback*.py @nithusha21
