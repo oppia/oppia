@@ -60,7 +60,7 @@ class UserSettings(python_utils.OBJECT):
 
     Attributes:
         user_id: str. The unique ID of the user.
-        gae_user_id: str. The ID of the user retrieved from GAE.
+        gae_id: str. The ID of the user retrieved from GAE.
         email: str. The user email.
         role: str. Role of the user. This is used in conjunction with
             PARENT_ROLES to determine which actions the user can perform.
@@ -139,7 +139,7 @@ class UserSettings(python_utils.OBJECT):
                 for audio translations preference.
         """
         self.user_id = user_id
-        self.gae_user_id = user_id
+        self.gae_id = user_id
         self.email = email
         self.role = role
         self.username = username
@@ -169,7 +169,7 @@ class UserSettings(python_utils.OBJECT):
 
         Raises:
             ValidationError: user_id is not str.
-            ValidationError: gae_user_id is not str.
+            ValidationError: gae_id is not str.
             ValidationError: email is not str.
             ValidationError: email is invalid.
             ValidationError: role is not str.
@@ -181,9 +181,9 @@ class UserSettings(python_utils.OBJECT):
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
 
-        if not isinstance(self.gae_user_id, python_utils.BASESTRING):
+        if not isinstance(self.gae_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected gae_user_id to be a string, received %s' %
+                'Expected gae_id to be a string, received %s' %
                 self.user_id
             )
 
@@ -619,7 +619,7 @@ def _save_user_settings(user_settings):
     user_settings.validate()
     user_models.UserSettingsModel(
         id=user_settings.user_id,
-        gae_user_id=user_settings.gae_user_id,
+        gae_id=user_settings.gae_id,
         email=user_settings.email,
         role=user_settings.role,
         username=user_settings.username,

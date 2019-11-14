@@ -1424,7 +1424,7 @@ class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
         migrated_user_settings_model = (
             user_models.UserSettingsModel.get(user_id))
         self.assertEqual(migrated_user_settings_model.id, user_id)
-        self.assertEqual(migrated_user_settings_model.gae_user_id, user_id)
+        self.assertEqual(migrated_user_settings_model.gae_id, user_id)
         # Check that the other values didn't change.
         self.assertEqual(migrated_user_settings_model.email, email)
 
@@ -1432,8 +1432,7 @@ class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
         user_id = 'user'
         email = 'user@domain.com'
         user_models.UserSettingsModel(
-            id=user_id, email=email, gae_user_id=None
-        ).put()
+            id=user_id, email=email, gae_id=None).put()
 
         output = self._run_one_off_job()
 
@@ -1448,7 +1447,7 @@ class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
         user_1_id = 'user1'
         user_1_email = 'user1@domain.com'
         user_models.UserSettingsModel(
-            id=user_1_id, email=user_1_email, gae_user_id=None).put()
+            id=user_1_id, email=user_1_email, gae_id=None).put()
 
         user_2_id = 'user2'
         user_2_email = 'user2@domain.com'
