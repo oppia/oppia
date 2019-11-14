@@ -137,7 +137,6 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     def delete(self, question_id, skill_ids):
         """Unlinks a question from a skill."""
         skill_ids = skill_ids.split(',')
-        print skill_ids
         for skill_id in skill_ids:
             question_services.delete_question_skill_link(
                 self.user_id, question_id, skill_id)
