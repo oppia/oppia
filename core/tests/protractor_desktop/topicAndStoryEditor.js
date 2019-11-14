@@ -192,6 +192,37 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
   });
 
+  it('should assign a skill to, between, and from subtopics', function() {
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill 2', 'Concept card explanation');
+
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+
+    topicEditorPage.get(topicId);
+    topicEditorPage.moveToSubtopicsTab();
+    topicEditorPage.addSubtopic('Subtopic 1');
+    topicEditorPage.addSubtopic('Subtopic 2');
+    topicEditorPage.saveTopic('Added subtopics.');
+
+    topicEditorPage.expectSubtopicToHaveSkills(0, []);
+    topicEditorPage.expectSubtopicToHaveSkills(1, []);
+
+    topicEditorPage.dragSkillToSubtopic(1, 0);
+    topicEditorPage.expectSubtopicToHaveSkills(0, ['Skill 2']);
+    topicEditorPage.expectSubtopicToHaveSkills(1, []);
+
+    topicEditorPage.dragSkillBetweenSubtopics(0, 0, 1);
+    topicEditorPage.expectSubtopicToHaveSkills(0, []);
+    topicEditorPage.expectSubtopicToHaveSkills(1, ['Skill 2']);
+
+    topicEditorPage.dragSkillFromSubtopicToUncategorized(1, 0);
+    topicEditorPage.expectSubtopicToHaveSkills(0, []);
+    topicEditorPage.expectSubtopicToHaveSkills(1, []);
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
     users.logout();
