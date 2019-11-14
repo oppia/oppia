@@ -16,34 +16,22 @@
  * @fileoverview Unit tests for IdGenerationService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { IdGenerationService } from 'services/id-generation.service';
 
-require('services/id-generation.service.ts');
+describe('IdGenerationService', () => {
+  let idGenerationService = null;
 
-describe('IdGenerationService', function() {
-  var IdGenerationService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    IdGenerationService = $injector.get('IdGenerationService');
-  }));
-
-  it('should generate a random id of fixed length', function() {
-    expect(IdGenerationService.generateNewId()).toMatch(/^[a-z0-9]{10}$/);
+  beforeEach(() => {
+    idGenerationService = new IdGenerationService();
   });
 
-  it('should generate two different ids', function() {
-    var id1 = IdGenerationService.generateNewId();
-    var id2 = IdGenerationService.generateNewId();
+  it('should generate a random id of fixed length', () => {
+    expect(idGenerationService.generateNewId()).toMatch(/^[a-z0-9]{10}$/);
+  });
+
+  it('should generate two different ids', () => {
+    let id1 = idGenerationService.generateNewId();
+    let id2 = idGenerationService.generateNewId();
     expect(id1).not.toEqual(id2);
   });
 });

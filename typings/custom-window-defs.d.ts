@@ -17,4 +17,5 @@ interface Window {
     encodeURIComponent?: any;
     opera?: any;
     safari?: any;
+    ga?: any;
 }
