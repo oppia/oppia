@@ -9,58 +9,60 @@
   </style>
   <p><i>Just use the lines you have seen so far.</i></p>
   <p>
-    <div class="row">
-      <div class="col-xs-6">
-        From R∧S we have R<br>
-        From R∧S we have S<br>
-        From R and S we have R∧S<br><br>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-6">
+          From R∧S we have R<br>
+          From R∧S we have S<br>
+          From R and S we have R∧S<br><br>
 
-        From R and R=>S we have S<br>
-        If R <i>(indent after)</i><br>
-        Hence R=>S <i>(deindent this line)</i><br>
-        We have R<br><br>
+          From R and R=>S we have S<br>
+          If R <i>(indent after)</i><br>
+          Hence R=>S <i>(deindent this line)</i><br>
+          We have R<br><br>
 
-        From R we have R∨S<br>
-        From S we have R∨S<br>
-        We have R∨S and whichever is true we have T<br><br>
+          From R we have R∨S<br>
+          From S we have R∨S<br>
+          We have R∨S and whichever is true we have T<br><br>
 
-        From R and ~R we have contradiction<br>
-        From contradiction we have S<br>
-        Hence ~R <i>(deindent this line)</i><br>
-        We have R∨~R
-      </div>
-      <div class="col-xs-6">
-        From R and R<=>S we have S<br>
-        From S and R<=>S we have R<br>
-        From R<=>S we have R=>S<br>
-        From R<=>S we have S=>R<br>
-        From R=>S and S=>R we have R<=>S<br><br>
+          From R and ~R we have contradiction<br>
+          From contradiction we have S<br>
+          Hence ~R <i>(deindent this line)</i><br>
+          We have R∨~R
+        </div>
+        <div class="col-xs-6">
+          From R and R<=>S we have S<br>
+          From S and R<=>S we have R<br>
+          From R<=>S we have R=>S<br>
+          From R<=>S we have S=>R<br>
+          From R=>S and S=>R we have R<=>S<br><br>
 
-        From ∀x.p at c we have p[x->c]<br>
-        Given c <i>(indent after)</i><br>
-        c was arbitrary hence ∀x.p<br>
-        From p[x->c] at c we have ∃x.p<br>
-        We have ∃x.p so take c satisfying p[x->c]<br>
-        Take x<br><br>
+          From ∀x.p at c we have p[x->c]<br>
+          Given c <i>(indent after)</i><br>
+          c was arbitrary hence ∀x.p<br>
+          From p[x->c] at c we have ∃x.p<br>
+          We have ∃x.p so take c satisfying p[x->c]<br>
+          Take x<br><br>
 
-        <i>An indent is two spaces at the start of the line</i><br><br>
+          <i>An indent is two spaces at the start of the line</i><br><br>
 
-        <table class="table-bordered">
-          <tr>
-            <td><i>Type</i></td>
-            <td>&amp;</td>
-            <td>|</td>
-            <td>@</td>
-            <td>$</td>
-          </tr>
-          <tr>
-            <td><i>to get</i></td>
-            <td>∧</td>
-            <td>∨</td>
-            <td>∀</td>
-            <td>∃</td>
-          </tr>
-        </table>
+          <table class="table-bordered">
+            <tr>
+              <td><i>Type</i></td>
+              <td>&amp;</td>
+              <td>|</td>
+              <td>@</td>
+              <td>$</td>
+            </tr>
+            <tr>
+              <td><i>to get</i></td>
+              <td>∧</td>
+              <td>∨</td>
+              <td>∀</td>
+              <td>∃</td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
   </p>

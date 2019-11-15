@@ -16,7 +16,7 @@
  * @fileoverview Directive for the exploration editor feedback tab.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -27,10 +27,10 @@ require(
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
-require('services/AlertsService.ts');
-require('services/DateTimeFormatService.ts');
-require('services/EditabilityService.ts');
-require('services/UserService.ts');
+require('services/alerts.service.ts');
+require('services/date-time-format.service.ts');
+require('services/editability.service.ts');
+require('services/user.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

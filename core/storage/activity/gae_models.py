@@ -39,19 +39,6 @@ class ActivityReferencesModel(base_models.BaseModel):
         """Activity references are not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
-        """ActivityReferencesModel doesn't reference any user_id.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
-
     @classmethod
     def get_or_create(cls, list_name):
         """This creates the relevant model instance, if it does not already

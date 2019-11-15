@@ -1,0 +1,33 @@
+<div class="modal-header">
+  <h3> Select new difficulty </h3>
+</div>
+<div class="modal-body select-skill-modal">
+  <div class="list-group">
+    <div class="list-group-item"  ng-repeat="skillWithDifficulty in linkedSkillsWithDifficulty track by $index">
+      <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty.getDescription()]></label>
+      <md-radio-group ng-model="skillWithDifficulty._difficulty">
+        <md-radio-button value="0.3">
+          Easy:
+          <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][0].getExplanation()">
+          </angular-html-bind>
+        </md-radio-button>
+
+        <md-radio-button value="0.6">
+          Medium:
+          <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][1].getExplanation()">
+          </angular-html-bind>
+        </md-radio-button>
+
+        <md-radio-button value="0.9">
+          Hard:
+          <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][2].getExplanation()">
+          </angular-html-bind>
+        </md-radio-button>
+      </md-radio-group>
+    </div>
+  </div>
+</div>
+<div class="modal-footer" ng-switch="linkedSkillsWithDifficulty.length > 0">
+  <button class="btn btn-secondary" ng-click="cancelModal()"> Cancel </button>
+  <button class="btn btn-success" ng-click="done()"> Done </button>
+</div>

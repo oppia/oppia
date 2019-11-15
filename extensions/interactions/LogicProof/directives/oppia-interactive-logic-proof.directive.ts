@@ -18,13 +18,13 @@
 
 require('interactions/codemirrorRequires.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/html-escaper.service.ts');
 
 import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
 import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';

@@ -20,19 +20,19 @@ using release_summary.md.
 This script should only be run after release_info.py script is run
 successfully.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import collections
 import datetime
-import getpass
 import os
-import re
+import subprocess
 import sys
 
-import feconf
 import python_utils
+import release_constants
 
 from . import common
 
@@ -91,7 +91,7 @@ def update_sorted_file(filepath, new_list):
     # and then the sorted list. So, the start_index is the index of
     # last_comment_line plus 2.
     start_index = file_lines.index(last_comment_line) + 2
-    updated_list = new_list + file_lines[start_index:]
+    updated_list = list(set(new_list + file_lines[start_index:]))
     updated_list = sorted(updated_list, key=lambda s: s.lower())
     file_lines = file_lines[:start_index] + updated_list
     with python_utils.open_file(filepath, 'w') as f:
@@ -111,7 +111,7 @@ def check_ordering_of_sections(release_summary_lines):
             ../release_summary.md.
 
     Raises:
-        Exception: If expected ordering does not match the ordering
+        Exception: The expected ordering does not match the ordering
             in release_summary.md.
     """
     sections = [
@@ -132,10 +132,64 @@ def check_ordering_of_sections(release_summary_lines):
                     section.strip(), next_section.strip()))
 
 
-def update_changelog(release_summary_lines, current_release_version):
+def get_previous_release_version(branch_type, current_release_version):
+    """Finds previous version given the current version.
+
+    Args:
+        branch_type: str. The type of the branch: release or hotfix.
+        current_release_version: str. The current release version.
+
+    Returns:
+        str. The previous version.
+
+    Raises:
+        Exception: Branch type is invalid.
+        Exception: Previous release version is same as current release version.
+    """
+    all_tags = subprocess.check_output(['git', 'tag'])[:-1].split('\n')
+    # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
+    # version.
+    if branch_type == release_constants.RELEASE_BRANCH_TYPE:
+        previous_release_version = all_tags[-1][1:]
+    elif branch_type == release_constants.HOTFIX_BRANCH_TYPE:
+        previous_release_version = all_tags[-2][1:]
+    else:
+        raise Exception('Invalid branch type: %s.' % branch_type)
+    assert previous_release_version != current_release_version
+    return previous_release_version
+
+
+def remove_repetition_from_changelog(
+        current_release_version, previous_release_version, changelog_lines):
+    """Removes information about current version from changelog before
+    generation of changelog again.
+
+    Args:
+        current_release_version: str. The current release version.
+        previous_release_version: str. The previous release version.
+        changelog_lines: str. The lines of changelog file.
+
+    Returns:
+        list(str). Changelog lines with no information on current release
+            version.
+    """
+    current_version_start = 0
+    previous_version_start = 0
+    for index, line in enumerate(changelog_lines):
+        if 'v%s' % current_release_version in line:
+            current_version_start = index
+        if 'v%s' % previous_release_version in line:
+            previous_version_start = index
+    changelog_lines[current_version_start:previous_version_start] = []
+    return changelog_lines
+
+
+def update_changelog(
+        branch_name, release_summary_lines, current_release_version):
     """Updates CHANGELOG file.
 
     Args:
+        branch_name: str. The name of the current branch.
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
         current_release_version: str. The version of current release.
@@ -150,6 +204,25 @@ def update_changelog(release_summary_lines, current_release_version):
     changelog_lines = []
     with python_utils.open_file(CHANGELOG_FILEPATH, 'r') as changelog_file:
         changelog_lines = changelog_file.readlines()
+
+    if release_constants.HOTFIX_BRANCH_TYPE in branch_name:
+        previous_release_version = get_previous_release_version(
+            release_constants.HOTFIX_BRANCH_TYPE, current_release_version)
+        changelog_lines = remove_repetition_from_changelog(
+            current_release_version, previous_release_version, changelog_lines)
+    else:
+        previous_release_version = get_previous_release_version(
+            release_constants.RELEASE_BRANCH_TYPE, current_release_version)
+        # Update only if changelog is generated before and contains info for
+        # current version.
+        if any(
+                line.startswith(
+                    'v%s' % current_release_version
+                    ) for line in changelog_lines):
+            changelog_lines = remove_repetition_from_changelog(
+                current_release_version, previous_release_version,
+                changelog_lines)
+
     changelog_lines[2:2] = release_version_changelog
     with python_utils.open_file(CHANGELOG_FILEPATH, 'w') as changelog_file:
         for line in changelog_lines:
@@ -296,8 +369,8 @@ def update_developer_names(release_summary_lines):
                 '%s</ul>\n' % span_indent)
 
             old_developer_names = about_page_lines[start_index:end_index]
-            updated_developer_names = (
-                old_developer_names + developer_name_dict[char])
+            updated_developer_names = list(set((
+                old_developer_names + developer_name_dict[char])))
             updated_developer_names = sorted(
                 updated_developer_names, key=lambda s: s.lower())
             about_page_lines[start_index:end_index] = updated_developer_names
@@ -365,35 +438,18 @@ def create_branch(repo_fork, target_branch, github_username):
         'Please create a pull request from the %s branch' % target_branch)
 
 
-def ask_user_to_confirm(message):
-    """Asks user to perform a task and confirm once they are done.
-
-    Args:
-        message: str. The message which specifies the task user has
-            to do.
-    """
-    while True:
-        python_utils.PRINT(
-            '******************************************************')
-        python_utils.PRINT(message)
-        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
-        answer = python_utils.INPUT().lower()
-        if answer in ['y', 'ye', 'yes']:
-            return
-
-
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
-    if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
+    if not common.is_current_branch_a_release_branch():
         raise Exception(
             'This script should only be run from the latest release branch.')
 
-    if not os.path.exists(feconf.RELEASE_SUMMARY_FILEPATH):
+    if not os.path.exists(release_constants.RELEASE_SUMMARY_FILEPATH):
         raise Exception(
             'Release summary file %s is missing. Please run the '
             'release_info.py script and re-run this script.' % (
-                feconf.RELEASE_SUMMARY_FILEPATH))
+                release_constants.RELEASE_SUMMARY_FILEPATH))
 
     parsed_args = _PARSER.parse_args()
     if parsed_args.github_username is None:
@@ -402,16 +458,7 @@ def main():
             'script specifying a username using --username=<Your username>')
     github_username = parsed_args.github_username
 
-    personal_access_token = getpass.getpass(
-        prompt=(
-            'Please provide personal access token for your github ID. '
-            'You can create one at https://github.com/settings/tokens: '))
-
-    if personal_access_token is None:
-        raise Exception(
-            'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and re-run '
-            'the script')
+    personal_access_token = common.get_personal_access_token()
     g = github.Github(personal_access_token)
     repo_fork = g.get_repo('%s/oppia' % github_username)
 
@@ -426,18 +473,19 @@ def main():
         'updating the CHANGELOG file\n- have a correct list of new '
         'authors and contributors to update AUTHORS, CONTRIBUTORS '
         'and developer_names section in about-page.directive.html\n' % (
-            feconf.RELEASE_SUMMARY_FILEPATH))
-    ask_user_to_confirm(message)
+            release_constants.RELEASE_SUMMARY_FILEPATH))
+    common.ask_user_to_confirm(message)
 
     release_summary_lines = []
     with python_utils.open_file(
-        feconf.RELEASE_SUMMARY_FILEPATH, 'r') as release_summary_file:
+        release_constants.RELEASE_SUMMARY_FILEPATH, 'r'
+        ) as release_summary_file:
         release_summary_lines = release_summary_file.readlines()
 
     check_ordering_of_sections(release_summary_lines)
 
     update_changelog(
-        release_summary_lines, current_release_version)
+        branch_name, release_summary_lines, current_release_version)
     update_authors(release_summary_lines)
     update_contributors(release_summary_lines)
     update_developer_names(release_summary_lines)
@@ -447,12 +495,13 @@ def main():
         'following files:\n1. %s\n2. %s\n3. %s\n4. %s\n' % (
             CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
             ABOUT_PAGE_FILEPATH))
-    ask_user_to_confirm(message)
+    common.ask_user_to_confirm(message)
 
     create_branch(repo_fork, target_branch, github_username)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when build.py is used as a script.
+# it will only be called when update_changelog_and_credits.py is used as
+# a script.
 if __name__ == '__main__': # pragma: no cover
     main()

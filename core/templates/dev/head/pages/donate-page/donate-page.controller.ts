@@ -18,9 +18,9 @@
 
 require('base-components/base-content.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/site-analytics.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('donatePage', [
   'UrlInterpolationService', function(

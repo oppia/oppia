@@ -19,7 +19,7 @@
  */
 
 require('domain/exploration/StatesObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('pages/exploration-editor-page/services/angular-name.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -34,9 +34,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/ValidatorsService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').factory('ExplorationStatesService', [
   '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
@@ -475,6 +475,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         _states.renameState(oldStateName, newStateName);
 
         StateEditorService.setActiveStateName(newStateName);
+        StateEditorService.setStateNames(_states.getStateNames());
         // The 'rename state' command must come before the 'change
         // init_state_name' command in the change list, otherwise the backend
         // will raise an error because the new initial state name does not

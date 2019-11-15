@@ -17,13 +17,13 @@
  */
 
 require('domain/state/StateObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
-require('services/EditabilityService.ts');
-require('services/SuggestionModalService.ts');
+require('services/editability.service.ts');
+require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
   '$log', '$rootScope', '$uibModal',

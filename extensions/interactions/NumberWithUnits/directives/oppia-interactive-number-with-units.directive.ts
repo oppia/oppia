@@ -17,13 +17,15 @@
  */
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/NumberWithUnits/directives/' +
   'number-with-units-rules.service.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
+
+require('domain/objects/objects-domain.constants.ajs.ts');
 
 angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
   'UrlInterpolationService',

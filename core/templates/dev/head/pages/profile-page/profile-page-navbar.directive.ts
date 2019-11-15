@@ -16,8 +16,8 @@
  * @fileoverview Directive for profile page
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/contextual/UrlService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('profilePageNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {

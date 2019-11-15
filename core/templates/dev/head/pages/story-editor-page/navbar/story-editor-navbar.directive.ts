@@ -19,13 +19,13 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
-require('domain/editor/undo_redo/BaseUndoRedoService.ts');
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/summary/ExplorationSummaryBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/editor/undo_redo/base-undo-redo.service.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/summary/exploration-summary-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
+require('services/alerts.service.ts');
+require('services/contextual/url.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -72,8 +72,8 @@ angular.module('oppia').directive('storyEditorNavbar', [
           };
 
           var _validateStory = function() {
-            _validateExplorations();
             $scope.validationIssues = $scope.story.validate();
+            _validateExplorations();
           };
 
           var _validateExplorations = function() {
@@ -84,6 +84,9 @@ angular.module('oppia').directive('storyEditorNavbar', [
                 nodes[i].getExplorationId() !== null &&
                 nodes[i].getExplorationId() !== '') {
                 explorationIds.push(nodes[i].getExplorationId());
+              } else {
+                $scope.validationIssues.push(
+                  'Some chapters don\'t have exploration IDs provided.');
               }
             }
 
