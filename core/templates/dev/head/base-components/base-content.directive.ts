@@ -59,7 +59,8 @@ angular.module('oppia').directive('baseContent', [
           ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
           ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
           ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
-          ctrl.isBackgroundMaskActive = () => BackgroundMaskService.isMaskActive();
+          ctrl.isBackgroundMaskActive = () => (
+            BackgroundMaskService.isMaskActive());
           ctrl.DEV_MODE = $rootScope.DEV_MODE;
           ctrl.skipToMainContent = function() {
             var mainContentElement = document.getElementById(
