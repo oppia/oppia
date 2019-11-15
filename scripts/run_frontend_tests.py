@@ -79,7 +79,7 @@ def main(args=None):
 
         build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
-        subprocess.call([
+        subprocess.check_call([
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
             '--prodEnv'])

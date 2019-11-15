@@ -16,8 +16,8 @@
  * @fileoverview Functionality for creating a new skill.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
@@ -30,7 +30,8 @@ angular.module('oppia').factory('SkillCreationService', [
     var skillCreationInProgress = false;
 
     return {
-      createNewSkill: function(description, rubrics, linkedTopicIds) {
+      createNewSkill: function(
+          description, rubrics, explanation, linkedTopicIds) {
         if (skillCreationInProgress) {
           return;
         }
@@ -43,6 +44,7 @@ angular.module('oppia').factory('SkillCreationService', [
         $http.post('/skill_editor_handler/create_new', {
           description: description,
           linked_topic_ids: linkedTopicIds,
+          explanation_dict: explanation,
           rubrics: rubrics
         }).then(function(response) {
           $timeout(function() {

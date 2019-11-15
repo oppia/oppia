@@ -19,12 +19,12 @@
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/IdGenerationService.ts');
-require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
-require('services/SchemaDefaultValueService.ts');
-require('services/SchemaUndefinedLastElementService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/id-generation.service.ts');
+require('services/nested-directives-recursion-timeout-prevention.service.ts');
+require('services/schema-default-value.service.ts');
+require('services/schema-undefined-last-element.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',

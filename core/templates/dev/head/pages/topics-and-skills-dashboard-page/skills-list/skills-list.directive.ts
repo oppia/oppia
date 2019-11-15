@@ -17,16 +17,15 @@
  */
 
 require(
-  'pages/topics-and-skills-dashboard-page/skill-selector/' +
-  'skill-selector.directive.ts');
+  'components/skill-selector/skill-selector.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
 
-require('domain/skill/EditableSkillBackendApiService.ts');
-require('domain/topic/EditableTopicBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
+require('domain/skill/editable-skill-backend-api.service.ts');
+require('domain/topic/editable-topic-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +

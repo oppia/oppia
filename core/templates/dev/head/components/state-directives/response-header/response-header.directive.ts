@@ -16,14 +16,14 @@
  * @fileoverview Directive for the header of the response tiles.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/EditabilityService.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').directive('responseHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {

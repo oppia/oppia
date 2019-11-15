@@ -29,7 +29,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -59,7 +59,9 @@ angular.module('oppia').directive('outcomeEditor', [
             ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.editOutcomeForm = {};
-          ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
+          ctrl.isInQuestionMode = function() {
+            return StateEditorService.isInQuestionMode();
+          };
           ctrl.canAddPrerequisiteSkill = (
             ENABLE_PREREQUISITE_SKILLS &&
             StateEditorService.isExplorationWhitelisted());
@@ -132,11 +134,12 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.isSelfLoopWithNoFeedback = function(outcome) {
-            if (!outcome) {
-              return false;
+            if (outcome && typeof outcome === 'object' &&
+              outcome.constructor.name === 'Outcome') {
+              return ctrl.isSelfLoop(outcome) &&
+                !outcome.hasNonemptyFeedback();
             }
-            return ctrl.isSelfLoop(outcome) &&
-              !outcome.hasNonemptyFeedback();
+            return false;
           };
 
           ctrl.invalidStateAfterFeedbackSave = function() {
@@ -169,6 +172,12 @@ angular.module('oppia').directive('outcomeEditor', [
               ctrl.outcome.feedback.getHtml());
             ctrl.savedOutcome.feedback = angular.copy(
               ctrl.outcome.feedback);
+            // If the stateName has changed and previously saved
+            // destination points to the older name, update it to
+            // the active state name.
+            if (ctrl.savedOutcome.dest === ctrl.outcome.dest) {
+              ctrl.savedOutcome.dest = StateEditorService.getActiveStateName();
+            }
             var feedbackContentId = ctrl.savedOutcome.feedback.getContentId();
             if (fromClickSaveFeedbackButton && contentHasChanged) {
               var contentId = ctrl.savedOutcome.feedback.getContentId();

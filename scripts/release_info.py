@@ -17,17 +17,17 @@
 """Script that simplifies releases by collecting various information.
 Should be run from the oppia root dir.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import getpass
 import os
 import re
 import sys
 
-import feconf
 import python_utils
+import release_constants
 
 from . import common
 
@@ -54,11 +54,6 @@ FECONF_VAR_NAMES = ['CURRENT_STATE_SCHEMA_VERSION',
                     'CURRENT_COLLECTION_SCHEMA_VERSION']
 FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
-# PyGithub can fetch milestone only by using the milestone number. Milestones
-# are numbered sequentially as they are created and the number remains fixed.
-# The number for blocking_bugs milestone is 39 which is used to fetch this
-# milestone.
-BLOCKING_BUG_MILESTONE_NUMBER = 39
 FECONF_FILEPATH = os.path.join('', 'feconf.py')
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
@@ -270,78 +265,17 @@ def check_storage_models(current_release):
     return [item for item in diff_list if item.startswith('core/storage')]
 
 
-def get_blocking_bug_issue_count(repo):
-    """Returns the number of unresolved blocking bugs.
-
-    Args:
-        repo: github.Repository.Repository. The PyGithub object for the repo.
-
-    Returns:
-        int: Number of unresolved blocking bugs.
-    """
-    blocking_bugs_milestone = repo.get_milestone(
-        number=BLOCKING_BUG_MILESTONE_NUMBER)
-    return blocking_bugs_milestone.open_issues
-
-
-def check_prs_for_current_release_are_released(repo):
-    """Checks that all pull requests for current release have a
-    'PR: released' label.
-
-    Args:
-        repo: github.Repository.Repository. The PyGithub object for the repo.
-
-    Returns:
-        bool. Whether all pull requests for current release have a
-            PR: released label.
-    """
-    all_prs = repo.get_pulls(state='all')
-    for pr in all_prs:
-        label_names = [label.name for label in pr.labels]
-        if 'PR: released' not in label_names and (
-                'PR: for current release' in label_names):
-            return False
-    return True
-
-
 def main():
     """Collects necessary info and dumps it to disk."""
-    branch_name = common.get_current_branch_name()
-    if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
+    if not common.is_current_branch_a_release_branch():
         raise Exception(
             'This script should only be run from the latest release branch.')
-
-    personal_access_token = getpass.getpass(
-        prompt=(
-            'Please provide personal access token for your github ID. '
-            'You can create one at https://github.com/settings/tokens: '))
-
-    if personal_access_token is None:
-        raise Exception(
-            'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and re-run '
-            'the script')
+    personal_access_token = common.get_personal_access_token()
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
-    blocking_bugs_count = get_blocking_bug_issue_count(repo)
-    if blocking_bugs_count:
-        common.open_new_tab_in_browser_if_possible(
-            'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
-            'is%3Aissue+milestone%3A%22Blocking+bugs%22')
-        raise Exception(
-            'There are %s unresolved blocking bugs. Please ensure '
-            'that they are resolved before release summary generation.' % (
-                blocking_bugs_count))
-
-    if not check_prs_for_current_release_are_released(repo):
-        common.open_new_tab_in_browser_if_possible(
-            'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
-            '+label%3A%22PR%3A+for+current+release%22+')
-        raise Exception(
-            'There are PRs for current release which do not have '
-            'a \'PR: released\' label. Please ensure that they are released '
-            'before release summary generation.')
+    common.check_blocking_bug_issue_count(repo)
+    common.check_prs_for_current_release_are_released(repo)
 
     current_release = get_current_version_tag(repo)
     current_release_tag = current_release.name
@@ -365,7 +299,8 @@ def main():
     prs = get_prs_from_pr_numbers(pr_numbers, repo)
     categorized_pr_titles = get_changelog_categories(prs)
 
-    with python_utils.open_file(feconf.RELEASE_SUMMARY_FILEPATH, 'w') as out:
+    with python_utils.open_file(
+        release_constants.RELEASE_SUMMARY_FILEPATH, 'w') as out:
         out.write('## Collected release information\n')
 
         if feconf_version_changes:
@@ -445,10 +380,10 @@ def main():
                 out.write('* [%s](%s)\n' % (link, link))
 
     python_utils.PRINT('Done. Summary file generated in %s' % (
-        feconf.RELEASE_SUMMARY_FILEPATH))
+        release_constants.RELEASE_SUMMARY_FILEPATH))
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when build.py is used as a script.
+# it will only be called when release_info.py is used as a script.
 if __name__ == '__main__': # pragma: no cover
     main()

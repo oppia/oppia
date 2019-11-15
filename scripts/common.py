@@ -17,11 +17,14 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
+import getpass
 import os
+import re
 import socket
 import subprocess
 
 import python_utils
+import release_constants
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -83,7 +86,7 @@ def open_new_tab_in_browser_if_possible(url):
     browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
-            subprocess.call([cmd, url])
+            subprocess.check_call([cmd, url])
             return
     python_utils.PRINT(
         '******************************************************************')
@@ -148,7 +151,10 @@ def is_current_branch_a_release_branch():
         bool. Whether the current branch is a release branch.
     """
     current_branch_name = get_current_branch_name()
-    return current_branch_name.startswith(RELEASE_BRANCH_NAME_PREFIX)
+    return (
+        bool(re.match(r'release-\d+\.\d+\.\d+$', current_branch_name)) or bool(
+            re.match(
+                r'release-\d+\.\d+\.\d+-hotfix-[1-9]+$', current_branch_name)))
 
 
 def verify_current_branch_name(expected_branch_name):
@@ -180,7 +186,7 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
                     'instructions: '
                     'https://help.github.com/articles/'
                     'error-repository-not-found/#check-your-ssh-access')
-            subprocess.call([
+            subprocess.check_call([
                 'git', 'clone',
                 'git@github.com:oppia/release-scripts.git'])
 
@@ -191,7 +197,7 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         # Update the local repo.
         remote_alias = get_remote_alias(
             'git@github.com:oppia/release-scripts.git')
-        subprocess.call(['git', 'pull', remote_alias])
+        subprocess.check_call(['git', 'pull', remote_alias])
 
 
 def is_port_open(port):
@@ -262,8 +268,98 @@ def install_npm_library(library_name, version, path):
         'Checking whether %s is installed in %s' % (library_name, path))
     if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
         python_utils.PRINT('Installing %s' % library_name)
-        subprocess.call([
+        subprocess.check_call([
             'yarn', 'add', '%s@%s' % (library_name, version)])
+
+
+def ask_user_to_confirm(message):
+    """Asks user to perform a task and confirm once they are done.
+
+    Args:
+        message: str. The message which specifies the task user has
+            to do.
+    """
+    while True:
+        python_utils.PRINT(
+            '******************************************************')
+        python_utils.PRINT(message)
+        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
+        answer = python_utils.INPUT().lower()
+        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+            return
+
+
+def get_personal_access_token():
+    """"Returns the personal access token for the GitHub id of user.
+
+    Returns:
+        str. The personal access token for the GitHub id of user.
+
+    Raises:
+        Exception: Personal access token is None.
+    """
+    personal_access_token = getpass.getpass(
+        prompt=(
+            'Please provide personal access token for your github ID. '
+            'You can create one at https://github.com/settings/tokens: '))
+
+    if personal_access_token is None:
+        raise Exception(
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script')
+    return personal_access_token
+
+
+def check_blocking_bug_issue_count(repo):
+    """Checks the number of unresolved blocking bugs.
+
+    Args:
+        repo: github.Repository.Repository. The PyGithub object for the repo.
+
+    Raises:
+        Exception: Number of unresolved blocking bugs is not zero.
+        Exception: The blocking bug milestone is closed.
+    """
+    blocking_bugs_milestone = repo.get_milestone(
+        number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
+    if blocking_bugs_milestone.state == 'closed':
+        raise Exception('The blocking bug milestone is closed.')
+    if blocking_bugs_milestone.open_issues:
+        open_new_tab_in_browser_if_possible(
+            'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
+            'is%3Aissue+milestone%3A%22Blocking+bugs%22')
+        raise Exception(
+            'There are %s unresolved blocking bugs. Please ensure '
+            'that they are resolved before release summary generation.' % (
+                blocking_bugs_milestone.open_issues))
+
+
+def check_prs_for_current_release_are_released(repo):
+    """Checks that all pull requests for current release have a
+    'PR: released' label.
+
+    Args:
+        repo: github.Repository.Repository. The PyGithub object for the repo.
+
+    Raises:
+        Exception: Some pull requests for current release do not have a
+            PR: released label.
+    """
+    current_release_label = repo.get_label(
+        release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
+    current_release_prs = repo.get_issues(
+        state='all', labels=[current_release_label])
+    for pr in current_release_prs:
+        label_names = [label.name for label in pr.labels]
+        if release_constants.LABEL_FOR_RELEASED_PRS not in label_names:
+            open_new_tab_in_browser_if_possible(
+                'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
+                '+label%3A%22PR%3A+for+current+release%22+')
+            raise Exception(
+                'There are PRs for current release which do not have '
+                'a \'PR: released\' label. Please ensure that they are '
+                'released before release summary generation.')
 
 
 class CD(python_utils.OBJECT):
