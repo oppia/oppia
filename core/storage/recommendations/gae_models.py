@@ -58,6 +58,12 @@ class ExplorationRecommendationsModel(
         """
         return False
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationRecommendationsModel doesn't have any field with user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
 
 class TopicSimilaritiesModel(base_models.BaseModel):
     """This model stores the similarity between any two topics. The topic
