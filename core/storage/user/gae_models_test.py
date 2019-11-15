@@ -318,11 +318,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     STATE_NAME_2 = 'state_name_2'
     EXP_VERSION = 1
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.ExpUserLastPlaythroughModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
     def setUp(self):
         super(ExpUserLastPlaythroughModelTest, self).setUp()
 
@@ -356,6 +351,11 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.ExpUserLastPlaythroughModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             user_models.ExpUserLastPlaythroughModel
@@ -373,6 +373,18 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             user_models.ExpUserLastPlaythroughModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.ExpUserLastPlaythroughModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
+
+    def test_get_user_id_migration_field(self):
+        self.assertEqual(
+            user_models.ExpUserLastPlaythroughModel
+            .get_user_id_migration_field(),
+            user_models.ExpUserLastPlaythroughModel.user_id)
 
     def test_create_success(self):
         user_models.ExpUserLastPlaythroughModel.create(
@@ -968,11 +980,6 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     EXP_ID_TWO = 'exp_id_two'
     EXP_ID_THREE = 'exp_id_three'
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.ExplorationUserDataModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.ANONYMIZE)
-
     def setUp(self):
         super(ExplorationUserDataModelTest, self).setUp()
         user_models.ExplorationUserDataModel(
@@ -999,6 +1006,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.ExplorationUserDataModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.ANONYMIZE)
+
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             user_models.ExplorationUserDataModel
@@ -1012,6 +1024,16 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             user_models.ExplorationUserDataModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.ExplorationUserDataModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
+
+    def test_get_user_id_migration_field(self):
+        self.assertEqual(
+            user_models.ExplorationUserDataModel.get_user_id_migration_field(),
+            user_models.ExplorationUserDataModel.user_id)
 
     def test_create_success(self):
         user_models.ExplorationUserDataModel.create(
@@ -1171,6 +1193,11 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.CollectionProgressModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             user_models.CollectionProgressModel
@@ -1188,6 +1215,16 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             user_models.CollectionProgressModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.CollectionProgressModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
+
+    def test_get_user_id_migration_field(self):
+        self.assertEqual(
+            user_models.CollectionProgressModel.get_user_id_migration_field(),
+            user_models.CollectionProgressModel.user_id)
 
     def test_export_data_on_nonexistent_user(self):
         """Test export data on nonexistent user."""
@@ -1215,11 +1252,6 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_data, user_data)
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.CollectionProgressModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
 
 class StoryProgressModelTests(test_utils.GenericTestBase):
     """Tests for StoryProgressModel."""
@@ -1232,11 +1264,6 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
     STORY_ID_2 = 'story_id_2'
     COMPLETED_NODE_IDS_1 = ['node_id_1', 'node_id_2']
     COMPLETED_NODE_IDS_2 = ['node_id_a']
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.StoryProgressModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         super(StoryProgressModelTests, self).setUp()
@@ -1266,6 +1293,11 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.StoryProgressModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             user_models.StoryProgressModel
@@ -1283,6 +1315,16 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             user_models.StoryProgressModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.StoryProgressModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
+
+    def test_get_user_id_migration_field(self):
+        self.assertEqual(
+            user_models.StoryProgressModel.get_user_id_migration_field(),
+            user_models.StoryProgressModel.user_id)
 
     def test_export_data_on_nonexistent_user(self):
         user_data = user_models.StoryProgressModel.export_data(
@@ -1523,11 +1565,6 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     SKILL_ID_2 = 'skill_id_2'
     DEGREE_OF_MASTERY = 0.5
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserSkillMasteryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
     def setUp(self):
         super(UserSkillMasteryModelTests, self).setUp()
         user_models.UserSkillMasteryModel(
@@ -1553,6 +1590,11 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserSkillMasteryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             user_models.UserSkillMasteryModel
@@ -1566,6 +1608,16 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             user_models.UserSkillMasteryModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.UserSkillMasteryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
+
+    def test_get_user_id_migration_field(self):
+        self.assertEqual(
+            user_models.UserSkillMasteryModel.get_user_id_migration_field(),
+            user_models.UserSkillMasteryModel.user_id)
 
     def test_construct_model_id(self):
         constructed_model_id = (

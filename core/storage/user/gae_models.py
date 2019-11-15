@@ -361,6 +361,17 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         """
         return cls.query(cls.user_id == user_id).get() is not None
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExpUserLastPlaythroughModel has ID that contains user id and
+        one other field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+
+    @staticmethod
+    def get_user_id_migration_field():
+        """Return field that contains user ID."""
+        return ExpUserLastPlaythroughModel.user_id
+
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
         """Generates key for the instance of ExpUserLastPlaythroughModel
@@ -941,6 +952,17 @@ class ExplorationUserDataModel(base_models.BaseModel):
         """
         return cls.query(cls.user_id == user_id).get() is not None
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationUserDataModel has ID that contains user id and one other
+        field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+
+    @staticmethod
+    def get_user_id_migration_field():
+        """Return field that contains user ID."""
+        return ExplorationUserDataModel.user_id
+
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
         """Generates key for the instance of ExplorationUserDataModel class in
@@ -1082,6 +1104,17 @@ class CollectionProgressModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get() is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """CollectionProgressModel has ID that contains user id and one other
+        field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+
+    @staticmethod
+    def get_user_id_migration_field():
+        """Return field that contains user ID."""
+        return CollectionProgressModel.user_id
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
@@ -1231,6 +1264,17 @@ class StoryProgressModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get() is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StoryProgressModel has ID that contains user id and one other field
+        that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+
+    @staticmethod
+    def get_user_id_migration_field():
+        """Return field that contains user ID."""
+        return StoryProgressModel.user_id
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -1506,6 +1550,17 @@ class UserSkillMasteryModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get() is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserSkillMasteryModel has ID that contains user id and one other
+        field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+
+    @staticmethod
+    def get_user_id_migration_field():
+        """Return field that contains user ID."""
+        return UserSkillMasteryModel.user_id
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):
