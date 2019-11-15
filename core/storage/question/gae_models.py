@@ -81,6 +81,11 @@ class QuestionModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """QuestionModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _get_new_id(cls):
         """Generates a unique ID for the question of the form
@@ -214,6 +219,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """QuestionSkillLinkModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -603,6 +613,16 @@ class QuestionSummaryModel(base_models.BaseModel):
         """
         return cls.query(cls.creator_id == user_id).get() is not None
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """QuestionSummaryModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.creator_id
+
     @classmethod
     def get_by_creator_id(cls, creator_id):
         """Get QuestionSummaryModels created by the given user.
@@ -662,3 +682,13 @@ class QuestionRightsModel(base_models.VersionedModel):
         """
         return (cls.query(cls.creator_id == user_id).get() is not None or
                 cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """QuestionRightsModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.creator_id
