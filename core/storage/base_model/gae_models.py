@@ -45,6 +45,17 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
+# Types of user id migration policies. The pragma comment is needed because
+# Enums are evaluated as classes in Python and they should use PascalCase,
+# but using UPPER_CASE seems more appropriate here.
+USER_ID_MIGRATION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+    'COPY',
+    'COPY_PART',
+    'ONE_FIELD',
+    'CUSTOM',
+    'NOT_APPLICABLE'
+)
+
 # Constants used for generating ids.
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
@@ -100,6 +111,27 @@ class BaseModel(ndb.Model):
                 class.
         """
         raise NotImplementedError
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def get_user_id_migration_field():
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError
+
 
     @staticmethod
     def export_data(user_id):
@@ -347,6 +379,16 @@ class BaseCommitLogEntryModel(BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get() is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """BaseCommitLogEntryModel has one field that contains user ID."""
+        return USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @staticmethod
+    def get_user_id_migration_field():
+        """Return field that contains user ID."""
+        return BaseCommitLogEntryModel.user_id
 
     @classmethod
     def create(
@@ -943,6 +985,16 @@ class BaseSnapshotMetadataModel(BaseModel):
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """BaseSnapshotMetadataModel has one field that contains user ID."""
+        return USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @staticmethod
+    def get_user_id_migration_field():
+        """Return field that contains user ID."""
+        return BaseSnapshotMetadataModel.committer_id
 
     @classmethod
     def exists_for_user_id(cls, user_id):
