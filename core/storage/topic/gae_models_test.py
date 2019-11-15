@@ -49,6 +49,11 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             topic_models.TopicModel.has_reference_to_user_id('x_id'))
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            topic_models.TopicModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
 
@@ -159,6 +164,11 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             topic_models.TopicSummaryModel.has_reference_to_user_id('any_id'))
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            topic_models.TopicSummaryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageModel class."""
@@ -244,6 +254,12 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             topic_models.SubtopicPageCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            topic_models.SubtopicPageCommitLogEntryModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+
     def test__get_instance_id(self):
         # Calling create() method calls _get_instance (a protected method)
         # and sets the instance id equal to the result of calling that method.
@@ -289,3 +305,9 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             .has_reference_to_user_id('committer_id'))
         self.assertFalse(
             topic_models.TopicRightsModel.has_reference_to_user_id('x_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            topic_models.TopicRightsModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)

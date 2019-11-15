@@ -92,6 +92,11 @@ class TopicModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -244,6 +249,11 @@ class TopicSummaryModel(base_models.BaseModel):
         """
         return False
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicSummaryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
@@ -291,6 +301,11 @@ class SubtopicPageModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SubtopicPageModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -405,6 +420,11 @@ class TopicRightsModel(base_models.VersionedModel):
         """
         return (cls.query(cls.manager_ids == user_id).get() is not None or
                 cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicRightsModel has one field that contains multiple user IDs."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod
     def get_by_user(cls, user_id):
