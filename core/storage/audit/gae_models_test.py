@@ -62,6 +62,16 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            audit_models.RoleQueryAuditModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_get_user_id_migration_field(self):
+        self.assertEqual(
+            audit_models.RoleQueryAuditModel.get_user_id_migration_field(),
+            audit_models.RoleQueryAuditModel.user_id)
+
     def test_get_model(self):
         audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
 

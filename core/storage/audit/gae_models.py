@@ -63,3 +63,13 @@ class RoleQueryAuditModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get() is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """RoleQueryAuditModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @staticmethod
+    def get_user_id_migration_field():
+        """Return field that contains user ID."""
+        return RoleQueryAuditModel.user_id
