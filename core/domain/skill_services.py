@@ -209,7 +209,8 @@ def get_skill_from_model(skill_model):
         skill_model.language_code,
         skill_model.version, skill_model.next_misconception_id,
         skill_model.superseding_skill_id, skill_model.all_questions_merged,
-        skill_model.created_on, skill_model.last_updated)
+        skill_model.prerequisite_skill_ids, skill_model.created_on,
+        skill_model.last_updated)
 
 
 def get_all_skill_summaries():
@@ -431,7 +432,8 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         rubric_schema_version=skill.rubric_schema_version,
         skill_contents_schema_version=skill.skill_contents_schema_version,
         superseding_skill_id=skill.superseding_skill_id,
-        all_questions_merged=skill.all_questions_merged
+        all_questions_merged=skill.all_questions_merged,
+        prerequisite_skill_ids=skill.prerequisite_skill_ids
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -504,6 +506,10 @@ def apply_change_list(skill_id, change_list, committer_id):
                 skill.add_misconception(change.new_misconception_dict)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
+            elif change.cmd == skill_domain.CMD_ADD_PREREQUISITE_SKILL:
+                skill.add_prerequisite_skill(change.skill_id)
+            elif change.cmd == skill_domain.CMD_DELETE_PREREQUISITE_SKILL:
+                skill.delete_prerequisite_skill(change.skill_id)
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
                 skill.update_rubric(
                     change.difficulty, change.explanation)
@@ -520,6 +526,10 @@ def apply_change_list(skill_id, change_list, committer_id):
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
+                        change.misconception_id, change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
+                    skill.update_misconception_must_be_addressed(
                         change.misconception_id, change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
@@ -587,6 +597,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.language_code = skill.language_code
     skill_model.superseding_skill_id = skill.superseding_skill_id
     skill_model.all_questions_merged = skill.all_questions_merged
+    skill_model.prerequisite_skill_ids = skill.prerequisite_skill_ids
     skill_model.misconceptions_schema_version = (
         skill.misconceptions_schema_version)
     skill_model.rubric_schema_version = (

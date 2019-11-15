@@ -187,7 +187,7 @@ CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2
 
 # The current version of rubric dict in the skill schema.
 CURRENT_RUBRIC_SCHEMA_VERSION = 1
@@ -353,8 +353,7 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# Committer id for system actions. The username for the system committer
-# (i.e. admin) is also 'admin'.
+# Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
@@ -702,7 +701,6 @@ SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
-SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'

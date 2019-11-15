@@ -49,9 +49,9 @@ require('components/state-editor/state-editor.directive.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/ExplorationFeaturesService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/exploration-features.service.ts');
 
 angular.module('oppia').directive('explorationEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -159,7 +159,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveStateContent = function(displayedValue) {
             ExplorationStatesService.saveStateContent(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
             // Show the interaction when the text content is saved, even if no
             // content is entered.
             ctrl.interactionIsShown = true;
@@ -167,13 +168,15 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveInteractionId = function(displayedValue) {
             ExplorationStatesService.saveInteractionId(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
             StateEditorService.setInteractionId(angular.copy(displayedValue));
           };
 
           ctrl.saveInteractionAnswerGroups = function(newAnswerGroups) {
             ExplorationStatesService.saveInteractionAnswerGroups(
-              ctrl.stateName, angular.copy(newAnswerGroups));
+              StateEditorService.getActiveStateName(),
+              angular.copy(newAnswerGroups));
 
             StateEditorService.setInteractionAnswerGroups(
               angular.copy(newAnswerGroups));
@@ -182,7 +185,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveInteractionDefaultOutcome = function(newOutcome) {
             ExplorationStatesService.saveInteractionDefaultOutcome(
-              ctrl.stateName, angular.copy(newOutcome));
+              StateEditorService.getActiveStateName(),
+              angular.copy(newOutcome));
 
             StateEditorService.setInteractionDefaultOutcome(
               angular.copy(newOutcome));
@@ -191,7 +195,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveInteractionCustomizationArgs = function(displayedValue) {
             ExplorationStatesService.saveInteractionCustomizationArgs(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
 
             StateEditorService.setInteractionCustomizationArgs(
               angular.copy(displayedValue));
@@ -199,7 +204,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveSolution = function(displayedValue) {
             ExplorationStatesService.saveSolution(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
 
             StateEditorService.setInteractionSolution(
               angular.copy(displayedValue));
@@ -207,7 +213,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveHints = function(displayedValue) {
             ExplorationStatesService.saveHints(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
 
             StateEditorService.setInteractionHints(
               angular.copy(displayedValue));
@@ -215,7 +222,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveSolicitAnswerDetails = function(displayedValue) {
             ExplorationStatesService.saveSolicitAnswerDetails(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
 
             StateEditorService.setSolicitAnswerDetails(
               angular.copy(displayedValue));

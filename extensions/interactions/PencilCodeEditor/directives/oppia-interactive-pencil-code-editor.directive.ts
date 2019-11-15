@@ -26,9 +26,9 @@ require(
 require(
   'interactions/PencilCodeEditor/directives/' +
   'pencil-code-editor-rules.service.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/HtmlEscaperService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/html-escaper.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
   'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',

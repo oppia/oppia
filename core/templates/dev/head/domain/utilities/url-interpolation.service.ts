@@ -17,9 +17,9 @@
  * necessary to have a fully-qualified URL.
  */
 
-require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
-require('services/UtilsService.ts');
+require('services/alerts.service.ts');
+require('services/contextual/url.service.ts');
+require('services/utils.service.ts');
 
 require('app.constants.ajs.ts');
 

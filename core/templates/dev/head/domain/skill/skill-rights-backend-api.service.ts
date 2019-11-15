@@ -19,10 +19,8 @@
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('SkillRightsBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  'SKILL_PUBLISH_URL_TEMPLATE', 'SKILL_RIGHTS_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService,
-      SKILL_PUBLISH_URL_TEMPLATE, SKILL_RIGHTS_URL_TEMPLATE) {
+  '$http', '$q', 'UrlInterpolationService', 'SKILL_RIGHTS_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService, SKILL_RIGHTS_URL_TEMPLATE) {
     // Maps previously loaded skill rights to their IDs.
     var skillRightsCache = {};
 
@@ -42,29 +40,6 @@ angular.module('oppia').factory('SkillRightsBackendApiService', [
             can_edit_skill_description: responseData.can_edit_skill_description,
             skill_is_private: responseData.skill_is_private
           });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _setSkillPublic = function(
-        skillId, skillVersion, successCallback, errorCallback) {
-      var skillRightsPublishUrl = UrlInterpolationService.interpolateUrl(
-        SKILL_PUBLISH_URL_TEMPLATE, {
-          skill_id: skillId
-        });
-
-      var putParams = {
-        version: skillVersion
-      };
-
-      $http.put(skillRightsPublishUrl, putParams).then(function(response) {
-        skillRightsCache[skillId] = response.data;
-        if (successCallback) {
-          successCallback(response.data);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -128,16 +103,6 @@ angular.module('oppia').factory('SkillRightsBackendApiService', [
        */
       cacheSkillRights: function(skillId, skillRights) {
         skillRightsCache[skillId] = angular.copy(skillRights);
-      },
-
-      /**
-       * Updates a skill's rights to have public learner access,
-       * given its ID and version.
-       */
-      setSkillPublic: function(skillId, skillVersion) {
-        return $q(function(resolve, reject) {
-          _setSkillPublic(skillId, skillVersion, resolve, reject);
-        });
       }
     };
   }
