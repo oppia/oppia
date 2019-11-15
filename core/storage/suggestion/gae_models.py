@@ -157,6 +157,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
             ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
         ).get() is not None
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralSuggestionModel has two fields that contain user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
     @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
@@ -384,6 +389,12 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         return cls.query(
             ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
         ).get() is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralVoiceoverApplicationModel has two fields that contain user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod
     def get_user_voiceover_applications(cls, author_id, status=None):

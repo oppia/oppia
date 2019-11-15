@@ -109,6 +109,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             .has_reference_to_user_id('id_x')
         )
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            suggestion_models.GeneralSuggestionModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
     def test_score_type_contains_delimiter(self):
         for score_type in suggestion_models.SCORE_TYPE_CHOICES:
             self.assertTrue(
@@ -478,6 +484,12 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             suggestion_models.GeneralVoiceoverApplicationModel
             .has_reference_to_user_id('author_2'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_get_user_voiceover_applications(self):
         author_id = 'author'
