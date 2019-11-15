@@ -51,6 +51,11 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionModel
             .has_reference_to_user_id('x_id'))
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            collection_models.CollectionModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+
     def test_get_collection_count(self):
         collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
@@ -132,6 +137,12 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             collection_models.CollectionRightsModel
             .has_reference_to_user_id(self.USER_ID_3))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            collection_models.CollectionRightsModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_save(self):
         collection_models.CollectionRightsModel(
@@ -324,6 +335,12 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             collection_models.CollectionSummaryModel
             .has_reference_to_user_id('x_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            collection_models.CollectionSummaryModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_get_non_private(self):
         public_collection_summary_model = (

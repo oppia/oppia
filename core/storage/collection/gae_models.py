@@ -88,6 +88,11 @@ class CollectionModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """CollectionModel doesnt have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_collection_count(cls):
         """Returns the total number of collections."""
@@ -211,6 +216,10 @@ class CollectionRightsModel(base_models.VersionedModel):
             )).get() is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """CollectionRightsModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given
@@ -476,6 +485,11 @@ class CollectionSummaryModel(base_models.BaseModel):
             cls.editor_ids == user_id,
             cls.viewer_ids == user_id,
             cls.contributor_ids == user_id)).get() is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """CollectionSummaryModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod
     def get_non_private(cls):
