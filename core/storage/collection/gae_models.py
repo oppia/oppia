@@ -90,7 +90,7 @@ class CollectionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_user_id_migration_policy():
-        """CollectionModel doesnt have any field with user ID."""
+        """CollectionModel doesn't have any field with user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod

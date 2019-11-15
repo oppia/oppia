@@ -117,6 +117,11 @@ class ExplorationModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
@@ -243,6 +248,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 cls.viewer_ids == user_id
             )).get() is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationRightsModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration
@@ -539,6 +549,11 @@ class ExpSummaryModel(base_models.BaseModel):
             cls.viewer_ids == user_id,
             cls.contributor_ids == user_id
         )).get() is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExpSummaryModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod
     def get_non_private(cls):

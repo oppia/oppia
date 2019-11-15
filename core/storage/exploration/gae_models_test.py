@@ -51,6 +51,11 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
             exploration_models.ExplorationModel
             .has_reference_to_user_id('x_id'))
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            exploration_models.ExplorationModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+
     def test_get_exploration_count(self):
         exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
@@ -136,6 +141,12 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             exploration_models.ExplorationRightsModel
             .has_reference_to_user_id(self.USER_ID_3))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            exploration_models.ExplorationRightsModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_save(self):
         exploration_models.ExplorationRightsModel(
@@ -338,6 +349,11 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             exploration_models.ExpSummaryModel
             .has_reference_to_user_id('x_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            exploration_models.ExpSummaryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_get_non_private(self):
         public_exploration_summary_model = (
