@@ -1451,6 +1451,11 @@ class UserQueryModel(base_models.BaseModel):
         """
         return cls.query(cls.submitter_id == user_id).get() is not None
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserQueryModel has two fields that contain user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
     @classmethod
     def fetch_page(cls, page_size, cursor):
         """Fetches a list of all query_models sorted by creation date.
@@ -1632,6 +1637,12 @@ class UserContributionScoringModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get() is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserContributionScoringModel has ID that contains user id and one
+        other field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):

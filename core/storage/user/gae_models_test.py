@@ -1377,11 +1377,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
     USER_ID_1 = 'submitter_id_1'
     USER_ID_2 = 'submitter_id_2'
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserQueryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserQueryModelTests, self).setUp()
@@ -1396,6 +1391,11 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserQueryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             user_models.UserQueryModel
@@ -1409,6 +1409,11 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             user_models.UserQueryModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.UserQueryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_instance_stores_correct_data(self):
         inactive_in_last_n_days = 5
@@ -1727,6 +1732,12 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             user_models.UserContributionScoringModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.UserContributionScoringModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_create_model(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
