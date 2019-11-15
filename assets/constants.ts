@@ -629,5 +629,5 @@ export = {
   // in prod mode when the resource bucket name is not allowed to be null.
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",
 
-  "DEV_MODE": true
+  "DEV_MODE": false
 };
