@@ -66,6 +66,11 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             self.assertFalse(
                 email_models.SentEmailModel.has_reference_to_user_id('id_x'))
 
+    def test_get_user_id_migration_polic(self):
+        self.assertEqual(
+            email_models.SentEmailModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
@@ -205,6 +210,11 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             email_models.BulkEmailModel.has_reference_to_user_id('id_x'))
 
+    def test_get_user_id_migration_polic(self):
+        self.assertEqual(
+            email_models.BulkEmailModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
 
 class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackEmailReplyToIdModel class."""
@@ -228,6 +238,18 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
         self.assertFalse(
             email_models.GeneralFeedbackEmailReplyToIdModel
             .has_reference_to_user_id('id_x'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
+
+    def test_get_user_id_migration_field(self):
+        self.assertEqual(
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .get_user_id_migration_policy(),
+            email_models.GeneralFeedbackEmailReplyToIdModel.user_id)
 
     def test_put_function(self):
         email_reply_model = email_models.GeneralFeedbackEmailReplyToIdModel(

@@ -95,6 +95,11 @@ class SentEmailModel(base_models.BaseModel):
             cls.sender_id == user_id,
         )).get() is not None
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SentEmailModel has two fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
     @classmethod
     def _generate_id(cls, intent):
         """Generates an ID for a new SentEmailModel instance.
@@ -305,6 +310,11 @@ class BulkEmailModel(base_models.BaseModel):
         """
         return cls.query(cls.sender_id == user_id).get() is not None
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """BulkEmailModel has two fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
     @classmethod
     def create(
             cls, instance_id, recipient_ids, sender_id, sender_email,
@@ -362,6 +372,17 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get() is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralFeedbackEmailReplyToIdModel has ID that contains user id and
+        one other field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+
+    @staticmethod
+    def get_user_id_migration_field():
+        """Return field that contains user ID."""
+        return GeneralFeedbackEmailReplyToIdModel.user_id
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):
