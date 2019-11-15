@@ -121,6 +121,13 @@ class UserSettingsModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
+    def get_user_id_migration_policy():
+        """UserSettingsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
+    @staticmethod
     def export_data(user_id):
         """Exports the data from UserSettingsModel into dict format for Takeout.
 
@@ -227,6 +234,13 @@ class CompletedActivitiesModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
+    def get_user_id_migration_policy():
+        """CompletedActivitiesModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
+    @staticmethod
     def export_data(user_id):
         """(Takeout) Export CompletedActivitiesModel's user properties.
 
@@ -279,6 +293,13 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """IncompleteActivitiesModel has ID that contains user ID and needs to
+        be replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -445,6 +466,13 @@ class LearnerPlaylistModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
+    def get_user_id_migration_policy():
+        """LearnerPlaylistModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
+    @staticmethod
     def export_data(user_id):
         """(Takeout) Export user-relevant properties of LearnerPlaylistModel.
 
@@ -501,6 +529,13 @@ class UserContributionsModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserContributionsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -564,6 +599,13 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserEmailPreferencesModel has ID that contains user ID and needs to
+        be replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
@@ -603,6 +645,13 @@ class UserSubscriptionsModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserSubscriptionsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -659,6 +708,13 @@ class UserSubscribersModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserSubscribersModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     """A list of recent changes corresponding to things a user subscribes to.
@@ -690,6 +746,13 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserRecentChangesBatchModel has ID that contains user ID and needs to
+        be replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -760,6 +823,13 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserStatsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @classmethod
     def get_or_create(cls, user_id):
@@ -1394,6 +1464,13 @@ class UserBulkEmailsModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserBulkEmailsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
 
 class UserSkillMasteryModel(base_models.BaseModel):
