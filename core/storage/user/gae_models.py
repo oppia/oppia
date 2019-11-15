@@ -367,10 +367,10 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         one other field that contains user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
-    @staticmethod
-    def get_user_id_migration_field():
+    @classmethod
+    def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
-        return ExpUserLastPlaythroughModel.user_id
+        return cls.user_id
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -958,10 +958,10 @@ class ExplorationUserDataModel(base_models.BaseModel):
         field that contains user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
-    @staticmethod
-    def get_user_id_migration_field():
+    @classmethod
+    def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
-        return ExplorationUserDataModel.user_id
+        return cls.user_id
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -1111,10 +1111,10 @@ class CollectionProgressModel(base_models.BaseModel):
         field that contains user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
-    @staticmethod
-    def get_user_id_migration_field():
+    @classmethod
+    def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
-        return CollectionProgressModel.user_id
+        return cls.user_id
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
@@ -1271,10 +1271,10 @@ class StoryProgressModel(base_models.BaseModel):
         that contains user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
-    @staticmethod
-    def get_user_id_migration_field():
+    @classmethod
+    def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
-        return StoryProgressModel.user_id
+        return cls.user_id
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -1557,10 +1557,10 @@ class UserSkillMasteryModel(base_models.BaseModel):
         field that contains user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
-    @staticmethod
-    def get_user_id_migration_field():
+    @classmethod
+    def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
-        return UserSkillMasteryModel.user_id
+        return cls.user_id
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):

@@ -69,7 +69,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
         """RoleQueryAuditModel has one field that contains user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
 
-    @staticmethod
-    def get_user_id_migration_field():
+    @classmethod
+    def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
-        return RoleQueryAuditModel.user_id
+        return cls.user_id

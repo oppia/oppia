@@ -122,8 +122,8 @@ class BaseModel(ndb.Model):
         """
         raise NotImplementedError
 
-    @staticmethod
-    def get_user_id_migration_field():
+    @classmethod
+    def get_user_id_migration_field(cls):
         """This method should be implemented by subclasses.
 
         Raises:
@@ -385,10 +385,10 @@ class BaseCommitLogEntryModel(BaseModel):
         """BaseCommitLogEntryModel has one field that contains user ID."""
         return USER_ID_MIGRATION_POLICY.ONE_FIELD
 
-    @staticmethod
-    def get_user_id_migration_field():
+    @classmethod
+    def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
-        return BaseCommitLogEntryModel.user_id
+        return cls.user_id
 
     @classmethod
     def create(
@@ -991,10 +991,10 @@ class BaseSnapshotMetadataModel(BaseModel):
         """BaseSnapshotMetadataModel has one field that contains user ID."""
         return USER_ID_MIGRATION_POLICY.ONE_FIELD
 
-    @staticmethod
-    def get_user_id_migration_field():
+    @classmethod
+    def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
-        return BaseSnapshotMetadataModel.committer_id
+        return cls.committer_id
 
     @classmethod
     def exists_for_user_id(cls, user_id):

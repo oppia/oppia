@@ -127,9 +127,22 @@ class StorageModelsTest(test_utils.GenericTestBase):
                         msg='has_reference_to_user_id is not defined for %s' % (
                             clazz.__name__))
 
-
     def test_base_models_do_not_have_method_has_reference_to_user_id(self):
         for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
                 with self.assertRaises(NotImplementedError):
                     clazz.has_reference_to_user_id('any_id')
+
+    def test_base_or_versioned_child_classes_have_get_user_id_migration_policy(
+            self):
+        for clazz in self._get_base_or_versioned_model_child_classes():
+            if (clazz.get_deletion_policy() !=
+                    base_models.DELETION_POLICY.NOT_APPLICABLE):
+                try:
+                    self.assertIn(
+                        clazz.get_deletion_policy(),
+                        base_models.DELETION_POLICY.__dict__)
+                except NotImplementedError:
+                    self.fail(
+                        msg='get_user_id_migration_policy is not defined for %s'
+                            % clazz.__name__)

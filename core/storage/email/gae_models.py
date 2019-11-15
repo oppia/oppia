@@ -379,10 +379,10 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         one other field that contains user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
-    @staticmethod
-    def get_user_id_migration_field():
+    @classmethod
+    def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
-        return GeneralFeedbackEmailReplyToIdModel.user_id
+        return cls.user_id
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):
