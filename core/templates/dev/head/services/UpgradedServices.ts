@@ -64,7 +64,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class UpgradedServices {
-  static upgradedServices = (() => {
+  static allUpgradedServices = (() => {
     var upgradedServices = {};
     // Group 1: Services without dependencies.
     upgradedServices['BackgroundMaskService'] = new BackgroundMaskService();
@@ -122,10 +122,11 @@ export class UpgradedServices {
     return upgradedServices;
   })();
 
-  getUpgradedServices(): any {
-    return UpgradedServices.upgradedServices;
+  getUpgradedServices() {
+    return UpgradedServices.allUpgradedServices;
   }
 }
 
 angular.module('oppia').factory(
-  'UpgradedServices', downgradeInjectable(UpgradedServices));
+  'UpgradedServices',
+  downgradeInjectable(UpgradedServices));
