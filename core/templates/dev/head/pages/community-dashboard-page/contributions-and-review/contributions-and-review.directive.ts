@@ -22,6 +22,7 @@ require(
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-and-review.services.ts');
+require('services/audio-player.service.ts');
 require('services/suggestion-modal.service.ts');
 
 require('filters/format-rte-preview.filter.ts');
@@ -38,9 +39,11 @@ angular.module('oppia').directive('contributionsAndReview', [
         'contributions-and-review.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$uibModal', 'ContributionAndReviewService', 'UserService',
+        '$filter', '$uibModal', 'AudioPlayerService',
+        'ContributionAndReviewService', 'LanguageUtilService', 'UserService',
         function(
-            $filter, $uibModal, ContributionAndReviewService, UserService) {
+            $filter, $uibModal, AudioPlayerService,
+            ContributionAndReviewService, LanguageUtilService, UserService) {
           var SUGGESTION_LABELS = {
             review: {
               text: 'Awaiting review',
@@ -55,21 +58,62 @@ angular.module('oppia').directive('contributionsAndReview', [
               color: '#e76c8c'
             }
           };
-          var ctrl = this;
+          var activeTabItem = null;
           var username = null;
+          var TRANSLATIONS_SUGGESTION_ITEM = 'Translations Suggestion';
+          var VOICEOVER_APPLICATIONS_ITEM = 'Voiceover Applications';
+          var itemsList = [
+            TRANSLATIONS_SUGGESTION_ITEM, VOICEOVER_APPLICATIONS_ITEM]
+          var itemsData = {};
+
+          var ctrl = this;
+          ctrl.activeTabName = null;
+          ctrl.THINGS_TO_DO = 'THINGS_TO_DO';
+          ctrl.CONTRIBUTION_TABS = 'CONTRIBUTION_TABS'
+          ctrl.tabsName = {};
+          ctrl.tabsName[ctrl.THINGS_TO_DO] = itemsList;
+          ctrl.tabsName[ctrl.CONTRIBUTION_TABS] = itemsList;
           ctrl.isAdmin = false;
           ctrl.userDeatilsLoading = true;
           ctrl.userIsLoggedIn = false;
-          ctrl.contributions = {};
-          ctrl.contributionSummaries = [];
-          ctrl.contributionsDataLoading = true;
-          ctrl.reviewTabActive = false;
+          ctrl.itemList = [];
 
-          var getTranslationContributionsSummary = function() {
+          ctrl.isActiveTab = function (tabName, item) {
+            return ctrl.activeTabName === tabName && activeTabItem === item;
+          };
+          var activeTabTofetcherFunction = {
+            [ctrl.CONTRIBUTION_TABS]: {
+              [TRANSLATIONS_SUGGESTION_ITEM]: (
+                ContributionAndReviewService
+                .getUserCreatedTranslationSuggestions),
+              [VOICEOVER_APPLICATIONS_ITEM]: (
+                ContributionAndReviewService
+                .getUserSubmittedVoiceoverApplications)
+            },
+            [ctrl.THINGS_TO_DO]: {
+              [TRANSLATIONS_SUGGESTION_ITEM]: (
+                ContributionAndReviewService
+                .getReviewableTranslationSuggestions),
+              [VOICEOVER_APPLICATIONS_ITEM]: (
+                ContributionAndReviewService
+                .getReviewableVoiceoverApplications)
+            }
+          }
+
+          ctrl.switchTab = function (tabName, item) {
+            activeTabItem = item;
+            ctrl.activeTabName = tabName;
+            ctrl.itemList = [];
+            activeTabTofetcherFunction[tabName][item](populateTabData);
+          };
+
+
+          var getTranslationSuggestionsPresentationData = function(data) {
+            itemsData = data;
             var translationContributionsSummaryList = [];
-            Object.keys(ctrl.contributions).forEach(function(key) {
-              var suggestion = ctrl.contributions[key].suggestion;
-              var details = ctrl.contributions[key].details;
+            Object.keys(data).forEach(function(key) {
+              var suggestion = data[key].suggestion;
+              var details = data[key].details;
               var change = suggestion.change;
               var requiredData = {
                 id: suggestion.suggestion_id,
@@ -78,22 +122,58 @@ angular.module('oppia').directive('contributionsAndReview', [
                   ' / ' + details.chapter_title),
                 labelText: SUGGESTION_LABELS[suggestion.status].text,
                 labelColor: SUGGESTION_LABELS[suggestion.status].color,
-                actionButtonTitle: (ctrl.reviewTabActive ? 'Review' : 'View')
+                actionButtonTitle: (
+                  ctrl.activeTabName === ctrl.THINGS_TO_DO ? 'Review' : 'View')
               };
               translationContributionsSummaryList.push(requiredData);
             });
             return translationContributionsSummaryList;
           };
 
-          var removeContributionToReview = function(suggestionId) {
-            ctrl.contributionSummaries = (
-              ctrl.contributionSummaries.filter(function(suggestion) {
-                if (suggestion.id === suggestionId) {
+          var getVoiceoverApplicationsPresentationData = function (data) {
+            itemsData = data;
+            var voiceoverApplications = [];
+            var buttonTitle = (
+              ctrl.activeTabName === ctrl.THINGS_TO_DO ? 'Review' : 'View');
+            Object.keys(data).forEach(function(key) {
+              var voiceoverApplication = data[key];
+              console.log(voiceoverApplication)
+              if (voiceoverApplication.status === 'accepted') {
+                buttonTitle = 'Voiceover';
+              }
+              var requiredData = {
+                id: voiceoverApplication.voiceover_application_id,
+                heading: $filter('formatRtePreview')(
+                  voiceoverApplication.content),
+                subheading: 'Language ' + (
+                  LanguageUtilService.getAudioLanguageDescription(
+                    voiceoverApplication.language_code))  ,
+                labelText: SUGGESTION_LABELS[voiceoverApplication.status].text,
+                labelColor: SUGGESTION_LABELS[voiceoverApplication.status].color,
+                actionButtonTitle: buttonTitle
+              };
+              voiceoverApplications.push(requiredData);
+            });
+            return voiceoverApplications;
+          };
+          var populateTabData = function(data) {
+            if (activeTabItem === TRANSLATIONS_SUGGESTION_ITEM) {
+              ctrl.itemList = getTranslationSuggestionsPresentationData(data);
+            } else if (activeTabItem === VOICEOVER_APPLICATIONS_ITEM) {
+              ctrl.itemList = getVoiceoverApplicationsPresentationData(data);
+            }
+          };
+
+          var removeContributionToReview = function(itemId) {
+            ctrl.itemList = (
+              ctrl.itemList.filter(function(item) {
+                if (item.id === itemId) {
                   return false;
                 }
                 return true;
               }));
           };
+
           var _showTranslationSuggestionModal = function(
               targetId, suggestionId, contentHtml, translationHtml,
               reviewable) {
@@ -157,43 +237,124 @@ angular.module('oppia').directive('contributionsAndReview', [
             });
           };
 
-          ctrl.onClickViewSuggestion = function(suggestionId) {
-            var suggestion = ctrl.contributions[suggestionId].suggestion;
-            _showTranslationSuggestionModal(
-              suggestion.target_id, suggestion.suggestion_id,
-              suggestion.change.content_html,
-              suggestion.change.translation_html, ctrl.reviewTabActive);
+          var _showVoiceoverApplicationModal = function(voiceoverApplication) {
+            if (voiceoverApplication.status === 'accepted') {
+              var win = window.open('http://localhost:8181/create/' + voiceoverApplication.target_id + '#/translation', '_blank');
+              win.focus();
+              return;
+            }
+            var contentHtml = voiceoverApplication.content;
+            var audioFilename = voiceoverApplication.filename;
+            var targetId = voiceoverApplication.target_id;
+            var voiceoverApplicationId = (
+              voiceoverApplication.voiceover_application_id);
+            var reviewable = ctrl.activeTabName === ctrl.THINGS_TO_DO;
+            var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/community-dashboard-page/modal-templates/' +
+              'voiceover-application-review-modal.directive.html');
+
+            $uibModal.open({
+              templateUrl: _templateUrl,
+              backdrop: true,
+              size: 'lg',
+              resolve: {
+                audioFilename: function() {
+                  return audioFilename;
+                },
+                contentHtml: function() {
+                  return contentHtml;
+                },
+                reviewable: function() {
+                  return reviewable;
+                },
+                targetId: function() {
+                  return targetId;
+                }
+              },
+              controller: [
+                '$scope', '$uibModalInstance', 'AudioPlayerService',
+                'SuggestionModalService',
+                'reviewable', 'audioFilename', 'contentHtml', 'targetId',
+                function($scope, $uibModalInstance, AudioPlayerService,
+                    SuggestionModalService,
+                    reviewable, audioFilename, contentHtml, targetId) {
+                  $scope.audioFilename = audioFilename;
+                  $scope.contentHtml = contentHtml;
+                  $scope.reviewable = reviewable;
+                  $scope.reviewMessage = '';
+                  $scope.audioLoadingIndicatorIsShown = true;
+                    console.log("Hereeeeee")
+                  AudioPlayerService.load(
+                    'voiceover_application', targetId, audioFilename)
+                  .then(function (argument) {
+                    $scope.audioLoadingIndicatorIsShown = false;
+                  });
+                  $scope.track = {
+                    progress: function(progressPercentage) {
+                      if (angular.isDefined(progressPercentage)) {
+                        AudioPlayerService.setProgress(progressPercentage / 100);
+                      }
+                      return AudioPlayerService.getProgress() * 100;
+                    }
+                  };
+                  $scope.playPauseVoiceover = function() {
+                    if (!AudioPlayerService.isPlaying()) {
+                      if (AudioPlayerService.isTrackLoaded()) {
+                        AudioPlayerService.play();
+                      } else {
+                        loadAndPlayAudioTranslation();
+                      }
+                    } else {
+                      AudioPlayerService.pause();
+                    }
+                  };
+
+                  $scope.accept = function() {
+                    SuggestionModalService.acceptSuggestion(
+                      $uibModalInstance, {
+                        action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+                        reviewMessage: null
+                      });
+                  };
+
+                  $scope.reject = function() {
+                    SuggestionModalService.rejectSuggestion(
+                      $uibModalInstance, {
+                        action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+                        reviewMessage: $scope.reviewMessage
+                      });
+                  };
+                  $scope.cancel = function() {
+                    SuggestionModalService.cancelSuggestion($uibModalInstance);
+                  };
+                }
+              ]
+            }).result.then(function(result) {
+              console.log(voiceoverApplicationId)
+              ContributionAndReviewService.resolveVoiceoverApplication(
+                voiceoverApplicationId, result.action, result.reviewMessage,
+                result.commitMessage, removeContributionToReview);
+            }, function() {
+              console.log("ASddddddddd")
+                            AudioPlayerService.clear();
+
+            });
           };
 
-          ctrl.switchToContributionsTab = function() {
-            if (ctrl.reviewTabActive) {
-              ctrl.reviewTabActive = false;
-              ctrl.contributionsDataLoading = true;
-              ctrl.contributionSummaries = [];
-              ContributionAndReviewService.getUserCreatedTranslationSuggestions(
-                username, function(suggestionIdToSuggestions) {
-                  ctrl.contributions = suggestionIdToSuggestions;
-                  ctrl.contributionSummaries = (
-                    getTranslationContributionsSummary());
-                  ctrl.contributionsDataLoading = false;
-                });
+          ctrl.onClickActionButton = function(itemId) {
+            if (activeTabItem == TRANSLATIONS_SUGGESTION_ITEM) {
+              var suggestion = itemsData[itemId].suggestion;
+              _showTranslationSuggestionModal(
+                suggestion.target_id, suggestion.suggestion_id,
+                suggestion.change.content_html,
+                suggestion.change.translation_html, ctrl.reviewTabActive);
+            } else if (activeTabItem === VOICEOVER_APPLICATIONS_ITEM) {
+              var voiceoverApplication = itemsData[itemId];
+              console.log(voiceoverApplication)
+              _showVoiceoverApplicationModal(voiceoverApplication);
             }
           };
 
-          ctrl.switchToReviewTab = function() {
-            if (!ctrl.reviewTabActive) {
-              ctrl.reviewTabActive = true;
-              ctrl.contributionsDataLoading = true;
-              ctrl.contributionSummaries = [];
-              ContributionAndReviewService.getReviewableTranslationSuggestions(
-                function(suggestionIdToSuggestions) {
-                  ctrl.contributions = suggestionIdToSuggestions;
-                  ctrl.contributionSummaries = (
-                    getTranslationContributionsSummary());
-                  ctrl.contributionsDataLoading = false;
-                });
-            }
-          };
 
           UserService.getUserInfoAsync().then(function(userInfo) {
             ctrl.isAdmin = userInfo.isAdmin();
@@ -201,11 +362,10 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.userDeatilsLoading = false;
             username = userInfo.getUsername();
             if (ctrl.isAdmin) {
-              ctrl.reviewTabActive = false;
-              ctrl.switchToReviewTab();
+              ctrl.switchTab(ctrl.THINGS_TO_DO, TRANSLATIONS_SUGGESTION_ITEM);
             } else if (ctrl.userIsLoggedIn) {
-              ctrl.reviewTabActive = true;
-              ctrl.switchToContributionsTab();
+              ctrl.switchTab(
+                ctrl.CONTRIBUTION_TABS, TRANSLATIONS_SUGGESTION_ITEM);
             }
           });
         }

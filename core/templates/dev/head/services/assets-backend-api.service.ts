@@ -198,6 +198,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
     };
 
     var _getDownloadUrl = function(entityType, entityId, filename, assetType) {
+      console.log(entityType, entityId, filename)
       return UrlInterpolationService.interpolateUrl(
         (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
         IMAGE_DOWNLOAD_URL_TEMPLATE), {
@@ -230,15 +231,15 @@ angular.module('oppia').factory('AssetsBackendApiService', [
     };
 
     return {
-      loadAudio: function(explorationId, filename) {
+      loadAudio: function(entityType, entityId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
             resolve(AudioFileObjectFactory.createNew(
               filename, assetsCache[filename]));
           } else {
             _fetchFile(
-              ENTITY_TYPE.EXPLORATION, explorationId, filename,
-              ASSET_TYPE_AUDIO, resolve, reject);
+              entityType, entityId, filename, ASSET_TYPE_AUDIO, resolve,
+              reject);
           }
         });
       },

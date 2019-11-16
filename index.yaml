@@ -159,6 +159,17 @@ indexes:
   - name: suggestion_type
   - name: author_id
 
+- kind: GeneralVoiceoverApplicationModel
+  properties:
+  - name: author_id
+  - name: created_on
+    direction: desc
+
+- kind: GeneralVoiceoverApplicationModel
+  properties:
+  - name: status
+  - name: author_id
+
 - kind: InteractionAnswerSummariesRealtimeModel
   properties:
   - name: realtime_layer

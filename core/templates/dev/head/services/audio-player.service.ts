@@ -16,6 +16,13 @@
  * @fileoverview Service to operate the playback of audio.
  */
 
+require(
+  'pages/exploration-player-page/services/' +
+  'audio-translation-manager.service.ts');
+require('services/context.service.ts');
+require('services/assets-backend-api.service.ts');
+
+
 angular.module('oppia').factory('AudioPlayerService', [
   '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
   'ContextService', 'ngAudio',
@@ -27,11 +34,10 @@ angular.module('oppia').factory('AudioPlayerService', [
     var _currentTrackDuration = null;
 
     var _load = function(
-        filename, successCallback, errorCallback) {
+        entityType, entityId, filename, successCallback, errorCallback) {
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.loadAudio(
-          ContextService.getExplorationId(), filename)
-          .then(function(loadedAudiofile) {
+          entityType, entityId, filename).then(function(loadedAudiofile) {
             var blobUrl = URL.createObjectURL(loadedAudiofile.data);
             _currentTrack = ngAudio.load(blobUrl);
             _currentTrackFilename = filename;
@@ -58,7 +64,6 @@ angular.module('oppia').factory('AudioPlayerService', [
                 };
               }
             }, 100);
-
             successCallback();
           }, function(reason) {
             errorCallback(reason);
@@ -96,9 +101,9 @@ angular.module('oppia').factory('AudioPlayerService', [
     };
 
     return {
-      load: function(filename) {
+      load: function(entityType, entityId, filename) {
         return $q(function(resolve, reject) {
-          _load(filename, resolve, reject);
+          _load(entityType, entityId, filename, resolve, reject);
         });
       },
       play: function() {

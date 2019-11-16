@@ -27,9 +27,9 @@ require('services/context.service.ts');
 
 angular.module('oppia').factory('AudioPreloaderService', [
   'AssetsBackendApiService', 'AudioTranslationLanguageService',
-  'ComputeGraphService', 'ContextService',
+  'ComputeGraphService', 'ContextService', 'ENTITY_TYPE',
   function(AssetsBackendApiService, AudioTranslationLanguageService,
-      ComputeGraphService, ContextService) {
+      ComputeGraphService, ContextService, ENTITY_TYPE) {
     var MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
     var _filenamesOfAudioCurrentlyDownloading = [];
@@ -64,8 +64,8 @@ angular.module('oppia').factory('AudioPreloaderService', [
 
     var _loadAudio = function(audioFilename) {
       AssetsBackendApiService.loadAudio(
-        ContextService.getExplorationId(), audioFilename
-      ).then(function(loadedAudio) {
+        ENTITY_TYPE.EXPLORATION, ContextService.getExplorationId(),
+        audioFilename).then(function(loadedAudio) {
         for (var i = 0;
           i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
           if (_filenamesOfAudioCurrentlyDownloading[i] ===
