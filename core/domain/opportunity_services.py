@@ -60,13 +60,9 @@ def get_exploration_opportunity_summary_from_model(model):
         ExplorationOpportunitySummary. The corresponding
         ExplorationOpportunitySummary object.
     """
-    # The newly added supported audio language will not be populate into the
-    # incomplete_translation_language_codes of the model and it will fail the
-    # strict object validation. To pass the validation and make sure the domain
-    # object is passed in a good state we are populating the new language code
-    # in incomplete_translation_language_codes and to make sure this changes
-    # take place in expected way we are logging the changes.
-    # NOTE: Running the opportunity regeneration job will fix the issue.
+    # We're making sure that the audio language codes in any exploration
+    # opportunity domain object match the ones in
+    # constants.SUPPORTED_AUDIO_LANGUAGES.
     set_of_all_languages = set(
         model.incomplete_translation_language_codes +
         model.need_voice_artist_in_language_codes +
@@ -80,11 +76,14 @@ def get_exploration_opportunity_summary_from_model(model):
             'Missing language codes %s in exploration opportunity model with '
             'id %s' % (missing_language_codes, model.id))
 
+    new_incomplete_translation_language_codes = (
+        model.incomplete_translation_language_codes + missing_language_codes)
+
     return opportunity_domain.ExplorationOpportunitySummary(
         model.id, model.topic_id, model.topic_name, model.story_id,
         model.story_title, model.chapter_title, model.content_count,
-        model.incomplete_translation_language_codes + missing_language_codes,
-        model.translation_counts, model.need_voice_artist_in_language_codes,
+        new_incomplete_translation_language_codes, model.translation_counts,
+        model.need_voice_artist_in_language_codes,
         model.assigned_voice_artist_in_language_codes)
 
 

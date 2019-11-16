@@ -613,6 +613,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         opportunities = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 ['0']))
+        self.assertEqual(len(opportunities), 1)
+
         opportunity = opportunities['0']
 
         self.assertFalse(
@@ -631,6 +633,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunities = (
                 opportunity_services
                 .get_exploration_opportunity_summaries_by_ids(['0']))
+            self.assertEqual(len(opportunities), 1)
+
             opportunity = opportunities['0']
 
             self.assertTrue(
