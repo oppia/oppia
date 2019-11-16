@@ -64,41 +64,68 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class UpgradedServices {
-  /* eslint-disable quote-props */
-  upgradedServices = {
-    'AlertsService': new AlertsService(new LoggerService()),
-    'BackgroundMaskService': new BackgroundMaskService(),
-    'ComputeGraphService': new ComputeGraphService(),
-    'ChangesInHumanReadableFormService': new ChangesInHumanReadableFormService(
-      new UtilsService(), document),
-    'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
-    'DebouncerService': new DebouncerService(),
-    'DeviceInfoService': new DeviceInfoService(new WindowRef()),
-    'DocumentAttributeCustomizationService':
-        new DocumentAttributeCustomizationService(new WindowRef()),
-    'EditorFirstTimeEventsService': new EditorFirstTimeEventsService(
-      new SiteAnalyticsService(new WindowRef())),
-    'ExplorationDiffService': new ExplorationDiffService(),
-    'ExtensionTagAssemblerService': new ExtensionTagAssemblerService(
-      new HtmlEscaperService(new LoggerService()),
-      new CamelCaseToHyphensPipe()),
-    'GenerateContentIdService': new GenerateContentIdService(),
-    'HtmlEscaperService': new HtmlEscaperService(
-      new LoggerService()),
-    'IdGenerationService': new IdGenerationService(),
-    'MetaTagCustomizationService': new MetaTagCustomizationService(
-      new WindowRef()),
-    'SidebarStatusService': new SidebarStatusService(
-      new WindowDimensionsService()),
-    'SiteAnalyticsService': new SiteAnalyticsService(new WindowRef()),
-    'UrlService': new UrlService(new WindowRef()),
-    'UtilsService': new UtilsService(),
-    'NumberWithUnitsObjectFactory': new NumberWithUnitsObjectFactory(
-      new UnitsObjectFactory(), new FractionObjectFactory()),
-    'WindowDimensionsService': new WindowDimensionsService()
-  };
+  static upgradedServices = (() => {
+    var upgradedServices = {};
+    // Group 1: Services without dependencies.
+    upgradedServices['BackgroundMaskService'] = new BackgroundMaskService();
+    upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
+    upgradedServices['ComputeGraphService'] = new ComputeGraphService();
+    upgradedServices['DebouncerService'] = new DebouncerService();
+    upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
+    upgradedServices['FormatTimePipe'] = new FormatTimePipe();
+    upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
+    upgradedServices['GenerateContentIdService'] =
+      new GenerateContentIdService();
+    upgradedServices['IdGenerationService'] = new IdGenerationService();
+    upgradedServices['LoggerService'] = new LoggerService();
+    upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
+    upgradedServices['UtilsService'] = new UtilsService();
+    upgradedServices['WindowDimensionsService'] = new WindowDimensionsService();
+    upgradedServices['WindowRef'] = new WindowRef();
+
+    // Group 2: Services depending only on group 1.
+    upgradedServices['AlertsService'] =
+      new AlertsService(upgradedServices['LoggerService']);
+    upgradedServices['ChangesInHumanReadableFormService'] =
+      new ChangesInHumanReadableFormService(
+        upgradedServices['UtilsService'], document);
+    upgradedServices['DateTimeFormatService'] =
+      new DateTimeFormatService(upgradedServices['FormatTimePipe']);
+    upgradedServices['DeviceInfoService'] =
+      new DeviceInfoService(upgradedServices['WindowRef']);
+    upgradedServices['DocumentAttributeCustomizationService'] =
+      new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
+    upgradedServices['HtmlEscaperService'] =
+      new HtmlEscaperService(upgradedServices['LoggerService']);
+    upgradedServices['MetaTagCustomizationService'] =
+      new MetaTagCustomizationService(upgradedServices['WindowRef']);
+    upgradedServices['NumberWithUnitsObjectFactory'] =
+      new NumberWithUnitsObjectFactory(
+        upgradedServices['UnitsObjectFactory'],
+        upgradedServices['FractionObjectFactory']);
+    upgradedServices['SidebarStatusService'] =
+      new SidebarStatusService(upgradedServices['WindowDimensionsService']);
+    upgradedServices['SiteAnalyticsService'] =
+      new SiteAnalyticsService(upgradedServices['WindowRef']);
+    upgradedServices['UrlService'] =
+      new UrlService(upgradedServices['WindowRef']);
+
+    // Group 3: Services depending only on groups 1-2.
+    upgradedServices['EditorFirstTimeEventsService'] =
+      new EditorFirstTimeEventsService(
+        upgradedServices['SiteAnalyticsService']);
+    upgradedServices['ExtensionTagAssemblerService'] =
+      new ExtensionTagAssemblerService(
+        upgradedServices['HtmlEscaperService'],
+        upgradedServices['CamelCaseToHyphensPipe']);
+
+    return upgradedServices;
+  })();
+
+  getUpgradedServices(): any {
+    return UpgradedServices.upgradedServices;
+  }
 }
 
 angular.module('oppia').factory(
-  'UpgradedServices',
-  downgradeInjectable(UpgradedServices));
+  'UpgradedServices', downgradeInjectable(UpgradedServices));
