@@ -120,13 +120,11 @@ import { WrittenTranslationsObjectFactory } from
   providedIn: 'root'
 })
 export class UpgradedServices {
-  getUpgradedServices () {
+  getUpgradedServices() {
     var upgradedServices = {};
-
-    // eslint-disable dot-notation
+    /* eslint-disable dot-notation */
 
     // Group 1: Services without dependencies.
-    ////////////////////////////////////////////////////////////////////////////
     upgradedServices['AngularNameService'] = new AngularNameService();
     upgradedServices['AnswerClassificationResultObjectFactory'] =
       new AnswerClassificationResultObjectFactory();
@@ -179,7 +177,6 @@ export class UpgradedServices {
       new WrittenTranslationObjectFactory();
 
     // Group 2: Services depending only on group 1.
-    ////////////////////////////////////////////////////////////////////////////
     upgradedServices['AlertsService'] =
       new AlertsService(upgradedServices['LoggerService']);
     upgradedServices['ChangesInHumanReadableFormService'] =
@@ -228,7 +225,6 @@ export class UpgradedServices {
         upgradedServices['WrittenTranslationObjectFactory']);
 
     // Group 3: Services depending only on groups 1-2.
-    ////////////////////////////////////////////////////////////////////////////
     upgradedServices['AnswerGroupObjectFactory'] =
       new AnswerGroupObjectFactory(
         upgradedServices['OutcomeObjectFactory'],
@@ -241,8 +237,7 @@ export class UpgradedServices {
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
 
-    // eslint-enable dot-notation
-
+    /* eslint-enable dot-notation */
     return upgradedServices;
   }
 }
