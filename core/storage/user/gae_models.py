@@ -1454,7 +1454,24 @@ class UserQueryModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """UserQueryModel has two fields that contain user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.submitter_id
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the submitter_id.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        for model in cls.query(cls.submitter_id == old_user_id).fetch():
+            model.submitter_id = new_user_id
+            model.put(update_last_updated_time=False)
 
     @classmethod
     def fetch_page(cls, page_size, cursor):
@@ -1643,6 +1660,22 @@ class UserContributionScoringModel(base_models.BaseModel):
         """UserContributionScoringModel has ID that contains user id and one
         other field that contains user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the id and user_id.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        for model in cls.query(cls.user_id == old_user_id).fetch():
+            model_values = model.to_dict()
+            new_id = '%s.%s' % (model.id.split('.')[0], new_user_id)
+            model_values['id'] = new_id
+            model_values['user_id'] = new_user_id
+            cls(**model_values).put(update_last_updated_time=False)
+            model.delete()
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):

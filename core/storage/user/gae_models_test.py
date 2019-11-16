@@ -381,7 +381,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             user_models.ExpUserLastPlaythroughModel
             .get_user_id_migration_field(),
             user_models.ExpUserLastPlaythroughModel.user_id)
@@ -1031,7 +1031,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             user_models.ExplorationUserDataModel.get_user_id_migration_field(),
             user_models.ExplorationUserDataModel.user_id)
 
@@ -1222,7 +1222,7 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             user_models.CollectionProgressModel.get_user_id_migration_field(),
             user_models.CollectionProgressModel.user_id)
 
@@ -1322,7 +1322,7 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             user_models.StoryProgressModel.get_user_id_migration_field(),
             user_models.StoryProgressModel.user_id)
 
@@ -1413,7 +1413,12 @@ class UserQueryModelTests(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             user_models.UserQueryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_get_user_id_migration_field(self):
+        self.assert_model_fields_equal(
+            user_models.UserQueryModel.get_user_id_migration_field(),
+            user_models.UserQueryModel.submitter_id)
 
     def test_instance_stores_correct_data(self):
         inactive_in_last_n_days = 5
@@ -1620,7 +1625,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             user_models.UserSkillMasteryModel.get_user_id_migration_field(),
             user_models.UserSkillMasteryModel.user_id)
 
@@ -1692,32 +1697,35 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
     USER_2_ID = 'user_2_id'
-    SCORE_CATEGORY = 'category'
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserContributionScoringModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+    USER_3_ID_OLD = 'user_3_id_old'
+    USER_3_ID_NEW = 'user_3_id_new'
+    SCORE_CATEGORY_1 = 'category_1'
+    SCORE_CATEGORY_2 = 'category_2'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserContributionsScoringModelTests, self).setUp()
 
         user_models.UserContributionScoringModel(
-            id='%s.%s' % (self.SCORE_CATEGORY, self.USER_1_ID),
+            id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_1_ID),
             user_id=self.USER_1_ID,
-            score_category=self.SCORE_CATEGORY,
+            score_category=self.SCORE_CATEGORY_1,
             score=1.5,
             has_email_been_sent=False
         ).put()
         user_models.UserContributionScoringModel(
-            id='%s.%s' % (self.SCORE_CATEGORY, self.USER_2_ID),
+            id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_2_ID),
             user_id=self.USER_2_ID,
-            score_category=self.SCORE_CATEGORY,
+            score_category=self.SCORE_CATEGORY_1,
             score=1.5,
             has_email_been_sent=False,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserContributionScoringModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -1738,6 +1746,63 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             user_models.UserContributionScoringModel
             .get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_migrate_model(self):
+        original_model_1 = user_models.UserContributionScoringModel(
+            id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_3_ID_OLD),
+            user_id=self.USER_3_ID_OLD,
+            score_category=self.SCORE_CATEGORY_1,
+            score=1.5,
+            has_email_been_sent=False
+        )
+        original_model_1.put()
+        original_model_2 = user_models.UserContributionScoringModel(
+            id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_3_ID_OLD),
+            user_id=self.USER_3_ID_OLD,
+            score_category=self.SCORE_CATEGORY_2,
+            score=2,
+            has_email_been_sent=True
+        )
+        original_model_2.put()
+
+        user_models.UserContributionScoringModel.migrate_model(
+            self.USER_3_ID_OLD, self.USER_3_ID_NEW)
+        migrated_model_1 = user_models.UserContributionScoringModel.get_by_id(
+            '%s.%s' % (self.SCORE_CATEGORY_1, self.USER_3_ID_NEW))
+        self.assertEqual(self.USER_3_ID_NEW, migrated_model_1.user_id)
+        self.assertEqual(
+            original_model_1.score_category, migrated_model_1.score_category)
+        self.assertEqual(original_model_1.score, migrated_model_1.score)
+        self.assertEqual(
+            original_model_1.has_email_been_sent,
+            migrated_model_1.has_email_been_sent)
+        self.assertEqual(
+            original_model_1.created_on,
+            migrated_model_1.created_on)
+        self.assertEqual(
+            original_model_1.last_updated,
+            migrated_model_1.last_updated)
+
+        migrated_model_2 = user_models.UserContributionScoringModel.get_by_id(
+            '%s.%s' % (self.SCORE_CATEGORY_2, self.USER_3_ID_NEW))
+        self.assertEqual(self.USER_3_ID_NEW, migrated_model_2.user_id)
+        self.assertEqual(
+            original_model_2.score_category, migrated_model_2.score_category)
+        self.assertEqual(original_model_2.score, migrated_model_2.score)
+        self.assertEqual(
+            original_model_2.has_email_been_sent,
+            migrated_model_2.has_email_been_sent)
+        self.assertEqual(
+            original_model_2.created_on,
+            migrated_model_2.created_on)
+        self.assertEqual(
+            original_model_2.last_updated,
+            migrated_model_2.last_updated)
+
+        self.assertIsNone(user_models.UserContributionScoringModel.get_by_id(
+            '%s.%s' % (self.SCORE_CATEGORY_1, self.USER_3_ID_OLD)))
+        self.assertIsNone(user_models.UserContributionScoringModel.get_by_id(
+            '%s.%s' % (self.SCORE_CATEGORY_2, self.USER_3_ID_OLD)))
 
     def test_create_model(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)

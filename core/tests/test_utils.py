@@ -554,6 +554,9 @@ tags: []
         with self.assertRaisesRegexp(utils.ValidationError, error_substring):
             item.validate()
 
+    def assert_model_fields_equal(self, first, second):
+        self.assertEquals(str(first), str(second))
+
     def signup_superadmin_user(self):
         """Signs up a superadmin user. Should be called at the end of
         setUp().
