@@ -31,7 +31,7 @@ import { BackgroundMaskService } from
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ChangesInHumanReadableFormService } from
-  /* eslint-disable-next-line max-len */
+  // eslint-disable-next-line max-len
   'pages/exploration-editor-page/services/changes-in-human-readable-form.service';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
@@ -68,8 +68,7 @@ import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
-import { LoggerService } from
-  'services/contextual/logger.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { NumberWithUnitsObjectFactory } from
@@ -93,7 +92,7 @@ import { SolutionValidityService } from
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateEditorService } from
-  /* eslint-disable-next-line max-len */
+  // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
@@ -101,7 +100,7 @@ import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 import { ThreadStatusDisplayService } from
-  /* eslint-disable-next-line max-len */
+  // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlService } from 'services/contextual/url.service';
@@ -121,10 +120,13 @@ import { WrittenTranslationsObjectFactory } from
   providedIn: 'root'
 })
 export class UpgradedServices {
-  static allUpgradedServices = (() => {
+  getUpgradedServices () {
     var upgradedServices = {};
+
+    // eslint-disable dot-notation
+
     // Group 1: Services without dependencies.
-    /* eslint-disable dot-notation */
+    ////////////////////////////////////////////////////////////////////////////
     upgradedServices['AngularNameService'] = new AngularNameService();
     upgradedServices['AnswerClassificationResultObjectFactory'] =
       new AnswerClassificationResultObjectFactory();
@@ -177,6 +179,7 @@ export class UpgradedServices {
       new WrittenTranslationObjectFactory();
 
     // Group 2: Services depending only on group 1.
+    ////////////////////////////////////////////////////////////////////////////
     upgradedServices['AlertsService'] =
       new AlertsService(upgradedServices['LoggerService']);
     upgradedServices['ChangesInHumanReadableFormService'] =
@@ -225,6 +228,7 @@ export class UpgradedServices {
         upgradedServices['WrittenTranslationObjectFactory']);
 
     // Group 3: Services depending only on groups 1-2.
+    ////////////////////////////////////////////////////////////////////////////
     upgradedServices['AnswerGroupObjectFactory'] =
       new AnswerGroupObjectFactory(
         upgradedServices['OutcomeObjectFactory'],
@@ -236,13 +240,10 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
-    /* eslint-enable dot-notation */
+
+    // eslint-enable dot-notation
 
     return upgradedServices;
-  })();
-
-  getUpgradedServices() {
-    return UpgradedServices.allUpgradedServices;
   }
 }
 
