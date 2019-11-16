@@ -101,6 +101,24 @@ class SentEmailModel(base_models.BaseModel):
         return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the recipient_id and
+        sender_id.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        for model in cls.query(ndb.OR(
+                cls.recipient_id == old_user_id,
+                cls.sender_id == old_user_id)).fetch():
+            if model.recipient_id == old_user_id:
+                model.recipient_id = new_user_id
+            if model.sender_id == old_user_id:
+                model.sender_id = new_user_id
+            model.put(update_last_updated_time=False)
+
+    @classmethod
     def _generate_id(cls, intent):
         """Generates an ID for a new SentEmailModel instance.
 
@@ -313,7 +331,12 @@ class BulkEmailModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """BulkEmailModel has two fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.sender_id
 
     @classmethod
     def create(
