@@ -188,8 +188,8 @@ export class UpgradedServices {
       new DeviceInfoService(upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
       new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
-  upgradedServices['HintObjectFactory'] =
-    new HintObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
+    upgradedServices['HintObjectFactory'] =
+      new HintObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['HtmlEscaperService'] =
       new HtmlEscaperService(upgradedServices['LoggerService']);
     upgradedServices['MetaTagCustomizationService'] =
