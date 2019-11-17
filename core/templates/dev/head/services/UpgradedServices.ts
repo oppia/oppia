@@ -53,8 +53,6 @@ import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UrlService } from 'services/contextual/url.service';
-import { UtilsService } from 'services/utils.service';
 import { UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
 import { UrlService } from 'services/contextual/url.service';
