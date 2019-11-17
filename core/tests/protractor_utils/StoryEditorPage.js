@@ -340,7 +340,6 @@ var StoryEditorPage = function() {
   };
 
   this.expectWarningInIndicator = function(warning) {
-    browser.waitForAngular();
     browser.actions().mouseMove(warningIndicator).perform();
     warningTextElements.then(function(elems) {
       var p = new Promise(function(resolve, reject) {
