@@ -209,6 +209,21 @@ def ensure_pip_library_is_installed(package, version, path):
         pip_install(package, version, exact_lib_path)
 
 
+def get_yarn_command():
+    """Get command for yarn."""
+    # Rename the one without extension, otherwise it will be executed.
+    if common.OS_NAME == 'Windows':
+        origin_yarn_bin = os.path.join(common.YARN_PATH, 'bin', 'yarn')
+        if os.path.exists(origin_yarn_bin):
+            os.rename(
+                origin_yarn_bin,
+                os.path.join(common.YARN_PATH, 'bin', 'yarn.sh'))
+        yarn_command = 'yarn.cmd'
+    else:
+        yarn_command = 'yarn'
+    return yarn_command
+
+
 def main(args=None):
     """Install third-party libraries for Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -265,16 +280,7 @@ def main(args=None):
     install_third_party.main(args=[])
 
     # Install third-party node modules needed for the build process.
-    if common.OS_NAME == 'Windows':
-        # Rename the one without extension, otherwise it will be executed.
-        origin_yarn_bin = os.path.join(common.YARN_PATH, 'bin', 'yarn')
-        if os.path.exists(origin_yarn_bin):
-            os.rename(
-                origin_yarn_bin,
-                os.path.join(common.YARN_PATH, 'bin', 'yarn.sh'))
-        yarn_command = 'yarn.cmd'
-    else:
-        yarn_command = 'yarn'
+    yarn_command = get_yarn_command()
     subprocess.check_call([yarn_command])
 
     install_skulpt(parsed_args)
