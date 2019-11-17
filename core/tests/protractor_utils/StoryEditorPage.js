@@ -83,6 +83,7 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-skill-select-header'));
   var skillNameInputField = element(
     by.css('.protractor-test-skill-name-input'));
+  var skillSaveButton = element(by.css('.protractor-test-save-button'));
   var skillListItems = element.all(
     by.css('.protractor-test-skills-list-item'));
   var disconnectedChapterWarning = element(
@@ -96,7 +97,9 @@ var StoryEditorPage = function() {
   var acquiredSkillDescriptionCard = element.all(
     by.css('.protractor-test-acquired-skill-description-card'));
   var nextChapterCard = element(by.css('.protractor-test-next-chapter-card'));
-
+  var warningIndicator = element(by.css('.protractor-test-warning-indicator'));
+  var warningTextElements = element.all(
+    by.css('.protractor-test-warnings-text'));
   this.get = function(storyId) {
     browser.get(EDITOR_URL_PREFIX + storyId);
     return waitFor.pageToFullyLoad();
@@ -276,11 +279,10 @@ var StoryEditorPage = function() {
       selectSkill: function(name) {
         this._searchSkillByName(name);
         this._selectSkillBasedOnIndex(0);
-        var doneButton = element(by.css('.btn-success'));
         waitFor.elementToBeClickable(
-          doneButton,
+          skillSaveButton,
           'doneButton takes too long to be clickable');
-        doneButton.click();
+        skillSaveButton.click();
       },
     };
   };
