@@ -353,7 +353,7 @@ def main(args=None):
         # Specify the path to coverage so it can be viewed as a module.
         SUBPROCESS_ENV.update({
             'PYTHONPATH': COVERAGE_DIR.encode(encoding='utf-8')
-                          # In case of some encoding issues on Windows
+                          # In case of some encoding issues on Windows.
         })
         python_utils.PRINT(
             'Checking whether coverage is installed in %s'
