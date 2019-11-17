@@ -399,7 +399,7 @@ def get_users_settings(user_ids):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
             result.append(UserSettings(
                 user_id=feconf.SYSTEM_COMMITTER_ID,
-                gae_id=feconf.SYSTEM_COMMITTER_ID,
+                gae_id=None,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
                 role=feconf.ROLE_ID_ADMIN,
                 username='admin',
