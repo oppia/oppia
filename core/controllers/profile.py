@@ -26,6 +26,7 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 import feconf
 import utils
@@ -162,7 +163,7 @@ class PreferencesHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_own_profile
     def put(self):
-        """Handles POST requests."""
+        """Handles PUT requests."""
         update_type = self.payload.get('update_type')
         data = self.payload.get('data')
 
@@ -344,12 +345,12 @@ class RemoveAccountPage(base.BaseHandler):
 class RemoveAccountHandler(base.BaseHandler):
     """Provides data for the remove account page."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_own_profile
     def post(self):
         """Handles POST requests."""
-        raise NotImplementedError
+        self.render_json({})
 
 
 class UsernameCheckHandler(base.BaseHandler):
