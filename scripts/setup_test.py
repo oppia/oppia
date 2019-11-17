@@ -143,6 +143,33 @@ class SetupTests(test_utils.GenericTestBase):
             setup.test_python_version()
         self.assertEqual(print_arr, [])
 
+    def test_python_version_testing_with_incorrect_version_and_windows_os(self):
+        print_arr = []
+        def mock_print(msg_list):
+            print_arr.extend(msg_list)
+
+        print_swap = self.swap(
+            common, 'print_each_string_after_two_new_lines', mock_print)
+        uname_swap = self.swap(common, 'OS_NAME', 'Windows')
+        version_info = collections.namedtuple(
+            'version_info', ['major', 'minor'])
+        version_swap = self.swap(
+            sys, 'version_info', version_info(major=3, minor=4))
+        with print_swap, uname_swap, version_swap, self.assertRaises(Exception):
+            setup.test_python_version()
+        self.assertEqual(
+            print_arr, [
+                'It looks like you are using Windows. If you have Python '
+                'installed,',
+                'make sure it is in your PATH and that PYTHONPATH is set.',
+                'If you have two versions of Python (ie, Python 2.7 and 3), '
+                'specify 2.7 before other versions of Python when setting the '
+                'PATH.',
+                'Here are some helpful articles:',
+                'http://docs.python-guide.org/en/latest/starting/install/win/',
+                'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
+                'pythonpath-in-windows-7'])
+
     def test_download_and_install_package(self):
         check_function_calls = {
             'url_retrieve_is_called': False,
@@ -338,6 +365,68 @@ class SetupTests(test_utils.GenericTestBase):
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v1.17.3/yarn-v1.17.3.tar.gz'])
 
+    def test_package_install_with_windows_x64(self):
+        def mock_exists(unused_path):
+            return False
+        def mock_getuid():
+            return 10000
+
+        check_function_calls = [
+            'create_directory_is_called',
+            'test_python_version_is_called',
+            'rename_is_called',
+            'delete_file_is_called'
+        ]
+        os_swap = self.swap(common, 'OS_NAME', 'Windows')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'AMD64')
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        getuid_swap = self.swap(os, 'getuid', mock_getuid)
+
+        with self.test_py_swap, self.create_swap, exists_swap:
+            with self.download_swap, self.rename_swap:
+                with self.delete_swap, self.isfile_swap:
+                    with os_swap, getuid_swap, architecture_swap:
+                        setup.main(args=[])
+        for item in check_function_calls:
+            self.assertTrue(self.check_function_calls[item])
+        self.assertEqual(
+            self.urls, [
+                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
+                '-win-x64.zip',
+                'https://github.com/yarnpkg/yarn/releases/download/'
+                'v1.17.3/yarn-v1.17.3.tar.gz'])
+
+    def test_package_install_with_windows_x86(self):
+        def mock_exists(unused_path):
+            return False
+        def mock_getuid():
+            return 10000
+
+        check_function_calls = [
+            'create_directory_is_called',
+            'test_python_version_is_called',
+            'rename_is_called',
+            'delete_file_is_called'
+        ]
+        os_swap = self.swap(common, 'OS_NAME', 'Windows')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'AMD86')
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        getuid_swap = self.swap(os, 'getuid', mock_getuid)
+
+        with self.test_py_swap, self.create_swap, exists_swap:
+            with self.download_swap, self.rename_swap:
+                with self.delete_swap, self.isfile_swap:
+                    with os_swap, getuid_swap, architecture_swap:
+                        setup.main(args=[])
+        for item in check_function_calls:
+            self.assertTrue(self.check_function_calls[item])
+        self.assertEqual(
+            self.urls, [
+                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
+                '-win-x86.zip',
+                'https://github.com/yarnpkg/yarn/releases/download/'
+                'v1.17.3/yarn-v1.17.3.tar.gz'])
+
     def test_chrome_bin_setup_with_travis_var_set(self):
         def mock_get(unused_var):
             return 'Travis'
@@ -412,6 +501,21 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(
             os.environ['CHROME_BIN'],
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
+
+    def test_chrome_bin_setup_with_windows_google_chrome(self):
+        def mock_isfile(path):
+            return (
+                path == (
+                    'c:\\Program Files (x86)\\Google\\Chrome\\Application\\'
+                    'chrome.exe'))
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        with self.test_py_swap, self.create_swap, self.uname_swap:
+            with self.exists_swap, self.chown_swap, self.chmod_swap:
+                with self.get_swap, isfile_swap:
+                    setup.main(args=[])
+        self.assertEqual(
+            os.environ['CHROME_BIN'],
+            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe')
 
     def test_chrome_bin_setup_with_error(self):
         def mock_isfile(unused_path):
