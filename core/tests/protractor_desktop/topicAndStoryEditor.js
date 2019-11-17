@@ -324,6 +324,11 @@ describe('Chapter editor functionality', function() {
     ' acquired skill', function() {
     storyEditorPage.addAcquiredSkill(dummySkills[1]);
     storyEditorPage.expectSaveStoryDisabled();
+    var warningRegex = new RegExp(
+      'The skill with id [a-zA-Z0-9]+ is common to both the acquired and ' +
+      'prerequisite skill id ' +
+      'list in .*');
+    storyEditorPage.expectWarningInIndicator(warningRegex);
   });
 
   it('should delete prerequisite skill and acquired skill', function() {

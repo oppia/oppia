@@ -336,6 +336,26 @@ var StoryEditorPage = function() {
       by.cssContainingText('option', name));
     initialChapterOption.click();
   };
+
+  this.expectWarningInIndicator = function(warning) {
+    browser.waitForAngular();
+    browser.actions().mouseMove(warningIndicator).perform();
+    warningTextElements.then(function(elems) {
+      var p = new Promise(function(resolve, reject) {
+        elems.forEach(function(elem) {
+          elem.getText().then(function(text) {
+            if (warning.test(text)) {
+              resolve(true);
+            }
+          });
+        });
+        reject();
+      });
+      p.then(function(result) {
+        expect(result).toBe(true);
+      });
+    });
+  };
 };
 
 exports.StoryEditorPage = StoryEditorPage;
