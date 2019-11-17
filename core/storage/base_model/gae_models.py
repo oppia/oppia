@@ -1034,6 +1034,11 @@ class BaseSnapshotContentModel(BaseModel):
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """BaseSnapshotContentModel doesn't have any field with user ID."""
+        return USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     def get_unversioned_instance_id(self):
         """Gets the instance id from the snapshot id.
 

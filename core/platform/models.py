@@ -18,6 +18,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import inspect
+
 import feconf
 import python_utils
 import utils
@@ -131,6 +133,39 @@ class _Gae(Platform):
                 raise Exception('Invalid model name: %s' % name)
 
         return tuple(returned_models)
+
+    # List of model classes that are not actually storaged but are inherited
+    # from in other models.
+    BASE_CLASSES = (
+        'BaseMapReduceBatchResultsModel',
+        'BaseModel',
+        'BaseSnapshotContentModel',
+        'BaseSnapshotMetadataModel',
+        'VersionedModel',
+        'BaseCommitLogEntryModel',
+    )
+
+    @classmethod
+    def import_all_storage_model_classes(cls):
+        """Imports and returns all model classes that are in the storage, not
+        model classes that are just inherited from.
+
+        Returns:
+            list(class). The corresponding storage-layer model classes.
+        """
+        model_classes = []
+        for module in cls.import_models(
+                cls, [name for name in NAMES.__dict__ if '__' not in name]):
+            for member_name, member_obj in inspect.getmembers(module):
+                if inspect.isclass(member_obj):
+                    clazz = getattr(module, member_name)
+                    all_base_classes = [
+                        base_class.__name__ for base_class in inspect.getmro(
+                            clazz)]
+                    if ('Model' in all_base_classes and
+                            member_name not in self.BASE_CLASSES):
+                        model_classes.append(clazz)
+        return model_classes
 
     @classmethod
     def import_transaction_services(cls):
@@ -270,6 +305,15 @@ class Registry(python_utils.OBJECT):
             list(module). The corresponding storage-layer modules.
         """
         return cls._get().import_models(model_names)
+
+    @classmethod
+    def import_all_storage_model_classes(cls):
+        """Imports and returns all the storage models.
+
+        Returns:
+            list(class). The corresponding storage-layer model classes.
+        """
+        return cls._get().import_all_storage_model_classes()
 
     @classmethod
     def import_current_user_services(cls):

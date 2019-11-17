@@ -254,12 +254,6 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             topic_models.SubtopicPageCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            topic_models.SubtopicPageCommitLogEntryModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
     def test__get_instance_id(self):
         # Calling create() method calls _get_instance (a protected method)
         # and sets the instance id equal to the result of calling that method.
@@ -285,6 +279,15 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 class TopicRightsModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicRightsModel class."""
 
+    TOPIC_1_ID = 'topic_1_id'
+    TOPIC_2_ID = 'topic_2_id'
+    TOPIC_3_ID = 'topic_3_id'
+    MANAGER_1_ID_OLD = 'manager_1_id_old'
+    MANAGER_1_ID_NEW = 'manager_1_id_new'
+    MANAGER_2_ID_OLD = 'manager_2_id_old'
+    MANAGER_2_ID_NEW = 'manager_2_id_new'
+    MANAGER_3_ID_OLD = 'manager_3_id_old'
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             topic_models.TopicRightsModel.get_deletion_policy(),
@@ -292,7 +295,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         topic_rights = topic_models.TopicRightsModel(
-            id='topic_id', manager_ids=['manager_id'])
+            id=self.TOPIC_1_ID, manager_ids=['manager_id'])
         topic_rights.commit(
             'committer_id',
             'New topic rights',
@@ -308,6 +311,59 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
-            topic_models.TopicRightsModel
-            .get_user_id_migration_policy(),
+            topic_models.TopicRightsModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_migrate_model(self):
+        original_mode_1 = topic_models.TopicRightsModel(
+            id=self.TOPIC_1_ID, manager_ids=[self.MANAGER_1_ID_OLD])
+        original_mode_1.commit(
+            'committer_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+        original_mode_2 = topic_models.TopicRightsModel(
+            id=self.TOPIC_2_ID,
+            manager_ids=[self.MANAGER_1_ID_OLD, self.MANAGER_2_ID_OLD])
+        original_mode_2.commit(
+            'committer_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+        original_mode_3 = topic_models.TopicRightsModel(
+            id=self.TOPIC_3_ID,
+            manager_ids=[self.MANAGER_2_ID_OLD, self.MANAGER_3_ID_OLD])
+        original_mode_3.commit(
+            'committer_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+
+        topic_models.TopicRightsModel.migrate_model(
+            self.MANAGER_1_ID_OLD, self.MANAGER_1_ID_NEW)
+        migrated_model_1 = topic_models.TopicRightsModel.get_by_id(
+            self.TOPIC_1_ID)
+        self.assertEqual([self.MANAGER_1_ID_NEW], migrated_model_1.manager_ids)
+        migrated_model_2 = topic_models.TopicRightsModel.get_by_id(
+            self.TOPIC_2_ID)
+        self.assertEqual(
+            [self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_OLD],
+            migrated_model_2.manager_ids)
+        migrated_model_3 = topic_models.TopicRightsModel.get_by_id(
+            self.TOPIC_3_ID)
+        self.assertEqual(
+            [self.MANAGER_2_ID_OLD, self.MANAGER_3_ID_OLD],
+            migrated_model_3.manager_ids)
+
+        topic_models.TopicRightsModel.migrate_model(
+            self.MANAGER_2_ID_OLD, self.MANAGER_2_ID_NEW)
+        migrated_model_1 = topic_models.TopicRightsModel.get_by_id(
+            self.TOPIC_1_ID)
+        self.assertEqual([self.MANAGER_1_ID_NEW], migrated_model_1.manager_ids)
+        migrated_model_2 = topic_models.TopicRightsModel.get_by_id(
+            self.TOPIC_2_ID)
+        self.assertEqual(
+            [self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_NEW],
+            migrated_model_2.manager_ids)
+        migrated_model_3 = topic_models.TopicRightsModel.get_by_id(
+            self.TOPIC_3_ID)
+        self.assertEqual(
+            [self.MANAGER_2_ID_NEW, self.MANAGER_3_ID_OLD],
+            migrated_model_3.manager_ids)

@@ -427,6 +427,20 @@ class TopicRightsModel(base_models.VersionedModel):
         return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the manager_ids.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        for model in cls.query(cls.manager_ids == old_user_id).fetch():
+            model.manager_ids = [
+                new_user_id if manager_id == old_user_id else manager_id
+                for manager_id in model.manager_ids]
+            model.put(update_last_updated_time=False)
+
+    @classmethod
     def get_by_user(cls, user_id):
         """Retrieves the rights object for all topics assigned to given user
 
