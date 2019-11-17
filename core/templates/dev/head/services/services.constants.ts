@@ -16,8 +16,6 @@
  * @fileoverview Constants for shared services across Oppia.
  */
 
-const richTextComponents = require('rich_text_components_definitions.ts');
-
 export class ServicesConstants {
   public static PAGE_CONTEXT = {
     COLLECTION_EDITOR: 'collection_editor',

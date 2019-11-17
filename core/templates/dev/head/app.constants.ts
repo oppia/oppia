@@ -16,8 +16,6 @@
  * @fileoverview Shared constants for the Oppia module.
  */
 
-const constants = require('constants.ts');
-
 export class AppConstants {
   public static DEFAULT_TRANSLATIONS = {
     I18N_LIBRARY_PAGE_TITLE: 'Library',
