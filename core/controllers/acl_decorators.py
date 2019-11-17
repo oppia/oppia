@@ -2641,8 +2641,8 @@ def can_access_voiceover_applications(handler):
 
         Raises:
             NotLoggedInException: The user is not logged in.
-            UnauthorizedUserException: The user does not have
-                credentials to voiceover an exploration.
+            UnauthorizedUserException: The user does not have credentials to
+                access voiceover applications for the given purpose.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException

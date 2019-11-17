@@ -59,11 +59,11 @@ def _save_audio_file(
 
     if dot_index == -1 or dot_index == 0:
         raise Exception(
-            'No filename extension: it should have '
+            'No filename extension provided. It should have '
             'one of the following extensions: %s' % allowed_formats)
     if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
         raise Exception(
-            'Invalid filename extension: it should have '
+            'Invalid filename extension provided. It should have '
             'one of the following extensions: %s' % allowed_formats)
 
     tempbuffer = python_utils.string_io()
