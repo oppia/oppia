@@ -18,6 +18,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -327,6 +328,28 @@ class SignupHandler(base.BaseHandler):
                 self.user_id, default_dashboard)
 
         self.render_json({})
+
+
+class RemoveAccountPage(base.BaseHandler):
+    """The remove account page."""
+
+    @acl_decorators.can_manage_own_profile
+    def get(self):
+        """Handles GET requests."""
+        if constants.DISABLE_ACCOUNT_REMOVAL:
+            raise self.PageNotFoundException
+        self.render_template('remove-account-page.mainpage.html')
+
+
+class RemoveAccountHandler(base.BaseHandler):
+    """Provides data for the remove account page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_manage_own_profile
+    def post(self):
+        """Handles POST requests."""
+        raise NotImplementedError
 
 
 class UsernameCheckHandler(base.BaseHandler):

@@ -13,15 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview File to import necessary scripts for get_started page.
+ * @fileoverview File to import necessary scripts for remove-account page.
  */
 
 // The module needs to be loaded before everything else since it defines the
 // main module the elements are attached to.
-require('pages/get-started-page/get-started-page.module.ts');
+require('pages/remove-account-page/remove-account-page.module.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+require('pages/remove-account-page/remove-account-page.controller.ts');

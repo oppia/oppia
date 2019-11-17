@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base_components/header.html', {"title": "Remove Account - Oppia"})
+    @require('../../base-components/header.template.html', {"title": "Remove Account - Oppia"})
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
@@ -17,65 +17,11 @@
         </navbar-breadcrumb>
 
         <content>
-          <div class="oppia-static-header">
-            <h1 class="protractor-test-get-started-page">Remove account</h1>
-          </div>
-          <background-banner></background-banner>
-          <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
-            <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-get-started">
-
-              <h2>Overview</h2>
-              <p>
-                This action will remove this user account and
-                also all the private data that are associated with this account.
-                Already published data will be anonymized,
-                so they can't be associated with this account and
-                the ownership of that data will be transferred to the community.
-                Summary of data tha will be removed:
-              </p>
-              <ul style="margin-left: 40px">
-                <li>User and email settings</li>
-                <li>User statistics</li>
-                <li>Private explorations, collections, topics, stories, skills, questions</li>
-              </ul>
-              <p>
-                Summary of data that will be anonymized:
-              </p>
-              <ul style="margin-left: 40px; margin-bottom: 24px;">
-                <li>Threads and suggestions</li>
-                <li>User statistics</li>
-                <li>Public explorations, collections, topics, stories, skills, questions</li>
-              </ul>
-              <p>
-                Summary of data that will be transfered to community:
-              </p>
-              <ul style="margin-left: 40px; margin-bottom: 24px;">
-                <li>Public explorations, collections, topics, stories, skills, questions</li>
-              </ul>
-              <p>
-                If you have any questions or
-                concerns about the account removal process,
-                you can email to <strong>privacy@oppia.org</strong>.
-              </p>
-
-              <button type="button" class="btn btn-danger" title="Remove my account">
-                Remove my account
-              </button>
-            </div>
-          </div>
-          <div class="oppia-footer-padding-below-banner">
-          </div>
+          <remove-account-page>
+          </remove-account-page>
         </content>
       </base-content>
     </div>
-
-    <style>
-      .oppia-get-started h2 {
-        font-size: 1.17em;
-        font-weight: bold;
-        text-align: left;
-      }
-    </style>
 
     @require('../footer_js_libs.html')
   </body>
