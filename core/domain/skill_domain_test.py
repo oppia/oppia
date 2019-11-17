@@ -372,17 +372,17 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'html': '<p>Another worked example</p>'
         }]
 
-        worked_examples_object_list = [
+        worked_examples_list = [
             state_domain.SubtitledHtml.from_dict(worked_example)
             for worked_example in worked_examples_dict]
 
-        self.skill.update_worked_examples(worked_examples_object_list)
+        self.skill.update_worked_examples(worked_examples_list)
         self.skill.validate()
 
         # Delete the last worked_example.
-        worked_examples_object_list.pop()
+        worked_examples_list.pop()
 
-        self.skill.update_worked_examples(worked_examples_object_list)
+        self.skill.update_worked_examples(worked_examples_list)
         self.skill.validate()
 
     def test_skill_rights_is_creator(self):

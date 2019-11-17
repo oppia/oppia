@@ -803,13 +803,14 @@ class Skill(python_utils.OBJECT):
         """Updates the worked examples list of the skill.
 
         Args:
-            worked_examples: list(SubtitledHtml). The new worked examples of the skill.
+            worked_examples: list(SubtitledHtml). The new worked examples of
+                the skill.
         """
 
         old_content_ids = [worked_example.content_id for worked_example in (
             self.skill_contents.worked_examples)]
 
-        self.skill_contents.worked_examples = worked_examples
+        self.skill_contents.worked_examples = list(worked_examples)
 
         new_content_ids = [worked_example.content_id for worked_example in (
             self.skill_contents.worked_examples)]
@@ -827,6 +828,7 @@ class Skill(python_utils.OBJECT):
             new_ids_list: list(str). A list of content ids currently present
                 in worked_examples.
         """
+
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
         written_translations = self.skill_contents.written_translations
