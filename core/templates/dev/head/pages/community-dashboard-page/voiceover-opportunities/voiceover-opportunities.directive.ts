@@ -107,7 +107,7 @@ angular.module('oppia').directive('voiceoverOpportunities', [
             }
           };
 
-          ctrl.onClickButton = function(expId) {
+          ctrl.onClickOpportunityActionButton = function(expId) {
             var opportunity = getOpportunitySummary(expId);
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -130,7 +130,6 @@ angular.module('oppia').directive('voiceoverOpportunities', [
                   var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
                     'There was an error uploading the audio file.');
                   var uploadedFile = null;
-                  // Whether there was an error uploading the audio file.
                   $scope.errorMessage = null;
                   $scope.droppedFile = null;
                   $scope.errorMessage = null;
