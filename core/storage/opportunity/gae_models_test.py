@@ -29,12 +29,6 @@ import python_utils
 class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationOpportunitySummaryModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            opportunity_models.ExplorationOpportunitySummaryModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
     def setUp(self):
         super(ExplorationOpportunitySummaryModelUnitTest, self).setUp()
 
@@ -64,6 +58,17 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             need_voice_artist_in_language_codes=['en'],
             assigned_voice_artist_in_language_codes=[]
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .has_reference_to_user_id('any_id'))
 
     def test_get_all_translation_opportunities(self):
         results, cursor, more = (
@@ -152,3 +157,58 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             .get_all_translation_opportunities(1, None, 'hi'))
         self.assertEqual(len(results), 0)
         self.assertFalse(more)
+
+
+class SkillOpportunityModelTest(test_utils.GenericTestBase):
+    """Tests for the SkillOpportunityModel class."""
+
+    def setUp(self):
+        super(SkillOpportunityModelTest, self).setUp()
+
+        opportunity_models.SkillOpportunityModel(
+            id='opportunity_id1',
+            skill_description='A skill description',
+            question_count=20,
+        ).put()
+        opportunity_models.SkillOpportunityModel(
+            id='opportunity_id2',
+            skill_description='A skill description',
+            question_count=30,
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            opportunity_models.SkillOpportunityModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            opportunity_models.SkillOpportunityModel
+            .has_reference_to_user_id('any_id'))
+
+    def test_get_skill_opportunities(self):
+        results, cursor, more = (
+            opportunity_models.SkillOpportunityModel
+            .get_skill_opportunities(5, None))
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0].id, 'opportunity_id1')
+        self.assertEqual(results[1].id, 'opportunity_id2')
+        self.assertFalse(more)
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+
+    def test_get_skill_opportunities_pagination(self):
+        results, cursor, more = (
+            opportunity_models.SkillOpportunityModel
+            .get_skill_opportunities(1, None))
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, 'opportunity_id1')
+        self.assertTrue(more)
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+
+        results, cursor, more = (
+            opportunity_models.SkillOpportunityModel
+            .get_skill_opportunities(1, cursor))
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, 'opportunity_id2')
+        self.assertFalse(more)
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))

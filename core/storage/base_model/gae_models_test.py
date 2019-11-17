@@ -32,16 +32,16 @@ import python_utils
 class BaseModelUnitTests(test_utils.GenericTestBase):
     """Test the generic base model."""
 
-    def test_get_deletion_policy(self):
-        with self.assertRaises(NotImplementedError):
-            base_models.BaseModel.get_deletion_policy()
-
     def tearDown(self):
         """Deletes all model entities."""
         for entity in base_models.BaseModel.get_all():
             entity.delete()
 
         super(BaseModelUnitTests, self).tearDown()
+
+    def test_get_deletion_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_deletion_policy()
 
     def test_has_reference_to_user_id(self):
         with self.assertRaises(NotImplementedError):
@@ -169,6 +169,17 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
 
 class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
+
+    def test_exists_for_user_id(self):
+        model1 = base_models.BaseSnapshotMetadataModel(
+            id='model_id-1', committer_id='committer_id', commit_type='create')
+        model1.put()
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('committer_id'))
+        self.assertFalse(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('x_id'))
 
     def test_get_version_string(self):
         model1 = base_models.BaseSnapshotMetadataModel(

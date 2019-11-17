@@ -1,0 +1,12 @@
+Hi all,
+
+The main changes in this release are [Add main changes].
+
+Please welcome Alice for whom this release marks their first contribution to Oppia!
+
+Thanks to Bob and Paul, our returning contributors who made this release possible.
+
+Finally, I'd like to thank [Add names of release testers] for their help with pre-release testing, bug-fixing and QA, as well as Tom for leading the QA team for this release.
+
+Thanks,
+Ruth

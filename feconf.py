@@ -36,10 +36,6 @@ POST_COMMIT_STATUS_PRIVATE = 'private'
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# The path for generating release_summary.md file for the current release.
-RELEASE_SUMMARY_FILEPATH = os.path.join(
-    os.getcwd(), os.pardir, 'release_summary.md')
-
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.
@@ -191,7 +187,7 @@ CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2
 
 # The current version of rubric dict in the skill schema.
 CURRENT_RUBRIC_SCHEMA_VERSION = 1
@@ -705,7 +701,6 @@ SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
-SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'

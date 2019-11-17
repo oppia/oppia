@@ -23,7 +23,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.directive.ts');
 require('domain/exploration/StatesObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/autosave-info-modals.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -46,10 +46,10 @@ require('pages/exploration-editor-page/services/exploration-title.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/site-analytics.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',

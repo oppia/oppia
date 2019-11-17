@@ -18,8 +18,8 @@
 
 require('components/concept-card/concept-card.directive.ts');
 require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/UserService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').directive('skillsMasteryList', [
   'UrlInterpolationService', function(UrlInterpolationService) {

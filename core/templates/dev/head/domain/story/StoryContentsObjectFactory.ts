@@ -39,7 +39,7 @@ export class StoryContents {
     this._storyNodeObjectFactoryInstance = storyNodeObjectFactoryInstance;
   }
 
-  _disconnectedNodeIds: string[] = [];
+  _disconnectedNodes: StoryNode[] = [];
 
   getIncrementedNodeId(nodeId: string): string {
     var index = parseInt(
@@ -52,8 +52,23 @@ export class StoryContents {
     return this._initialNodeId;
   }
 
-  getDisconnectedNodeIds(): string[] {
-    return this._disconnectedNodeIds;
+  getLinearNodesList(): StoryNode[] {
+    var linearList = [];
+    var currentIndex = this.getNodeIndex(this._initialNodeId);
+    while (true) {
+      var node = this._nodes[currentIndex];
+      linearList.push(node);
+      if (node.getDestinationNodeIds().length === 0) {
+        break;
+      } else {
+        currentIndex = this.getNodeIndex(node.getDestinationNodeIds()[0]);
+      }
+    }
+    return linearList;
+  }
+
+  getDisconnectedNodes(): StoryNode[] {
+    return this._disconnectedNodes;
   }
 
   getNextNodeId(): string {
@@ -110,7 +125,7 @@ export class StoryContents {
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because the return type is a list with varying element types.
   validate(): any {
-    this._disconnectedNodeIds = [];
+    this._disconnectedNodes = [];
     var issues = [];
     var nodes = this._nodes;
     for (var i = 0; i < nodes.length; i++) {
@@ -191,7 +206,7 @@ export class StoryContents {
         nodeIsVisited[currentNodeIndex] = true;
         var currentNode = nodes[currentNodeIndex];
 
-        startingNode.getAcquiredSkillIds().forEach((skillId) => {
+        currentNode.getAcquiredSkillIds().forEach((skillId) => {
           simulatedSkillIds.add(skillId);
         });
         for (var i = 0; i < currentNode.getDestinationNodeIds().length; i++) {
@@ -222,7 +237,7 @@ export class StoryContents {
       }
       for (var i = 0; i < nodeIsVisited.length; i++) {
         if (!nodeIsVisited[i]) {
-          this._disconnectedNodeIds.push(nodeIds[i]);
+          this._disconnectedNodes.push(nodes[i]);
           issues.push(
             'There is no way to get to the chapter with title ' +
             nodeTitles[i] + ' from any other chapter');
