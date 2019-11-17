@@ -350,6 +350,7 @@ class RemoveAccountHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_profile
     def post(self):
         """Handles POST requests."""
+        wipeout_service.remove_user_account(self.user_id)
         self.render_json({})
 
 

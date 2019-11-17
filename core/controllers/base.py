@@ -152,6 +152,9 @@ class BaseHandler(webapp2.RequestHandler):
                     self.user_id, email)
             self.values['user_email'] = user_settings.email
 
+            if user_settings.to_be_removed:
+                self.user_id = None
+
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not
                     user_services.has_fully_registered(self.user_id)):
                 _clear_login_cookies(self.response.headers)
