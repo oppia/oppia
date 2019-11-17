@@ -158,11 +158,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         chdir_swap = self.swap(os, 'chdir', mock_chdir)
         mkdir_swap = self.swap(os, 'mkdir', mock_mkdir)
-        check_call_swap = self.swap(subprocess, 'call', mock_call)
+        call_swap = self.swap(subprocess, 'call', mock_call)
         copytree_swap = self.swap(shutil, 'copytree', mock_copytree)
         input_swap = self.swap(fileinput, 'input', mock_input)
 
-        with exists_swap, chdir_swap, mkdir_swap, check_call_swap:
+        with exists_swap, chdir_swap, mkdir_swap, call_swap:
             with copytree_swap, input_swap, self.print_swap:
                 install_third_party_libs.install_skulpt(
                     argparse.Namespace(nojsrepl=False, noskulpt=False))
