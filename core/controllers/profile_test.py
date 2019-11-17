@@ -763,13 +763,13 @@ class RemoveAccountPageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
     def test_get_remove_account_page(self):
-        with self.swap(constants, 'DISABLE_ACCOUNT_REMOVAL', False):
+        with self.swap(constants, 'ENABLE_ACCOUNT_REMOVAL', True):
             response = self.get_html_response('/remove-account')
             self.assertIn(
                 '<remove-account-page></remove-account-page>', response.body)
 
     def test_get_remove_account_page_disabled(self):
-        with self.swap(constants, 'DISABLE_ACCOUNT_REMOVAL', True):
+        with self.swap(constants, 'ENABLE_ACCOUNT_REMOVAL', False):
             self.get_html_response('/remove-account', expected_status_int=404)
 
 

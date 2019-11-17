@@ -336,7 +336,7 @@ class RemoveAccountPage(base.BaseHandler):
     @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
-        if constants.DISABLE_ACCOUNT_REMOVAL:
+        if not constants.ENABLE_ACCOUNT_REMOVAL:
             raise self.PageNotFoundException
         self.render_template('remove-account-page.mainpage.html')
 
