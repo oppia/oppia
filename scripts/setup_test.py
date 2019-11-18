@@ -36,6 +36,8 @@ from . import setup
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNTAR_PATH = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.tar.gz')
+NODE_VERSION = setup.NODE_VERSION
+YARN_VERSION = setup.YARN_VERSION
 
 
 class SetupTests(test_utils.GenericTestBase):
@@ -289,10 +291,10 @@ class SetupTests(test_utils.GenericTestBase):
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-darwin-x64.tar.gz',
+                'https://nodejs.org/dist/%s/node-%s'
+                '-darwin-x64.tar.gz' % (NODE_VERSION, NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                'v1.17.3/yarn-v1.17.3.tar.gz'])
+                '%s/yarn-%s.tar.gz' % (YARN_VERSION, YARN_VERSION)])
 
     def test_package_install_with_darwin_x86(self):
         def mock_exists(unused_path):
@@ -312,10 +314,10 @@ class SetupTests(test_utils.GenericTestBase):
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-darwin-x86.tar.gz',
+                'https://nodejs.org/dist/%s/node-%s'
+                '-darwin-x86.tar.gz' % (NODE_VERSION, NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                'v1.17.3/yarn-v1.17.3.tar.gz'])
+                '%s/yarn-%s.tar.gz' % (YARN_VERSION, YARN_VERSION)])
 
     def test_package_install_with_linux_x64(self):
         def mock_exists(unused_path):
@@ -336,10 +338,10 @@ class SetupTests(test_utils.GenericTestBase):
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-linux-x64.tar.gz',
+                'https://nodejs.org/dist/%s/node-%s'
+                '-linux-x64.tar.gz' % (NODE_VERSION, NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                'v1.17.3/yarn-v1.17.3.tar.gz'])
+                '%s/yarn-%s.tar.gz' % (YARN_VERSION, YARN_VERSION)])
 
     def test_package_install_with_linux_x86(self):
         def mock_exists(unused_path):
@@ -360,10 +362,10 @@ class SetupTests(test_utils.GenericTestBase):
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-linux-x86.tar.gz',
+                'https://nodejs.org/dist/%s/node-%s'
+                '-linux-x86.tar.gz' % (NODE_VERSION, NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                'v1.17.3/yarn-v1.17.3.tar.gz'])
+                '%s/yarn-%s.tar.gz' % (YARN_VERSION, YARN_VERSION)])
 
     def test_package_install_with_windows_x64(self):
         def mock_exists(unused_path):
@@ -391,10 +393,10 @@ class SetupTests(test_utils.GenericTestBase):
             self.assertTrue(self.check_function_calls[item])
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-win-x64.zip',
+                'https://nodejs.org/dist/%s/node-%s'
+                '-win-x64.zip' % (NODE_VERSION, NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                'v1.17.3/yarn-v1.17.3.tar.gz'])
+                '%s/yarn-%s.tar.gz' % (YARN_VERSION, YARN_VERSION)])
 
     def test_package_install_with_windows_x86(self):
         def mock_exists(unused_path):
@@ -422,10 +424,10 @@ class SetupTests(test_utils.GenericTestBase):
             self.assertTrue(self.check_function_calls[item])
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-win-x86.zip',
+                'https://nodejs.org/dist/%s/node-%s'
+                '-win-x86.zip' % (NODE_VERSION, NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                'v1.17.3/yarn-v1.17.3.tar.gz'])
+                '%s/yarn-%s.tar.gz' % (YARN_VERSION, YARN_VERSION)])
 
     def test_chrome_bin_setup_with_travis_var_set(self):
         def mock_get(unused_var):

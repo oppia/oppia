@@ -32,6 +32,8 @@ from . import common
 _PARSER = argparse.ArgumentParser(description="""
 Python execution environent set up for all scripts.
 """)
+NODE_VERSION = 'v10.15.3'
+YARN_VERSION = 'v1.17.3'
 
 
 def create_directory(directory_path):
@@ -126,23 +128,23 @@ def main(args=None):
         extension = '.tar.gz'
         if common.OS_NAME == 'Darwin':
             if common.ARCHITECTURE == 'x86_64':
-                node_file_name = 'node-v10.15.3-darwin-x64'
+                node_file_name = 'node-%s-darwin-x64' % NODE_VERSION
             else:
-                node_file_name = 'node-v10.15.3-darwin-x86'
+                node_file_name = 'node-%s-darwin-x86' % NODE_VERSION
         elif common.OS_NAME == 'Linux':
             if common.ARCHITECTURE == 'x86_64':
-                node_file_name = 'node-v10.15.3-linux-x64'
+                node_file_name = 'node-%s-linux-x64' % NODE_VERSION
             else:
-                node_file_name = 'node-v10.15.3-linux-x86'
+                node_file_name = 'node-%s-linux-x86' % NODE_VERSION
         elif common.OS_NAME == 'Windows':
             extension = '.zip'
             if common.ARCHITECTURE == 'AMD64':
-                node_file_name = 'node-v10.15.3-win-x64'
+                node_file_name = 'node-%s-win-x64' % NODE_VERSION
             else:
-                node_file_name = 'node-v10.15.3-win-x86'
+                node_file_name = 'node-%s-win-x86' % NODE_VERSION
             downloaded_file_name = 'node-download.zip'
-        download_link = 'https://nodejs.org/dist/v10.15.3/%s%s' % (
-            node_file_name, extension)
+        download_link = 'https://nodejs.org/dist/%s/%s%s' % (
+            NODE_VERSION, node_file_name, extension)
         download_and_install_package(
             download_link,
             downloaded_file_name)
@@ -170,11 +172,10 @@ def main(args=None):
             'visit https://yarnpkg.com/en/docs/usage.'])
 
         # NB: Update .yarnrc if the yarn version below is changed.
-        yarn_version = 'v1.17.3'
-        yarn_file_name = 'yarn-%s.tar.gz' % yarn_version
+        yarn_file_name = 'yarn-%s.tar.gz' % YARN_VERSION
         download_and_install_package(
             'https://github.com/yarnpkg/yarn/releases/download/%s/%s'
-            % (yarn_version, yarn_file_name), yarn_file_name)
+            % (YARN_VERSION, yarn_file_name), yarn_file_name)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.

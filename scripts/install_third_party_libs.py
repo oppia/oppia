@@ -218,10 +218,9 @@ def get_yarn_command():
             os.rename(
                 origin_yarn_bin,
                 os.path.join(common.YARN_PATH, 'bin', 'yarn.sh'))
-        yarn_command = 'yarn.cmd'
+        return 'yarn.cmd'
     else:
-        yarn_command = 'yarn'
-    return yarn_command
+        return 'yarn'
 
 
 def main(args=None):
