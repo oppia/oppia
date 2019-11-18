@@ -287,6 +287,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
     MANAGER_2_ID_OLD = 'manager_2_id_old'
     MANAGER_2_ID_NEW = 'manager_2_id_new'
     MANAGER_3_ID_OLD = 'manager_3_id_old'
+    MANAGER_3_ID_NEW = 'manager_3_id_old'
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -338,22 +339,11 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
 
         topic_models.TopicRightsModel.migrate_model(
             self.MANAGER_1_ID_OLD, self.MANAGER_1_ID_NEW)
-        migrated_model_1 = topic_models.TopicRightsModel.get_by_id(
-            self.TOPIC_1_ID)
-        self.assertEqual([self.MANAGER_1_ID_NEW], migrated_model_1.manager_ids)
-        migrated_model_2 = topic_models.TopicRightsModel.get_by_id(
-            self.TOPIC_2_ID)
-        self.assertEqual(
-            [self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_OLD],
-            migrated_model_2.manager_ids)
-        migrated_model_3 = topic_models.TopicRightsModel.get_by_id(
-            self.TOPIC_3_ID)
-        self.assertEqual(
-            [self.MANAGER_2_ID_OLD, self.MANAGER_3_ID_OLD],
-            migrated_model_3.manager_ids)
-
         topic_models.TopicRightsModel.migrate_model(
             self.MANAGER_2_ID_OLD, self.MANAGER_2_ID_NEW)
+        topic_models.TopicRightsModel.migrate_model(
+            self.MANAGER_3_ID_OLD, self.MANAGER_3_ID_NEW)
+
         migrated_model_1 = topic_models.TopicRightsModel.get_by_id(
             self.TOPIC_1_ID)
         self.assertEqual([self.MANAGER_1_ID_NEW], migrated_model_1.manager_ids)
@@ -365,5 +355,5 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
         migrated_model_3 = topic_models.TopicRightsModel.get_by_id(
             self.TOPIC_3_ID)
         self.assertEqual(
-            [self.MANAGER_2_ID_NEW, self.MANAGER_3_ID_OLD],
+            [self.MANAGER_2_ID_NEW, self.MANAGER_3_ID_NEW],
             migrated_model_3.manager_ids)

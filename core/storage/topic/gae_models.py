@@ -434,11 +434,14 @@ class TopicRightsModel(base_models.VersionedModel):
             old_user_id: str. The old user ID.
             new_user_id: str. The new user ID.
         """
+        migrated_models = []
         for model in cls.query(cls.manager_ids == old_user_id).fetch():
             model.manager_ids = [
                 new_user_id if manager_id == old_user_id else manager_id
                 for manager_id in model.manager_ids]
-            model.put(update_last_updated_time=False)
+            migrated_models.append(model)
+        TopicRightsModel.put_multi(
+            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def get_by_user(cls, user_id):
