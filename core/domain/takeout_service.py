@@ -65,9 +65,9 @@ def export_data_for_user(user_id):
 
     exported_data = dict()
     for model in models_to_export:
-        # split the model name by uppercase characters
+        # Split the model name by uppercase characters.
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
-        # join the split name with underscores and add _data for final name
+        # Join the split name with underscores and add _data for final name.
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'
         exported_data[final_name] = model.export_data(user_id)
 

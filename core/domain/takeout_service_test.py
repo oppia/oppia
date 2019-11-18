@@ -299,14 +299,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     def test_export_nonexistent_user(self):
         """Setup for nonexistent user test of export_data functionality."""
         with self.assertRaises(
-             user_models.UserSettingsModel.EntityNotFoundError):
+            user_models.UserSettingsModel.EntityNotFoundError):
             takeout_service.export_data_for_user('fake_user_id')
 
     def test_export_data_trivial(self):
-        """Trivial test of export_data functionality"""
+        """Trivial test of export_data functionality."""
         self.set_up_trivial()
 
-        # Generate expected output
+        # Generate expected output.
         collection_progress_data = {}
         collection_rights_data = {
             'editable_collection_ids': [],
@@ -381,12 +381,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_email_reply_to_id_data': reply_to_data
         }
 
-        # Perform export and compare
+        # Perform export and compare.
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
         self.assertEqual(expected_export, exported_data)
 
     def test_export_data_nontrivial(self):
-        """Nontrivial test of export_data functionality"""
+        """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             entity_type=self.THREAD_ENTITY_TYPE,
