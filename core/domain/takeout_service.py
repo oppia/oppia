@@ -38,7 +38,7 @@ def export_data_for_user(user_id):
     Returns:
         dict. Dictionary containing all user data in the following format:
         {
-            <MODEL_NAME>_data: <dict of data in format as specified by 
+            <MODEL_NAME>_data: <dict of data in format as specified by
                                 model export policy>
         }
     """

@@ -95,7 +95,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         suggestion_models.SCORE_TYPE_TRANSLATION +
         suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
 
-    def setUpNontrivial(self):
+    def set_up_non_trivial(self):
         """Set up all models for use in testing.
         1) Simulates the creation of a user, user_1, and their stats model.
         2) Simulates skill mastery of user_1 with two skills.
@@ -114,6 +114,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         15) Populates user settings.
         16) Creates two reply-to ids for feedback. 
         """
+        super(TakeoutServiceUnitTests, self).setUp()
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -287,22 +288,20 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.USER_ID_1, self.THREAD_ID_2).put()
 
-    def setUpTrivial(self):
+    def set_up_trivial(self):
+        super(TakeoutServiceUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1, email=self.USER_1_EMAIL, role=self.USER_1_ROLE
         ).put()
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
-
-    def setUp(self):
-        super(TakeoutServiceUnitTests, self).setUp()
 
     def test_export_nonexistent_user(self):
         with self.assertRaises(user_models.UserSettingsModel.EntityNotFoundError):
             takeout_service.export_data_for_user('fake_user_id')
 
     def test_export_data_trivial(self):
-        '''Trivial test of export_data functionality'''
-        self.setUpTrivial()
+        """Trivial test of export_data functionality"""
+        self.set_up_trivial()
 
         # Generate expected output
         collection_progress_data = {}
@@ -378,14 +377,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_data': exploration_rights_data,
             'general_feedback_email_reply_to_id_data': reply_to_data
         }
-        
+       
         # Perform export and compare
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
         self.assertEqual(expected_export, exported_data)
 
     def test_export_data_nontrivial(self):
-        '''Nontrivial test of export_data functionality'''
-        self.setUpNontrivial()
+        """Nontrivial test of export_data functionality"""
+        self.set_up_non_trivial()
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             entity_type=self.THREAD_ENTITY_TYPE,
             entity_id=self.THREAD_ENTITY_ID,
