@@ -158,7 +158,7 @@ class UserIdJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_model.last_updated, migrated_model.last_updated)
 
-    def test_change_user_contribution_scoring_model(self):
+    def test_one_user_one_model_custom(self):
         original_model = user_models.UserContributionScoringModel(
             id='%s.%s' % ('score_category', self.user_a_id),
             user_id=self.user_a_id,
