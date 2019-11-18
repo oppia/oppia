@@ -17,7 +17,6 @@
  */
 
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
 
 describe('datetimeformatter', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
@@ -26,7 +25,7 @@ describe('datetimeformatter', () => {
   let OldDate = Date;
 
   beforeEach(() => {
-    df = new DateTimeFormatService(new FormatTimePipe());
+    df = new DateTimeFormatService();
 
     // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
     // doesn't seem to be a good way to set the timezone locale directly.)

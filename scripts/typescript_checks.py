@@ -54,11 +54,11 @@ def compile_and_check_typescript():
         './node_modules/typescript/bin/tsc', '--project',
         TSCONFIG_FILEPATH]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    if os.path.exists(COMPILED_JS_DIR):
-        shutil.rmtree(COMPILED_JS_DIR)
     error_messages = []
     for line in iter(process.stdout.readline, ''):
         error_messages.append(line)
+    if os.path.exists(COMPILED_JS_DIR):
+        shutil.rmtree(COMPILED_JS_DIR)
     if error_messages:
         python_utils.PRINT('Errors found during compilation\n')
         for message in error_messages:

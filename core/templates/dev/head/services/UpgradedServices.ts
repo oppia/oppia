@@ -54,7 +54,6 @@ import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
@@ -141,7 +140,6 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['FeedbackThreadObjectFactory'] =
       new FeedbackThreadObjectFactory();
-    upgradedServices['FormatTimePipe'] = new FormatTimePipe();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();
@@ -182,8 +180,7 @@ export class UpgradedServices {
     upgradedServices['ChangesInHumanReadableFormService'] =
       new ChangesInHumanReadableFormService(
         upgradedServices['UtilsService'], document);
-    upgradedServices['DateTimeFormatService'] =
-      new DateTimeFormatService(upgradedServices['FormatTimePipe']);
+    upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DeviceInfoService'] =
       new DeviceInfoService(upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
