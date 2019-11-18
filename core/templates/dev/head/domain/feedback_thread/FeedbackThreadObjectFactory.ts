@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { FeedbackThreadSummary, FeedbackThreadSummaryObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory'
+  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 
 export class FeedbackThread {
   status: string;

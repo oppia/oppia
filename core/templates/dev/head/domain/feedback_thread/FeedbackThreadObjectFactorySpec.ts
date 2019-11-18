@@ -40,7 +40,7 @@ describe('Feedback thread object factory', () => {
       summary: 'sample summary',
       message_count: 10,
       state_name: 'state 1',
-      thread_id: 'exp1.thread1'
+      thread_id: 'exp1.thread1',
       thread_summary_dict: {
         status: 'accepted',
         original_author_id: 'usr1',
