@@ -471,7 +471,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_user_id_migration_policy():
-        """GeneralFeedbackThreadUserModel has one field that contains user ID.
+        """GeneralFeedbackThreadUserModel has one field that contains user
+        ID.
         """
         return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
 
@@ -663,5 +664,6 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """UnsentFeedbackEmailModel has ID that contains user ID and needs to be
-        replaced."""
+        replaced.
+        """
         return base_models.USER_ID_MIGRATION_POLICY.COPY

@@ -132,7 +132,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 except NotImplementedError:
                     self.fail(
                         msg='get_user_id_migration_policy is not defined for %s'
-                            % clazz.__name__)
+                        % clazz.__name__)
 
     def test_base_or_versioned_child_classes_have_migrate_model(
             self):

@@ -364,7 +364,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """ExpUserLastPlaythroughModel has ID that contains user id and
-        one other field that contains user ID."""
+        one other field that contains user ID.
+        """
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
     @classmethod
@@ -955,7 +956,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """ExplorationUserDataModel has ID that contains user id and one other
-        field that contains user ID."""
+        field that contains user ID.
+        """
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
     @classmethod
@@ -1108,7 +1110,8 @@ class CollectionProgressModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """CollectionProgressModel has ID that contains user id and one other
-        field that contains user ID."""
+        field that contains user ID.
+        """
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
     @classmethod
@@ -1268,7 +1271,8 @@ class StoryProgressModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """StoryProgressModel has ID that contains user id and one other field
-        that contains user ID."""
+        that contains user ID.
+        """
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
     @classmethod
@@ -1576,7 +1580,8 @@ class UserSkillMasteryModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """UserSkillMasteryModel has ID that contains user id and one other
-        field that contains user ID."""
+        field that contains user ID.
+        """
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
     @classmethod
@@ -1658,7 +1663,8 @@ class UserContributionScoringModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """UserContributionScoringModel has ID that contains user id and one
-        other field that contains user ID."""
+        other field that contains user ID.
+        """
         return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod

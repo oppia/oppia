@@ -47,6 +47,7 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
+
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Tests the SkillCommitLogEntryModel class."""
 

@@ -54,6 +54,17 @@ class _Gae(Platform):
     GAE (Google App Engine).
     """
 
+    # List of model classes that are not actually storaged but are inherited
+    # from in other models.
+    BASE_CLASSES = (
+        'BaseMapReduceBatchResultsModel',
+        'BaseModel',
+        'BaseSnapshotContentModel',
+        'BaseSnapshotMetadataModel',
+        'VersionedModel',
+        'BaseCommitLogEntryModel',
+    )
+
     @classmethod
     def import_models(cls, model_names):
         """Imports and returns the storage modules listed in model_names.
@@ -134,17 +145,6 @@ class _Gae(Platform):
 
         return tuple(returned_models)
 
-    # List of model classes that are not actually storaged but are inherited
-    # from in other models.
-    BASE_CLASSES = (
-        'BaseMapReduceBatchResultsModel',
-        'BaseModel',
-        'BaseSnapshotContentModel',
-        'BaseSnapshotMetadataModel',
-        'VersionedModel',
-        'BaseCommitLogEntryModel',
-    )
-
     @classmethod
     def import_all_storage_model_classes(cls):
         """Imports and returns all model classes that are in the storage, not
@@ -163,7 +163,7 @@ class _Gae(Platform):
                         base_class.__name__ for base_class in inspect.getmro(
                             clazz)]
                     if ('Model' in all_base_classes and
-                            member_name not in self.BASE_CLASSES):
+                            member_name not in _Gae.BASE_CLASSES):
                         model_classes.append(clazz)
         return model_classes
 

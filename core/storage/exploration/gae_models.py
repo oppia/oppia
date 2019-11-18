@@ -280,7 +280,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             model.viewer_ids = [
                 new_user_id if viewer_id == old_user_id else viewer_id
                 for viewer_id in model.viewer_ids]
-            print(model)
             migrated_models.append(model)
         ExplorationRightsModel.put_multi(
             migrated_models, update_last_updated_time=False)

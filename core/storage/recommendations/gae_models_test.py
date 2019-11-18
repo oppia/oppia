@@ -43,6 +43,7 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
             .get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
+
 class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSimilaritiesModel class."""
 

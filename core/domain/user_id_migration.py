@@ -82,22 +82,22 @@ class UserIdJob(jobs.BaseMapReduceOneOffJobManager):
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
                 continue
             elif (model_class.get_user_id_migration_policy() ==
-                    base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE):
+                  base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE):
                 continue
             elif (model_class.get_user_id_migration_policy() ==
-                    base_models.USER_ID_MIGRATION_POLICY.COPY):
+                  base_models.USER_ID_MIGRATION_POLICY.COPY):
                 UserIdJob._copy_model_with_new_id(
                     model_class, old_user_id, new_user_id)
             elif (model_class.get_user_id_migration_policy() ==
-                    base_models.USER_ID_MIGRATION_POLICY.COPY_PART):
+                  base_models.USER_ID_MIGRATION_POLICY.COPY_PART):
                 UserIdJob._copy_model_with_new_id_and_user_id(
                     model_class, old_user_id, new_user_id)
             elif (model_class.get_user_id_migration_policy() ==
-                    base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
+                  base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
                 UserIdJob._change_model_with_one_user_id_field(
                     model_class, old_user_id, new_user_id)
             elif (model_class.get_user_id_migration_policy() ==
-                    base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
+                  base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
                 model_class.migrate_model(old_user_id, new_user_id)
         yield ('SUCCESS', new_user_id)
 

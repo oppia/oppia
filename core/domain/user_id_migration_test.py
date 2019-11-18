@@ -186,4 +186,3 @@ class UserIdJobTests(test_utils.GenericTestBase):
             original_model.created_on, migrated_model.created_on)
         self.assertEqual(
             original_model.last_updated, migrated_model.last_updated)
-

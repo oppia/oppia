@@ -392,7 +392,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_user_id_migration_policy():
-        """GeneralVoiceoverApplicationModel has two fields that contain user ID.
+        """GeneralVoiceoverApplicationModel has two fields that contain user
+        ID.
         """
         return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 

@@ -399,7 +399,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """GeneralFeedbackEmailReplyToIdModel has ID that contains user id and
-        one other field that contains user ID."""
+        one other field that contains user ID.
+        """
         return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
 
     @classmethod

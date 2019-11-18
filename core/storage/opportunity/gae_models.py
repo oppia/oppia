@@ -203,8 +203,7 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @staticmethod
     def get_user_id_migration_policy():
-        """SkillOpportunityModel doesn't have any field with user ID..
-        """
+        """SkillOpportunityModel doesn't have any field with user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
