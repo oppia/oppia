@@ -32,11 +32,11 @@ export class FeedbackThread {
   messageCount: number;
   stateName: string;
   threadId: string;
+  threadSummary: FeedbackThreadSummary;
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'messages' is an array of dicts with underscore_cased keys
   // which give tslint errors against underscore_casing in favor of camelCasing.
   messages: any[];
-  threadSummary: FeedbackThreadSummary;
 
   constructor(
       status: string, subject: string, summary: string,
