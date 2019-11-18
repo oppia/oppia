@@ -22,6 +22,7 @@ from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
+import python_utils
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -40,7 +41,7 @@ class ThreadListHandler(base.BaseHandler):
             feedback_services.get_thread_summaries(
                 self.user_id,
                 [d['thread_id'] for d in feedback_thread_dicts]))
-        for thread_dict, summary_dict in zip(
+        for thread_dict, summary_dict in python_utils.ZIP(
                 feedback_thread_dicts, feedback_thread_summary_dicts):
             thread_dict['thread_summary_dict'] = summary_dict
 
@@ -51,7 +52,7 @@ class ThreadListHandler(base.BaseHandler):
             feedback_services.get_thread_summaries(
                 self.user_id,
                 [d['thread_id'] for d in suggestion_thread_dicts]))
-        for thread_dict, summary_dict in zip(
+        for thread_dict, summary_dict in python_utils.ZIP(
                 suggestion_thread_dicts, suggestion_thread_summary_dicts):
             thread_dict['thread_summary_dict'] = summary_dict
 
