@@ -33,13 +33,33 @@ class ThreadListHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
+        feedback_thread_dicts = [
+            thread.to_dict() for thread in feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]
+        feedback_thread_summary_dicts, unread_feedback_threads = (
+            feedback_services.get_thread_summaries(
+                self.user_id,
+                [d['thread_id'] for d in feedback_thread_dicts]))
+        for thread_dict, summary_dict in zip(feedback_thread_dicts,
+                                             feedback_thread_summary_dicts):
+            thread_dict['summary_dict'] = summary_dict
+
+        suggestion_thread_dicts = [
+            thread.to_dict() for thread in feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)]
+        suggestion_thread_summary_dicts, unread_suggestion_threads = (
+            feedback_services.get_thread_summaries(
+                self.user_id,
+                [d['thread_id'] for d in suggestion_thread_dicts]))
+        for thread_dict, summary_dict in zip(suggestion_thread_dicts,
+                                             suggestion_thread_summary_dicts):
+            thread_dict['summary_dict'] = summary_dict
+
         self.values.update({
-            'feedback_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]),
-            'suggestion_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
+            'feedback_thread_dicts': feedback_thread_dicts,
+            'unread_feedback_threads': unread_feedback_threads,
+            'suggestion_thread_dicts': suggestion_thread_dicts,
+            'unread_suggestion_threads': unread_suggestion_threads,
         })
         self.render_json(self.values)
 
