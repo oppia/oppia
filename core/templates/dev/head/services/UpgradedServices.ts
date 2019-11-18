@@ -54,6 +54,8 @@ import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { FeedbackThreadSummaryObjectFactory } from
+  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
@@ -138,8 +140,8 @@ export class UpgradedServices {
       new ExplorationDraftObjectFactory();
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
-    upgradedServices['FeedbackThreadObjectFactory'] =
-      new FeedbackThreadObjectFactory();
+    upgradedServices['FeedbackThreadSummaryObjectFactory'] =
+      new FeedbackThreadSummaryObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();
@@ -185,6 +187,9 @@ export class UpgradedServices {
       new DeviceInfoService(upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
       new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
+    upgradedServices['FeedbackThreadObjectFactory'] =
+      new FeedbackThreadObjectFactory(
+        upgradedServices['FeedbackThreadSummaryObjectFactory']);
     upgradedServices['HintObjectFactory'] =
       new HintObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['HtmlEscaperService'] =

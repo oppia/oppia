@@ -16,14 +16,19 @@
  * @fileoverview Unit tests for FeedbackThreadObjectFactory.
  */
 
+import { TestBed } from '@angular/core/testing';
+
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 
 describe('Feedback thread object factory', () => {
-  let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
-
+  var feedbackThreadObjectFactory: FeedbackThreadObjectFactory = null;
   beforeEach(() => {
-    feedbackThreadObjectFactory = new FeedbackThreadObjectFactory();
+    TestBed.configureTestingModule({
+      providers: [FeedbackThreadObjectFactory]
+    });
+
+    feedbackThreadObjectFactory = TestBed.get(FeedbackThreadObjectFactory);
   });
 
   it('should create a new feedback thread from a backend dict.', () => {
@@ -36,6 +41,20 @@ describe('Feedback thread object factory', () => {
       message_count: 10,
       state_name: 'state 1',
       thread_id: 'exp1.thread1'
+      thread_summary_dict: {
+        status: 'accepted',
+        original_author_id: 'usr1',
+        last_updated: 1000,
+        last_message_text: 'last message',
+        total_message_count: 2,
+        last_message_is_read: false,
+        second_last_message_is_read: true,
+        author_last_message: 'Test user 2',
+        author_second_last_message: 'Test user 1',
+        exploration_title: 'Sample exploration 1',
+        exploration_id: 'exp1',
+        thread_id: 'exp1.thread1'
+      },
     };
 
     var feedbackThread = feedbackThreadObjectFactory.createFromBackendDict(
@@ -48,13 +67,13 @@ describe('Feedback thread object factory', () => {
     expect(feedbackThread.messageCount).toEqual(10);
     expect(feedbackThread.stateName).toEqual('state 1');
     expect(feedbackThread.threadId).toEqual('exp1.thread1');
+    expect(feedbackThread.threadSummary.threadId).toEqual('exp1.thread1');
     expect(feedbackThread.isSuggestionThread()).toEqual(false);
 
-    var messages = [{
-      text: 'message1'
-    }, {
-      text: 'message2'
-    }];
+    var messages = [
+      {text: 'first message'},
+      {text: 'last message'},
+    ];
     feedbackThread.setMessages(messages);
     expect(feedbackThread.messages).toEqual(messages);
   });

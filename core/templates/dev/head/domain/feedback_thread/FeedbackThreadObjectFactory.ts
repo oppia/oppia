@@ -17,8 +17,11 @@
    thread domain objects.
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { FeedbackThreadSummary, FeedbackThreadSummaryObjectFactory } from
+  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory'
 
 export class FeedbackThread {
   status: string;
@@ -33,11 +36,13 @@ export class FeedbackThread {
   // 'any' because 'messages' is an array of dicts with underscore_cased keys
   // which give tslint errors against underscore_casing in favor of camelCasing.
   messages: any[];
+  threadSummary: FeedbackThreadSummary;
 
   constructor(
       status: string, subject: string, summary: string,
       originalAuthorName: string, lastUpdated: number, messageCount: number,
-      stateName: string, threadId: string) {
+      stateName: string, threadId: string,
+      threadSummary: FeedbackThreadSummary) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -46,6 +51,7 @@ export class FeedbackThread {
     this.messageCount = messageCount;
     this.stateName = stateName;
     this.threadId = threadId;
+    this.threadSummary = threadSummary;
     this.messages = [];
   }
 
@@ -65,6 +71,10 @@ export class FeedbackThread {
   providedIn: 'root'
 })
 export class FeedbackThreadObjectFactory {
+  constructor(
+    private feedbackThreadSummaryObjectFactory:
+      FeedbackThreadSummaryObjectFactory) {}
+
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'feedbackThreadBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
@@ -77,7 +87,9 @@ export class FeedbackThreadObjectFactory {
       feedbackThreadBackendDict.last_updated,
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
-      feedbackThreadBackendDict.thread_id);
+      feedbackThreadBackendDict.thread_id,
+      this.feedbackThreadSummaryObjectFactory.createFromBackendDict(
+        feedbackThreadBackendDict.thread_summary_dict));
   }
 }
 angular.module('oppia').factory(
