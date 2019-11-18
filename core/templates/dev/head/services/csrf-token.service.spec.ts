@@ -28,6 +28,7 @@ describe('Csrf Token Service', function() {
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
 
+    // TODO(#8035): Remove ts-ignore and find the exact type
     // This ts ignore is because returnValue is expecting a jqXHR<any>
     // and wherease a Promise<{token: string}> is being provided.
     // @ts-ignore
