@@ -107,12 +107,10 @@ describe('Topic editor functionality', function() {
   it('should create a question for a skill in the topic', function() {
     var skillId = null;
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 1');
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill 1', 'Concept card explanation');
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
-      skillEditorPage.editConceptCard('Concept card explanation');
-      skillEditorPage.saveOrPublishSkill('Added review material.');
-      skillEditorPage.firstTimePublishSkill();
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
       topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
@@ -135,7 +133,8 @@ describe('Topic editor functionality', function() {
 
       topicEditorPage.get(topicId);
       topicEditorPage.moveToQuestionsTab();
-      topicEditorPage.expectNumberOfQuestionsToBe(1);
+      topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+        1, 'Skill 1');
 
       skillEditorPage.get(skillId);
       skillEditorPage.moveToQuestionsTab();
@@ -191,6 +190,37 @@ describe('Topic editor functionality', function() {
     storyEditorPage.returnToTopic();
 
     topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
+  });
+
+  it('should assign a skill to, between, and from subtopics', function() {
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill 2', 'Concept card explanation');
+
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+
+    topicEditorPage.get(topicId);
+    topicEditorPage.moveToSubtopicsTab();
+    topicEditorPage.addSubtopic('Subtopic 1');
+    topicEditorPage.addSubtopic('Subtopic 2');
+    topicEditorPage.saveTopic('Added subtopics.');
+
+    topicEditorPage.expectSubtopicToHaveSkills(0, []);
+    topicEditorPage.expectSubtopicToHaveSkills(1, []);
+
+    topicEditorPage.dragSkillToSubtopic(1, 0);
+    topicEditorPage.expectSubtopicToHaveSkills(0, ['Skill 2']);
+    topicEditorPage.expectSubtopicToHaveSkills(1, []);
+
+    topicEditorPage.dragSkillBetweenSubtopics(0, 0, 1);
+    topicEditorPage.expectSubtopicToHaveSkills(0, []);
+    topicEditorPage.expectSubtopicToHaveSkills(1, ['Skill 2']);
+
+    topicEditorPage.dragSkillFromSubtopicToUncategorized(1, 0);
+    topicEditorPage.expectSubtopicToHaveSkills(0, []);
+    topicEditorPage.expectSubtopicToHaveSkills(1, []);
   });
 
   afterEach(function() {

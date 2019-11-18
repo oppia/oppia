@@ -20,9 +20,9 @@ require(
   'pages/library-page/search-results/' +
   'activity-tiles-infinity-grid.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/UserService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/site-analytics.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').directive('searchResults', [
   'UrlInterpolationService', function(UrlInterpolationService) {

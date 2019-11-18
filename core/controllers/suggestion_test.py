@@ -675,7 +675,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/topic/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
@@ -694,13 +694,17 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)
-        questions, grouped_skill_descriptions, _ = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                1, [self.SKILL_ID], ''))
+        (
+            questions, merged_question_skill_links, _) = (
+                question_services.get_displayable_question_skill_link_details(
+                    1, [self.SKILL_ID], ''))
         self.assertEqual(len(questions), 1)
         self.assertEqual(questions[0].creator_id, self.author_id)
         self.assertEqual(
-            grouped_skill_descriptions[0], [self.SKILL_DESCRIPTION])
+            merged_question_skill_links[0].skill_descriptions,
+            [self.SKILL_DESCRIPTION])
+        self.assertEqual(
+            merged_question_skill_links[0].skill_difficulties, [0.3])
         self.assertEqual(
             questions[0].question_content,
             self.question_dict['question_state_data']['content']['html']
@@ -771,7 +775,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
             self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX, self.topic_id,
@@ -807,7 +811,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -838,7 +842,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -868,7 +872,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -900,7 +904,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/topic/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_reject['target_id'],
@@ -935,7 +939,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/topic/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],

@@ -17,12 +17,12 @@
  * on the type of response received as a result of the autosaving request.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'changes-in-human-readable-form.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/LocalStorageService.ts');
+require('services/local-storage.service.ts');
 
 angular.module('oppia').factory('AutosaveInfoModalsService', [
   '$log', '$timeout', '$uibModal', '$window',

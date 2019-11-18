@@ -26,11 +26,11 @@ require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/subtopic_viewer/SubtopicViewerBackendApiService.ts');
-require('services/AlertsService.ts');
-require('services/PageTitleService.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
+require('services/alerts.service.ts');
+require('services/page-title.service.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('subtopicViewerPage', [
   'UrlInterpolationService', function(

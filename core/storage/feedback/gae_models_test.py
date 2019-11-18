@@ -37,10 +37,45 @@ FIELDS_NOT_REQUIRED = [CREATED_ON_FIELD, LAST_UPDATED_FIELD, DELETED_FIELD]
 class FeedbackThreadModelTest(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackThreadModel class."""
 
+    NONEXISTENT_USER_ID = 'id_x'
+    ENTITY_TYPE = feconf.ENTITY_TYPE_EXPLORATION
+    ENTITY_ID = 'exp_id_2'
+    USER_ID = 'user_1'
+    STATUS = 'open'
+    SUBJECT = 'dummy subject'
+    HAS_SUGGESTION = True
+    SUMMARY = 'This is a great summary.'
+    MESSAGE_COUNT = 0
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             feedback_models.GeneralFeedbackThreadModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(FeedbackThreadModelTest, self).setUp()
+
+        self.feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            id='%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random'),
+            entity_type=self.ENTITY_TYPE,
+            entity_id=self.ENTITY_ID,
+            original_author_id=self.USER_ID,
+            status=self.STATUS,
+            subject=self.SUBJECT,
+            has_suggestion=self.HAS_SUGGESTION,
+            summary=self.SUMMARY,
+            message_count=self.MESSAGE_COUNT
+        )
+        self.feedback_thread_model.put()
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            feedback_models.GeneralFeedbackThreadModel
+            .has_reference_to_user_id(self.USER_ID))
+        self.assertFalse(
+            feedback_models.GeneralFeedbackThreadModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
     def test_raise_exception_by_mocking_collision(self):
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
@@ -77,42 +112,20 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
-        # Set up testing variables.
-        test_export_entity_type = feconf.ENTITY_TYPE_EXPLORATION
-        test_export_entity_id = 'exp_id_2'
-        test_export_author_id = 'user_1'
-        test_export_status = 'open'
-        test_export_subject = 'dummy subject'
-        test_export_has_suggestion = True
-        test_export_summary = 'This is a great summary.'
-        test_export_message_count = 0
-
-        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
-            entity_type=test_export_entity_type,
-            entity_id=test_export_entity_id,
-            original_author_id=test_export_author_id,
-            status=test_export_status,
-            subject=test_export_subject,
-            has_suggestion=test_export_has_suggestion,
-            summary=test_export_summary,
-            message_count=test_export_message_count
-        )
-
-        feedback_thread_model.put()
-
         user_data = (
             feedback_models
-            .GeneralFeedbackThreadModel.export_data('user_1'))
+            .GeneralFeedbackThreadModel.export_data(self.USER_ID))
+        feedback_id = '%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random')
         test_data = {
-            feedback_thread_model.id: {
-                'entity_type': test_export_entity_type,
-                'entity_id': test_export_entity_id,
-                'status': test_export_status,
-                'subject': test_export_subject,
-                'has_suggestion': test_export_has_suggestion,
-                'summary': test_export_summary,
-                'message_count': test_export_message_count,
-                'last_updated': feedback_thread_model.last_updated
+            feedback_id: {
+                'entity_type': self.ENTITY_TYPE,
+                'entity_id': self.ENTITY_ID,
+                'status': self.STATUS,
+                'subject': self.SUBJECT,
+                'has_suggestion': self.HAS_SUGGESTION,
+                'summary': self.SUMMARY,
+                'message_count': self.MESSAGE_COUNT,
+                'last_updated': self.feedback_thread_model.last_updated
             }
         }
         self.assertEqual(user_data, test_data)
@@ -125,6 +138,21 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_models.GeneralFeedbackMessageModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id(self):
+        feedback_models.GeneralFeedbackMessageModel(
+            id='id',
+            thread_id='thread_id',
+            message_id=1,
+            author_id='user_id',
+            received_via_email=False
+        ).put()
+        self.assertTrue(
+            feedback_models.GeneralFeedbackMessageModel
+            .has_reference_to_user_id('user_id'))
+        self.assertFalse(
+            feedback_models.GeneralFeedbackMessageModel
+            .has_reference_to_user_id('id_x'))
 
     def test_raise_exception_by_mocking_collision(self):
         with self.assertRaisesRegexp(
@@ -273,6 +301,25 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             self.USER_ID_A, self.THREAD_ID_C)
         model.message_ids_read_by_user = self.MESSAGE_IDS_READ_IN_THREAD_C
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            feedback_models.GeneralFeedbackThreadUserModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        feedback_models.GeneralFeedbackThreadUserModel(
+            id='id',
+            thread_id='thread_id',
+            user_id='user_id',
+        ).put()
+        self.assertTrue(
+            feedback_models.GeneralFeedbackThreadUserModel
+            .has_reference_to_user_id('user_id'))
+        self.assertFalse(
+            feedback_models.GeneralFeedbackThreadUserModel
+            .has_reference_to_user_id('id_x'))
+
     def test_put_function(self):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id',
@@ -293,12 +340,6 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         # as the default value of update_last_updated_time is True.
         feedback_thread_model.put()
         self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            feedback_models.GeneralFeedbackThreadUserModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
 
     def test_create_new_object(self):
         feedback_models.GeneralFeedbackThreadUserModel.create(
@@ -403,6 +444,11 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
             feedback_models.FeedbackAnalyticsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            feedback_models.FeedbackAnalyticsModel
+            .has_reference_to_user_id('id_x'))
+
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
     """Tests for FeedbackMessageEmailDataModel class."""
@@ -411,6 +457,15 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_models.UnsentFeedbackEmailModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
+
+    def test_has_reference_to_user_id(self):
+        feedback_models.UnsentFeedbackEmailModel(id='user_id').put()
+        self.assertTrue(
+            feedback_models.UnsentFeedbackEmailModel
+            .has_reference_to_user_id('user_id'))
+        self.assertFalse(
+            feedback_models.UnsentFeedbackEmailModel
+            .has_reference_to_user_id('id_x'))
 
     def test_new_instances_stores_correct_data(self):
         user_id = 'A'

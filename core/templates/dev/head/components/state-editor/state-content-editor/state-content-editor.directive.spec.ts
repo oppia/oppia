@@ -31,7 +31,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
-require('services/EditabilityService.ts');
+require('services/editability.service.ts');
 
 describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, rvo, srvos;
@@ -58,7 +58,7 @@ describe('State content editor directive', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

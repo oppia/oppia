@@ -17,15 +17,15 @@
  */
 
 require('components/graph-services/graph-layout.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/EditabilityService.ts');
-require('services/UserService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/editability.service.ts');
+require('services/user.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('outcomeDestinationEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -58,6 +58,9 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
             StateEditorService.isExplorationWhitelisted());
 
           $scope.$on('saveOutcomeDestDetails', function() {
+            if (ctrl.isSelfLoop()) {
+              ctrl.outcome.dest = StateEditorService.getActiveStateName();
+            }
             // Create new state if specified.
             if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
               EditorFirstTimeEventsService
