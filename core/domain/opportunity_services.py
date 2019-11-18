@@ -18,6 +18,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from constants import constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
@@ -58,11 +60,29 @@ def get_exploration_opportunity_summary_from_model(model):
         ExplorationOpportunitySummary. The corresponding
         ExplorationOpportunitySummary object.
     """
+    # We're making sure that the audio language codes in any exploration
+    # opportunity domain object match the ones in
+    # constants.SUPPORTED_AUDIO_LANGUAGES.
+    set_of_all_languages = set(
+        model.incomplete_translation_language_codes +
+        model.need_voice_artist_in_language_codes +
+        model.assigned_voice_artist_in_language_codes)
+    supported_language_codes = set([language['id'] for language in (
+        constants.SUPPORTED_AUDIO_LANGUAGES)])
+    missing_language_codes = list(
+        supported_language_codes - set_of_all_languages)
+    if missing_language_codes:
+        logging.info(
+            'Missing language codes %s in exploration opportunity model with '
+            'id %s' % (missing_language_codes, model.id))
+
+    new_incomplete_translation_language_codes = (
+        model.incomplete_translation_language_codes + missing_language_codes)
 
     return opportunity_domain.ExplorationOpportunitySummary(
         model.id, model.topic_id, model.topic_name, model.story_id,
         model.story_title, model.chapter_title, model.content_count,
-        model.incomplete_translation_language_codes, model.translation_counts,
+        new_incomplete_translation_language_codes, model.translation_counts,
         model.need_voice_artist_in_language_codes,
         model.assigned_voice_artist_in_language_codes)
 

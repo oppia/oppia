@@ -18,7 +18,28 @@ This should not be run directly. Instead, navigate to the oppia/ folder and
 execute:
 
     python -m scripts.run_backend_tests
+
+You can also append the following options to the above command:
+
+    --verbose prints the output of the tests to the console.
+
+    --test_target=core.controllers.editor_test runs only the tests in the
+        core.controllers.editor_test module. (You can change
+        "core.controllers.editor_test" to any valid module path.)
+
+    --test_path=core/controllers runs all tests in test files in the
+        core/controllers directory. (You can change "core/controllers" to any
+        valid subdirectory path.)
+
+    --generate_coverage_report generates a coverage report as part of the final
+        test output (but it makes the tests slower).
+
+Note: If you've made some changes and tests are failing to run at all, this
+might mean that you have introduced a circular dependency (e.g. module A
+imports module B, which imports module C, which imports module A). This needs
+to be fixed before the tests will run.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
