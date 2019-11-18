@@ -240,13 +240,15 @@ var StoryEditorPage = function() {
   };
 
   this.expectExplorationIdAlreadyExistWarningAndCloseIt = function() {
-    var warningToast = element(by.css('.toast-message'));
+    var warningToast = element(
+      by.css('.protractor-test-toast-warning-message'));
     waitFor.visibilityOf(
       warningToast,
       'warningToast takes too long to be visible.');
     expect(warningToast.getText()).toEqual(
       'The given exploration already exists in the story.');
-    var closeToastButton = element(by.css('.toast-close-button'));
+    var closeToastButton = element(
+      by.css('.protractor-test-close-toast-warning'));
     waitFor.elementToBeClickable(
       closeToastButton,
       'closeToastButton takes too long to be clickable.');
