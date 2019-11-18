@@ -598,3 +598,19 @@ class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             question_models.QuestionRightsModel
             .has_reference_to_user_id('x_id'))
+
+        # We change the creator_id to to see that the creator_id is still found
+        # in QuestionRightsSnapshotContentModel.
+        question_rights = question_models.QuestionRightsModel.get('question_id')
+        question_rights.creator_id = 'different_creator_id'
+        question_rights.commit(
+            'committer_id',
+            'Update question rights again',
+            [{'cmd': question_domain.CMD_CREATE_NEW}])
+
+        self.assertTrue(
+            question_models.QuestionRightsModel
+            .has_reference_to_user_id('creator_id'))
+        self.assertTrue(
+            question_models.QuestionRightsModel
+            .has_reference_to_user_id('different_creator_id'))

@@ -122,6 +122,13 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
         ).commit(
             'user_4_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        skill_models.SkillRightsModel(
+            id='id_5',
+            creator_id='user_5_id',
+            skill_is_private=True
+        ).commit(
+            'user_6_id', 'Created new skill rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -140,6 +147,20 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillRightsModel
             .has_reference_to_user_id('x_id'))
 
+        # We change the creator_id to to see that the user_5_id is still found
+        # in SkillRightsSnapshotContentModel.
+        skill_model = skill_models.SkillRightsModel.get('id_5')
+        skill_model.creator_id = 'user_7_id'
+        skill_model.commit(
+            'user_6_id',
+            'Update skill rights',
+            [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+
+        self.assertTrue(
+            skill_models.SkillRightsModel.has_reference_to_user_id('user_5_id'))
+        self.assertTrue(
+            skill_models.SkillRightsModel.has_reference_to_user_id('user_7_id'))
+
     def test_get_unpublished_by_creator_id(self):
         results = (
             skill_models.SkillRightsModel
@@ -154,4 +175,4 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_unpublished_fetches_all_unpublished_skills(self):
         self.assertEqual(
-            len(skill_models.SkillRightsModel.get_unpublished().fetch(4)), 3)
+            len(skill_models.SkillRightsModel.get_unpublished().fetch(5)), 4)
