@@ -965,20 +965,24 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         """Test the case of a user who existed in the system before the
         last-login check was introduced.
         """
-        # Set up a 'previous-generation' user.
-        self.login(self.VIEWER_EMAIL)
+        previous_last_logged_in_datetime = (
+            user_services.get_user_settings(self.viewer_id).last_logged_in)
+        self.assertIsNotNone(previous_last_logged_in_datetime)
+
         current_datetime = datetime.datetime.utcnow()
         mocked_datetime_utcnow = current_datetime - datetime.timedelta(days=1)
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             user_services.record_user_logged_in(self.viewer_id)
-            user_settings = user_services.get_user_settings(self.viewer_id)
-            last_logged_in_prev = user_settings.last_logged_in
+
+        user_settings = user_services.get_user_settings(self.viewer_id)
+        last_logged_in = user_settings.last_logged_in
 
         # After logging in and requesting a URL, the last_logged_in property is
         # changed.
+        self.login(self.VIEWER_EMAIL)
         self.get_html_response(feconf.LIBRARY_INDEX_URL)
         self.assertLess(
-            last_logged_in_prev,
+            last_logged_in,
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.logout()
 
@@ -1031,7 +1035,6 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         """Test the case of a user who are editing exploration for first time
         after the last edited time check was introduced.
         """
-        # Set up a 'previous-generation' user.
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNone(editor_settings.last_edited_an_exploration)
 
@@ -1098,11 +1101,8 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         """Test the case of a user who are creating exploration for first time
         after the last edited time check was introduced.
         """
-        # Set up a 'previous-generation' user.
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertIsNone(owner_settings.last_created_an_exploration)
-
-        user_services.record_user_created_an_exploration(self.owner_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID_A, self.owner_id, end_state_name='End')
