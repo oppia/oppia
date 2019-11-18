@@ -289,16 +289,99 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
     def setUpTrivial(self):
         user_models.UserSettingsModel(
-            id=self.USER_1_ID, email=self.USER_1_EMAIL, role=self.USER_1_ROLE
+            id=self.USER_ID_1, email=self.USER_1_EMAIL, role=self.USER_1_ROLE
         ).put()
+        user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
     def setUp(self):
         super(TakeoutServiceUnitTests, self).setUp()
 
+    def test_export_nonexistent_user(self):
+        with self.assertRaises(user_models.UserSettingsModel.EntityNotFoundError):
+            takeout_service.export_data_for_user('fake_user_id')
+
     def test_export_data_trivial(self):
         '''Trivial test of export_data functionality'''
+        self.setUpTrivial()
+
+        # Generate expected output
+        collection_progress_data = {}
+        collection_rights_data = {
+            'editable_collection_ids': [],
+            'owned_collection_ids': [],
+            'viewable_collection_ids': [],
+            'voiced_collection_ids': []
+        }
+        completed_activities_data = None
+        contribution_data = None
+        exploration_rights_data = {
+            'editable_exploration_ids': [],
+            'owned_exploration_ids': [],
+            'viewable_exploration_ids': [],
+            'voiced_exploration_ids': []
+        }
+        exploration_data = {}
+        reply_to_data = {}
+        general_feedback_message_data = {}
+        general_feedback_thread_data = {}
+        general_suggestion_data = {}
+        last_playthrough_data = {}
+        learner_playlist_data = None
+        incomplete_activities_data = None
+        settings_data = {
+            'email': 'user1@example.com',
+            'role': feconf.ROLE_ID_ADMIN,
+            'username': None,
+            'normalized_username': None,
+            'last_agreed_to_terms': None,
+            'last_started_state_editor_tutorial': None,
+            'last_started_state_translation_tutorial': None,
+            'last_logged_in': None,
+            'last_edited_an_exploration': None,
+            'profile_picture_data_url': None,
+            'default_dashboard': 'learner',
+            'creator_dashboard_display_pref': 'card',
+            'user_bio': None,
+            'subject_interests': [],
+            'first_contribution_msec': None,
+            'preferred_language_codes': [],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None
+        }
+        skill_data = {}
+        stats_data = None
+        story_progress_data = {}
+        subscriptions_data = {
+            'activity_ids': [],
+            'collection_ids': [],
+            'creator_ids': [],
+            'general_feedback_thread_ids': [],
+            'last_checked': None
+        }
+        expected_export = {
+            'user_stats_data': stats_data,
+            'user_settings_data': settings_data,
+            'user_subscriptions_data': subscriptions_data,
+            'user_skill_mastery_data': skill_data,
+            'user_contributions_data': contribution_data,
+            'exploration_user_data_data': exploration_data,
+            'completed_activities_data': completed_activities_data,
+            'incomplete_activities_data': incomplete_activities_data,
+            'exp_user_last_playthrough_data': last_playthrough_data,
+            'learner_playlist_data': learner_playlist_data,
+            'collection_progress_data': collection_progress_data,
+            'story_progress_data': story_progress_data,
+            'general_feedback_thread_data': general_feedback_thread_data,
+            'general_feedback_message_data': general_feedback_message_data,
+            'collection_rights_data': collection_rights_data,
+            'general_suggestion_data': general_suggestion_data,
+            'exploration_rights_data': exploration_rights_data,
+            'general_feedback_email_reply_to_id_data': reply_to_data
+        }
+        
+        # Perform export and compare
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-        print(exported_data)
+        self.assertEqual(expected_export, exported_data)
 
     def test_export_data_nontrivial(self):
         '''Nontrivial test of export_data functionality'''
