@@ -108,10 +108,6 @@ import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
-import { UnitsObjectFactory } from
-  'domain/objects/UnitsObjectFactory';
-import { UrlService } from 'services/contextual/url.service';
-import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -136,6 +132,7 @@ export class UpgradedServices {
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
+    upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
