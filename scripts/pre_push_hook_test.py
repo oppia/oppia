@@ -144,9 +144,15 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_get_remote_name_with_error_in_obtaining_remote_url(self):
         def mock_communicate():
+            # The first invoke of communicate should return no error
+            # Otherwise there the second communicate will never be executed.
+            if mock_communicate.count == 0:
+                mock_communicate.count += 1
+                return ('test', '')
             return ('test', 'Error')
+        mock_communicate.count = 0
         process_for_remote = subprocess.Popen(
-            ['python', '-c', 'print \"origin\nupstream\"'],
+            ['python', '-c', 'print \"origin\\nupstream\"'],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         process_for_remote_url = subprocess.Popen(
