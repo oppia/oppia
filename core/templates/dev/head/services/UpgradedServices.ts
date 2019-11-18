@@ -30,7 +30,6 @@ import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 import { ExtensionTagAssemblerService }
   from 'services/extension-tag-assembler.service';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
@@ -50,7 +49,7 @@ export class UpgradedServices {
   upgradedServices = {
     'AlertsService': new AlertsService(new LoggerService()),
     'BackgroundMaskService': new BackgroundMaskService(),
-    'DateTimeFormatService': new DateTimeFormatService(new FormatTimePipe()),
+    'DateTimeFormatService': new DateTimeFormatService(),
     'DeviceInfoService': new DeviceInfoService(new WindowRef()),
     'DocumentAttributeCustomizationService':
         new DocumentAttributeCustomizationService(new WindowRef()),
