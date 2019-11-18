@@ -112,7 +112,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         13) Simulates a general suggestion.
         14) Creates new exploration rights.
         15) Populates user settings.
-        16) Creates two reply-to ids for feedback. 
+        16) Creates two reply-to ids for feedback.
         """
         super(TakeoutServiceUnitTests, self).setUp()
         # Setup for UserStatsModel.
@@ -289,6 +289,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 self.USER_ID_1, self.THREAD_ID_2).put()
 
     def set_up_trivial(self):
+        """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1, email=self.USER_1_EMAIL, role=self.USER_1_ROLE
@@ -296,7 +297,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
     def test_export_nonexistent_user(self):
-        with self.assertRaises(user_models.UserSettingsModel.EntityNotFoundError):
+        """Setup for nonexistent user test of export_data functionality."""
+        with self.assertRaises(
+             user_models.UserSettingsModel.EntityNotFoundError):
             takeout_service.export_data_for_user('fake_user_id')
 
     def test_export_data_trivial(self):
@@ -377,7 +380,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_data': exploration_rights_data,
             'general_feedback_email_reply_to_id_data': reply_to_data
         }
-       
+
         # Perform export and compare
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
         self.assertEqual(expected_export, exported_data)
