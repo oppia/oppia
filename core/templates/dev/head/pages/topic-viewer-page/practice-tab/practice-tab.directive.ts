@@ -18,8 +18,8 @@
 
 require('components/summary-tile/story-summary-tile.directive.ts');
 require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('practiceTab', [
   '$window', 'UrlInterpolationService',

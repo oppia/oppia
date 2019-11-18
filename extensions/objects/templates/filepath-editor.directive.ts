@@ -19,11 +19,11 @@
 // This directive can only be used in the context of an exploration.
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
-require('services/AssetsBackendApiService.ts');
-require('services/ContextService.ts');
-require('services/CsrfTokenService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
+require('services/assets-backend-api.service.ts');
+require('services/context.service.ts');
+require('services/csrf-token.service.ts');
 
 var gifFrames = require('gif-frames');
 var gifshot = require('gifshot');

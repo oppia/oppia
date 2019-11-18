@@ -19,7 +19,8 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // state-interaction-editor.directive.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService';
+  'services/exploration-features.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require(
@@ -67,6 +68,12 @@ describe('State Interaction controller', function() {
         });
       });
     });
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
 
     var scope, ecs, cls, ess, siis, scas, scs, idc, IS;
     var $httpBackend;

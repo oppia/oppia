@@ -29,9 +29,9 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
+import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService';
+  'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { LearnerActionObjectFactory } from
@@ -59,7 +59,7 @@ import { StateEditorService } from
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { SuggestionModalService } from 'services/SuggestionModalService';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -69,13 +69,14 @@ import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/statistics/LearnerActionObjectFactory.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
-require('services/PlaythroughService.ts');
+require('services/playthrough.service.ts');
 
 describe('Learner Action Render Service', function() {
   beforeEach(angular.mock.module('oppia'));
@@ -134,6 +135,12 @@ describe('Learner Action Render Service', function() {
       'WrittenTranslationsObjectFactory',
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
 
   describe('Test learner action render service functions', function() {

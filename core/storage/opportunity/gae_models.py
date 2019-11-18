@@ -53,6 +53,20 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """ExplorationOpportunitySummaryModel doesn't reference any user_id
+        directly.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data
+            should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
+    @classmethod
     def get_all_translation_opportunities(
             cls, page_size, urlsafe_start_cursor, language_code):
         """Returns a list of opportunities available for translation in a
@@ -144,3 +158,72 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         """Deletes all entities of this class."""
         keys = cls.query().fetch(keys_only=True)
         ndb.delete_multi(keys)
+
+
+class SkillOpportunityModel(base_models.BaseModel):
+    """Model for opportunities to add questions to skills.
+
+    The id of each instance is the id of the corresponding skill.
+
+    A new instance of this model is created each time a SkillModel is created.
+    When a SkillModel's skill description changes, the corresponding instance
+    of this model is also updated.
+    """
+    # The description of the opportunity's skill.
+    skill_description = ndb.StringProperty(required=True, indexed=True)
+    # The number of questions associated with this opportunity's skill.
+    question_count = ndb.IntegerProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Skill opportunity is deleted only if the corresponding skill is not
+        public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """ExplorationOpportunitySummaryModel doesn't reference any user_id
+        directly.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data
+            should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
+    @classmethod
+    def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
+        """Returns a list of skill opportunities available for adding questions.
+
+        Args:
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
+
+        Returns:
+            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            https://developers.google.com/appengine/docs/python/ndb/queryclass,
+            where:
+                results: list(SkillOpportunityModel)|None. A list
+                    of query results.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
+        if urlsafe_start_cursor:
+            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        else:
+            start_cursor = None
+
+        results, cursor, more = cls.get_all().order(
+            cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
+        return (results, (cursor.urlsafe() if cursor else None), more)

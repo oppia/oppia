@@ -16,81 +16,85 @@
  * @fileoverview Unit tests for the learner answer info service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
 import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+  'domain/classifier/AnswerClassificationResultObjectFactory';
 /* eslint-disable max-len */
 import { AnswerGroupsCacheService } from
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory';
 /* eslint-disable max-len */
 import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory.ts';
-import { EditabilityService } from 'services/EditabilityService.ts';
+  'domain/editor/undo_redo/ChangeObjectFactory';
+import { EditabilityService } from 'services/editability.service';
 import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory.ts';
+  'domain/exploration/ExplorationDraftObjectFactory';
 import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory.ts';
+  'domain/classifier/ClassifierObjectFactory';
 import { CodeNormalizerService } from
-  'services/CodeNormalizerService.ts';
+  'services/code-normalizer.service';
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService.ts';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
-import { ImprovementsService } from 'services/ImprovementsService.ts';
+  'services/exploration-features.service';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { ImprovementsService } from 'services/improvements.service';
 import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory.ts';
+  'domain/statistics/LearnerActionObjectFactory';
 import { LearnerParamsService } from
-  'pages/exploration-player-page/services/learner-params.service.ts';
+  'pages/exploration-player-page/services/learner-params.service';
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory.ts';
+  'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { ParamMetadataObjectFactory } from
-  'domain/exploration/ParamMetadataObjectFactory.ts';
+  'domain/exploration/ParamMetadataObjectFactory';
 import { ParamSpecObjectFactory } from
-  'domain/exploration/ParamSpecObjectFactory.ts';
+  'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory.ts';
+  'domain/exploration/ParamSpecsObjectFactory';
 import { ParamTypeObjectFactory } from
-  'domain/exploration/ParamTypeObjectFactory.ts';
+  'domain/exploration/ParamTypeObjectFactory';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory.ts';
+  'domain/classifier/PredictionResultObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory.ts';
+  'domain/story/StoryNodeObjectFactory';
 /* eslint-enable max-len */
 import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory.ts';
+  'domain/suggestion/SuggestionObjectFactory';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
-import { SuggestionModalService } from 'services/SuggestionModalService.ts';
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
+  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 /* eslint-enable max-len */
 import { TopicRightsObjectFactory } from
-  'domain/topic/TopicRightsObjectFactory.ts';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+  'domain/topic/TopicRightsObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VersionTreeService } from
-  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
+  'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory.ts';
+  'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory.ts';
+  'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
 require('domain/exploration/OutcomeObjectFactory.ts');
 require(
@@ -175,6 +179,12 @@ describe('Learner answer info service', function() {
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
 
   var sof = null;

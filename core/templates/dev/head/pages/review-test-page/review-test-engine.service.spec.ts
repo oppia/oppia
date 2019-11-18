@@ -15,21 +15,22 @@
 /**
  * @fileoverview Unit tests for the review tests.
  */
-require('pages/review-test-page/review-test-engine.service.ts');
 
-describe('Review test engine service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  var ReviewTestEngineService = null;
+import { ReviewTestEngineService } from
+  'pages/review-test-page/review-test-engine.service.ts';
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ReviewTestEngineService = $injector.get('ReviewTestEngineService');
-  }));
+describe('Review test engine service', () => {
+  let rtes: ReviewTestEngineService = null;
+
+  beforeEach(() => {
+    rtes = new ReviewTestEngineService;
+  });
 
   it('should return the correct count of review test questions', function() {
-    expect(ReviewTestEngineService.getReviewTestQuestionCount(-2)).toEqual(0);
-    expect(ReviewTestEngineService.getReviewTestQuestionCount(0)).toEqual(0);
-    expect(ReviewTestEngineService.getReviewTestQuestionCount(3)).toEqual(9);
-    expect(ReviewTestEngineService.getReviewTestQuestionCount(8)).toEqual(16);
-    expect(ReviewTestEngineService.getReviewTestQuestionCount(12)).toEqual(12);
+    expect(rtes.getReviewTestQuestionCount(-2)).toEqual(0);
+    expect(rtes.getReviewTestQuestionCount(0)).toEqual(0);
+    expect(rtes.getReviewTestQuestionCount(3)).toEqual(9);
+    expect(rtes.getReviewTestQuestionCount(8)).toEqual(16);
+    expect(rtes.getReviewTestQuestionCount(12)).toEqual(12);
   });
 });

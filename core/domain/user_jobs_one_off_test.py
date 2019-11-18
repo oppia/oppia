@@ -1216,9 +1216,11 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
             self.exp_id, self.owner_id, end_state_name='End')
         self.logout()
 
-        user_settings = user_services.get_user_settings(self.owner_id)
-        user_settings.last_created_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+        user_models.UserSettingsModel(
+            id=self.owner_id,
+            email=self.OWNER_EMAIL,
+            last_created_an_exploration=None
+        ).put()
 
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertIsNone(owner_settings.last_created_an_exploration)
@@ -1244,9 +1246,11 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
             })], 'Test edit')
         self.logout()
 
-        user_settings = user_services.get_user_settings(self.editor_id)
-        user_settings.last_edited_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+        user_models.UserSettingsModel(
+            id=self.editor_id,
+            email=self.EDITOR_EMAIL,
+            last_edited_an_exploration=None
+        ).put()
 
         editor_settings = user_services.get_user_settings(self.editor_id)
 
@@ -1280,14 +1284,18 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
             })], 'Test edit new')
         self.logout()
 
-        user_settings = user_services.get_user_settings(self.owner_id)
-        user_settings.last_created_an_exploration = None
-        user_settings.last_edited_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+        user_models.UserSettingsModel(
+            id=self.owner_id,
+            email=self.OWNER_EMAIL,
+            last_created_an_exploration=None,
+            last_edited_an_exploration=None
+        ).put()
 
-        user_settings = user_services.get_user_settings(self.editor_id)
-        user_settings.last_edited_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+        user_models.UserSettingsModel(
+            id=self.editor_id,
+            email=self.EDITOR_EMAIL,
+            last_edited_an_exploration=None
+        ).put()
 
         owner_settings = user_services.get_user_settings(self.owner_id)
         editor_settings = user_services.get_user_settings(self.editor_id)
@@ -1308,10 +1316,12 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(editor_settings.last_created_an_exploration)
 
     def test_that_last_edited_and_created_time_are_not_updated(self):
-        user_settings = user_services.get_user_settings(self.owner_id)
-        user_settings.last_created_an_exploration = None
-        user_settings.last_edited_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+        user_models.UserSettingsModel(
+            id=self.owner_id,
+            email=self.OWNER_EMAIL,
+            last_created_an_exploration=None,
+            last_edited_an_exploration=None
+        ).put()
 
         owner_settings = user_services.get_user_settings(self.owner_id)
 
@@ -1414,7 +1424,7 @@ class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
         migrated_user_settings_model = (
             user_models.UserSettingsModel.get(user_id))
         self.assertEqual(migrated_user_settings_model.id, user_id)
-        self.assertEqual(migrated_user_settings_model.gae_user_id, user_id)
+        self.assertEqual(migrated_user_settings_model.gae_id, user_id)
         # Check that the other values didn't change.
         self.assertEqual(migrated_user_settings_model.email, email)
 
@@ -1422,8 +1432,7 @@ class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
         user_id = 'user'
         email = 'user@domain.com'
         user_models.UserSettingsModel(
-            id=user_id, email=email, gae_user_id=None
-        ).put()
+            id=user_id, email=email, gae_id=None).put()
 
         output = self._run_one_off_job()
 
@@ -1438,7 +1447,7 @@ class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
         user_1_id = 'user1'
         user_1_email = 'user1@domain.com'
         user_models.UserSettingsModel(
-            id=user_1_id, email=user_1_email, gae_user_id=None).put()
+            id=user_1_id, email=user_1_email, gae_id=None).put()
 
         user_2_id = 'user2'
         user_2_email = 'user2@domain.com'

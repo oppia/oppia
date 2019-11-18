@@ -22,6 +22,7 @@ import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Text Input Prediction Service', function() {
@@ -36,6 +37,12 @@ describe('Text Input Prediction Service', function() {
     $provide.value(
       'SVMPredictionService', new SVMPredictionService(
         new PredictionResultObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
 
   describe('Test text prediction service', function() {

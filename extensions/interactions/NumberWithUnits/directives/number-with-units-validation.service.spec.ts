@@ -16,26 +16,20 @@
  * @fileoverview Unit tests for number with units validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// number-with-units-validation.service.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { AppConstants } from 'app.constants';
+/* eslint-disable max-len */
+import { NumberWithUnitsValidationService } from
+  'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
+/* eslint-enable max-len */
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-// ^^^ This block is to be removed.
 
-require(
-  'interactions/NumberWithUnits/directives/' +
-  'number-with-units-validation.service.ts');
-
-describe('NumberWithUnitsValidationService', function() {
+describe('NumberWithUnitsValidationService', () => {
   var validatorService, WARNING_TYPES;
 
   var currentState;
@@ -44,36 +38,16 @@ describe('NumberWithUnitsValidationService', function() {
     equivalentToTwoByThreeRule, equivalentToTwoRule;
   var createNumberWithUnitsDict;
   var oof, agof, rof;
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-  }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('NumberWithUnitsValidationService');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    rof = $injector.get('RuleObjectFactory');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+  beforeEach(() => {
+    validatorService = TestBed.get(NumberWithUnitsValidationService);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
 
-    var createFractionDict = function(
-        isNegative, wholeNumber, numerator, denominator) {
+    var createFractionDict = (
+        isNegative, wholeNumber, numerator, denominator) => {
       return {
         isNegative: isNegative,
         wholeNumber: wholeNumber,
@@ -82,8 +56,8 @@ describe('NumberWithUnitsValidationService', function() {
       };
     };
 
-    var createNumberWithUnitsDict = function(
-        type, real, fractionDict, unitList) {
+    var createNumberWithUnitsDict = (
+        type, real, fractionDict, unitList) => {
       return {
         type: type,
         real: real,
@@ -154,15 +128,15 @@ describe('NumberWithUnitsValidationService', function() {
       goodDefaultOutcome,
       false
     )];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should catch equals followed by equals same value', function() {
+  it('should catch equals followed by equals same value', () => {
     answerGroups[0].rules = [equalsTwoRule, equalsTwoRule];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
@@ -174,7 +148,7 @@ describe('NumberWithUnitsValidationService', function() {
   });
 
   it('should not catch equals followed by equals with unequal values',
-    function() {
+    () => {
       answerGroups[0].rules = [equalsTwoRule, equalsTwoByThreeRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
@@ -182,7 +156,7 @@ describe('NumberWithUnitsValidationService', function() {
     });
 
   it('should not catch equals followed by equivalent as redundant',
-    function() {
+    () => {
       answerGroups[0].rules = [equalsTwoRule, equivalentToTwoThousandRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
@@ -195,7 +169,7 @@ describe('NumberWithUnitsValidationService', function() {
     });
 
   it('should catch equivalent followed by equals with equivalent values',
-    function() {
+    () => {
       answerGroups[0].rules = [equivalentToTwoThousandRule, equalsTwoRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
@@ -207,7 +181,7 @@ describe('NumberWithUnitsValidationService', function() {
     });
 
   it('should not catch equivalent followed by equals with non-equivalent' +
-    ' values', function() {
+    ' values', () => {
     answerGroups[0].rules = [equivalentToTwoThousandRule, equalsTwoByThreeRule];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
@@ -215,7 +189,7 @@ describe('NumberWithUnitsValidationService', function() {
   });
 
   it('should catch equivalent followed by equivalent with equivalent values',
-    function() {
+    () => {
       answerGroups[0].rules = [equivalentToTwoThousandRule,
         equivalentToTwoRule];
       var warnings = validatorService.getAllWarnings(
@@ -228,7 +202,7 @@ describe('NumberWithUnitsValidationService', function() {
     });
 
   it('should not catch equivalent followed by equivalent with non-equivalent' +
-    ' values', function() {
+    ' values', () => {
     answerGroups[0].rules = [equivalentToTwoByThreeRule,
       equivalentToTwoThousandRule];
     var warnings = validatorService.getAllWarnings(

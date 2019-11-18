@@ -261,7 +261,6 @@
         "targetDirPrefix": "bootstrap-",
         "bundle": {
           "css": ["css/bootstrap.css"],
-          "fontsPath": "fonts",
           "js": ["js/bootstrap.js"]
         }
       },
@@ -476,22 +475,15 @@
       "ckeditor": {
         "version": "4.12.1",
         "downloadFormat": "zip",
-        "url": "https://download.cksource.com/CKEditor/CKEditor/CKEditor%204.12.1/ckeditor_4.12.1_full.zip",
-        "rootDir": "ckeditor",
+        "url": "https://github.com/ckeditor/ckeditor4-releases/archive/4.12.1.zip",
+        "rootDirPrefix": "ckeditor4-releases-",
         "targetDirPrefix": "ckeditor-"
       },
-      "ckeditorSharedspace": {
-        "version": "4.12.1",
-        "downloadFormat": "zip",
-        "url": "https://download.ckeditor.com/sharedspace/releases/sharedspace_4.12.1.zip",
-        "rootDir": "sharedspace",
-        "targetDirPrefix": "ckeditor-sharedspace-"
-      },
       "ckeditorBootstrapCK": {
-        "version": "1.0",
+        "version": "1.0.0",
         "downloadFormat": "zip",
-        "url": "https://download.ckeditor.com/bootstrapck/releases/bootstrapck_1.0_0.zip",
-        "rootDir": "bootstrapck",
+        "url": "https://github.com/Kunstmaan/BootstrapCK4-Skin/archive/v1.0.0.zip",
+        "rootDirPrefix": "BootstrapCK4-Skin-",
         "targetDirPrefix": "ckeditor-bootstrapck-"
       },
       "uiBootstrap": {

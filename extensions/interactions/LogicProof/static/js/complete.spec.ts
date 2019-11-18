@@ -16,10 +16,10 @@
  * @fileoverview Complete tests for LogicProof interaction JS.
  */
 
-import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
-import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
+import logicProofStudent from 'interactions/LogicProof/static/js/student';
+import logicProofTeacher from 'interactions/LogicProof/static/js/teacher';
 import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
-  'interactions/LogicProof/static/js/generatedDefaultData.ts';
+  'interactions/LogicProof/static/js/generatedDefaultData';
 
 describe('Full system', function() {
   var sharedErrorWrapper = function(message, line, code, category) {

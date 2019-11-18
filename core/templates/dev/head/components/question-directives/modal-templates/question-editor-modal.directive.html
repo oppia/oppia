@@ -22,5 +22,5 @@
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
-  <button class="btn btn-success protractor-test-save-question-button" ng-click="done()"> Save and Publish Question </button>
+  <button title="To Save please add: interaction, hint and solution" class="btn btn-success protractor-test-save-question-button" ng-click="done()" ng-disabled="isSaveButtonDisabled()"> Save and Publish Question </button>
 </div>

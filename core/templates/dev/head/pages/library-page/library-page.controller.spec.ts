@@ -20,7 +20,10 @@
 // library-page.controller.ts is upgraded to Angular 8.
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/library-page/library-page.directive.ts');
@@ -35,6 +38,12 @@ describe('Library controller', function() {
     beforeEach(function() {
       angular.mock.module('ui.bootstrap');
     });
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
 
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -50,6 +59,7 @@ describe('Library controller', function() {
             }
           };
         }]);
+      $provide.value('WindowDimensionsService', new WindowDimensionsService());
       $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
       $provide.value('PageTitleService', {
         setPageTitle(title) {

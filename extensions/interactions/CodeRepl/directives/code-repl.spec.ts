@@ -16,7 +16,11 @@
  * @fileoverview Unit tests for the CodeRepl interaction.
  */
 
-import { CodeNormalizerService } from 'services/CodeNormalizerService';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { CodeNormalizerService } from 'services/code-normalizer.service';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
 describe('CodeRepl interaction', function() {
   describe('CodeRepl tests', function() {
@@ -28,6 +32,12 @@ describe('CodeRepl interaction', function() {
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value('CodeNormalizerService', new CodeNormalizerService());
+    }));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
     }));
 
     beforeEach(angular.mock.inject(function(

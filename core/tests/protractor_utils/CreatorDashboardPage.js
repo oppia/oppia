@@ -247,6 +247,15 @@ var CreatorDashboardPage = function() {
       'Unable to find exploration views');
     return expSummaryRowViewsElements;
   };
+
+  this.expectToHaveExplorationCard = function(explorationName) {
+    _getExplorationElements(explorationName).then(function(elems) {
+      if (elems.length === 0) {
+        throw 'Could not find exploration title with name ' + explorationTitle;
+      }
+      expect(elems.length).toBeGreaterThanOrEqual(1);
+    });
+  };
 };
 
 exports.CreatorDashboardPage = CreatorDashboardPage;

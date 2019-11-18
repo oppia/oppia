@@ -22,9 +22,9 @@
           <span class="oppia-editor-description">Use a name that will be easy for question creators to understand.</span>
         </div>
         <div>
-          <input class="form-control protractor-test-misconception-name-field" type="text" ng-model="misconceptionName" maxlength="50" autofocus>
-          <span ng-if="misconceptionName.length === 50" class="form-text" style="color: red; font-size: smaller">
-            <em>Please use at most 50 characters.</em>
+          <input class="form-control protractor-test-misconception-name-field" type="text" ng-model="misconceptionName" maxlength="<[MISCONCEPTION_NAME_CHAR_LIMIT]>" autofocus>
+          <span ng-if="misconceptionName.length === MISCONCEPTION_NAME_CHAR_LIMIT" class="form-text" style="color: red; font-size: smaller">
+            <em>Please use at most <[MISCONCEPTION_NAME_CHAR_LIMIT]> characters.</em>
           </span>
         </div>
       </div>
@@ -44,11 +44,15 @@
         <schema-based-editor class="protractor-test-feedback-textarea" schema="MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA" local-value="misconceptionFeedback">
         </schema-based-editor>
       </div>
+      <div class="oppia-misconception-editor-section">
+        <strong>Should a response to this misconception be enforced on every question linked to this skill?</strong>
+        <input type="checkbox" ng-model="misconceptionMustBeAddressed">
+      </div>
     </div>
   </div>
 
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-add-misconception-button" ng-click="saveMisconception()" ng-disabled="!misconceptionName || misconceptionNotes.length === 0 || misconceptionFeedback.length === 0">Save</button>
+    <button class="btn btn-success protractor-test-confirm-add-misconception-button" ng-click="saveMisconception()" ng-disabled="!misconceptionName || misconceptionFeedback.length === 0">Save</button>
   </div>
 </div>

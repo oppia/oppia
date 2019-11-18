@@ -16,7 +16,7 @@
  * @fileoverview Directive for the side navigation bar.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('sideNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -28,9 +28,9 @@ angular.module('oppia').directive('sideNavigationBar', [
         '/components/common-layout-directives/navigation-bars/' +
         'side-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$timeout', function($timeout) {
+      controller: ['$timeout', '$window', function($timeout, $window) {
         var ctrl = this;
-        ctrl.currentUrl = window.location.pathname;
+        ctrl.currentUrl = $window.location.pathname;
         ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
       }]
     };
