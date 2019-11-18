@@ -40,8 +40,8 @@ class ThreadListHandler(base.BaseHandler):
             feedback_services.get_thread_summaries(
                 self.user_id,
                 [d['thread_id'] for d in feedback_thread_dicts]))
-        for thread_dict, summary_dict in zip(feedback_thread_dicts,
-                                             feedback_thread_summary_dicts):
+        for thread_dict, summary_dict in zip(
+                feedback_thread_dicts, feedback_thread_summary_dicts):
             thread_dict['thread_summary_dict'] = summary_dict
 
         suggestion_thread_dicts = [
@@ -51,8 +51,8 @@ class ThreadListHandler(base.BaseHandler):
             feedback_services.get_thread_summaries(
                 self.user_id,
                 [d['thread_id'] for d in suggestion_thread_dicts]))
-        for thread_dict, summary_dict in zip(suggestion_thread_dicts,
-                                             suggestion_thread_summary_dicts):
+        for thread_dict, summary_dict in zip(
+                suggestion_thread_dicts, suggestion_thread_summary_dicts):
             thread_dict['thread_summary_dict'] = summary_dict
 
         self.values.update({
