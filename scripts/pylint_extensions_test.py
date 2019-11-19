@@ -1473,11 +1473,14 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
 
 class DivisionOperatorCheckerTests(unittest.TestCase):
 
-    def test_division_operator(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
+    def setUp(self):
+        super(DivisionOperatorCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DivisionOperatorChecker)
-        checker_test_object.setup_method()
+        self.checker_test_object.setup_method()
+
+    def test_division_operator(self):
         node_division_operator = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1492,9 +1495,9 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
         node_division_operator.file = filename
         node_division_operator.path = filename
 
-        checker_test_object.checker.process_module(node_division_operator)
+        self.checker_test_object.checker.process_module(node_division_operator)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='division-operator-used',
                 line=1
@@ -1506,6 +1509,7 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
+    def test_division_operator_inside_single_line_comment(self):
         node_single_line_comment = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1520,11 +1524,13 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
         node_single_line_comment.file = filename
         node_single_line_comment.path = filename
 
-        checker_test_object.checker.process_module(node_single_line_comment)
+        self.checker_test_object.checker.process_module(
+            node_single_line_comment)
 
-        with checker_test_object.assertNoMessages():
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_division_operator_inside_string(self):
         node_division_inside_string = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1539,13 +1545,13 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
         node_division_inside_string.file = filename
         node_division_inside_string.path = filename
 
-        checker_test_object.checker.process_module(
+        self.checker_test_object.checker.process_module(
             node_division_inside_string)
 
-        with checker_test_object.assertNoMessages():
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
-
+    def test_divide_method_used(self):
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -1558,7 +1564,8 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
-        checker_test_object.checker.process_module(node_with_no_error_message)
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
 
-        with checker_test_object.assertNoMessages():
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
