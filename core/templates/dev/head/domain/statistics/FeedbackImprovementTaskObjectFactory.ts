@@ -25,10 +25,10 @@ require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
 angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
-  '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
+  'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
   'ThreadDataService', 'FEEDBACK_IMPROVEMENT_TASK_TYPE',
   function(
-      $q, ImprovementActionButtonObjectFactory, ImprovementModalService,
+      ImprovementActionButtonObjectFactory, ImprovementModalService,
       ThreadDataService, FEEDBACK_IMPROVEMENT_TASK_TYPE) {
     var FeedbackImprovementTask = function(feedbackThread) {
       this._feedbackThread = feedbackThread;
