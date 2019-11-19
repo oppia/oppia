@@ -27,7 +27,7 @@
     </div>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-accessibility-translation-start-record"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-start-record protractor-test-accessibility-translation-start-record"
             uib-tooltip="Record"
             tooltip-placement="above"
             ng-click="checkAndStartRecording()"
@@ -38,7 +38,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-accessibility-translation-upload-audio"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio protractor-test-accessibility-translation-upload-audio"
             uib-tooltip="Upload"
             tooltip-placement="above"
             ng-click="openAddAudioTranslationModal()"
@@ -74,7 +74,7 @@
     </div>
   </div>
   <div class="oppia-content-wrapper" ng-if="voiceoverRecorder.status().isRecording">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-stop-record"
             uib-tooltip="Stop"
             tooltip-placement="above"
             ng-click="stopRecording()"
@@ -91,7 +91,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="!voiceoverRecorder.status().isRecording && audioBlob">
-    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition protractor-test-confirm-record"
             ng-click="saveRecordedAudio()"
             aria-label="Save the recorded audio">
       Confirm
@@ -119,7 +119,7 @@
 </div>
 <div ng-if="isAudioAvailable && !audioIsUpdating" class="oppia-audio-recording-bar">
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-play-record"
             ng-click="playPauseUploadedAudioTranslation()">
       <i class="material-icons"><[isPlayingUploadedAudio() ? 'pause' : 'play_arrow']></i>
     </button>
@@ -148,7 +148,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-delete-record"
             uib-tooltip="Delete"
             tooltip-placement="above"
             ng-hide="!canVoiceover"

@@ -7,12 +7,12 @@ var suites = {
     // them. Therefore, we mention the complete directory
     // in 'full'.
     full: [
-      'protractor/*.js',
-      'protractor_desktop/*.js'
+      //'protractor/*.js',
+      'protractor_desktop/explorationTranslationTab.js'
     ],
 
-    // Unfortunately, adding more than one file to a test suite results in
-    // severe instability as of Chromedriver 2.38 (Chrome 66).
+    // // Unfortunately, adding more than one file to a test suite results in
+    // // severe instability as of Chromedriver 2.38 (Chrome 66).
     accessibility: [
       'protractor/accessibility.js'
     ],
@@ -203,7 +203,7 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['--lang=en-EN', '--window-size=1285x1000']
+      args: ['--lang=en-EN', '--window-size=1285x1000', '--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream']
     },
     prefs: {
       intl: {

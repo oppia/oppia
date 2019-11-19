@@ -16,10 +16,12 @@
  * @fileoverview Page object for the exploration editor, for use in Protractor
  * tests.
  */
-var waitFor = require('./waitFor.js');
-
+var waitFor = require(
+  './waitFor.js'
+);
 var ExplorationEditorFeedbackTab = require(
-  '../protractor_utils/ExplorationEditorFeedbackTab.js');
+  '../protractor_utils/ExplorationEditorFeedbackTab.js'
+);
 var ExplorationEditorHistoryTab = require(
   '../protractor_utils/ExplorationEditorHistoryTab.js'
 );
@@ -30,11 +32,17 @@ var ExplorationEditorMainTab = require(
   '../protractor_utils/ExplorationEditorMainTab.js'
 );
 var ExplorationEditorSettingsTab = require(
-  '../protractor_utils/ExplorationEditorSettingsTab.js');
+  '../protractor_utils/ExplorationEditorSettingsTab.js'
+);
 var ExplorationEditorStatsTab = require(
-  '../protractor_utils/ExplorationEditorStatsTab.js');
+  '../protractor_utils/ExplorationEditorStatsTab.js'
+);
 var ExplorationEditorTranslationTab = require(
-  '../protractor_utils/ExplorationEditorTranslationTab.js');
+  '../protractor_utils/ExplorationEditorTranslationTab.js'
+);
+var ExplorationPlayerPage = require(
+  '../protractor_utils/ExplorationPlayerPage.js'
+);
 
 var ExplorationEditorPage = function() {
   /*
@@ -47,8 +55,8 @@ var ExplorationEditorPage = function() {
     return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
   };
   this.getImprovementsTab = function() {
-    return new ExplorationEditorImprovementsTab
-      .ExplorationEditorImprovementsTab();
+    return new ExplorationEditorImprovementsTab.
+      ExplorationEditorImprovementsTab();
   };
   this.getMainTab = function() {
     return new ExplorationEditorMainTab.ExplorationEditorMainTab();
@@ -60,8 +68,11 @@ var ExplorationEditorPage = function() {
     return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();
   };
   this.getTranslationTab = function() {
-    return new ExplorationEditorTranslationTab
-      .ExplorationEditorTranslationTab();
+    return new ExplorationEditorTranslationTab.
+      ExplorationEditorTranslationTab();
+  };
+  this.getPreviewTab = function() {
+    return new ExplorationPlayerPage.ExplorationPlayerPage();
   };
 
   /*
@@ -83,20 +94,24 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-feedback-tab'));
   var navigateToHistoryTabButton = element(
     by.css('.protractor-test-history-tab'));
-  var navigateToMainTabButton = element(by.css('.protractor-test-main-tab'));
+  var navigateToMainTabButton = element(
+    by.css('.protractor-test-main-tab'));
   var navigateToImprovementsTabButton = element(
     by.css('.protractor-test-improvements-tab'));
   var navigateToPreviewTabButton = element(
     by.css('.protractor-test-preview-tab'));
   var navigateToSettingsTabButton = element(
     by.css('.protractor-test-settings-tab'));
-  var navigateToStatsTabButton = element(by.css('.protractor-test-stats-tab'));
+  var navigateToStatsTabButton = element(
+    by.css('.protractor-test-stats-tab'));
   var navigateToTranslationTabButton = element(
     by.css('.protractor-test-translation-tab'));
-  var saveChangesButton = element(by.css('.protractor-test-save-changes'));
+  var saveChangesButton = element(
+    by.css('.protractor-test-save-changes'));
   var saveDiscardToggleButton = element(
     by.css('.protractor-test-save-discard-toggle'));
-  var saveDraftButton = element(by.css('.protractor-test-save-draft-button'));
+  var saveDraftButton = element(
+    by.css('.protractor-test-save-draft-button'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
 
