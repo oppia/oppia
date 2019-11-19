@@ -4534,3 +4534,7 @@ div.oppia-issues-learner-action {
   max-width: none;
   white-space: nowrap;
 }
+
+.oppia-rule-preview {
+  word-wrap: break-word;
+}
