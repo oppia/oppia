@@ -127,7 +127,7 @@ describe('retrieving threads service', function() {
       suggestions: mockGeneralSuggestionThreads
     });
 
-    ThreadDataService.fetchThreads(function() {
+    ThreadDataService.fetchThreads().then(() => {
       for (var i = 0; i < mockFeedbackThreads.length; i++) {
         expect(ThreadDataService.getData().feedbackThreads).toContain(
           mockFeedbackThreads[i]);

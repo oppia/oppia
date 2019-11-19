@@ -89,7 +89,9 @@ angular.module('oppia').factory('ThreadDataService', [
             _setFeedbackThreadFromBackendDict);
           _data.suggestionThreads = response.data.suggestion_thread_dicts.map(
             _setSuggestionThreadFromBackendDict);
-          onSuccess();
+          if (onSuccess) {
+            onSuccess();
+          }
           return _data;
         });
       },
