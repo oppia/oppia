@@ -288,7 +288,7 @@ class CreatorDashboardHandler(base.BaseHandler):
                 ids_of_suggestions_which_can_be_reviewed)])
 
         thread_summaries_linked_to_suggestions_by_user, _ = (
-           feedback_services.get_thread_summaries(
+            feedback_services.get_thread_summaries(
                 self.user_id, ids_of_suggestions_created_by_user))
         thread_summaries_linked_to_suggestions_which_can_be_reviewed, _ = (
             feedback_services.get_thread_summaries(
