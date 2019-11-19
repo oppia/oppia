@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import copy
+import datetime
 import inspect
 import itertools
 import json
@@ -1730,6 +1731,56 @@ tags: []
         slash.
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
+
+    @contextlib.contextmanager
+    def mock_datetime_utcnow(self, mocked_datetime):
+        """Mocks response from datetime.datetime.utcnow method.
+
+        Example usage:
+            import datetime
+            mocked_datetime_utcnow = datetime.datetime.utcnow() -
+                datetime.timedelta(days=1)
+            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+                print datetime.datetime.utcnow() # prints time reduced by 1 day
+            print datetime.datetime.utcnow()  # prints current time.
+
+        Args:
+            mocked_datetime: datetime.datetime.
+                The datetime which will be used instead of
+                the current UTC datetime.
+
+        Yields:
+            nothing.
+        """
+        if not isinstance(mocked_datetime, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected mocked_datetime to be datetime.datetime, got %s' % (
+                    type(mocked_datetime)))
+
+        original_datetime_type = datetime.datetime
+
+        class PatchedDatetimeType(type):
+            """Validates the datetime instances."""
+            def __instancecheck__(cls, other):
+                """Validates whether the given instance is datetime
+                instance.
+                """
+                return isinstance(other, original_datetime_type)
+
+        class MockDatetime( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
+            @classmethod
+            def utcnow(cls):
+                """Returns the mocked datetime."""
+                return mocked_datetime
+
+        setattr(datetime, 'datetime', MockDatetime)
+
+        try:
+            yield
+        finally:
+            setattr(datetime, 'datetime', original_datetime_type)
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
