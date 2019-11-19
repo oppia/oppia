@@ -68,6 +68,9 @@ module.exports = {
     community_dashboard:
       commonPrefix + '/pages/community-dashboard-page/' +
       'community-dashboard-page.scripts.ts',
+    delete_account:
+      commonPrefix + '/pages/delete-account-page/' +
+        'delete-account-page.scripts.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.scripts.ts',
     email_dashboard:
       commonPrefix +
@@ -105,9 +108,6 @@ module.exports = {
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.scripts.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.scripts.ts',
-    remove_account:
-      commonPrefix + '/pages/remove-account-page/' +
-        'remove-account-page.scripts.ts',
     review_test:
       commonPrefix + '/pages/review-test-page/review-test-page.scripts.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.scripts.ts',
@@ -238,6 +238,16 @@ module.exports = {
       template:
         commonPrefix + '/pages/community-dashboard-page/' +
         'community-dashboard-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['delete_account'],
+      filename: 'delete-account-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/delete-account-page/' +
+          'delete-account-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -459,16 +469,6 @@ module.exports = {
       filename: 'profile-page.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/profile-page/profile-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['remove_account'],
-      filename: 'remove-account-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/remove-account-page/' +
-          'remove-account-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

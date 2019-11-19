@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the remove account page.
+ * @fileoverview Module for the delete account page.
  */
 
 import 'core-js/es7/reflect';
@@ -55,7 +55,7 @@ import { ObjectsDomainConstants } from
     ObjectsDomainConstants,
   ]
 })
-class RemoveAccountPageModule {
+class DeleteAccountPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
@@ -65,7 +65,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(RemoveAccountPageModule);
+  return platformRef.bootstrapModule(DeleteAccountPageModule);
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 

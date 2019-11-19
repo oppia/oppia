@@ -50,14 +50,14 @@ angular.module('oppia').directive('preferencesPage', [
         '$window', '$uibModal', 'AlertsService', 'LanguageUtilService',
         'UrlInterpolationService', 'UserService', 'UtilsService',
         'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
-        'ENABLE_ACCOUNT_REMOVAL', 'SUPPORTED_AUDIO_LANGUAGES',
+        'ENABLE_ACCOUNT_DELETION', 'SUPPORTED_AUDIO_LANGUAGES',
         'SUPPORTED_SITE_LANGUAGES',
         function(
             $http, $q, $rootScope, $scope, $timeout, $translate,
             $window, $uibModal, AlertsService, LanguageUtilService,
             UrlInterpolationService, UserService, UtilsService,
             DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
-            ENABLE_ACCOUNT_REMOVAL, SUPPORTED_AUDIO_LANGUAGES,
+            ENABLE_ACCOUNT_DELETION, SUPPORTED_AUDIO_LANGUAGES,
             SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
           var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
@@ -102,7 +102,7 @@ angular.module('oppia').directive('preferencesPage', [
 
           ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
-          ctrl.canRemoveAccount = ENABLE_ACCOUNT_REMOVAL;
+          ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
 
           var _saveDataItem = function(updateType, data) {
             $http.put(_PREFERENCES_DATA_URL, {
