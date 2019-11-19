@@ -218,7 +218,7 @@ class VoicoverApplicationHandler(base.BaseHandler):
                 target_type, target_id, language_code, voiceover_content,
                 filename, self.user_id)
         except utils.ValidationError as e:
-             raise self.InvalidInputException(e)
+            raise self.InvalidInputException(e)
 
         self.render_json({})
 

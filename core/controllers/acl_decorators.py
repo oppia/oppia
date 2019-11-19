@@ -2658,9 +2658,9 @@ def can_view_voiceover_applications(handler):
 
         return handler(self, purpose, **kwargs)
 
-    test_can_access_voiceover_applications.__wrapped__ = True
+    test_can_view_voiceover_applications.__wrapped__ = True
 
-    return test_can_access_voiceover_applications
+    return test_can_view_voiceover_applications
 
 
 def can_review_voiceover_application(handler):
