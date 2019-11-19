@@ -1756,12 +1756,13 @@ tags: []
             raise utils.ValidationError(
                 'Expected mocked_datetime to be datetime.datetime, got %s' % (
                     type(mocked_datetime)))
+
         original_datetime_type = datetime.datetime
 
         class PatchedDatetimeType(type):
             """Validates the datetime instances."""
             def __instancecheck__(cls, other):
-                """Validates whether the given instance is a datatime
+                """Validates whether the given instance is datetime
                 instance.
                 """
                 return isinstance(other, original_datetime_type)
