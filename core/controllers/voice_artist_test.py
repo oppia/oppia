@@ -370,7 +370,7 @@ class VoiceoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
             }, expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'Translation for the give content_id content does not exist'
+            'Translation for the given content_id content does not exist'
             ' in invalid language code')
 
     def test_guest_cannot_submit_voiceover_application(self):

@@ -628,7 +628,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
             response_dict['error'],
-            'Invalid filename extension: it should have '
+            'Invalid filename extension provided. It should have '
             'one of the following extensions: %s'
             % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))
 
@@ -689,7 +689,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
             response_dict['error'],
-            'No filename extension: it should have '
+            'No filename extension provided. It should have '
             'one of the following extensions: '
             '%s' % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))
 
