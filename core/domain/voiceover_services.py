@@ -251,7 +251,6 @@ def reject_voiceover_application(
     reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
 
     voiceover_application.reject(reviewer.user_id, rejection_message)
-
     _save_voiceover_applications([voiceover_application])
 
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
