@@ -781,9 +781,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     def test_get_suggestions_list(self):
         self.login(self.OWNER_EMAIL)
-        suggestions = self.get_json(
-            feconf.CREATOR_DASHBOARD_DATA_URL)['created_suggestions_list']
-        self.assertEqual(suggestions, [])
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        suggestion_threads = response['threads_for_created_suggestions_list']
+        self.assertEqual(suggestion_threads, [])
         change_dict = {
             'cmd': 'edit_state_property',
             'property_name': 'content',
@@ -794,24 +794,26 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             'edit_exploration_state_content', 'exploration',
             'exploration_id', 1, self.owner_id, change_dict, '', None)
-        suggestions = self.get_json(
-            feconf.CREATOR_DASHBOARD_DATA_URL)['created_suggestions_list'][0]
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        suggestion_threads = response['threads_for_created_suggestions_list']
+        self.assertEqual(len(suggestion_threads), 1)
+        suggestion = suggestion_threads[0]['suggestion_dict']
         change_dict['old_value'] = {
             'content_id': 'content',
             'html': ''
         }
-        self.assertEqual(suggestions['change'], change_dict)
-        # Test to check if suggestions populate old value of the change.
+        self.assertEqual(suggestion['change'], change_dict)
+        # Test to check if suggestion populate old value of the change.
         self.assertEqual(
-            suggestions['change']['old_value']['content_id'], 'content')
+            suggestion['change']['old_value']['content_id'], 'content')
         self.logout()
 
     def test_get_suggestions_to_review_list(self):
         self.login(self.OWNER_EMAIL)
 
-        suggestions = self.get_json(
-            feconf.CREATOR_DASHBOARD_DATA_URL)['suggestions_to_review_list']
-        self.assertEqual(suggestions, [])
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        suggestion_threads = response['threads_for_suggestions_to_review_list']
+        self.assertEqual(suggestion_threads, [])
 
         change_dict = {
             'cmd': 'edit_state_property',
@@ -823,32 +825,25 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
         suggestion_services.create_new_user_contribution_scoring_model(
             self.owner_id, 'category1', 15)
-        model1 = feedback_models.GeneralFeedbackThreadModel.create(
-            'exploration.exp1.thread_1')
-        model1.entity_type = 'exploration'
-        model1.entity_id = 'exp1'
-        model1.subject = 'subject'
-        model1.put()
-
-        suggestion_models.GeneralSuggestionModel.create(
+        suggestion_id = suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
-            'exp1', 1, suggestion_models.STATUS_IN_REVIEW, self.owner_id_1,
-            self.owner_id_2, change_dict, 'category1',
-            'exploration.exp1.thread_1')
-
+            'exp1', 1, self.owner_id_1, change_dict, '', self.owner_id_2)
+        suggestion = suggestion_models.GeneralSuggestionModel.get(suggestion_id)
+        suggestion.score_category = 'category1'
+        suggestion.put()
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        suggestion_threads = response['threads_for_suggestions_to_review_list']
+        self.assertEqual(len(suggestion_threads), 1)
+        suggestion = suggestion_threads[0]['suggestion_dict']
         change_dict['old_value'] = {
             'content_id': 'content',
             'html': ''
         }
-        suggestions = self.get_json(
-            feconf.CREATOR_DASHBOARD_DATA_URL)['suggestions_to_review_list']
-
-        self.assertEqual(len(suggestions), 1)
-        self.assertEqual(suggestions[0]['change'], change_dict)
-        # Test to check if suggestions populate old value of the change.
+        self.assertEqual(suggestion['change'], change_dict)
+        # Test to check if suggestion populate old value of the change.
         self.assertEqual(
-            suggestions[0]['change']['old_value']['content_id'], 'content')
+            suggestion['change']['old_value']['content_id'], 'content')
 
         self.logout()
 
