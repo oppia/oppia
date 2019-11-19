@@ -32,6 +32,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (exp_models, stats_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.statistics])
@@ -1492,3 +1493,54 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
             output,
             [u'[u\'Missing model without revert commit\', [u\''
              + self.EXP_ID + '\']]'])
+
+    def test_job_cleans_up_stats_models_for_deleted_exps(self):
+        EXP_ID_1 = 'EXP_ID_1'
+        exp = self.save_new_valid_exploration(EXP_ID_1, 'owner_id')
+        state_name = exp.init_state_name
+
+        change_list = []
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, EXP_ID_1, change_list, '')
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': state_name,
+                'new_state_name': 'b',
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, EXP_ID_1, change_list, '')
+
+        exp_services.revert_exploration(
+            feconf.SYSTEM_COMMITTER_ID, EXP_ID_1, 3, 2)
+
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': state_name,
+                'new_state_name': 'b',
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, EXP_ID_1, change_list, '')
+        exp = exp_fetchers.get_exploration_by_id(EXP_ID_1)
+        self.assertEqual(exp.version, 5)
+
+        exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, EXP_ID_1)
+
+        # The call to delete_exploration() causes some tasks to be started. So,
+        # we flush them before running the job.
+        self.process_and_flush_pending_tasks()
+
+        output = self.run_one_off_job()
+        self.assertEqual(
+            output, [u'[u\'Deleted all stats\', [u\'' + EXP_ID_1 + '\']]',
+                     u'[u\'No change\', 1]'])
+
+        all_models = (
+            stats_models.ExplorationStatsModel.get_multi_stats_models(
+                [exp_domain.ExpVersionReference(exp.id, version)
+                 for version in python_utils.RANGE(1, exp.version + 1)]))
+        for model in all_models:
+            self.assertEqual(model, None)

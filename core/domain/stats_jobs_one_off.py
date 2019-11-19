@@ -1257,6 +1257,14 @@ class RegenerateMissingV2StatsModelsOneOffJob(
             stats_models.ExplorationStatsModel.get_multi_stats_models(
                 [exp_domain.ExpVersionReference(exp.id, version)
                  for version in python_utils.RANGE(1, exp.version + 1)]))
+
+        if exp.deleted:
+            for model in all_models:
+                if model:
+                    model.delete()
+            yield ('Deleted all stats', exp.id)
+            return
+
         first_missing_version = None
         for version, model in enumerate(all_models):
             if model is None:
