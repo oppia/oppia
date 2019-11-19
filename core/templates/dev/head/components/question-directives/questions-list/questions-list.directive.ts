@@ -268,7 +268,7 @@ angular.module('oppia').directive('questionsList', [
                       var idIndex = $scope.linkedSkillsWithDifficulty.map(
                         function(linkedSkillWithDifficulty) {
                           return linkedSkillWithDifficulty.getId();
-                        }).indexOf(skillId);
+                        }).indexOf(summary.id);
                       $scope.linkedSkillsWithDifficulty.splice(idIndex, 1);
                       summary.isSelected = false;
                     }

@@ -43,7 +43,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
     var _skillIsInitialized = false;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
-    var _groupedSkillSummaries = {};
+    var _groupedSkillSummaries = {
+      current: [],
+      others: []
+    };
 
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
