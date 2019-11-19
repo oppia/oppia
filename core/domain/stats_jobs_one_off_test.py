@@ -1495,13 +1495,13 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
              + self.EXP_ID + '\']]'])
 
     def test_job_cleans_up_stats_models_for_deleted_exps(self):
-        EXP_ID_1 = 'EXP_ID_1'
-        exp = self.save_new_valid_exploration(EXP_ID_1, 'owner_id')
+        exp_id_1 = 'EXP_ID_1'
+        exp = self.save_new_valid_exploration(exp_id_1, 'owner_id')
         state_name = exp.init_state_name
 
         change_list = []
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, EXP_ID_1, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -1510,10 +1510,10 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, EXP_ID_1, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
 
         exp_services.revert_exploration(
-            feconf.SYSTEM_COMMITTER_ID, EXP_ID_1, 3, 2)
+            feconf.SYSTEM_COMMITTER_ID, exp_id_1, 3, 2)
 
         change_list = [
             exp_domain.ExplorationChange({
@@ -1523,11 +1523,11 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, EXP_ID_1, change_list, '')
-        exp = exp_fetchers.get_exploration_by_id(EXP_ID_1)
+            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+        exp = exp_fetchers.get_exploration_by_id(exp_id_1)
         self.assertEqual(exp.version, 5)
 
-        exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, EXP_ID_1)
+        exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, exp_id_1)
 
         # The call to delete_exploration() causes some tasks to be started. So,
         # we flush them before running the job.
@@ -1535,7 +1535,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
 
         output = self.run_one_off_job()
         self.assertEqual(
-            output, [u'[u\'Deleted all stats\', [u\'' + EXP_ID_1 + '\']]',
+            output, [u'[u\'Deleted all stats\', [u\'' + exp_id_1 + '\']]',
                      u'[u\'No change\', 1]'])
 
         all_models = (
