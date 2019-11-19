@@ -120,13 +120,21 @@ class QuestionSkillLinkHandler(base.BaseHandler):
         question.
         """
         if self.payload.get('action') == 'update_difficulty':
-            new_difficulty = float(self.payload.get('new_difficulty'))
+            new_difficulty = self.payload.get('new_difficulty')
             skill_id = self.payload.get('skill_id')
+            if skill_id is None or new_difficulty is None:
+                raise self.InvalidInputException(
+                    'Missing fields \'new_difficulty\' and '
+                    '\'skill_id\'in payload')
             question_services.update_question_skill_link_difficulty(
-                question_id, skill_id, new_difficulty)
+                question_id, skill_id, float(new_difficulty))
         elif self.payload.get('action') == 'edit_links':
             difficulty = self.payload.get('difficulty')
             skill_ids_task_list = self.payload.get('skill_ids_task_list')
+            if skill_ids_task_list is None or difficulty is None:
+                raise self.InvalidInputException(
+                    'Missing fields \'difficulty\' and '
+                    '\'skill_ids_task_list\'in payload')
             for task_dict in skill_ids_task_list:
                 if task_dict['task'] == 'remove':
                     question_services.delete_question_skill_link(
@@ -134,6 +142,8 @@ class QuestionSkillLinkHandler(base.BaseHandler):
                 elif task_dict['task'] == 'add':
                     question_services.create_new_question_skill_link(
                         self.user_id, question_id, task_dict['id'], difficulty)
+        else:
+            raise self.InvalidInputException('Invalid action in payload.')
 
         self.render_json(self.values)
 
