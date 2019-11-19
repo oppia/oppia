@@ -8,10 +8,10 @@
       <p ng-class="{'has-error': !tmpSkillDescription.length > 0}">
         <input type="text" class="form-control protractor-test-skill-description-field" ng-if="canEditSkillDescription()"
                ng-model="tmpSkillDescription" ng-blur="saveSkillDescription(tmpSkillDescription)"
-               maxlength="40" ng-trim="false">
+               maxlength="100" ng-trim="false">
         <span ng-if="!canEditSkillDescription()"><[tmpSkillDescription]></span>
-        <span ng-if="tmpSkillDescription.length === 40" class="form-text" style="color: red; font-size: smaller">
-          <em>Please use at most 40 characters.</em>
+        <span ng-if="tmpSkillDescription.length === 100" class="form-text" style="color: red; font-size: smaller">
+          <em>Please use at most 100 characters.</em>
         </span>
       </p>
     </div>
