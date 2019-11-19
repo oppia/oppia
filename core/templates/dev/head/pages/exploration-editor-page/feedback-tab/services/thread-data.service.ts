@@ -83,15 +83,12 @@ angular.module('oppia').factory('ThreadDataService', [
       getData: function() {
         return _data;
       },
-      fetchThreads: function(onSuccess) {
+      fetchThreads: function() {
         return $http.get(_THREAD_LIST_HANDLER_URL).then(response => {
           _data.feedbackThreads = response.data.feedback_thread_dicts.map(
             _setFeedbackThreadFromBackendDict);
           _data.suggestionThreads = response.data.suggestion_thread_dicts.map(
             _setSuggestionThreadFromBackendDict);
-          if (onSuccess) {
-            onSuccess();
-          }
           return _data;
         });
       },
@@ -113,7 +110,7 @@ angular.module('oppia').factory('ThreadDataService', [
       getOpenThreadsCount: function() {
         return _openThreadsCount;
       },
-      createNewThread: function(newSubject, newText, onSuccess) {
+      createNewThread: function(newSubject, newText) {
         return $http.post(_THREAD_LIST_HANDLER_URL, {
           state_name: null,
           subject: newSubject,
@@ -123,7 +120,7 @@ angular.module('oppia').factory('ThreadDataService', [
           return this.fetchThreads();
         }, () => {
           AlertsService.addWarning('Error creating new thread.');
-        }).then(onSuccess);
+        });
       },
       markThreadAsSeen: function(threadId) {
         return $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
@@ -131,7 +128,7 @@ angular.module('oppia').factory('ThreadDataService', [
         });
       },
       addNewMessage: function(
-          threadId, newMessage, newStatus, onSuccess, onFailure) {
+          threadId, newMessage, newStatus) {
         var thread = _threadsById[threadId];
         if (!thread) {
           return $q.reject('Can not add message to nonexistent thread.');
@@ -151,11 +148,10 @@ angular.module('oppia').factory('ThreadDataService', [
             _openThreadsCount -= 1;
           }
           return this.fetchMessages(threadId);
-        }).then(onSuccess, onFailure);
+        });
       },
       resolveSuggestion: function(
-          threadId, action, commitMessage, reviewMessage, audioUpdateRequired,
-          onSuccess, onFailure) {
+          threadId, action, commitMessage, reviewMessage, audioUpdateRequired) {
         var thread = _threadsById[threadId];
         if (!thread) {
           return $q.reject('Can not add message to nonexistent thread.');
@@ -172,7 +168,7 @@ angular.module('oppia').factory('ThreadDataService', [
           thread.status =
             action === ACTION_ACCEPT_SUGGESTION ? STATUS_FIXED : STATUS_IGNORED;
           _openThreadsCount -= 1;
-        }).then(onSuccess, onFailure);
+        });
       },
     };
   }
