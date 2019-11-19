@@ -33,23 +33,13 @@ angular.module('oppia').directive('suggestionImprovementTask', [
         '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
         function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
           $scope.getLatestMessage = function() {
-            var numMessages = $scope.getData().messages.length;
-            if (numMessages > 1) {
-              var latestMessage = $scope.getData().messages[numMessages - 1];
-              return {
-                text: latestMessage.text,
-                author: latestMessage.author_username,
-                updatedOn: latestMessage.created_on,
-                updatedStatus: latestMessage.updated_status,
-              };
-            } else {
-              return {
-                text: $scope.getData().subject,
-                author: $scope.getData().originalAuthorName,
-                updatedOn: $scope.getData().lastUpdated,
-                updatedStatus: null,
-              };
-            }
+            var data = $scope.getData().threadSummary;
+            return {
+              text: data.lastMessageText,
+              author: data.authorLastMessage,
+              updatedOn: data.lastUpdated,
+              updatedStatus: data.totalMessageCount === 1 ? null : data.status,
+            };
           };
 
           $scope.getHumanReadableUpdatedStatus = function() {

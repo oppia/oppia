@@ -126,11 +126,9 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'feedback-thread-modal.template.html'),
           resolve: {
-            isUserLoggedIn: function() {
-              return UserService.getUserInfoAsync().then(function(userInfo) {
-                return userInfo.isLoggedIn();
-              });
-            },
+            isUserLoggedIn: UserService.getUserInfoAsync().then(
+              userInfo => userInfo.isLoggedIn()),
+            threadMessages: ThreadDataService.fetchMessages(thread.threadId),
           },
           controller: [
             '$scope', '$uibModalInstance', 'isUserLoggedIn',
@@ -194,11 +192,9 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'suggestion-thread-modal.template.html'),
           resolve: {
-            isUserLoggedIn: function() {
-              return UserService.getUserInfoAsync().then(function(userInfo) {
-                return userInfo.isLoggedIn();
-              });
-            },
+            isUserLoggedIn: UserService.getUserInfoAsync().then(
+              userInfo => userInfo.isLoggedIn()),
+            threadMessages: ThreadDataService.fetchMessages(thread.threadId),
           },
           controller: [
             '$scope', '$uibModalInstance', 'isUserLoggedIn',
