@@ -1432,6 +1432,45 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_content_ids_for_text_translation(), [
                 'feedback_2', 'feedback_1'])
 
+    def test_get_translated_content_in_non_existing_language_raise_error(self):
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': '<p> In English.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        translated_content = written_translations.get_translated_content(
+            'content', 'en')
+        self.assertEqual(translated_content, '<p> In English.</p>')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Translation for the given content_id content does not '
+            'exist in hi language code'):
+            written_translations.get_translated_content('content', 'hi')
+
+    def test_get_translated_content_for_invalid_content_id_raise_error(self):
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': '<p> In English.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        translated_content = written_translations.get_translated_content(
+            'content', 'en')
+        self.assertEqual(translated_content, '<p> In English.</p>')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid content_id: invalid_id'):
+            written_translations.get_translated_content('invalid_id', 'hi')
+
     def test_add_content_id_for_translations_adds_content_id(self):
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {}

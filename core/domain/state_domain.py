@@ -930,6 +930,31 @@ class WrittenTranslations(python_utils.OBJECT):
         """
         return list(self.translations_mapping.keys())
 
+    def get_translated_content(self, content_id, language_code):
+        """Returns the translated content for the given content_id in the given
+        language.
+
+        Args:
+            content_id: str. The ID of the content.
+            language_code: str. The language code for the translated content.
+
+        Returns:
+            str. The translated content for a given content id in a language.
+
+        Raises:
+            Exception: Translation doesn't exist in the given language.
+            Exception: The given content id doesn't exist.
+        """
+        if content_id in self.translations_mapping:
+            if language_code in self.translations_mapping[content_id]:
+                return self.translations_mapping[content_id][language_code].html
+            else:
+                raise Exception(
+                    'Translation for the given content_id %s does not exist in '
+                    '%s language code' % (content_id, language_code))
+        else:
+            raise Exception('Invalid content_id: %s' % content_id)
+
     def add_content_id_for_translation(self, content_id):
         """Adds a content id as a key for the translation into the
         content_translation dict.

@@ -50,6 +50,7 @@
 # Community contribution project
 /core/controllers/community_dashboard*.py @DubeySandeep
 /core/domain/opportunity*.py @DubeySandeep
+/core/domain/voiceover_services*.py @DubeySandeep
 /core/storage/opportunity/ @DubeySandeep
 /core/templates/dev/head/pages/community-dashboard-page/ @DubeySandeep
 

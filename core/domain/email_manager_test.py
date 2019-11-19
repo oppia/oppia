@@ -2172,6 +2172,122 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
                 email_intent)
 
 
+class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
+    """Unit test related to voiceover application emails."""
+    APPLICANT_USERNAME = 'applicant'
+    APPLICANT_EMAIL = 'applicant@example.com'
+
+    def setUp(self):
+        super(VoiceoverApplicationEmailUnitTest, self).setUp()
+        self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
+        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
+        user_services.update_email_preferences(
+            self.applicant_id, True, False, False, False)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
+
+    def test_that_email_not_sent_if_can_send_emails_is_false(self):
+        with self.can_not_send_emails_ctx:
+            email_manager.send_accepted_voiceover_application_email(
+                self.applicant_id, 'Lesson to voiceover', 'en')
+
+        messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+        self.assertEqual(len(messages), 0)
+
+    def test_that_correct_accepted_voiceover_application_email_is_sent(self):
+        expected_email_subject = (
+            '[Accepted] Updates on submitted voiceover application')
+        expected_email_html_body = (
+            'Hi applicant,<br><br>'
+            'Congratulations! Your voiceover application for '
+            '"Lesson to voiceover" lesson got accepted and you have been '
+            'assigned with a voice artist role in the lesson. Now you will be '
+            'able to add voiceovers to the lesson in English '
+            'language.'
+            '<br><br>You can check the wiki page to learn'
+            '<a href="https://github.com/oppia/oppia/wiki/'
+            'Instructions-for-voice-artists">how to voiceover a lesson</a>'
+            '<br><br>'
+            'Thank you for helping improve Oppia\'s lessons!'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_accepted_voiceover_application_email(
+                self.applicant_id, 'Lesson to voiceover', 'en')
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.applicant_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.APPLICANT_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
+
+    def test_that_correct_rejected_voiceover_application_email_is_sent(self):
+        expected_email_subject = 'Updates on submitted voiceover application'
+        expected_email_html_body = (
+            'Hi applicant,<br><br>'
+            'Your voiceover application for "Lesson to voiceover" lesson in '
+            'language English got rejected and the reviewer has left a message.'
+            '<br><br>Review message: A rejection message!<br><br>'
+            'You can create a new voiceover application through the'
+            '<a href="https://oppia.org/community_dashboard">'
+            'community dashboard</a> page.<br><br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_rejected_voiceover_application_email(
+                self.applicant_id, 'Lesson to voiceover', 'en',
+                'A rejection message!')
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.applicant_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.APPLICANT_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
+
+
 class BulkEmailsTests(test_utils.GenericTestBase):
     SENDER_EMAIL = 'sender@example.com'
     SENDER_USERNAME = 'sender'

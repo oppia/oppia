@@ -423,3 +423,22 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         return cls.query(ndb.AND(
             cls.author_id != user_id,
             cls.status == STATUS_IN_REVIEW)).fetch()
+
+    @classmethod
+    def get_voiceover_applications(cls, target_type, target_id, language_code):
+        """Returns a list of voiceover applications submitted for a give entity
+        in a given language.
+
+        Args:
+            target_type: str. The type of entity.
+            target_id: str. The ID of the targeted entity.
+            language_code: str. The code of the language in which the voiceover
+                application is submitted.
+
+        Returns:
+            list(GeneralVoiceoverApplicationModel). The list of voiceover
+            application which is submitted to a give entity in a given language.
+        """
+        return cls.query(ndb.AND(
+            cls.target_type == target_type, cls.target_id == target_id,
+            cls.language_code == language_code)).fetch()

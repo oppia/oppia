@@ -315,3 +315,16 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_base64_from_int(self):
         base64_number = utils.base64_from_int(108)
         self.assertEqual(base64.b64decode(base64_number), '[108]')
+
+    def test_get_supported_audio_language_description_with_invalid_code(self):
+        valid_language_code = 'en'
+        expected_language_description = 'English'
+        self.assertEqual(
+            utils.get_supported_audio_language_description(valid_language_code),
+            expected_language_description)
+
+        invalid_language_code = 'invalid_code'
+        with self.assertRaisesRegexp(
+            Exception, 'Unsupported audio language code: invalid_code'):
+            utils.get_supported_audio_language_description(
+                invalid_language_code)
