@@ -18,5 +18,6 @@
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
+export default INTERACTION_SPECS;
 angular.module('oppia').constant(
   'INTERACTION_SPECS', INTERACTION_SPECS);

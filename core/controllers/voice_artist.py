@@ -59,11 +59,11 @@ def _save_audio_file(
 
     if dot_index == -1 or dot_index == 0:
         raise Exception(
-            'No filename extension: it should have '
+            'No filename extension provided. It should have '
             'one of the following extensions: %s' % allowed_formats)
     if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
         raise Exception(
-            'Invalid filename extension: it should have '
+            'Invalid filename extension provided. It should have '
             'one of the following extensions: %s' % allowed_formats)
 
     tempbuffer = python_utils.string_io()
@@ -152,7 +152,7 @@ class UserVoicoverApplicationsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_voiceover_applications
+    @acl_decorators.can_view_voiceover_applications
     def get(self, purpose):
         """Handles GET requests."""
         if purpose == feconf.VOICEOVER_APPLICATION_REVIEW:
@@ -210,11 +210,15 @@ class VoicoverApplicationHandler(base.BaseHandler):
                 raw_audio_file, filename,
                 feconf.ENTITY_TYPE_VOICEOVER_APPLICATION, target_id,
                 self.user_id)
+        except Exception as e:
+            raise self.InvalidInputException(e)
+
+        try:
             voiceover_services.create_new_voiceover_application(
                 target_type, target_id, language_code, voiceover_content,
                 filename, self.user_id)
-        except Exception as e:
-            raise self.InvalidInputException(e)
+        except utils.ValidationError as e:
+             raise self.InvalidInputException(e)
 
         self.render_json({})
 
