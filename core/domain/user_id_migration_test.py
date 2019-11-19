@@ -45,14 +45,14 @@ class UserIdJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = user_id_migration.UserIdJob.create_new()
-        user_id_migration.UserIdJob.enqueue(job_id)
+        job_id = user_id_migration.UserIdMigrationJob.create_new()
+        user_id_migration.UserIdMigrationJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            user_id_migration.UserIdJob.get_output(job_id))
+            user_id_migration.UserIdMigrationJob.get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item)
                        for stringified_item in stringified_output]
         return eval_output

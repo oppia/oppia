@@ -114,13 +114,13 @@ class BaseModel(ndb.Model):
 
     @staticmethod
     def get_user_id_migration_policy():
-        """This method should be implemented by subclasses.
+        """Returns a user id migration policy for the model. NOT_APPLICABLE is
+        used by default and it is overridden in models that contain user ID.
 
-        Raises:
-            NotImplementedError: The method is not overwritten in a derived
-                class.
+        Return:
+            enum. Migration policy for the specific model.
         """
-        raise NotImplementedError
+        return USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_user_id_migration_field(cls):

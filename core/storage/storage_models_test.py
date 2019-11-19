@@ -120,25 +120,19 @@ class StorageModelsTest(test_utils.GenericTestBase):
                         msg='has_reference_to_user_id is not defined for %s' % (
                             clazz.__name__))
 
-    def test_base_or_versioned_child_classes_have_get_user_id_migration_policy(
-            self):
+    def test_all_model_classes_have_get_user_id_migration_policy(self):
         for clazz in self._get_base_or_versioned_model_child_classes():
-            if (clazz.get_deletion_policy() !=
-                    base_models.DELETION_POLICY.NOT_APPLICABLE):
-                try:
-                    self.assertIn(
-                        clazz.get_user_id_migration_policy(),
-                        base_models.USER_ID_MIGRATION_POLICY.__dict__)
-                except NotImplementedError:
-                    self.fail(
-                        msg='get_user_id_migration_policy is not defined for %s'
-                        % clazz.__name__)
+            try:
+                self.assertIn(
+                    clazz.get_user_id_migration_policy(),
+                    base_models.USER_ID_MIGRATION_POLICY.__dict__)
+            except NotImplementedError:
+                self.fail(
+                    msg='get_user_id_migration_policy is not defined for %s'
+                    % clazz.__name__)
 
-    def test_base_or_versioned_child_classes_have_migrate_model(
-            self):
+    def test_all_model_classes_have_migrate_model(self):
         for clazz in self._get_base_or_versioned_model_child_classes():
-            if (clazz.get_deletion_policy() !=
-                    base_models.DELETION_POLICY.NOT_APPLICABLE and
-                    clazz.get_user_id_migration_policy() !=
+            if (clazz.get_user_id_migration_policy() ==
                     base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
                 self.assertTrue(hasattr(clazz, 'migrate_model'))

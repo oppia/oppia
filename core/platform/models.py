@@ -54,17 +54,6 @@ class _Gae(Platform):
     GAE (Google App Engine).
     """
 
-    # List of model classes that are not actually storaged but are inherited
-    # from in other models.
-    BASE_CLASSES = (
-        'BaseMapReduceBatchResultsModel',
-        'BaseModel',
-        'BaseSnapshotContentModel',
-        'BaseSnapshotMetadataModel',
-        'VersionedModel',
-        'BaseCommitLogEntryModel',
-    )
-
     @classmethod
     def import_models(cls, model_names):
         """Imports and returns the storage modules listed in model_names.
@@ -146,7 +135,7 @@ class _Gae(Platform):
         return tuple(returned_models)
 
     @classmethod
-    def import_all_storage_model_classes(cls):
+    def get_all_storage_model_classes(cls):
         """Imports and returns all model classes that are in the storage, not
         model classes that are just inherited from.
 
@@ -155,15 +144,15 @@ class _Gae(Platform):
         """
         model_classes = []
         for module in cls.import_models(
-                cls, [name for name in NAMES.__dict__ if '__' not in name]):
+                [name for name in NAMES.__dict__
+                 if '__' not in name and name != 'base_model']):
             for member_name, member_obj in inspect.getmembers(module):
                 if inspect.isclass(member_obj):
                     clazz = getattr(module, member_name)
                     all_base_classes = [
                         base_class.__name__ for base_class in inspect.getmro(
                             clazz)]
-                    if ('Model' in all_base_classes and
-                            member_name not in _Gae.BASE_CLASSES):
+                    if 'Model' in all_base_classes:
                         model_classes.append(clazz)
         return model_classes
 
@@ -307,13 +296,13 @@ class Registry(python_utils.OBJECT):
         return cls._get().import_models(model_names)
 
     @classmethod
-    def import_all_storage_model_classes(cls):
+    def get_all_storage_model_classes(cls):
         """Imports and returns all the storage models.
 
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-        return cls._get().import_all_storage_model_classes()
+        return cls._get().get_all_storage_model_classes()
 
     @classmethod
     def import_current_user_services(cls):

@@ -248,7 +248,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 new_user_id if viewer_id == old_user_id else viewer_id
                 for viewer_id in model.viewer_ids]
             migrated_models.append(model)
-        CollectionRightsModel.put_multi(
+        cls.put_multi(
             migrated_models, update_last_updated_time=False)
 
     def save(self, committer_id, commit_message, commit_cmds):
@@ -520,6 +520,35 @@ class CollectionSummaryModel(base_models.BaseModel):
     def get_user_id_migration_policy():
         """CollectionSummaryModel has multiple fields with user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the owner_ids, editor_ids,
+        viewer_ids and contributor_ids.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.owner_ids == old_user_id, cls.editor_ids == old_user_id,
+                cls.viewer_ids == old_user_id,
+                cls.contributor_ids == old_user_id)).fetch():
+            model.owner_ids = [
+                new_user_id if owner_id == old_user_id else owner_id
+                for owner_id in model.owner_ids]
+            model.editor_ids = [
+                new_user_id if editor_id == old_user_id else editor_id
+                for editor_id in model.editor_ids]
+            model.viewer_ids = [
+                new_user_id if viewer_id == old_user_id else viewer_id
+                for viewer_id in model.viewer_ids]
+            model.contributor_ids = [
+                new_user_id if contributor_id == old_user_id else contributor_id
+                for contributor_id in model.contributor_ids]
+            migrated_models.append(model)
+        cls.put_multi(migrated_models, update_last_updated_time=False)
 
     @classmethod
     def get_non_private(cls):

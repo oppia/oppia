@@ -440,7 +440,7 @@ class TopicRightsModel(base_models.VersionedModel):
                 new_user_id if manager_id == old_user_id else manager_id
                 for manager_id in model.manager_ids]
             migrated_models.append(model)
-        TopicRightsModel.put_multi(
+        cls.put_multi(
             migrated_models, update_last_updated_time=False)
 
     @classmethod

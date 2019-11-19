@@ -163,6 +163,24 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the author_id and
+        final_reviewer_id.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        for model in cls.query(ndb.OR(
+                cls.author_id == old_user_id,
+                cls.final_reviewer_id == old_user_id)).fetch():
+            if model.author_id == old_user_id:
+                model.author_id = new_user_id
+            if model.final_reviewer_id == old_user_id:
+                model.final_reviewer_id = new_user_id
+            model.put(update_last_updated_time=False)
+
+    @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
             target_version_at_submission, status, author_id,
@@ -396,6 +414,24 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         ID.
         """
         return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the author_id and
+        final_reviewer_id.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        for model in cls.query(ndb.OR(
+                cls.author_id == old_user_id,
+                cls.final_reviewer_id == old_user_id)).fetch():
+            if model.author_id == old_user_id:
+                model.author_id = new_user_id
+            if model.final_reviewer_id == old_user_id:
+                model.final_reviewer_id = new_user_id
+            model.put(update_last_updated_time=False)
 
     @classmethod
     def get_user_voiceover_applications(cls, author_id, status=None):

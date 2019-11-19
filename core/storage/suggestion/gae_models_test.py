@@ -115,6 +115,39 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             .get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
+    def test_migrate_model(self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED, 'author_old_id',
+            'reviewer_old_id', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_6')
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED, 'author_old_id',
+            None, self.change_cmd, self.score_category,
+            'exploration.exp1.thread_7')
+
+        suggestion_models.GeneralSuggestionModel.migrate_model(
+            'author_old_id', 'author_new_id')
+        suggestion_models.GeneralSuggestionModel.migrate_model(
+            'reviewer_old_id', 'reviewer_new_id')
+
+        suggestion_model_1 = suggestion_models.GeneralSuggestionModel.get_by_id(
+            'exploration.exp1.thread_6')
+        self.assertEqual(suggestion_model_1.author_id, 'author_new_id')
+        self.assertEqual(
+            suggestion_model_1.final_reviewer_id, 'reviewer_new_id')
+
+        suggestion_model_2 = suggestion_models.GeneralSuggestionModel.get_by_id(
+            'exploration.exp1.thread_7')
+        self.assertEqual(suggestion_model_2.author_id, 'author_new_id')
+        self.assertIsNone(suggestion_model_2.final_reviewer_id)
+
     def test_score_type_contains_delimiter(self):
         for score_type in suggestion_models.SCORE_TYPE_CHOICES:
             self.assertTrue(
@@ -490,6 +523,47 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralVoiceoverApplicationModel
             .get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_migrate_model(self):
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_1_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='author_old_id',
+            final_reviewer_id='reviewer_old_id',
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_2_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='author_old_id',
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        suggestion_models.GeneralVoiceoverApplicationModel.migrate_model(
+            'author_old_id', 'author_new_id')
+        suggestion_models.GeneralVoiceoverApplicationModel.migrate_model(
+            'reviewer_old_id', 'reviewer_new_id')
+
+        voiceover_model_1 = (suggestion_models.GeneralVoiceoverApplicationModel
+                             .get_by_id('application_1_id'))
+        self.assertEqual(voiceover_model_1.author_id, 'author_new_id')
+        self.assertEqual(
+            voiceover_model_1.final_reviewer_id, 'reviewer_new_id')
+
+        voiceover_model_1 = (suggestion_models.GeneralVoiceoverApplicationModel
+                             .get_by_id('application_2_id'))
+        self.assertEqual(voiceover_model_1.author_id, 'author_new_id')
+        self.assertIsNone(voiceover_model_1.final_reviewer_id)
 
     def test_get_user_voiceover_applications(self):
         author_id = 'author'

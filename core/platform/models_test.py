@@ -188,6 +188,11 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         with self.assertRaises(Exception):
             self.registry_instance.import_models([''])
 
+    def test_get_all_storage_model_classes(self):
+        """Tests get_all_storage_model_classes."""
+        classes = self.registry_instance.get_all_storage_model_classes()
+        self.assertIsNot(classes, [])
+
     def test_import_current_user_services(self):
         """Tests import current user services function."""
         from core.platform.users import gae_current_user_services

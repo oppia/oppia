@@ -69,9 +69,9 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
 
 class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionRightsModel class."""
-    COLLECTION_ID_1 = 1
-    COLLECTION_ID_2 = 2
-    COLLECTION_ID_3 = 3
+    COLLECTION_ID_1 = '1'
+    COLLECTION_ID_2 = '2'
+    COLLECTION_ID_3 = '3'
     USER_ID_1 = 'id_1'  # Related to all three collections
     USER_ID_2 = 'id_2'  # Related to a subset of the three collections
     USER_ID_3 = 'id_3'  # Related to no collections
@@ -393,6 +393,16 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     """Tests for the CollectionSummaryModel."""
 
+    COLLECTION_ID_1 = '1'
+    COLLECTION_ID_2 = '2'
+    COLLECTION_ID_3 = '3'
+    USER_ID_1_OLD = 'id_1_old'
+    USER_ID_1_NEW = 'id_1_new'
+    USER_ID_2_OLD = 'id_2_old'
+    USER_ID_2_NEW = 'id_2_new'
+    USER_ID_3_OLD = 'id_3_old'
+    USER_ID_3_NEW = 'id_3_new'
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             collection_models.CollectionSummaryModel.get_deletion_policy(),
@@ -432,6 +442,86 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionSummaryModel
             .get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_migrate_model(self):
+        collection_models.CollectionSummaryModel(
+            id=self.COLLECTION_ID_1,
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            owner_ids=[
+                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
+            editor_ids=[
+                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
+            viewer_ids=[
+                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
+            contributor_ids=[
+                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
+        ).put()
+        collection_models.CollectionSummaryModel(
+            id=self.COLLECTION_ID_2,
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            owner_ids=[self.USER_ID_1_OLD],
+            editor_ids=[self.USER_ID_1_OLD],
+            viewer_ids=[self.USER_ID_2_OLD],
+            contributor_ids=[self.USER_ID_3_OLD],
+        ).put()
+        collection_models.CollectionSummaryModel(
+            id=self.COLLECTION_ID_3,
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            owner_ids=[self.USER_ID_1_OLD, self.USER_ID_2_OLD],
+            editor_ids=[self.USER_ID_2_OLD],
+            viewer_ids=[],
+            contributor_ids=[self.USER_ID_3_OLD],
+        ).put()
+
+        collection_models.CollectionSummaryModel.migrate_model(
+            self.USER_ID_1_OLD, self.USER_ID_1_NEW)
+        collection_models.CollectionSummaryModel.migrate_model(
+            self.USER_ID_2_OLD, self.USER_ID_2_NEW)
+        collection_models.CollectionSummaryModel.migrate_model(
+            self.USER_ID_3_OLD, self.USER_ID_3_NEW)
+
+        migrated_model_1 = collection_models.CollectionSummaryModel.get_by_id(
+            self.COLLECTION_ID_1)
+        self.assertEqual(
+            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
+            migrated_model_1.owner_ids)
+        self.assertEqual(
+            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
+            migrated_model_1.editor_ids)
+        self.assertEqual(
+            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
+            migrated_model_1.viewer_ids)
+        self.assertEqual(
+            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
+            migrated_model_1.contributor_ids)
+
+        migrated_model_2 = collection_models.CollectionSummaryModel.get_by_id(
+            self.COLLECTION_ID_2)
+        self.assertEqual([self.USER_ID_1_NEW], migrated_model_2.owner_ids)
+        self.assertEqual([self.USER_ID_1_NEW], migrated_model_2.editor_ids)
+        self.assertEqual([self.USER_ID_2_NEW], migrated_model_2.viewer_ids)
+        self.assertEqual([self.USER_ID_3_NEW], migrated_model_2.contributor_ids)
+
+        migrated_model_3 = collection_models.CollectionSummaryModel.get_by_id(
+            self.COLLECTION_ID_3)
+        self.assertEqual(
+            [self.USER_ID_1_NEW, self.USER_ID_2_NEW],
+            migrated_model_3.owner_ids)
+        self.assertEqual([self.USER_ID_2_NEW], migrated_model_3.editor_ids)
+        self.assertEqual([], migrated_model_3.viewer_ids)
+        self.assertEqual([self.USER_ID_3_NEW], migrated_model_3.contributor_ids)
 
     def test_get_non_private(self):
         public_collection_summary_model = (

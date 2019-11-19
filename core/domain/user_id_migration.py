@@ -24,7 +24,7 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 
 
-class UserIdJob(jobs.BaseMapReduceOneOffJobManager):
+class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating new user ids for all the users and re-adding
     models that use the user id.
     """
@@ -63,7 +63,7 @@ class UserIdJob(jobs.BaseMapReduceOneOffJobManager):
             migration_field == old_user_id).fetch()
         for model in found_models:
             model_values = model.to_dict()
-            model_values[migration_field.__name__] = new_user_id
+            model_values[migration_field._name] = new_user_id  # pylint: disable=protected-access
             model.populate(**model_values)
             model.put(update_last_updated_time=False)
 
@@ -77,24 +77,21 @@ class UserIdJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function for this job."""
         old_user_id = user_model.id
         new_user_id = user_models.UserSettingsModel.get_new_id('user')
-        for model_class in models.Registry.import_all_storage_model_classes():
-            if (model_class.get_deletion_policy() ==
-                    base_models.DELETION_POLICY.NOT_APPLICABLE):
-                continue
-            elif (model_class.get_user_id_migration_policy() ==
-                  base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE):
+        for model_class in models.Registry.get_all_storage_model_classes():
+            if (model_class.get_user_id_migration_policy() ==
+                    base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE):
                 continue
             elif (model_class.get_user_id_migration_policy() ==
                   base_models.USER_ID_MIGRATION_POLICY.COPY):
-                UserIdJob._copy_model_with_new_id(
+                UserIdMigrationJob._copy_model_with_new_id(
                     model_class, old_user_id, new_user_id)
             elif (model_class.get_user_id_migration_policy() ==
                   base_models.USER_ID_MIGRATION_POLICY.COPY_PART):
-                UserIdJob._copy_model_with_new_id_and_user_id(
+                UserIdMigrationJob._copy_model_with_new_id_and_user_id(
                     model_class, old_user_id, new_user_id)
             elif (model_class.get_user_id_migration_policy() ==
                   base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
-                UserIdJob._change_model_with_one_user_id_field(
+                UserIdMigrationJob._change_model_with_one_user_id_field(
                     model_class, old_user_id, new_user_id)
             elif (model_class.get_user_id_migration_policy() ==
                   base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
