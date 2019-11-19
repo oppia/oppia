@@ -72,6 +72,7 @@ then
 fi
 
 set -e
+python -m scripts.install_third_party_libs
 python -m scripts.setup
 python -m scripts.setup_gae
 if [ "$TRAVIS" == 'true' ]; then

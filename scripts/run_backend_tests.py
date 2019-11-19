@@ -18,7 +18,28 @@ This should not be run directly. Instead, navigate to the oppia/ folder and
 execute:
 
     python -m scripts.run_backend_tests
+
+You can also append the following options to the above command:
+
+    --verbose prints the output of the tests to the console.
+
+    --test_target=core.controllers.editor_test runs only the tests in the
+        core.controllers.editor_test module. (You can change
+        "core.controllers.editor_test" to any valid module path.)
+
+    --test_path=core/controllers runs all tests in test files in the
+        core/controllers directory. (You can change "core/controllers" to any
+        valid subdirectory path.)
+
+    --generate_coverage_report generates a coverage report as part of the final
+        test output (but it makes the tests slower).
+
+Note: If you've made some changes and tests are failing to run at all, this
+might mean that you have introduced a circular dependency (e.g. module A
+imports module B, which imports module C, which imports module A). This needs
+to be fixed before the tests will run.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -472,14 +493,14 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.call(['python', COVERAGE_PATH, 'combine'])
-        subprocess.call([
+        subprocess.check_call(['python', COVERAGE_PATH, 'combine'])
+        subprocess.check_call([
             'python', COVERAGE_PATH, 'report',
             '--omit="%s*","third_party/*","/usr/share/*"'
             % common.OPPIA_TOOLS_DIR, '--show-missing'])
 
         python_utils.PRINT('Generating xml coverage report...')
-        subprocess.call(['python', COVERAGE_PATH, 'xml'])
+        subprocess.check_call(['python', COVERAGE_PATH, 'xml'])
 
     python_utils.PRINT('')
     python_utils.PRINT('Done!')

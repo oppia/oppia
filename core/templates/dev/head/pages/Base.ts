@@ -47,7 +47,7 @@ angular.module('oppia').controller('Base', [
       return UrlInterpolationService.getFullStaticAssetUrl(path);
     };
 
-    $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
+    $scope.isBackgroundMaskActive = () => BackgroundMaskService.isMaskActive();
     $scope.AlertsService = AlertsService;
     $rootScope.DEV_MODE = DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
@@ -102,8 +102,8 @@ angular.module('oppia').controller('Base', [
     });
 
     $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
-    $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
-    $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
+    $scope.isSidebarShown = () => SidebarStatusService.isSidebarShown();
+    $scope.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
 
     $scope.skipToMainContent = function() {
       var mainContentElement = document.getElementById(
