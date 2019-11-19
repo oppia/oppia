@@ -1,7 +1,7 @@
 <md-card class="md-padding">
   <div ng-style="infoCardBackgroundCss" class="oppia-info-card-logo-thumbnail">
     <img ng-src="<[getStaticImageUrl(infoCardBackgroundImageUrl)]>" class="oppia-info-card-bg-image">
-    <h2 class="oppia-info-card-title"><[explorationTitle]></h2>
+    <h2 ng-style="titleWrapper()" class="oppia-info-card-title"><[explorationTitle]></h2>
   </div>
 
   <div class="oppia-info-card-content">
