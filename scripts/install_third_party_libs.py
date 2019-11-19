@@ -219,8 +219,7 @@ def get_yarn_command():
                 origin_yarn_bin,
                 os.path.join(common.YARN_PATH, 'bin', 'yarn.sh'))
         return 'yarn.cmd'
-    else:
-        return 'yarn'
+    return 'yarn'
 
 
 def main(args=None):
