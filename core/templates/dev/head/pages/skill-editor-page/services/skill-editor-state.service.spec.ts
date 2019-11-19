@@ -65,10 +65,10 @@ describe('Skill editor state service', function() {
             skill: self.newBackendSkillObject,
             groupedSkillSummaries: {
               Name: [{
-                id: 'skill_id_1',
+                id: '1',
                 description: 'Description 1'
               }, {
-                id: 'skill_id_2',
+                id: '2',
                 description: 'Description 2'
               }]
             }
@@ -274,9 +274,11 @@ describe('Skill editor state service', function() {
     expect(SkillEditorStateService.hasLoadedSkill()).toBe(true);
     var groupedSkillSummaries =
       SkillEditorStateService.getGroupedSkillSummaries();
-    expect(groupedSkillSummaries.Name.length).toEqual(2);
-    expect(groupedSkillSummaries.Name[0].id).toEqual('skill_id_1');
-    expect(groupedSkillSummaries.Name[1].id).toEqual('skill_id_2');
+    expect(groupedSkillSummaries.current.length).toEqual(2);
+    expect(groupedSkillSummaries.others.length).toEqual(0);
+
+    expect(groupedSkillSummaries.current[0].id).toEqual('1');
+    expect(groupedSkillSummaries.current[1].id).toEqual('2');
   });
 
   it('should return the last skill loaded as the same object', function() {

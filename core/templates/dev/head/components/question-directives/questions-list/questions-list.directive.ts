@@ -215,7 +215,12 @@ angular.module('oppia').directive('questionsList', [
                 SkillDifficultyObjectFactory.create(
                   skillId, '', DEFAULT_SKILL_DIFFICULTY));
             });
-            var allSkillSummaries = ctrl.getAllSkillSummaries().map(
+            var sortedSkillSummaries =
+              ctrl.getGroupedSkillSummaries().current.concat(
+                ctrl.getGroupedSkillSummaries().others);
+            var countOfSkillsToPrioritize =
+              ctrl.getGroupedSkillSummaries().current.length;
+            var allSkillSummaries = sortedSkillSummaries.map(
               function(summary) {
                 summary.isSelected = false;
                 return summary;
@@ -229,30 +234,43 @@ angular.module('oppia').directive('questionsList', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   var init = function() {
+                    $scope.countOfSkillsToPrioritize =
+                      countOfSkillsToPrioritize;
                     $scope.instructionMessage = (
                       'Select the skill(s) to link the question to:');
                     $scope.currentMode = currentMode;
                     $scope.linkedSkillsWithDifficulty =
                       linkedSkillsWithDifficulty;
                     $scope.skillSummaries = allSkillSummaries;
+                    $scope.skillSummariesInitial = [];
+                    $scope.skillSummariesFinal = [];
+
+                    for (var idx in allSkillSummaries) {
+                      if (idx < countOfSkillsToPrioritize) {
+                        $scope.skillSummariesInitial.push(
+                          allSkillSummaries[idx]);
+                      } else {
+                        $scope.skillSummariesFinal.push(
+                          allSkillSummaries[idx]);
+                      }
+                    }
                     $scope.skillIdToRubricsObject = skillIdToRubricsObject;
                   };
 
-                  $scope.selectOrDeselectSkill = function(skillId, index) {
-                    if (!$scope.skillSummaries[index].isSelected) {
+                  $scope.selectOrDeselectSkill = function(summary) {
+                    if (!summary.isSelected) {
                       $scope.linkedSkillsWithDifficulty.push(
                         SkillDifficultyObjectFactory.create(
-                          skillId,
-                          $scope.skillSummaries[index].getDescription(),
+                          summary.id, summary.description,
                           DEFAULT_SKILL_DIFFICULTY));
-                      $scope.skillSummaries[index].isSelected = true;
+                      summary.isSelected = true;
                     } else {
                       var idIndex = $scope.linkedSkillsWithDifficulty.map(
                         function(linkedSkillWithDifficulty) {
                           return linkedSkillWithDifficulty.getId();
                         }).indexOf(skillId);
                       $scope.linkedSkillsWithDifficulty.splice(idIndex, 1);
-                      $scope.skillSummaries[index].isSelected = false;
+                      summary.isSelected = false;
                     }
                   };
 
@@ -554,36 +572,11 @@ angular.module('oppia').directive('questionsList', [
                     returnArray = [];
                   };
                   $scope.addSkill = function() {
-                    var sortedSkillSummaries = [];
-                    var topicName = null;
-                    var skillsInSameTopicCount = 0;
-                    for (var name in groupedSkillSummaries) {
-                      var skillSummaries = groupedSkillSummaries[name];
-                      for (var idx in skillSummaries) {
-                        if (skillSummaries[idx].id === selectedSkillId) {
-                          topicName = name;
-                          break;
-                        }
-                      }
-                      if (topicName !== null) {
-                        break;
-                      }
-                    }
-
-                    for (var idx in groupedSkillSummaries[topicName]) {
-                      skillsInSameTopicCount++;
-                      sortedSkillSummaries.push(
-                        groupedSkillSummaries[topicName][idx]);
-                    }
-                    for (var name in groupedSkillSummaries) {
-                      if (name === topicName) {
-                        continue;
-                      }
-                      var skillSummaries = groupedSkillSummaries[name];
-                      for (var idx in skillSummaries) {
-                        sortedSkillSummaries.push(skillSummaries[idx]);
-                      }
-                    }
+                    var skillsInSameTopicCount =
+                      groupedSkillSummaries.current.length;
+                    var sortedSkillSummaries =
+                      groupedSkillSummaries.current.concat(
+                        groupedSkillSummaries.others);
                     var modalInstance = $uibModal.open({
                       templateUrl:
                         UrlInterpolationService.getDirectiveTemplateUrl(

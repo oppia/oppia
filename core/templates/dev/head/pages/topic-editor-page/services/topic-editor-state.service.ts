@@ -71,11 +71,21 @@ angular.module('oppia').factory('TopicEditorStateService', [
     };
 
     var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
+      var sortedSkillSummaries = [];
+      _groupedSkillSummaries.current = [];
+      _groupedSkillSummaries.others = [];
+
+      for (var idx in groupedSkillSummaries[_topic.getName()]) {
+        _groupedSkillSummaries.current.push(
+          groupedSkillSummaries[_topic.getName()][idx]);
+      }
       for (var name in groupedSkillSummaries) {
-        _groupedSkillSummaries[name] = [];
-        var summaryDicts = groupedSkillSummaries[name];
-        for (var idx in summaryDicts) {
-          _groupedSkillSummaries[name].push(summaryDicts[idx]);
+        if (name === _topic.getName()) {
+          continue;
+        }
+        var skillSummaries = groupedSkillSummaries[name];
+        for (var idx in skillSummaries) {
+          _groupedSkillSummaries.others.push(skillSummaries[idx]);
         }
       }
     };
@@ -151,12 +161,12 @@ angular.module('oppia').factory('TopicEditorStateService', [
         EditableTopicBackendApiService.fetchTopic(
           topicId).then(
           function(newBackendTopicObject) {
-            _updateGroupedSkillSummaries(
-              newBackendTopicObject.groupedSkillSummaries);
             _updateTopic(
               newBackendTopicObject.topicDict,
               newBackendTopicObject.skillIdToDescriptionDict
             );
+            _updateGroupedSkillSummaries(
+              newBackendTopicObject.groupedSkillSummaries);
             _updateSkillIdToRubricsObject(
               newBackendTopicObject.skillIdToRubricsDict);
             EditableTopicBackendApiService.fetchStories(topicId).then(
