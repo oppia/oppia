@@ -30,11 +30,11 @@ require(
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
-  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED',
+  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
   function(
       $http, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
-      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED) {
+      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
     var _expId = ExplorationDataService.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
@@ -43,7 +43,6 @@ angular.module('oppia').factory('ThreadDataService', [
         'exploration/' + _expId + '/';
     var _THREAD_HANDLER_PREFIX = '/threadhandler/';
     var _FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
-    var _THREAD_STATUS_OPEN = 'open';
 
     // All the threads for this exploration. This is a list whose entries are
     // objects, each representing threads. The 'messages' key of this object
@@ -96,7 +95,7 @@ angular.module('oppia').factory('ThreadDataService', [
       },
       fetchMessages: function(threadId) {
         var thread = _threadsById[threadId];
-        if (thread === null) {
+        if (!thread) {
           return $q.reject('Can not fetch messages of nonexistent thread.');
         }
 
@@ -116,7 +115,7 @@ angular.module('oppia').factory('ThreadDataService', [
         return $http.post(_THREAD_LIST_HANDLER_URL, {
           state_name: null,
           subject: newSubject,
-          text: newText
+          text: newText,
         }).then(() => {
           _openThreadsCount += 1;
           return this.fetchThreads();
@@ -126,53 +125,53 @@ angular.module('oppia').factory('ThreadDataService', [
       },
       markThreadAsSeen: function(threadId) {
         return $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
-          thread_id: threadId
+          thread_id: threadId,
         });
       },
       addNewMessage: function(
           threadId, newMessage, newStatus, onSuccess, onFailure) {
         var thread = _threadsById[threadId];
-        if (thread === null) {
+        if (!thread) {
           return $q.reject('Can not add message to nonexistent thread.');
         }
 
         var oldStatus = thread.status;
-        var updatedStatus = (oldStatus === newStatus) ? null : newStatus;
+        var updatedStatus = newStatus !== oldStatus ? newStatus : null;
         return $http.post(_THREAD_HANDLER_PREFIX + threadId, {
           updated_status: updatedStatus,
           updated_subject: null,
-          text: newMessage
+          text: newMessage,
         }).then(() => {
           thread.status = newStatus;
-          if (updatedStatus === _THREAD_STATUS_OPEN) {
+          if (updatedStatus === STATUS_OPEN) {
             _openThreadsCount += 1;
-          } else if (updatedStatus && oldStatus === _THREAD_STATUS_OPEN) {
+          } else if (updatedStatus !== null && oldStatus === STATUS_OPEN) {
             _openThreadsCount -= 1;
           }
           return this.fetchMessages(threadId);
         }).then(onSuccess, onFailure);
       },
       resolveSuggestion: function(
-          threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
+          threadId, action, commitMessage, reviewMessage, audioUpdateRequired,
           onSuccess, onFailure) {
         var thread = _threadsById[threadId];
-        if (thread === null) {
+        if (!thread) {
           return $q.reject('Can not add message to nonexistent thread.');
         }
         if (action !== ACTION_ACCEPT_SUGGESTION) {
-          commitMsg = null;
+          commitMessage = null;
         }
 
         return $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {
           action: action,
-          review_message: reviewMsg,
-          commit_message: commitMsg,
+          review_message: reviewMessage,
+          commit_message: commitMessage,
         }).then(() => {
           thread.status =
             action === ACTION_ACCEPT_SUGGESTION ? STATUS_FIXED : STATUS_IGNORED;
           _openThreadsCount -= 1;
         }).then(onSuccess, onFailure);
-      }
+      },
     };
   }
 ]);
