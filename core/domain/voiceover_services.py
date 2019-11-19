@@ -100,18 +100,22 @@ def _get_voiceover_application_from_model(voiceover_application_model):
         voiceover_application_model.rejection_message)
 
 
-def _save_voiceover_application(voiceover_application):
-    """Saves a given voiceover application object in datastore.
+def _save_voiceover_applications(voiceover_applications):
+    """Saves a list of given voiceover application object in datastore.
 
     Args:
-        voiceover_application: BaseVoiceoverApplication. The voiceover
-            application object.
+        voiceover_applications: list(BaseVoiceoverApplication). The list of
+            voiceover application objects.
     """
-    voiceover_application.validate()
-    voiceover_application_model = _get_voiceover_application_model(
-        voiceover_application)
+    voiceover_application_models = []
+    for voiceover_application in voiceover_applications:
+        voiceover_application.validate()
+        voiceover_application_model = _get_voiceover_application_model(
+            voiceover_application)
+        voiceover_application_models.append(voiceover_application_model)
 
-    voiceover_application_model.put()
+    suggestion_models.GeneralVoiceoverApplicationModel.put_multi(
+        voiceover_application_models)
 
 
 def get_voiceover_application_by_id(voiceover_application_id):
@@ -189,7 +193,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
 
     voiceover_application.accept(reviewer_id)
 
-    _save_voiceover_application(voiceover_application)
+    _save_voiceover_applications([voiceover_application])
 
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
         rights_manager.assign_role_for_exploration(
@@ -205,9 +209,25 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
             voiceover_application.author_id,
             opportunities[voiceover_application.target_id].chapter_title,
             voiceover_application.language_code)
-    # Need to reject all other voiceover application for the same entity?
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.
+
+    voiceover_application_models = (
+        suggestion_models.GeneralVoiceoverApplicationModel
+        .get_voiceover_applications(
+            voiceover_application.target_type, voiceover_application.target_id,
+            voiceover_application.language_code))
+    rejected_voiceover_applications = []
+    for model in voiceover_application_models:
+        voiceover_application = _get_voiceover_application_from_model(
+            model)
+        if not voiceover_application.is_handled:
+            voiceover_application.reject(
+                reviewer_id, 'We have to reject your application as another '
+                'application for the same opportunity got accepted.')
+            rejected_voiceover_applications.append(voiceover_application)
+
+    _save_voiceover_applications(rejected_voiceover_applications)
 
 
 def reject_voiceover_application(
@@ -231,7 +251,7 @@ def reject_voiceover_application(
     reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
 
     voiceover_application.reject(reviewer.user_id, rejection_message)
-    _save_voiceover_application(voiceover_application)
+    _save_voiceover_applications([voiceover_application])
 
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
         opportunities = (
@@ -266,7 +286,7 @@ def create_new_voiceover_application(
         voiceover_application_id, target_id, suggestion_models.STATUS_IN_REVIEW,
         author_id, None, language_code, filename, content, None)
 
-    _save_voiceover_application(voiceover_application)
+    _save_voiceover_applications([voiceover_application])
 
 
 def get_text_to_create_voiceover_application(

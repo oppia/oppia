@@ -234,6 +234,60 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(opportunities), 0)
         self.assertFalse(more)
 
+    def test_accept_application_removes_rejectes_other_similar_applications(
+            self):
+        voiceover_services.create_new_voiceover_application(
+            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            'audio_file.mp3', self.applicant_id)
+
+        voiceover_services.create_new_voiceover_application(
+            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            'audio_file.mp3', self.owner_id)
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id))
+        self.assertEqual(len(user_voiceover_applications), 1)
+        self.assertEqual(
+            user_voiceover_applications[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.owner_id))
+        self.assertEqual(len(user_voiceover_applications), 1)
+        self.assertEqual(
+            user_voiceover_applications[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id))
+        voiceover_services.accept_voiceover_application(
+            user_voiceover_applications[0].voiceover_application_id,
+            self.admin_id)
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id, status=suggestion_models.STATUS_ACCEPTED))
+        self.assertEqual(len(user_voiceover_applications), 1)
+        self.assertEqual(
+            user_voiceover_applications[0].status,
+            suggestion_models.STATUS_ACCEPTED)
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.owner_id))
+        self.assertEqual(len(user_voiceover_applications), 1)
+        self.assertEqual(
+            user_voiceover_applications[0].status,
+            suggestion_models.STATUS_REJECTED)
+        self.assertEqual(
+            user_voiceover_applications[0].rejection_message,
+            'We have to reject your application as another application for the '
+            'same opportunity got accepted.')
+
     def test_author_accepts_own_voiceover_application_raise_exception(self):
         voiceover_services.create_new_voiceover_application(
             suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',

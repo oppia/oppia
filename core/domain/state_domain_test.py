@@ -1448,7 +1448,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(translated_content, '<p> In English.</p>')
 
         with self.assertRaisesRegexp(
-            Exception, 'Translation for the give content_id content does not '
+            Exception, 'Translation for the given content_id content does not '
             'exist in hi language code'):
             written_translations.get_translated_content('content', 'hi')
 
