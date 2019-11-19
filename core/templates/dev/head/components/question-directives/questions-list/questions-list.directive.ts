@@ -197,7 +197,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.questionId = ctrl.question.getId();
             ctrl.questionStateData = ctrl.question.getStateData();
             ctrl.questionIsBeingUpdated = false;
-            ctrl.newQuestion = true;
+            ctrl.newQuestionIsBeingCreated = true;
             ctrl.openQuestionEditor();
           };
 
@@ -344,7 +344,7 @@ angular.module('oppia').directive('questionsList', [
               ctrl.questionId = ctrl.question.getId();
               ctrl.questionStateData = ctrl.question.getStateData();
               ctrl.questionIsBeingUpdated = true;
-              ctrl.newQuestion = false;
+              ctrl.newQuestionIsBeingCreated = false;
               ctrl.openQuestionEditor(difficulty);
             }, function(errorResponse) {
               AlertsService.addWarning(
@@ -353,7 +353,7 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.deleteQuestionFromSkill = function(
-              questionId, skillDescriptions) {
+              questionId, skillDescription) {
             if (!ctrl.canEditQuestion()) {
               AlertsService.addWarning(
                 'User does not have enough rights to delete the question');
@@ -374,7 +374,7 @@ angular.module('oppia').directive('questionsList', [
               });
             } else {
               ctrl.getAllSkillSummaries().forEach(function(summary) {
-                if (summary.getDescription() === skillDescriptions[0]) {
+                if (summary.getDescription() === skillDescription) {
                   EditableQuestionBackendApiService.editQuestionSkillLinks(
                     questionId, [{id: summary.getId(), task: 'remove'}]
                   ).then(function() {
@@ -390,7 +390,7 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.changeDifficulty = function(
-              questionId, skillDescriptions, skillDifficulties) {
+              questionId, skillDescription, skillDifficulty) {
             if (!ctrl.canEditQuestion()) {
               AlertsService.addWarning(
                 'User does not have enough rights to edit the question');
@@ -400,25 +400,21 @@ angular.module('oppia').directive('questionsList', [
             if (ctrl.getAllSkillSummaries().length === 0) {
               linkedSkillsWithDifficulty.push(
                 SkillDifficultyObjectFactory.create(
-                  ctrl.selectedSkillId, skillDescriptions[0],
-                  skillDifficulties[0])
+                  ctrl.selectedSkillId, skillDescription,
+                  skillDifficulty)
               );
             } else {
               var allSkillSummaries = ctrl.getAllSkillSummaries().filter(
                 function(summary) {
                   summary.isSelected = false;
-                  return (
-                    skillDescriptions.indexOf(
-                      summary.getDescription()) !== -1);
+                  return skillDescription === summary.getDescription();
                 });
               for (var idx in allSkillSummaries) {
-                var index = skillDescriptions.indexOf(
-                  allSkillSummaries[idx].getDescription());
                 linkedSkillsWithDifficulty.push(
                   SkillDifficultyObjectFactory.create(
                     allSkillSummaries[idx].getId(),
                     allSkillSummaries[idx].getDescription(),
-                    skillDifficulties[index]));
+                    skillDifficulty));
               }
             }
             var oldLinkedSkillWithDifficulty = angular.copy(
@@ -493,7 +489,7 @@ angular.module('oppia').directive('questionsList', [
             var canEditQuestion = ctrl.canEditQuestion();
             var misconceptionsBySkill = ctrl.misconceptionsBySkill;
             var associatedSkillSummaries = ctrl.associatedSkillSummaries;
-            var newQuestion = ctrl.newQuestion;
+            var newQuestionIsBeingCreated = ctrl.newQuestionIsBeingCreated;
             QuestionUndoRedoService.clearChanges();
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
@@ -518,9 +514,9 @@ angular.module('oppia').directive('questionsList', [
                   $scope.questionId = questionId;
                   $scope.misconceptionsBySkill = misconceptionsBySkill;
                   $scope.canEditQuestion = canEditQuestion;
-                  $scope.newQuestion = newQuestion;
+                  $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
 
-                  if (!newQuestion) {
+                  if (!newQuestionIsBeingCreated) {
                     $scope.validationError = $scope.question.validate(
                       $scope.misconceptionsBySkill);
                   }

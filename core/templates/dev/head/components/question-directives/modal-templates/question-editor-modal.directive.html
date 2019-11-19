@@ -1,10 +1,10 @@
 <div class="modal-header">
   <h3>
-    Question <span ng-if="!newQuestion"> and Linked Skills </span> Editor
+    Question <span ng-if="!newQuestionIsBeingCreated"> and Linked Skills </span> Editor
   </h3>
 </div>
 <div class="modal-body" style="width: 96%; margin-left: 2%;">
-  <div ng-if="!newQuestion">
+  <div ng-if="!newQuestionIsBeingCreated">
     <h4> <strong> Linked Skills </strong> </h4>
     <md-card class="question-skill-id" ng-repeat="skill in associatedSkillSummaries">
       <div class="skill-description-card">
@@ -20,7 +20,7 @@
     <button class="btn btn-primary btn-sm" ng-click="undo()">Undo Skill Changes</button>
   </div>
 
-  <h4 ng-if="!newQuestion" style="margin-top: 4vh;"> <strong> Question Editor </strong> </h4>
+  <h4 ng-if="!newQuestionIsBeingCreated" style="margin-top: 4vh;"> <strong> Question Editor </strong> </h4>
   <question-editor question-id="questionId"
                    misconceptions-by-skill="misconceptionsBySkill"
                    question-state-data="questionStateData"

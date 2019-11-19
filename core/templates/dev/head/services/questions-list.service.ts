@@ -81,6 +81,16 @@ angular.module('oppia').factory('QuestionsListService', [
           QuestionBackendApiService.fetchQuestionSummaries(
             skillIds, _nextCursorForQuestions).then(
             function(returnObject) {
+              if (skillIds.length === 1) {
+                for (var idx in returnObject.questionSummaries) {
+                  returnObject.questionSummaries[idx].skillDifficulty =
+                    returnObject.questionSummaries[idx].skill_difficulties[0];
+                  returnObject.questionSummaries[idx].skillDescription =
+                    returnObject.questionSummaries[idx].skill_descriptions[0];
+                  delete returnObject.questionSummaries[idx].skill_difficulties;
+                  delete returnObject.questionSummaries[idx].skill_descriptions;
+                }
+              }
               _setQuestionSummaries(returnObject.questionSummaries);
               _setNextQuestionsCursor(returnObject.nextCursor);
             }
