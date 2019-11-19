@@ -403,10 +403,16 @@ class TopicRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        for snapshot_content_model in cls.SNAPSHOT_CONTENT_CLASS.get_all():
-            reconstituted_model = cls(**snapshot_content_model.content)
-            if user_id in reconstituted_model.manager_ids:
-                return True
+        more_results = True
+        cursor = None
+        while more_results:
+            snapshot_content_models, cursor, more_results = (
+                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
+                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
+            for snapshot_content_model in snapshot_content_models:
+                reconstituted_model = cls(**snapshot_content_model.content)
+                if user_id in reconstituted_model.manager_ids:
+                    return True
         return (cls.query(cls.manager_ids == user_id).get() is not None or
                 cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 

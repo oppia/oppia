@@ -573,44 +573,48 @@ class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
-        question_services.create_new_question_rights('question_id', 'owner_id')
-        self.assertTrue(
-            question_models.QuestionRightsModel
-            .has_reference_to_user_id('owner_id'))
-        # The question_rights.creator_id is by default the same as committer_id,
-        # we change it to different value so that we really check all
-        # separate fields.
-        question_rights = question_models.QuestionRightsModel.get('question_id')
-        question_rights.creator_id = 'creator_id'
-        question_rights.commit(
-            'committer_id',
-            'Update question rights',
-            [{'cmd': question_domain.CMD_CREATE_NEW}])
-        self.assertTrue(
-            question_models.QuestionRightsModel
-            .has_reference_to_user_id('owner_id'))
-        self.assertTrue(
-            question_models.QuestionRightsModel
-            .has_reference_to_user_id('creator_id'))
-        self.assertTrue(
-            question_models.QuestionRightsModel
-            .has_reference_to_user_id('committer_id'))
-        self.assertFalse(
-            question_models.QuestionRightsModel
-            .has_reference_to_user_id('x_id'))
+        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+            question_services.create_new_question_rights(
+                'question_id', 'owner_id')
+            self.assertTrue(
+                question_models.QuestionRightsModel
+                .has_reference_to_user_id('owner_id'))
+            # The question_rights.creator_id is by default the same as
+            # committer_id, we change it to different value so that we really
+            # check all separate fields.
+            question_rights = question_models.QuestionRightsModel.get(
+                'question_id')
+            question_rights.creator_id = 'creator_id'
+            question_rights.commit(
+                'committer_id',
+                'Update question rights',
+                [{'cmd': question_domain.CMD_CREATE_NEW}])
+            self.assertTrue(
+                question_models.QuestionRightsModel
+                .has_reference_to_user_id('owner_id'))
+            self.assertTrue(
+                question_models.QuestionRightsModel
+                .has_reference_to_user_id('creator_id'))
+            self.assertTrue(
+                question_models.QuestionRightsModel
+                .has_reference_to_user_id('committer_id'))
+            self.assertFalse(
+                question_models.QuestionRightsModel
+                .has_reference_to_user_id('x_id'))
 
-        # We change the creator_id to to see that the creator_id is still found
-        # in QuestionRightsSnapshotContentModel.
-        question_rights = question_models.QuestionRightsModel.get('question_id')
-        question_rights.creator_id = 'different_creator_id'
-        question_rights.commit(
-            'committer_id',
-            'Update question rights again',
-            [{'cmd': question_domain.CMD_CREATE_NEW}])
+            # We change the creator_id to to see that the creator_id is still
+            # found in QuestionRightsSnapshotContentModel.
+            question_rights = question_models.QuestionRightsModel.get(
+                'question_id')
+            question_rights.creator_id = 'different_creator_id'
+            question_rights.commit(
+                'committer_id',
+                'Update question rights again',
+                [{'cmd': question_domain.CMD_CREATE_NEW}])
 
-        self.assertTrue(
-            question_models.QuestionRightsModel
-            .has_reference_to_user_id('creator_id'))
-        self.assertTrue(
-            question_models.QuestionRightsModel
-            .has_reference_to_user_id('different_creator_id'))
+            self.assertTrue(
+                question_models.QuestionRightsModel
+                .has_reference_to_user_id('creator_id'))
+            self.assertTrue(
+                question_models.QuestionRightsModel
+                .has_reference_to_user_id('different_creator_id'))

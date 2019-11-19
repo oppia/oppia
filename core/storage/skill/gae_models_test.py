@@ -131,35 +131,38 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_has_reference_to_user_id(self):
-        self.assertTrue(
-            skill_models.SkillRightsModel
-            .has_reference_to_user_id('user_1_id'))
-        self.assertTrue(
-            skill_models.SkillRightsModel
-            .has_reference_to_user_id('user_2_id'))
-        self.assertTrue(
-            skill_models.SkillRightsModel
-            .has_reference_to_user_id('user_3_id'))
-        self.assertTrue(
-            skill_models.SkillRightsModel
-            .has_reference_to_user_id('user_4_id'))
-        self.assertFalse(
-            skill_models.SkillRightsModel
-            .has_reference_to_user_id('x_id'))
+        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+            self.assertTrue(
+                skill_models.SkillRightsModel
+                .has_reference_to_user_id('user_1_id'))
+            self.assertTrue(
+                skill_models.SkillRightsModel
+                .has_reference_to_user_id('user_2_id'))
+            self.assertTrue(
+                skill_models.SkillRightsModel
+                .has_reference_to_user_id('user_3_id'))
+            self.assertTrue(
+                skill_models.SkillRightsModel
+                .has_reference_to_user_id('user_4_id'))
+            self.assertFalse(
+                skill_models.SkillRightsModel
+                .has_reference_to_user_id('x_id'))
 
-        # We change the creator_id to to see that the user_5_id is still found
-        # in SkillRightsSnapshotContentModel.
-        skill_model = skill_models.SkillRightsModel.get('id_5')
-        skill_model.creator_id = 'user_7_id'
-        skill_model.commit(
-            'user_6_id',
-            'Update skill rights',
-            [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+            # We change the creator_id to to verify that the user_5_id is still
+            # found in SkillRightsSnapshotContentModel.
+            skill_model = skill_models.SkillRightsModel.get('id_5')
+            skill_model.creator_id = 'user_7_id'
+            skill_model.commit(
+                'user_6_id',
+                'Update skill rights',
+                [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
 
-        self.assertTrue(
-            skill_models.SkillRightsModel.has_reference_to_user_id('user_5_id'))
-        self.assertTrue(
-            skill_models.SkillRightsModel.has_reference_to_user_id('user_7_id'))
+            self.assertTrue(
+                skill_models.SkillRightsModel.has_reference_to_user_id(
+                    'user_5_id'))
+            self.assertTrue(
+                skill_models.SkillRightsModel.has_reference_to_user_id(
+                    'user_7_id'))
 
     def test_get_unpublished_by_creator_id(self):
         results = (
