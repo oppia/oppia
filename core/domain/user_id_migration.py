@@ -16,17 +16,25 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import inspect
+
 from core import jobs
 from core.platform import models
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+(base_models, collection_models, exploration_models,
+ question_models, skill_models, topic_models,
+ user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration,
+     models.NAMES.question, models.NAMES.skill, models.NAMES.topic,
+     models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
 
 class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating new user ids for all the users and re-adding
-    models that use the user id.
+    models that use the user id. This migration doesn't handle snapshot content
+    models that can contain user ID, these are handled by
+    SnapshotsUserIdMigrationJob.
     """
 
     @staticmethod
@@ -102,3 +110,67 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, new_user_ids):
         """Implements the reduce function for this job."""
         yield (key, new_user_ids)
+
+
+class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for going through all the snapshot content models that can
+    contain user ID and replacing it with new user ID.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [collection_models.CollectionRights,
+                exploration_models.ExplorationRights,
+                question_models.QuestionRights,
+                skill_models.SkillRights,
+                topic_models.TopicRights]
+
+    @staticmethod
+    def map(snapshot_model):
+        """Implements the map function for this job."""
+        yield ('SUCCESS', snapshot_model)
+
+    @staticmethod
+    def reduce(key, new_user_ids):
+        """Implements the reduce function for this job."""
+        yield (key, new_user_ids)
+
+
+class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for going through all the snapshot content models that can
+    contain user ID and replacing it with new user ID.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user_model):
+        """Implements the map function for this job."""
+        gae_id = user_model.gae_id
+        for model_class in models.Registry.get_all_storage_model_classes():
+            base_classes = [
+                base.__name__ for base in inspect.getmro(model_class)]
+            # BaseSnapshotMetadataModel and models that inherit from it
+            # are checked from the associated VersionedModel.
+            if 'BaseSnapshotMetadataModel' in base_classes:
+                continue
+            # BaseSnapshotContentModel and models that inherit from it
+            # are checked from the associated VersionedModel.
+            if 'BaseSnapshotContentModel' in base_classes:
+                continue
+            if (model_class.get_deletion_policy() ==
+                    base_models.DELETION_POLICY.NOT_APPLICABLE):
+                continue
+            if model_class.has_reference_to_user_id(gae_id):
+                yield ('FAILURE', (gae_id, model_class.__name__))
+
+        yield ('SUCCESS', (gae_id, ''))
+
+    @staticmethod
+    def reduce(key, status):
+        """Implements the reduce function for this job."""
+        yield (key, status)

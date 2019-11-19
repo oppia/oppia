@@ -251,6 +251,33 @@ class CollectionRightsModel(base_models.VersionedModel):
         cls.put_multi(
             migrated_models, update_last_updated_time=False)
 
+    @classmethod
+    def migrate_snapshot_content_models(cls, old_user_id, new_user_id):
+        """Migrate snapshot models to use the new user ID in the owner_ids,
+        editor_ids, voice_artist_ids and viewer_ids.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for snapshot_content_model in cls.SNAPSHOT_CONTENT_CLASS.get_all():
+            reconstituted_model = cls(**snapshot_content_model.content)
+            reconstituted_model.owner_ids = [
+                new_user_id if owner_id == old_user_id else owner_id
+                for owner_id in snapshot_content_model.owner_ids]
+            reconstituted_model.editor_ids = [
+                new_user_id if editor_id == old_user_id else editor_id
+                for editor_id in snapshot_content_model.editor_ids]
+            reconstituted_model.voice_artist_ids = [
+                new_user_id if voice_art_id == old_user_id else voice_art_id
+                for voice_art_id in snapshot_content_model.voice_artist_ids]
+            reconstituted_model.viewer_ids = [
+                new_user_id if viewer_id == old_user_id else viewer_id
+                for viewer_id in snapshot_content_model.viewer_ids]
+            cls.SNAPSHOT_CONTENT_CLASS.put(
+                reconstituted_model, update_last_updated_time=False)
+
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
