@@ -392,6 +392,27 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 'action': 'edit_links',
                 'difficulty': 0.5
             }, csrf_token=csrf_token, expected_status_int=400)
+        self.put_json(
+            '%s/%s' % (
+                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
+            ), {
+                'action': 'edit_links',
+                'difficulty': 0.5,
+                'skill_ids_task_list': [{
+                    'id': 'skill_2',
+                    'task': 'invalid'
+                }]
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.put_json(
+            '%s/%s' % (
+                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
+            ), {
+                'action': 'edit_links',
+                'difficulty': 0.5,
+                'skill_ids_task_list': [{
+                    'task': 'add'
+                }]
+            }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
     def test_put_with_topic_manager_email_allows_updation(self):

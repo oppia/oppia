@@ -138,6 +138,9 @@ class QuestionSkillLinkHandler(base.BaseHandler):
                     'Missing fields \'skill_ids_task_list\'in payload')
 
             for task_dict in skill_ids_task_list:
+                if not 'id' in task_dict:
+                    raise self.InvalidInputException(
+                        'Missing skill ID for edit_links.')
                 if task_dict['task'] == 'remove':
                     question_services.delete_question_skill_link(
                         self.user_id, question_id, task_dict['id'])
@@ -147,6 +150,9 @@ class QuestionSkillLinkHandler(base.BaseHandler):
                             'Missing field \'difficulty\' in payload')
                     question_services.create_new_question_skill_link(
                         self.user_id, question_id, task_dict['id'], difficulty)
+                else:
+                    raise self.InvalidInputException(
+                        'Invalid task for edit_links.')
         else:
             raise self.InvalidInputException('Invalid action in payload.')
 
