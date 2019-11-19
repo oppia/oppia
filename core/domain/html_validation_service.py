@@ -824,7 +824,7 @@ def add_dimensions_to_image_tags(is_question, exp_id, html_string):
     tags that have no filepath.
 
     Args:
-        is_question: bool. Whether entity is a Question.
+        is_question: bool. Whether the entity is a question.
         exp_id: str. Exploration id.
         html_string: str. HTML string to modify.
 
@@ -859,8 +859,8 @@ def add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(
     collapsible blocks. Removes image tags that have no filepath.
 
     Args:
-        is_question: bool. Whether entity is a Question.
-        entity_id: str. Exploration id or Question id.
+        is_question: bool. Whether the entity is a question.
+        entity_id: str. ID of the entity.
         html_string: str. HTML string to modify.
 
     Returns:
@@ -880,7 +880,7 @@ def add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(
             collapsible_component['content-with-value'])
         collapsible_component_soup = bs4.BeautifulSoup(
             collapsible_component_html_string, 'html.parser')
-        modify_image_filename(
+        _modify_image_filename(
             is_question, entity_id, collapsible_component_soup)
         collapsible_component['content-with-value'] = (
             escape_html(python_utils.UNICODE(collapsible_component_soup)
@@ -897,20 +897,20 @@ def add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(
             tab_component['tab_contents-with-value'])
         tab_component_soup = bs4.BeautifulSoup(
             tab_component_html_string, 'html.parser')
-        modify_image_filename(is_question, entity_id, tab_component_soup)
+        _modify_image_filename(is_question, entity_id, tab_component_soup)
         tab_component['tab_contents-with-value'] = (
             escape_html(python_utils.UNICODE(tab_component_soup)
                         .replace('\'', '')))
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
-def modify_image_filename(is_question, entity_id, soup):
+def _modify_image_filename(is_question, entity_id, soup):
     """Modifies filenames of images. This is a helper method for
     add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks.
 
     Args:
-        is_question: bool. Whether entity is a Question.
-        entity_id: str. Exploration id or Question id.
+        is_question: bool. Whether the entity is a question.
+        entity_id: str. ID of the entity.
         soup: bs4.BeautifulSoup. The html soup whose image file is
             to be renamed.
     """
@@ -940,10 +940,10 @@ def get_filename_with_dimensions(is_question, old_filename, entity_id):
     """Gets the filename with dimensions of the image file in it.
 
     Args:
-        is_question: bool. Whether entity is a Question.
+        is_question: bool. Whether the entity is a question.
         old_filename: str. Name of the file whose dimensions need to be
             calculated.
-        entity_id: str. Exploration id or Question id.
+        entity_id: str. ID of the entity.
 
     Returns:
         str. The new filename of the image file.

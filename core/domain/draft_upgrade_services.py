@@ -86,6 +86,21 @@ def try_upgrading_draft_to_exp_version(
 
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
+    
+    @classmethod
+    def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
+        """Converts draft change list from state version 30 to 31. State
+        version 31 adds image dimensions to images inside collapsible
+        blocks and tabs, for which there should be no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
 
     @classmethod
     def _convert_states_v29_dict_to_v30_dict(cls, draft_change_list):
