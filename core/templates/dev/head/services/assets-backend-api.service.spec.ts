@@ -49,7 +49,7 @@ describe('Assets Backend API Service', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -248,7 +248,7 @@ describe('Assets Backend API Service', function() {
         filename: 'myfile.mp3'
       });
 
-    $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
+    $httpBackend.expect('GET', requestUrl).respond(201, {type: 'audio/mpeg'});
     AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
       successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())

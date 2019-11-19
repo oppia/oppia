@@ -950,7 +950,7 @@ class WrittenTranslations(python_utils.OBJECT):
                 return self.translations_mapping[content_id][language_code].html
             else:
                 raise Exception(
-                    'Translation for the give content_id %s does not exist in '
+                    'Translation for the given content_id %s does not exist in '
                     '%s language code' % (content_id, language_code))
         else:
             raise Exception('Invalid content_id: %s' % content_id)
