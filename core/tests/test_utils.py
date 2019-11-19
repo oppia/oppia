@@ -68,6 +68,9 @@ current_user_services = models.Registry.import_current_user_services()
 # We are using the b' prefix as all the stdouts are in bytes.
 LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 
+# Used when swap an attribute that does not exist.
+NO_ATTRIBUTE = 'NO SUCH ATTRIBUTE'
+
 
 def empty_environ():
     """Create an empty environment for the tests."""
@@ -1809,12 +1812,12 @@ tags: []
         the generator will immediately raise StopIteration, and contextlib will
         raise a RuntimeError.
         """
-        original = getattr(obj, attr, 'NO SUCH ATTRIBUTE')
+        original = getattr(obj, attr, NO_ATTRIBUTE)
         setattr(obj, attr, newvalue)
         try:
             yield
         finally:
-            if original == 'NO SUCH ATTRIBUTE':
+            if original == NO_ATTRIBUTE:
                 delattr(obj, attr)
             else:
                 setattr(obj, attr, original)
