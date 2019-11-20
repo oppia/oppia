@@ -440,10 +440,10 @@ angular.module('oppia').directive('audioTranslationBar', [
               AudioPlayerService.load(
                 ENTITY_TYPE.EXPLORATION, ContextService.getExplorationId(),
                 audioTranslation.filename).then(function() {
-                $scope.audioLoadingIndicatorIsShown = false;
-                $scope.audioTimerIsShown = true;
-                AudioPlayerService.play();
-              });
+                  $scope.audioLoadingIndicatorIsShown = false;
+                  $scope.audioTimerIsShown = true;
+                  AudioPlayerService.play();
+                });
             }
           };
 

@@ -196,6 +196,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
     };
 
     var _getDownloadUrl = function(entityType, entityId, filename, assetType) {
+      console.log(entityType, entityId, filename)
       return UrlInterpolationService.interpolateUrl(
         (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
         IMAGE_DOWNLOAD_URL_TEMPLATE), {

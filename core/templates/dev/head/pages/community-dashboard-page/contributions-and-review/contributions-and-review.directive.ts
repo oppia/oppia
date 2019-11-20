@@ -107,7 +107,6 @@ angular.module('oppia').directive('contributionsAndReview', [
             activeTabTofetcherFunction[tabName][item](populateTabData);
           };
 
-
           var getTranslationSuggestionsPresentationData = function(data) {
             itemsData = data;
             var translationContributionsSummaryList = [];

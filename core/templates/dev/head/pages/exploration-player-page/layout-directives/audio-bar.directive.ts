@@ -259,9 +259,9 @@ angular.module('oppia').directive('audioBar', [
             AudioPlayerService.load(
               ENTITY_TYPE.EXPLORATION, ContextService.getExplorationId(),
               audioFilename).then(function() {
-              $scope.audioLoadingIndicatorIsShown = false;
-              AudioPlayerService.play();
-            });
+                $scope.audioLoadingIndicatorIsShown = false;
+                AudioPlayerService.play();
+              });
           };
 
           /**

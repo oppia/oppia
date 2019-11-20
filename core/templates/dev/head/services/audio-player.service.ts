@@ -38,9 +38,9 @@ angular.module('oppia').factory('AudioPlayerService', [
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.loadAudio(
           entityType, entityId, filename).then(function(loadedAudiofile) {
-          var blobUrl = URL.createObjectURL(loadedAudiofile.data);
-          _currentTrack = ngAudio.load(blobUrl);
-          _currentTrackFilename = filename;
+            var blobUrl = URL.createObjectURL(loadedAudiofile.data);
+            _currentTrack = ngAudio.load(blobUrl);
+            _currentTrackFilename = filename;
 
           // ngAudio doesn't seem to provide any way of detecting
           // when native audio object has finished loading -- see
@@ -56,18 +56,18 @@ angular.module('oppia').factory('AudioPlayerService', [
             // property of the audio.
             if (_currentTrack !== null &&
                 _currentTrack.audio !== undefined) {
-              _currentTrack.audio.onended = function() {
-                _currentTrack = null;
-                _currentTrackFilename = null;
-                AudioTranslationManagerService
-                  .clearSecondaryAudioTranslations();
-              };
-            }
-          }, 100);
-          successCallback();
-        }, function(reason) {
-          errorCallback(reason);
-        });
+                _currentTrack.audio.onended = function() {
+                  _currentTrack = null;
+                  _currentTrackFilename = null;
+                  AudioTranslationManagerService
+                    .clearSecondaryAudioTranslations();
+                };
+              }
+            }, 100);
+            successCallback();
+          }, function(reason) {
+            errorCallback(reason);
+          });
       }
     };
 
