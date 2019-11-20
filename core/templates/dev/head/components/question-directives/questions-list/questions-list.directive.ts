@@ -318,38 +318,39 @@ angular.module('oppia').directive('questionsList', [
               });
           };
 
-          ctrl.editQuestion = function(questionSummary, difficulty) {
+          ctrl.editQuestion = function(questionSummaryForOneSkill, difficulty) {
             if (ctrl.editorIsOpen) {
               return;
             }
             ctrl.misconceptionsBySkill = {};
             ctrl.associatedSkillSummaries = [];
             EditableQuestionBackendApiService.fetchQuestion(
-              questionSummary.getQuestionId()).then(function(response) {
-              if (response.associated_skill_dicts) {
-                response.associated_skill_dicts.forEach(function(skillDict) {
-                  ctrl.misconceptionsBySkill[skillDict.id] =
-                    skillDict.misconceptions.map(function(misconception) {
-                      return MisconceptionObjectFactory.createFromBackendDict(
-                        misconception);
-                    });
-                  ctrl.associatedSkillSummaries.push(
-                    SkillSummaryObjectFactory.create(
-                      skillDict.id, skillDict.description));
-                });
-              }
-              ctrl.question =
-                QuestionObjectFactory.createFromBackendDict(
-                  response.question_dict);
-              ctrl.questionId = ctrl.question.getId();
-              ctrl.questionStateData = ctrl.question.getStateData();
-              ctrl.questionIsBeingUpdated = true;
-              ctrl.newQuestionIsBeingCreated = false;
-              ctrl.openQuestionEditor(difficulty);
-            }, function(errorResponse) {
-              AlertsService.addWarning(
-                errorResponse.error || 'Failed to fetch question.');
-            });
+              questionSummaryForOneSkill.getQuestionId()).then(
+              function(response) {
+                if (response.associated_skill_dicts) {
+                  response.associated_skill_dicts.forEach(function(skillDict) {
+                    ctrl.misconceptionsBySkill[skillDict.id] =
+                      skillDict.misconceptions.map(function(misconception) {
+                        return MisconceptionObjectFactory.createFromBackendDict(
+                          misconception);
+                      });
+                    ctrl.associatedSkillSummaries.push(
+                      SkillSummaryObjectFactory.create(
+                        skillDict.id, skillDict.description));
+                  });
+                }
+                ctrl.question =
+                  QuestionObjectFactory.createFromBackendDict(
+                    response.question_dict);
+                ctrl.questionId = ctrl.question.getId();
+                ctrl.questionStateData = ctrl.question.getStateData();
+                ctrl.questionIsBeingUpdated = true;
+                ctrl.newQuestionIsBeingCreated = false;
+                ctrl.openQuestionEditor(difficulty);
+              }, function(errorResponse) {
+                AlertsService.addWarning(
+                  errorResponse.error || 'Failed to fetch question.');
+              });
           };
 
           ctrl.deleteQuestionFromSkill = function(
