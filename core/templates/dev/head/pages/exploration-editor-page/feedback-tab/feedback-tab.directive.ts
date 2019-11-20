@@ -36,8 +36,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('feedbackTab', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -50,16 +49,14 @@ angular.module('oppia').directive('feedbackTab', [
         '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
         'DateTimeFormatService', 'EditabilityService',
         'ExplorationStatesService',
-        'SuggestionModalForExplorationEditorService',
-        'ThreadDataService', 'ThreadStatusDisplayService',
-        'UrlInterpolationService', 'UserService',
+        'SuggestionModalForExplorationEditorService', 'ThreadDataService',
+        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
         function(
             $q, $rootScope, $uibModal, AlertsService, ChangeListService,
             DateTimeFormatService, EditabilityService,
             ExplorationStatesService,
-            SuggestionModalForExplorationEditorService,
-            ThreadDataService, ThreadStatusDisplayService,
-            UrlInterpolationService, UserService) {
+            SuggestionModalForExplorationEditorService, ThreadDataService,
+            ThreadStatusDisplayService, UrlInterpolationService, UserService) {
           var ctrl = this;
           ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
           ctrl.threadData = ThreadDataService.data;
@@ -75,7 +72,7 @@ angular.module('oppia').directive('feedbackTab', [
           ctrl.isExplorationEditable = EditabilityService.isEditable;
           $rootScope.loadingMessage = 'Loading';
           var userInfoPromise = UserService.getUserInfoAsync();
-          userInfoPromise.then(function(userInfo) {
+          userInfoPromise.then(userInfo => {
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           });
 
@@ -96,7 +93,7 @@ angular.module('oppia').directive('feedbackTab', [
           ctrl.clearActiveThread();
           ThreadDataService.fetchFeedbackStats();
           var threadPromise = ThreadDataService.fetchThreads();
-          $q.all([userInfoPromise, threadPromise]).then(function() {
+          $q.all([userInfoPromise, threadPromise]).then(() => {
             $rootScope.loadingMessage = '';
           });
           // Fetches the threads again if any thread is updated.
@@ -119,33 +116,34 @@ angular.module('oppia').directive('feedbackTab', [
                 'create-feedback-thread-modal.template.html'),
               backdrop: true,
               resolve: {},
-              controller: ['$scope', '$uibModalInstance', function(
-                  $scope, $uibModalInstance) {
-                $scope.newThreadSubject = '';
-                $scope.newThreadText = '';
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.newThreadSubject = '';
+                  $scope.newThreadText = '';
 
-                $scope.create = function(newThreadSubject, newThreadText) {
-                  if (!newThreadSubject) {
-                    AlertsService.addWarning(
-                      'Please specify a thread subject.');
-                    return;
-                  }
-                  if (!newThreadText) {
-                    AlertsService.addWarning('Please specify a message.');
-                    return;
-                  }
+                  $scope.create = function(newThreadSubject, newThreadText) {
+                    if (!newThreadSubject) {
+                      AlertsService.addWarning(
+                        'Please specify a thread subject.');
+                      return;
+                    }
+                    if (!newThreadText) {
+                      AlertsService.addWarning('Please specify a message.');
+                      return;
+                    }
 
-                  $uibModalInstance.close({
-                    newThreadSubject: newThreadSubject,
-                    newThreadText: newThreadText
-                  });
-                };
+                    $uibModalInstance.close({
+                      newThreadSubject: newThreadSubject,
+                      newThreadText: newThreadText,
+                    });
+                  };
 
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                };
-              }]
-            }).result.then(function(result) {
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }]
+            }).result.then(result => {
               ThreadDataService.createNewThread(
                 result.newThreadSubject, result.newThreadText
               ).then(() => {
@@ -165,7 +163,7 @@ angular.module('oppia').directive('feedbackTab', [
           };
 
           var _hasUnsavedChanges = function() {
-            return (ChangeListService.getChangeList().length > 0);
+            return ChangeListService.getChangeList().length > 0;
           };
 
           ctrl.getSuggestionButtonType = function() {
@@ -176,17 +174,16 @@ angular.module('oppia').directive('feedbackTab', [
           // TODO(Allan): Implement ability to edit suggestions before applying.
           ctrl.showSuggestionModal = function() {
             SuggestionModalForExplorationEditorService.showSuggestionModal(
-              ctrl.activeThread.suggestion.suggestionType,
-              {
+              ctrl.activeThread.suggestion.suggestionType, {
                 activeThread: ctrl.activeThread,
-                setActiveThread: function(threadId) {
+                setActiveThread: threadId => {
                   ThreadDataService.fetchThreads().then(() => {
                     ctrl.setActiveThread(threadId);
                   });
                 },
                 isSuggestionHandled: _isSuggestionHandled,
                 hasUnsavedChanges: _hasUnsavedChanges,
-                isSuggestionValid: _isSuggestionValid
+                isSuggestionValid: _isSuggestionValid,
               }
             );
           };
@@ -207,24 +204,16 @@ angular.module('oppia').directive('feedbackTab', [
               .then(() => {
                 _resetTmpMessageFields();
                 ctrl.messageSendingInProgress = false;
-              }, function() {
+              }, () => {
                 ctrl.messageSendingInProgress = false;
               });
           };
 
           ctrl.setActiveThread = function(threadId) {
+            ctrl.activeThread = ThreadDataService.getThread(threadId);
+            ctrl.tmpMessage.status = ctrl.activeThread.status;
             ThreadDataService.fetchMessages(threadId);
             ThreadDataService.markThreadAsSeen(threadId);
-            var allThreads = [].concat(
-              ctrl.threadData.feedbackThreads,
-              ctrl.threadData.suggestionThreads);
-            for (var i = 0; i < allThreads.length; i++) {
-              if (allThreads[i].threadId === threadId) {
-                ctrl.activeThread = allThreads[i];
-                break;
-              }
-            }
-            ctrl.tmpMessage.status = ctrl.activeThread.status;
           };
         }
       ]};

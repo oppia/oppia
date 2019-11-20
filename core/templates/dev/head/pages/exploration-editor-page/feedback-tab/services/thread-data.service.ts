@@ -47,15 +47,15 @@ angular.module('oppia').factory('ThreadDataService', [
     // All the threads for this exploration. This is a list whose entries are
     // objects, each representing threads. The 'messages' key of this object
     // is updated lazily.
-    var _data = {
-      feedbackThreads: [],
-      suggestionThreads: [],
-    };
+    var _data = {feedbackThreads: [], suggestionThreads: []};
+    // Helper-object to provide efficient access to threads.
     var _threadsById = {};
+    // Number of open threads that need action
+    var _openThreadsCount = 0;
 
     var _setFeedbackThreadFromBackendDict = function(backendDict) {
-      var thread =
-        FeedbackThreadObjectFactory.createFromBackendDict(backendDict);
+      var thread = FeedbackThreadObjectFactory.createFromBackendDict(
+        backendDict);
       if (!_threadsById.hasOwnProperty(thread.threadId)) {
         _threadsById[thread.threadId] = thread;
       } else {
@@ -65,8 +65,8 @@ angular.module('oppia').factory('ThreadDataService', [
     };
 
     var _setSuggestionThreadFromBackendDict = function(backendDict) {
-      var thread =
-        SuggestionThreadObjectFactory.createFromBackendDict(backendDict);
+      var thread = SuggestionThreadObjectFactory.createFromBackendDict(
+        backendDict);
       if (!_threadsById.hasOwnProperty(thread.threadId)) {
         _threadsById[thread.threadId] = thread;
       } else {
@@ -75,13 +75,13 @@ angular.module('oppia').factory('ThreadDataService', [
       return thread;
     };
 
-    // Number of open threads that need action
-    var _openThreadsCount = 0;
-
     return {
       data: _data,
       getData: function() {
         return _data;
+      },
+      getThread: function(threadId) {
+        return _threadsById[threadId];
       },
       fetchThreads: function() {
         return $http.get(_THREAD_LIST_HANDLER_URL).then(response => {
@@ -93,7 +93,7 @@ angular.module('oppia').factory('ThreadDataService', [
         });
       },
       fetchMessages: function(threadId) {
-        var thread = _threadsById[threadId];
+        var thread = this.getThread(threadId);
         if (!thread) {
           return $q.reject('Can not fetch messages of nonexistent thread.');
         }
@@ -127,9 +127,8 @@ angular.module('oppia').factory('ThreadDataService', [
           thread_id: threadId,
         });
       },
-      addNewMessage: function(
-          threadId, newMessage, newStatus) {
-        var thread = _threadsById[threadId];
+      addNewMessage: function(threadId, newMessage, newStatus) {
+        var thread = this.getThread(threadId);
         if (!thread) {
           return $q.reject('Can not add message to nonexistent thread.');
         }
@@ -152,7 +151,7 @@ angular.module('oppia').factory('ThreadDataService', [
       },
       resolveSuggestion: function(
           threadId, action, commitMessage, reviewMessage, audioUpdateRequired) {
-        var thread = _threadsById[threadId];
+        var thread = this.getThread(threadId);
         if (!thread) {
           return $q.reject('Can not add message to nonexistent thread.');
         }
