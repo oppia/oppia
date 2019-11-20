@@ -29,8 +29,20 @@ import release_constants
 from . import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_APPENGINE_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67', 'google_appengine')
 _PYGSHEETS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pygsheets-2.0.2')
+_GOOGLE_PATH = os.path.join(_PYGSHEETS_PATH, 'google')
+
+sys.path.insert(0, _APPENGINE_PATH)
 sys.path.insert(0, _PYGSHEETS_PATH)
+
+# pylint: disable=wrong-import-position
+import google # isort:skip
+# pylint: enable=wrong-import-position
+
+# Refer: https://groups.google.com/forum/#!topic/google-appengine/AJJbuQ3FaGI.
+google.__path__.append(_GOOGLE_PATH)
 
 # pylint: disable=wrong-import-position
 import pygsheets # isort:skip
