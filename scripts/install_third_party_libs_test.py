@@ -31,6 +31,7 @@ from core.tests import test_utils
 
 import python_utils
 
+from . import common
 from . import install_third_party
 from . import install_third_party_libs
 from . import pre_commit_hook
@@ -68,14 +69,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_darwin_os(self):
-        def mock_uname():
-            return ['Darwin']
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_swap = self.swap(common, 'OS_NAME', 'Darwin')
 
         import pip
         try:
             sys.modules['pip'] = None
-            with uname_swap, self.print_swap, self.check_call_swap:
+            with os_swap, self.print_swap, self.check_call_swap:
                 with self.assertRaises(Exception):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
@@ -87,14 +86,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertFalse(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_linux_os(self):
-        def mock_uname():
-            return ['Linux']
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_swap = self.swap(common, 'OS_NAME', 'Linux')
 
         import pip
         try:
             sys.modules['pip'] = None
-            with uname_swap, self.print_swap, self.check_call_swap:
+            with os_swap, self.print_swap, self.check_call_swap:
                 with self.assertRaises(Exception):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
@@ -106,13 +103,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertFalse(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_windows_os(self):
-        def mock_uname():
-            return ['Windows']
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_swap = self.swap(common, 'OS_NAME', 'Windows')
         import pip
         try:
             sys.modules['pip'] = None
-            with uname_swap, self.print_swap, self.check_call_swap:
+            with os_swap, self.print_swap, self.check_call_swap:
                 with self.assertRaises(Exception):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
@@ -163,11 +158,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         chdir_swap = self.swap(os, 'chdir', mock_chdir)
         mkdir_swap = self.swap(os, 'mkdir', mock_mkdir)
-        check_call_swap = self.swap(subprocess, 'call', mock_call)
+        call_swap = self.swap(subprocess, 'call', mock_call)
         copytree_swap = self.swap(shutil, 'copytree', mock_copytree)
         input_swap = self.swap(fileinput, 'input', mock_input)
 
-        with exists_swap, chdir_swap, mkdir_swap, check_call_swap:
+        with exists_swap, chdir_swap, mkdir_swap, call_swap:
             with copytree_swap, input_swap, self.print_swap:
                 install_third_party_libs.install_skulpt(
                     argparse.Namespace(nojsrepl=False, noskulpt=False))
@@ -283,3 +278,51 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             self.assertEqual(f.read(), py_expected_text)
         with python_utils.open_file(temp_pq_config_file, 'r') as f:
             self.assertEqual(f.read(), pq_expected_text)
+
+    def test_get_yarn_command_on_linux(self):
+        check_function_call = {
+            'exists': False,
+            'rename': False
+        }
+        def mock_exists(path):
+            self.assertTrue(path.endswith('yarn'))
+            check_function_call['exists'] = True
+            return True
+
+        def mock_rename(origin, new):
+            self.assertTrue(origin.endswith('yarn'))
+            self.assertTrue(new.endswith('yarn.sh'))
+            check_function_call['rename'] = True
+
+        os_swap = self.swap(common, 'OS_NAME', 'Linux')
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        rename_swap = self.swap(os, 'rename', mock_rename)
+        with os_swap, exists_swap, rename_swap:
+            self.assertEqual(
+                install_third_party_libs.get_yarn_command(), 'yarn')
+        for called in check_function_call.values():
+            self.assertFalse(called)
+
+    def test_get_yarn_command_on_windows(self):
+        check_function_call = {
+            'exists': False,
+            'rename': False
+        }
+        def mock_exists(path):
+            self.assertTrue(path.endswith('yarn'))
+            check_function_call['exists'] = True
+            return True
+
+        def mock_rename(origin, new):
+            self.assertTrue(origin.endswith('yarn'))
+            self.assertTrue(new.endswith('yarn.sh'))
+            check_function_call['rename'] = True
+
+        os_swap = self.swap(common, 'OS_NAME', 'Windows')
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        rename_swap = self.swap(os, 'rename', mock_rename)
+        with os_swap, exists_swap, rename_swap:
+            self.assertEqual(
+                install_third_party_libs.get_yarn_command(), 'yarn.cmd')
+        for called in check_function_call.values():
+            self.assertTrue(called)

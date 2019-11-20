@@ -137,7 +137,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
 
     def test_start_subprocess_for_result(self):
         process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            ['python', '-c', 'print \"test\"'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # pylint: disable=unused-argument
         def mock_popen(
                 unused_cmd_tokens, stdout=subprocess.PIPE,
@@ -146,8 +147,10 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         # pylint: enable=unused-argument
 
         with self.swap(subprocess, 'Popen', mock_popen):
+            out, err = pre_commit_hook.start_subprocess_for_result('cmd')
+            out = out.replace('\r', '')
             self.assertEqual(
-                pre_commit_hook.start_subprocess_for_result('cmd'),
+                (out, err),
                 ('test\n', ''))
 
     def test_does_diff_include_package_lock_file_with_package_lock_in_diff(
