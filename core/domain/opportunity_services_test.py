@@ -18,6 +18,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_domain
@@ -598,3 +601,46 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunities[0],
             opportunity_domain.ExplorationOpportunitySummary)
         self.assertEqual(opportunities[0].id, '0')
+
+    def test_get_exploration_opportunity_summary_from_model_populates_new_lang(
+            self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.info()."""
+            observed_log_messages.append(msg % args)
+
+        opportunities = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['0']))
+        self.assertEqual(len(opportunities), 1)
+
+        opportunity = opportunities[0]
+
+        self.assertFalse(
+            'new_lang' in opportunity.incomplete_translation_language_codes)
+
+        mock_supported_languages = constants.SUPPORTED_AUDIO_LANGUAGES + [{
+            'id': 'new_lang',
+            'description': 'New language',
+            'relatedLanguages': ['new_lang']
+        }]
+
+        self.assertEqual(len(observed_log_messages), 0)
+
+        with self.swap(logging, 'info', _mock_logging_function), self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES', mock_supported_languages):
+            opportunities = (
+                opportunity_services
+                .get_exploration_opportunity_summaries_by_ids(['0']))
+            self.assertEqual(len(opportunities), 1)
+
+            opportunity = opportunities[0]
+
+            self.assertTrue(
+                'new_lang' in opportunity.incomplete_translation_language_codes)
+            self.assertEqual(len(observed_log_messages), 1)
+            self.assertEqual(
+                observed_log_messages[0],
+                'Missing language codes [u\'new_lang\'] in exploration '
+                'opportunity model with id 0')

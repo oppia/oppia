@@ -50,11 +50,6 @@ THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join('css', 'third_party.css')
 MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
     'css', 'third_party.min.css')
 
-FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
-# /webfonts is needed for font-awesome-5, due to changes
-# in its directory structure hence, FAM-5 now doesn't use /fonts
-# but /fonts is needed by BootStrap and will be removed later
-# if /fonts is not used by any other library.
 WEBFONTS_RELATIVE_DIRECTORY_PATH = os.path.join('webfonts', '')
 
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
@@ -117,7 +112,6 @@ JS_FILEPATHS_NOT_TO_BUILD = (
 # need cache invalidation.
 FILEPATHS_NOT_TO_RENAME = (
     '*.py',
-    'third_party/generated/fonts/*',
     'third_party/generated/js/third_party.min.js.map',
     'third_party/generated/webfonts/*',
     '*.bundle.js',
@@ -588,8 +582,6 @@ def build_third_party_libs(third_party_directory_path):
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
     THIRD_PARTY_CSS_FILEPATH = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
-    FONTS_DIR = os.path.join(
-        third_party_directory_path, FONTS_RELATIVE_DIRECTORY_PATH)
     WEBFONTS_DIR = os.path.join(
         third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH)
 
@@ -603,11 +595,6 @@ def build_third_party_libs(third_party_directory_path):
     with python_utils.open_file(
         THIRD_PARTY_CSS_FILEPATH, 'w+') as third_party_css_file:
         _join_files(dependency_filepaths['css'], third_party_css_file)
-
-    ensure_directory_exists(FONTS_DIR)
-    _execute_tasks(
-        _generate_copy_tasks_for_fonts(
-            dependency_filepaths['fonts'], FONTS_DIR))
 
     ensure_directory_exists(WEBFONTS_DIR)
     _execute_tasks(
@@ -1322,7 +1309,8 @@ def compile_typescript_files(project_dir):
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files...')
-    cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
+    cmd = [
+        'node', './node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
 
 
@@ -1338,7 +1326,7 @@ def compile_typescript_files_continuously(project_dir):
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files in watch mode...')
     cmd = [
-        './node_modules/typescript/bin/tsc', '--project', project_dir,
+        'node', './node_modules/typescript/bin/tsc', '--project', project_dir,
         '--watch']
 
     with python_utils.open_file('tsc_output_log.txt', 'w') as out:
