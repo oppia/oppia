@@ -24,6 +24,10 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
+import { QuestionSummaryObjectFactory } from
+  'domain/question/QuestionSummaryObjectFactory';
+import { QuestionSummaryForOneSkillObjectFactory } from
+  'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
@@ -132,6 +136,12 @@ describe('Skill editor state service', function() {
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value('RubricObjectFactory', new RubricObjectFactory());
+    $provide.value(
+      'QuestionSummaryObjectFactory', new QuestionSummaryObjectFactory());
+    $provide.value(
+      'QuestionSummaryForOneSkillObjectFactory',
+      new QuestionSummaryForOneSkillObjectFactory(
+        new QuestionSummaryObjectFactory));
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));

@@ -3,7 +3,7 @@
         style="float: right;">
   Create Question
 </button>
-<table class="dashboard-table" ng-if="$ctrl.getQuestionSummaries().length > 0">
+<table class="dashboard-table" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
   <colgroup>
     <col style="width: 5%;">
     <col style="width: 40%;">
@@ -37,33 +37,33 @@
       <p> Unlink question from skill </p>
     </th>
   </tr>
-  <tr ng-repeat="questionSummary in $ctrl.getQuestionSummaries()"
+  <tr ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill()"
       class="list-item protractor-test-question-list-item"
       style="height: 4em;"
-      ng-click="$ctrl.editQuestion(questionSummary.summary, questionSummary.skill_difficulties[0])"
+      ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDifficulty())"
       ng-dblclick="$event.stopPropagation()">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
-    <td class="question-content"> <[questionSummary.summary.question_content]> </td>
-    <td> <[$ctrl.getDifficultyString(questionSummary.skill_difficulties[0])]> </td>
+    <td class="question-content"> <[questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()]> </td>
+    <td> <[$ctrl.getDifficultyString(questionSummaryForOneSkill.getSkillDifficulty())]> </td>
     <td class="edit-icon" ng-click="$event.stopPropagation()">
-      <span ng-click="$ctrl.changeDifficulty(questionSummary.summary.id, questionSummary.skill_descriptions, questionSummary.skill_difficulties)"
+      <span ng-click="$ctrl.changeDifficulty(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())"
             class="list-summary">
         <i class="material-icons">edit</i>
       </span>
     </td>
     <td class="delete-icon" ng-click="$event.stopPropagation()">
-      <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummary.summary.id, questionSummary.skill_descriptions)"
+      <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription())"
             class="list-summary">
         <i class="material-icons">link_off</i>
       </span>
     </td>
   </tr>
 </table>
-<h4 ng-if="$ctrl.getQuestionSummaries().length === 0" style="color: gray;">
+<h4 ng-if="$ctrl.getQuestionSummariesForOneSkill().length === 0" style="color: gray;">
   Click on Create Question to create a new question.
 </h4>
 
-<div class="page-navigation-arrows" ng-if="$ctrl.getQuestionSummaries().length > 0">
+<div class="page-navigation-arrows" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
   <i class="material-icons md-18"
      ng-if="$ctrl.getCurrentPageNumber() !== 0"
      ng-click="$ctrl.goToPreviousPage()">&#xE5C4;

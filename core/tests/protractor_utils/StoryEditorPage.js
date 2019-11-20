@@ -48,6 +48,10 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-confirm-chapter-creation-button'));
   var addDestinationChapterButton = element(
     by.css('.protractor-test-add-destination-chapter-button'));
+  var deleteDestinationChapterButton = element(
+    by.css('.protractor-test-remove-destination-button'));
+  var destinationSelect = element(
+    by.css('.protractor-test-destination-select'));
   var chapterTitles = element.all(by.css('.protractor-test-chapter-title'));
   var deleteChapterButtons = element.all(
     by.css('.protractor-test-delete-chapter-button'));
@@ -57,6 +61,50 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-publish-story-button'));
   var unpublishStoryButton = element(
     by.css('.protractor-test-unpublish-story-button'));
+
+  /*
+   * CHAPTER
+   */
+  var initialChapterSelect = element(
+    by.css('.protractor-test-initial-chapter-select'));
+  var explorationIdInput = element(
+    by.css('.protractor-test-exploration-id-input'));
+  var explorationIdSaveButton = element(
+    by.css('.protractor-test-exploration-id-save-button'));
+  var nodeOutlineEditor = element(
+    by.css('.protractor-test-add-chapter-outline'));
+  var nodeOutlineSaveButton = element(
+    by.css('.protractor-test-node-outline-save-button'));
+  var addPrerequisiteSkillButton = element(
+    by.css('.protractor-test-add-prerequisite-skill'));
+  var addAcquiredSkillButton = element(
+    by.css('.protractor-test-add-acquired-skill'));
+  var selectSkillModalHeader = element(
+    by.css('.protractor-test-skill-select-header'));
+  var skillNameInputField = element(
+    by.css('.protractor-test-skill-name-input'));
+  var skillSaveButton = element(
+    by.css('.protractor-test-confirm-skill-selection-button'));
+  var skillListItems = element.all(
+    by.css('.protractor-test-skills-list-item'));
+  var disconnectedChapterWarning = element(
+    by.css('.protractor-test-disconnected-node-warning'));
+  var deletePrerequisiteSkillButton = element.all(
+    by.css('.protractor-test-remove-prerequisite-skill'));
+  var deleteAcquiredSkillButton = element.all(
+    by.css('.protractor-test-remove-acquired-skill'));
+  var prerequisiteSkillDescriptionCard = element.all(
+    by.css('.protractor-test-prerequisite-skill-description-card'));
+  var acquiredSkillDescriptionCard = element.all(
+    by.css('.protractor-test-acquired-skill-description-card'));
+  var nextChapterCard = element(by.css('.protractor-test-next-chapter-card'));
+  var warningIndicator = element(by.css('.protractor-test-warning-indicator'));
+  var warningTextElements = element.all(
+    by.css('.protractor-test-warnings-text'));
+  this.get = function(storyId) {
+    browser.get(EDITOR_URL_PREFIX + storyId);
+    return waitFor.pageToFullyLoad();
+  };
 
   this.publishStory = function() {
     publishStoryButton.click();
@@ -79,6 +127,21 @@ var StoryEditorPage = function() {
     newChapterTitleField.sendKeys(title);
     confirmChapterCreationButton.click();
     general.scrollToTop();
+  };
+
+  this.removeDestination = function() {
+    deleteDestinationChapterButton.click();
+  };
+
+  this.selectDestinationChapterByName = function(chapterName) {
+    var destinationOption = destinationSelect.element(
+      by.cssContainingText('option', chapterName));
+    destinationOption.click();
+  };
+
+  this.expectDestinationToBe = function(chapterName) {
+    var pattern = '\s*' + chapterName + '\s*';
+    return expect(nextChapterCard.getText()).toMatch(pattern);
   };
 
   this.expectNumberOfChaptersToBe = function(count) {
@@ -138,6 +201,164 @@ var StoryEditorPage = function() {
       'Close save modal button takes too long to be clickable');
     closeSaveModalButton.click();
     waitFor.pageToFullyLoad();
+  };
+
+  this.expectSaveStoryDisabled = function() {
+    return expect(
+      saveStoryButton.getAttribute('disabled')).toEqual('true');
+  };
+
+  this.expectDisplayUnreachableChapterWarning = function() {
+    return expect(disconnectedChapterWarning.isPresent()).toBe(true);
+  };
+
+  this.setChapterExplorationId = function(explorationId) {
+    waitFor.visibilityOf(
+      explorationIdInput,
+      'ExplorationIdInput takes too long to be visible'
+    );
+
+    explorationIdInput.sendKeys(explorationId);
+    waitFor.elementToBeClickable(
+      explorationIdSaveButton,
+      'ExplorationIdSaveButton takes too long to be clickable'
+    );
+    explorationIdSaveButton.click();
+  };
+
+  this.changeNodeOutline = function(richTextInstructions) {
+    var editor = forms.RichTextEditor(
+      nodeOutlineEditor);
+    editor.clear();
+    richTextInstructions(editor);
+    nodeOutlineSaveButton.click();
+  };
+
+  this.navigateToChapterByIndex = function(index) {
+    chapterTitles.then(function(elements) {
+      elements[index].click();
+    });
+  };
+
+  this.expectExplorationIdAlreadyExistWarningAndCloseIt = function() {
+    var warningToast = element(
+      by.css('.protractor-test-toast-warning-message'));
+    waitFor.visibilityOf(
+      warningToast,
+      'warningToast takes too long to be visible.');
+    expect(warningToast.getText()).toEqual(
+      'The given exploration already exists in the story.');
+    var closeToastButton = element(
+      by.css('.protractor-test-close-toast-warning'));
+    waitFor.elementToBeClickable(
+      closeToastButton,
+      'closeToastButton takes too long to be clickable.');
+    closeToastButton.click();
+  };
+
+  this.getSelectSkillModal = function() {
+    waitFor.visibilityOf(
+      selectSkillModalHeader,
+      'selectSkillModalHeader takes too long to be visible.');
+    return {
+      _searchSkillByName: function(name) {
+        waitFor.visibilityOf(
+          skillNameInputField,
+          'skillNameInputField takes too long to be visible');
+        skillNameInputField.sendKeys(name);
+      },
+
+      _selectSkillBasedOnIndex: function(index) {
+        skillListItems.then(function(elements) {
+          var selectedSkill = elements[index];
+          waitFor.elementToBeClickable(
+            selectedSkill,
+            'selectedSkill takes too long to be clickable.'
+          );
+          selectedSkill.click();
+        });
+      },
+
+      selectSkill: function(name) {
+        this._searchSkillByName(name);
+        this._selectSkillBasedOnIndex(0);
+        waitFor.elementToBeClickable(
+          skillSaveButton,
+          'doneButton takes too long to be clickable');
+        skillSaveButton.click();
+      },
+    };
+  };
+
+  this.addAcquiredSkill = function(skillName) {
+    waitFor.visibilityOf(
+      addAcquiredSkillButton,
+      'addAcquiredSkillButton takes too long to be visible');
+    waitFor.elementToBeClickable(
+      addAcquiredSkillButton,
+      'addAcquiredSkillButton takes too long to be clickable');
+    addAcquiredSkillButton.click();
+    var selectSkillModal = this.getSelectSkillModal();
+    selectSkillModal.selectSkill(skillName);
+  };
+
+  this.addPrerequisiteSkill = function(skillName) {
+    waitFor.visibilityOf(
+      addPrerequisiteSkillButton,
+      'addPrerequisitesSkillButton takes too long to be visible');
+    waitFor.elementToBeClickable(
+      addPrerequisiteSkillButton,
+      'addPrerequisitesSkillButton takes too long to be clickable');
+    addPrerequisiteSkillButton.click();
+    var selectSkillModal = this.getSelectSkillModal();
+    selectSkillModal.selectSkill(skillName);
+  };
+
+  this.deleteAcquiredSkillByIndex = function(index) {
+    deleteAcquiredSkillButton.then(function(elements) {
+      var toDelete = elements[index];
+      toDelete.click();
+    });
+  };
+
+  this.deletePrerequisiteSkillByIndex = function(index) {
+    deletePrerequisiteSkillButton.then(function(elements) {
+      var toDelete = elements[index];
+      toDelete.click();
+    });
+  };
+
+  this.expectAcquiredSkillDescriptionCardCount = function(number) {
+    expect(acquiredSkillDescriptionCard.count()).toBe(number);
+  };
+
+  this.expectPrerequisiteSkillDescriptionCardCount = function(number) {
+    expect(prerequisiteSkillDescriptionCard.count()).toBe(number);
+  };
+
+  this.selectInitialChapterByName = function(name) {
+    var initialChapterOption = initialChapterSelect.element(
+      by.cssContainingText('option', name));
+    initialChapterOption.click();
+  };
+
+  this.expectWarningInIndicator = function(warning) {
+    browser.actions().mouseMove(warningIndicator).perform();
+    warningTextElements.then(function(elems) {
+      var p = new Promise(function(resolve, reject) {
+        elems.forEach(function(elem) {
+          elem.getText().then(function(text) {
+            if (warning.test(text)) {
+              resolve(true);
+            }
+          });
+        });
+        reject();
+      });
+      p.then(function(result) {
+        expect(result).toBe(true);
+      });
+    });
   };
 };
 
