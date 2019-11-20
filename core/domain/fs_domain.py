@@ -38,7 +38,7 @@ CHANGE_LIST_SAVE = [{'cmd': 'save'}]
 ALLOWED_ENTITY_NAMES = [
     feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_TOPIC,
     feconf.ENTITY_TYPE_SKILL, feconf.ENTITY_TYPE_STORY,
-    feconf.ENTITY_TYPE_QUESTION]
+    feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_VOICEOVER_APPLICATION]
 
 
 class FileMetadataChange(change_domain.BaseChange):
