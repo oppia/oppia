@@ -149,9 +149,9 @@ angular.module('oppia').directive('feedbackTab', [
               ThreadDataService.createNewThread(
                 result.newThreadSubject, result.newThreadText
               ).then(() => {
-                  ctrl.clearActiveThread();
-                  AlertsService.addSuccessMessage('Feedback thread created.');
-                });
+                ctrl.clearActiveThread();
+                AlertsService.addSuccessMessage('Feedback thread created.');
+              });
             });
           };
 
