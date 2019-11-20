@@ -60,6 +60,8 @@ class QuestionsListHandler(base.BaseHandler):
                 if len(skill_ids) == 1:
                     return_dicts.append({
                         'summary': summary.to_dict(),
+                        'skill_id': merged_question_skill_links[
+                            index].skill_ids[0],
                         'skill_description': (
                             merged_question_skill_links[
                                 index].skill_descriptions[0]),
@@ -70,6 +72,8 @@ class QuestionsListHandler(base.BaseHandler):
                 else:
                     return_dicts.append({
                         'summary': summary.to_dict(),
+                        'skill_ids': merged_question_skill_links[
+                            index].skill_ids,
                         'skill_descriptions': (
                             merged_question_skill_links[
                                 index].skill_descriptions),

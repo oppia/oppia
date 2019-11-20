@@ -90,7 +90,7 @@ angular.module('oppia').directive('questionsList', [
           ctrl.selectedSkillIds = [];
           ctrl.associatedSkillSummaries = [];
           ctrl.selectedSkillId = ctrl.getSelectedSkillId();
-          ctrl.getQuestionSummaries =
+          ctrl.getQuestionSummariesForOneSkill =
             QuestionsListService.getCachedQuestionSummaries;
           ctrl.getCurrentPageNumber = QuestionsListService.getCurrentPageNumber;
           ctrl.editorIsOpen = false;
@@ -325,7 +325,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.misconceptionsBySkill = {};
             ctrl.associatedSkillSummaries = [];
             EditableQuestionBackendApiService.fetchQuestion(
-              questionSummary.id).then(function(response) {
+              questionSummary.getQuestionId()).then(function(response) {
               if (response.associated_skill_dicts) {
                 response.associated_skill_dicts.forEach(function(skillDict) {
                   ctrl.misconceptionsBySkill[skillDict.id] =

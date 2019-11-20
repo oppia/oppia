@@ -98,6 +98,12 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                     question_summary_dicts_2[i]['skill_descriptions'],
                     ['Skill Description 2', 'Skill Description'])
                 self.assertEqual(
+                    question_summary_dicts[i]['skill_ids'],
+                    [self.skill_id_2, self.skill_id])
+                self.assertEqual(
+                    question_summary_dicts_2[i]['skill_descriptions'],
+                    [self.skill_id_2, self.skill_id])
+                self.assertEqual(
                     question_summary_dicts[i]['skill_difficulties'], [0.3, 0.5])
                 self.assertEqual(
                     question_summary_dicts_2[i]['skill_difficulties'],
@@ -114,6 +120,8 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                 self.assertEqual(
                     question_summary_dicts_3[i]['skill_description'],
                     'Skill Description')
+                self.assertEqual(
+                    question_summary_dicts_3[i]['skill_id'], self.skill_id)
                 self.assertEqual(
                     question_summary_dicts_3[i]['skill_difficulty'], 0.5)
             self.assertNotEqual(
