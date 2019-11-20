@@ -143,13 +143,12 @@ angular.module('oppia').directive('feedbackTab', [
                     $uibModalInstance.dismiss('cancel');
                   };
                 }]
-            }).result.then(result => {
-              ThreadDataService.createNewThread(
-                result.newThreadSubject, result.newThreadText
-              ).then(() => {
-                ctrl.clearActiveThread();
-                AlertsService.addSuccessMessage('Feedback thread created.');
-              });
+            }).result.then(
+              result => ThreadDataService.createNewThread(
+                result.newThreadSubject, result.newThreadText)
+            ).then(() => {
+              ctrl.clearActiveThread();
+              AlertsService.addSuccessMessage('Feedback thread created.');
             });
           };
 
@@ -176,11 +175,8 @@ angular.module('oppia').directive('feedbackTab', [
             SuggestionModalForExplorationEditorService.showSuggestionModal(
               ctrl.activeThread.suggestion.suggestionType, {
                 activeThread: ctrl.activeThread,
-                setActiveThread: threadId => {
-                  ThreadDataService.fetchThreads().then(() => {
-                    ctrl.setActiveThread(threadId);
-                  });
-                },
+                setActiveThread: threadId => ThreadDataService.fetchThreads()
+                  .then(() => ctrl.setActiveThread(threadId)),
                 isSuggestionHandled: _isSuggestionHandled,
                 hasUnsavedChanges: _hasUnsavedChanges,
                 isSuggestionValid: _isSuggestionValid,
