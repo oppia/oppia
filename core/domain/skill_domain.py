@@ -325,9 +325,6 @@ class Rubric(python_utils.OBJECT):
                 'Expected explanation to be a string, received %s' %
                 self.explanation)
 
-        if self.explanation == '' or self.explanation == '<p></p>':
-            raise utils.ValidationError('Explanation should be non empty')
-
 
 class SkillContents(python_utils.OBJECT):
     """Domain object representing the skill_contents dict."""
