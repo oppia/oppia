@@ -401,8 +401,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 application submitted by the given user.
         """
         if status in STATUS_CHOICES:
-            return cls.query(ndb.AND(
-                cls.author_id == author_id, cls.status == status)).order(
+            return cls.query(
+                cls.author_id == author_id, cls.status == status).order(
                     -cls.created_on).fetch()
         else:
             return cls.query(cls.author_id == author_id).order(
