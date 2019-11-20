@@ -54,12 +54,13 @@ angular.module('oppia').directive('questionOpportunities', [
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'ContributionOpportunitiesService', 'EditableSkillBackendApiService',
-        'MisconceptionObjectFactory','QuestionObjectFactory',
+        'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionUndoRedoService', 'UserService',
         function(
-            $scope, $uibModal, AlertsService, ContributionOpportunitiesService,
-            EditableSkillBackendApiService, MisconceptionObjectFactory,
-            QuestionObjectFactory, QuestionUndoRedoService, UserService) {
+            $scope, $uibModal, AlertsService,
+            ContributionOpportunitiesService, EditableSkillBackendApiService,
+            MisconceptionObjectFactory, QuestionObjectFactory,
+            QuestionUndoRedoService, UserService) {
           var ctrl = this;
           var userIsLoggedIn = false;
           ctrl.opportunities = [];
@@ -176,28 +177,6 @@ angular.module('oppia').directive('questionOpportunities', [
                     return $scope.question.validate(
                       $scope.misconceptionsBySkill);
                   };
-
-                  // $scope.suggestQuestion = function() {
-                  //   if (!$scope.uploadingTranslation && !$scope.loadingData) {
-                  //     $scope.uploadingTranslation = true;
-                  //     TranslateTextService.suggestTranslatedText(
-                  //       $scope.activeWrittenTranslation.html,
-                  //       TranslationLanguageService.getActiveLanguageCode(),
-                  //       function() {
-                  //         if ($scope.moreAvailable) {
-                  //           var textAndAvailability = (
-                  //             TranslateTextService.getTextToTranslate());
-                  //           $scope.textToTranslate = textAndAvailability.text;
-                  //           $scope.moreAvailable = textAndAvailability.more;
-                  //         }
-                  //         $scope.activeWrittenTranslation.html = '';
-                  //         $scope.uploadingTranslation = false;
-                  //       });
-                  //   }
-                  //   if (!$scope.moreAvailable) {
-                  //     $uibModalInstance.dismiss('ok');
-                  //   }
-                  // };
 
                   $scope.cancel = function() {
                     if (QuestionUndoRedoService.hasChanges()) {
