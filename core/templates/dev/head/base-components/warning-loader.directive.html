@@ -1,10 +1,10 @@
 <div class="oppia-toast-container toast-top-center">
   <div ng-repeat="warning in ($ctrl.AlertsService.warnings | limitTo:5) track by $index"
        class="toast toast-warning oppia-toast">
-    <button type="button" class="toast-close-button" ng-click="$ctrl.AlertsService.deleteWarning(warning)"
+    <button type="button" class="toast-close-button protractor-test-close-toast-warning" ng-click="$ctrl.AlertsService.deleteWarning(warning)"
             role="button">&times;
     </button>
-    <div class="toast-message">
+    <div class="toast-message protractor-test-toast-warning-message">
       <[warning.content]>
     </div>
   </div>

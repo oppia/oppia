@@ -56,14 +56,14 @@
       <i class="material-icons">&#xE254;</i>
     </a>
     <div ng-show="getWarningsCount()"
-         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color">
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color protractor-test-warning-indicator">
       <span class="oppia-editor-warnings-count">
         <[getWarningsCount()]>
       </span>
     </div>
     <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
       <span class="oppia-editor-warnings-header">Warnings</span>
-      <li class="oppia-editor-warnings-text"
+      <li class="oppia-editor-warnings-text protractor-test-warnings-text"
           ng-repeat="issue in validationIssues track by $index">
         <hr class="oppia-editor-warnings-separator">
         <[issue]>
