@@ -603,6 +603,25 @@ def is_valid_language_code(language_code):
     return language_code in language_codes
 
 
+def get_supported_audio_language_description(language_code):
+    """Returns the language description for the given language code.
+
+    Args:
+        language_code: str. The language code for which the description is
+            required.
+
+    Returns:
+        str. The language description for the given language code.
+
+    Raises:
+        Exception: If the given language code is unsupported.
+    """
+    for language in constants.SUPPORTED_AUDIO_LANGUAGES:
+        if language['id'] == language_code:
+            return language['description']
+    raise Exception('Unsupported audio language code: %s' % language_code)
+
+
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent."""
     return python_utils.urllib_unquote(escaped_string).decode('utf-8')

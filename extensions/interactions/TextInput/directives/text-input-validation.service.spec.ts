@@ -27,6 +27,7 @@ import { OutcomeObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('interactions/TextInput/directives/text-input-validation.service.ts');
@@ -56,6 +57,12 @@ describe('TextInputValidationService', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

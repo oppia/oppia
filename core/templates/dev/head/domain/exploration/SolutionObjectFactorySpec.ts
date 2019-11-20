@@ -22,6 +22,7 @@ import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/SolutionObjectFactory.ts');
@@ -33,6 +34,12 @@ describe('Solution object factory', function() {
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
 
   describe('SolutionObjectFactory', function() {

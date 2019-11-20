@@ -28,6 +28,7 @@ import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 /* eslint-enable max-len */
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
@@ -73,6 +74,12 @@ describe('Creator dashboard controller', function() {
     beforeEach(function() {
       angular.mock.module('oppia');
     });
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
 
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.factory(

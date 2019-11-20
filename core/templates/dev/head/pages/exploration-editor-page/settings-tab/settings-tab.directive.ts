@@ -28,8 +28,8 @@ require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'param-changes-editor.directive.ts');
 
-require('domain/exploration/EditableExplorationBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -65,9 +65,9 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
-require('services/AlertsService.ts');
-require('services/EditabilityService.ts');
-require('services/ExplorationFeaturesService.ts');
+require('services/alerts.service.ts');
+require('services/editability.service.ts');
+require('services/exploration-features.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

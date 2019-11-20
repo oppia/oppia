@@ -34,6 +34,13 @@ var AdminPage = function() {
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('[ng-if="$ctrl.statusMessage"]'));
 
+  // Viewing roles can be done by two methods: 1. By roles 2. By username
+  var roleDropdown = element(by.css('.protractor-test-role-method'));
+  var roleValueOption = element(by.css('.protractor-test-role-value'));
+  var roleUsernameOption = element(by.css(
+    '.protractor-test-username-value'));
+  var viewRoleButton = element(by.css('.protractor-test-role-success'));
+
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
@@ -150,7 +157,48 @@ var AdminPage = function() {
     waitFor.textToBePresentInElement(
       statusMessage, 'successfully updated to',
       'Could not set role successfully');
-    return true;
+  };
+
+  this.getUsersAsssignedToRole = function(role) {
+    waitFor.visibilityOf(roleDropdown,
+      'View role dropdown taking too long to be visible');
+    roleDropdown.sendKeys('By Role');
+
+    roleValueOption.click();
+    roleValueOption.sendKeys(role);
+
+    viewRoleButton.click();
+  };
+
+  this.viewRolesbyUsername = function(username) {
+    waitFor.visibilityOf(roleDropdown,
+      'View role dropdown taking too long to be visible');
+    roleDropdown.sendKeys('By Username');
+
+    roleUsernameOption.click();
+    roleUsernameOption.sendKeys(username);
+
+    viewRoleButton.click();
+  };
+
+  this.expectUsernamesToMatch = function(expectedUsernamesArray) {
+    var foundUsersArray = [];
+    element.all(by.css('.protractor-test-roles-result-rows'))
+      .map(function(elm) {
+        return elm.getText();
+      })
+      .then(function(texts) {
+        texts.forEach(function(name) {
+          foundUsersArray.push(name);
+        });
+        expect(foundUsersArray.length).toEqual(expectedUsernamesArray.length);
+
+        expectedUsernamesArray.sort();
+        foundUsersArray.sort();
+        foundUsersArray.forEach(function(name, ind) {
+          expect(name).toEqual(expectedUsernamesArray[ind]);
+        });
+      });
   };
 };
 

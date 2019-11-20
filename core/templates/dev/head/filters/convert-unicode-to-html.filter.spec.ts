@@ -16,10 +16,21 @@
  * @fileoverview Tests for the convert unicode to html filter.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('filters/convert-unicode-to-html.filter.ts');
 
 describe('HTML to text', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   var htmlUnicodeHtmlPairings = [
     ['abc', 'abc', 'abc'],

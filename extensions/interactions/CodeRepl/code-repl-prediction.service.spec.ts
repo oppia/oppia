@@ -24,6 +24,7 @@ import { PredictionResultObjectFactory } from
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('CodeRepl prediction service', function() {
@@ -37,6 +38,12 @@ describe('CodeRepl prediction service', function() {
         new PredictionResultObjectFactory()));
     $provide.value(
       'WinnowingPreprocessingService', new WinnowingPreprocessingService());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
   describe('CodeRepl prediction service test', function() {
     var service, tokenizer;

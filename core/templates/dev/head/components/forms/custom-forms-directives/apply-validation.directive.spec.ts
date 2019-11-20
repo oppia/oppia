@@ -16,6 +16,11 @@
  * @fileoverview Tests for Directive for applying validation.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require(
   'components/forms/custom-forms-directives/' +
   'apply-validation.directive.ts');
@@ -24,6 +29,12 @@ describe('Testing apply-validation directive', function() {
   var $compile, element, scope, testInput;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.inject(function($rootScope) {
     scope = $rootScope.$new();

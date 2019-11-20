@@ -7,7 +7,15 @@
     <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
       <strong>New Skill Description</strong>
     </div>
-    <input type="text" class="form-control protractor-test-new-skill-description-field" placeholder="eg: Adding Fractions" ng-model="newSkillDescription" autofocus>
+    <input type="text" class="form-control protractor-test-new-skill-description-field"
+           placeholder="eg: Adding Fractions" ng-model="newSkillDescription"
+           autofocus maxlength="100">
+    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
+      <strong>Review Material</strong>
+    </div>
+    <review-material-editor bindable-dict="bindableDict"
+                            on-save-explanation="onSaveExplanation">
+    </review-material-editor>
     <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
       <strong>Add Skill Rubrics</strong>
     </div>
@@ -19,7 +27,7 @@
   <div class="modal-footer">
     <button class="btn btn-success protractor-test-confirm-skill-creation-button"
             type="submit"
-            ng-disabled="newSkillDescription.length === 0 || !allRubricsAdded">
+            ng-disabled="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0 || !allRubricsAdded">
             Save
     </button>
     <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>

@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for the prediction algorithm registry service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require(
   'pages/exploration-player-page/services/' +
   'prediction-algorithm-registry.service.ts');
@@ -26,6 +31,12 @@ describe('Prediction algorithm registry service', function() {
   describe('Test prediction algorithm registry functions', function() {
     var registryService, predictionService;
 
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
     beforeEach(function() {
       angular.mock.module(function($provide) {
         $provide.factory('PredictionSampleService', [function() {

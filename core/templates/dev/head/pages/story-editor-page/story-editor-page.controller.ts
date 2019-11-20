@@ -27,11 +27,11 @@ require(
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
 require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('services/PageTitleService.ts');
-require('services/contextual/UrlService.ts');
+require('services/page-title.service.ts');
+require('services/contextual/url.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 

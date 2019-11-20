@@ -29,6 +29,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
@@ -177,6 +178,8 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_ONBOARD_REVIEWER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
@@ -376,7 +379,7 @@ def send_mail_to_admin(email_subject, email_body):
         body, body.replace('\n', '<br/>'), bcc_admin=False)
 
 
-def send_post_signup_email(user_id):
+def send_post_signup_email(user_id, test_for_duplicate_email=False):
     """Sends a post-signup email to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
@@ -384,15 +387,17 @@ def send_post_signup_email(user_id):
 
     Args:
         user_id: str. User ID of the user that signed up.
+        test_for_duplicate_email: bool. For testing duplicate emails.
     """
 
-    for key, content in SIGNUP_EMAIL_CONTENT.value.items():
-        if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
-            log_new_error(
-                'Please ensure that the value for the admin config property '
-                'SIGNUP_EMAIL_CONTENT is set, before allowing post-signup '
-                'emails to be sent.')
-            return
+    if not test_for_duplicate_email:
+        for key, content in SIGNUP_EMAIL_CONTENT.value.items():
+            if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
+                log_new_error(
+                    'Please ensure that the value for the admin config '
+                    'property SIGNUP_EMAIL_CONTENT is set, before allowing '
+                    'post-signup emails to be sent.')
+                return
 
     user_settings = user_services.get_user_settings(user_id)
     email_subject = SIGNUP_EMAIL_CONTENT.value['subject']
@@ -762,8 +767,8 @@ def send_suggestion_email(
         can_users_receive_thread_email(recipient_list, exploration_id, True))
     for index, recipient_id in enumerate(recipient_list):
         recipient_user_settings = user_services.get_user_settings(recipient_id)
+        # Send email only if recipient wants to receive.
         if can_users_receive_email[index]:
-            # Send email only if recipient wants to receive.
             email_body = email_body_template % (
                 recipient_user_settings.username, author_settings.username,
                 exploration_id, exploration_title, exploration_id,
@@ -1018,8 +1023,8 @@ def send_mail_to_onboard_new_reviewers(user_id, category):
     can_user_receive_email = user_services.get_email_preferences(
         user_id).can_receive_email_updates
 
+    # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        # Send email only if recipient wants to receive.
         email_body = email_body_template % (
             recipient_user_settings.username, category, category,
             EMAIL_FOOTER.value)
@@ -1061,11 +1066,107 @@ def send_mail_to_notify_users_to_review(user_id, category):
     can_user_receive_email = user_services.get_email_preferences(
         user_id).can_receive_email_updates
 
+    # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        # Send email only if recipient wants to receive.
         email_body = email_body_template % (
             recipient_user_settings.username, category, EMAIL_FOOTER.value)
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_accepted_voiceover_application_email(
+        user_id, lesson_title, language_code):
+    """Sends an email to users to an give update on the accepted voiceover
+    application.
+
+    Args:
+        user_id: str. The id of the user whose voiceover application got
+            accepted.
+        lesson_title: str. The title of the lessons for which the voiceover
+            application got accepted.
+        language_code: str. The language code for which the voiceover
+            application got accepted.
+    """
+    email_subject = '[Accepted] Updates on submitted voiceover application'
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'Congratulations! Your voiceover application for "%s" lesson got '
+        'accepted and you have been assigned with a voice artist role in the '
+        'lesson. Now you will be able to add voiceovers to the lesson in %s '
+        'language.'
+        '<br><br>You can check the wiki page to learn'
+        '<a href="https://github.com/oppia/oppia/wiki/'
+        'Instructions-for-voice-artists">how to voiceover a lesson</a><br><br>'
+        'Thank you for helping improve Oppia\'s lessons!'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        user_id).can_receive_email_updates
+
+    # Send email only if recipient wants to receive.
+    if can_user_receive_email:
+        language = utils.get_supported_audio_language_description(language_code)
+        email_body = email_body_template % (
+            recipient_user_settings.username, lesson_title, language,
+            EMAIL_FOOTER.value)
+        _send_email(
+            user_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_rejected_voiceover_application_email(
+        user_id, lesson_title, language_code, rejection_message):
+    """Sends an email to users to give update on the rejected voiceover
+    application.
+
+    Args:
+        user_id: str. The id of the user whose voiceover application got
+            accepted.
+        lesson_title: str. The title of the lessons for which the voiceover
+            application got accepted.
+        language_code: str. The language code in which for which the voiceover
+            application got accepted.
+        rejection_message: str. The message left by the reviewer while rejecting
+            the voiceover application.
+    """
+    email_subject = 'Updates on submitted voiceover application'
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'Your voiceover application for "%s" lesson in language %s got rejected'
+        ' and the reviewer has left a message.'
+        '<br><br>Review message: %s<br><br>'
+        'You can create a new voiceover application through the'
+        '<a href="https://oppia.org/community_dashboard">'
+        'community dashboard</a> page.<br><br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        user_id).can_receive_email_updates
+
+    # Send email only if recipient wants to receive.
+    if can_user_receive_email:
+        language = utils.get_supported_audio_language_description(language_code)
+        email_body = email_body_template % (
+            recipient_user_settings.username, lesson_title, language,
+            rejection_message, EMAIL_FOOTER.value)
+        _send_email(
+            user_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)

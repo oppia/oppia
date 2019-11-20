@@ -16,68 +16,7 @@
  * @fileoverview Unit tests for the PlaythroughImprovementTaskObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// PlaythroughImprovementTaskObjectFactory.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
-import { FeedbackThreadObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
-import { PlaythroughObjectFactory } from
-  'domain/statistics/PlaythroughObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-/* eslint-enable max-len */
-import { SuggestionModalService } from 'services/SuggestionModalService';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
-/* eslint-disable max-len */
-import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-/* eslint-enable max-len */
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-// ^^^ This block is to be removed.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 require('domain/statistics/PlaythroughImprovementTaskObjectFactory');
 
@@ -86,100 +25,55 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   var $rootScope = null;
   var $uibModal = null;
   var PlaythroughImprovementTaskObjectFactory = null;
-  var playthroughIssueObjectFactory = null;
   var PlaythroughIssuesService = null;
+  var UserExplorationPermissionsService = null;
   var PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = null;
 
-  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
-    $provide.value(
-      'AnswerGroupObjectFactory',
-      new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-    $provide.value('EditabilityService', new EditabilityService());
-    $provide.value(
-      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
-    $provide.value(
-      'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory',
-      new HintObjectFactory(new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'ImprovementActionButtonObjectFactory',
-      new ImprovementActionButtonObjectFactory());
-    $provide.value(
-      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
-    $provide.value(
-      'OutcomeObjectFactory',
-      new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()));
-    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value(
-      'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
-    $provide.value(
-      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
-        new LearnerActionObjectFactory()));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-    $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService(
-        new ClassifierObjectFactory()));
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('SuggestionModalService', new SuggestionModalService());
-    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
-    $provide.value(
-      'ThreadStatusDisplayService', new ThreadStatusDisplayService());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory', new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
 
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
-      _PlaythroughImprovementTaskObjectFactory_,
-      _PlaythroughIssueObjectFactory_, _PlaythroughIssuesService_,
-      _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_) {
+      _PlaythroughImprovementTaskObjectFactory_, _PlaythroughIssuesService_,
+      _UserExplorationPermissionsService_, _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_,
+      // TODO(#7222): Import these as done above after
+      // PlaythroughImprovementTaskObjectFactory is upgraded to Angular 8.
+      ExplorationFeaturesService, PlaythroughIssueObjectFactory) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
     PlaythroughImprovementTaskObjectFactory =
       _PlaythroughImprovementTaskObjectFactory_;
-    playthroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
+    UserExplorationPermissionsService = _UserExplorationPermissionsService_;
     PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = _PLAYTHROUGH_IMPROVEMENT_TASK_TYPE_;
 
-    PlaythroughIssuesService.initSession(expId, expVersion);
-
-    var expId = '7';
-    var expVersion = 1;
-    this.scope = $rootScope.$new();
+    // TODO(#7222): Use these as done above after
+    // PlaythroughImprovementTaskObjectFactory is upgraded to Angular 8.
+    this.ExplorationFeaturesService = ExplorationFeaturesService;
+    this.PlaythroughIssueObjectFactory = PlaythroughIssueObjectFactory;
   }));
 
+  beforeEach(function() {
+    this.expId = '7';
+    this.expVersion = 1;
+    PlaythroughIssuesService.initSession(this.expId, this.expVersion);
+
+    this.scope = $rootScope.$new();
+  });
+
   describe('.createNew', function() {
+    beforeEach(function() {
+      spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({can_edit: true}));
+    });
+
     it('retrieves data from passed issue', function() {
-      var issue = playthroughIssueObjectFactory.createFromBackendDict({
+      var issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
         issue_customization_args: {
           state_name: {value: 'Hola'},
@@ -192,23 +86,22 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
 
       var task = PlaythroughImprovementTaskObjectFactory.createNew(issue);
 
-      expect(task.getTitle()).toEqual(
-        PlaythroughIssuesService.renderIssueStatement(issue));
+      expect(task.getTitle())
+        .toEqual(PlaythroughIssuesService.renderIssueStatement(issue));
       expect(task.getDirectiveData()).toEqual({
         title: PlaythroughIssuesService.renderIssueStatement(issue),
-        suggestions:
-          PlaythroughIssuesService.renderIssueSuggestions(issue),
+        suggestions: PlaythroughIssuesService.renderIssueSuggestions(issue),
         playthroughIds: ['1', '2'],
       });
-      expect(task.getDirectiveType()).toEqual(
-        PLAYTHROUGH_IMPROVEMENT_TASK_TYPE);
+      expect(task.getDirectiveType())
+        .toEqual(PLAYTHROUGH_IMPROVEMENT_TASK_TYPE);
     });
   });
 
   describe('.fetchTasks', function() {
-    it('returns a task for each existing issue', function(done) {
-      var earlyQuitIssue =
-        playthroughIssueObjectFactory.createFromBackendDict({
+    beforeEach(function() {
+      this.earlyQuitIssue =
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -218,11 +111,8 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
-      var earlyQuitTaskTitle =
-        PlaythroughIssuesService.renderIssueStatement(earlyQuitIssue);
-
-      var multipleIncorrectSubmissionsIssue =
-        playthroughIssueObjectFactory.createFromBackendDict({
+      this.multipleIncorrectSubmissionsIssue =
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'MultipleIncorrectSubmissions',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -232,12 +122,8 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
-      var multipleIncorrectSubmissionsTaskTitle =
-        PlaythroughIssuesService.renderIssueStatement(
-          multipleIncorrectSubmissionsIssue);
-
-      var cyclicTransitionsIssue =
-        playthroughIssueObjectFactory.createFromBackendDict({
+      this.cyclicTransitionsIssue =
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'CyclicTransitions',
           issue_customization_args: {
             state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
@@ -246,33 +132,57 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
-      var cyclicTransitionsTaskTitle =
-        PlaythroughIssuesService.renderIssueStatement(
-          cyclicTransitionsIssue);
-
-      spyOn(PlaythroughIssuesService, 'getIssues').and.returnValue(
-        $q.resolve([
-          earlyQuitIssue,
-          multipleIncorrectSubmissionsIssue,
-          cyclicTransitionsIssue,
+      this.getIssuesSpy = spyOn(PlaythroughIssuesService, 'getIssues')
+        .and.returnValue($q.resolve([
+          this.earlyQuitIssue,
+          this.multipleIncorrectSubmissionsIssue,
+          this.cyclicTransitionsIssue,
         ]));
 
+      spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({can_edit: true}));
+    });
+
+    it('returns task for each issue if recording is enabled', function(done) {
+      spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
+        .and.returnValue(true);
+
       PlaythroughImprovementTaskObjectFactory.fetchTasks()
-        .then(function(tasks) {
-          expect(tasks.length).toEqual(3);
-          expect(tasks[0].getTitle()).toEqual(earlyQuitTaskTitle);
-          expect(tasks[1].getTitle())
-            .toEqual(multipleIncorrectSubmissionsTaskTitle);
-          expect(tasks[2].getTitle()).toEqual(cyclicTransitionsTaskTitle);
+        .then(allTasks => allTasks.map(task => task.getTitle()))
+        .then(allTaskTitles => {
+          expect(allTaskTitles).toEqual([
+            PlaythroughIssuesService.renderIssueStatement(
+              this.earlyQuitIssue),
+            PlaythroughIssuesService.renderIssueStatement(
+              this.multipleIncorrectSubmissionsIssue),
+            PlaythroughIssuesService.renderIssueStatement(
+              this.cyclicTransitionsIssue),
+          ]);
         }).then(done, done.fail);
 
-      this.scope.$digest(); // Forces all pending promises to evaluate.
+      // Force all pending promises to evaluate.
+      this.scope.$digest();
+    });
+
+    it('returns nothing if recording is disabled', function(done) {
+      spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
+        .and.returnValue(false);
+
+      PlaythroughImprovementTaskObjectFactory.fetchTasks()
+        .then(allTasks => allTasks.map(task => task.getTitle()))
+        .then(allTaskTitles => {
+          expect(allTaskTitles).toEqual([]);
+          expect(this.getIssuesSpy).not.toHaveBeenCalled();
+        }).then(done, done.fail);
+
+      // Force all pending promises to evaluate.
+      this.scope.$digest();
     });
   });
 
   describe('PlaythroughImprovementTask', function() {
     beforeEach(function() {
-      this.issue = playthroughIssueObjectFactory.createFromBackendDict({
+      this.issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
         issue_customization_args: {
           state_name: {value: 'Hola'},
@@ -282,55 +192,85 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         schema_version: 1,
         is_valid: true,
       });
-      this.task = PlaythroughImprovementTaskObjectFactory.createNew(this.issue);
     });
 
     describe('.getActionButtons', function() {
-      it('contains a specific sequence of buttons', function() {
-        expect(this.task.getActionButtons().length).toEqual(1);
-        expect(this.task.getActionButtons()[0].getText())
-          .toEqual('Mark as Resolved');
+      describe('for a user with edit permissions', function() {
+        it('has the mark as resolved button', function() {
+          spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+            .and.returnValue($q.resolve({can_edit: true}));
+
+          var task = PlaythroughImprovementTaskObjectFactory.createNew(
+            this.issue);
+
+          // Force all pending promises to evaluate.
+          this.scope.$digest();
+
+          expect(task.getActionButtons().map(button => button.getText()))
+            .toEqual(['Mark as Resolved']);
+        });
+      });
+
+      describe('for a user without edit permissions', function() {
+        it('has no buttons', function() {
+          spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+            .and.returnValue($q.resolve({can_edit: false}));
+
+          var task = PlaythroughImprovementTaskObjectFactory.createNew(
+            this.issue);
+
+          // Force all pending promises to evaluate.
+          this.scope.$digest();
+
+          expect(task.getActionButtons().map(button => button.getText()))
+            .toEqual([]);
+        });
       });
     });
 
     describe('Mark as Resolved Action Button', function() {
-      it('marks the task as resolved after confirmation', function() {
-        var task = this.task;
-        var issue = this.issue;
-        var resolveActionButton = task.getActionButtons()[0];
-        var resolveIssueSpy =
+      beforeEach(function() {
+        spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+          .and.returnValue($q.resolve({can_edit: true}));
+
+        this.task = PlaythroughImprovementTaskObjectFactory.createNew(
+          this.issue);
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
+        this.resolveActionButton = this.task.getActionButtons()[0];
+
+        this.resolveIssueSpy =
           spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
+      });
 
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve(), // Returned when confirm button is pressed.
-        });
+      it('marks the task as resolved after confirmation', function() {
+        expect(this.task.getStatus()).toEqual('open');
 
-        expect(task.getStatus()).toEqual('open');
-        resolveActionButton.execute();
+        // Mock confirmation by returning a resolved promise.
+        spyOn($uibModal, 'open').and.returnValue({result: $q.resolve()});
 
-        this.scope.$digest(); // Forces all pending promises to evaluate.
+        this.resolveActionButton.execute();
 
-        expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
-        expect(task.getStatus()).not.toEqual('open');
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
+
+        expect(this.resolveIssueSpy).toHaveBeenCalledWith(this.issue);
+        expect(this.task.getStatus()).not.toEqual('open');
       });
 
       it('keeps the task after cancel', function() {
-        var task = this.task;
-        var issue = this.issue;
-        var resolveActionButton = task.getActionButtons()[0];
-        var resolveIssueSpy =
-          spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
+        expect(this.task.getStatus()).toEqual('open');
 
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject(), // Returned when cancel button is pressed.
-        });
+        // Mock cancellation by returning a rejected promise.
+        spyOn($uibModal, 'open').and.returnValue({result: $q.reject()});
 
-        expect(task.getStatus()).toEqual('open');
-        resolveActionButton.execute();
-        this.scope.$digest(); // Forces all pending promises to evaluate.
+        this.resolveActionButton.execute();
 
-        expect(resolveIssueSpy).not.toHaveBeenCalled();
-        expect(task.getStatus()).toEqual('open');
+        // Force all pending promises to evaluate.
+        this.scope.$digest();
+
+        expect(this.resolveIssueSpy).not.toHaveBeenCalled();
+        expect(this.task.getStatus()).toEqual('open');
       });
     });
   });

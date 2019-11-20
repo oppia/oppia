@@ -16,9 +16,9 @@
  * @fileoverview A service that fetches and stores the permissions
  * of a user for a particular exploration.
  */
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/ContextService.ts');
-require('services/contextual/UrlService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/context.service.ts');
+require('services/contextual/url.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

@@ -34,10 +34,10 @@ require('components/rubrics-editor/rubrics-editor.directive.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardBackendApiService.ts'
+  'topics-and-skills-dashboard-backend-api.service.ts'
 );
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
@@ -156,7 +156,16 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 function($scope, $uibModalInstance) {
                   $scope.newSkillDescription = '';
                   $scope.rubrics = rubrics;
-                  $scope.allRubricsAdded = false;
+                  $scope.allRubricsAdded = true;
+                  $scope.bindableDict = {
+                    displayedConceptCardExplanation: ''
+                  };
+                  var newExplanationObject = null;
+
+                  $scope.$watch('newSkillDescription', function() {
+                    $scope.rubrics[1].setExplanation(
+                      '<p>' + $scope.newSkillDescription + '</p>');
+                  });
 
                   var areAllRubricsPresent = function() {
                     for (var idx in $scope.rubrics) {
@@ -168,6 +177,11 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     $scope.allRubricsAdded = true;
                   };
 
+                  $scope.onSaveExplanation = function(explanationObject) {
+                    newExplanationObject = explanationObject.toBackendDict();
+                    $scope.bindableDict.displayedConceptCardExplanation =
+                      explanationObject.getHtml();
+                  };
 
                   $scope.onSaveRubric = function(difficulty, explanation) {
                     for (var idx in $scope.rubrics) {
@@ -181,7 +195,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   $scope.createNewSkill = function() {
                     $uibModalInstance.close({
                       description: $scope.newSkillDescription,
-                      rubrics: $scope.rubrics
+                      rubrics: $scope.rubrics,
+                      explanation: newExplanationObject
                     });
                   };
 
@@ -192,7 +207,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               ]
             }).result.then(function(result) {
               SkillCreationService.createNewSkill(
-                result.description, result.rubrics, []);
+                result.description, result.rubrics, result.explanation, []);
             });
           };
 

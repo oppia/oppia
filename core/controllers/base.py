@@ -51,7 +51,6 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
 
-
 def _clear_login_cookies(response_headers):
     """Clears login cookies from the given response headers."""
 

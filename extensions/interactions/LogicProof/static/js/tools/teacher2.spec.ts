@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for LogicProof interaction teacher2 components.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
+import logicProofTeacher from 'interactions/LogicProof/static/js/teacher';
+import logicProofData from 'interactions/LogicProof/static/js/data';
 import logicProofTeacher2 from
-  'interactions/LogicProof/static/js/tools/teacher2.ts';
+  'interactions/LogicProof/static/js/tools/teacher2';
 
 describe('Build line templates', function() {
   var errorWrapper2 = function(

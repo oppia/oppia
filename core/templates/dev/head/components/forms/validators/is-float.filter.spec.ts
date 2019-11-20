@@ -16,12 +16,24 @@
  * @fileoverview Tests for Validator to check if input is float.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('components/forms/validators/is-float.filter.ts');
 
 describe('Normalizer tests', function() {
   var filterName = 'isFloat';
 
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   it('should have the relevant filters', angular.mock.inject(function($filter) {
     expect($filter(filterName)).not.toEqual(null);

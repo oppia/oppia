@@ -22,8 +22,8 @@
 
 require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/HtmlEscaperService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponsePencilCodeEditor', [
   'HtmlEscaperService', 'UrlInterpolationService',

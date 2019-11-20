@@ -62,6 +62,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -86,6 +87,12 @@ describe('TrainingDataService', function() {
 
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(function() {
     angular.mock.module('oppia');

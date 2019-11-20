@@ -172,6 +172,157 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(observed_training_data, expected_training_data)
 
+    def test_get_content_html_with_correct_state_name_returns_html(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>hint one</p>')
+
+        hints_list[0]['hint_content']['html'] = '<p>Changed hint one</p>'
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
+
+    def test_get_content_html_with_invalid_content_id_raise_error(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>hint one</p>')
+
+        with self.assertRaisesRegexp(
+            ValueError, 'Content ID Invalid id does not exist'):
+            init_state.get_content_html('Invalid id')
+
+    def test_get_content_id_mapping_needing_translations_with_existing_translations(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome_dict = {
+            'dest': 'Introduction',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': '<p>The default outcome.</p>'},
+            'labelled_as_correct': False,
+            'missing_prerequisite_skill_id': None,
+            'param_changes': [],
+            'refresher_exploration_id': None
+        }
+
+        init_state.update_interaction_default_outcome(default_outcome_dict)
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            },
+        }
+
+        init_state.update_interaction_solution(solution_dict)
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                },
+                'hint_1': {},
+                'default_outcome': {},
+                'solution': {},
+                'feedback_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        init_state.update_written_translations(written_translations)
+
+        self.assertEqual(
+            init_state.get_content_id_mapping_needing_translations('hi'), {
+                'hint_1': '<p>hint one</p>',
+                'solution': '<p>hello_world is a string</p>',
+                'feedback_1': '<p>Feedback</p>',
+                'default_outcome': '<p>The default outcome.</p>'
+            })
+
+    def test_add_translation_works_correctly(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+
+        self.assertEqual(init_state.get_translation_counts(), {})
+
+        init_state.add_translation('content', 'hi', '<p>Translated text</p>')
+
+        self.assertEqual(init_state.get_translation_counts(), {'hi': 1})
+
     def test_state_operations(self):
         """Test adding, updating and checking existence of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -1281,6 +1432,45 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_content_ids_for_text_translation(), [
                 'feedback_2', 'feedback_1'])
 
+    def test_get_translated_content_in_non_existing_language_raise_error(self):
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': '<p> In English.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        translated_content = written_translations.get_translated_content(
+            'content', 'en')
+        self.assertEqual(translated_content, '<p> In English.</p>')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Translation for the given content_id content does not '
+            'exist in hi language code'):
+            written_translations.get_translated_content('content', 'hi')
+
+    def test_get_translated_content_for_invalid_content_id_raise_error(self):
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': '<p> In English.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        translated_content = written_translations.get_translated_content(
+            'content', 'en')
+        self.assertEqual(translated_content, '<p> In English.</p>')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid content_id: invalid_id'):
+            written_translations.get_translated_content('invalid_id', 'hi')
+
     def test_add_content_id_for_translations_adds_content_id(self):
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {}
@@ -1458,6 +1648,59 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                 'Expected state written_translations to match the listed '
                 'content ids [\'invalid_content\']')):
             written_translations.validate([b'invalid_content'])
+
+    def test_get_content_ids_that_are_correctly_translated(self):
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {},
+                'hint_1': {}
+            }
+        }
+
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        self.assertEqual(
+            written_translations.get_content_ids_that_are_correctly_translated(
+                'hi'), [])
+
+    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations(self): # pylint: disable=line-too-long
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                },
+                'hint_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        self.assertEqual(
+            written_translations.get_content_ids_that_are_correctly_translated(
+                'hi'), ['content'])
+
+    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations_needs_update(self): # pylint: disable=line-too-long
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>hello!</p>',
+                        'needs_update': True
+                    }
+                },
+                'hint_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        self.assertEqual(
+            written_translations.get_content_ids_that_are_correctly_translated(
+                'hi'), [])
 
 
 class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):

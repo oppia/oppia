@@ -52,7 +52,8 @@
       </suggestion-improvement-task>
     </div>
 
-    <div class="oppia-improvement-task-footer modal-footer">
+    <div ng-if="task.getActionButtons().length > 0"
+         class="oppia-improvement-task-footer modal-footer">
       <button ng-repeat="actionButton in task.getActionButtons()"
               ng-click="actionButton.execute()" ng-disabled="!actionButton.isEnabled()"
               ng-class="actionButton.getCssClass()"

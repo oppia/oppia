@@ -16,8 +16,8 @@
  * @fileoverview Directive for the local navigation in the learner view.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
@@ -28,9 +28,9 @@ require('pages/exploration-player-page/services/player-position.service.ts');
 require(
   'pages/exploration-player-page/suggestion-modal-for-learner-local-view/' +
   'suggestion-modal-for-exploration-player.service.ts');
-require('services/AlertsService.ts');
-require('services/UserService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/alerts.service.ts');
+require('services/user.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');

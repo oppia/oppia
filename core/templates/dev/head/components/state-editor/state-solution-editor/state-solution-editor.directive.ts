@@ -23,7 +23,7 @@ require(
   'components/state-directives/solution-editor/solution-editor.directive.ts');
 
 require('domain/exploration/SolutionObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
@@ -50,11 +50,11 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/EditabilityService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/GenerateContentIdService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/editability.service.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/generate-content-id.service.ts');
 
 require('components/state-editor/state-editor.constants.ajs.ts');
 
@@ -290,6 +290,8 @@ angular.module('oppia').directive('stateSolutionEditor', [
               StateEditorService.deleteCurrentSolutionValidity();
             });
           };
+
+          StateEditorService.updateStateSolutionEditorInitialised();
         }
       ]
     };
