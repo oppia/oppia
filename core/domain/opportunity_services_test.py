@@ -615,7 +615,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 ['0']))
         self.assertEqual(len(opportunities), 1)
 
-        opportunity = opportunities['0']
+        opportunity = opportunities[0]
 
         self.assertFalse(
             'new_lang' in opportunity.incomplete_translation_language_codes)
@@ -635,7 +635,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 .get_exploration_opportunity_summaries_by_ids(['0']))
             self.assertEqual(len(opportunities), 1)
 
-            opportunity = opportunities['0']
+            opportunity = opportunities[0]
 
             self.assertTrue(
                 'new_lang' in opportunity.incomplete_translation_language_codes)
