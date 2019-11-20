@@ -33,7 +33,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import collections
 import os
+import platform
 import pprint
+import re
 import shutil
 import subprocess
 import sys
@@ -114,7 +116,10 @@ def get_remote_name():
     task = subprocess.Popen(get_remotes_name_cmd, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     out, err = task.communicate()
-    remotes = python_utils.UNICODE(out)[:-1].split('\n')
+
+    # Get rid of Windows new line symbol.
+    out = python_utils.UNICODE(out)[:-1].replace('\r', '')
+    remotes = re.split('\n|\t', out)
     if not err:
         for remote in remotes:
             get_remotes_url_cmd = (
@@ -123,6 +128,7 @@ def get_remote_name():
                                     stderr=subprocess.PIPE)
             remote_url, err = task.communicate()
             if not err:
+                remote_url = remote_url.replace('\r', '')
                 if remote_url.endswith('oppia/oppia.git\n'):
                     remote_num += 1
                     remote_name = remote
@@ -312,20 +318,23 @@ def install_hook():
         python_utils.PRINT('Symlink already exists')
     else:
         try:
-            os.symlink(os.path.abspath(__file__), pre_push_file)
+            # On Windows, it will try to copy the pyc file instead the py file.
+            this_file = __file__.replace('pyc', 'py')
+            os.symlink(os.path.abspath(this_file), pre_push_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
         except (OSError, AttributeError):
-            shutil.copy(__file__, pre_push_file)
+            shutil.copy(this_file, pre_push_file)
             python_utils.PRINT('Copied file to .git/hooks directory')
 
     python_utils.PRINT('Making pre-push hook file executable ...')
-    _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
+    if platform.uname()[0] != 'Windows':
+        _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
-    if not err_chmod_cmd:
-        python_utils.PRINT('pre-push hook file is now executable!')
-    else:
-        raise ValueError(err_chmod_cmd)
+        if not err_chmod_cmd:
+            python_utils.PRINT('pre-push hook file is now executable!')
+        else:
+            raise ValueError(err_chmod_cmd)
 
 
 def does_diff_include_js_or_ts_files(files_to_lint):

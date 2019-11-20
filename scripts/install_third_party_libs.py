@@ -88,12 +88,11 @@ def pip_install(package, version, install_path):
             'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
             'page:'])
 
-        os_info = os.uname()
-        if os_info[0] == 'Darwin':
+        if common.OS_NAME == 'Darwin':
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
                 'OS%29')
-        elif os_info[0] == 'Linux':
+        elif common.OS_NAME == 'Linux':
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
                 '%29')
@@ -210,6 +209,19 @@ def ensure_pip_library_is_installed(package, version, path):
         pip_install(package, version, exact_lib_path)
 
 
+def get_yarn_command():
+    """Get command for yarn."""
+    # Rename the one without extension, otherwise it will be executed.
+    if common.OS_NAME == 'Windows':
+        origin_yarn_bin = os.path.join(common.YARN_PATH, 'bin', 'yarn')
+        if os.path.exists(origin_yarn_bin):
+            os.rename(
+                origin_yarn_bin,
+                os.path.join(common.YARN_PATH, 'bin', 'yarn.sh'))
+        return 'yarn.cmd'
+    return 'yarn'
+
+
 def main(args=None):
     """Install third-party libraries for Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -266,7 +278,8 @@ def main(args=None):
     install_third_party.main(args=[])
 
     # Install third-party node modules needed for the build process.
-    subprocess.check_call(['yarn'])
+    yarn_command = get_yarn_command()
+    subprocess.check_call([yarn_command])
 
     install_skulpt(parsed_args)
 
