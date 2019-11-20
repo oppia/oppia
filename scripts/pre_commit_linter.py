@@ -2758,7 +2758,8 @@ class OtherLintChecksManager(LintChecksManager):
             self.css_filepaths + self.html_filepaths +
             self.other_filepaths + self.py_filepaths)
 
-    def _check_import_order(self):
+    def _check_import_order(
+            self, py_filepaths, global_stdout, process_manager):
         """This function is used to check that each file
         has imports placed in alphabetical order.
         """
