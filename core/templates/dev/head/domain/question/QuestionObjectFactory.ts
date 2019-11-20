@@ -18,6 +18,7 @@
  */
 
 require('domain/state/StateObjectFactory.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionObjectFactory', [
   'StateObjectFactory', 'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
