@@ -1550,7 +1550,7 @@ def _lint_py_files_for_python3_compatibility(
     python_utils.PRINT('Python linting for Python 3 compatibility finished.')
 
 
-def _check_codeowner_file(verbose_mode_enabled):
+def check_codeowner_file(verbose_mode_enabled):
     """Checks the CODEOWNERS file for any uncovered dirs/files and also
     checks that every pattern in the CODEOWNERS file matches at least one
     file/dir. Note that this checks the CODEOWNERS file according to the
