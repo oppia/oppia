@@ -29,11 +29,11 @@ require(
 
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ExplorationDataService',
-  'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory', 'UserService',
+  'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
   'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
   function(
       $http, $q, AlertsService, ExplorationDataService,
-      FeedbackThreadObjectFactory, SuggestionThreadObjectFactory, UserService,
+      FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
     var _expId = ExplorationDataService.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
@@ -135,7 +135,7 @@ angular.module('oppia').factory('ThreadDataService', [
 
         return $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
           thread_id: threadId,
-        }).then(thread.threadSummary.markTheLastTwoMessagesAsRead)
+        }).then(thread.threadSummary.markTheLastTwoMessagesAsRead);
       },
       addNewMessage: function(threadId, newMessage, newStatus) {
         var thread = this.getThread(threadId);
