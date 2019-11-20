@@ -646,7 +646,17 @@ class QuestionRightsSnapshotMetadataModel(
 
 class QuestionRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question rights snapshot."""
-    pass
+
+    def migrate_snapshot_model(self):
+        """Migrate model to use the new user ID in the owner_ids, editor_ids,
+        voice_artist_ids and viewer_ids.
+        """
+        reconstituted_rights_model = QuestionRightsModel(**self.content)
+        reconstituted_rights_model.creator_id = (
+            user_models.UserSettingsModel.get_by_gae_id(
+                reconstituted_rights_model.creator_id).user_id)
+        self.content = reconstituted_rights_model.to_dict()
+        self.put(update_last_updated_time=False)
 
 
 class QuestionRightsModel(base_models.VersionedModel):

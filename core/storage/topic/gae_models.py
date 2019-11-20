@@ -384,7 +384,17 @@ class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
-    pass
+
+    def migrate_snapshot_model(self):
+        """Migrate model to use the new user ID in the owner_ids, editor_ids,
+        voice_artist_ids and viewer_ids.
+        """
+        reconstituted_rights_model = TopicRightsModel(**self.content)
+        reconstituted_rights_model.manager_ids = [
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).user_id
+            for gae_id in reconstituted_rights_model.manager_ids]
+        self.content = reconstituted_rights_model.to_dict()
+        self.put(update_last_updated_time=False)
 
 
 class TopicRightsModel(base_models.VersionedModel):

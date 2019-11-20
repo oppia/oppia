@@ -120,26 +120,28 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
-        return [collection_models.CollectionRights,
-                exploration_models.ExplorationRights,
-                question_models.QuestionRights,
-                skill_models.SkillRights,
-                topic_models.TopicRights]
+        return [collection_models.CollectionRightsSnapshotContentModel,
+                exploration_models.ExplorationRightsSnapshotContentModel,
+                question_models.QuestionRightsSnapshotContentModel,
+                skill_models.SkillRightsSnapshotContentModel,
+                topic_models.TopicRightsSnapshotContentModel]
 
     @staticmethod
     def map(snapshot_model):
         """Implements the map function for this job."""
-        yield ('SUCCESS', snapshot_model)
+        snapshot_model.migrate_snapshot_model()
+        yield ('SUCCESS', snapshot_model.id)
 
     @staticmethod
-    def reduce(key, new_user_ids):
+    def reduce(key, ids):
         """Implements the reduce function for this job."""
-        yield (key, new_user_ids)
+        yield (key, ids)
 
 
 class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for going through all the snapshot content models that can
-    contain user ID and replacing it with new user ID.
+    """One-off job for going through all the UserSettingsModels and checking
+    that the gae_id is not mentioned in any of the fields that should contain
+    user_id.
     """
 
     @classmethod
