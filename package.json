@@ -48,7 +48,7 @@
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "ajv": "^6.10.0",
-    "angular": "1.6.6",
+    "angular": "1.7.9",
     "angular-route": "1.6.6",
     "babel-eslint": "^10.0.1",
     "bootstrap": "3.4.1",
