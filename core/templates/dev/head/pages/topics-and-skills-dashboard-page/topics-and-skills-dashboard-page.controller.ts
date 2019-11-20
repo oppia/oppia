@@ -143,7 +143,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             var rubrics = [];
             for (var idx in SKILL_DIFFICULTIES) {
               rubrics.push(
-                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], 'N/A')
+                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], '')
               );
             }
             $uibModal.open({
@@ -164,7 +164,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
 
                   $scope.$watch('newSkillDescription', function() {
                     $scope.rubrics[1].setExplanation(
-                      $scope.newSkillDescription);
+                      '<p>' + $scope.newSkillDescription + '</p>');
                   });
 
                   var areAllRubricsPresent = function() {
