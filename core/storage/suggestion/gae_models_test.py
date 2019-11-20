@@ -654,3 +654,27 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralVoiceoverApplicationModel
             .get_reviewable_voiceover_applications(author_id))
         self.assertEqual(applicant_models, [])
+
+    def test_get_voiceover_applications(self):
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='author_id',
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_voiceover_applications('exploration', 'exp_id', 'en'))
+        self.assertEqual(len(applicant_models), 1)
+        self.assertEqual(applicant_models[0].id, 'application_id')
+
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_voiceover_applications('exploration', 'exp_id', 'hi'))
+        self.assertEqual(len(applicant_models), 0)
