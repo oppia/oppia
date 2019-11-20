@@ -205,6 +205,8 @@ export class UpgradedServices {
       new NumberWithUnitsObjectFactory(
         upgradedServices['UnitsObjectFactory'],
         upgradedServices['FractionObjectFactory']);
+    upgradedServices['NormalizeWhitespacePipe'] = new NormalizeWhitespacePipe(
+      upgradedServices['UtilsService']);
     upgradedServices['OutcomeObjectFactory'] =
       new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['ParamChangesObjectFactory'] =
@@ -227,6 +229,9 @@ export class UpgradedServices {
       new StateEditorService(upgradedServices['SolutionValidityService']);
     upgradedServices['UrlService'] =
       new UrlService(upgradedServices['WindowRef']);
+    upgradedServices['ValidatorsService'] = new ValidatorsService(
+      upgradedServices['AlertsService'],
+      upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['WrittenTranslationsObjectFactory'] =
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
