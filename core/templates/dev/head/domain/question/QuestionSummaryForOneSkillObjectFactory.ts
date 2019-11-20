@@ -14,7 +14,10 @@
 
 /**
  * @fileoverview Object factory for creating frontend instances of
- * question summary for one skill objects.
+ * question summary for one skill objects. This differs from
+ * QuestionSummaryObjectFactory in that, this contains QuestionSummary and the
+ * data for the relevant linked skill (description, difficulty and id), whereas
+ * QuestionSummary just contains the question data.
  */
 
 import { Injectable } from '@angular/core';
