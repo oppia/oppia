@@ -29,8 +29,8 @@ angular.module('oppia').directive('createActivityButton', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/button-directives/create-activity-button.directive.html'),
+      template: eval(require(
+        'html-loader!./create-activity-button.directive.html'))(),
       controllerAs: '$ctrl',
       controller: [
         '$timeout', '$window', '$uibModal',

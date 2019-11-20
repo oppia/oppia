@@ -22,15 +22,13 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 
-const html = require('./splash-page.directive.html');
-
 angular.module('oppia').directive('splashPage', [
   function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: html,
+      template: eval(require('html-loader!./splash-page.directive.html'))(),
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
