@@ -101,7 +101,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                     question_summary_dicts[i]['skill_ids'],
                     [self.skill_id_2, self.skill_id])
                 self.assertEqual(
-                    question_summary_dicts_2[i]['skill_descriptions'],
+                    question_summary_dicts_2[i]['skill_ids'],
                     [self.skill_id_2, self.skill_id])
                 self.assertEqual(
                     question_summary_dicts[i]['skill_difficulties'], [0.3, 0.5])
