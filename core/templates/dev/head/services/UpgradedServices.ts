@@ -131,6 +131,7 @@ export class UpgradedServices {
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
+    upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
@@ -180,7 +181,6 @@ export class UpgradedServices {
     upgradedServices['ChangesInHumanReadableFormService'] =
       new ChangesInHumanReadableFormService(
         upgradedServices['UtilsService'], document);
-    upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DeviceInfoService'] =
       new DeviceInfoService(upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
