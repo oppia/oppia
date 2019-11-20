@@ -52,10 +52,13 @@ angular.module('oppia').directive('questionOpportunities', [
       'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'ContributionOpportunitiesService', 'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'QuestionUndoRedoService', 'UserService',
+        '$scope', '$uibModal', 'AlertsService',
+        'ContributionOpportunitiesService', 'EditableSkillBackendApiService',
+        'MisconceptionObjectFactory','QuestionObjectFactory',
+        'QuestionUndoRedoService', 'UserService',
         function(
-            $scope, $uibModal, AlertsService, ContributionOpportunitiesService, EditableSkillBackendApiService, MisconceptionObjectFactory,
+            $scope, $uibModal, AlertsService, ContributionOpportunitiesService,
+            EditableSkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, QuestionUndoRedoService, UserService) {
           var ctrl = this;
           var userIsLoggedIn = false;

@@ -63,8 +63,8 @@ angular.module('oppia').directive('contributionsAndReview', [
           ctrl.contributionSummaries = [];
           ctrl.contributionsDataLoading = true;
           ctrl.reviewTabActive = false;
-          ctrl.SUGGESTION_TYPE_QUESTION = 'add_question'
-          ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content'
+          ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
+          ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
 
           var getQuestionContributionsSummary = function() {
             var questionContributionsSummaryList = [];
@@ -239,18 +239,18 @@ angular.module('oppia').directive('contributionsAndReview', [
 
           ctrl.onClickViewSuggestion = function(suggestionId) {
             var suggestion = ctrl.contributions[suggestionId].suggestion;
-            if (suggestion.suggestion_type == ctrl.SUGGESTION_TYPE_TRANSLATE) {
+            if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {
               _showTranslationSuggestionModal(
                 suggestion.target_id, suggestion.suggestion_id,
                 suggestion.change.content_html,
                 suggestion.change.translation_html, ctrl.reviewTabActive);
             }
-            if (suggestion.suggestion_type ==
+            if (suggestion.suggestion_type ===
                 ctrl.SUGGESTION_TYPE_ADD_QUESTION) {
               _showQuestionSuggestionModal(
                 suggestion.target_id, suggestion.suggestion_id,
                 suggestion.change.question_dict.question_state_data.content
-                .html, ctrl.reviewTabActive);
+                  .html, ctrl.reviewTabActive);
             }
           };
 
@@ -259,7 +259,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               ctrl.reviewTabActive = false;
               ctrl.contributionsDataLoading = true;
               ctrl.contributionSummaries = [];
-              if (suggestionType == ctrl.SUGGESTION_TYPE_QUESTION) {
+              if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
                 ContributionAndReviewService.getUserCreatedQuestionSuggestions(
                   function(suggestionIdToSuggestions) {
                     ctrl.contributions = suggestionIdToSuggestions;
@@ -268,15 +268,15 @@ angular.module('oppia').directive('contributionsAndReview', [
                     ctrl.contributionsDataLoading = false;
                   });
               }
-              if (suggestionType == ctrl.SUGGESTION_TYPE_TRANSLATE) {
+              if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
                 ContributionAndReviewService
-                .getUserCreatedTranslationSuggestions(
-                  function(suggestionIdToSuggestions) {
-                    ctrl.contributions = suggestionIdToSuggestions;
-                    ctrl.contributionSummaries = (
-                      getTranslationContributionsSummary());
-                    ctrl.contributionsDataLoading = false;
-                  });
+                  .getUserCreatedTranslationSuggestions(
+                    function(suggestionIdToSuggestions) {
+                      ctrl.contributions = suggestionIdToSuggestions;
+                      ctrl.contributionSummaries = (
+                        getTranslationContributionsSummary());
+                      ctrl.contributionsDataLoading = false;
+                    });
               }
             }
           };
@@ -287,7 +287,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               ctrl.contributionsDataLoading = true;
               ctrl.contributionSummaries = [];
 
-              if (suggestionType == ctrl.SUGGESTION_TYPE_QUESTION) {
+              if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
                 ContributionAndReviewService.getReviewableQuestionSuggestions(
                   function(suggestionIdToSuggestions) {
                     ctrl.contributions = suggestionIdToSuggestions;
@@ -296,15 +296,15 @@ angular.module('oppia').directive('contributionsAndReview', [
                     ctrl.contributionsDataLoading = false;
                   });
               }
-              if (suggestionType == ctrl.SUGGESTION_TYPE_TRANSLATE) {
+              if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
                 ContributionAndReviewService
-                .getReviewableTranslationSuggestions(
-                  function(suggestionIdToSuggestions) {
-                    ctrl.contributions = suggestionIdToSuggestions;
-                    ctrl.contributionSummaries = (
-                      getTranslationContributionsSummary());
-                    ctrl.contributionsDataLoading = false;
-                  });
+                  .getReviewableTranslationSuggestions(
+                    function(suggestionIdToSuggestions) {
+                      ctrl.contributions = suggestionIdToSuggestions;
+                      ctrl.contributionSummaries = (
+                        getTranslationContributionsSummary());
+                      ctrl.contributionsDataLoading = false;
+                    });
               }
             }
           };
