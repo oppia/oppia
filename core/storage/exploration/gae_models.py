@@ -184,16 +184,16 @@ class ExplorationRightsSnapshotContentModel(
         """
         reconstituted_rights_model = ExplorationRightsModel(**self.content)
         reconstituted_rights_model.owner_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).user_id
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
             for gae_id in reconstituted_rights_model.owner_ids]
         reconstituted_rights_model.editor_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).user_id
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
             for gae_id in reconstituted_rights_model.editor_ids]
         reconstituted_rights_model.voice_artist_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).user_id
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
             for gae_id in reconstituted_rights_model.voice_artist_ids]
         reconstituted_rights_model.viewer_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).user_id
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
             for gae_id in reconstituted_rights_model.viewer_ids]
         self.content = reconstituted_rights_model.to_dict()
         self.put(update_last_updated_time=False)

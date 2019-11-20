@@ -391,7 +391,7 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
         """
         reconstituted_rights_model = TopicRightsModel(**self.content)
         reconstituted_rights_model.manager_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).user_id
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
             for gae_id in reconstituted_rights_model.manager_ids]
         self.content = reconstituted_rights_model.to_dict()
         self.put(update_last_updated_time=False)

@@ -259,7 +259,7 @@ class SkillRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
         reconstituted_rights_model = SkillRightsModel(**self.content)
         reconstituted_rights_model.creator_id = (
             user_models.UserSettingsModel.get_by_gae_id(
-                reconstituted_rights_model.creator_id).user_id)
+                reconstituted_rights_model.creator_id).id)
         self.content = reconstituted_rights_model.to_dict()
         self.put(update_last_updated_time=False)
 

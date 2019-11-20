@@ -26,6 +26,7 @@ from core.domain import collection_services
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (base_models, collection_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.collection, models.NAMES.user])
@@ -70,48 +71,74 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
 class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
     """Test the CollectionRightsSnapshotContentModel class."""
 
-    COLLECTION_ID_1 = '1'
-    COLLECTION_ID_2 = '2'
-    COLLECTION_ID_3 = '3'
+    SNAPSHOT_ID = '1'
     USER_1_USER_ID = 'user_id_1'
     USER_1_GAE_ID = 'gae_id_1'
-    USER_1_USER_ID = 'user_id_1'
-    USER_1_USER_ID = 'user_id_1'
+    USER_2_USER_ID = 'user_id_2'
+    USER_2_GAE_ID = 'gae_id_2'
+    USER_3_USER_ID = 'user_id_3'
+    USER_3_GAE_ID = 'gae_id_3'
 
     def setUp(self):
         super(CollectionRightsSnapshotContentModelTests, self).setUp()
         user_models.UserSettingsModel(
-            id=self.USER_1_USER_ID, gae_id=USER_1_GAE_ID, email=self.USER_1_EMAIL, role=self.USER_1_ROLE
+            id=self.USER_1_USER_ID,
+            gae_id=self.USER_1_GAE_ID,
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_2_USER_ID,
+            gae_id=self.USER_2_GAE_ID,
+            email='some.different@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_3_USER_ID,
+            gae_id=self.USER_3_GAE_ID,
+            email='some.different@email.cz',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
 
-
     def test_migrate_snapshot_model(self):
-        rights_model = collection_models.CollectionRightsModel(
-            id=self.COLLECTION_ID_1,
-            owner_ids=[self.USER_ID_1],
-            editor_ids=[self.USER_ID_1],
-            voice_artist_ids=[self.USER_ID_1],
-            viewer_ids=[self.USER_ID_2],
+        original_rights_model = collection_models.CollectionRightsModel(
+            id=self.SNAPSHOT_ID,
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0
         )
-        reconstituted_rights_model = CollectionRightsModel(**self.content)
-        reconstituted_rights_model.owner_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).user_id
-            for gae_id in reconstituted_rights_model.owner_ids]
-        reconstituted_rights_model.editor_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).user_id
-            for gae_id in reconstituted_rights_model.editor_ids]
-        reconstituted_rights_model.voice_artist_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).user_id
-            for gae_id in reconstituted_rights_model.voice_artist_ids]
-        reconstituted_rights_model.viewer_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).user_id
-            for gae_id in reconstituted_rights_model.viewer_ids]
-        self.content = reconstituted_rights_model.to_dict()
-        self.put(update_last_updated_time=False)
+        original_rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.migrate_snapshot_model()
+
+        migrated_rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                self.SNAPSHOT_ID))
+        self.assertEqual(
+            original_rights_snapshot_model.last_updated,
+            migrated_rights_snapshot_model.last_updated)
+
+        migrated_rights_model = collection_models.CollectionRightsModel(
+            **migrated_rights_snapshot_model.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID],
+            migrated_rights_model.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model.viewer_ids)
 
 
 class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
