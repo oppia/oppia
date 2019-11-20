@@ -453,7 +453,8 @@ class DeployTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build(self):
-        process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
+        process = subprocess.Popen(
+            ['python', '--version'], stdout=subprocess.PIPE)
         cmd_tokens = []
         # pylint: disable=unused-argument
         def mock_popen(tokens, stdout):
@@ -466,8 +467,9 @@ class DeployTests(test_utils.GenericTestBase):
             cmd_tokens, ['python', '-m', 'scripts.build', '--prod_env'])
 
     def test_build_failure(self):
-        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
-        process.return_code = 1
+        process = subprocess.Popen(
+            ['python', '-c', 'print \"test\"'], stdout=subprocess.PIPE)
+        process.returncode = 1
         cmd_tokens = []
         # pylint: disable=unused-argument
         def mock_popen(tokens, stdout):
