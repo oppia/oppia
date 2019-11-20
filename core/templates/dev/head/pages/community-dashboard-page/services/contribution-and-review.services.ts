@@ -127,7 +127,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           review_message: (
             action === ACTION_ACCEPT_SUGGESTION ? null : reviewMessage)
         }).then(function() {
-          onSuccess(threadId);
+          onSuccess();
         });
       }
     };

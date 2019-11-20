@@ -303,8 +303,6 @@ angular.module('oppia').directive('contributionsAndReview', [
                     if (!AudioPlayerService.isPlaying()) {
                       if (AudioPlayerService.isTrackLoaded()) {
                         AudioPlayerService.play();
-                      } else {
-                        loadAndPlayAudioTranslation();
                       }
                     } else {
                       AudioPlayerService.pause();

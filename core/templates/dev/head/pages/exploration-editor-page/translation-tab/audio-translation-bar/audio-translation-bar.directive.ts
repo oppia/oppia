@@ -113,7 +113,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         'StateEditorService', 'StateRecordedVoiceoversService',
         'TranslationLanguageService', 'TranslationStatusService',
         'TranslationTabActiveContentIdService', 'VoiceoverRecordingService',
-        'RECORDING_TIME_LIMIT',
+        'ENTITY_TYPE', 'RECORDING_TIME_LIMIT',
         function(
             $filter, $interval, $rootScope, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
@@ -122,7 +122,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             StateEditorService, StateRecordedVoiceoversService,
             TranslationLanguageService, TranslationStatusService,
             TranslationTabActiveContentIdService, VoiceoverRecordingService,
-            RECORDING_TIME_LIMIT) {
+            ENTITY_TYPE, RECORDING_TIME_LIMIT) {
           $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
           $scope.audioBlob = null;
           $scope.voiceoverRecorder = null;
@@ -440,10 +440,10 @@ angular.module('oppia').directive('audioTranslationBar', [
               AudioPlayerService.load(
                 ENTITY_TYPE.EXPLORATION, ContextService.getExplorationId(),
                 audioTranslation.filename).then(function() {
-                  $scope.audioLoadingIndicatorIsShown = false;
-                  $scope.audioTimerIsShown = true;
-                  AudioPlayerService.play();
-                });
+                $scope.audioLoadingIndicatorIsShown = false;
+                $scope.audioTimerIsShown = true;
+                AudioPlayerService.play();
+              });
             }
           };
 

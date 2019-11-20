@@ -95,7 +95,8 @@ describe('Assets Backend API Service', function() {
     expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
 
 
-    AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+    AssetsBackendApiService.loadAudio(
+      ENTITY_TYPE.EXPLORATION, '0', 'myfile.mp3').then(
       successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .audio.length).toBe(1);
@@ -150,7 +151,8 @@ describe('Assets Backend API Service', function() {
         });
 
       $httpBackend.expect('GET', requestUrl).respond(500, 'MutagenError');
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      AssetsBackendApiService.loadAudio(
+        ENTITY_TYPE.EXPLORATION, '0', 'myfile.mp3').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -196,7 +198,8 @@ describe('Assets Backend API Service', function() {
 
       $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
 
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      AssetsBackendApiService.loadAudio(
+        ENTITY_TYPE.EXPLORATION, '0', 'myfile.mp3').then(
         successHandler, failHandler);
 
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
@@ -249,7 +252,8 @@ describe('Assets Backend API Service', function() {
       });
 
     $httpBackend.expect('GET', requestUrl).respond(201, {type: 'audio/mpeg'});
-    AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+    AssetsBackendApiService.loadAudio(
+      ENTITY_TYPE.EXPLORATION, '0', 'myfile.mp3').then(
       successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .audio.length).toBe(1);
