@@ -171,7 +171,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                   .then(() => {
                     $scope.tmpMessage.status = $scope.activeThread.status;
                     $scope.messageSendingInProgress = false;
-                  }, function() {
+                  }, () => {
                     $scope.messageSendingInProgress = false;
                   }).then($uibModalInstance.close);
               };
