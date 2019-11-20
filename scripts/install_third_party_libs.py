@@ -88,12 +88,11 @@ def pip_install(package, version, install_path):
             'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
             'page:'])
 
-        os_info = os.uname()
-        if os_info[0] == 'Darwin':
+        if common.OS_NAME == 'Darwin':
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
                 'OS%29')
-        elif os_info[0] == 'Linux':
+        elif common.OS_NAME == 'Linux':
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
                 '%29')
@@ -179,7 +178,9 @@ def install_skulpt(parsed_args):
                     line.replace('ret = rununits(opt=True)', 'ret = 0'),
                     end='')
 
-            subprocess.check_call(['python', skulpt_filepath, 'dist'])
+            # NB: Check call cannot be used because the commands above make the
+            # git tree for skulpt dirty.
+            subprocess.call(['python', skulpt_filepath, 'dist'])
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
@@ -206,6 +207,19 @@ def ensure_pip_library_is_installed(package, version, path):
     if not os.path.exists(exact_lib_path):
         python_utils.PRINT('Installing %s' % package)
         pip_install(package, version, exact_lib_path)
+
+
+def get_yarn_command():
+    """Get command for yarn."""
+    # Rename the one without extension, otherwise it will be executed.
+    if common.OS_NAME == 'Windows':
+        origin_yarn_bin = os.path.join(common.YARN_PATH, 'bin', 'yarn')
+        if os.path.exists(origin_yarn_bin):
+            os.rename(
+                origin_yarn_bin,
+                os.path.join(common.YARN_PATH, 'bin', 'yarn.sh'))
+        return 'yarn.cmd'
+    return 'yarn'
 
 
 def main(args=None):
@@ -264,7 +278,8 @@ def main(args=None):
     install_third_party.main(args=[])
 
     # Install third-party node modules needed for the build process.
-    subprocess.check_call(['yarn'])
+    yarn_command = get_yarn_command()
+    subprocess.check_call([yarn_command])
 
     install_skulpt(parsed_args)
 

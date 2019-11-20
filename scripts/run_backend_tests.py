@@ -18,7 +18,28 @@ This should not be run directly. Instead, navigate to the oppia/ folder and
 execute:
 
     python -m scripts.run_backend_tests
+
+You can also append the following options to the above command:
+
+    --verbose prints the output of the tests to the console.
+
+    --test_target=core.controllers.editor_test runs only the tests in the
+        core.controllers.editor_test module. (You can change
+        "core.controllers.editor_test" to any valid module path.)
+
+    --test_path=core/controllers runs all tests in test files in the
+        core/controllers directory. (You can change "core/controllers" to any
+        valid subdirectory path.)
+
+    --generate_coverage_report generates a coverage report as part of the final
+        test output (but it makes the tests slower).
+
+Note: If you've made some changes and tests are failing to run at all, this
+might mean that you have introduced a circular dependency (e.g. module A
+imports module B, which imports module C, which imports module A). This needs
+to be fixed before the tests will run.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -69,8 +90,14 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
-COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4', 'coverage')
+# Explicitly pass all current environment variables into subprocess.
+# Otherwise, there will be dll error for running coverage. (For Windows)
+SUBPROCESS_ENV = {
+    k.encode('utf-8'): v.encode('utf-8') for k, v in os.environ.items()
+}
+
+COVERAGE_DIR = os.path.join(
+    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -128,7 +155,8 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
-    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
+
+    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=SUBPROCESS_ENV)
     last_stdout_str, last_stderr_str = p.communicate()
     # Converting to unicode to stay compatible with the rest of the strings.
     last_stdout_str = last_stdout_str.decode(encoding='utf-8')
@@ -193,7 +221,7 @@ class TestingTaskSpec(python_utils.OBJECT):
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
+                'python', '-m', 'coverage', 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
         else:
             exc_list = ['python', TEST_RUNNER_PATH, test_target_flag]
@@ -267,7 +295,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
         """
         class_names = []
         test_target_path = os.path.relpath(
-            path, os.getcwd())[:-3].replace('/', '.')
+            path, os.getcwd())[:-3].replace('/', '.').replace('\\', '.')
         python_module = importlib.import_module(test_target_path)
         for name, clazz in inspect.getmembers(
                 python_module, predicate=inspect.isclass):
@@ -322,6 +350,12 @@ def main(args=None):
     dev_appserver.fix_sys_path()
 
     if parsed_args.generate_coverage_report:
+        # Specify the path to coverage so it can be viewed as a module.
+        # Also In case of some encoding issues on Windows.
+        SUBPROCESS_ENV.update({
+            'PYTHONPATH'.encode(encoding='utf-8'):
+                COVERAGE_DIR.encode(encoding='utf-8')
+        })
         python_utils.PRINT(
             'Checking whether coverage is installed in %s'
             % common.OPPIA_TOOLS_DIR)
@@ -472,14 +506,16 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call(['python', COVERAGE_PATH, 'combine'])
+        subprocess.check_call(
+            ['python', '-m', 'coverage', 'combine'], env=SUBPROCESS_ENV)
         subprocess.check_call([
-            'python', COVERAGE_PATH, 'report',
+            'python', '-m', 'coverage', 'report',
             '--omit="%s*","third_party/*","/usr/share/*"'
-            % common.OPPIA_TOOLS_DIR, '--show-missing'])
+            % common.OPPIA_TOOLS_DIR, '--show-missing'], env=SUBPROCESS_ENV)
 
         python_utils.PRINT('Generating xml coverage report...')
-        subprocess.check_call(['python', COVERAGE_PATH, 'xml'])
+        subprocess.check_call(
+            ['python', '-m', 'coverage', 'xml'], env=SUBPROCESS_ENV)
 
     python_utils.PRINT('')
     python_utils.PRINT('Done!')

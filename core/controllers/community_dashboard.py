@@ -52,7 +52,8 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
             opportunities, next_cursor, more = (
-                self._get_skill_opportunities_with_topic(search_cursor))
+                self._get_skill_opportunities_with_corresponding_topic_name(
+                    search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
             language_code = self.request.get('language_code')
@@ -83,7 +84,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
-    def _get_skill_opportunities_with_topic(self, cursor):
+    def _get_skill_opportunities_with_corresponding_topic_name(self, cursor):
         """Returns a list of skill opportunities available for questions with
         topic information.
 
@@ -94,8 +95,8 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
 
         Returns:
             3-tuple(opportunities, cursor, more). where:
-                opportunities: list(dict). A list of dict of opportunity
-                    details.
+                opportunities: list(dict). A list of dicts of skill opportunity
+                    details with additional corresponding topic_name.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
                     be None.
@@ -106,8 +107,8 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         topics_with_skills = topic_fetchers.get_all_topics_with_skills()
         skill_opportunities, cursor, more = (
             opportunity_services.get_skill_opportunities(cursor))
-        id_to_skill_opportunity_dict = self._skill_id_to_skill_opportunity_dict(
-            skill_opportunities)
+        id_to_skill_opportunity_dict = {
+            opp.id: opp.to_dict() for opp in skill_opportunities}
         opportunities = []
         for topic in topics_with_skills:
             for skill_id in topic.get_all_skill_ids():
@@ -119,20 +120,6 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     skill_opportunity_dict['topic_name'] = topic.name
                     opportunities.append(skill_opportunity_dict)
         return opportunities, cursor, more
-
-    def _skill_id_to_skill_opportunity_dict(self, skill_opportunities):
-        """Returns a dictionary of skill_id to corresponding SkillOpportunity
-        dict.
-
-        Args:
-            skill_opportunities: iterable(dict). The SkillOpportunity domain
-                objects from which to construct the mapping.
-
-        Returns:
-            id_to_skill_opportunity_dict. dict(str -> dict), Dictionary
-            of skill_id to dict of SkillOpportunity details.
-        """
-        return {opp.id: opp.to_dict() for opp in skill_opportunities}
 
     def _get_translation_opportunity_dicts(self, language_code, search_cursor):
         """Returns a list of translation opportunity dicts.
@@ -164,7 +151,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         """Returns a list of voiceover opportunity dicts.
 
         Args:
-            language_code: str. The language for which translation opportunities
+            language_code: str. The language for which voiceover opportunities
                 should be fetched.
             search_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise, the
