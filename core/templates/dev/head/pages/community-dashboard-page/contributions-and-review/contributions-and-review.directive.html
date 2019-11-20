@@ -2,28 +2,21 @@
   <div class="oppia-contributions-show-review-side-navbar-container" >
     <div class="oppia-contributions-side-navbar-part" ng-if="$ctrl.isAdmin">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Things to do">
-        <div class="oppia-contributions-navbar-item">
+        <div class="oppia-contributions-navbar-item" ng-repeat="item in $ctrl.tabsName[$ctrl.THINGS_TO_DO]">
           <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToReviewTab()"
-                  ng-class="$ctrl.reviewTabActive ? 'oppia-contributions-active-navbar': ''">
-            Review Translations
-          </button>
-        </div>
-        <div class="oppia-contributions-navbar-item">
-          <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToReviewTab()"
-                  ng-class="$ctrl.reviewTabActive ? 'oppia-contributions-active-navbar': ''">
-            Review Voiceover Applications
+                  ng-click="$ctrl.switchTab($ctrl.THINGS_TO_DO, item)"
+                  ng-class="$ctrl.isActiveTab($ctrl.THINGS_TO_DO, item) ? 'oppia-contributions-active-navbar': ''">
+            Review <[item]>
           </button>
         </div>
       </div>
     </div>
     <div class="oppia-contributions-side-navbar-part" ng-if="$ctrl.userIsLoggedIn">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions">
-        <div class="oppia-contributions-navbar-item">
+        <div class="oppia-contributions-navbar-item" ng-repeat="item in $ctrl.tabsName[$ctrl.CONTRIBUTION_TABS]">
           <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToContributionsTab()"
-                  ng-class="$ctrl.reviewTabActive ? '' : 'oppia-contributions-active-navbar'">Translations
+                  ng-click="$ctrl.switchTab($ctrl.CONTRIBUTION_TABS, item)"
+                  ng-class="$ctrl.isActiveTab($ctrl.CONTRIBUTION_TABS, item) ? 'oppia-contributions-active-navbar' : ''"> <[item]>
           </button>
         </div>
       </div>
@@ -35,9 +28,9 @@
     </div>
     <div class="oppia-login-required" ng-if="$ctrl.userIsLoggedIn">
       <opportunities-list opportunity-data-is-loading="$ctrl.contributionsDataLoading"
-                          opportunities="$ctrl.contributionSummaries"
-                          on-click-action-button="$ctrl.onClickViewSuggestion"
-                          label-required="!$ctrl.reviewTabActive">
+                          opportunities="$ctrl.itemList"
+                          on-click-action-button="$ctrl.onClickActionButton"
+                          label-required="$ctrl.activeTabName !== $ctrl.THINGS_TO_DO">
       </opportunities-list>
     </div>
   </div>
@@ -109,7 +102,7 @@
     margin-right: 15%;
     padding-left: 15%;
     text-align: left;
-    width: 85%;
+    width: 90%;
   }
 
   contributions-and-review .oppia-contributions-active-navbar,

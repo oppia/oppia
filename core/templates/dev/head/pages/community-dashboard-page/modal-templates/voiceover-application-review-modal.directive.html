@@ -1,0 +1,62 @@
+<div class="modal-header">
+  <h3>Review voiceover application</h3>
+</div>
+
+<div class="modal-body">
+  <section class="oppia-application-review-container">
+    <strong>Content voiceover:</strong>
+    <div class="oppia-application-review-panel-container">
+        <angular-html-bind html-data="contentHtml">
+        </angular-html-bind>
+    </div>
+    <div class="oppia-voiceover-player-container">
+      <div class="oppia-content-wrapper">
+        <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+                ng-click="playPauseVoiceover()">
+          <i class="material-icons">play_arrow</i>
+        </button>
+      </div>
+      <div class="oppia-slider-section oppia-content-wrapper" style="width: 100%;">
+        <div ng-if="audioLoadingIndicatorIsShown">
+          <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+        </div>
+        <div ng-if="!audioLoadingIndicatorIsShown">
+          <md-slider ng-model="track.progress" ng-model-options="{getterSetter: true}" aria-label="audio-slider">
+          </md-slider>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+  <div ng-show="reviewable" class="oppia-suggestion-review-message">
+    Review message (required if rejecting):
+    <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" ng-if="!reviewable" ng-click="cancel()">Cancel</button>
+  <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
+    <button class="btn btn-danger" ng-if="reviewable" ng-disabled="reviewMessage.length == 0" ng-click="reject()">Reject</button>
+  </span>
+  <button class="btn btn-success"
+          ng-if="reviewable"
+          ng-click="accept()">Accept</button>
+</div>
+
+<style>
+  .oppia-suggestion-review-message {
+    margin-left: 10px;
+    margin-top: 20px;
+  }
+  .oppia-application-review-container {
+
+  }
+  .oppia-application-review-panel-container {
+    margin: 35px 0px;
+  }
+  .oppia-voiceover-player-container {
+    background-color: #009688;
+    display: flex;
+  }
+</style>

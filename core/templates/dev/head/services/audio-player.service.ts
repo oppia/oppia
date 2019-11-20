@@ -16,53 +16,58 @@
  * @fileoverview Service to operate the playback of audio.
  */
 
+require(
+  'pages/exploration-player-page/services/' +
+  'audio-translation-manager.service.ts');
+require('services/context.service.ts');
+require('services/assets-backend-api.service.ts');
+
+
 angular.module('oppia').factory('AudioPlayerService', [
   '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
-  'ContextService', 'ngAudio',
+  'ngAudio',
   function(
       $q, $timeout, AssetsBackendApiService, AudioTranslationManagerService,
-      ContextService, ngAudio) {
+      ngAudio) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
     var _currentTrackDuration = null;
 
     var _load = function(
-        filename, successCallback, errorCallback) {
+        entityType, entityId, filename, successCallback, errorCallback) {
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.loadAudio(
-          ContextService.getExplorationId(), filename)
-          .then(function(loadedAudiofile) {
-            var blobUrl = URL.createObjectURL(loadedAudiofile.data);
-            _currentTrack = ngAudio.load(blobUrl);
-            _currentTrackFilename = filename;
+          entityType, entityId, filename).then(function(loadedAudiofile) {
+          var blobUrl = URL.createObjectURL(loadedAudiofile.data);
+          _currentTrack = ngAudio.load(blobUrl);
+          _currentTrackFilename = filename;
 
-            // ngAudio doesn't seem to provide any way of detecting
-            // when native audio object has finished loading -- see
-            // https://github.com/danielstern/ngAudio/issues/139. It seems
-            // that after creating an ngAudio object, the native audio
-            // object is asynchronously loaded. So we use a timeout
-            // to grab native audio.
-            // TODO(tjiang11): Look for a better way to handle this.
-            $timeout(function() {
-              // _currentTrack could be null if the learner stops audio
-              // shortly after loading a new card or language. In such
-              // cases, we do not want to attempt setting the 'onended'
-              // property of the audio.
-              if (_currentTrack !== null &&
+          // ngAudio doesn't seem to provide any way of detecting
+          // when native audio object has finished loading -- see
+          // https://github.com/danielstern/ngAudio/issues/139. It seems
+          // that after creating an ngAudio object, the native audio
+          // object is asynchronously loaded. So we use a timeout
+          // to grab native audio.
+          // TODO(tjiang11): Look for a better way to handle this.
+          $timeout(function() {
+            // _currentTrack could be null if the learner stops audio
+            // shortly after loading a new card or language. In such
+            // cases, we do not want to attempt setting the 'onended'
+            // property of the audio.
+            if (_currentTrack !== null &&
                 _currentTrack.audio !== undefined) {
-                _currentTrack.audio.onended = function() {
-                  _currentTrack = null;
-                  _currentTrackFilename = null;
-                  AudioTranslationManagerService
-                    .clearSecondaryAudioTranslations();
-                };
-              }
-            }, 100);
-
-            successCallback();
-          }, function(reason) {
-            errorCallback(reason);
-          });
+              _currentTrack.audio.onended = function() {
+                _currentTrack = null;
+                _currentTrackFilename = null;
+                AudioTranslationManagerService
+                  .clearSecondaryAudioTranslations();
+              };
+            }
+          }, 100);
+          successCallback();
+        }, function(reason) {
+          errorCallback(reason);
+        });
       }
     };
 
@@ -96,9 +101,9 @@ angular.module('oppia').factory('AudioPlayerService', [
     };
 
     return {
-      load: function(filename) {
+      load: function(entityType, entityId, filename) {
         return $q(function(resolve, reject) {
-          _load(filename, resolve, reject);
+          _load(entityType, entityId, filename, resolve, reject);
         });
       },
       play: function() {

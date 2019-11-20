@@ -26,13 +26,11 @@ require('services/csrf-token.service.ts');
 angular.module('oppia').factory('AssetsBackendApiService', [
   '$http', '$q', 'AudioFileObjectFactory', 'CsrfTokenService',
   'FileDownloadRequestObjectFactory', 'ImageFileObjectFactory',
-  'UrlInterpolationService', 'DEV_MODE', 'ENTITY_TYPE',
-  'GCS_RESOURCE_BUCKET_NAME',
+  'UrlInterpolationService', 'DEV_MODE', 'GCS_RESOURCE_BUCKET_NAME',
   function(
       $http, $q, AudioFileObjectFactory, CsrfTokenService,
       FileDownloadRequestObjectFactory, ImageFileObjectFactory,
-      UrlInterpolationService, DEV_MODE, ENTITY_TYPE,
-      GCS_RESOURCE_BUCKET_NAME) {
+      UrlInterpolationService, DEV_MODE, GCS_RESOURCE_BUCKET_NAME) {
     if (!DEV_MODE && !GCS_RESOURCE_BUCKET_NAME) {
       throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
@@ -230,15 +228,15 @@ angular.module('oppia').factory('AssetsBackendApiService', [
     };
 
     return {
-      loadAudio: function(explorationId, filename) {
+      loadAudio: function(entityType, entityId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
             resolve(AudioFileObjectFactory.createNew(
               filename, assetsCache[filename]));
           } else {
             _fetchFile(
-              ENTITY_TYPE.EXPLORATION, explorationId, filename,
-              ASSET_TYPE_AUDIO, resolve, reject);
+              entityType, entityId, filename, ASSET_TYPE_AUDIO, resolve,
+              reject);
           }
         });
       },

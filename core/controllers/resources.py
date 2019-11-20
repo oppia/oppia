@@ -95,7 +95,8 @@ class AssetDevHandler(base.BaseHandler):
                     page_context == feconf.ENTITY_TYPE_EXPLORATION or
                     page_context == feconf.ENTITY_TYPE_SKILL or
                     page_context == feconf.ENTITY_TYPE_TOPIC or
-                    page_context == feconf.ENTITY_TYPE_STORY):
+                    page_context == feconf.ENTITY_TYPE_STORY or
+                    page_context == feconf.ENTITY_TYPE_VOICEOVER_APPLICATION):
                 entity_type = page_context
                 entity_id = page_identifier
             else:

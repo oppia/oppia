@@ -437,12 +437,13 @@ angular.module('oppia').directive('audioTranslationBar', [
             var audioTranslation = getAvailableAudio(
               $scope.contentId, $scope.languageCode);
             if (audioTranslation) {
-              AudioPlayerService.load(audioTranslation.filename)
-                .then(function() {
-                  $scope.audioLoadingIndicatorIsShown = false;
-                  $scope.audioTimerIsShown = true;
-                  AudioPlayerService.play();
-                });
+              AudioPlayerService.load(
+                ENTITY_TYPE.EXPLORATION, ContextService.getExplorationId(),
+                audioTranslation.filename).then(function() {
+                $scope.audioLoadingIndicatorIsShown = false;
+                $scope.audioTimerIsShown = true;
+                AudioPlayerService.play();
+              });
             }
           };
 
