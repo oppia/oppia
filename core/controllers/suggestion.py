@@ -240,21 +240,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
                 target_type, suggestion_type)
             suggestions = suggestion_services.get_reviewable_suggestions(
                 self.user_id, suggestion_type)
-<<<<<<< HEAD
             self._render_suggestions(target_type, suggestions)
-=======
-
-            if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_id_to_opportunity_dict = (
-                    _get_target_id_to_exploration_opportunity_dict(suggestions))
-                self.render_json({
-                    'suggestions': [s.to_dict() for s in suggestions],
-                    'target_id_to_opportunity_dict':
-                        target_id_to_opportunity_dict
-                })
-            else:
-                self.render_json({})
->>>>>>> community-dashboard-list-skill-opportunities-frontend
         except Exception as e:
             raise self.InvalidInputException(e)
 
@@ -272,21 +258,7 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
                 target_type, suggestion_type)
             suggestions = suggestion_services.get_submitted_suggestions(
                 self.user_id, suggestion_type)
-<<<<<<< HEAD
             self._render_suggestions(target_type, suggestions)
-=======
-
-            if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_id_to_opportunity_dict = (
-                    _get_target_id_to_exploration_opportunity_dict(suggestions))
-                self.render_json({
-                    'suggestions': [s.to_dict() for s in suggestions],
-                    'target_id_to_opportunity_dict':
-                        target_id_to_opportunity_dict
-                })
-            else:
-                self.render_json({})
->>>>>>> community-dashboard-list-skill-opportunities-frontend
         except Exception as e:
             raise self.InvalidInputException(e)
 
