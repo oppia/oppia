@@ -18,6 +18,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from constants import constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
@@ -58,11 +60,29 @@ def get_exploration_opportunity_summary_from_model(model):
         ExplorationOpportunitySummary. The corresponding
         ExplorationOpportunitySummary object.
     """
+    # We're making sure that the audio language codes in any exploration
+    # opportunity domain object match the ones in
+    # constants.SUPPORTED_AUDIO_LANGUAGES.
+    set_of_all_languages = set(
+        model.incomplete_translation_language_codes +
+        model.need_voice_artist_in_language_codes +
+        model.assigned_voice_artist_in_language_codes)
+    supported_language_codes = set([language['id'] for language in (
+        constants.SUPPORTED_AUDIO_LANGUAGES)])
+    missing_language_codes = list(
+        supported_language_codes - set_of_all_languages)
+    if missing_language_codes:
+        logging.info(
+            'Missing language codes %s in exploration opportunity model with '
+            'id %s' % (missing_language_codes, model.id))
+
+    new_incomplete_translation_language_codes = (
+        model.incomplete_translation_language_codes + missing_language_codes)
 
     return opportunity_domain.ExplorationOpportunitySummary(
         model.id, model.topic_id, model.topic_name, model.story_id,
         model.story_title, model.chapter_title, model.content_count,
-        model.incomplete_translation_language_codes, model.translation_counts,
+        new_incomplete_translation_language_codes, model.translation_counts,
         model.need_voice_artist_in_language_codes,
         model.assigned_voice_artist_in_language_codes)
 
@@ -251,6 +271,31 @@ def update_exploration_opportunities_with_story_changes(story, exp_ids):
 
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
+
+
+def update_exploration_voiceover_opportunities(
+        exp_id, assigned_voice_artist_in_language_code):
+    """Updates the assigned_voice_artist_in_language_codes of exploration
+    opportunity model.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+        assigned_voice_artist_in_language_code: str. The language code in which
+            a voice artist is assigned to the exploration.
+    """
+    model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
+    exploration_opportunity_summary = (
+        get_exploration_opportunity_summary_from_model(model))
+
+    exploration_opportunity_summary.need_voice_artist_in_language_codes.remove(
+        assigned_voice_artist_in_language_code)
+    (
+        exploration_opportunity_summary
+        .assigned_voice_artist_in_language_codes.append(
+            assigned_voice_artist_in_language_code))
+    exploration_opportunity_summary.validate()
+    _save_multi_exploration_opportunity_summary(
+        [exploration_opportunity_summary])
 
 
 def delete_exploration_opportunities(exp_ids):

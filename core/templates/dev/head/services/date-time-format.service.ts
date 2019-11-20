@@ -21,15 +21,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import moment from 'moment';
 
-import { FormatTimePipe } from 'filters/format-timer.pipe';
-
-
 @Injectable({
   providedIn: 'root'
 })
 export class DateTimeFormatService {
-  constructor(private formatTimePipe: FormatTimePipe) {}
-
   // Returns just the time if the local datetime representation has the
   // same date as the current date. Otherwise, returns just the date if the
   // local datetime representation has the same year as the current date.
@@ -43,13 +38,11 @@ export class DateTimeFormatService {
         hour12: true
       });
     } else if (date.getFullYear() === new Date().getFullYear()) {
-      let transformedDate = this.formatTimePipe.transform(Number(date));
       // moment will return Oct 10
-      return moment(transformedDate).format('MMM d');
+      return moment(date).format('MMM d');
     } else {
-      let transformedDate = this.formatTimePipe.transform(Number(date));
       // moment will return 10/22/35(shortDate)
-      return moment(transformedDate).format('MM/DD/YY');
+      return moment(date).format('MM/DD/YY');
     }
   }
 
