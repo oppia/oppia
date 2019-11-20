@@ -400,22 +400,22 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.put()
 
-        stats_data = {
+        expected_stats_data = {
             'impact_score': self.USER_1_IMPACT_SCORE,
             'total_plays': self.USER_1_TOTAL_PLAYS,
             'average_ratings': self.USER_1_AVERAGE_RATINGS,
             'num_ratings': self.USER_1_NUM_RATINGS,
             'weekly_creator_stats_list': self.USER_1_WEEKLY_CREATOR_STATS_LIST
         }
-        skill_data = {
+        expected_skill_data = {
             self.SKILL_ID_1: self.DEGREE_OF_MASTERY,
             self.SKILL_ID_2: self.DEGREE_OF_MASTERY
         }
-        contribution_data = {
+        expected_contribution_data = {
             'created_exploration_ids': [self.EXPLORATION_IDS[0]],
             'edited_exploration_ids': [self.EXPLORATION_IDS[0]]
         }
-        exploration_data = {
+        expected_exploration_data = {
             self.EXPLORATION_IDS[0]: {
                 'rating': 2,
                 'rated_on': self.GENERIC_DATE,
@@ -429,28 +429,28 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
             }
         }
-        completed_activities_data = {
+        expected_completed_activities_data = {
             'completed_exploration_ids': self.EXPLORATION_IDS,
             'completed_collection_ids': self.COLLECTION_IDS
         }
-        incomplete_activities_data = {
+        expected_incomplete_activities_data = {
             'incomplete_exploration_ids': self.EXPLORATION_IDS,
             'incomplete_collection_ids': self.COLLECTION_IDS
         }
-        last_playthrough_data = {
+        expected_last_playthrough_data = {
             self.EXPLORATION_IDS[0]: {
                 'exp_version': self.EXP_VERSION,
                 'state_name': self.STATE_NAME
             }
         }
-        learner_playlist_data = {
+        expected_learner_playlist_data = {
             'playlist_exploration_ids': self.EXPLORATION_IDS,
             'playlist_collection_ids': self.COLLECTION_IDS
         }
-        collection_progress_data = {
+        expected_collection_progress_data = {
             self.COLLECTION_IDS[0]: self.EXPLORATION_IDS
         }
-        story_progress_data = {
+        expected_story_progress_data = {
             self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
         }
         thread_id = feedback_services.create_thread(
@@ -467,7 +467,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
-        general_feedback_thread_data = {
+        expected_general_feedback_thread_data = {
             feedback_thread_model.id: {
                 'entity_type': self.THREAD_ENTITY_TYPE,
                 'entity_id': self.THREAD_ENTITY_ID,
@@ -491,7 +491,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                                  get(thread_id).last_updated)
             }
         }
-        general_feedback_message_data = {
+        expected_general_feedback_message_data = {
             thread_id + '.0': {
                 'thread_id': thread_id,
                 'message_id': 0,
@@ -509,7 +509,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'received_via_email': self.MESSAGE_RECEIEVED_VIA_EMAIL
             }
         }
-        collection_rights_data = {
+        expected_collection_rights_data = {
             'owned_collection_ids': (
                 [self.COLLECTION_IDS[0]]),
             'editable_collection_ids': (
@@ -518,7 +518,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 [self.COLLECTION_IDS[0]]),
             'viewable_collection_ids': [self.COLLECTION_IDS[0]]
         }
-        general_suggestion_data = {
+        expected_general_suggestion_data = {
             'exploration.exp1.thread_1': {
                 'suggestion_type': (suggestion_models.
                                     SUGGESTION_TYPE_EDIT_STATE_CONTENT),
@@ -529,7 +529,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'change_cmd': self.CHANGE_CMD
             }
         }
-        exploration_rights_data = {
+        expected_exploration_rights_data = {
             'owned_exploration_ids': (
                 [self.EXPLORATION_IDS[0]]),
             'editable_exploration_ids': (
@@ -538,7 +538,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 [self.EXPLORATION_IDS[0]]),
             'viewable_exploration_ids': [self.EXPLORATION_IDS[0]]
         }
-        settings_data = {
+        expected_settings_data = {
             'email': self.USER_1_EMAIL,
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
@@ -567,10 +567,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         thread_and_message_ids = self.GENERAL_FEEDBACK_THREAD_IDS
         thread_and_message_ids.append(thread_id)
 
-        activities = self.ACTIVITY_IDS
-        activities.extend(self.EXPLORATION_IDS)
-
-        subscriptions_data = {
+        expected_subscriptions_data = {
             'creator_ids': self.CREATOR_IDS,
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS,
@@ -578,27 +575,32 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'last_checked': None
         }
 
+        activities = self.ACTIVITY_IDS
+        activities.extend(self.EXPLORATION_IDS)
+
         expected_export = {
-            'user_stats_data': stats_data,
-            'user_settings_data': settings_data,
-            'user_subscriptions_data': subscriptions_data,
-            'user_skill_mastery_data': skill_data,
-            'user_contributions_data': contribution_data,
-            'exploration_user_data_data': exploration_data,
-            'completed_activities_data': completed_activities_data,
-            'incomplete_activities_data': incomplete_activities_data,
-            'exp_user_last_playthrough_data': last_playthrough_data,
-            'learner_playlist_data': learner_playlist_data,
-            'collection_progress_data': collection_progress_data,
-            'story_progress_data': story_progress_data,
-            'general_feedback_thread_data': general_feedback_thread_data,
-            'general_feedback_message_data': general_feedback_message_data,
-            'collection_rights_data': collection_rights_data,
-            'general_suggestion_data': general_suggestion_data,
-            'exploration_rights_data': exploration_rights_data,
+            'user_stats_data': expected_stats_data,
+            'user_settings_data': expected_settings_data,
+            'user_subscriptions_data': expected_subscriptions_data,
+            'user_skill_mastery_data': expected_skill_data,
+            'user_contributions_data': expected_contribution_data,
+            'exploration_user_data_data': expected_exploration_data,
+            'completed_activities_data': expected_completed_activities_data,
+            'incomplete_activities_data': expected_incomplete_activities_data,
+            'exp_user_last_playthrough_data': expected_last_playthrough_data,
+            'learner_playlist_data': expected_learner_playlist_data,
+            'collection_progress_data': expected_collection_progress_data,
+            'story_progress_data': expected_story_progress_data,
+            'general_feedback_thread_data':
+                expected_general_feedback_thread_data,
+            'general_feedback_message_data':
+                expected_general_feedback_message_data,
+            'collection_rights_data':
+                expected_collection_rights_data,
+            'general_suggestion_data': expected_general_suggestion_data,
+            'exploration_rights_data': expected_exploration_rights_data,
             'general_feedback_email_reply_to_id_data': expected_reply_to_data
         }
 
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-
         self.assertEqual(exported_data, expected_export)
