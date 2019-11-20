@@ -459,7 +459,7 @@
 
 
 # User Data Takeout.
-/core/domain/takeout_service*.py @varun-tandon
+/core/domain/takeout_service*.py @vojtechjelinek @seanlip
 
 
 # User’s profile page.
