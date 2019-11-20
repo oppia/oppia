@@ -2758,56 +2758,7 @@ class OtherLintChecksManager(LintChecksManager):
             self.css_filepaths + self.html_filepaths +
             self.other_filepaths + self.py_filepaths)
 
-    def _check_division_operator(
-            self, py_filepaths, global_stdout, process_manager, file_cache):
-        """This function ensures that the division operator('/') is not used and
-        python_utils.divide() is used instead.
-        """
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting division checks')
-            python_utils.PRINT('----------------------------------------')
-
-        summary_messages = []
-        files_to_check = [
-            filepath for filepath in py_filepaths if not
-            any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS)]
-        failed = False
-
-        stdout = python_utils.string_io()
-        with _redirect_stdout(stdout):
-            for filepath in files_to_check:
-                ast_file = ast.walk(
-                    ast.parse(
-                        python_utils.convert_to_bytes(
-                            file_cache.read(filepath))))
-                ast_divisions = [n for n in ast_file if isinstance(n, ast.Div)]
-                if ast_divisions:
-                    python_utils.PRINT(
-                        'Please use python_utils.divide() instead of the '
-                        '"/" operator in --> %s' % filepath)
-                    failed = True
-
-            python_utils.PRINT('')
-            if failed:
-                summary_message = (
-                    '%s Division operator check failed, "/" should not be '
-                    'used, remove the operator from files listed above.' % (
-                        _MESSAGE_TYPE_FAILED))
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-            else:
-                summary_message = (
-                    '%s Division operator check passed' % _MESSAGE_TYPE_SUCCESS)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-
-            python_utils.PRINT('')
-            process_manager['division'] = summary_messages
-            global_stdout.append(stdout)
-
-
-    def _check_import_order(self, py_filepaths, global_stdout, process_manager):
+    def _check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
         """
@@ -2850,12 +2801,10 @@ class OtherLintChecksManager(LintChecksManager):
         global_stdout.append(stdout)
 
 
-    def _check_divide_and_import(self):
-        """Run checks relates to division and import order."""
+    def _check_import(self):
+        """Run checks relates to import order."""
         arg = (self.py_filepaths, _STDOUT_LIST, self.process_manager)
-        methods = [
-            (self._check_division_operator, arg + (FILE_CACHE,)),
-            (self._check_import_order, arg)]
+        methods = [(self._check_import_order, arg)]
         super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
 
     def _check_docstrings_and_comments(self):
@@ -3224,7 +3173,9 @@ class OtherLintChecksManager(LintChecksManager):
 
         common_messages = super(
             OtherLintChecksManager, self).perform_all_lint_checks()
-        self._check_divide_and_import()
+        # division_operator_messages = self._check_division_operator()
+        # import_order_messages = self._check_import_order()
+        self._check_import()
         self._check_docstrings_and_comments()
         docstring_messages = self.process_manager['docstrings']
         comment_messages = self.process_manager['comments']
@@ -3234,13 +3185,11 @@ class OtherLintChecksManager(LintChecksManager):
             self._check_html_tags_and_attributes())
         html_linter_messages = self._lint_html_files()
         import_order_messages = self.process_manager['import']
-        division_operator_messages = self.process_manager['division']
 
         all_messages = (
             import_order_messages + common_messages +
             docstring_messages + comment_messages +
-            html_tag_and_attribute_messages + html_linter_messages +
-            division_operator_messages)
+            html_tag_and_attribute_messages + html_linter_messages)
         return all_messages
 
 
