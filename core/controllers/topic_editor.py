@@ -198,16 +198,6 @@ class EditableTopicDataHandler(base.BaseHandler):
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
-        topics = topic_fetchers.get_all_topics()
-        grouped_skill_summary_dicts = {}
-
-        for topic_object in topics:
-            skill_summaries = skill_services.get_multi_skill_summaries(
-                topic_object.get_all_skill_ids())
-            skill_summary_dicts = [
-                summary.to_dict() for summary in skill_summaries]
-            grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
-
         self.values.update({
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
