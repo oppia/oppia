@@ -32,6 +32,7 @@ require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
+require('interactions/codemirrorRequires.ts');
 require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
@@ -144,8 +145,10 @@ angular.module('oppia').directive('questionOpportunities', [
               keyboard: false,
               controller: [
                 '$scope', '$uibModalInstance', 'StateEditorService',
+                'UndoRedoService',
                 function(
-                    $scope, $uibModalInstance, StateEditorService) {
+                    $scope, $uibModalInstance, StateEditorService,
+                    UndoRedoService) {
                   $scope.canEditQuestion = true;
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
