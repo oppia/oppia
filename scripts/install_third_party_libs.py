@@ -28,14 +28,14 @@ TOOLS_DIR = os.path.join('..', 'oppia_tools')
 # Download and install pyyaml.
 if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
     subprocess.check_call([
-        'pip2', 'install', 'pyyaml==5.1.2', '--target',
-        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2'), '--user', '--prefix=', '--system'])
+        'pip', 'install', 'pyyaml==5.1.2', '--target',
+        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
 # Download and install future.
 if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
     subprocess.check_call([
-        'pip2', 'install', 'future==0.17.1', '--target',
-        os.path.join('third_party', 'future-0.17.1'), '--user', '--prefix=', '--system'])
+        'pip', 'install', 'future==0.17.1', '--target',
+        os.path.join('third_party', 'future-0.17.1')])
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -104,8 +104,8 @@ def pip_install(package, version, install_path):
         raise Exception
 
     subprocess.check_call([
-        'pip2', 'install', '%s==%s' % (package, version), '--target',
-        install_path, '--user', '--prefix=', '--system'])
+        'pip', 'install', '%s==%s' % (package, version), '--target',
+        install_path])
 
 
 def install_skulpt(parsed_args):

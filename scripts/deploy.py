@@ -73,7 +73,7 @@ _PARSER.add_argument(
     '--version', help='version to deploy', type=str)
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
-APP_NAME_OPPIATESTSERVER = 'oppia-test-server-vojta'
+APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
 BUCKET_NAME_SUFFIX = '-resources'
 
 CURRENT_DATETIME = datetime.datetime.utcnow()
@@ -249,11 +249,11 @@ def deploy_application_and_write_log_entry(
         version_to_deploy_to: str. The version to deploy to.
         current_git_revision: str. The current git revision.
     """
+    # Deploy export service to GAE.
+    gcloud_adapter.deploy_application('export/app.yaml', app_name)
     # Deploy app to GAE.
     gcloud_adapter.deploy_application(
         './app.yaml', app_name, version=version_to_deploy_to)
-    # Deploy export service to GAE.
-    gcloud_adapter.deploy_application('export/app.yaml', app_name)
     # Writing log entry.
     common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
     with python_utils.open_file(LOG_FILE_PATH, 'a') as log_file:
@@ -451,8 +451,8 @@ def execute_deployment():
         raise Exception('Current release version has \'.\' character.')
 
     # Do prerequisite checks.
-    # common.require_cwd_to_be_oppia()
-    # common.ensure_release_scripts_folder_exists_and_is_up_to_date()
+    common.require_cwd_to_be_oppia()
+    common.ensure_release_scripts_folder_exists_and_is_up_to_date()
     gcloud_adapter.require_gcloud_to_be_available()
     try:
         if app_name == APP_NAME_OPPIASERVER:
