@@ -17,7 +17,7 @@
  * in the translation tab is currently active.
  */
 
-require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/language-util.service.ts');
 
 angular.module('oppia').factory('TranslationLanguageService', [
   '$log', '$rootScope', 'LanguageUtilService',

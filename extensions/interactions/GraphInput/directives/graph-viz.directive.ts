@@ -20,10 +20,10 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('interactions/GraphInput/directives/graph-detail.service.ts');
-require('services/contextual/DeviceInfoService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/contextual/device-info.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 require('interactions/interactions-extension.constants.ajs.ts');
 
@@ -178,28 +178,28 @@ angular.module('oppia').directive('graphViz', [
             ctrl.buttons = [];
             if (ctrl.canMoveVertex) {
               ctrl.buttons.push({
-                text: '\uE068',
+                text: '\uF0B2',
                 description: 'I18N_INTERACTIONS_GRAPH_MOVE',
                 mode: _MODES.MOVE
               });
             }
             if (ctrl.canAddEdge) {
               ctrl.buttons.push({
-                text: '\uE144',
+                text: '\uF0C1',
                 description: 'I18N_INTERACTIONS_GRAPH_ADD_EDGE',
                 mode: _MODES.ADD_EDGE
               });
             }
             if (ctrl.canAddVertex) {
               ctrl.buttons.push({
-                text: '\u002B',
+                text: '\uF067',
                 description: 'I18N_INTERACTIONS_GRAPH_ADD_NODE',
                 mode: _MODES.ADD_VERTEX
               });
             }
             if (ctrl.canDeleteVertex || ctrl.canDeleteEdge) {
               ctrl.buttons.push({
-                text: '\u2212',
+                text: '\uF068',
                 description: 'I18N_INTERACTIONS_GRAPH_DELETE',
                 mode: _MODES.DELETE
               });

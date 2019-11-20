@@ -18,13 +18,13 @@
 
 require('base-components/base-content.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
-require('services/IdGenerationService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/UserService.ts');
-require('services/contextual/UrlService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
+require('services/id-generation.service.ts');
+require('services/site-analytics.service.ts');
+require('services/user.service.ts');
+require('services/contextual/url.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('signupPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

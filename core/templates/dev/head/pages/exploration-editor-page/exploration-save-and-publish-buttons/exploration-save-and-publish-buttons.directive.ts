@@ -20,7 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-save.service.ts');
@@ -29,7 +29,7 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
-require('services/EditabilityService.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').directive('explorationSaveAndPublishButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {

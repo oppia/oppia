@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
@@ -145,9 +146,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         response = self.get_html_response(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
         self.assertIn(
-            '<title itemprop="name">Topics and Skills Dashboard - Oppia'
-            '</title>',
-            response.body)
+            '{"title": "Topics and Skills Dashboard - Oppia"})', response.body)
 
         self.logout()
 
@@ -191,7 +190,12 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'explanation': 'Explanation 3'
         }]
         json_response = self.post_json(
-            self.url, {'description': 'Skill Description', 'rubrics': rubrics},
+            self.url, {
+                'description': 'Skill Description',
+                'rubrics': rubrics,
+                'explanation_dict': state_domain.SubtitledHtml(
+                    '1', '<p>Explanation</p>').to_dict()
+            },
             csrf_token=csrf_token)
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
@@ -205,7 +209,9 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         payload = {
             'description': 'Skill Description',
             'linked_topic_ids': ['topic'],
-            'rubrics': []
+            'rubrics': [],
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>').to_dict()
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -220,6 +226,34 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': 'invalid'
+        }
+        json_response = self.post_json(
+            self.url, payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(json_response['status_code'], 400)
+        self.logout()
+
+    def test_skill_creation_in_invalid_explanation(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'description': 'Skill Description',
+            'linked_topic_ids': [self.topic_id],
+            'rubrics': [],
+            'explanation_dict': 'explanation'
+        }
+        json_response = self.post_json(
+            self.url, payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(json_response['status_code'], 400)
+
+        payload = {
+            'description': 'Skill Description',
+            'linked_topic_ids': [self.topic_id],
+            'rubrics': [],
+            'explanation_dict': {
+                'explanation': 'Explanation'
+            }
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -243,7 +277,9 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         payload = {
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
-            'rubrics': rubrics
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>').to_dict()
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token)

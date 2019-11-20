@@ -25,6 +25,7 @@ from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -177,7 +178,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
     topic.version += 1
-    create_topic_summary(topic.id)
+    generate_topic_summary(topic.id)
 
 
 def save_new_topic(committer_id, topic):
@@ -282,8 +283,8 @@ def apply_change_list(topic_id, change_list):
             elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
                 topic.delete_additional_story(change.story_id)
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
-                topic.add_uncategorized_skill_id(
-                    change.new_uncategorized_skill_id)
+                _add_uncategorized_skill_id_to_topic(
+                    topic, change.new_uncategorized_skill_id)
             elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
                 topic.remove_uncategorized_skill_id(
                     change.uncategorized_skill_id)
@@ -353,6 +354,21 @@ def apply_change_list(topic_id, change_list):
                 e.__class__.__name__, e, topic_id, change_list)
         )
         raise
+
+
+def _add_uncategorized_skill_id_to_topic(topic, uncategorized_skill_id):
+    """Adds an uncategorized skill_id to a topic.
+
+    Args:
+        topic: Topic. Topic to be modified.
+        uncategorized_skill_id: str. Skill ID to be added.
+    """
+    skill_ids_for_unpublished_skills = [
+        skill_rights.id for skill_rights in (
+            skill_services.get_all_unpublished_skill_rights())]
+    if uncategorized_skill_id in skill_ids_for_unpublished_skills:
+        raise Exception('Cannot assign unpublished skills to a topic')
+    topic.add_uncategorized_skill_id(uncategorized_skill_id)
 
 
 def _save_topic(committer_id, topic, commit_message, change_list):
@@ -463,7 +479,7 @@ def update_topic_and_subtopic_pages(
             subtopic_page_services.save_subtopic_page(
                 committer_id, subtopic_page, commit_message,
                 subtopic_page_change_list)
-    create_topic_summary(topic_id)
+    generate_topic_summary(topic_id)
 
     if old_topic.name != updated_topic.name:
         opportunity_services.update_opportunities_with_new_topic_name(
@@ -574,6 +590,7 @@ def publish_story(topic_id, story_id, committer_id):
     _save_topic(
         committer_id, topic, 'Published story with id %s' % story_id,
         change_list)
+    generate_topic_summary(topic.id)
 
 
 def unpublish_story(topic_id, story_id, committer_id):
@@ -607,6 +624,7 @@ def unpublish_story(topic_id, story_id, committer_id):
     _save_topic(
         committer_id, topic, 'Unpublished story with id %s' % story_id,
         change_list)
+    generate_topic_summary(topic.id)
 
 
 def delete_canonical_story(user_id, topic_id, story_id):
@@ -734,7 +752,7 @@ def delete_topic_summary(topic_id):
     topic_models.TopicSummaryModel.get(topic_id).delete()
 
 
-def create_topic_summary(topic_id):
+def generate_topic_summary(topic_id):
     """Creates and stores a summary of the given topic.
 
     Args:
@@ -755,8 +773,16 @@ def compute_summary_of_topic(topic):
     Returns:
         TopicSummary. The computed summary for the given topic.
     """
-    topic_model_canonical_story_count = len(topic.canonical_story_references)
-    topic_model_additional_story_count = len(topic.additional_story_references)
+    canonical_story_count = 0
+    additional_story_count = 0
+    for reference in topic.canonical_story_references:
+        if reference.story_is_published:
+            canonical_story_count += 1
+    for reference in topic.additional_story_references:
+        if reference.story_is_published:
+            additional_story_count += 1
+    topic_model_canonical_story_count = canonical_story_count
+    topic_model_additional_story_count = additional_story_count
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 

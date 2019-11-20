@@ -36,6 +36,7 @@ import { SubtitledHtmlObjectFactory } from
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/InteractionObjectFactory.ts');
@@ -80,6 +81,12 @@ describe('State card object factory', function() {
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

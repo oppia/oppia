@@ -22,7 +22,6 @@ import copy
 
 from constants import constants
 from core.domain import change_domain
-from core.domain import skill_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -759,8 +758,8 @@ class Topic(python_utils.OBJECT):
         """
         return cls(
             topic_id, name,
-            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [], 1,
-            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
 
@@ -865,11 +864,6 @@ class Topic(python_utils.OBJECT):
                 'The skill id %s is already an uncategorized skill.'
                 % new_uncategorized_skill_id)
 
-        skill_ids_for_unpublished_skills = [
-            skill_rights.id for skill_rights in (
-                skill_services.get_all_unpublished_skill_rights())]
-        if new_uncategorized_skill_id in skill_ids_for_unpublished_skills:
-            raise Exception('Cannot assign unpublished skills to a topic')
         self.uncategorized_skill_ids.append(new_uncategorized_skill_id)
 
     def remove_uncategorized_skill_id(self, uncategorized_skill_id):

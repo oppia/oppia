@@ -16,9 +16,9 @@
  * @fileoverview User exploration emails service for the exploration settings.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').factory('UserEmailPreferencesService', [
   '$http', 'AlertsService', 'ExplorationDataService',

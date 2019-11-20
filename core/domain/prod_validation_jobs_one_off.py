@@ -38,6 +38,7 @@ from core.domain import fs_domain
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
 from core.domain import question_domain
+from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -52,6 +53,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 import feconf
 import python_utils
@@ -163,7 +165,7 @@ class BaseModelValidator(python_utils.OBJECT):
             unused_item: ndb.Model. Entity to validate.
 
         Returns:
-            *: A domain object to validate.
+            *. A domain object to validate.
         """
         return None
 
@@ -175,14 +177,12 @@ class BaseModelValidator(python_utils.OBJECT):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        model_domain_object_instance = cls._get_model_domain_object_instance(
-            item)
-
-        if model_domain_object_instance is None:
-            # No domain object exists for this storage model class.
-            return
-
         try:
+            model_domain_object_instance = (
+                cls._get_model_domain_object_instance(item))
+            if model_domain_object_instance is None:
+                # No domain object exists for this storage model class.
+                return
             model_domain_object_instance.validate()
         except Exception as e:
             cls.errors['domain object check'].append((
@@ -202,6 +202,9 @@ class BaseModelValidator(python_utils.OBJECT):
             dict(str, (ndb.Model, list(str)). A dictionary whose keys are
             field names of the model to validate, and whose values are tuples
             that consist of the external model class and list of keys to fetch.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
         """
         raise NotImplementedError
 
@@ -281,6 +284,9 @@ class BaseModelValidator(python_utils.OBJECT):
 
         Each validation function should accept only a single arg, which is the
         model instance to validate.
+
+        Returns:
+            list(function). The list of custom validation functions to run.
         """
         return []
 
@@ -314,11 +320,14 @@ class BaseSummaryModelValidator(BaseModelValidator):
         This should be implemented by subclasses.
 
         Returns:
-            tuple(str, list(tuple), dict): A tuple with first element as
+            tuple(str, list(tuple), dict). A tuple with first element as
                 external model name, second element as a tuple of
                 cls.external_instance_details and the third element
                 as a properties dict with key as property name in summary
                 model and value as property name in external model.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
         """
         raise NotImplementedError
 
@@ -476,8 +485,11 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
             unused_item: ndb.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange: A domain object class for the
+            change_domain.BaseChange. A domain object class for the
                 changes made by commit commands of the model.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
         """
         raise NotImplementedError
 
@@ -657,7 +669,7 @@ class BaseUserModelValidator(BaseModelValidator):
             unused_item: ndb.Model. BaseUserModel to validate.
 
         Returns:
-            list(tuple(str, str, list, str, list):
+            list(tuple(str, str, list, str, list).
                 A list of tuple which consists of External model name,
                 property name in model, list of property value in model,
                 property name in external model, list of property value
@@ -1371,6 +1383,73 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
             cls._validate_content_count,
             cls._validate_chapter_title
             ]
+
+
+class SkillOpportunityModelValidator(BaseSummaryModelValidator):
+    """Class for validating SkillOpportunityModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return (
+            opportunity_services.get_skill_opportunity_from_model(item))
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_ids': (
+                skill_models.SkillModel, [item.id])
+        }
+
+    @classmethod
+    def _validate_question_count(cls, item):
+        """Validate that question_count matches the number of questions linked
+        to the opportunity's skill.
+
+        Args:
+            item: ndb.Model. SkillOpportunityModel to validate.
+        """
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+
+        for (_, _, skill_model) in (
+                skill_model_class_model_id_model_tuples):
+            # The case for missing skill external model is ignored here
+            # since errors for missing skill external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if skill_model is None or skill_model.deleted:
+                continue
+            skill = skill_services.get_skill_from_model(skill_model)
+            question_skill_links = (
+                question_services.get_question_skill_links_of_skill(
+                    skill.id, skill.description))
+            question_count = len(question_skill_links)
+            if question_count != item.question_count:
+                cls.errors['question_count check'].append((
+                    'Entity id %s: question_count: %s does not match the '
+                    'question_count of external skill model: %s') % (
+                        item.id, item.question_count, question_count))
+
+    @classmethod
+    def _get_external_model_properties(cls):
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+
+        skill_model_properties_dict = {
+            'skill_description': 'description'
+        }
+
+        return [(
+            'skill',
+            skill_model_class_model_id_model_tuples,
+            skill_model_properties_dict
+        )]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_question_count,
+        ]
 
 
 class ConfigPropertyModelValidator(BaseModelValidator):
@@ -2458,7 +2537,7 @@ class QuestionModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return question_services.get_question_from_model(item)
+        return question_fetchers.get_question_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -3324,30 +3403,34 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
             cls._validate_final_reveiwer_id]
 
 
-class ReviewerRotationTrackingModelValidator(BaseModelValidator):
-    """Class for validating ReviewerRotationTrackingModels."""
+class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
+    """Class for validating GeneralVoiceoverApplicationModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        # Valid id: same as score category.
-        regex_string = '^(%s)$' % ('|').join(ALLOWED_SCORE_CATEGORIES)
-        return regex_string
+    def _get_model_domain_object_instance(cls, item):
+        """Returns a domain object instance created from the model.
+
+        Args:
+            item: GeneralVoiceoverApplicationModel. Entity to validate.
+
+        Returns:
+            *. A domain object to validate.
+        """
+        return voiceover_services.get_voiceover_application_by_id(item.id)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        question_ids = []
-        split_id = item.id.split(suggestion_models.SCORE_CATEGORY_DELIMITER)
-        if len(split_id) == 2 and (
-                split_id[0] == suggestion_models.SCORE_TYPE_QUESTION):
-            question_ids = [split_id[1]]
-        return {
-            'user_ids': (
-                user_models.UserSettingsModel,
-                [item.current_position_in_rotation]),
-            'question_ids': (
-                question_models.QuestionModel,
-                question_ids)
+        external_instance_details = {
+            'author_ids': (user_models.UserSettingsModel, [item.author_id]),
         }
+        if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
+            external_instance_details['%s_ids' % item.target_type] = (
+                TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
+                [item.target_id])
+        if item.final_reviewer_id is not None:
+            external_instance_details['final_reviewer_ids'] = (
+                user_models.UserSettingsModel, [item.final_reviewer_id])
+        return external_instance_details
 
 
 class TopicModelValidator(BaseModelValidator):
@@ -3616,16 +3699,17 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             # function.
             if topic_model is None or topic_model.deleted:
                 continue
-            canonical_story_ids = [
+            pubished_canonical_story_ids = [
                 reference['story_id']
-                for reference in topic_model.canonical_story_references]
-            if item.canonical_story_count != len(canonical_story_ids):
+                for reference in topic_model.canonical_story_references
+                if reference['story_is_published']]
+            if item.canonical_story_count != len(pubished_canonical_story_ids):
                 cls.errors['canonical story count check'].append((
                     'Entity id %s: Canonical story count: %s does not '
                     'match the number of story ids in canonical_story_ids in '
                     'topic model: %s') % (
                         item.id, item.canonical_story_count,
-                        canonical_story_ids))
+                        pubished_canonical_story_ids))
 
     @classmethod
     def _validate_additional_story_count(cls, item):
@@ -3645,16 +3729,19 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             # function.
             if topic_model is None or topic_model.deleted:
                 continue
-            additional_story_ids = [
+            published_additional_story_ids = [
                 reference['story_id']
-                for reference in topic_model.additional_story_references]
-            if item.additional_story_count != len(additional_story_ids):
+                for reference in topic_model.additional_story_references
+                if reference['story_is_published']]
+            if (
+                    item.additional_story_count !=
+                    len(published_additional_story_ids)):
                 cls.errors['additional story count check'].append((
                     'Entity id %s: Additional story count: %s does not '
                     'match the number of story ids in additional_story_ids in '
                     'topic model: %s') % (
                         item.id, item.additional_story_count,
-                        additional_story_ids))
+                        published_additional_story_ids))
 
     @classmethod
     def _validate_uncategorized_skill_count(cls, item):
@@ -5004,8 +5091,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
     collection_models.CollectionCommitLogEntryModel: (
         CollectionCommitLogEntryModelValidator),
     collection_models.CollectionSummaryModel: CollectionSummaryModelValidator,
-    opportunity_models.ExplorationOpportunitySummaryModel: (
-        ExplorationOpportunitySummaryModelValidator),
     config_models.ConfigPropertyModel: ConfigPropertyModelValidator,
     config_models.ConfigPropertySnapshotMetadataModel: (
         ConfigPropertySnapshotMetadataModelValidator),
@@ -5046,6 +5131,9 @@ MODEL_TO_VALIDATOR_MAPPING = {
     file_models.FileSnapshotContentModel: FileSnapshotContentModelValidator,
     job_models.JobModel: JobModelValidator,
     job_models.ContinuousComputationModel: ContinuousComputationModelValidator,
+    opportunity_models.ExplorationOpportunitySummaryModel: (
+        ExplorationOpportunitySummaryModelValidator),
+    opportunity_models.SkillOpportunityModel: (SkillOpportunityModelValidator),
     question_models.QuestionModel: QuestionModelValidator,
     question_models.QuestionSkillLinkModel: (
         QuestionSkillLinkModelValidator),
@@ -5087,8 +5175,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         StoryCommitLogEntryModelValidator),
     story_models.StorySummaryModel: StorySummaryModelValidator,
     suggestion_models.GeneralSuggestionModel: GeneralSuggestionModelValidator,
-    suggestion_models.ReviewerRotationTrackingModel: (
-        ReviewerRotationTrackingModelValidator),
+    suggestion_models.GeneralVoiceoverApplicationModel: (
+        GeneralVoiceoverApplicationModelValidator),
     topic_models.TopicModel: TopicModelValidator,
     topic_models.TopicSnapshotMetadataModel: (
         TopicSnapshotMetadataModelValidator),
@@ -5274,6 +5362,14 @@ class ExplorationOpportunitySummaryModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [opportunity_models.ExplorationOpportunitySummaryModel]
+
+
+class SkillOpportunityModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillOpportunityModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [opportunity_models.SkillOpportunityModel]
 
 
 class ConfigPropertyModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -5719,12 +5815,13 @@ class GeneralSuggestionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [suggestion_models.GeneralSuggestionModel]
 
 
-class ReviewerRotationTrackingModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates ReviewerRotationTrackingModel."""
+class GeneralVoiceoverApplicationModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates GeneralVoiceoverApplicationModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [suggestion_models.ReviewerRotationTrackingModel]
+        return [suggestion_models.GeneralVoiceoverApplicationModel]
 
 
 class TopicModelAuditOneOffJob(ProdValidationAuditOneOffJob):

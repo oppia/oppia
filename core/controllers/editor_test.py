@@ -114,7 +114,9 @@ class EditorTests(BaseEditorControllerTests):
 
         # Check that non-editors can access, but not edit, the editor page.
         response = self.get_html_response('/create/0')
-        self.assertIn('Help others learn new things.', response.body)
+        self.assertIn(
+            '<exploration-editor-page></exploration-editor-page>',
+            response.body)
         self.assert_cannot_edit('0')
 
         # Log in as an editor.
@@ -122,7 +124,9 @@ class EditorTests(BaseEditorControllerTests):
 
         # Check that it is now possible to access and edit the editor page.
         response = self.get_html_response('/create/0')
-        self.assertIn('Help others learn new things.', response.body)
+        self.assertIn(
+            '<exploration-editor-page></exploration-editor-page>',
+            response.body)
         self.assert_can_edit('0')
 
         self.logout()
@@ -1049,18 +1053,24 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             self.delete_json(
                 '/createhandler/data/%s' % exp_id)
 
-            # Observed_log_messages[1] is 'Attempting to delete documents
+            # Observed_log_messaged[0] is 'adding the following docs to
+            # index %s: %s' % (index.name, documents). It is logged from the
+            # function add_documents_to_index in
+            # oppia/core/platform/search/gae_search_services.py,
+            # not to be checked here (same for admin and moderator). The
+            # function is called when an exploration is saved.
+            # Observed_log_messages[2] is 'Attempting to delete documents
             # from index %s, ids: %s' % (index.name, ', '.join(doc_ids)). It
             # is logged by function delete_documents_from_index in
             # oppia/core/platform/search/gae_search_services.py,
             # not to be checked here (same for admin and moderator).
-            self.assertEqual(len(observed_log_messages), 3)
+            self.assertEqual(len(observed_log_messages), 4)
             self.assertEqual(
-                observed_log_messages[0],
+                observed_log_messages[1],
                 '(%s) %s tried to delete exploration %s' %
                 (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id))
             self.assertEqual(
-                observed_log_messages[2],
+                observed_log_messages[3],
                 '(%s) %s deleted exploration %s' %
                 (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id))
             self.logout()
@@ -1074,13 +1084,13 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             self.login(self.ADMIN_EMAIL)
             self.delete_json('/createhandler/data/%s' % exp_id)
-            self.assertEqual(len(observed_log_messages), 3)
+            self.assertEqual(len(observed_log_messages), 4)
             self.assertEqual(
-                observed_log_messages[0],
+                observed_log_messages[1],
                 '(%s) %s tried to delete exploration %s' %
                 (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.assertEqual(
-                observed_log_messages[2],
+                observed_log_messages[3],
                 '(%s) %s deleted exploration %s' %
                 (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.logout()
@@ -1094,13 +1104,13 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             self.login(self.MODERATOR_EMAIL)
             self.delete_json('/createhandler/data/%s' % exp_id)
-            self.assertEqual(len(observed_log_messages), 3)
+            self.assertEqual(len(observed_log_messages), 4)
             self.assertEqual(
-                observed_log_messages[0],
+                observed_log_messages[1],
                 '(%s) %s tried to delete exploration %s' %
                 (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id))
             self.assertEqual(
-                observed_log_messages[2],
+                observed_log_messages[3],
                 '(%s) %s deleted exploration %s' %
                 (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id))
             self.logout()

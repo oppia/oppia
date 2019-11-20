@@ -51,10 +51,12 @@ STATUS_CHOICES = [
 
 # Constants defining various suggestion types.
 SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
 SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
 
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
@@ -140,6 +142,20 @@ class GeneralSuggestionModel(base_models.BaseModel):
     def get_deletion_policy():
         """General suggestion needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralSuggestionModel exists for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
+        ).get() is not None
 
     @classmethod
     def create(
@@ -242,6 +258,42 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
+    def get_in_review_suggestions_of_suggestion_type(
+            cls, suggestion_type, user_id):
+        """Gets all suggestions of suggestion_type which are in review.
+
+        Args:
+            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+                As a user cannot review their own suggestions, suggestions
+                authored by the user will be excluded.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are of the given
+                type, which are in review, but not created by the given user.
+        """
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.suggestion_type == suggestion_type).filter(
+                cls.author_id != user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_user_created_suggestions_of_suggestion_type(
+            cls, suggestion_type, user_id):
+        """Gets all suggestions of suggestion_type which the user has created.
+
+        Args:
+            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are of the given
+                type, which the given user has created.
+        """
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.suggestion_type == suggestion_type).filter(
+                cls.author_id == user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
     def get_all_score_categories(cls):
         """Gets all the score categories for which suggestions have been
         created.
@@ -284,53 +336,109 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return user_data
 
 
-class ReviewerRotationTrackingModel(base_models.BaseModel):
-    """Model to keep track of the position in the reviewer rotation. This model
-    is keyed by the score category.
-    """
+class GeneralVoiceoverApplicationModel(base_models.BaseModel):
+    """A general model for voiceover application of an entity.
 
-    # The ID of the user whose turn is just completed in the rotation.
-    current_position_in_rotation = ndb.StringProperty(
-        required=True, indexed=False)
+    The ID of the voiceover application will be a random hashed value.
+    """
+    # The type of entity to which the user will be assigned as a voice artist
+    # once the application will get approved.
+    target_type = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the entity to which the application belongs.
+    target_id = ndb.StringProperty(required=True, indexed=True)
+    # The language code for the voiceover audio.
+    language_code = ndb.StringProperty(required=True, indexed=True)
+    # The status of the application. One of: accepted, rejected, in-review.
+    status = ndb.StringProperty(
+        required=True, indexed=True, choices=STATUS_CHOICES)
+    # The HTML content written in the given language_code.
+    # This will typically be a snapshot of the content of the initial card of
+    # the target.
+    content = ndb.TextProperty(required=True)
+    # The filename of the voiceover audio. The filename will have
+    # datetime-randomId(length 6)-language_code.mp3 pattern.
+    filename = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the author of the voiceover application.
+    author_id = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the reviewer who accepted/rejected the voiceover application.
+    final_reviewer_id = ndb.StringProperty(indexed=True)
+    # The plain text message submitted by the reviewer while rejecting the
+    # application.
+    rejection_message = ndb.TextProperty()
 
     @staticmethod
     def get_deletion_policy():
-        """Reviewer rotation tracking is going to be reworked oon.
-        Thus, using using not applicable for now.
+        """General voiceover application needs to be pseudonymized for the
+        user.
         """
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def create(cls, score_category, user_id):
-        """Creates a new ReviewerRotationTrackingModel instance.
-
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralVoiceoverApplicationModel exists for the user.
         Args:
-            score_category: str. The score category.
-            user_id: str. The ID of the user who completed their turn in the
-                rotation for the given category.
-
-        Raises:
-            Exception: There is already an instance with the given id.
+            user_id: str. The ID of the user whose data should be checked.
+        Returns:
+            bool. Whether any models refer to the given user ID.
         """
-        if cls.get_by_id(score_category):
-            raise Exception(
-                'There already exists an instance with the given id: %s' % (
-                    score_category))
-        cls(id=score_category, current_position_in_rotation=user_id).put()
+        return cls.query(
+            ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
+        ).get() is not None
 
     @classmethod
-    def update_position_in_rotation(cls, score_category, user_id):
-        """Updates current position in rotation for the given score_category.
+    def get_user_voiceover_applications(cls, author_id, status=None):
+        """Returns a list of voiceover application submitted by the given user.
 
         Args:
-            score_category: str. The score category.
-            user_id: str. The ID of the user who completed their turn in the
-                rotation for the given category.
-        """
-        instance = cls.get_by_id(score_category)
+            author_id: str. The id of the user created the voiceover
+                application.
+            status: str|None. The status of the voiceover application.
+                If the status is None, the query will fetch all the
+                voiceover applications.
 
-        if instance is None:
-            cls.create(score_category, user_id)
+        Returns:
+            list(GeneralVoiceoverApplicationModel). The list of voiceover
+                application submitted by the given user.
+        """
+        if status in STATUS_CHOICES:
+            return cls.query(ndb.AND(
+                cls.author_id == author_id, cls.status == status)).fetch()
         else:
-            instance.current_position_in_rotation = user_id
-            instance.put()
+            return cls.query(cls.author_id == author_id).fetch()
+
+    @classmethod
+    def get_reviewable_voiceover_applications(cls, user_id):
+        """Returns a list of voiceover application which a given user can
+        review.
+
+        Args:
+            user_id: str. The id of the user trying to make this query.
+                As a user cannot review their own voiceover application, so the
+                voiceover application created by the user will be excluded.
+
+        Returns:
+            list(GeneralVoiceoverApplicationModel). The list of voiceover
+                application which the given user can review.
+        """
+        return cls.query(ndb.AND(
+            cls.author_id != user_id,
+            cls.status == STATUS_IN_REVIEW)).fetch()
+
+    @classmethod
+    def get_voiceover_applications(cls, target_type, target_id, language_code):
+        """Returns a list of voiceover applications submitted for a give entity
+        in a given language.
+
+        Args:
+            target_type: str. The type of entity.
+            target_id: str. The ID of the targeted entity.
+            language_code: str. The code of the language in which the voiceover
+                application is submitted.
+
+        Returns:
+            list(GeneralVoiceoverApplicationModel). The list of voiceover
+            application which is submitted to a give entity in a given language.
+        """
+        return cls.query(ndb.AND(
+            cls.target_type == target_type, cls.target_id == target_id,
+            cls.language_code == language_code)).fetch()

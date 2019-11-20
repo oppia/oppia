@@ -23,6 +23,7 @@ import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require(
@@ -43,6 +44,12 @@ describe('retrieving threads service', function() {
       $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     });
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   var ThreadDataService, httpBackend;
   beforeEach(angular.mock.inject(function($httpBackend, _ThreadDataService_) {

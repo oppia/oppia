@@ -72,6 +72,7 @@ then
 fi
 
 set -e
+python -m scripts.install_third_party_libs
 python -m scripts.setup
 python -m scripts.setup_gae
 if [ "$TRAVIS" == 'true' ]; then
@@ -96,6 +97,15 @@ if ( nc -vz localhost 9001 ); then
   exit 1
 fi
 
+export OPPIA_DIR=`pwd`
+# Set COMMON_DIR to the absolute path of the directory above OPPIA_DIR. This
+# is necessary becaue COMMON_DIR (or subsequent variables which refer to it)
+# may use it in a situation where relative paths won't work as expected (such
+# as $PYTHONPATH).
+export COMMON_DIR=$(cd $OPPIA_DIR/..; pwd)
+export TOOLS_DIR=$COMMON_DIR/oppia_tools
+export NODE_PATH=$TOOLS_DIR/node-10.15.3
+export PATH=$NODE_PATH/bin:$PATH
 
 # Forces the cleanup function to run on exit.
 # Developers: note that at the end of this script, the cleanup() function at

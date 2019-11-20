@@ -46,7 +46,7 @@ class SentEmailModel(base_models.BaseModel):
     recipient_email = ndb.StringProperty(required=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
-    sender_id = ndb.StringProperty(required=True)
+    sender_id = ndb.StringProperty(required=True, indexed=True)
     # The email address used to send the notification.
     sender_email = ndb.StringProperty(required=True)
     # The intent of the email.
@@ -64,6 +64,7 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
         feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
         feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+        feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
         feconf.BULK_EMAIL_INTENT_TEST
     ])
     # The subject line of the email.
@@ -79,6 +80,21 @@ class SentEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SentEmailModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(ndb.OR(
+            cls.recipient_id == user_id,
+            cls.sender_id == user_id,
+        )).get() is not None
 
     @classmethod
     def _generate_id(cls, intent):
@@ -137,12 +153,12 @@ class SentEmailModel(base_models.BaseModel):
 
         email_model_instance.put()
 
-    def put(self):
+    def put(self, update_last_updated_time=True):
         """Saves this SentEmailModel instance to the datastore."""
         email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
         self.email_hash = email_hash
-        super(SentEmailModel, self).put()
+        super(SentEmailModel, self).put(update_last_updated_time)
 
     @classmethod
     def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
@@ -252,7 +268,7 @@ class BulkEmailModel(base_models.BaseModel):
     recipient_ids = ndb.JsonProperty(default=[], compressed=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
-    sender_id = ndb.StringProperty(required=True)
+    sender_id = ndb.StringProperty(required=True, indexed=True)
     # The email address used to send the notification.
     sender_email = ndb.StringProperty(required=True)
     # The intent of the email.
@@ -274,6 +290,21 @@ class BulkEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether BulkEmailModel exists for user. Since recipient_ids
+        can't be indexed it also can't be checked by this method, we can allow
+        this because the deletion policy for this model is keep , thus even the
+        deleted user's id will remain here.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.sender_id == user_id).get() is not None
 
     @classmethod
     def create(
@@ -315,36 +346,23 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     thread_id = ndb.StringProperty(required=False, indexed=True)
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
-    # When this user thread was created and last updated. This overrides the
-    # fields in BaseModel. We are overriding them because we do not want the
-    # last_updated field to be updated when running one off job and whe the
-    # model is created we need to make sure that created_on is set before
-    # last updated.
-    created_on = ndb.DateTimeProperty(indexed=True, required=True)
-    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
-
-    def put(self, update_last_updated_time=True):
-        """Writes the given thread instance to the datastore.
-
-        Args:
-            update_last_updated_time: bool. Whether to update the
-                last_updated_field of the thread.
-
-        Returns:
-            GeneralFeedbackEmailReplyToIdModel. The thread entity.
-        """
-        if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
-
-        if update_last_updated_time or self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
-
-        return super(GeneralFeedbackEmailReplyToIdModel, self).put()
 
     @staticmethod
     def get_deletion_policy():
         """Feedback email reply to id should be deleted."""
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralFeedbackEmailReplyToIdModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):

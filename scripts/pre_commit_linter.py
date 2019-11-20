@@ -23,15 +23,6 @@ it will only lint files that have been touched in this commit.
 
 This script ignores all filepaths contained within .eslintignore.
 
-IMPORTANT NOTES:
-
-1.  Before running this script, you must install third-party dependencies by
-    running
-
-        python -m scripts.install_third_party_libs
-
-    at least once.
-
 =====================
 CUSTOMIZATION OPTIONS
 =====================
@@ -71,7 +62,12 @@ import tempfile
 import threading
 import time
 
-import python_utils
+# Install third party dependencies before proceeding.
+from . import install_third_party_libs
+install_third_party_libs.main(args=[])
+
+# pylint: disable=wrong-import-position
+import python_utils  # isort:skip
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
@@ -98,7 +94,9 @@ EXCLUDED_PATHS = (
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
-    'webpack_bundles/*', 'core/tests/services_sources/*')
+    'webpack_bundles/*', 'core/tests/services_sources/*',
+    'core/tests/release_sources/tmp_unzip.zip',
+    'core/tests/release_sources/tmp_unzip.tar.gz')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
@@ -669,6 +667,22 @@ def _lint_all_files(
     """This function is used to check if node-eslint dependencies are
     installed and pass ESLint binary path and lint all the files(JS, Python,
     HTML, CSS) with their respective third party linters.
+
+    Args:
+        js_filepaths: list(str). The list of js filepaths to be linted.
+        ts_filepaths: list(str). The list of ts filepaths to be linted.
+        py_filepaths: list(str). The list of python filepaths to be linted.
+        html_filepaths: list(str). The list of HTML filepaths to be linted.
+        css_filepaths: list(str). The list of CSS filepaths to be linted.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+
+    Returns:
+        linting_processes: list(multiprocessing.Process). A list of linting
+        processes.
+        result_queues: list(multiprocessing.Queue). A list of queues to put
+        results of tests.
+        stdout_queus: list(multiprocessing.Queue). A list of queues to store
+        Stylelint outputs.
     """
 
     python_utils.PRINT('Starting Js, Ts, Python, HTML, and CSS linter...')
@@ -1049,7 +1063,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
     def __init__(self, filepath, file_lines, debug, failed=False):
-        """Define various variables to parse HTML."""
+        """Define various variables to parse HTML.
+
+        Args:
+            filepath: str. path of the file.
+            file_lines: list(str). list of the lines in the file.
+            debug: bool. if true prints tag_stack for the file.
+            failed: bool. true if the HTML indentation check fails.
+        """
         html.parser.HTMLParser.__init__(self)
         self.tag_stack = []
         self.debug = debug
@@ -1064,7 +1085,12 @@ class CustomHTMLParser(html.parser.HTMLParser):
             'param', 'source', 'track', 'wbr']
 
     def handle_starttag(self, tag, attrs):
-        """Handle start tag of a HTML line."""
+        """Handle start tag of a HTML line.
+
+        Args:
+            tag: str. start tag of a HTML line.
+            attrs: list(str). list of attributes in the start tag.
+        """
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
         expected_indentation = self.indentation_level * self.indentation_width
@@ -1162,7 +1188,11 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 self.failed = True
 
     def handle_endtag(self, tag):
-        """Handle end tag of a HTML line."""
+        """Handle end tag of a HTML line.
+
+        Args:
+            tag: str. end tag of a HTML line.
+        """
         line_number, _ = self.getpos()
         tag_line = self.file_lines[line_number - 1]
         leading_spaces_count = len(tag_line) - len(tag_line.lstrip())
@@ -1196,7 +1226,11 @@ class CustomHTMLParser(html.parser.HTMLParser):
             python_utils.PRINT(self.tag_stack)
 
     def handle_data(self, data):
-        """Handle indentation level."""
+        """Handle indentation level.
+
+        Args:
+            data: str. contents of HTML file to be parsed.
+        """
         data_lines = data.split('\n')
         opening_block = tuple(
             ['{% block', '{% macro', '{% if', '% for', '% if'])
@@ -1362,7 +1396,8 @@ def _check_codeowner_file(verbose_mode_enabled):
                         break
                 if not match:
                     python_utils.PRINT(
-                        '%s is not covered under CODEOWNERS' % file_path)
+                        '%s is not listed in the .github/CODEOWNERS file.' % (
+                            file_path))
                     failed = True
 
         failed = failed or (
@@ -1370,10 +1405,12 @@ def _check_codeowner_file(verbose_mode_enabled):
                 important_rules_in_critical_section))
 
         if failed:
-            summary_message = '%s   CODEOWNERS file check failed' % (
-                _MESSAGE_TYPE_FAILED)
+            summary_message = (
+                '%s   CODEOWNERS file coverage check failed, see messages '
+                'above for files that need to be added or patterns that need '
+                'to be fixed.' % _MESSAGE_TYPE_FAILED)
         else:
-            summary_message = '%s  CODEOWNERS file check passed' % (
+            summary_message = '%s  CODEOWNERS file coverage check passed' % (
                 _MESSAGE_TYPE_SUCCESS)
 
         summary_messages.append(summary_message)
@@ -1734,7 +1771,8 @@ def _check_codeowner_file(verbose_mode_enabled):
                         break
                 if not match:
                     python_utils.PRINT(
-                        '%s is not covered under CODEOWNERS' % file_path)
+                        '%s is not listed in the .github/CODEOWNERS file.' % (
+                            file_path))
                     failed = True
 
         failed = failed or (
@@ -1742,8 +1780,10 @@ def _check_codeowner_file(verbose_mode_enabled):
                 important_rules_in_critical_section))
 
         if failed:
-            summary_message = '%s   CODEOWNERS file check failed' % (
-                _MESSAGE_TYPE_FAILED)
+            summary_message = (
+                '%s   CODEOWNERS file coverage check failed, see messages '
+                'above for files that need to be added or patterns that need '
+                'to be fixed.' % _MESSAGE_TYPE_FAILED)
         else:
             summary_message = '%s  CODEOWNERS file check passed' % (
                 _MESSAGE_TYPE_SUCCESS)
@@ -1853,7 +1893,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         summary_messages = []
         failed = False
         stdout = python_utils.string_io()
-        with _redirect_stdout(_TARGET_STDOUT):
+        with _redirect_stdout(stdout):
             sets_of_patterns_to_match = [
                 MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
             for filepath in self.all_filepaths:
@@ -1863,8 +1903,8 @@ class LintChecksManager( # pylint: disable=inherit-non-class
 
             if failed:
                 summary_message = (
-                    '%s  Mandatory pattern check failed' % (
-                        _MESSAGE_TYPE_FAILED))
+                    '%s  Mandatory pattern check failed, see errors above for'
+                    'patterns that should be added.' % _MESSAGE_TYPE_FAILED)
             else:
                 summary_message = (
                     '%s  Mandatory pattern check passed' % (
@@ -1929,8 +1969,10 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                             python_utils.PRINT('')
                             total_error_count += 1
             if failed:
-                summary_message = '%s Pattern checks failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s Pattern check failed, see errors above '
+                    'for patterns that should be removed.' % (
+                        _MESSAGE_TYPE_FAILED))
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s Pattern checks passed' % (
@@ -2010,6 +2052,10 @@ class JsTsLintChecksManager(LintChecksManager):
     def _validate_and_parse_js_and_ts_files(self):
         """This function validates JavaScript and Typescript files and
         returns the parsed contents as a Python dictionary.
+
+        Returns:
+            dict. contains the contents of js and ts files after
+            validating and parsing the files.
         """
 
         # Select JS files which need to be checked.
@@ -2057,6 +2103,10 @@ class JsTsLintChecksManager(LintChecksManager):
     def _get_expressions_from_parsed_script(self):
         """This function returns the expressions in the script parsed using
         js and ts files.
+
+        Returns:
+            dict. contains the expressions in the script parsed using js
+            and ts files.
         """
 
         parsed_expressions_in_files = collections.defaultdict(dict)
@@ -2127,8 +2177,10 @@ class JsTsLintChecksManager(LintChecksManager):
                 python_utils.PRINT(err_msg)
 
             if failed:
-                summary_message = '%s  Extra JS files check failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s  Extra JS files check failed, see '
+                    'message above on resolution steps.' % (
+                        _MESSAGE_TYPE_FAILED))
             else:
                 summary_message = '%s  Extra JS files check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
@@ -2179,8 +2231,9 @@ class JsTsLintChecksManager(LintChecksManager):
         with _redirect_stdout(stdout):
             if failed:
                 summary_message = (
-                    '%s  JS and TS Component name and count check failed' %
-                    (_MESSAGE_TYPE_FAILED))
+                    '%s  JS and TS Component name and count check failed, '
+                    'see messages above for duplicate names.' % (
+                        _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -2313,8 +2366,10 @@ class JsTsLintChecksManager(LintChecksManager):
 
         with _redirect_stdout(stdout):
             if failed:
-                summary_message = '%s   Directive scope check failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s   Directive scope check failed, '
+                    'see messages above for suggested fixes.' % (
+                        _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -2407,7 +2462,8 @@ class JsTsLintChecksManager(LintChecksManager):
         with _redirect_stdout(stdout):
             if failed:
                 summary_message = (
-                    '%s  Sorted dependencies check failed' % (
+                    '%s  Sorted dependencies check failed, fix files that '
+                    'that don\'t have sorted dependencies mentioned above.' % (
                         _MESSAGE_TYPE_FAILED))
             else:
                 summary_message = (
@@ -2470,7 +2526,8 @@ class JsTsLintChecksManager(LintChecksManager):
 
             if failed:
                 summary_message = (
-                    '%s   Controller dependency line break check failed' % (
+                    '%s   Controller dependency line break check failed, '
+                    'see messages above for the affected files.' % (
                         _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
@@ -2650,8 +2707,10 @@ class JsTsLintChecksManager(LintChecksManager):
                                 'constants file.' % (filepath, constant))
 
             if failed:
-                summary_message = '%s  Constants declaration check failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s  Constants declaration check failed, '
+                    'see messages above for constants with errors.' % (
+                        _MESSAGE_TYPE_FAILED))
             else:
                 summary_message = '%s  Constants declaration check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
@@ -2742,8 +2801,10 @@ class JsTsLintChecksManager(LintChecksManager):
                         python_utils.PRINT('')
 
             if failed:
-                summary_message = '%s   HTML directive name check failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s   HTML directive name check failed, see files above '
+                    'that did not end with _directive.html but '
+                    'should have.' % _MESSAGE_TYPE_FAILED)
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s   HTML directive name check passed' % (
@@ -2806,52 +2867,6 @@ class OtherLintChecksManager(LintChecksManager):
             self.css_filepaths + self.html_filepaths +
             self.other_filepaths + self.py_filepaths)
 
-    def _check_division_operator(self):
-        """This function ensures that the division operator('/') is not used and
-        python_utils.divide() is used instead.
-        """
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting division checks')
-            python_utils.PRINT('----------------------------------------')
-
-        summary_messages = []
-        files_to_check = [
-            filepath for filepath in self.py_filepaths if not
-            any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS)]
-        failed = False
-
-        stdout = python_utils.string_io()
-        with _redirect_stdout(stdout):
-            for filepath in files_to_check:
-                ast_file = ast.walk(
-                    ast.parse(
-                        python_utils.convert_to_bytes(
-                            FILE_CACHE.read(filepath))))
-                ast_divisions = [n for n in ast_file if isinstance(n, ast.Div)]
-                if ast_divisions:
-                    python_utils.PRINT(
-                        'Please use python_utils.divide() instead of the '
-                        '"/" operator in --> %s' % filepath)
-                    failed = True
-
-            python_utils.PRINT('')
-            if failed:
-                summary_message = (
-                    '%s Division operator check failed' % _MESSAGE_TYPE_FAILED)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-            else:
-                summary_message = (
-                    '%s Division operator check passed' % _MESSAGE_TYPE_SUCCESS)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-
-            python_utils.PRINT('')
-            self.process_manager['division'] = summary_messages
-            _STDOUT_LIST.append(stdout)
-
-
     def _check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
@@ -2881,7 +2896,9 @@ class OtherLintChecksManager(LintChecksManager):
             python_utils.PRINT('')
             if failed:
                 summary_message = (
-                    '%s   Import order checks failed' % _MESSAGE_TYPE_FAILED)
+                    '%s   Import order checks failed, file imports should be '
+                    'alphabetized, see affect files above.' % (
+                        _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -2893,9 +2910,9 @@ class OtherLintChecksManager(LintChecksManager):
         _STDOUT_LIST.append(stdout)
 
 
-    def _check_divide_and_import(self):
-        """Run checks relates to division and import order."""
-        methods = [self._check_division_operator, self._check_import_order]
+    def _check_import(self):
+        """Run checks relates to import order."""
+        methods = [self._check_import_order]
         super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
 
     def _check_docstrings_and_comments(self):
@@ -3049,7 +3066,8 @@ class OtherLintChecksManager(LintChecksManager):
             python_utils.PRINT('')
             if failed:
                 summary_message = (
-                    '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
+                    '%s   Docstring check failed, see files above with bad'
+                    'docstrings to be fixed.' % _MESSAGE_TYPE_FAILED)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -3128,7 +3146,8 @@ class OtherLintChecksManager(LintChecksManager):
             python_utils.PRINT('')
             if failed:
                 summary_message = (
-                    '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
+                    '%s   Comments check failed, fix files that have bad '
+                    'comment formating.' % _MESSAGE_TYPE_FAILED)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -3166,8 +3185,9 @@ class OtherLintChecksManager(LintChecksManager):
                     failed = True
 
             if failed:
-                summary_message = '%s   HTML tag and attribute check failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s   HTML tag and attribute check failed, fix the HTML '
+                    'files listed above.' % _MESSAGE_TYPE_FAILED)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -3229,8 +3249,9 @@ class OtherLintChecksManager(LintChecksManager):
             if total_error_count:
                 python_utils.PRINT('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
-                summary_message = '%s   HTML linting failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s   HTML linting failed, '
+                    'fix the HTML files listed above.' % _MESSAGE_TYPE_FAILED)
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s   HTML linting passed' % (
@@ -3256,7 +3277,7 @@ class OtherLintChecksManager(LintChecksManager):
             OtherLintChecksManager, self).perform_all_lint_checks()
         # division_operator_messages = self._check_division_operator()
         # import_order_messages = self._check_import_order()
-        self._check_divide_and_import()
+        self._check_import()
         self._check_docstrings_and_comments()
         docstring_messages = self.process_manager['docstrings']
         comment_messages = self.process_manager['comments']
@@ -3266,13 +3287,11 @@ class OtherLintChecksManager(LintChecksManager):
             self._check_html_tags_and_attributes())
         html_linter_messages = self._lint_html_files()
         import_order_messages = self.process_manager['import']
-        division_operator_messages = self.process_manager['division']
 
         all_messages = (
             import_order_messages + common_messages +
             docstring_messages + comment_messages +
-            html_tag_and_attribute_messages + html_linter_messages +
-            division_operator_messages)
+            html_tag_and_attribute_messages + html_linter_messages)
         return all_messages
 
 
@@ -3388,9 +3407,11 @@ def main(args=None):
         python_utils.PRINT('---------------------------')
 
 
+NAME_SPACE = multiprocessing.Manager().Namespace()
+PROCESSES = multiprocessing.Manager().dict()
+NAME_SPACE.files = FileCache()
+FILE_CACHE = NAME_SPACE.files
+
+
 if __name__ == '__main__':
-    NAME_SPACE = multiprocessing.Manager().Namespace()
-    PROCESSES = multiprocessing.Manager().dict()
-    NAME_SPACE.files = FileCache()
-    FILE_CACHE = NAME_SPACE.files
     main()

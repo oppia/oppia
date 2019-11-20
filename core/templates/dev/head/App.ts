@@ -16,31 +16,32 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('directives/focus-on.directive.ts');
 
 require('pages/Base.ts');
 
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/CsrfTokenService.ts');
-require('services/NavigationService.ts');
-require('services/UtilsService.ts');
-require('services/DebouncerService.ts');
-require('services/DateTimeFormatService.ts');
-require('services/IdGenerationService.ts');
-require('services/HtmlEscaperService.ts');
-require('services/TranslationFileHashLoaderService.ts');
-require('services/RteHelperService.ts');
-require('services/StateRulesStatsService.ts');
-require('services/ConstructTranslationIdsService.ts');
-require('services/UserService.ts');
-require('services/PromoBarService.ts');
-require('services/contextual/DeviceInfoService.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/stateful/BackgroundMaskService.ts');
-require('services/stateful/FocusManagerService.ts');
-require('services/SiteAnalyticsService.ts');
+require('services/context.service.ts');
+require('services/csrf-token.service.ts');
+require('services/navigation.service.ts');
+require('services/debouncer.service.ts');
+require('services/date-time-format.service.ts');
+require('services/id-generation.service.ts');
+require('services/html-escaper.service.ts');
+require('services/translation-file-hash-loader.service.ts');
+require('services/rte-helper.service.ts');
+require('services/state-rules-stats.service.ts');
+require('services/construct-translation-ids.service.ts');
+require('services/user.service.ts');
+require('services/promo-bar.service.ts');
+require('services/contextual/device-info.service.ts');
+require('services/contextual/url.service.ts');
+require('services/stateful/focus-manager.service.ts');
+require('services/site-analytics.service.ts');
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -59,9 +60,8 @@ require(
   'components/common-layout-directives/navigation-bars/' +
   'top-navigation-bar.directive.ts');
 
-require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('app.constants.ajs.ts');
 
@@ -75,14 +75,17 @@ const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider',
+  '$interpolateProvider', '$locationProvider', '$provide',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider) {
+      $interpolateProvider, $locationProvider, $provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
-
     // Set the AngularJS interpolators as <[ and ]>, to not conflict with
     // Jinja2 templates.
     $interpolateProvider.startSymbol('<[');
@@ -96,7 +99,6 @@ angular.module('oppia').config([
 
     // Prevent storing duplicate cookies for translation language.
     $cookiesProvider.defaults.path = '/';
-
     // Set default headers for POST and PUT requests.
     $httpProvider.defaults.headers.post = {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -335,4 +337,56 @@ if (!Array.prototype.fill) {
       return O;
     }
   });
+}
+
+
+// Add SVGElement.prototype.outerHTML polyfill for IE
+if (!('outerHTML' in SVGElement.prototype)) {
+  Object.defineProperty(SVGElement.prototype, 'outerHTML', {
+    get: function() {
+      var $node, $temp;
+      $temp = document.createElement('div');
+      $node = this.cloneNode(true);
+      $temp.appendChild($node);
+      return $temp.innerHTML;
+    },
+    enumerable: false,
+    configurable: true
+  });
+}
+
+
+// Older browsers might not implement mediaDevices at all,
+// so we set an empty object first.
+if (navigator.mediaDevices === undefined) {
+  // @ts-ignore: mediaDevices is read-only error.
+  navigator.mediaDevices = {};
+}
+
+// Some browsers partially implement mediaDevices.
+// We can't just assign an object with getUserMedia
+// as it would overwrite existing properties.
+// Here, we will just add the getUserMedia property
+// if it's missing.
+if (navigator.mediaDevices.getUserMedia === undefined) {
+  navigator.mediaDevices.getUserMedia = function(constraints) {
+    // First get ahold of the legacy getUserMedia, if present.
+    var getUserMedia = (
+      // @ts-ignore: 'webkitGetUserMedia' and 'mozGetUserMedia'
+      // property does not exist error.
+      navigator.webkitGetUserMedia || navigator.mozGetUserMedia);
+
+    // If getUserMedia is not implemented, return a rejected promise
+    // with an error to keep a consistent interface.
+    if (!getUserMedia) {
+      return Promise.reject(
+        new Error('getUserMedia is not implemented in this browser'));
+    }
+
+    // Otherwise, wrap the call to the old navigator.getUserMedia
+    // with a Promise.
+    return new Promise(function(resolve, reject) {
+      getUserMedia.call(navigator, constraints, resolve, reject);
+    });
+  };
 }

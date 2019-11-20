@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Installation script for Oppia third-party libraries."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -26,13 +27,13 @@ import subprocess
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 # Download and install pyyaml.
 if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
-    subprocess.call([
+    subprocess.check_call([
         'pip', 'install', 'pyyaml==5.1.2', '--target',
         os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
 # Download and install future.
 if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
-    subprocess.call([
+    subprocess.check_call([
         'pip', 'install', 'future==0.17.1', '--target',
         os.path.join('third_party', 'future-0.17.1')])
 
@@ -40,7 +41,6 @@ if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
 # pylint: disable=wrong-import-order
 import python_utils  # isort:skip
 
-from . import build  # isort:skip
 from . import common  # isort:skip
 from . import install_third_party  # isort:skip
 from . import pre_commit_hook  # isort:skip
@@ -62,6 +62,11 @@ _PARSER.add_argument(
     '--noskulpt',
     help='optional; if specified, skips installation of skulpt.',
     action='store_true')
+
+PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
+    common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
+PQ_CONFIGPARSER_FILEPATH = os.path.join(
+    common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
 
 
 def pip_install(package, version, install_path):
@@ -128,12 +133,12 @@ def install_skulpt(parsed_args):
             os.chdir(common.OPPIA_TOOLS_DIR)
             os.mkdir('skulpt-0.10.0')
             os.chdir('skulpt-0.10.0')
-            subprocess.call([
+            subprocess.check_call([
                 'git', 'clone', 'https://github.com/skulpt/skulpt'])
             os.chdir('skulpt')
 
             # Use a specific Skulpt release.
-            subprocess.call(['git', 'checkout', '0.10.0'])
+            subprocess.check_call(['git', 'checkout', '0.10.0'])
 
             python_utils.PRINT('Compiling Skulpt')
             # The Skulpt setup function needs to be tweaked. It fails without
@@ -174,6 +179,8 @@ def install_skulpt(parsed_args):
                     line.replace('ret = rununits(opt=True)', 'ret = 0'),
                     end='')
 
+            # NB: Check call cannot be used because the commands above make the
+            # git tree for skulpt dirty.
             subprocess.call(['python', skulpt_filepath, 'dist'])
 
             # Return to the Oppia root folder.
@@ -184,23 +191,6 @@ def install_skulpt(parsed_args):
             os.path.join(
                 common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/dist/'),
             os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
-
-
-def maybe_install_dependencies(
-        skip_installing_third_party_libs, run_minified_tests):
-    """Parse additional command line arguments."""
-    if skip_installing_third_party_libs is False:
-        # Install third party dependencies.
-        main(args=[])
-        # Ensure that generated JS and CSS files are in place before running the
-        # tests.
-        python_utils.PRINT('Running build task with concatenation only')
-        build.main(args=[])
-
-    if run_minified_tests is True:
-        python_utils.PRINT(
-            'Running build task with concatenation and minification')
-        build.main(args=['--prod_env'])
 
 
 def ensure_pip_library_is_installed(package, version, path):
@@ -245,10 +235,8 @@ def main(args=None):
     # Do a little surgery on configparser in pylint-1.9.4 to remove dependency
     # on ConverterMapping, which is not implemented in some Python
     # distributions.
-    pylint_configparser_filepath = os.path.join(
-        common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
     pylint_newlines = []
-    with python_utils.open_file(pylint_configparser_filepath, 'r') as f:
+    with python_utils.open_file(PYLINT_CONFIGPARSER_FILEPATH, 'r') as f:
         for line in f.readlines():
             if line.strip() == 'ConverterMapping,':
                 continue
@@ -257,22 +245,20 @@ def main(args=None):
                     line[:line.find('"ConverterMapping"')] + '\n')
             else:
                 pylint_newlines.append(line)
-    with python_utils.open_file(pylint_configparser_filepath, 'w+') as f:
+    with python_utils.open_file(PYLINT_CONFIGPARSER_FILEPATH, 'w+') as f:
         f.writelines(pylint_newlines)
 
     # Do similar surgery on configparser in pylint-quotes-0.1.8 to remove
     # dependency on ConverterMapping.
-    pq_configparser_filepath = os.path.join(
-        common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
     pq_newlines = []
-    with python_utils.open_file(pq_configparser_filepath, 'r') as f:
+    with python_utils.open_file(PQ_CONFIGPARSER_FILEPATH, 'r') as f:
         for line in f.readlines():
             if line.strip() == 'ConverterMapping,':
                 continue
             if line.strip() == '"ConverterMapping",':
                 continue
             pq_newlines.append(line)
-    with python_utils.open_file(pq_configparser_filepath, 'w+') as f:
+    with python_utils.open_file(PQ_CONFIGPARSER_FILEPATH, 'w+') as f:
         f.writelines(pq_newlines)
 
     # Download and install required JS and zip files.
@@ -280,7 +266,7 @@ def main(args=None):
     install_third_party.main(args=[])
 
     # Install third-party node modules needed for the build process.
-    subprocess.call(['yarn'])
+    subprocess.check_call(['yarn'])
 
     install_skulpt(parsed_args)
 
@@ -293,5 +279,7 @@ def main(args=None):
     pre_push_hook.main(args=['--install'])
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when install_third_party_libs.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

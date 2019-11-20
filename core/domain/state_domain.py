@@ -843,6 +843,37 @@ class WrittenTranslations(python_utils.OBJECT):
 
         return cls(translations_mapping)
 
+    def get_content_ids_that_are_correctly_translated(self, language_code):
+        """Returns a list of content ids in which a correct translation is
+        available in the given language.
+
+        Args:
+            language_code: str. The abbreviated code of the language.
+
+        Return:
+            list(str). A list of content ids in which the translations are
+                available in the given language.
+        """
+        correctly_translated_content_ids = []
+        for content_id, translations in self.translations_mapping.items():
+            if language_code in translations and not (
+                    translations[language_code].needs_update):
+                correctly_translated_content_ids.append(content_id)
+
+        return correctly_translated_content_ids
+
+    def add_translation(self, content_id, language_code, html):
+        """Adds a translation for the given content id in a given language.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code of the translated html.
+            html: str. The translated html.
+        """
+        written_translation = WrittenTranslation(html, False)
+        self.translations_mapping[content_id][language_code] = (
+            written_translation)
+
     def validate(self, expected_content_id_list):
         """Validates properties of the WrittenTranslations.
 
@@ -898,6 +929,31 @@ class WrittenTranslations(python_utils.OBJECT):
             list(str). A list of content id available for text translation.
         """
         return list(self.translations_mapping.keys())
+
+    def get_translated_content(self, content_id, language_code):
+        """Returns the translated content for the given content_id in the given
+        language.
+
+        Args:
+            content_id: str. The ID of the content.
+            language_code: str. The language code for the translated content.
+
+        Returns:
+            str. The translated content for a given content id in a language.
+
+        Raises:
+            Exception: Translation doesn't exist in the given language.
+            Exception: The given content id doesn't exist.
+        """
+        if content_id in self.translations_mapping:
+            if language_code in self.translations_mapping[content_id]:
+                return self.translations_mapping[content_id][language_code].html
+            else:
+                raise Exception(
+                    'Translation for the given content_id %s does not exist in '
+                    '%s language code' % (content_id, language_code))
+        else:
+            raise Exception('Invalid content_id: %s' % content_id)
 
     def add_content_id_for_translation(self, content_id):
         """Adds a content id as a key for the translation into the
@@ -1405,6 +1461,24 @@ class State(python_utils.OBJECT):
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
 
+    def get_content_html(self, content_id):
+        """Returns the content belongs to a given content id of the object.
+
+        Args:
+            content_id: The id of the content.
+
+        Returns:
+            str. The html content corresponding to the given content id.
+
+        Raises:
+            ValueError: The given content_id does not exist.
+        """
+        content_id_to_html = self._get_all_translatable_content()
+        if content_id not in content_id_to_html:
+            raise ValueError('Content ID %s does not exist' % content_id)
+
+        return content_id_to_html[content_id]
+
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
         state_training_data_by_answer_group = []
@@ -1529,6 +1603,18 @@ class State(python_utils.OBJECT):
                     content_id)
                 self.written_translations.add_content_id_for_translation(
                     content_id)
+
+    def add_translation(self, content_id, language_code, translation_html):
+        """Adds translation to a given content id in a specific language.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code.
+            translation_html: str. The translated html content.
+        """
+        translation_html = html_cleaner.clean(translation_html)
+        self.written_translations.add_translation(
+            content_id, language_code, translation_html)
 
     def update_content(self, content):
         """Update the content of this state.
@@ -1770,6 +1856,65 @@ class State(python_utils.OBJECT):
                 'Expected solicit_answer_details to be a boolean, received %s'
                 % solicit_answer_details)
         self.solicit_answer_details = solicit_answer_details
+
+    def _get_all_translatable_content(self):
+        """Returns all content which can be translated into different languages.
+
+        Returns:
+            dict(str, str). Returns a dict with key as content id and content
+            html as the value.
+        """
+        content_id_to_html = {}
+
+        content_id_to_html[self.content.content_id] = self.content.html
+
+        # TODO(#6178): Remove empty html checks once we add a validation
+        # check that ensures each content in state should be non-empty html.
+        default_outcome = self.interaction.default_outcome
+        if default_outcome is not None and default_outcome.feedback.html != '':
+            content_id_to_html[default_outcome.feedback.content_id] = (
+                default_outcome.feedback.html)
+
+        for answer_group in self.interaction.answer_groups:
+            if answer_group.outcome.feedback.html != '':
+                content_id_to_html[answer_group.outcome.feedback.content_id] = (
+                    answer_group.outcome.feedback.html)
+
+        for hint in self.interaction.hints:
+            if hint.hint_content.html != '':
+                content_id_to_html[hint.hint_content.content_id] = (
+                    hint.hint_content.html)
+
+        solution = self.interaction.solution
+        if solution is not None and solution.explanation.html != '':
+            content_id_to_html[solution.explanation.content_id] = (
+                solution.explanation.html)
+
+        return content_id_to_html
+
+    def get_content_id_mapping_needing_translations(self, language_code):
+        """Returns all text html which can be translated in the given language.
+
+        Args:
+            language_code: str. The abbreviated code of the language.
+
+        Returns:
+            dict(str, str). A dict with key as content id and value as the
+            content html.
+        """
+        content_id_to_html = self._get_all_translatable_content()
+        available_translation_content_ids = (
+            self.written_translations
+            .get_content_ids_that_are_correctly_translated(language_code))
+
+        for content_id in available_translation_content_ids:
+            del content_id_to_html[content_id]
+
+        # TODO(#7571): Add functionality to return the list of
+        # translations which needs update.
+
+        return content_id_to_html
+
 
     def to_dict(self):
         """Returns a dict representing this State domain object.

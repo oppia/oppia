@@ -18,8 +18,8 @@
 
 require('components/summary-tile/subtopic-summary-tile.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('subtopicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {

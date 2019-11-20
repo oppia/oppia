@@ -21,13 +21,13 @@ import { MathExpressionInputRulesService } from
   'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
 /* eslint-enable max-len */
 
-describe('Math expression input rules service', function() {
+describe('Math expression input rules service', () => {
   let meirs: MathExpressionInputRulesService = null;
   beforeEach(() => {
     meirs = new MathExpressionInputRulesService();
   });
 
-  it('should have a correct equivalence rule', function() {
+  it('should have a correct equivalence rule', () => {
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x',
       latex: 'x'

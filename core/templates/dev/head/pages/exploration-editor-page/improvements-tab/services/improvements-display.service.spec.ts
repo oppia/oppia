@@ -16,6 +16,11 @@
  * @fileoverview Tests for ImprovementsDisplayService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvements-display.service.ts');
@@ -30,6 +35,12 @@ describe('ImprovementsDisplayService', function() {
   var STATUS_OPEN = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function(
       _$httpBackend_, _ImprovementsDisplayService_,
       _STATUS_COMPLIMENT_, _STATUS_FIXED_, _STATUS_IGNORED_,

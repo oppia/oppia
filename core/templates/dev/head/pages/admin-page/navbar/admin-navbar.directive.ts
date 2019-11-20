@@ -16,9 +16,9 @@
  * @fileoverview Directive for the navigation bar in the admin panel.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
-require('services/UserService.ts');
+require('services/user.service.ts');
 
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
@@ -40,12 +40,24 @@ angular.module('oppia').directive('adminNavbar', [
       controller: ['UserService', function(UserService) {
         var ctrl = this;
         ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
-        ctrl.showTab = AdminRouterService.showTab;
-        ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
-        ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
-        ctrl.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
-        ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
-        ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
+        ctrl.showTab = function() {
+          return AdminRouterService.showTab();
+        };
+        ctrl.isActivitiesTabOpen = function() {
+          return AdminRouterService.isActivitiesTabOpen();
+        };
+        ctrl.isJobsTabOpen = function() {
+          return AdminRouterService.isJobsTabOpen();
+        };
+        ctrl.isConfigTabOpen = function() {
+          return AdminRouterService.isConfigTabOpen();
+        };
+        ctrl.isRolesTabOpen = function() {
+          return AdminRouterService.isRolesTabOpen();
+        };
+        ctrl.isMiscTabOpen = function() {
+          return AdminRouterService.isMiscTabOpen();
+        };
 
         UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
           ctrl.profilePictureDataUrl = dataUrl;

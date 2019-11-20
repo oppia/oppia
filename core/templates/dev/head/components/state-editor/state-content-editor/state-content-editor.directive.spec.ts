@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for the state content editor directive.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -26,7 +31,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
-require('services/EditabilityService.ts');
+require('services/editability.service.ts');
 
 describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, rvo, srvos;
@@ -51,6 +56,12 @@ describe('State content editor directive', function() {
       $provide.value('ExplorationDataService', [mockExplorationData][0]);
     });
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.inject(
     function($compile, $injector, $rootScope, $templateCache) {

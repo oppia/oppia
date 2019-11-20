@@ -17,9 +17,9 @@
  * editor page.
  */
 
-require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ParamChangeObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-category.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -43,8 +43,8 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/ContextService.ts');
-require('services/ExplorationFeaturesService.ts');
+require('services/context.service.ts');
+require('services/exploration-features.service.ts');
 
 angular.module('oppia').directive('previewTab', [
   'UrlInterpolationService', function(

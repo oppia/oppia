@@ -18,7 +18,28 @@ This should not be run directly. Instead, navigate to the oppia/ folder and
 execute:
 
     python -m scripts.run_backend_tests
+
+You can also append the following options to the above command:
+
+    --verbose prints the output of the tests to the console.
+
+    --test_target=core.controllers.editor_test runs only the tests in the
+        core.controllers.editor_test module. (You can change
+        "core.controllers.editor_test" to any valid module path.)
+
+    --test_path=core/controllers runs all tests in test files in the
+        core/controllers directory. (You can change "core/controllers" to any
+        valid subdirectory path.)
+
+    --generate_coverage_report generates a coverage report as part of the final
+        test output (but it makes the tests slower).
+
+Note: If you've made some changes and tests are failing to run at all, this
+might mean that you have introduced a circular dependency (e.g. module A
+imports module B, which imports module C, which imports module A). This needs
+to be fixed before the tests will run.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -35,7 +56,6 @@ import time
 
 import python_utils
 
-from . import build
 from . import common
 from . import install_third_party_libs
 from . import setup
@@ -176,7 +196,7 @@ class TaskThread(threading.Thread):
         except Exception as e:
             self.exception = e
             if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
-                    self.exception):
+                    self.exception.args[0]):
                 log('ERROR %s: %.1f secs' %
                     (self.name, time.time() - self.start_time), show_time=True)
             self.finished = True
@@ -333,13 +353,6 @@ def main(args=None):
                 'coverage', '4.5.4',
                 os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'))
 
-    build.main(args=[])
-
-    python_utils.PRINT('Compiling webpack...')
-    subprocess.call([
-        os.path.join(common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
-        '--config', 'webpack.dev.config.ts'])
-
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
                         'should be specified.')
@@ -387,7 +400,7 @@ def main(args=None):
 
     for task in tasks:
         if task.exception:
-            log(python_utils.convert_to_bytes(task.exception))
+            log(python_utils.convert_to_bytes(task.exception.args[0]))
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')
@@ -405,19 +418,20 @@ def main(args=None):
         if not task.finished:
             python_utils.PRINT('CANCELED  %s' % spec.test_target)
             test_count = 0
-        elif 'No tests were run' in python_utils.convert_to_bytes(
-                task.exception):
+        elif (task.exception and
+              'No tests were run' in python_utils.convert_to_bytes(
+                  task.exception.args[0])):
             python_utils.PRINT(
                 'ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
-            exc_str = python_utils.convert_to_bytes(task.exception)
+            exc_str = python_utils.convert_to_bytes(task.exception.args[0])
             python_utils.PRINT(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
                 '([0-9]+) failures',
-                python_utils.convert_to_bytes(task.exception))
+                python_utils.convert_to_bytes(task.exception.args[0]))
 
             try:
                 test_count = int(tests_failed_regex_match.group(1))
@@ -479,14 +493,14 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.call(['python', COVERAGE_PATH, 'combine'])
-        subprocess.call([
+        subprocess.check_call(['python', COVERAGE_PATH, 'combine'])
+        subprocess.check_call([
             'python', COVERAGE_PATH, 'report',
             '--omit="%s*","third_party/*","/usr/share/*"'
             % common.OPPIA_TOOLS_DIR, '--show-missing'])
 
         python_utils.PRINT('Generating xml coverage report...')
-        subprocess.call(['python', COVERAGE_PATH, 'xml'])
+        subprocess.check_call(['python', COVERAGE_PATH, 'xml'])
 
     python_utils.PRINT('')
     python_utils.PRINT('Done!')

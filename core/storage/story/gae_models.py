@@ -68,6 +68,18 @@ class StoryModel(base_models.VersionedModel):
         """Story should be kept if the corresponding topic is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether StoryModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -115,6 +127,13 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
     # The id of the story being edited.
     story_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Story commit log is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def _get_instance_id(cls, story_id, version):
@@ -168,3 +187,16 @@ class StorySummaryModel(base_models.BaseModel):
         published.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether StorySummaryModel references the given user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+            be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False

@@ -20,7 +20,7 @@
 // history-tab.directive.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
+import { EditabilityService } from 'services/editability.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -45,6 +45,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
@@ -87,6 +88,12 @@ describe('HistoryTab controller', function() {
       'WrittenTranslationsObjectFactory',
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
 
   describe('HistoryTab', function() {

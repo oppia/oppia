@@ -17,13 +17,13 @@
  */
 
 require('domain/utilities/StopwatchObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
-require('services/ContextService.ts');
-require('services/MessengerService.ts');
-require('services/PlaythroughService.ts');
-require('services/SiteAnalyticsService.ts');
+require('services/context.service.ts');
+require('services/messenger.service.ts');
+require('services/playthrough.service.ts');
+require('services/site-analytics.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
@@ -111,11 +111,13 @@ angular.module('oppia').factory('StatsReportingService', [
       }
     };
 
-    if (!_editorPreviewMode && !_questionPlayerMode ) {
-      $interval(function() {
-        postStatsToBackend();
-      }, 300000);
-    }
+    var startStatsTimer = function() {
+      if (!_editorPreviewMode && !_questionPlayerMode ) {
+        $interval(function() {
+          postStatsToBackend();
+        }, 300000);
+      }
+    };
 
     // This method is called whenever a learner tries to leave an exploration,
     // when a learner starts an exploration, when a learner completes an
@@ -142,6 +144,7 @@ angular.module('oppia').factory('StatsReportingService', [
         stateStopwatch = StopwatchObjectFactory.create();
         optionalCollectionId = collectionId;
         refreshAggregatedStats();
+        startStatsTimer();
       },
       // Note that this also resets the stateStopwatch.
       recordExplorationStarted: function(stateName, params) {
