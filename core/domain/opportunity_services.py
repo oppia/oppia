@@ -273,6 +273,31 @@ def update_exploration_opportunities_with_story_changes(story, exp_ids):
         exploration_opportunity_summary_list)
 
 
+def update_exploration_voiceover_opportunities(
+        exp_id, assigned_voice_artist_in_language_code):
+    """Updates the assigned_voice_artist_in_language_codes of exploration
+    opportunity model.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+        assigned_voice_artist_in_language_code: str. The language code in which
+            a voice artist is assigned to the exploration.
+    """
+    model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
+    exploration_opportunity_summary = (
+        get_exploration_opportunity_summary_from_model(model))
+
+    exploration_opportunity_summary.need_voice_artist_in_language_codes.remove(
+        assigned_voice_artist_in_language_code)
+    (
+        exploration_opportunity_summary
+        .assigned_voice_artist_in_language_codes.append(
+            assigned_voice_artist_in_language_code))
+    exploration_opportunity_summary.validate()
+    _save_multi_exploration_opportunity_summary(
+        [exploration_opportunity_summary])
+
+
 def delete_exploration_opportunities(exp_ids):
     """Deletes the ExplorationOpportunitySummaryModel models corresponding to
     the given exp_ids.
