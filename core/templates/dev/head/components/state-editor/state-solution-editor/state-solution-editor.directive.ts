@@ -168,8 +168,6 @@ angular.module('oppia').directive('stateSolutionEditor', [
                     CurrentInteractionService, INTERACTION_SPECS,
                     COMPONENT_NAME_SOLUTION, GenerateContentIdService) {
                   $scope.StateSolutionService = StateSolutionService;
-                  console.log('StateInteractionIdService', StateInteractionIdService.savedMemento);
-                  console.log('StateCustomizationArgsService', StateCustomizationArgsService.savedMemento);
                   $scope.correctAnswerEditorHtml = (
                     ExplorationHtmlFormatterService.getInteractionHtml(
                       StateInteractionIdService.savedMemento,

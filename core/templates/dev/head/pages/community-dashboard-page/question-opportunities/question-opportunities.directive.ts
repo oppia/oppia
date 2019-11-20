@@ -128,7 +128,6 @@ angular.module('oppia').directive('questionOpportunities', [
             var opportunity = getOpportunity(skillId);
             var question =
               QuestionObjectFactory.createDefaultQuestion([skillId]);
-            console.log(question);
             var questionId = question.getId();
             var questionStateData = question.getStateData();
             var misconceptionsBySkill = ctrl.populateMisconceptions([skillId]);
@@ -143,7 +142,6 @@ angular.module('oppia').directive('questionOpportunities', [
                 '$scope', '$uibModalInstance', 'StateEditorService',
                 function(
                     $scope, $uibModalInstance, StateEditorService) {
-                  console.log('open modal function');
                   $scope.canEditQuestion = true;
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
