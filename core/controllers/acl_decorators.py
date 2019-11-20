@@ -2619,7 +2619,7 @@ def can_play_entity(handler):
     return test_can_play_entity
 
 
-def can_access_voiceover_applications(handler):
+def can_view_voiceover_applications(handler):
     """Decorator to check whether the user can access voiceover applications for
     a given purpose.
 
@@ -2632,8 +2632,8 @@ def can_access_voiceover_applications(handler):
             purpose.
     """
 
-    def test_can_access_voiceover_application(self, purpose, **kwargs):
-        """Checks if the user can access voiceover application for a given
+    def test_can_view_voiceover_applications(self, purpose, **kwargs):
+        """Checks if the user can view voiceover applications for a given
         purpose.
 
         Returns:
@@ -2641,8 +2641,8 @@ def can_access_voiceover_applications(handler):
 
         Raises:
             NotLoggedInException: The user is not logged in.
-            UnauthorizedUserException: The user does not have
-                credentials to voiceover an exploration.
+            UnauthorizedUserException: The user does not have credentials to
+                access voiceover applications for the given purpose.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -2653,14 +2653,14 @@ def can_access_voiceover_applications(handler):
                     role_services.ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION not in
                     user_actions_info.actions):
                 raise self.UnauthorizedUserException(
-                    'You do not have credentials to review voiceover '
-                    'applications.')
+                    'You do not have credentials to view voiceover '
+                    'applications for review.')
 
         return handler(self, purpose, **kwargs)
 
-    test_can_access_voiceover_application.__wrapped__ = True
+    test_can_view_voiceover_applications.__wrapped__ = True
 
-    return test_can_access_voiceover_application
+    return test_can_view_voiceover_applications
 
 
 def can_review_voiceover_application(handler):
@@ -2731,7 +2731,7 @@ def can_submit_voiceover_application(handler):
         if role_services.ACTION_SUBMIT_VOICEOVER_APPLICATION in (
                 self.user.actions):
             # The voiceover_service returns user submitted voiceover
-            # applications in sorted oder of the date of submission.
+            # applications in sorted order of the date of submission.
             voiceover_applications = (
                 voiceover_services.get_user_submitted_voiceover_applications(
                     self.user_id))

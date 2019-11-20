@@ -503,6 +503,45 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(applicant_models), 1)
         self.assertEqual(applicant_models[0].id, 'application_id')
 
+    def test_get_user_voiceover_applications_returns_applications_in_order(
+            self):
+        author_id = 'author'
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_user_voiceover_applications(author_id))
+        self.assertEqual(applicant_models, [])
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id_1',
+            target_type='exploration',
+            target_id='exp_id_1',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=author_id,
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id_2',
+            target_type='exploration',
+            target_id='exp_id_2',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=author_id,
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_user_voiceover_applications(author_id))
+        self.assertEqual(len(applicant_models), 2)
+        self.assertEqual(applicant_models[0].id, 'application_id_2')
+        self.assertEqual(applicant_models[1].id, 'application_id_1')
+
     def test_get_user_voiceover_applications_with_status(self):
         author_id = 'author'
         applicant_models = (
@@ -568,3 +607,27 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralVoiceoverApplicationModel
             .get_reviewable_voiceover_applications(author_id))
         self.assertEqual(applicant_models, [])
+
+    def test_get_voiceover_applications(self):
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='author_id',
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_voiceover_applications('exploration', 'exp_id', 'en'))
+        self.assertEqual(len(applicant_models), 1)
+        self.assertEqual(applicant_models[0].id, 'application_id')
+
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_voiceover_applications('exploration', 'exp_id', 'hi'))
+        self.assertEqual(len(applicant_models), 0)

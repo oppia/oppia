@@ -2987,7 +2987,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class AccessVoiceoverApplicationsDecoratorTests(test_utils.GenericTestBase):
+class ViewVoiceoverApplicationsDecoratorTests(test_utils.GenericTestBase):
     applicant_username = 'applicant'
     applicant_email = 'applicant@example.com'
     reviewer_username = 'reviewer'
@@ -2996,12 +2996,12 @@ class AccessVoiceoverApplicationsDecoratorTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        @acl_decorators.can_access_voiceover_applications
+        @acl_decorators.can_view_voiceover_applications
         def get(self, purpose):
             self.render_json({'purpose': purpose})
 
     def setUp(self):
-        super(AccessVoiceoverApplicationsDecoratorTests, self).setUp()
+        super(ViewVoiceoverApplicationsDecoratorTests, self).setUp()
         self.signup(self.applicant_email, self.applicant_username)
         self.signup(self.reviewer_email, self.reviewer_username)
 

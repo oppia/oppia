@@ -370,7 +370,7 @@ class VoiceoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
             }, expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'Translation for the give content_id content does not exist'
+            'Translation for the given content_id content does not exist'
             ' in invalid language code')
 
     def test_guest_cannot_submit_voiceover_application(self):
@@ -437,6 +437,30 @@ class VoiceoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         self.assertEqual(response['error'], 'Invalid language_code: invalid')
+
+    def test_users_cannot_submit_voiceover_application_with_non_audio_file(
+            self):
+        self.signup('contributor@community.com', 'contributor')
+        self.login('contributor@community.com')
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            mode='rb', encoding=None) as f:
+            raw_audio = f.read()
+
+        response = self.post_json(
+            '/createvoiceoverapplicationhandler', {
+                'target_type': 'exploration',
+                'target_id': '0',
+                'language_code': 'invalid',
+                'voiceover_content': '<p>Some content</p>',
+            }, csrf_token=csrf_token,
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)],
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'], 'Audio not recognized as a mp3 file')
 
     def test_admin_can_accept_voiceover_application(self):
         self.login(self.reviewer_email)
