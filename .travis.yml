@@ -14,7 +14,7 @@ branches:
   - /^release-\d+\.\d+\.\d+-hotfix-\d+$/
 
 env:
-  matrix:
+  jobs:
     # These lines are commented out because these checks are being run on CircleCI
     # here: https://circleci.com/gh/oppia/oppia
     # - RUN_LINT=true
@@ -51,7 +51,7 @@ env:
     - RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR=true
     - RUN_E2E_TESTS_USERS=true
 
-matrix:
+jobs:
   allow_failures: []
   fast_finish: true
 
