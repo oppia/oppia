@@ -1096,6 +1096,67 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
                         'single-space-above-raises', line=line_num + 1)
 
 
+class DivisionOperatorChecker(checkers.BaseChecker):
+    """Checks if division operator is used."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'division-operator-used'
+    priority = -1
+    msgs = {
+        'C0015': (
+            'Division Operator is used.',
+            'division-operator-used',
+            'Please use python_utils.divide() instead of the "/" operator'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that the division operator('/') is not
+        used and python_utils.divide() is used instead.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        string_indicator = b'\''
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single line comment, ignore it.
+            if line.startswith(b'#'):
+                continue
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            # Ignore anything inside a string.
+            if line.count(string_indicator) >= 2:
+                continue
+
+            if re.search(br'[^/]/[^/]', line):
+                self.add_message(
+                    'division-operator-used', line=line_num + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1113,3 +1174,4 @@ def register(linter):
     linter.register_checker(SingleSpaceAfterYieldChecker(linter))
     linter.register_checker(ExcessiveEmptyLinesChecker(linter))
     linter.register_checker(SingleNewlineAboveArgsChecker(linter))
+    linter.register_checker(DivisionOperatorChecker(linter))
