@@ -62,7 +62,9 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--no_auto_restart',
-    help='optional; if specified, does not automatically restart when files are changed.',
+    help=(
+        'optional; if specified, does not automatically restart when files are '
+        'changed.'),
     action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
