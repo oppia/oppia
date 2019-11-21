@@ -169,26 +169,29 @@ class EditableTopicDataHandler(base.BaseHandler):
             skill_services.get_descriptions_of_skills(
                 topic.get_all_skill_ids()))
 
-        skill_id_to_rubrics_dict, deleted_skill_ids = (
-            skill_services.get_rubrics_of_skills(topic.get_all_skill_ids())
-        )
-
-        if deleted_skill_ids:
-            deleted_skills_string = ', '.join(deleted_skill_ids)
-            logging.error(
-                'The deleted skills: %s are still present in topic with id %s'
-                % (deleted_skills_string, topic_id)
-            )
-            if feconf.CAN_SEND_EMAILS:
-                email_manager.send_mail_to_admin(
-                    'Deleted skills present in topic',
-                    'The deleted skills: %s are still present in topic with '
-                    'id %s' % (deleted_skills_string, topic_id))
-
         topics = topic_fetchers.get_all_topics()
         grouped_skill_summary_dicts = {}
+        skill_id_to_rubrics_dict = {}
 
         for topic_object in topics:
+            skill_id_to_rubrics_dict_local, deleted_skill_ids = (
+                skill_services.get_rubrics_of_skills(
+                    topic_object.get_all_skill_ids())
+            )
+
+            skill_id_to_rubrics_dict.update(skill_id_to_rubrics_dict_local)
+
+            if deleted_skill_ids:
+                deleted_skills_string = ', '.join(deleted_skill_ids)
+                logging.error(
+                    'The deleted skills: %s are still present in topic with '
+                    'id %s' % (deleted_skills_string, topic_id)
+                )
+                if feconf.CAN_SEND_EMAILS:
+                    email_manager.send_mail_to_admin(
+                        'Deleted skills present in topic',
+                        'The deleted skills: %s are still present in '
+                        'topic with id %s' % (deleted_skills_string, topic_id))
             skill_summaries = skill_services.get_multi_skill_summaries(
                 topic_object.get_all_skill_ids())
             skill_summary_dicts = [
