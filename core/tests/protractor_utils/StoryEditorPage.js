@@ -83,7 +83,8 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-skill-select-header'));
   var skillNameInputField = element(
     by.css('.protractor-test-skill-name-input'));
-  var skillSaveButton = element(by.css('.protractor-test-save-button'));
+  var skillSaveButton = element(
+    by.css('.protractor-test-confirm-skill-selection-button'));
   var skillListItems = element.all(
     by.css('.protractor-test-skills-list-item'));
   var disconnectedChapterWarning = element(

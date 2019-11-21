@@ -45,6 +45,9 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
+# Constant used when retrieving big number of models.
+FETCH_BATCH_SIZE = 1000
+
 # Constants used for generating ids.
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
