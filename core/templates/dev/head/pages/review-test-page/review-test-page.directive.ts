@@ -109,8 +109,8 @@ angular.module('oppia').directive('reviewTestPage', [
                     passCutoff: 0.75
                   },
                   questionsSortedByDifficulty: true
-                  };
-                  ctrl.questionPlayerConfig = questionPlayerConfig;
+                };
+                ctrl.questionPlayerConfig = questionPlayerConfig;
               });
           };
           _fetchSkillDetails();
