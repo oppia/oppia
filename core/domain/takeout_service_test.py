@@ -389,7 +389,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
 
-        # Feedback_thread_model setup here to access model for expected data.
+        # We set up the feedback_thread_model here so that we can easily 
+        # access it when computing the expected data later.
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             entity_type=self.THREAD_ENTITY_TYPE,
             entity_id=self.THREAD_ENTITY_ID,
@@ -569,16 +570,16 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         thread_and_message_ids = self.GENERAL_FEEDBACK_THREAD_IDS
         thread_and_message_ids.append(thread_id)
 
+        activities = self.ACTIVITY_IDS
+        activities.extend(self.EXPLORATION_IDS)
+
         expected_subscriptions_data = {
             'creator_ids': self.CREATOR_IDS,
             'collection_ids': self.COLLECTION_IDS,
-            'activity_ids': self.ACTIVITY_IDS,
+            'activity_ids': activities,
             'general_feedback_thread_ids': thread_and_message_ids,
             'last_checked': None
         }
-
-        activities = self.ACTIVITY_IDS
-        activities.extend(self.EXPLORATION_IDS)
 
         expected_export = {
             'user_stats_data': expected_stats_data,
