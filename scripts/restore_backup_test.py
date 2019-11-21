@@ -56,24 +56,12 @@ class RestoreBackupTests(test_utils.GenericTestBase):
             Exception, 'Directory %s does not exist.' % restore_backup.GAE_DIR):
             restore_backup.main(args=[])
 
-    def test_invalid_branch(self):
-        def mock_is_current_branch_a_release_branch():
-            return False
-        branch_check_swap = self.swap(
-            common, 'is_current_branch_a_release_branch',
-            mock_is_current_branch_a_release_branch)
-        with self.exists_swap, branch_check_swap, self.assertRaisesRegexp(
-            Exception,
-            'This script should only be run from the latest '
-            'release branch.'):
-            restore_backup.main(args=[])
-
     def test_missing_project_name(self):
         with self.exists_swap, self.branch_check_swap, self.assertRaisesRegexp(
             Exception, 'Please provide project name for backup restoration.'):
             restore_backup.main(args=[])
 
-    def test_backup_restoration(self):
+    def test_backup_restoration_with_invalid_export_metadata_filepath(self):
         check_function_calls = {
             'open_tab_is_called': False,
             'input_is_called': False
@@ -84,9 +72,46 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         }
         def mock_open_tab(unused_url):
             check_function_calls['open_tab_is_called'] = True
+        invalid_export_metadata_filepath = (
+            'oppia-export-backups/20181111-123456/'
+            '20181111-123457.overall_export_metadata')
         def mock_input():
             check_function_calls['input_is_called'] = True
-            return 'export_metadata_filepath'
+            return invalid_export_metadata_filepath
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        with self.exists_swap, self.branch_check_swap, self.run_cmd_swap:
+            with open_tab_swap, input_swap, self.assertRaisesRegexp(
+                Exception,
+                'Invalid export metadata filepath: %s' % (
+                    invalid_export_metadata_filepath)):
+                restore_backup.main(args=['--project_name=sample_project_name'])
+        self.assertEqual(
+            self.all_cmd_tokens,
+            [
+                restore_backup.GCLOUD_PATH, 'config', 'set', 'project',
+                'sample_project_name'])
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_backup_restoration_with_valid_export_metadata_filepath(self):
+        check_function_calls = {
+            'open_tab_is_called': False,
+            'input_is_called': False
+        }
+        expected_check_function_calls = {
+            'open_tab_is_called': True,
+            'input_is_called': True
+        }
+        def mock_open_tab(unused_url):
+            check_function_calls['open_tab_is_called'] = True
+        valid_export_metadata_filepath = (
+            'oppia-export-backups/20181111-123456/'
+            '20181111-123456.overall_export_metadata')
+        def mock_input():
+            check_function_calls['input_is_called'] = True
+            return valid_export_metadata_filepath
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
@@ -101,7 +126,7 @@ class RestoreBackupTests(test_utils.GenericTestBase):
                 restore_backup.GCLOUD_PATH, 'config', 'set', 'project',
                 'sample_project_name',
                 restore_backup.GCLOUD_PATH, 'datastore', 'import',
-                'gs://export_metadata_filepath', '--async'])
+                'gs://%s' % valid_export_metadata_filepath, '--async'])
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_check_status(self):
