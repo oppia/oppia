@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 require('domain/review_test/review-test-backend-api.service.ts');
 
-describe('Review test backend API service', function () {
+describe('Review test backend API service', function() {
   var ReviewTestBackendApiService = null;
   var sampleDataResults = null;
   var $rootScope = null;
@@ -31,14 +31,14 @@ describe('Review test backend API service', function () {
   var UndoRedoService = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function ($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(angular.mock.inject(function ($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ReviewTestBackendApiService = $injector.get(
       'ReviewTestBackendApiService');
     $rootScope = $injector.get('$rootScope');
@@ -57,7 +57,7 @@ describe('Review test backend API service', function () {
   });
 
   it('should successfully fetch an review test data from the backend',
-    function () {
+    function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
@@ -73,19 +73,20 @@ describe('Review test backend API service', function () {
   );
 
   it('should use the rejection handler if the backend request failed',
-    function () {
+    function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect(
         'GET', '/review_test_handler/data/0').respond(
-          500, 'Error getting review test data.');
+        500, 'Error getting review test data.');
       ReviewTestBackendApiService.fetchReviewTestData('0').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error getting review test data.');
+      expect(failHandler).toHaveBeenCalledWith('Error getting review' +
+      'test data.');
     }
   );
 });

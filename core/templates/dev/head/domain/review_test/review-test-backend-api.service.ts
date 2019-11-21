@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to retrieve information of review tests from the 
+ * @fileoverview Service to retrieve information of review tests from the
  * backend.
  */
 
@@ -22,11 +22,12 @@ require('domain/review_test/review-test-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('ReviewTestBackendApiService', [
-  '$http', 'UrlInterpolationService', 'REVIEW_TEST_DATA_URL', function ($http, UrlInterpolationService, REVIEW_TEST_DATA_URL) {
-    var _fetchReviewTestData = function (storyId) {
+  '$http', 'UrlInterpolationService', 'REVIEW_TEST_DATA_URL',
+  function($http, UrlInterpolationService, REVIEW_TEST_DATA_URL) {
+    var _fetchReviewTestData = function(storyId) {
       var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
-        REVIEW_TEST_DATA_URL, {
-        story_id: storyId
+      REVIEW_TEST_DATA_URL, {
+      story_id: storyId
       });
       return $http.get(reviewTestsDataUrl);
     };
