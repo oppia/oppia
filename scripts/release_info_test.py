@@ -87,21 +87,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             Exception, (
                 'This script should only be run from the latest release '
                 'branch.')):
-            release_info.main()
-
-    def test_missing_personal_access_token(self):
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
-            return None
-        # pylint: enable=unused-argument
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        with self.branch_name_swap:
-            with getpass_swap, self.assertRaisesRegexp(
-                Exception, (
-                    'No personal access token provided, please set up a '
-                    'personal access token at https://github.com/settings/'
-                    'tokens and re-run the script')):
-                release_info.main()
+            release_info.main('test-token')
 
     def test_get_current_version_tag(self):
         def mock_get_tags(unused_self):
@@ -362,7 +348,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                             with check_versions_swap, setup_scripts_swap:
                                 with storage_models_swap, release_summary_swap:
                                     with get_changelog_swap, extract_prs_swap:
-                                        release_info.main()
+                                        release_info.main('test-token')
         with python_utils.open_file(
             GENERATED_RELEASE_SUMMARY_FILEPATH, 'r') as f:
             expected_lines = f.readlines()

@@ -35,6 +35,7 @@ import python_utils
 import release_constants
 
 from . import common
+from . import release_info
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -451,12 +452,6 @@ def main():
         raise Exception(
             'This script should only be run from the latest release branch.')
 
-    if not os.path.exists(release_constants.RELEASE_SUMMARY_FILEPATH):
-        raise Exception(
-            'Release summary file %s is missing. Please run the '
-            'release_info.py script and re-run this script.' % (
-                release_constants.RELEASE_SUMMARY_FILEPATH))
-
     parsed_args = _PARSER.parse_args()
     if parsed_args.github_username is None:
         raise Exception(
@@ -465,6 +460,15 @@ def main():
     github_username = parsed_args.github_username
 
     personal_access_token = common.get_personal_access_token()
+
+    python_utils.PRINT('Generating release summary...')
+    release_info.main(personal_access_token)
+
+    if not os.path.exists(release_constants.RELEASE_SUMMARY_FILEPATH):
+        raise Exception(
+            'Release summary file %s is missing. Please re-run '
+            'this script.' % release_constants.RELEASE_SUMMARY_FILEPATH)
+
     g = github.Github(personal_access_token)
     repo_fork = g.get_repo('%s/oppia' % github_username)
 

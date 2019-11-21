@@ -29,6 +29,7 @@ import python_utils
 import release_constants
 
 from . import common
+from . import release_info
 from . import update_changelog_and_credits
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -99,6 +100,12 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         def mock_get_git_ref(unused_self, unused_ref):
             return github.GitRef.GitRef(
                 requester='', headers='', attributes={}, completed='')
+        def mock_main(unused_personal_access_token):
+            pass
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return 'test-token'
+        # pylint: enable=unused-argument
 
         self.mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
@@ -114,6 +121,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         self.run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         self.get_git_ref_swap = self.swap(
             github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
+        self.main_swap = self.swap(release_info, 'main', mock_main)
+        self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
     def test_get_previous_release_version_without_hotfix(self):
         def mock_check_output(unused_cmd_tokens):
@@ -362,16 +371,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'branch.')):
             update_changelog_and_credits.main()
 
-    def test_missing_release_summary_file(self):
-        release_summary_swap = self.swap(
-            release_constants, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
-        with self.branch_name_swap, release_summary_swap:
-            with self.assertRaisesRegexp(
-                Exception, (
-                    'Release summary file invalid.md is missing. Please run '
-                    'the release_info.py script and re-run this script.')):
-                update_changelog_and_credits.main()
-
     def test_missing_github_username(self):
         args_swap = self.swap(
             sys, 'argv', ['update_changelog_and_credits.py'])
@@ -394,6 +393,16 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                     'No personal access token provided, please set up a '
                     'personal access token at https://github.com/settings/'
                     'tokens and re-run the script')):
+                update_changelog_and_credits.main()
+
+    def test_missing_release_summary_file(self):
+        release_summary_swap = self.swap(
+            release_constants, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
+        with self.main_swap, self.branch_name_swap, release_summary_swap:
+            with self.args_swap, self.getpass_swap, self.assertRaisesRegexp(
+                Exception, (
+                    'Release summary file invalid.md is missing. '
+                    'Please re-run this script.')):
                 update_changelog_and_credits.main()
 
     def test_create_branch(self):
@@ -496,10 +505,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 unused_repo_fork, unused_target_branch, unused_github_username,
                 unused_current_release_version):
             check_function_calls['create_branch_gets_called'] = True
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
-            return 'test-token'
-        # pylint: enable=unused-argument
         def mock_input():
             return 'y'
         def mock_get_repo(unused_self, unused_repo_name):
@@ -525,15 +530,15 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             mock_check_ordering_of_sections)
         create_branch_swap = self.swap(
             update_changelog_and_credits, 'create_branch', mock_create_branch)
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
 
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
-            with input_swap, remove_updates_swap, update_authors_swap:
-                with update_changelog_swap, update_contributors_swap:
-                    with update_developer_names_swap, check_order_swap:
-                        with create_branch_swap, getpass_swap, get_repo_swap:
-                            update_changelog_and_credits.main()
+            with self.main_swap, self.getpass_swap, input_swap:
+                with remove_updates_swap, update_authors_swap:
+                    with update_changelog_swap, update_contributors_swap:
+                        with update_developer_names_swap, check_order_swap:
+                            with create_branch_swap, get_repo_swap:
+                                update_changelog_and_credits.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)

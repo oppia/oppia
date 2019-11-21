@@ -265,12 +265,11 @@ def check_storage_models(current_release):
     return [item for item in diff_list if item.startswith('core/storage')]
 
 
-def main():
+def main(personal_access_token):
     """Collects necessary info and dumps it to disk."""
     if not common.is_current_branch_a_release_branch():
         raise Exception(
             'This script should only be run from the latest release branch.')
-    personal_access_token = common.get_personal_access_token()
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
@@ -381,9 +380,3 @@ def main():
 
     python_utils.PRINT('Done. Summary file generated in %s' % (
         release_constants.RELEASE_SUMMARY_FILEPATH))
-
-
-# The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when release_info.py is used as a script.
-if __name__ == '__main__': # pragma: no cover
-    main()
