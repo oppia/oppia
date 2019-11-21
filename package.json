@@ -110,5 +110,9 @@
     "yargs": "^13.2.2",
     "zone.js": "^0.9.1"
   },
-  "keywords": []
+  "keywords": [],
+  "dependencies": {
+    "gif-frames": "^1.0.1",
+    "gifshot": "^0.4.5"
+  }
 }
