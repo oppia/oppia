@@ -65,7 +65,7 @@ var TopicsAndSkillsDashboardPage = function() {
   var mergeSkillsButtons = element.all(
     by.css('.protractor-test-merge-skills-button'));
   var confirmSkillsMergeButton = element(
-    by.css('.protractor-test-confirm-skills-merge-button'));
+    by.css('.protractor-test-confirm-skill-selection-button'));
   var searchSkillInput = element(by.css('.protractor-test-search-skill-input'));
   var editConceptCardExplanationButton = element(
     by.css('.protractor-test-edit-concept-card'));

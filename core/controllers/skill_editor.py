@@ -121,6 +121,10 @@ class EditableSkillDataHandler(base.BaseHandler):
         skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
 
+        if skill is None:
+            raise self.PageNotFoundException(
+                Exception('The skill with the given id doesn\'t exist.'))
+
         topics = topic_fetchers.get_all_topics()
         grouped_skill_summary_dicts = {}
 
@@ -130,10 +134,6 @@ class EditableSkillDataHandler(base.BaseHandler):
             skill_summary_dicts = [
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic.name] = skill_summary_dicts
-
-        if skill is None:
-            raise self.PageNotFoundException(
-                Exception('The skill with the given id doesn\'t exist.'))
 
         self.values.update({
             'skill': skill.to_dict(),

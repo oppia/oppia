@@ -185,8 +185,19 @@ class EditableTopicDataHandler(base.BaseHandler):
                     'The deleted skills: %s are still present in topic with '
                     'id %s' % (deleted_skills_string, topic_id))
 
+        topics = topic_fetchers.get_all_topics()
+        grouped_skill_summary_dicts = {}
+
+        for topic_object in topics:
+            skill_summaries = skill_services.get_multi_skill_summaries(
+                topic_object.get_all_skill_ids())
+            skill_summary_dicts = [
+                summary.to_dict() for summary in skill_summaries]
+            grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
+
         self.values.update({
             'topic_dict': topic.to_dict(),
+            'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
             'skill_id_to_description_dict': skill_id_to_description_dict,
             'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })

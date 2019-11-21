@@ -22,7 +22,7 @@ export class QuestionDomainConstants {
   public static QUESTION_CREATION_URL =
     '/question_editor_handler/create_new';
   public static QUESTION_SKILL_LINK_URL_TEMPLATE =
-    '/manage_question_skill_link/<question_id>/<skill_id>';
+    '/manage_question_skill_link/<question_id>';
 
   public static PRETEST_QUESTIONS_URL_TEMPLATE =
     '/pretest_handler/<exploration_id>?story_id=<story_id>&cursor=<cursor>';

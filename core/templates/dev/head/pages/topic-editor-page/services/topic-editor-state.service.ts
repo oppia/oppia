@@ -64,9 +64,20 @@ angular.module('oppia').factory('TopicEditorStateService', [
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
     var _skillIdToRubricsObject = {};
+    var _groupedSkillSummaries = {};
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
+    };
+
+    var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
+      for (var name in groupedSkillSummaries) {
+        _groupedSkillSummaries[name] = [];
+        var summaryDicts = groupedSkillSummaries[name];
+        for (var idx in summaryDicts) {
+          _groupedSkillSummaries[name].push(summaryDicts[idx]);
+        }
+      }
     };
     var _getSubtopicIdFromSubtopicPageId = function(subtopicPageId) {
       // The subtopic page id consists of the topic id of length 12, a hyphen
@@ -140,6 +151,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
         EditableTopicBackendApiService.fetchTopic(
           topicId).then(
           function(newBackendTopicObject) {
+            _updateGroupedSkillSummaries(
+              newBackendTopicObject.groupedSkillSummaries);
             _updateTopic(
               newBackendTopicObject.topicDict,
               newBackendTopicObject.skillIdToDescriptionDict
@@ -166,6 +179,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
             'There was an error when loading the topic rights.');
           _topicIsLoading = false;
         });
+      },
+
+      getGroupedSkillSummaries: function() {
+        return angular.copy(_groupedSkillSummaries);
       },
 
       /**

@@ -43,6 +43,8 @@ angular.module('oppia').factory('EditableTopicBackendApiService', [
           // resolve or reject can have only a single parameter.
           successCallback({
             topicDict: angular.copy(response.data.topic_dict),
+            groupedSkillSummaries: angular.copy(
+              response.data.grouped_skill_summary_dicts),
             skillIdToDescriptionDict: angular.copy(
               response.data.skill_id_to_description_dict),
             skillIdToRubricsDict: angular.copy(
