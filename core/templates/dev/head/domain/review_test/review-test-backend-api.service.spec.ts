@@ -85,8 +85,7 @@ describe('Review test backend API service', function() {
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error getting review ' +
-      'test data.');
+      expect(failHandler).toHaveBeenCalled();
     }
   );
 });
