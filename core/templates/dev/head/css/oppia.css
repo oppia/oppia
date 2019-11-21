@@ -2606,7 +2606,7 @@ div#ng-curtain {
 }
 
 .oppia-navbar-brand-name {
-  float: left;
+  float: right;
   height: 56px;
   line-height: 20px;
   margin-left: -10px;
