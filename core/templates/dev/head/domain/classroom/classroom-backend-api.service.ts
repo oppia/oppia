@@ -16,12 +16,15 @@
  * @fileoverview Service to get classroom data.
  */
 
+require('domain/topic/TopicSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/classroom/classroom-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('ClassroomBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'CLASSROOOM_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, CLASSROOOM_DATA_URL_TEMPLATE) {
+  '$http', '$q', 'TopicSummaryObjectFactory', 'UrlInterpolationService',
+  'CLASSROOOM_DATA_URL_TEMPLATE',
+  function($http, $q, TopicSummaryObjectFactory, UrlInterpolationService,
+      CLASSROOOM_DATA_URL_TEMPLATE) {
     var topicSummaryDicts = null;
     var _fetchClassroomData = function(
         classroomName, successCallback, errorCallback) {
@@ -32,8 +35,14 @@ angular.module('oppia').factory('ClassroomBackendApiService', [
 
       $http.get(classroomDataUrl).then(function(response) {
         topicSummaryDicts = angular.copy(response.data.topic_summary_dicts);
+        topicSummaryObject = topicSummaryDicts.map(
+          function(summaryDict) {
+            return TopicSummaryObjectFactory.createFromBackendDict(
+              summaryDict);
+          }
+        );
         if (successCallback) {
-          successCallback(topicSummaryDicts);
+          successCallback(topicSummaryObject);
         }
       }, function(errorResponse) {
         if (errorCallback) {
