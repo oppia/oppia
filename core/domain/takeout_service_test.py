@@ -570,13 +570,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         thread_and_message_ids = self.GENERAL_FEEDBACK_THREAD_IDS
         thread_and_message_ids.append(thread_id)
 
-        activities = self.ACTIVITY_IDS
-        activities.extend(self.EXPLORATION_IDS)
-
         expected_subscriptions_data = {
             'creator_ids': self.CREATOR_IDS,
             'collection_ids': self.COLLECTION_IDS,
-            'activity_ids': activities,
+            'activity_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
             'general_feedback_thread_ids': thread_and_message_ids,
             'last_checked': None
         }
