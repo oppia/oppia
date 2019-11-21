@@ -99,8 +99,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
 
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story-editor-page/modal-templates/' +
-                'select-skill-modal.template.html'),
+                '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
