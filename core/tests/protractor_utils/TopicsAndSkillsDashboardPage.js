@@ -65,11 +65,14 @@ var TopicsAndSkillsDashboardPage = function() {
   var mergeSkillsButtons = element.all(
     by.css('.protractor-test-merge-skills-button'));
   var confirmSkillsMergeButton = element(
-    by.css('.protractor-test-confirm-skills-merge-button'));
+    by.css('.protractor-test-confirm-skill-selection-button'));
+  var searchSkillInput = element(by.css('.protractor-test-search-skill-input'));
   var editConceptCardExplanationButton = element(
     by.css('.protractor-test-edit-concept-card'));
   var saveConceptCardExplanationButton = element(
     by.css('.protractor-test-save-concept-card'));
+  var topicNamesInTopicSelectModal = element.all(
+    by.css('.protractor-test-topic-name-in-topic-select-modal'));
 
   this.get = function() {
     browser.get(DASHBOARD_URL);
@@ -99,6 +102,25 @@ var TopicsAndSkillsDashboardPage = function() {
       topicsListItems.then(function(topics) {
         topics[index].click();
         confirmMoveButton.click();
+      });
+    });
+  };
+
+  this.assignSkillWithIndexToTopicByTopicName = function(
+      skillIndex, topicName) {
+    assignSkillToTopicButtons.then(function(elems) {
+      elems[skillIndex].click();
+      topicNamesInTopicSelectModal.then(function(topics) {
+        for (var i = 0; i < topics.length; i++) {
+          (function(topic) {
+            topic.getText().then(function(isTarget) {
+              if (isTarget === topicName) {
+                topic.click();
+                confirmMoveButton.click();
+              }
+            });
+          })(topics[i]);
+        }
       });
     });
   };
@@ -206,6 +228,13 @@ var TopicsAndSkillsDashboardPage = function() {
     skillsListItems.then(function(elems) {
       expect(elems.length).toBe(number);
     });
+  };
+
+  this.searchSkillByName = function(name) {
+    waitFor.visibilityOf(
+      searchSkillInput,
+      'searchSkillInput takes too long to be visible.');
+    searchSkillInput.sendKeys(name);
   };
 };
 
