@@ -2425,8 +2425,10 @@ oppia-parameter {
   opacity: .5;
 }
 
-.modal-content, .modal-dialog {
-  min-width: 590px;
+@media(min-width: 768px) {
+  .modal-content, .modal-dialog {
+    min-width: 590px;
+  }
 }
 .modal-content {
   background-clip: padding-box;
