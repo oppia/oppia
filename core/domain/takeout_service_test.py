@@ -389,7 +389,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
 
-        # We set up the feedback_thread_model here so that we can easily 
+        # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             entity_type=self.THREAD_ENTITY_TYPE,
