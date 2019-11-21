@@ -14,12 +14,25 @@
       attached to it. Please link a skill to this topic before adding questions.
     </div>
     <div class="list-group">
-      <a class="list-group-item protractor-test-skill-item"
-         ng-repeat="skillSummary in skillSummaries track by $index"
-         ng-click="selectOrDeselectSkill(skillSummary.getId(), $index)"
-         ng-class="{'list-group-item-success': skillSummary.isSelected}">
-        <label class="list-group-item-heading" style="font-size: 1em;"><[skillSummary.getDescription()]></label>
-      </a>
+      <md-card layout="row" class="list-view-item">
+        Search By Skill
+        <input type="text" class="form-control" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
+      </md-card>
+      <div style="max-height: 50vh; overflow-y: auto;">
+        <a class="list-group-item protractor-test-skill-item"
+           ng-repeat="skillSummary in skillSummariesInitial | filter:skillFilterText"
+           ng-click="selectOrDeselectSkill(skillSummary)"
+           ng-class="{'list-group-item-success': (skillSummary.isSelected)}">
+          <label class="list-group-item-heading"><[skillSummary.description]></label>
+        </a>
+        <hr ng-if="skillSummariesInitial.length > 0">
+        <a class="list-group-item protractor-test-skill-item"
+           ng-repeat="skillSummary in skillSummariesFinal | filter:skillFilterText"
+           ng-click="selectOrDeselectSkill(skillSummary)"
+           ng-class="{'list-group-item-success': (skillSummary.isSelected)}">
+          <label class="list-group-item-heading"><[skillSummary.description]></label>
+        </a>
+      </div>
     </div>
   </div>
   <div class="modal-footer" ng-switch="skillSummaries.length > 0">
