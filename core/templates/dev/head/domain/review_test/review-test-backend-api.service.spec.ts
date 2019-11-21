@@ -51,7 +51,7 @@ describe('Review test backend API service', function() {
     };
   }));
 
-  afterEach(function () {
+  afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
   });

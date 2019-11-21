@@ -26,9 +26,9 @@ angular.module('oppia').factory('ReviewTestBackendApiService', [
   function($http, UrlInterpolationService, REVIEW_TEST_DATA_URL) {
     var _fetchReviewTestData = function(storyId) {
       var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
-      REVIEW_TEST_DATA_URL, {
-      story_id: storyId
-      });
+        REVIEW_TEST_DATA_URL, {
+          story_id: storyId
+        });
       return $http.get(reviewTestsDataUrl);
     };
 

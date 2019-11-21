@@ -72,46 +72,46 @@ angular.module('oppia').directive('reviewTestPage', [
               STORY_VIEWER_PAGE, {
                 story_id: ctrl.storyId
               });
-            ReviewTestBackendApiService.
-            fetchReviewTestData(ctrl.storyId).then(function(result) {
-              var skillIdList = [];
-              var skillDescriptions = [];
-              PageTitleService.setPageTitle(
-                'Review Test: ' + result.data.story_name + ' - Oppia');
-              for (var skillId in result.data.skill_descriptions) {
-                skillIdList.push(skillId);
-                skillDescriptions.push(
-                  result.data.skill_descriptions[skillId]);
-              }
-              var questionPlayerConfig = {
-                resultActionButtons: [
-                  {
-                    type: 'BOOST_SCORE',
-                    i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+            ReviewTestBackendApiService.fetchReviewTestData(ctrl.storyId).then(
+              function(result) {
+                var skillIdList = [];
+                var skillDescriptions = [];
+                PageTitleService.setPageTitle(
+                  'Review Test: ' + result.data.story_name + ' - Oppia');
+                for (var skillId in result.data.skill_descriptions) {
+                  skillIdList.push(skillId);
+                  skillDescriptions.push(
+                    result.data.skill_descriptions[skillId]);
+                }
+                var questionPlayerConfig = {
+                  resultActionButtons: [
+                    {
+                      type: 'BOOST_SCORE',
+                      i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+                    },
+                    {
+                      type: 'RETRY_SESSION',
+                      i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
+                      url: reviewTestsUrl
+                    },
+                    {
+                      type: 'DASHBOARD',
+                      i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
+                      url: storyViewerUrl
+                    }
+                  ],
+                  skillList: skillIdList,
+                  skillDescriptions: skillDescriptions,
+                  questionCount: ReviewTestEngineService
+                    .getReviewTestQuestionCount(skillIdList.length),
+                  questionPlayerMode: {
+                    modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
+                    passCutoff: 0.75
                   },
-                  {
-                    type: 'RETRY_SESSION',
-                    i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
-                    url: reviewTestsUrl
-                  },
-                  {
-                    type: 'DASHBOARD',
-                    i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
-                    url: storyViewerUrl
-                  }
-                ],
-                skillList: skillIdList,
-                skillDescriptions: skillDescriptions,
-                questionCount: ReviewTestEngineService
-                  .getReviewTestQuestionCount(skillIdList.length),
-                questionPlayerMode: {
-                  modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
-                  passCutoff: 0.75
-                },
-                questionsSortedByDifficulty: true
-              };
-              ctrl.questionPlayerConfig = questionPlayerConfig;
-            });
+                  questionsSortedByDifficulty: true
+                  };
+                  ctrl.questionPlayerConfig = questionPlayerConfig;
+              });
           };
           _fetchSkillDetails();
         }
