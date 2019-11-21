@@ -276,6 +276,7 @@
 /core/templates/dev/head/components/skill-mastery/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/components/skills-mastery-list/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681 @vinitamurthi
+/core/templates/dev/head/domain/review_test/ @nishantwrp
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/pages/review-test-page/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/services/questions-list.service.ts @sophiewu6 @vinitamurthi
