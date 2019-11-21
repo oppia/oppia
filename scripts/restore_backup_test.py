@@ -39,14 +39,9 @@ class RestoreBackupTests(test_utils.GenericTestBase):
             self.all_cmd_tokens.extend(cmd_tokens)
         def mock_exists(unused_path):
             return True
-        def mock_is_current_branch_a_release_branch():
-            return True
 
         self.run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
-        self.branch_check_swap = self.swap(
-            common, 'is_current_branch_a_release_branch',
-            mock_is_current_branch_a_release_branch)
 
     def test_missing_gae_dir(self):
         def mock_exists(unused_path):
@@ -57,7 +52,7 @@ class RestoreBackupTests(test_utils.GenericTestBase):
             restore_backup.main(args=[])
 
     def test_missing_project_name(self):
-        with self.exists_swap, self.branch_check_swap, self.assertRaisesRegexp(
+        with self.exists_swap, self.assertRaisesRegexp(
             Exception, 'Please provide project name for backup restoration.'):
             restore_backup.main(args=[])
 
@@ -82,8 +77,8 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.exists_swap, self.branch_check_swap, self.run_cmd_swap:
-            with open_tab_swap, input_swap, self.assertRaisesRegexp(
+        with self.exists_swap, self.run_cmd_swap, open_tab_swap:
+            with input_swap, self.assertRaisesRegexp(
                 Exception,
                 'Invalid export metadata filepath: %s' % (
                     invalid_export_metadata_filepath)):
@@ -116,9 +111,8 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.exists_swap, self.branch_check_swap, self.run_cmd_swap:
-            with open_tab_swap, input_swap:
-                restore_backup.main(args=['--project_name=sample_project_name'])
+        with self.exists_swap, self.run_cmd_swap, open_tab_swap, input_swap:
+            restore_backup.main(args=['--project_name=sample_project_name'])
 
         self.assertEqual(
             self.all_cmd_tokens,
@@ -130,9 +124,22 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_check_status(self):
-        with self.exists_swap, self.branch_check_swap, self.run_cmd_swap:
+        with self.exists_swap, self.run_cmd_swap:
             restore_backup.main(args=['--check_status'])
 
         self.assertEqual(
             self.all_cmd_tokens,
             [restore_backup.GCLOUD_PATH, 'datastore', 'operations', 'list'])
+
+    def test_cancel_operation(self):
+        def mock_input():
+            return 'Sample operation'
+        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        with self.exists_swap, self.run_cmd_swap, input_swap:
+            restore_backup.main(args=['--cancel_operation'])
+        self.assertEqual(
+            self.all_cmd_tokens,
+            [
+                restore_backup.GCLOUD_PATH, 'datastore', 'operations', 'list',
+                restore_backup.GCLOUD_PATH, 'datastore', 'operations', 'cancel',
+                'Sample operation'])

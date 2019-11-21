@@ -23,6 +23,10 @@ The name of the project should match the project name on App Engine.
 If the status of a backup restoration is to be checked, run the script as:
 
     python -m scripts.restore_backup --check_status
+
+If you want to cancel a backup restoration operation, run the script as:
+
+    python -m scripts.restore_backup --cancel_operation
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -52,6 +56,8 @@ LIST_OF_BUCKETS_URL = (
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--project_name', help='name of the project to set for backup', type=str)
+_PARSER.add_argument(
+    '--cancel_operation', action='store_true', default=False)
 _PARSER.add_argument(
     '--check_status', action='store_true', default=False)
 
@@ -92,6 +98,17 @@ def check_backup_restoration_status():
         common.run_cmd([GCLOUD_PATH, 'datastore', 'operations', 'list']))
 
 
+def cancel_operation():
+    """Cancels a datastore operation."""
+    python_utils.PRINT('List of operations in progress:\n')
+    check_backup_restoration_status()
+    python_utils.PRINT(
+        'Enter the name of the operation to cancel.')
+    operation_name = python_utils.INPUT()
+    common.run_cmd([
+        GCLOUD_PATH, 'datastore', 'operations', 'cancel', operation_name])
+
+
 def main(args=None):
     """Performs task to restore backup or check the status of
     backup restoration.
@@ -103,8 +120,11 @@ def main(args=None):
 
     options = _PARSER.parse_args(args=args)
 
-    if options.check_status:
-        check_backup_restoration_status()
+    if options.check_status or options.cancel_operation:
+        if options.check_status:
+            check_backup_restoration_status()
+        if options.cancel_operation:
+            cancel_operation()
     else:
         if options.project_name is None:
             raise Exception(
