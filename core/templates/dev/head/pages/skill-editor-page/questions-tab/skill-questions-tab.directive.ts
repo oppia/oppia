@@ -64,6 +64,8 @@ angular.module('oppia').directive('questionsTab', [
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.getQuestionSummariesAsync =
               QuestionsListService.getQuestionSummariesAsync;
+            $scope.getGroupedSkillSummaries =
+              SkillEditorStateService.getGroupedSkillSummaries;
             $scope.isLastQuestionBatch =
              QuestionsListService.isLastQuestionBatch;
             $scope.skillIdToRubricsObject = {};
