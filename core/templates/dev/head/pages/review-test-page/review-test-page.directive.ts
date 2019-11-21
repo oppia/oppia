@@ -30,6 +30,7 @@ require('pages/review-test-page/review-test-engine.service.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
+require('domain/review_test/review-test-backend-api.service.ts');
 
 angular.module('oppia').directive('reviewTestPage', [
   'UrlInterpolationService', function(
@@ -43,12 +44,14 @@ angular.module('oppia').directive('reviewTestPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', 'AlertsService', 'PageTitleService',
-        'ReviewTestEngineService', 'UrlInterpolationService', 'UrlService',
+        'ReviewTestEngineService', 'ReviewTestBackendApiService',
+        'UrlInterpolationService', 'UrlService',
         'FATAL_ERROR_CODES', 'QUESTION_PLAYER_MODE', 'REVIEW_TEST_DATA_URL',
         'REVIEW_TESTS_URL', 'STORY_VIEWER_PAGE',
         function(
             $http, $rootScope, AlertsService, PageTitleService,
-            ReviewTestEngineService, UrlInterpolationService, UrlService,
+            ReviewTestEngineService, ReviewTestBackendApiService,
+            UrlInterpolationService, UrlService,
             FATAL_ERROR_CODES, QUESTION_PLAYER_MODE, REVIEW_TEST_DATA_URL,
             REVIEW_TESTS_URL, STORY_VIEWER_PAGE
         ) {
@@ -69,7 +72,7 @@ angular.module('oppia').directive('reviewTestPage', [
               STORY_VIEWER_PAGE, {
                 story_id: ctrl.storyId
               });
-            $http.get(reviewTestsDataUrl).then(function(result) {
+            ReviewTestBackendApiService.fetchReviewTestData(ctrl.storyId).then(function(result) {
               var skillIdList = [];
               var skillDescriptions = [];
               PageTitleService.setPageTitle(
