@@ -472,33 +472,38 @@ def main():
     g = github.Github(personal_access_token)
     repo_fork = g.get_repo('%s/oppia' % github_username)
 
-    current_release_version = branch_name[len(
-        common.RELEASE_BRANCH_NAME_PREFIX):]
+    current_release_version = branch_name[
+        len(common.RELEASE_BRANCH_NAME_PREFIX):]
     target_branch = 'update-changelog-for-releasev%s' % current_release_version
 
     remove_updates_and_delete_branch(repo_fork, target_branch)
 
     # Opens Credit Form.
+    python_utils.PRINT(
+        'Note: Make following changes directly to %s and make sure to '
+        'save the file after making these changes.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
+
+    common.ask_user_to_confirm(
+        'Check emails and names for authors and contributors and '
+        'verify that the emails are '
+        'correct through welcome emails sent from welcome@oppia.org '
+        '(Confirm from Sean in case of doubt).')
     common.open_new_tab_in_browser_if_possible(
         'https://docs.google.com/forms/d/'
         '1yH6ZO2UiD_VspgKJR40byRSjUP1AaBF9ARSe814p8K0/edit#responses')
-    message = (
-        'Note: Make following changes directly to %s and make sure to '
-        'save the file after making these changes.\n\n'
-        '1. Check emails and names for authors and contributors and '
-        'verify that the emails are '
-        'correct through welcome emails sent from welcome@oppia.org '
-        '(Confirm from Sean in case of doubt).\n\n'
-        '2. Check the credits form and add any non technical contributors '
-        'to the contributor list in release summary file.\n\n'
-        '3. Categorize the terms in uncategorized section and arrange '
-        'the changelog to have user facing categories on top.\n\n'
-        '4. Verify each item is in correct section and remove '
-        'trivial changes like "Fix lint errors" from the changelog.\n\n'
-        '5. Ensure that all items in changelog start with a '
-        'verb in simple present tense\n\n' % (
-            release_constants.RELEASE_SUMMARY_FILEPATH))
-    common.ask_user_to_confirm(message)
+    common.ask_user_to_confirm(
+        'Check the credits form and add any non technical contributors '
+        'to the contributor list in release summary file.')
+    common.ask_user_to_confirm(
+        'Categorize the terms in uncategorized section and arrange '
+        'the changelog to have user facing categories on top.')
+    common.ask_user_to_confirm(
+        'Verify each item is in correct section and remove '
+        'trivial changes like "Fix lint errors" from the changelog.')
+    common.ask_user_to_confirm(
+        'Ensure that all items in changelog start with a '
+        'verb in simple present tense.')
 
     release_summary_lines = []
     with python_utils.open_file(

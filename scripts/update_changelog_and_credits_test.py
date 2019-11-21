@@ -473,7 +473,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_contributors_gets_called': False,
             'update_developer_names_gets_called': False,
             'check_ordering_of_sections_gets_called': False,
-            'create_branch_gets_called': False
+            'create_branch_gets_called': False,
+            'open_new_tab_in_browser_if_possible_gets_called': False
         }
         expected_check_function_calls = {
             'remove_updates_and_delete_branch_gets_called': True,
@@ -482,7 +483,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_contributors_gets_called': True,
             'update_developer_names_gets_called': True,
             'check_ordering_of_sections_gets_called': True,
-            'create_branch_gets_called': True
+            'create_branch_gets_called': True,
+            'open_new_tab_in_browser_if_possible_gets_called': True
         }
         def mock_remove_updates_and_delete_branch(
                 unused_repo_fork, unused_target_branch):
@@ -509,6 +511,9 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             return 'y'
         def mock_get_repo(unused_self, unused_repo_name):
             return self.mock_repo
+        def mock_open_tab(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_gets_called'] = True
 
         remove_updates_swap = self.swap(
             update_changelog_and_credits, 'remove_updates_and_delete_branch',
@@ -532,10 +537,12 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits, 'create_branch', mock_create_branch)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
 
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
             with self.main_swap, self.getpass_swap, input_swap:
-                with remove_updates_swap, update_authors_swap:
+                with remove_updates_swap, update_authors_swap, open_tab_swap:
                     with update_changelog_swap, update_contributors_swap:
                         with update_developer_names_swap, check_order_swap:
                             with create_branch_swap, get_repo_swap:
