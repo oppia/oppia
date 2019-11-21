@@ -410,8 +410,8 @@
 /scripts/update_configs_test.py @ankita240796
 /scripts/update_indexes.py @ankita240796
 /scripts/update_indexes_test.py @ankita240796
-/scripts/wrap_release.py @ankita240796
-/scripts/wrap_release_test.py @ankita240796
+/scripts/wrap_up_release.py @ankita240796
+/scripts/wrap_up_release_test.py @ankita240796
 
 
 # Rich text editor team.

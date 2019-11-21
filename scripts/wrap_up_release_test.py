@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/wrap_release.py."""
+"""Unit tests for scripts/wrap_up_release.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -27,7 +27,7 @@ from core.tests import test_utils
 import release_constants
 
 from . import common
-from . import wrap_release
+from . import wrap_up_release
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -63,7 +63,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             Exception, (
                 'This script should only be run from the latest release '
                 'branch.')):
-            wrap_release.main()
+            wrap_up_release.main()
 
     def test_missing_release_summary_file(self):
         release_summary_swap = self.swap(
@@ -73,7 +73,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
                 Exception, (
                     'Release summary file invalid.md is missing. Please run '
                     'the release_info.py script and re-run this script.')):
-                wrap_release.main()
+                wrap_up_release.main()
 
     def test_missing_personal_access_token(self):
         # pylint: disable=unused-argument
@@ -87,7 +87,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
                     'No personal access token provided, please set up a '
                     'personal access token at https://github.com/settings/'
                     'tokens and re-run the script')):
-                wrap_release.main()
+                wrap_up_release.main()
 
     def test_closed_blocking_bugs_milestone_results_in_exception(self):
         # pylint: disable=unused-argument
@@ -100,7 +100,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             github.Repository.Repository, 'get_milestone', mock_get_milestone)
         with get_milestone_swap, self.assertRaisesRegexp(
             Exception, 'The blocking bug milestone is closed.'):
-            wrap_release.remove_blocking_bugs_milestone_from_issues(
+            wrap_up_release.remove_blocking_bugs_milestone_from_issues(
                 self.mock_repo)
 
     def test_non_zero_blocking_bugs_count_results_in_exception(self):
@@ -118,7 +118,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         with get_milestone_swap, open_tab_swap, self.assertRaisesRegexp(
             Exception, '10 blocking bugs are not resolved.'):
-            wrap_release.remove_blocking_bugs_milestone_from_issues(
+            wrap_up_release.remove_blocking_bugs_milestone_from_issues(
                 self.mock_repo)
 
     def test_blocking_bugs_milestone_removal(self):
@@ -153,7 +153,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         edit_swap = self.swap(
             github.Issue.Issue, 'edit', mock_edit)
         with get_milestone_swap, get_issues_swap, edit_swap:
-            wrap_release.remove_blocking_bugs_milestone_from_issues(
+            wrap_up_release.remove_blocking_bugs_milestone_from_issues(
                 self.mock_repo)
         self.assertEqual(check_function_calls, expected_function_calls)
 
@@ -193,7 +193,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         with get_label_swap, get_issues_swap:
             with self.assertRaisesRegexp(
                 Exception, 'Following PRs are not released: \\[7567\\].'):
-                wrap_release.remove_release_labels(self.mock_repo)
+                wrap_up_release.remove_release_labels(self.mock_repo)
 
     def test_label_removal_from_prs(self):
         label_for_current_release_prs = github.Label.Label(
@@ -241,7 +241,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             mock_remove_from_labels)
 
         with get_label_swap, get_issues_swap, remove_from_labels_swap:
-            wrap_release.remove_release_labels(self.mock_repo)
+            wrap_up_release.remove_release_labels(self.mock_repo)
         self.assertEqual(check_function_calls, expected_function_calls)
 
     def test_function_calls(self):
@@ -269,10 +269,10 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         # pylint: enable=unused-argument
 
         remove_blocking_bugs_milestone_from_issues_swap = self.swap(
-            wrap_release, 'remove_blocking_bugs_milestone_from_issues',
+            wrap_up_release, 'remove_blocking_bugs_milestone_from_issues',
             mock_remove_blocking_bugs_milestone_from_issues)
         remove_release_labels_swap = self.swap(
-            wrap_release, 'remove_release_labels',
+            wrap_up_release, 'remove_release_labels',
             mock_remove_release_labels)
         get_org_swap = self.swap(
             github.Github, 'get_organization', mock_get_organization)
@@ -283,6 +283,6 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         with self.branch_name_swap, self.exists_swap, get_org_swap:
             with get_repo_swap, getpass_swap, remove_release_labels_swap:
                 with remove_blocking_bugs_milestone_from_issues_swap:
-                    wrap_release.main()
+                    wrap_up_release.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
