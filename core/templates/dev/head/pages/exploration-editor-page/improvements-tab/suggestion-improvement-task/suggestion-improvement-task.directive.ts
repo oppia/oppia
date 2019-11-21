@@ -36,7 +36,7 @@ angular.module('oppia').directive('suggestionImprovementTask', [
             var thread = $scope.getData();
             var threadSummary = thread.threadSummary;
             return {
-              text: threadSummary.lastMessageText || thread.summary,
+              text: threadSummary.lastMessageText || thread.subject,
               author: threadSummary.authorLastMessage,
               updatedOn: threadSummary.lastUpdated,
               updatedStatus: threadSummary.totalMessageCount === 1 ?
