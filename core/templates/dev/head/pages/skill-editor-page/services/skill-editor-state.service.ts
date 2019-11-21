@@ -43,7 +43,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
     var _skillIsInitialized = false;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
-    var _groupedSkillSummaries = {};
+    var _groupedSkillSummaries = {
+      current: [],
+      others: []
+    };
 
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
@@ -61,11 +64,34 @@ angular.module('oppia').factory('SkillEditorStateService', [
     };
 
     var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
+      var topicName = null;
+      var sortedSkillSummaries = [];
+      _groupedSkillSummaries.current = [];
+      _groupedSkillSummaries.others = [];
+
       for (var name in groupedSkillSummaries) {
-        _groupedSkillSummaries[name] = [];
-        var summaryDicts = groupedSkillSummaries[name];
-        for (var idx in summaryDicts) {
-          _groupedSkillSummaries[name].push(summaryDicts[idx]);
+        var skillSummaries = groupedSkillSummaries[name];
+        for (var idx in skillSummaries) {
+          if (skillSummaries[idx].id === _skill.getId()) {
+            topicName = name;
+            break;
+          }
+        }
+        if (topicName !== null) {
+          break;
+        }
+      }
+      for (var idx in groupedSkillSummaries[topicName]) {
+        _groupedSkillSummaries.current.push(
+          groupedSkillSummaries[topicName][idx]);
+      }
+      for (var name in groupedSkillSummaries) {
+        if (name === topicName) {
+          continue;
+        }
+        var skillSummaries = groupedSkillSummaries[name];
+        for (var idx in skillSummaries) {
+          _groupedSkillSummaries.others.push(skillSummaries[idx]);
         }
       }
     };
@@ -84,9 +110,9 @@ angular.module('oppia').factory('SkillEditorStateService', [
         EditableSkillBackendApiService.fetchSkill(
           skillId).then(
           function(newBackendSkillObject) {
+            _updateSkill(newBackendSkillObject.skill);
             _updateGroupedSkillSummaries(
               newBackendSkillObject.groupedSkillSummaries);
-            _updateSkill(newBackendSkillObject.skill);
             QuestionsListService.getQuestionSummariesAsync(
               [skillId], true, false
             );
