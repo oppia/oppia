@@ -2425,8 +2425,10 @@ oppia-parameter {
   opacity: .5;
 }
 
-.modal-content, .modal-dialog {
-  min-width: 590px;
+@media(min-width: 768px) {
+  .modal-content, .modal-dialog {
+    min-width: 590px;
+  }
 }
 .modal-content {
   background-clip: padding-box;
@@ -2604,7 +2606,7 @@ div#ng-curtain {
 }
 
 .oppia-navbar-brand-name {
-  float: left;
+  float: right;
   height: 56px;
   line-height: 20px;
   margin-left: -10px;
