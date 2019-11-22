@@ -28,7 +28,7 @@ angular.module('oppia').directive('promoBar', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: eval(require('html-loader!./promo-bar.directive.html'))(),
+      template: require('!html-loader!./promo-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {

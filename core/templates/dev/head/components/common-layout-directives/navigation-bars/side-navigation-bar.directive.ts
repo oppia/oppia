@@ -24,8 +24,8 @@ angular.module('oppia').directive('sideNavigationBar', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: eval(require(
-        'html-loader!./side-navigation-bar.directive.html'))(),
+      template: require(
+        '!html-loader!./side-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$timeout', '$window', function($timeout, $window) {
         var ctrl = this;

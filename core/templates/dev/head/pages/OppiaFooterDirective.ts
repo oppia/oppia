@@ -24,7 +24,7 @@ angular.module('oppia').directive('oppiaFooter', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: eval(require('html-loader!./oppia_footer_directive.html'))(),
+      template: require('!html-loader!./oppia_footer_directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {}
