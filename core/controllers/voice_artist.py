@@ -147,7 +147,7 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
         self.render_json({})
 
 
-class UserVoicoverApplicationsHandler(base.BaseHandler):
+class UserVoiceoverApplicationsHandler(base.BaseHandler):
     """Handler for the voiceover applications submitted by the user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
