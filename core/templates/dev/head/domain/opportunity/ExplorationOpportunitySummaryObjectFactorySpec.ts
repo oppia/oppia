@@ -35,7 +35,7 @@ fdescribe('Exploration opportunity summary object factory', () => {
         chapter_title: 'Introduction',
         content_count: 100,
         translation_counts: {
-          'hi': 15
+          hi: 15
         }
       };
     });
@@ -88,8 +88,8 @@ fdescribe('Exploration opportunity summary object factory', () => {
     it('should return a correct translation progress percentage for non ' +
       'existing language code', () => {
       let explorationOpportunitySummary = (
-      explorationOpportunitySummaryObjectFactory.createFromBackendDict(
-        backendDict));
+        explorationOpportunitySummaryObjectFactory.createFromBackendDict(
+          backendDict));
 
       expect(
         explorationOpportunitySummary.getTranslationProgressPercentage('en'))

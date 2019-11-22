@@ -33,8 +33,9 @@ export class ExplorationOpportunitySummary {
   translationCounts: ITranslationCountsDict;
 
   constructor(
-    expId: string, topicName: string, storyTitle: string, chapterTitle: string,
-    contentCount: number, translationCounts: ITranslationCountsDict) {
+      expId: string, topicName: string, storyTitle: string,
+      chapterTitle: string, contentCount: number,
+      translationCounts: ITranslationCountsDict) {
     this.id = expId;
     this.topicName = topicName;
     this.storyTitle = storyTitle;

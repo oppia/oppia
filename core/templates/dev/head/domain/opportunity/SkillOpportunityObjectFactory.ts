@@ -27,8 +27,8 @@ export class SkillOpportunity {
   questionCount: number;
 
   constructor(
-    skillId: string, skillDescription: string, topicName: string,
-    questionCount: number) {
+      skillId: string, skillDescription: string, topicName: string,
+      questionCount: number) {
     this.id = skillId;
     this.skillDescription = skillDescription;
     this.topicName = topicName;
