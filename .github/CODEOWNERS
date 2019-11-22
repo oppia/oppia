@@ -52,6 +52,7 @@
 /core/domain/opportunity*.py @DubeySandeep
 /core/domain/voiceover_services*.py @DubeySandeep
 /core/storage/opportunity/ @DubeySandeep
+/core/templates/dev/head/domain/opportunity @DubeySandeep
 /core/templates/dev/head/pages/community-dashboard-page/ @DubeySandeep
 
 
