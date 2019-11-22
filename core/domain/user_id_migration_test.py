@@ -76,9 +76,8 @@ class UserIdJobTests(test_utils.GenericTestBase):
         original_model.put()
 
         output = self._run_one_off_job()
-
         migrated_model = (
-            user_models.CompletedActivitiesModel.get_by_id(output[0][1][0]))
+            user_models.CompletedActivitiesModel.get_by_id(output[0][1][0][1]))
         self.assertNotEqual(
             original_model.id, migrated_model.id)
         self.assertEqual(
@@ -106,7 +105,7 @@ class UserIdJobTests(test_utils.GenericTestBase):
 
         migrated_model = (
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                '%s.%s' % (output[0][1][0], 'exp_id')))
+                '%s.%s' % (output[0][1][0][1], 'exp_id')))
         self.assertNotEqual(
             original_model.id, migrated_model.id)
         self.assertNotEqual(
@@ -141,7 +140,7 @@ class UserIdJobTests(test_utils.GenericTestBase):
         migrated_model = (
             exp_models.ExplorationSnapshotMetadataModel.query(
                 exp_models.ExplorationSnapshotMetadataModel.committer_id ==
-                output[0][1][0]
+                output[0][1][0][1]
             ).get())
 
         self.assertNotEqual(
@@ -168,10 +167,9 @@ class UserIdJobTests(test_utils.GenericTestBase):
         original_model.put()
 
         output = self._run_one_off_job()
-
         migrated_model = (
             user_models.UserContributionScoringModel.get_by_id(
-                '%s.%s' % ('score_category', output[0][1][0])))
+                '%s.%s' % ('score_category', output[0][1][0][1])))
         self.assertNotEqual(
             original_model.id, migrated_model.id)
         self.assertNotEqual(

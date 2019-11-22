@@ -104,7 +104,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             elif (model_class.get_user_id_migration_policy() ==
                   base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
                 model_class.migrate_model(old_user_id, new_user_id)
-        yield ('SUCCESS', new_user_id)
+        yield ('SUCCESS', (old_user_id, new_user_id))
 
     @staticmethod
     def reduce(key, new_user_ids):
