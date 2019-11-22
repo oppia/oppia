@@ -59,6 +59,7 @@ require('services/generate-content-id.service.ts');
 
 require('components/state-editor/state-editor.constants.ajs.ts');
 require('directives/angular-html-bind.directive.ts');
+require('interactions/TextInput/directives/oppia-interactive-text-input.directive.ts');
 
 angular.module('oppia').directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
