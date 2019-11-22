@@ -100,10 +100,10 @@ export = {
     "Welcome": "#992a2b"
   },
 
-  // List of supported language codes. Each description has a
-  // parenthetical part that may be stripped out to give a shorter
-  // description.
-  "ALL_LANGUAGE_CODES": [{
+  // List of supported content languages in which we can create explorations or
+  // other entities. Each description has a parenthetical part that may be
+  // stripped out to give a shorter description.
+  "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
     "description": "English"
   }, {
@@ -227,6 +227,7 @@ export = {
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
   // languages are in alphabetical order.
+  // List of supported site languages in which the platform is offered.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "id",
     "text": "Bahasa Indonesia"
@@ -262,6 +263,8 @@ export = {
     "text": "中文(繁體)"
   }],
 
+  // List of supported audio languages in which we have audio and translations
+  // for explorations or other entities.
   // Related languages are used to prioritize an exploration's language when
   // setting the default audio language.
   "SUPPORTED_AUDIO_LANGUAGES": [{
