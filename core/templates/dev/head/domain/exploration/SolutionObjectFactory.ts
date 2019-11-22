@@ -38,7 +38,9 @@ export class Solution {
   answerIsExclusive: boolean;
   correctAnswer: any;
   explanation: any;
-  constructor(explorations, answerisexclusive, correctanswer, _explanation) {
+  constructor(
+      explorations: any, answerisexclusive: any, correctanswer: any,
+      _explanation: any) {
     this.explorationHtml = explorations;
     this.answerIsExclusive = answerisexclusive;
     this.correctAnswer = correctanswer;

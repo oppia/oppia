@@ -46,31 +46,31 @@ export class Interaction {
     this.solution = solution;
   }
 
-  setId(newValue): void {
+  setId(newValue: string): void {
     this.id = newValue;
   }
-
-  setAnswerGroups(newValue): void {
+  // TODO(#7165): Replace any with exact type.
+  setAnswerGroups(newValue: any): void {
     this.answerGroups = newValue;
   }
-
-  setDefaultOutcome(newValue): void {
+  // TODO(#7165): Replace any with exact type.
+  setDefaultOutcome(newValue: any): void {
     this.defaultOutcome = newValue;
   }
-
-  setCustomizationArgs(newValue): void {
+  // TODO(#7165): Replace any with exact type.
+  setCustomizationArgs(newValue: any): void {
     this.customizationArgs = newValue;
   }
-
-  setSolution(newValue): void {
+  // TODO(#7165): Replace any with exact type.
+  setSolution(newValue: any): void {
     this.solution = newValue;
   }
-
-  setHints(newValue): void {
+  // TODO(#7165): Replace any with exact type.
+  setHints(newValue: any): void {
     this.hints = newValue;
   }
-
-  copy(otherInteraction): void {
+  // TODO(#7165): Replace any with exact type.
+  copy(otherInteraction: any): void {
     this.answerGroups = angular.copy(otherInteraction.answerGroups);
     this.confirmedUnclassifiedAnswers =
       angular.copy(otherInteraction.confirmedUnclassifiedAnswers);
