@@ -91,7 +91,7 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
         indexed=True,
-        choices=[lc['code'] for lc in constants.ALL_LANGUAGE_CODES])
+        choices=[lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES])
     # System language preference (for I18N).
     preferred_site_language_code = ndb.StringProperty(
         default=None, choices=[

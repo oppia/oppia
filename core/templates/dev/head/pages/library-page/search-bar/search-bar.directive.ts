@@ -88,7 +88,7 @@ angular.module('oppia').directive('searchBar', [
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
             ctrl.activeMenuName = NavigationService.activeMenuName;
           };
-          ctrl.ALL_LANGUAGE_CODES = (
+          ctrl.SUPPORTED_CONTENT_LANGUAGES = (
             LanguageUtilService.getLanguageIdsAndTexts());
 
           ctrl.searchQuery = '';
@@ -104,7 +104,7 @@ angular.module('oppia').directive('searchBar', [
             languageCodes: {
               description: '',
               itemsName: 'languages',
-              masterList: ctrl.ALL_LANGUAGE_CODES,
+              masterList: ctrl.SUPPORTED_CONTENT_LANGUAGES,
               numSelections: 0,
               selections: {},
               summary: ''

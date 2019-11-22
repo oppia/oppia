@@ -97,7 +97,7 @@ var constants = {
   // List of supported language codes. Each description has a
   // parenthetical part that may be stripped out to give a shorter
   // description.
-  "ALL_LANGUAGE_CODES": [{
+  "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
     "description": "English"
   }, {

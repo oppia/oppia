@@ -599,7 +599,8 @@ def is_valid_language_code(language_code):
     Returns:
         bool. Whether the language code is valid or not.
     """
-    language_codes = [lc['code'] for lc in constants.ALL_LANGUAGE_CODES]
+    language_codes = [
+        lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES]
     return language_code in language_codes
 
 

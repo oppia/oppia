@@ -316,6 +316,6 @@ class SubtopicPage(python_utils.OBJECT):
                 'Expected language code to be a string, received %s' %
                 self.language_code)
         if not any([self.language_code == lc['code']
-                    for lc in constants.ALL_LANGUAGE_CODES]):
+                    for lc in constants.SUPPORTED_CONTENT_LANGUAGES]):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)

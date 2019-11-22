@@ -20,22 +20,22 @@ require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
 angular.module('oppia').factory('ExplorationLanguageCodeService', [
-  'ExplorationPropertyService', 'ALL_LANGUAGE_CODES',
-  function(ExplorationPropertyService, ALL_LANGUAGE_CODES) {
+  'ExplorationPropertyService', 'SUPPORTED_CONTENT_LANGUAGES',
+  function(ExplorationPropertyService, SUPPORTED_CONTENT_LANGUAGES) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'language_code';
-    child.getAllLanguageCodes = function() {
-      return ALL_LANGUAGE_CODES;
+    child.getSupportedContentLanguages = function() {
+      return SUPPORTED_CONTENT_LANGUAGES;
     };
     child.getCurrentLanguageDescription = function() {
-      for (var i = 0; i < ALL_LANGUAGE_CODES.length; i++) {
-        if (ALL_LANGUAGE_CODES[i].code === child.displayed) {
-          return ALL_LANGUAGE_CODES[i].description;
+      for (var i = 0; i < SUPPORTED_CONTENT_LANGUAGES.length; i++) {
+        if (SUPPORTED_CONTENT_LANGUAGES[i].code === child.displayed) {
+          return SUPPORTED_CONTENT_LANGUAGES[i].description;
         }
       }
     };
     child._isValid = function(value) {
-      return ALL_LANGUAGE_CODES.some(function(elt) {
+      return SUPPORTED_CONTENT_LANGUAGES.some(function(elt) {
         return elt.code === value;
       });
     };
