@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Object factory for creating frontend instances of
- * skill opportunity domain objects.
+ * skill opportunity domain object.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -25,6 +25,7 @@ export class SkillOpportunity {
   skillDescription: string;
   topicName: string;
   questionCount: number;
+
   constructor(
     skillId: string, skillDescription: string, topicName: string,
     questionCount: number) {

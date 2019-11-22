@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Object factory for creating frontend instances of
- * exploration opportunity summary domain objects.
+ * exploration opportunity summary domain object.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -31,6 +31,7 @@ export class ExplorationOpportunitySummary {
   chapterTitle: string;
   contentCount: number;
   translationCounts: ITranslationCountsDict;
+
   constructor(
     expId: string, topicName: string, storyTitle: string, chapterTitle: string,
     contentCount: number, translationCounts: ITranslationCountsDict) {
