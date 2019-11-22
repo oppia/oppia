@@ -98,8 +98,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['topic_name'], 'topic')
-        self.assertEqual(opportunity['story_title'], 'A story')
+        self.assertEqual(opportunity.topic_name, 'topic')
+        self.assertEqual(opportunity.story_title, 'A story')
 
     def test_opportunity_get_deleted_with_removing_exploration_from_story_node(
             self):
@@ -197,8 +197,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['story_title'], 'A story')
-        self.assertEqual(opportunity['topic_name'], 'topic')
+        self.assertEqual(opportunity.story_title, 'A story')
+        self.assertEqual(opportunity.topic_name, 'topic')
 
         topic_services.update_topic_and_subtopic_pages(
             self.owner_id, self.TOPIC_ID, [topic_domain.TopicChange({
@@ -213,8 +213,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['story_title'], 'A story')
-        self.assertEqual(opportunity['topic_name'], 'A new topic')
+        self.assertEqual(opportunity.story_title, 'A story')
+        self.assertEqual(opportunity.topic_name, 'A new topic')
 
     def test_opportunities_updates_with_updating_story_title(self):
         story_services.update_story(
@@ -235,7 +235,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['story_title'], 'A story')
+        self.assertEqual(opportunity.story_title, 'A story')
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
@@ -250,7 +250,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['story_title'], 'A new story')
+        self.assertEqual(opportunity.story_title, 'A new story')
 
     def test_opportunity_updates_with_updating_story_node_title(self):
         story_services.update_story(
@@ -271,7 +271,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['chapter_title'], 'Node1')
+        self.assertEqual(opportunity.chapter_title, 'Node1')
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
@@ -287,7 +287,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['chapter_title'], 'A new Node1')
+        self.assertEqual(opportunity.chapter_title, 'A new Node1')
 
     def test_opportunity_updates_with_updating_exploration(self):
         story_services.update_story(
@@ -306,7 +306,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0]['content_count'], 2)
+        self.assertEqual(translation_opportunities[0].content_count, 2)
 
         answer_group_dict = {
             'outcome': {
@@ -378,7 +378,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0]['content_count'], 5)
+        self.assertEqual(translation_opportunities[0].content_count, 5)
 
     def test_create_new_skill_creates_new_skill_opportunity(self):
         skill_opportunities, _, _ = (
@@ -391,8 +391,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
         opportunity = skill_opportunities[0]
-        self.assertEqual(opportunity['id'], self.SKILL_ID)
-        self.assertEqual(opportunity['skill_description'], 'skill_description')
+        self.assertEqual(opportunity.id, self.SKILL_ID)
+        self.assertEqual(opportunity.skill_description, 'skill_description')
 
     def test_create_skill_opportunity_counts_existing_linked_questions(self):
         self.save_new_question(
@@ -408,9 +408,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
         opportunity = skill_opportunities[0]
-        self.assertEqual(opportunity['id'], self.SKILL_ID)
-        self.assertEqual(opportunity['skill_description'], 'description')
-        self.assertEqual(opportunity['question_count'], 1)
+        self.assertEqual(opportunity.id, self.SKILL_ID)
+        self.assertEqual(opportunity.skill_description, 'description')
+        self.assertEqual(opportunity.question_count, 1)
 
     def test_create_skill_opportunity_for_existing_opportunity_raises_exception(
             self):
@@ -442,8 +442,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
-        self.assertEqual(opportunity['id'], self.SKILL_ID)
-        self.assertEqual(opportunity['skill_description'], 'new_description')
+        self.assertEqual(opportunity.id, self.SKILL_ID)
+        self.assertEqual(opportunity.skill_description, 'new_description')
 
     def test_update_skill_opportunity_skill_description_invalid_skill_id(self):
         opportunity_services.update_skill_opportunity_skill_description(
@@ -477,7 +477,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
         self.assertEqual(len(skill_opportunities), 1)
-        self.assertEqual(opportunity['question_count'], 1)
+        self.assertEqual(opportunity.question_count, 1)
 
     def test_create_question_skill_link_increments_question_count(self):
         opportunity_services.create_skill_opportunity(
@@ -492,7 +492,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
-        self.assertEqual(opportunity['question_count'], 1)
+        self.assertEqual(opportunity.question_count, 1)
 
     def test_link_multiple_skills_for_question_increments_question_count(self):
         opportunity_services.create_skill_opportunity(
@@ -507,7 +507,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
-        self.assertEqual(opportunity['question_count'], 1)
+        self.assertEqual(opportunity.question_count, 1)
 
     def test_delete_question_decrements_question_count(self):
         opportunity_services.create_skill_opportunity(
@@ -522,7 +522,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
         self.assertEqual(len(skill_opportunities), 1)
-        self.assertEqual(opportunity['question_count'], 0)
+        self.assertEqual(opportunity.question_count, 0)
 
     def test_delete_question_skill_link_decrements_question_count(self):
         opportunity_services.create_skill_opportunity(
@@ -539,7 +539,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
-        self.assertEqual(opportunity['question_count'], 0)
+        self.assertEqual(opportunity.question_count, 0)
 
 
 class OpportunityServicesUnitTest(test_utils.GenericTestBase):
@@ -590,7 +590,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 []))
 
-        self.assertEqual(output, {})
+        self.assertEqual(output, [])
 
         opportunities = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
@@ -598,9 +598,9 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(opportunities), 1)
         self.assertIsInstance(
-            opportunities['0'],
+            opportunities[0],
             opportunity_domain.ExplorationOpportunitySummary)
-        self.assertEqual(opportunities['0'].id, '0')
+        self.assertEqual(opportunities[0].id, '0')
 
     def test_get_exploration_opportunity_summary_from_model_populates_new_lang(
             self):
@@ -615,7 +615,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 ['0']))
         self.assertEqual(len(opportunities), 1)
 
-        opportunity = opportunities['0']
+        opportunity = opportunities[0]
 
         self.assertFalse(
             'new_lang' in opportunity.incomplete_translation_language_codes)
@@ -635,7 +635,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 .get_exploration_opportunity_summaries_by_ids(['0']))
             self.assertEqual(len(opportunities), 1)
 
-            opportunity = opportunities['0']
+            opportunity = opportunities[0]
 
             self.assertTrue(
                 'new_lang' in opportunity.incomplete_translation_language_codes)

@@ -178,7 +178,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
     """Accept the voiceover application of given voiceover application id.
 
     Args:
-        voiceover_application_id: str. The is of the voiceover application which
+        voiceover_application_id: str. The id of the voiceover application which
             need to be accepted.
         reviewer_id: str. The user ID of the reviewer.
     """
@@ -207,7 +207,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
                 voiceover_application.target_id]))
         email_manager.send_accepted_voiceover_application_email(
             voiceover_application.author_id,
-            opportunities[voiceover_application.target_id].chapter_title,
+            opportunities[0].chapter_title,
             voiceover_application.language_code)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.
@@ -259,7 +259,7 @@ def reject_voiceover_application(
                 voiceover_application.target_id]))
         email_manager.send_rejected_voiceover_application_email(
             voiceover_application.author_id,
-            opportunities[voiceover_application.target_id].chapter_title,
+            opportunities[0].chapter_title,
             voiceover_application.language_code, rejection_message)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.

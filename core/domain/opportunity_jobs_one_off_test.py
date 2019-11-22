@@ -143,7 +143,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertFalse(more)
 
-        self.assertEqual(old_opportunities, new_opportunities)
+        old_opportunity_dicts = [opp.to_dict() for opp in old_opportunities]
+        new_opportunity_dicts = [opp.to_dict() for opp in new_opportunities]
+        self.assertEqual(old_opportunity_dicts, new_opportunity_dicts)
 
     def test_regeneration_job_returns_correct_output(self):
         exp_opp_summary_model_regen_job_class = (

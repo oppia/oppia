@@ -41,7 +41,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
 
       return $q.when(suggestionsPromise, function(res) {
         var suggestionIdToSuggestions = {};
-        var targetIdToDetails = res.data.target_ids_to_opportunity_dicts;
+        var targetIdToDetails = res.data.target_id_to_opportunity_dict;
         res.data.suggestions.forEach(function(suggestion) {
           suggestionIdToSuggestions[suggestion.suggestion_id] = {
             suggestion: suggestion,

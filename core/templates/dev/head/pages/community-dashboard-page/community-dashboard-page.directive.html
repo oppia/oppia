@@ -47,6 +47,9 @@
   <div ng-if="$ctrl.activeTabName === 'myContributionTab' || !$ctrl.activeTabName">
     <contributions-and-review></contributions-and-review>
   </div>
+  <div ng-if="$ctrl.activeTabName === 'questionTab'">
+    <question-opportunities></question-opportunities>
+  </div>
   <div ng-if="$ctrl.activeTabName === 'translationTab'">
     <translation-opportunities></translation-opportunities>
   </div>
