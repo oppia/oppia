@@ -50,6 +50,24 @@ def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
             'Invalid suggestion_type: %s' % suggestion_type)
 
 
+def _get_target_id_to_exploration_opportunity_dict(suggestions):
+    """Returns a dict of target_id to exploration opportunity summary dict.
+
+    Args:
+        suggestions: list(BaseSuggestion). A list of suggestions to retrieve
+            opportunity dicts.
+
+    Returns:
+        dict. Dict mapping target_id to corresponding exploration opportunity
+            summary dict.
+    """
+    target_ids = set([s.target_id for s in suggestions])
+    opportunities = (
+        opportunity_services.get_exploration_opportunity_summaries_by_ids(
+            list(target_ids)))
+    return {opp.id: opp.to_dict() for opp in opportunities}
+
+
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 
@@ -179,17 +197,12 @@ class ReviewableSuggestionsHandler(base.BaseHandler):
                 self.user_id, suggestion_type)
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_ids = set([s.target_id for s in suggestions])
-                target_ids_to_opportunities = (
-                    opportunity_services
-                    .get_exploration_opportunity_summaries_by_ids(
-                        list(target_ids)))
+                target_id_to_opportunity_dict = (
+                    _get_target_id_to_exploration_opportunity_dict(suggestions))
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
-                    'target_ids_to_opportunity_dicts': {
-                        t: d.to_dict() for (
-                            t, d) in target_ids_to_opportunities.items()
-                    }
+                    'target_id_to_opportunity_dict':
+                        target_id_to_opportunity_dict
                 })
             else:
                 self.render_json({})
@@ -215,17 +228,12 @@ class UserSubmittedSuggestionsHandler(base.BaseHandler):
                 self.user_id, suggestion_type)
 
             if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_ids = set([s.target_id for s in suggestions])
-                target_ids_to_opportunities = (
-                    opportunity_services
-                    .get_exploration_opportunity_summaries_by_ids(
-                        list(target_ids)))
+                target_id_to_opportunity_dict = (
+                    _get_target_id_to_exploration_opportunity_dict(suggestions))
                 self.render_json({
                     'suggestions': [s.to_dict() for s in suggestions],
-                    'target_ids_to_opportunity_dicts': {
-                        t: d.to_dict() for (
-                            t, d) in target_ids_to_opportunities.items()
-                    }
+                    'target_id_to_opportunity_dict':
+                        target_id_to_opportunity_dict
                 })
             else:
                 self.render_json({})
