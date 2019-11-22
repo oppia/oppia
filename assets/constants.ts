@@ -100,9 +100,9 @@ export = {
     "Welcome": "#992a2b"
   },
 
-  // List of supported languages in which we can create explorations or other
-  // entities. Each description has a parenthetical part that may be stripped
-  //  out to give a shorter description.
+  // List of supported content languages in which we can create explorations or
+  // other entities. Each description has a parenthetical part that may be
+  // stripped out to give a shorter description.
   "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
     "description": "English"
