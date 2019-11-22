@@ -46,6 +46,10 @@ describe('URL Interpolation Service', () => {
     alertsObject.alertsService = alertsService;
   });
 
+  afterAll(() => {
+    Constants.DEV_MODE = true;
+  });
+
   it('should add hash to url if hash is set', () => {
     expect(uis._getUrlWithSlug('/hash_test.html')).toBe(
       '/hash_test.' + hashes['/hash_test.html'] + '.html'
