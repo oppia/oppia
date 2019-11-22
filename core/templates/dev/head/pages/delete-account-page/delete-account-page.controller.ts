@@ -50,7 +50,7 @@ angular.module('oppia').directive('deleteAccountPage', [
                   };
                 }
               ]
-            }).result.then(function() {});
+            });
           };
         }
       ]
