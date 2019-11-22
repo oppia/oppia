@@ -1,7 +1,7 @@
 <div class="list-group">
-  <md-card layout="row" class="list-view-item">
+  <md-card layout="row" class="list-view-item protractor-test-skill-select-header">
     Search By Skill
-    <input type="text" class="form-control" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
+    <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
   </md-card>
   <div style="max-height: 50vh; overflow-y: auto;">
     <a class="list-group-item protractor-test-skills-list-item"
@@ -15,7 +15,7 @@
        ng-repeat="skillSummary in skillSummariesFinal | filter:skillFilterText"
        ng-click="selectSkill(skillSummary.id)"
        ng-class="{'list-group-item-success': (skillSummary.id === selectedSkillId)}">
-      <label class="list-group-item-heading"><[skillSummary.description]></label>
+      <label class="list-group-item-heading protractor-test-skills-list-item"><[skillSummary.description]></label>
     </a>
   </div>
 </div>
