@@ -26,7 +26,6 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
-from core.domain import wipeout_service
 from core.platform import models
 import feconf
 import utils
@@ -331,26 +330,27 @@ class SignupHandler(base.BaseHandler):
         self.render_json({})
 
 
-class RemoveAccountPage(base.BaseHandler):
-    """The remove account page."""
+class DeleteAccountPage(base.BaseHandler):
+    """The delete account page."""
 
     @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
-        if constants.DISABLE_ACCOUNT_REMOVAL:
+        if not constants.ENABLE_ACCOUNT_DELETION:
             raise self.PageNotFoundException
-        self.render_template('remove-account-page.mainpage.html')
+        self.render_template('delete-account-page.mainpage.html')
 
 
-class RemoveAccountHandler(base.BaseHandler):
-    """Provides data for the remove account page."""
+class DeleteAccountHandler(base.BaseHandler):
+    """Provides data for the delete account page."""
 
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_own_profile
     def post(self):
         """Handles POST requests."""
-        wipeout_service.remove_user_account(self.user_id)
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
         self.render_json({})
 
 

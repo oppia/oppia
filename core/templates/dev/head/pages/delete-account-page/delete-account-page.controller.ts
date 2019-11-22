@@ -23,27 +23,27 @@ require(
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('removeAccountPage', [
+angular.module('oppia').directive('deleteAccountPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/remove-account-page/remove-account-page.directive.html'),
+        '/pages/delete-account-page/delete-account-page.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$uibModal',
         function($uibModal) {
           var ctrl = this;
-          ctrl.removeAccount = function() {
+          ctrl.deleteAccount = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/remove-account-page/templates/' +
-                'remove-account-modal.template.html'),
+                '/pages/delete-account-page/templates/' +
+                'delete-account-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', function(
                     $scope, $uibModalInstance) {
-                  $scope.reallyRemove = $uibModalInstance.close;
+                  $scope.reallyDelete = $uibModalInstance.close;
 
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');

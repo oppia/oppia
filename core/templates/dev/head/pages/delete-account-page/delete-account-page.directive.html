@@ -1,18 +1,18 @@
 <background-banner></background-banner>
 <div class="oppia-static-header">
-  <h1 class="protractor-test-get-started-page">Remove account</h1>
+  <h1 class="protractor-test-get-started-page">Delete account</h1>
 </div>
 <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
   <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-get-started">
 
     <h2>Overview</h2>
     <p>
-      This action will remove this user account and
+      This action will delete this user account and
       also all the private data that are associated with this account.
       Already published data will be anonymized,
       so they can't be associated with this account and
       the ownership of that data will be transferred to the community.
-      Summary of data tha will be removed:
+      Summary of data tha will be deleted:
     </p>
     <ul style="margin-left: 40px">
       <li>User and email settings</li>
@@ -38,10 +38,10 @@
       concerns about the account removal process,
       you can email to <strong>privacy@oppia.org</strong>.
     </p>
-    <div class="oppia-remove-button-container">
-      <button type="button" class="btn btn-danger" title="Remove my account"
-              ng-click="$ctrl.removeAccount()">
-        Remove my account
+    <div class="oppia-delete-button-container">
+      <button type="button" class="btn btn-danger" title="Delete my account"
+              ng-click="$ctrl.deleteAccount()">
+        Delete my account
       </button>
     </div>
   </div>
@@ -56,7 +56,7 @@
     text-align: left;
   }
 
-  .oppia-remove-button-container {
+  .oppia-delete-button-container {
     margin: 30px 0;
     display: flex;
     justify-content: center;

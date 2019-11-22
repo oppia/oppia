@@ -18,7 +18,7 @@
 
 // The module needs to be loaded before everything else since it defines the
 // main module the elements are attached to.
-require('pages/remove-account-page/remove-account-page.module.ts');
+require('./delete-account-page.module.ts');
 require('App.ts');
 
-require('pages/remove-account-page/remove-account-page.controller.ts');
+require('./delete-account-page.controller.ts');

@@ -755,35 +755,43 @@ class SignupTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class RemoveAccountPageTests(test_utils.GenericTestBase):
+class DeleteAccountPageTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(RemoveAccountPageTests, self).setUp()
+        super(DeleteAccountPageTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
 
-    def test_get_remove_account_page(self):
-        with self.swap(constants, 'DISABLE_ACCOUNT_REMOVAL', False):
-            response = self.get_html_response('/remove-account')
+    def test_get_delete_account_page(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+            response = self.get_html_response('/delete-account')
             self.assertIn(
-                '<remove-account-page></remove-account-page>', response.body)
+                '<delete-account-page></delete-account-page>', response.body)
 
-    def test_get_remove_account_page_disabled(self):
-        with self.swap(constants, 'DISABLE_ACCOUNT_REMOVAL', True):
-            self.get_html_response('/remove-account', expected_status_int=404)
+    def test_get_delete_account_page_disabled(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
+            self.get_html_response('/delete-account', expected_status_int=404)
 
 
-class RemoveAccountHandlerTests(test_utils.GenericTestBase):
+class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(RemoveAccountHandlerTests, self).setUp()
+        super(DeleteAccountHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
 
     def test_post_remove_account(self):
-        csrf_token = self.get_new_csrf_token()
-        self.assertEqual(self.post_json(
-            '/removeaccounthandler', {}, csrf_token=csrf_token), {})
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+            csrf_token = self.get_new_csrf_token()
+            self.assertEqual(self.post_json(
+                '/deleteaccounthandler', {}, csrf_token=csrf_token), {})
+
+    def test_post_remove_account_disabled(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
+            csrf_token = self.get_new_csrf_token()
+            self.post_json(
+                '/deleteaccounthandler', {},
+                csrf_token=csrf_token, expected_status_int=404)
 
 
 
