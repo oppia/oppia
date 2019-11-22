@@ -15,41 +15,38 @@
 /**
  * @fileoverview Unit tests for UrlInterpolationService.
  */
+import { TestBed } from '@angular/core/testing';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { AlertsService } from 'services/alerts.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 
-require('domain/utilities/url-interpolation.service.ts');
+const Constants = require('constants.ts');
 
-describe('URL Interpolation Service', function() {
-  var hashes = require('hashes.json');
-  var uis = null;
-  var UrlService = null;
-  var mockLocation = null;
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.constant('DEV_MODE', false);
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    uis = $injector.get('UrlInterpolationService');
-
+describe('URL Interpolation Service', () => {
+  let hashes = require('hashes.json');
+  let uis: UrlInterpolationService = null;
+  let urlService: UrlService = null;
+  let mockLocation = null;
+  let alertsService = null;
+  let alertsObject = {
+    alertsService
+  };
+  beforeEach(() => {
     mockLocation = {
       origin: 'http://sample.com'
     };
 
-    UrlService = $injector.get('UrlService');
-    spyOn(UrlService, 'getCurrentLocation').and.returnValue(mockLocation);
-  }));
+    uis = TestBed.get(UrlInterpolationService);
+    urlService = TestBed.get(UrlService);
+    alertsService = TestBed.get(AlertsService);
+    Constants.DEV_MODE = false;
+    spyOn(urlService, 'getCurrentLocation').and.returnValue(mockLocation);
+    alertsObject.alertsService = alertsService;
+  });
 
-  it('should add hash to url if hash is set', function() {
+  it('should add hash to url if hash is set', () => {
     expect(uis._getUrlWithSlug('/hash_test.html')).toBe(
       '/hash_test.' + hashes['/hash_test.html'] + '.html'
     );
@@ -61,14 +58,14 @@ describe('URL Interpolation Service', function() {
     );
   });
 
-  it('should build complete URL with prefixes and hash', function() {
+  it('should build complete URL with prefixes and hash', () => {
     expect(uis._getCompleteUrl('/test_folder', '/hash_test.html')).toBe(
       '/build/test_folder/hash_test.' + hashes['/hash_test.html'] + '.html'
     );
     expect(
       uis._getCompleteUrl('/test_folder', '/path_test/hash_test.html')).toBe(
       '/build/test_folder/path_test/hash_test.' +
-      hashes['/path_test/hash_test.html'] + '.html'
+        hashes['/path_test/hash_test.html'] + '.html'
     );
     expect(uis._getCompleteUrl('/test_folder', '/hash_test.min.js')).toBe(
       '/build/test_folder/hash_test.min.' + hashes['/hash_test.min.js'] + '.js'
@@ -78,46 +75,46 @@ describe('URL Interpolation Service', function() {
     );
   });
 
-  it('should throw an error for erroneous URLs', function() {
-    expect(uis.interpolateUrl).toThrow(
-      new Error('Invalid or empty URL template passed in: \'undefined\''));
-    expect(uis.interpolateUrl.bind(null, null, {})).toThrow(
+  it('should throw an error for erroneous URLs', () => {
+    expect(uis.interpolateUrl.bind(uis, null, null)).toThrow(
       new Error('Invalid or empty URL template passed in: \'null\''));
-    expect(uis.interpolateUrl.bind(null, undefined, {})).toThrow(
+    expect(uis.interpolateUrl.bind(uis, null, {})).toThrow(
+      new Error('Invalid or empty URL template passed in: \'null\''));
+    expect(uis.interpolateUrl.bind(uis, undefined, {})).toThrow(
       new Error('Invalid or empty URL template passed in: \'undefined\''));
-    expect(uis.interpolateUrl.bind(null, '', {})).toThrow(
+    expect(uis.interpolateUrl.bind(uis, '', {})).toThrow(
       new Error('Invalid or empty URL template passed in: \'\''));
-    expect(uis.interpolateUrl.bind(null, '')).toThrow(
+    expect(uis.interpolateUrl.bind(uis, '', null)).toThrow(
       new Error('Invalid or empty URL template passed in: \'\''));
   });
 
-  it('should throw an error for erroneous interpolation values', function() {
-    expect(uis.interpolateUrl.bind(null, 'url', null)).toThrow(
+  it('should throw an error for erroneous interpolation values', () => {
+    expect(uis.interpolateUrl.bind(alertsObject, 'url', null)).toThrow(
       new Error('Expected an object of interpolation values to be passed ' +
-        'into interpolateUrl.'));
-    expect(uis.interpolateUrl.bind(null, 'url', undefined)).toThrow(
+            'into interpolateUrl.'));
+    expect(uis.interpolateUrl.bind(alertsObject, 'url', undefined)).toThrow(
       new Error('Expected an object of interpolation values to be passed ' +
-        'into interpolateUrl.'));
+            'into interpolateUrl.'));
     expect(
-      uis.interpolateUrl.bind(null, '/test_url/<param>', 'value')
+      uis.interpolateUrl.bind(alertsObject, '/test_url/<param>', 'value')
     ).toThrow(new Error(
       'Expected an object of interpolation values to be passed into ' +
-      'interpolateUrl.'));
+        'interpolateUrl.'));
     expect(
-      uis.interpolateUrl.bind(null, '/test_url/<param>', ['value'])
+      uis.interpolateUrl.bind(alertsObject, '/test_url/<param>', ['value'])
     ).toThrow(new Error(
       'Expected an object of interpolation values to be passed into ' +
-      'interpolateUrl.'));
+        'interpolateUrl.'));
   });
 
-  it('should interpolate URLs not requiring parameters', function() {
+  it('should interpolate URLs not requiring parameters', () => {
     expect(uis.interpolateUrl('/test_url/', {})).toBe('/test_url/');
     expect(uis.interpolateUrl('/test_url/', {
       param: 'value'
     })).toBe('/test_url/');
   });
 
-  it('should interpolate URLs when parameters have parentheses', function() {
+  it('should interpolate URLs when parameters have parentheses', () => {
     expect(uis.interpolateUrl('/test_url/<param>', {
       param: 'value (1'
     })).toBe('/test_url/value%20(1');
@@ -129,7 +126,7 @@ describe('URL Interpolation Service', function() {
     })).toBe('/test_url/value%20(1)');
   });
 
-  it('should interpolate URLs requiring one or more parameters', function() {
+  it('should interpolate URLs requiring one or more parameters', () => {
     expect(uis.interpolateUrl('/test_url/<fparam>', {
       fparam: 'value'
     })).toBe('/test_url/value');
@@ -142,7 +139,7 @@ describe('URL Interpolation Service', function() {
   });
 
   it('should interpolate parameters within words or adjacent to other ' +
-     'parameters', function() {
+      'parameters', () => {
     // It also doesn't need to have '/' prefixing the URL.
     expect(uis.interpolateUrl('word<with_param>', {
       with_param: '_with_value'
@@ -154,7 +151,7 @@ describe('URL Interpolation Service', function() {
   });
 
   it('should interpolate parameters beginning, ending, or composing ' +
-     'the URL', function() {
+      'the URL', () => {
     expect(uis.interpolateUrl('<prefix>_with_words', {
       prefix: 'Signs'
     })).toBe('Signs_with_words');
@@ -166,7 +163,7 @@ describe('URL Interpolation Service', function() {
     })).toBe('value');
   });
 
-  it('should sanitize parameters but not URLs', function() {
+  it('should sanitize parameters but not URLs', () => {
     expect(uis.interpolateUrl('URL with a space', {})).toBe(
       'URL with a space');
     expect(uis.interpolateUrl(
@@ -177,18 +174,18 @@ describe('URL Interpolation Service', function() {
       })).toBe('/test_url/SEARCH?title%20or%20website=oppia');
   });
 
-  it('should escape the "=" symbol correctly', function() {
+  it('should escape the "=" symbol correctly', () => {
     expect(uis.interpolateUrl(
       '/test_url/<first_param>', {
         first_param: 'first=param',
       })).toBe('/test_url/first%3Dparam');
   });
 
-  it('should not interpolate bad parameter names and values', function() {
+  it('should not interpolate bad parameter names and values', () => {
     // Empty angle brackets indicate a malformed URL.
-    expect(uis.interpolateUrl.bind(null, '/test_url/<>', {})).toThrow(
+    expect(uis.interpolateUrl.bind(uis, '/test_url/<>', {})).toThrow(
       new Error('Invalid URL template received: \'/test_url/<>\''));
-    expect(uis.interpolateUrl.bind(null, '/test_url/<>', {
+    expect(uis.interpolateUrl.bind(uis, '/test_url/<>', {
       '': 'value'
     })).toThrow(new Error('Invalid URL template received: \'/test_url/<>\''));
 
@@ -203,7 +200,7 @@ describe('URL Interpolation Service', function() {
       'parameter with spaces': 'value'
     })).toBe('/test_url/<parameter with spaces>');
 
-    expect(uis.interpolateUrl.bind(null, '/test_url/<<name>>', {
+    expect(uis.interpolateUrl.bind(uis, '/test_url/<<name>>', {
       name: 'value'
     })).toThrow(new Error(
       'Invalid URL template received: \'/test_url/<<name>>\''));
@@ -230,42 +227,42 @@ describe('URL Interpolation Service', function() {
     })).toEqual('/test_url/value%0Amultiple%20lines');
   });
 
-  it('should throw an error for missing parameters', function() {
-    expect(uis.interpolateUrl.bind(null, '/test_url/<page>', {})).toThrow(
+  it('should throw an error for missing parameters', () => {
+    expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {})).toThrow(
       new Error('Expected variable \'page\' when interpolating URL.'));
-    expect(uis.interpolateUrl.bind(null, '/test_url/<page1>', {
+    expect(uis.interpolateUrl.bind(uis, '/test_url/<page1>', {
       page2: 'v'
     })).toThrow(new Error(
       'Expected variable \'page1\' when interpolating URL.'));
   });
 
-  it('should throw an error for non-string parameters', function() {
-    expect(uis.interpolateUrl.bind(null, '/test_url/<page>', {
+  it('should throw an error for non-string parameters', () => {
+    expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: 0
     })).toThrow(new Error(
       'Parameters passed into interpolateUrl must be strings.'));
-    expect(uis.interpolateUrl.bind(null, '/test_url/<page>', {
+    expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: {}
     })).toThrow(new Error(
       'Parameters passed into interpolateUrl must be strings.'));
-    expect(uis.interpolateUrl.bind(null, '/test_url/<page>', {
+    expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: []
     })).toThrow(new Error(
       'Parameters passed into interpolateUrl must be strings.'));
-    expect(uis.interpolateUrl.bind(null, '/test_url/<page>', {
+    expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: /abc/
     })).toThrow(new Error(
       'Parameters passed into interpolateUrl must be strings.'));
   });
 
-  it('should interpolate correct path', function() {
+  it('should interpolate correct path', () => {
     expect(uis.getStaticImageUrl('/test.png')).toBe(
       '/build/assets/images/test.png');
     expect(uis.getStaticImageUrl('/test_url/test.png')).toBe(
       '/build/assets/images/test_url/test.png');
     expect(uis.getStaticImageUrl('/hash_test.png')).toBe(
       '/build/assets/images/hash_test.' + hashes['/images/hash_test.png'] +
-      '.png');
+        '.png');
 
     expect(uis.getStaticVideoUrl('/test.mp4')).toBe(
       '/build/assets/videos/test.mp4');
@@ -273,13 +270,13 @@ describe('URL Interpolation Service', function() {
       '/build/assets/videos/test_url/test.mp4');
     expect(uis.getStaticVideoUrl('/hash_test.mp4')).toBe(
       '/build/assets/videos/hash_test.' + hashes['/videos/hash_test.mp4'] +
-      '.mp4');
+        '.mp4');
 
     expect(uis.getInteractionThumbnailImageUrl('LogicProof')).toBe(
       '/build/extensions/interactions/LogicProof/static/LogicProof.png');
     expect(uis.getInteractionThumbnailImageUrl('interTest')).toBe(
       '/build/extensions/interactions/interTest/static/interTest.' +
-      hashes['/interactions/interTest/static/interTest.png'] + '.png');
+        hashes['/interactions/interTest/static/interTest.png'] + '.png');
 
     expect(uis.getDirectiveTemplateUrl('/test.html')).toBe(
       '/build/templates/head/test.html');
@@ -287,7 +284,7 @@ describe('URL Interpolation Service', function() {
       '/build/templates/head/test_url/test.html');
     expect(uis.getDirectiveTemplateUrl('/pages_test/hash_test.html')).toBe(
       '/build/templates/head/pages_test/hash_test.' +
-      hashes['/pages_test/hash_test.html'] + '.html');
+        hashes['/pages_test/hash_test.html'] + '.html');
 
     expect(uis.getStaticAssetUrl('/test.json')).toBe(
       '/build/assets/test.json');
@@ -295,7 +292,7 @@ describe('URL Interpolation Service', function() {
       '/build/assets/test_url/test.json');
     expect(uis.getStaticAssetUrl('/assets_test/hash_test.json')).toBe(
       '/build/assets/assets_test/hash_test.' +
-      hashes['/assets_test/hash_test.json'] + '.json');
+        hashes['/assets_test/hash_test.json'] + '.json');
 
     expect(uis.getFullStaticAssetUrl(
       '/assets/msapplication-large.png')).toBe(
@@ -313,83 +310,83 @@ describe('URL Interpolation Service', function() {
       '/build/extensions/test_url/test.html');
     expect(uis.getExtensionResourceUrl('/path_test/hash_test.html')).toBe(
       '/build/extensions/path_test/hash_test.' +
-      hashes['/path_test/hash_test.html'] + '.html');
+        hashes['/path_test/hash_test.html'] + '.html');
   });
 
-  it('should throw an error for empty path', function() {
-    expect(uis.getStaticImageUrl.bind(null, null)).toThrow(
+  it('should throw an error for empty path', () => {
+    expect(uis.getStaticImageUrl.bind(uis, null)).toThrow(
       new Error(
         'Empty path passed in method.'));
-    expect(uis.getStaticImageUrl.bind(null, '')).toThrow(
-      new Error(
-        'Empty path passed in method.'));
-
-    expect(uis.getStaticVideoUrl.bind(null, null)).toThrow(
-      new Error(
-        'Empty path passed in method.'));
-    expect(uis.getStaticVideoUrl.bind(null, '')).toThrow(
+    expect(uis.getStaticImageUrl.bind(uis, '')).toThrow(
       new Error(
         'Empty path passed in method.'));
 
-    expect(uis.getInteractionThumbnailImageUrl.bind(null, null)).toThrow(
+    expect(uis.getStaticVideoUrl.bind(uis, null)).toThrow(
+      new Error(
+        'Empty path passed in method.'));
+    expect(uis.getStaticVideoUrl.bind(uis, '')).toThrow(
+      new Error(
+        'Empty path passed in method.'));
+
+    expect(uis.getInteractionThumbnailImageUrl.bind(uis, null)).toThrow(
       new Error(
         'Empty interactionId passed in getInteractionThumbnailImageUrl.'));
-    expect(uis.getInteractionThumbnailImageUrl.bind(null, '')).toThrow(
+    expect(uis.getInteractionThumbnailImageUrl.bind(uis, '')).toThrow(
       new Error(
         'Empty interactionId passed in getInteractionThumbnailImageUrl.'));
 
-    expect(uis.getDirectiveTemplateUrl.bind(null, null)).toThrow(
+    expect(uis.getDirectiveTemplateUrl.bind(uis, null)).toThrow(
       new Error('Empty path passed in method.'));
-    expect(uis.getDirectiveTemplateUrl.bind(null, '')).toThrow(
-      new Error('Empty path passed in method.'));
-
-    expect(uis.getStaticAssetUrl.bind(null, null)).toThrow(
-      new Error('Empty path passed in method.'));
-    expect(uis.getStaticAssetUrl.bind(null, '')).toThrow(
+    expect(uis.getDirectiveTemplateUrl.bind(uis, '')).toThrow(
       new Error('Empty path passed in method.'));
 
-    expect(uis.getExtensionResourceUrl.bind(null, null)).toThrow(
+    expect(uis.getStaticAssetUrl.bind(uis, null)).toThrow(
       new Error('Empty path passed in method.'));
-    expect(uis.getExtensionResourceUrl.bind(null, '')).toThrow(
+    expect(uis.getStaticAssetUrl.bind(uis, '')).toThrow(
+      new Error('Empty path passed in method.'));
+
+    expect(uis.getExtensionResourceUrl.bind(uis, null)).toThrow(
+      new Error('Empty path passed in method.'));
+    expect(uis.getExtensionResourceUrl.bind(uis, '')).toThrow(
       new Error('Empty path passed in method.'));
   });
 
   it('should throw an error for path not beginning with forward slash',
-    function() {
-      expect(uis.getStaticImageUrl.bind(null, 'test_fail.png')).toThrow(
+    () => {
+      expect(uis.getStaticImageUrl.bind(uis, 'test_fail.png')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
-      expect(uis.getStaticImageUrl.bind(null, 'test_url/fail.png')).toThrow(
+      expect(uis.getStaticImageUrl.bind(uis, 'test_url/fail.png')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
 
-      expect(uis.getStaticVideoUrl.bind(null, 'test_fail.png')).toThrow(
+      expect(uis.getStaticVideoUrl.bind(uis, 'test_fail.png')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
-      expect(uis.getStaticVideoUrl.bind(null, 'test_url/fail.png')).toThrow(
+      expect(uis.getStaticVideoUrl.bind(uis, 'test_url/fail.png')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
 
-      expect(uis.getDirectiveTemplateUrl.bind(null, 'test_fail.html')).toThrow(
+      expect(uis.getDirectiveTemplateUrl.bind(uis, 'test_fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
       expect(
-        uis.getDirectiveTemplateUrl.bind(null, 'test_url/fail.html')).toThrow(
+        uis.getDirectiveTemplateUrl.bind(uis, 'test_url/fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
 
-      expect(uis.getStaticAssetUrl.bind(null, 'test_fail.html')).toThrow(
+      expect(uis.getStaticAssetUrl.bind(uis, 'test_fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
-      expect(uis.getStaticAssetUrl.bind(null, 'test_url/fail.html')).toThrow(
+      expect(uis.getStaticAssetUrl.bind(uis, 'test_url/fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
 
-      expect(uis.getExtensionResourceUrl.bind(null, 'test_fail.html')).toThrow(
+      expect(uis.getExtensionResourceUrl.bind(uis, 'test_fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
       expect(
-        uis.getExtensionResourceUrl.bind(null, 'test_url/fail.html')).toThrow(
+        uis.getExtensionResourceUrl.bind(uis, 'test_url/fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
     });
