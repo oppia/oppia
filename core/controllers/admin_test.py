@@ -872,7 +872,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, user_id, 'Name', 'Description', [], [], [], [], 1)
+            topic_id, user_id, 'Name', '', '',
+            'Description', [], [], [], [], 1)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 

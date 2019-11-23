@@ -260,7 +260,8 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         story_id = story_services.get_new_story_id()
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, 'user', 'Topic', 'A new topic', [], [], [], [], 0)
+            topic_id, 'user', 'Topic', '', '', 'A new topic',
+            [], [], [], [], 0)
         self.save_new_story(
             story_id, 'user', 'Title', 'Description', 'Notes', topic_id
         )

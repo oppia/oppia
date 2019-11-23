@@ -83,7 +83,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             self.story_id_2, 'Private Story Title', self.topic_id)
         story_services.save_new_story(self.admin_id, self.story_2)
         self.save_new_topic(
-            self.topic_id, 'user', 'Topic', 'A new topic',
+            self.topic_id, 'user', 'Topic', '', '', 'A new topic',
             [self.story_id_1, self.story_id_3], [], [], [], 0)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(

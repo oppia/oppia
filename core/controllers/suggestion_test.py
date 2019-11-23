@@ -732,8 +732,8 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         self.save_new_skill(self.skill_id, self.admin_id, 'Description')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description',
-            [], [], [self.skill_id], [], 1)
+            self.topic_id, self.admin_id, 'Name', '', '',
+            'Description', [], [], [self.skill_id], [], 1)
 
         self.question_dict = {
             'question_state_data': self._create_valid_question_data(
@@ -837,8 +837,8 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
                 self.author_id))['suggestions'][0]
 
         self.save_new_topic(
-            'topic_id', self.admin_id, 'Name1', 'Description',
-            [], [], [], [], 1)
+            'topic_id', self.admin_id, 'Name1', '', '',
+            'Description', [], [], [], [], 1)
 
         csrf_token = self.get_new_csrf_token()
 

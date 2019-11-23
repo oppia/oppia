@@ -45,8 +45,8 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
             self.skill_id_2, self.admin_id, 'Skill Description 2')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
-            [self.skill_id, self.skill_id_2], [], 1)
+            self.topic_id, self.admin_id, 'Name', '', '',
+            'Description', [], [], [self.skill_id, self.skill_id_2], [], 1)
         self.skill_id_3 = skill_services.get_new_skill_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,

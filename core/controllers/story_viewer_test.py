@@ -106,8 +106,8 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
         self.save_new_topic(
-            self.TOPIC_ID, 'user', 'Topic', 'A new topic', [story.id],
-            [], [], [], 0)
+            self.TOPIC_ID, 'user', 'Topic', '', '',
+            'A new topic', [story.id], [], [], [], 0)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID_1, self.admin_id)
@@ -146,8 +146,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
     def test_can_not_access_story_viewer_page_with_unpublished_topic(self):
         new_story_id = 'new_story_id'
         self.save_new_topic(
-            'topic_id_1', 'user', 'Topic 2', 'A new topic', [new_story_id],
-            [], [], [], 0)
+            'topic_id_1', 'user', 'Topic 2', '', '',
+            'A new topic', [new_story_id], [], [], [], 0)
         story = story_domain.Story.create_default_story(
             new_story_id, 'Title', 'topic_id_1')
         story_services.save_new_story(self.admin_id, story)
