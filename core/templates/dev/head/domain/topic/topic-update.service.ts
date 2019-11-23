@@ -28,7 +28,8 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicUpdateService', [
-  'ChangeObjectFactory', 'CMD_ADD_SUBTOPIC', 'CMD_DELETE_ADDITIONAL_STORY',
+  'ChangeObjectFactory', 'UndoRedoService',
+  'CMD_ADD_SUBTOPIC', 'CMD_DELETE_ADDITIONAL_STORY',
   'CMD_DELETE_CANONICAL_STORY', 'CMD_DELETE_SUBTOPIC',
   'CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC',
   'CMD_REMOVE_UNCATEGORIZED_SKILL_ID', 'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY',
@@ -37,8 +38,9 @@ angular.module('oppia').factory('TopicUpdateService', [
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'SUBTOPIC_PROPERTY_TITLE',
   'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
   'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_NAME',
-  'TOPIC_PROPERTY_THUMBNAIL_DATA_URL', 'UndoRedoService', function(
-      ChangeObjectFactory, CMD_ADD_SUBTOPIC, CMD_DELETE_ADDITIONAL_STORY,
+  'TOPIC_PROPERTY_THUMBNAIL_DATA_URL', function(
+      ChangeObjectFactory, UndoRedoService,
+      CMD_ADD_SUBTOPIC, CMD_DELETE_ADDITIONAL_STORY,
       CMD_DELETE_CANONICAL_STORY, CMD_DELETE_SUBTOPIC,
       CMD_MOVE_SKILL_ID_TO_SUBTOPIC, CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
       CMD_REMOVE_UNCATEGORIZED_SKILL_ID, CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
@@ -47,7 +49,7 @@ angular.module('oppia').factory('TopicUpdateService', [
       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML, SUBTOPIC_PROPERTY_TITLE,
       TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
       TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_NAME,
-      TOPIC_PROPERTY_THUMBNAIL_DATA_URL, UndoRedoService) {
+      TOPIC_PROPERTY_THUMBNAIL_DATA_URL) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // topic.
