@@ -1666,13 +1666,33 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""# coding: utf-8
                     # pylint: disable
-                    # end of comment.
+                    # str. variable
                 """)
         node_comment_with_excluded_phrase.file = filename
         node_comment_with_excluded_phrase.path = filename
 
         self.checker_test_object.checker.process_module(
             node_comment_with_excluded_phrase)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_variable_name_in_comment(self):
+        node_variable_name_in_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# variable_name is used.
+                """)
+        node_variable_name_in_comment.file = filename
+        node_variable_name_in_comment.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_variable_name_in_comment)
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()

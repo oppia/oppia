@@ -1194,7 +1194,8 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         file_length = len(file_content)
         allowed_terminating_punctuations = ['.', '?', '}', ']', ')']
         excluded_phrases = [
-            'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+            'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node',
+            'int', 'str', 'float', 'bool']
 
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].strip()
@@ -1227,7 +1228,11 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                 # Check if comment contains any excluded phrase.
                 word_is_present_in_excluded_phrases = any(
                     word in line for word in excluded_phrases)
-                if word_is_present_in_excluded_phrases:
+
+                # Check if variable name is used.
+                underscore_is_present = any('_' in word for word in line)
+
+                if word_is_present_in_excluded_phrases or underscore_is_present:
                     continue
 
             if line.startswith(b'#') and not next_line.startswith(b'#'):
