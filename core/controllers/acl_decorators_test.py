@@ -2987,48 +2987,35 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class ViewVoiceoverApplicationsDecoratorTests(test_utils.GenericTestBase):
+class UserVoiceoverApplicationsDecoratorTests(test_utils.GenericTestBase):
     applicant_username = 'applicant'
     applicant_email = 'applicant@example.com'
-    reviewer_username = 'reviewer'
-    reviewer_email = 'reviewer@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        @acl_decorators.can_view_voiceover_applications
-        def get(self, purpose):
-            self.render_json({'purpose': purpose})
+        @acl_decorators.can_view_submitted_voiceover_applications
+        def get(self):
+            self.render_json({'can_view': True})
 
     def setUp(self):
-        super(ViewVoiceoverApplicationsDecoratorTests, self).setUp()
+        super(UserVoiceoverApplicationsDecoratorTests, self).setUp()
         self.signup(self.applicant_email, self.applicant_username)
-        self.signup(self.reviewer_email, self.reviewer_username)
 
-        self.set_admins([self.reviewer_username])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<purpose>', self.MockHandler)],
+            [webapp2.Route('/mock', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
 
-    def test_unautheticated_user_cannot_access_applications_for_review(self):
+    def test_unautheticated_user_cannot_view_submitted_applications(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/review', expected_status_int=401)
+            self.get_json('/mock', expected_status_int=401)
 
-    def test_unautheticated_user_cannot_access_applications_for_status(self):
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/status', expected_status_int=401)
-
-    def test_non_admin_user_cannot_access_applications_for_review(self):
+    def test_autheticated_user_can_view_submitted_voiceover_applications(self):
         self.login(self.applicant_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/review', expected_status_int=401)
-
-    def test_admin_user_cannot_access_applications_for_review(self):
-        self.login(self.reviewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/review')
-        self.assertEqual(response['purpose'], 'review')
+            response = self.get_json('/mock')
+        self.assertTrue(response['can_view'])
 
 
 class ReviewVoiceoverApplicationDecoratorTests(test_utils.GenericTestBase):

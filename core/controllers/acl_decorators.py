@@ -2619,48 +2619,35 @@ def can_play_entity(handler):
     return test_can_play_entity
 
 
-def can_view_voiceover_applications(handler):
-    """Decorator to check whether the user can access voiceover applications for
-    a given purpose.
+def can_view_submitted_voiceover_applications(handler):
+    """Decorator to check whether the user can view submitted voiceover
+    applications.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks if a
-            user has permission to access voiceover application for a given
-            purpose.
+            user has permission to view submitted voiceover applications.
     """
 
-    def test_can_view_voiceover_applications(self, purpose, **kwargs):
-        """Checks if the user can view voiceover applications for a given
-        purpose.
+    def test_can_view_submitted_voiceover_applications(self, **kwargs):
+        """Checks if the user can view submitted voiceover applications.
 
         Returns:
             *. The return value of the decorated function.
 
         Raises:
             NotLoggedInException: The user is not logged in.
-            UnauthorizedUserException: The user does not have credentials to
-                access voiceover applications for the given purpose.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if purpose == feconf.VOICEOVER_APPLICATION_REVIEW:
-            user_actions_info = user_services.UserActionsInfo(self.user_id)
-            if (
-                    role_services.ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION not in
-                    user_actions_info.actions):
-                raise self.UnauthorizedUserException(
-                    'You do not have credentials to view voiceover '
-                    'applications for review.')
+        return handler(self, **kwargs)
 
-        return handler(self, purpose, **kwargs)
+    test_can_view_submitted_voiceover_applications.__wrapped__ = True
 
-    test_can_view_voiceover_applications.__wrapped__ = True
-
-    return test_can_view_voiceover_applications
+    return test_can_view_submitted_voiceover_applications
 
 
 def can_review_voiceover_application(handler):
@@ -2675,7 +2662,7 @@ def can_review_voiceover_application(handler):
     """
 
     def test_can_review_voiceover_application(
-            self, voiceover_application_id, **kwargs):
+            self, **kwargs):
         """Checks if the user can review voiceover application.
 
         Returns:
@@ -2697,7 +2684,7 @@ def can_review_voiceover_application(handler):
                 'You do not have credentials to review voiceover '
                 'applications.')
 
-        return handler(self, voiceover_application_id, **kwargs)
+        return handler(self, **kwargs)
 
     test_can_review_voiceover_application.__wrapped__ = True
 
