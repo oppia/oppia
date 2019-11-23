@@ -36,6 +36,7 @@ require('interactions/codemirrorRequires.ts');
 require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
+require('pages/community-dashboard-page/services/add-question.service.ts');
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
@@ -53,12 +54,12 @@ angular.module('oppia').directive('questionOpportunities', [
       'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
+        '$scope', '$uibModal', 'AddQuestionService', 'AlertsService',
         'ContributionOpportunitiesService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionUndoRedoService', 'UserService',
         function(
-            $scope, $uibModal, AlertsService,
+            $scope, $uibModal, AddQuestionService, AlertsService,
             ContributionOpportunitiesService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionUndoRedoService, UserService) {
@@ -172,6 +173,7 @@ angular.module('oppia').directive('questionOpportunities', [
                         'correspond to a correct answer';
                       return;
                     }
+                    AddQuestionService.addQuestion();
                     $uibModalInstance.close();
                   };
                   // Checking if Question contains all requirement to enable
