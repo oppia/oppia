@@ -508,11 +508,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.package_json_swap, start_npm_audit_swap:
-                        with self.assertRaises(SystemExit):
-                            pre_push_hook.main(args=[])
-        self.assertTrue(
-            'Push failed, please correct the npm audit issues above.'
-            in self.print_arr)
+                        pre_push_hook.main(args=[])
 
     def test_frontend_test_failure(self):
         self.does_diff_include_js_or_ts_files = True
