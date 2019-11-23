@@ -51,6 +51,10 @@ class TopicModel(base_models.VersionedModel):
     name = ndb.StringProperty(required=True, indexed=True)
     # The canonical name of the topic, created by making `name` lowercase.
     canonical_name = ndb.StringProperty(required=True, indexed=True)
+    # The abbreviated name of the topic.
+    abbreviated_name = ndb.StringProperty(indexed=False)
+    # Topic thumbnail as a dataURI string.
+    thumbnail_data_url = ndb.TextProperty(default=None, indexed=False)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that

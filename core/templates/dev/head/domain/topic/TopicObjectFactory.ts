@@ -27,11 +27,13 @@ angular.module('oppia').factory('TopicObjectFactory', [
       SkillSummaryObjectFactory, StoryReferenceObjectFactory,
       SubtopicObjectFactory) {
     var Topic = function(
-        id, name, description, languageCode, canonicalStoryReferences,
-        additionalStoryReferences, uncategorizedSkillIds,
-        nextSubtopicId, version, subtopics, skillIdToDescriptionMap) {
+        id, name, abbreviatedName, description, languageCode,
+        canonicalStoryReferences, additionalStoryReferences,
+        uncategorizedSkillIds, nextSubtopicId, version, subtopics,
+        skillIdToDescriptionMap, thumbnailDataUrl) {
       this._id = id;
       this._name = name;
+      this._abbreviatedName = abbreviatedName;
       this._description = description;
       this._languageCode = languageCode;
       this._canonicalStoryReferences = canonicalStoryReferences;
@@ -44,6 +46,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
       this._nextSubtopicId = nextSubtopicId;
       this._version = version;
       this._subtopics = angular.copy(subtopics);
+      this._thumbnailDataUrl = thumbnailDataUrl;
     };
 
     // Instance methods
@@ -58,6 +61,22 @@ angular.module('oppia').factory('TopicObjectFactory', [
 
     Topic.prototype.setName = function(name) {
       this._name = name;
+    };
+
+    Topic.prototype.getAbbreviatedName = function() {
+      return this._abbreviatedName;
+    };
+
+    Topic.prototype.setAbbreviatedName = function(abbreviatedName) {
+      this._abbreviatedName = abbreviatedName;
+    };
+
+    Topic.prototype.setThumbnail = function(thumbnailDataUrl) {
+      this._thumbnailDataUrl = thumbnailDataUrl;
+    };
+
+    Topic.prototype.getThumbnail = function() {
+      return this._thumbnailDataUrl;
     };
 
     Topic.prototype.getDescription = function() {
@@ -88,6 +107,10 @@ angular.module('oppia').factory('TopicObjectFactory', [
       var issues = [];
       if (this._name === '') {
         issues.push('Topic name should not be empty.');
+      }
+
+      if (this._thumbnailDataUrl === '') {
+        issues.push('Topic should have a thumbnail.');
       }
 
       var subtopics = this._subtopics;
@@ -341,6 +364,8 @@ angular.module('oppia').factory('TopicObjectFactory', [
     Topic.prototype.copyFromTopic = function(otherTopic) {
       this._id = otherTopic.getId();
       this.setName(otherTopic.getName());
+      this.setAbbreviatedName(otherTopic.getAbbreviatedName());
+      this.setThumbnail(otherTopic.getThumbnail());
       this.setDescription(otherTopic.getDescription());
       this.setLanguageCode(otherTopic.getLanguageCode());
       this._version = otherTopic.getVersion();
@@ -385,11 +410,11 @@ angular.module('oppia').factory('TopicObjectFactory', [
         });
       return new Topic(
         topicBackendDict.id, topicBackendDict.name,
-        topicBackendDict.description, topicBackendDict.language_code,
-        canonicalStoryReferences, additionalStoryReferences,
-        topicBackendDict.uncategorized_skill_ids,
+        topicBackendDict.abbreviated_name, topicBackendDict.description,
+        topicBackendDict.language_code, canonicalStoryReferences,
+        additionalStoryReferences, topicBackendDict.uncategorized_skill_ids,
         topicBackendDict.next_subtopic_id, topicBackendDict.version,
-        subtopics, skillIdToDescriptionDict
+        subtopics, skillIdToDescriptionDict, topicBackendDict.thumbnail_data_url
       );
     };
 
@@ -400,9 +425,8 @@ angular.module('oppia').factory('TopicObjectFactory', [
     Topic['createInterstitialTopic'] = function() {
     /* eslint-enable dot-notation */
       return new Topic(
-        null, 'Topic name loading', 'Topic description loading',
-        'en', [], [], [], 1, 1, [], {}
-      );
+        null, 'Topic name loading', 'Topic abbreviated name loading',
+        'Topic description loading', 'en', [], [], [], 1, 1, [], {}, '');
     };
     return Topic;
   }

@@ -33,12 +33,12 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
+        '$scope', '$uibModal', '$timeout', 'TopicEditorStateService', 'TopicUpdateService',
         'UndoRedoService', 'UrlInterpolationService', 'StoryCreationService',
         'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED',
         function(
-            $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
+            $scope, $uibModal, $timeout, TopicEditorStateService, TopicUpdateService,
             UndoRedoService, UrlInterpolationService, StoryCreationService,
             EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
@@ -47,7 +47,9 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
+            $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
+            $scope.editableThumbnailDataUrl = $scope.topic.getThumbnail() || UrlInterpolationService.getStaticImageUrl('/icons/story-image-icon.png');
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.topicDescriptionChanged = false;
@@ -57,6 +59,65 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.canonicalStorySummaries =
               TopicEditorStateService.getCanonicalStorySummaries();
           };
+
+          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+
+          $scope.showEditThumbnailModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic-editor-page/modal-templates/' +
+                'edit-topic-thumbnail-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', function(
+                    $scope, $uibModalInstance) {
+                  $scope.uploadedImage = null;
+                  $scope.croppedImageDataUrl = '';
+                  $scope.invalidImageWarningIsShown = false;
+
+                  $scope.onFileChanged = function(file) {
+                    $('.oppia-thumbnail-uploader').fadeOut(function() {
+                      $scope.invalidImageWarningIsShown = false;
+
+                      var reader = new FileReader();
+                      reader.onload = function(e) {
+                        $scope.$apply(function() {
+                          $scope.uploadedImage = (<FileReader>e.target).result;
+                        });
+                      };
+                      reader.readAsDataURL(file);
+
+                      $timeout(function() {
+                        $('.oppia-thumbnail-uploader').fadeIn();
+                      }, 100);
+                    });
+                  };
+
+                  $scope.reset = function() {
+                    $scope.uploadedImage = null;
+                    $scope.croppedImageDataUrl = '';
+                  };
+
+                  $scope.onInvalidImageLoaded = function() {
+                    $scope.uploadedImage = null;
+                    $scope.croppedImageDataUrl = '';
+                    $scope.invalidImageWarningIsShown = true;
+                  };
+
+                  $scope.confirm = function() {
+                    $uibModalInstance.close($scope.croppedImageDataUrl);
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            }).result.then(function(newThumbnailDataUrl) {
+              $scope.editableThumbnailDataUrl = newThumbnailDataUrl;
+              $scope.updateTopicThumbnail(newThumbnailDataUrl);
+            });
+          }
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
@@ -91,6 +152,20 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.setTopicName($scope.topic, newName);
             $scope.topicNameEditorIsShown = false;
+          };
+
+          $scope.updateAbbreviatedName = function(newAbbreviatedName) {
+            if (newAbbreviatedName === $scope.topic.getAbbreviatedName()) {
+              return;
+            }
+            TopicUpdateService.setAbbreviatedTopicName($scope.topic, newAbbreviatedName);
+          };
+
+          $scope.updateTopicThumbnail = function(newThumbnailDataUrl) {
+            if (newThumbnailDataUrl === $scope.topic.getThumbnail()) {
+              return;
+            }
+            TopicUpdateService.setThumbnailDataUrl($scope.topic, newThumbnailDataUrl);
           };
 
           $scope.updateTopicDescription = function(newDescription) {

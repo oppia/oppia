@@ -42,11 +42,15 @@ angular.module('oppia').factory('TopicCreationService', [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {
               $scope.topicName = '';
+              $scope.abbreviatedTopicName = '';
               $scope.isTopicNameEmpty = function(topicName) {
                 return (topicName === '');
               };
-              $scope.save = function(topicName) {
-                $uibModalInstance.close(topicName);
+              $scope.save = function(topicName, abbreviatedTopicName) {
+                $uibModalInstance.close({
+                  topicName: topicName,
+                  abbreviatedTopicName: abbreviatedTopicName
+                });
               };
               $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
@@ -55,26 +59,28 @@ angular.module('oppia').factory('TopicCreationService', [
           ]
         });
 
-        modalInstance.result.then(function(topicName) {
-          if (topicName === '') {
+        modalInstance.result.then(function(topic) {
+          if (topic.topicName === '') {
             throw Error('Topic name cannot be empty');
           }
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
 
           $rootScope.loadingMessage = 'Creating topic';
-          $http.post('/topic_editor_handler/create_new', {name: topicName})
-            .then(function(response) {
-              $timeout(function() {
-                $window.location = UrlInterpolationService.interpolateUrl(
-                  TOPIC_EDITOR_URL_TEMPLATE, {
-                    topic_id: response.data.topicId
-                  }
-                );
-              }, 150);
-            }, function() {
-              $rootScope.loadingMessage = '';
-            });
+          $http.post('/topic_editor_handler/create_new', {
+            name: topic.topicName,
+            abbreviated_name: topic.abbreviatedTopicName
+          }).then(function(response) {
+            $timeout(function() {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                TOPIC_EDITOR_URL_TEMPLATE, {
+                  topic_id: response.data.topicId
+                }
+              );
+            }, 150);
+          }, function() {
+            $rootScope.loadingMessage = '';
+          });
         });
       }
     };
