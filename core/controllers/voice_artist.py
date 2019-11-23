@@ -147,25 +147,36 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
         self.render_json({})
 
 
+class ReviewableVoiceoverApplicationsHandler(base.BaseHandler):
+    """Handler for the voiceover applications that needs review."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_review_voiceover_application
+    def get(self):
+        """Handles GET requests."""
+        voiceover_applications = (
+            voiceover_services.get_reviewable_voiceover_applications(
+                self.user_id))
+        self.values = {
+            'voiceover_applications': [
+                v_a.to_dict() for v_a in voiceover_applications]
+        }
+        self.render_json(self.values)
+
+
 class UserVoiceoverApplicationsHandler(base.BaseHandler):
     """Handler for the voiceover applications submitted by the user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_view_voiceover_applications
-    def get(self, purpose):
+    @acl_decorators.can_view_submitted_voiceover_applications
+    def get(self):
         """Handles GET requests."""
-        if purpose == feconf.VOICEOVER_APPLICATION_REVIEW:
-            voiceover_applications = (
-                voiceover_services.get_reviewable_voiceover_applications(
-                    self.user_id))
-        elif purpose == feconf.VOICEOVER_APPLICATION_STATUS:
-            status = self.request.get('status')
-            voiceover_applications = (
-                voiceover_services.get_user_submitted_voiceover_applications(
-                    self.user_id, status=status))
-        else:
-            raise self.PageNotFoundException
+        status = self.request.get('status', default_value=None)
+        voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.user_id, status=status))
 
         self.values = {
             'voiceover_applications': [

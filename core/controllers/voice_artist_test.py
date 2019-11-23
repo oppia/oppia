@@ -500,26 +500,20 @@ class VoiceoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
             {'action': 'invalid'}, csrf_token=csrf_token,
             expected_status_int=400)
 
-    def test_get_voiceover_application_for_review_purpose(self):
+    def test_get_voiceover_application_for_review(self):
         self.login(self.reviewer_email)
-        response = self.get_json('/getsubmittedvoiceoverapplication/review')
+        response = self.get_json('/reviewablevoiceoverapplications')
         self.assertEqual(len(response['voiceover_applications']), 1)
         response_voiceover_application = response['voiceover_applications'][0]
         self.assertEqual(
             response_voiceover_application['voiceover_application_id'],
             self.voiceover_application.voiceover_application_id)
 
-    def test_get_voiceover_application_for_status_purpose(self):
+    def test_get_voiceover_application_for_status(self):
         self.login(self.applicant_email)
-        response = self.get_json('/getsubmittedvoiceoverapplication/status')
+        response = self.get_json('/uservoiceoverapplications')
         self.assertEqual(len(response['voiceover_applications']), 1)
         response_voiceover_application = response['voiceover_applications'][0]
         self.assertEqual(
             response_voiceover_application['voiceover_application_id'],
             self.voiceover_application.voiceover_application_id)
-
-    def test_get_voiceover_application_for_unknown_purpose(self):
-        self.login(self.reviewer_email)
-        self.get_json(
-            '/getsubmittedvoiceoverapplication/invalid',
-            expected_status_int=404)
