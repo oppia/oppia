@@ -104,14 +104,18 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       });
     };
 
-    var _deleteQuestionFromSkill = function(
-        questionId, skillId, successCallback, errorCallback) {
-      var deleteQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
+    var _editQuestionSkillLinks = function(
+        questionId, skillIdsTaskArray, difficulty,
+        successCallback, errorCallback) {
+      var editQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
-          question_id: questionId,
-          skill_id: skillId
+          question_id: questionId
         });
-      $http['delete'](deleteQuestionSkillLinkUrl).then(function(response) {
+      $http.put(editQuestionSkillLinkUrl, {
+        action: 'edit_links',
+        difficulty: difficulty,
+        skill_ids_task_list: skillIdsTaskArray
+      }).then(function(response) {
         if (successCallback) {
           successCallback();
         }
@@ -126,11 +130,12 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
         questionId, skillId, newDifficulty, successCallback, errorCallback) {
       var changeDifficultyUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
-          question_id: questionId,
-          skill_id: skillId
+          question_id: questionId
         });
       var putData = {
-        new_difficulty: newDifficulty
+        new_difficulty: newDifficulty,
+        action: 'update_difficulty',
+        skill_id: skillId
       };
       $http.put(changeDifficultyUrl, putData).then(function(response) {
         if (successCallback) {
@@ -157,9 +162,11 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
         });
       },
 
-      deleteQuestionFromSkill: function(questionId, skillId) {
+      editQuestionSkillLinks: function(
+          questionId, skillIdsTaskArray, difficulty) {
         return $q(function(resolve, reject) {
-          _deleteQuestionFromSkill(questionId, skillId, resolve, reject);
+          _editQuestionSkillLinks(
+            questionId, skillIdsTaskArray, difficulty, resolve, reject);
         });
       },
 
