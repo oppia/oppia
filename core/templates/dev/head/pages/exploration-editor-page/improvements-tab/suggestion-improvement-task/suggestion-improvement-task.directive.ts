@@ -37,10 +37,12 @@ angular.module('oppia').directive('suggestionImprovementTask', [
             var threadSummary = thread.threadSummary;
             return {
               text: threadSummary.lastMessageText || thread.subject,
-              author: threadSummary.authorLastMessage,
-              updatedOn: threadSummary.lastUpdated,
-              updatedStatus: threadSummary.totalMessageCount === 1 ?
-                null : threadSummary.status,
+              author: (
+                threadSummary.authorLastMessage || thread.originalAuthorName),
+              updatedOn: thread.lastUpdated,
+              updatedStatus: (
+                threadSummary.totalMessageCount === 1 ?
+                  null : threadSummary.status),
             };
           };
 
