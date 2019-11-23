@@ -16,7 +16,6 @@
  * @fileoverview Directive for the footer.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('oppiaFooter', [
   function() {
@@ -30,4 +29,5 @@ angular.module('oppia').directive('oppiaFooter', [
         function() {}
       ]
     };
-  }]);
+  }
+]);

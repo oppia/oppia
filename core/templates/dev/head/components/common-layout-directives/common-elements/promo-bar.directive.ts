@@ -18,7 +18,6 @@
  * dismissible.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/promo-bar.service.ts');
 
 angular.module('oppia').directive('promoBar', [
