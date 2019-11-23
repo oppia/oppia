@@ -42,8 +42,7 @@
     <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
       <label for="topicDescription" class="form-heading">Description</label>
       <textarea type="text" class="form-control protractor-test-topic-description-field"
-                ng-model="editableDescription"
-                maxlength="120"
+                ng-model="editableDescription" maxlength="120"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
                 placeholder="Enter the description of the topic">
