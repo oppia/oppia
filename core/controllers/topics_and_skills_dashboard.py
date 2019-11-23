@@ -135,7 +135,8 @@ class NewTopicHandler(base.BaseHandler):
         abbreviated_name = self.payload.get('abbreviated_name')
         topic_domain.Topic.require_valid_name(name)
         new_topic_id = topic_services.get_new_topic_id()
-        topic = topic_domain.Topic.create_default_topic(new_topic_id, name, abbreviated_name)
+        topic = topic_domain.Topic.create_default_topic(
+            new_topic_id, name, abbreviated_name=create_default_topic)
         topic_services.save_new_topic(self.user_id, topic)
 
         self.render_json({

@@ -33,15 +33,15 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$timeout', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService', 'UrlInterpolationService', 'StoryCreationService',
-        'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_TOPIC_REINITIALIZED',
+        '$scope', '$uibModal', '$timeout', 'TopicEditorStateService',
+        'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
+        'StoryCreationService', 'EVENT_STORY_SUMMARIES_INITIALIZED',
+        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         function(
-            $scope, $uibModal, $timeout, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService, UrlInterpolationService, StoryCreationService,
-            EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
-            EVENT_TOPIC_REINITIALIZED) {
+            $scope, $uibModal, $timeout, TopicEditorStateService,
+            TopicUpdateService, UndoRedoService, UrlInterpolationService,
+            StoryCreationService, EVENT_STORY_SUMMARIES_INITIALIZED,
+            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
@@ -49,7 +49,10 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableName = $scope.topic.getName();
             $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
-            $scope.editableThumbnailDataUrl = $scope.topic.getThumbnail() || UrlInterpolationService.getStaticImageUrl('/icons/story-image-icon.png');
+            var placeholderImageUrl = '/icons/story-image-icon.png';
+            $scope.editableThumbnailDataUrl = (
+              $scope.topic.getThumbnail() ||
+              UrlInterpolationService.getStaticImageUrl(placeholderImageUrl));
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.topicDescriptionChanged = false;
@@ -117,7 +120,7 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.editableThumbnailDataUrl = newThumbnailDataUrl;
               $scope.updateTopicThumbnail(newThumbnailDataUrl);
             });
-          }
+          };
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
@@ -158,14 +161,16 @@ angular.module('oppia').directive('topicEditorTab', [
             if (newAbbreviatedName === $scope.topic.getAbbreviatedName()) {
               return;
             }
-            TopicUpdateService.setAbbreviatedTopicName($scope.topic, newAbbreviatedName);
+            TopicUpdateService.setAbbreviatedTopicName(
+              $scope.topic, newAbbreviatedName);
           };
 
           $scope.updateTopicThumbnail = function(newThumbnailDataUrl) {
             if (newThumbnailDataUrl === $scope.topic.getThumbnail()) {
               return;
             }
-            TopicUpdateService.setThumbnailDataUrl($scope.topic, newThumbnailDataUrl);
+            TopicUpdateService.setThumbnailDataUrl(
+              $scope.topic, newThumbnailDataUrl);
           };
 
           $scope.updateTopicDescription = function(newDescription) {

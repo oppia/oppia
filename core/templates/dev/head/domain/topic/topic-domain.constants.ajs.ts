@@ -68,10 +68,12 @@ angular.module('oppia').constant(
   'TOPIC_PROPERTY_NAME', TopicDomainConstants.TOPIC_PROPERTY_NAME);
 
 angular.module('oppia').constant(
-  'TOPIC_PROPERTY_ABBREVIATED_NAME', TopicDomainConstants.TOPIC_PROPERTY_ABBREVIATED_NAME);
+  'TOPIC_PROPERTY_ABBREVIATED_NAME',
+  TopicDomainConstants.TOPIC_PROPERTY_ABBREVIATED_NAME);
 
 angular.module('oppia').constant(
-  'TOPIC_PROPERTY_THUMBNAIL_DATA_URL', TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_DATA_URL);
+  'TOPIC_PROPERTY_THUMBNAIL_DATA_URL',
+  TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_DATA_URL);
 
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_DESCRIPTION',

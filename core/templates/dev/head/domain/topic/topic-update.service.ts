@@ -28,28 +28,26 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicUpdateService', [
-  'ChangeObjectFactory', 'UndoRedoService',
-  'CMD_ADD_SUBTOPIC',
-  'CMD_DELETE_ADDITIONAL_STORY', 'CMD_DELETE_CANONICAL_STORY',
-  'CMD_DELETE_SUBTOPIC', 'CMD_MOVE_SKILL_ID_TO_SUBTOPIC',
-  'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC', 'CMD_REMOVE_UNCATEGORIZED_SKILL_ID',
-  'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY', 'CMD_UPDATE_SUBTOPIC_PROPERTY',
-  'CMD_UPDATE_TOPIC_PROPERTY', 'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO',
+  'ChangeObjectFactory', 'CMD_ADD_SUBTOPIC', 'CMD_DELETE_ADDITIONAL_STORY',
+  'CMD_DELETE_CANONICAL_STORY', 'CMD_DELETE_SUBTOPIC',
+  'CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC',
+  'CMD_REMOVE_UNCATEGORIZED_SKILL_ID', 'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY',
+  'CMD_UPDATE_SUBTOPIC_PROPERTY', 'CMD_UPDATE_TOPIC_PROPERTY',
+  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO',
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'SUBTOPIC_PROPERTY_TITLE',
-  'TOPIC_PROPERTY_DESCRIPTION', 'TOPIC_PROPERTY_LANGUAGE_CODE',
-  'TOPIC_PROPERTY_NAME', 'TOPIC_PROPERTY_ABBREVIATED_NAME',
-  'TOPIC_PROPERTY_THUMBNAIL_DATA_URL', function(
-      ChangeObjectFactory, UndoRedoService,
-      CMD_ADD_SUBTOPIC,
-      CMD_DELETE_ADDITIONAL_STORY, CMD_DELETE_CANONICAL_STORY,
-      CMD_DELETE_SUBTOPIC, CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-      CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC, CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
-      CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY, CMD_UPDATE_SUBTOPIC_PROPERTY,
-      CMD_UPDATE_TOPIC_PROPERTY, SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
+  'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
+  'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_NAME',
+  'TOPIC_PROPERTY_THUMBNAIL_DATA_URL', 'UndoRedoService', function(
+      ChangeObjectFactory, CMD_ADD_SUBTOPIC, CMD_DELETE_ADDITIONAL_STORY,
+      CMD_DELETE_CANONICAL_STORY, CMD_DELETE_SUBTOPIC,
+      CMD_MOVE_SKILL_ID_TO_SUBTOPIC, CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+      CMD_REMOVE_UNCATEGORIZED_SKILL_ID, CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+      CMD_UPDATE_SUBTOPIC_PROPERTY, CMD_UPDATE_TOPIC_PROPERTY,
+      SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML, SUBTOPIC_PROPERTY_TITLE,
-      TOPIC_PROPERTY_DESCRIPTION, TOPIC_PROPERTY_LANGUAGE_CODE,
-      TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_ABBREVIATED_NAME,
-      TOPIC_PROPERTY_THUMBNAIL_DATA_URL) {
+      TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
+      TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_NAME,
+      TOPIC_PROPERTY_THUMBNAIL_DATA_URL, UndoRedoService) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // topic.
@@ -133,7 +131,8 @@ angular.module('oppia').factory('TopicUpdateService', [
       setAbbreviatedTopicName: function(topic, abbreviatedName) {
         var oldAbbreviatedName = angular.copy(topic.getAbbreviatedName());
         _applyTopicPropertyChange(
-          topic, TOPIC_PROPERTY_ABBREVIATED_NAME, abbreviatedName, oldAbbreviatedName,
+          topic, TOPIC_PROPERTY_ABBREVIATED_NAME,
+          abbreviatedName, oldAbbreviatedName,
           function(changeDict, topic) {
             // Apply
             var name = _getNewPropertyValueFromChangeDict(changeDict);
@@ -151,7 +150,8 @@ angular.module('oppia').factory('TopicUpdateService', [
       setThumbnailDataUrl: function(topic, thumbnailDataUrl) {
         var oldThumbnailDataUrl = angular.copy(topic.getThumbnail());
         _applyTopicPropertyChange(
-          topic, TOPIC_PROPERTY_THUMBNAIL_DATA_URL, thumbnailDataUrl, oldThumbnailDataUrl,
+          topic, TOPIC_PROPERTY_THUMBNAIL_DATA_URL,
+          thumbnailDataUrl, oldThumbnailDataUrl,
           function(changeDict, topic) {
             // Apply
             var thumbnail = _getNewPropertyValueFromChangeDict(changeDict);
