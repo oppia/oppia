@@ -49,7 +49,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1
         })]
         self.save_new_topic(
-            self.TOPIC_ID, self.user_id, 'Name', 'Description',
+            self.TOPIC_ID, self.user_id, 'Name', '', '', 'Description',
             [self.story_id_1, self.story_id_2], [self.story_id_3],
             [self.skill_id_1, self.skill_id_2], [], 1
         )
@@ -146,8 +146,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_topic_by_version(self):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.user_id, 'topic name', 'Description',
-            [], [], [], [], 1)
+            topic_id, self.user_id, 'topic name',
+            '', '', 'Description', [], [], [], [], 1)
 
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,

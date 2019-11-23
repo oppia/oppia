@@ -54,6 +54,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
+            'abbreviated_name': '',
+            'thumbnail_data_url': '',
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_references': [],
             'additional_story_references': [],
