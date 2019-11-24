@@ -147,7 +147,8 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
     def test_extract_pr_numbers(self):
         log1 = release_info.Log('sha1', 'author1', 'email1', 'msg(#1234)')
         log2 = release_info.Log('sha2', 'author2', 'email2', 'msg#6789')
-        log3 = release_info.Log('sha2', 'author2', 'email2', 'msg(#4588)')
+        log3 = release_info.Log(
+            'sha2', 'author2', 'email2', 'msg(#4588)\n\n* Issue fixed(#5699)\n')
         log4 = release_info.Log('sha2', 'author2', 'email2', 'msg1')
         actual_prs = release_info.extract_pr_numbers([log1, log2, log3, log4])
         expected_prs = ['4588', '1234']

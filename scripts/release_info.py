@@ -143,7 +143,7 @@ def extract_pr_numbers(logs):
         set(int): Set of PR numbers extracted from the log.
     """
     pr_numbers = PR_NUMBER_REGEX.findall(
-        ' '.join([log.message for log in logs]))
+        ' '.join([log.message.split('\n')[0] for log in logs]))
     # Delete duplicates.
     pr_numbers = list(set(pr_numbers))
     pr_numbers.sort(reverse=True)
