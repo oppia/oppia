@@ -1194,8 +1194,8 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         file_length = len(file_content)
         allowed_terminating_punctuations = ['.', '?', '}', ']', ')']
         excluded_phrases = [
-            'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node',
-            'int', 'str', 'float', 'bool']
+            'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+        data_types = ['int', 'str', 'float', 'bool']
 
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].strip()
@@ -1250,6 +1250,12 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
                 self.add_message(
                     'no-space-at-beginning', line=line_num + 1)
+
+            # Check if comment contains version info or data type.
+            if not previous_line.startswith(b'#'):
+                data_type_is_present = any(word in line for word in data_types)
+                if data_type_is_present or re.search(br'^# v[0-9]+ .*$', line):
+                    continue
 
             # Check that comment starts with a capital letter.
             if not previous_line.startswith(b'#') and (

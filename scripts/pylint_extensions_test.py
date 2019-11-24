@@ -1666,7 +1666,6 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""# coding: utf-8
                     # pylint: disable
-                    # str. variable
                 """)
         node_comment_with_excluded_phrase.file = filename
         node_comment_with_excluded_phrase.path = filename
@@ -1696,6 +1695,47 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
+
+    def test_comment_with_version_info(self):
+        node_comment_with_version_info = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# v2 is used.
+                """)
+        node_comment_with_version_info.file = filename
+        node_comment_with_version_info.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_comment_with_version_info)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_data_type_in_comment(self):
+        node_data_type_in_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# str. variable is type of str.
+                """)
+        node_data_type_in_comment.file = filename
+        node_data_type_in_comment.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_data_type_in_comment)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
 
     def test_well_formed_comment(self):
         node_with_no_error_message = astroid.scoped_nodes.Module(
