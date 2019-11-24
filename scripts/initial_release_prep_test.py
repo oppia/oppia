@@ -144,6 +144,43 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
                 'release before starting with the release process.'):
                 initial_release_prep.main()
 
+    def test_get_extra_jobs_due_to_schema_changes(self):
+        def mock_run_cmd(unused_cmd_tokens):
+            return (
+                '"diff --git a/feconf.py b/feconf.py\n'
+                '--- a/feconf.py\n+++ b/feconf.py\n'
+                '@@ -36,6 +36,10 @@ POST_COMMIT_STATUS_PRIVATE = \'private\'\n'
+                ' # Whether to unconditionally log info messages.\n'
+                ' DEBUG = False\n \n'
+                '+# The path for generating release_summary.md '
+                'file for the current release.\n'
+                '-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2\n'
+                '+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1\n')
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+
+        with run_cmd_swap:
+            self.assertEqual(
+                initial_release_prep.get_extra_jobs_due_to_schema_changes(
+                    'upstream', '1.2.3'), ['SkillMigrationOneOffJob'])
+
+    def test_check_changes_in_supported_audio_languages(self):
+        all_cmd_tokens = []
+        def mock_run_cmd(cmd_tokens):
+            all_cmd_tokens.append(cmd_tokens)
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+
+        with run_cmd_swap:
+            self.assertFalse(
+                initial_release_prep.check_changes_in_supported_audio_languages(
+                    'upstream', '1.2.3'))
+        self.assertEqual(
+            all_cmd_tokens, [
+                [
+                    'git', 'checkout', 'upstream/release-1.2.3',
+                    '--', 'assets/constants.ts'],
+                ['git', 'reset', 'assets/constants.ts'],
+                ['git', 'checkout', '--', 'assets/constants.ts']])
+
     def test_function_calls(self):
         check_function_calls = {
             'get_all_records_is_called': False,
@@ -156,7 +193,9 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'open_file_is_called': False,
             'authorize_is_called': False,
             'isfile_is_called': False,
-            'remove_is_called': False
+            'remove_is_called': False,
+            'get_extra_jobs_due_to_schema_changes_is_called': False,
+            'check_changes_in_supported_audio_languages_is_called': False
         }
         expected_check_function_calls = {
             'get_all_records_is_called': True,
@@ -169,7 +208,9 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'open_file_is_called': True,
             'authorize_is_called': True,
             'isfile_is_called': True,
-            'remove_is_called': True
+            'remove_is_called': True,
+            'get_extra_jobs_due_to_schema_changes_is_called': True,
+            'check_changes_in_supported_audio_languages_is_called': True
         }
         class MockWorksheet(python_utils.OBJECT):
             def get_all_records(self):
@@ -193,8 +234,13 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
                 'open_new_tab_in_browser_if_possible_is_called'] = True
         def mock_ask_user_to_confirm(unused_msg):
             check_function_calls['ask_user_to_confirm_is_called'] = True
+        print_arr = []
         def mock_input():
+            if print_arr[-1] == 'Enter version of previous release.':
+                return '1.2.3'
             return 'y'
+        def mock_print(msg):
+            print_arr.append(msg)
         def mock_get_job_details_for_current_release(
                 unused_job_details, unused_job_name_header,
                 unused_month_header, unused_author_email_header,
@@ -223,12 +269,23 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             return True
         def mock_remove(unused_filepath):
             check_function_calls['remove_is_called'] = True
+        def mock_get_extra_jobs_due_to_schema_changes(
+                unused_remote_alias, unused_previous_release_version):
+            check_function_calls[
+                'get_extra_jobs_due_to_schema_changes_is_called'] = True
+            return []
+        def mock_check_changes_in_supported_audio_languages(
+                unused_remote_alias, unused_previous_release_version):
+            check_function_calls[
+                'check_changes_in_supported_audio_languages_is_called'] = True
+            return True
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        print_swap = self.swap(python_utils, 'PRINT', mock_print)
         job_details_swap = self.swap(
             initial_release_prep, 'get_job_details_for_current_release',
             mock_get_job_details_for_current_release)
@@ -239,9 +296,16 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
         authorize_swap = self.swap(pygsheets, 'authorize', mock_authorize)
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         remove_swap = self.swap(os, 'remove', mock_remove)
+        get_extra_jobs_swap = self.swap(
+            initial_release_prep, 'get_extra_jobs_due_to_schema_changes',
+            mock_get_extra_jobs_due_to_schema_changes)
+        check_changes_swap = self.swap(
+            initial_release_prep, 'check_changes_in_supported_audio_languages',
+            mock_check_changes_in_supported_audio_languages)
 
-        with open_tab_swap, ask_user_swap, input_swap, job_details_swap:
-            with mail_msg_swap, open_file_swap, authorize_swap, isfile_swap:
-                with remove_swap:
-                    initial_release_prep.main()
+        with open_tab_swap, ask_user_swap, input_swap, print_swap:
+            with job_details_swap, mail_msg_swap, open_file_swap:
+                with authorize_swap, isfile_swap, remove_swap:
+                    with get_extra_jobs_swap, check_changes_swap:
+                        initial_release_prep.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)

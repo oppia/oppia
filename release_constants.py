@@ -59,3 +59,9 @@ ISSUE_FILING_URL = 'https://github.com/oppia/oppia/milestone/39'
 CREDITS_FORM_URL = (
     'https://docs.google.com/forms/d/'
     '1yH6ZO2UiD_VspgKJR40byRSjUP1AaBF9ARSe814p8K0/edit#responses')
+RELEASE_NOTES_TEMPLATE_URL = (
+    'https://docs.google.com/document/d/'
+    '1VBa3pdRLnvobNlfmZB6-uRYJHBz_Gc-6eN_ilSoVlhE/edit#')
+RELEASE_NOTES_EXAMPLE_URL = (
+    'https://docs.google.com/document/d/'
+    '1OUwgMPNORABJAz7DS0iuDUr5A2FxcXg4Y5-qUEdgo-M/edit#heading=h.l3dbee3s55ti')

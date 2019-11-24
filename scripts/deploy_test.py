@@ -104,6 +104,8 @@ class DeployTests(test_utils.GenericTestBase):
         self.print_arr = []
         def mock_print(msg):
             self.print_arr.append(msg)
+        def mock_create_release_doc():
+            pass
 
         self.install_swap = self.swap(
             install_third_party_libs, 'main', mock_main)
@@ -137,6 +139,8 @@ class DeployTests(test_utils.GenericTestBase):
         self.get_remote_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.create_swap = self.swap(
+            deploy, 'create_release_doc', mock_create_release_doc)
 
     def test_invalid_app_name(self):
         args_swap = self.swap(
@@ -188,7 +192,7 @@ class DeployTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, args_swap, out_swap:
+                with self.run_swap, self.create_swap, args_swap, out_swap:
                     with self.assertRaisesRegexp(
                         Exception, 'Invalid last commit message: Invalid.'):
                         deploy.execute_deployment()
@@ -237,14 +241,15 @@ class DeployTests(test_utils.GenericTestBase):
 
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, config_swap, get_token_swap, get_org_swap:
-                    with get_repo_swap, bug_check_swap, pr_check_swap, out_swap:
-                        with args_swap, feconf_swap, check_tests_swap:
-                            with self.assertRaisesRegexp(
-                                Exception,
-                                'The mailgun API key must be added before '
-                                'deployment.'):
-                                deploy.execute_deployment()
+                with self.run_swap, self.create_swap, config_swap:
+                    with get_token_swap, get_org_swap, get_repo_swap:
+                        with bug_check_swap, pr_check_swap, out_swap:
+                            with args_swap, feconf_swap, check_tests_swap:
+                                with self.assertRaisesRegexp(
+                                    Exception,
+                                    'The mailgun API key must be added before '
+                                    'deployment.'):
+                                    deploy.execute_deployment()
 
     def test_missing_third_party_dir(self):
         third_party_swap = self.swap(deploy, 'THIRD_PARTY_DIR', 'INVALID_DIR')
@@ -761,3 +766,26 @@ class DeployTests(test_utils.GenericTestBase):
             self.urls_to_open, [
                 'https://travis-ci.org/username/oppia/branches',
                 'https://circleci.com/gh/username/workflows/oppia'])
+
+    def test_create_release_doc(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'ask_user_to_confirm_is_called': False
+        }
+        expected_check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'ask_user_to_confirm_is_called': True
+        }
+        def mock_open_tab(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_is_called'] = True
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with open_tab_swap, ask_user_swap:
+            deploy.create_release_doc()
+        self.assertEqual(check_function_calls, expected_check_function_calls)

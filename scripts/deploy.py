@@ -396,6 +396,22 @@ def check_travis_and_circleci_tests(current_branch_name):
             'Please fix the circleci tests before deploying.')
 
 
+def create_release_doc():
+    """Asks the co-ordinator to create a doc for the current release."""
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.RELEASE_DRIVE_URL)
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.RELEASE_NOTES_TEMPLATE_URL)
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.RELEASE_NOTES_EXAMPLE_URL)
+    common.ask_user_to_confirm(
+        'Please create a dedicated section for this release in the '
+        'release tracking document created by the QA Lead.\n'
+        'The three tabs in your browser point to: '
+        'Release drive url, template for the release notes, example of release '
+        'notes from previous release.')
+
+
 def execute_deployment():
     """Executes the deployment process after doing the prerequisite checks.
 
@@ -454,6 +470,7 @@ def execute_deployment():
     gcloud_adapter.require_gcloud_to_be_available()
     try:
         if app_name == APP_NAME_OPPIASERVER:
+            create_release_doc()
             release_version = current_branch_name[len(
                 common.RELEASE_BRANCH_NAME_PREFIX):]
             last_commit_message = subprocess.check_output(

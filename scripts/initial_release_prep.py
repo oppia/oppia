@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import os
+import re
 import sys
 
 import python_utils
@@ -124,6 +125,76 @@ def get_mail_message_template(job_details):
     return mail_message_template
 
 
+def get_extra_jobs_due_to_schema_changes(
+        remote_alias, previous_release_version):
+    """Finds additional jobs which should be run based on
+    schema changes in feconf.
+
+    Args:
+        remote_alias: str. The alias for Oppia repo.
+        previous_release_version: str. The version of the previous release.
+
+    Returns:
+        list(str). The list of jobs to run based on schema changes.
+    """
+    schema_versions_to_jobs_mapping = {
+        'CURRENT_COLLECTION_SCHEMA_VERSION': 'CollectionMigrationOneOffJob',
+        'CURRENT_STATE_SCHEMA_VERSION': 'ExplorationMigrationJobManager',
+        'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION': 'SkillMigrationOneOffJob',
+        'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION': 'SkillMigrationOneOffJob',
+        'CURRENT_RUBRIC_SCHEMA_VERSION': 'SkillMigrationOneOffJob',
+        'CURRENT_STORY_CONTENTS_SCHEMA_VERSION': 'StoryMigrationOneOffJob',
+        'CURRENT_SUBTOPIC_SCHEMA_VERSION': 'TopicMigrationOneOffJob',
+        'CURRENT_STORY_REFERENCE_SCHEMA_VERSION': 'TopicMigrationOneOffJob'}
+
+    diff_output = common.run_cmd([
+        'git', 'diff', '%s/develop' % remote_alias,
+        '%s/release-%s' % (remote_alias, previous_release_version),
+        'feconf.py'])
+    feconf_diff = diff_output[:-1].split('\n')
+
+    jobs_to_run = []
+    for version_key in schema_versions_to_jobs_mapping:
+        for line in feconf_diff:
+            if line.startswith(('+%s' % version_key, '-%s' % version_key)):
+                jobs_to_run.append(schema_versions_to_jobs_mapping[version_key])
+
+    return list(set(jobs_to_run))
+
+
+def check_changes_in_supported_audio_languages(
+        remote_alias, previous_release_version):
+    """Checks changes in constants.SUPPORTED_AUDIO_LANGUAGES between
+    the current and previous release.
+
+    Args:
+        remote_alias: str. The alias for Oppia repo.
+        previous_release_version: str. The version of the previous release.
+
+    Returns:
+        bool. Whether supported audio languages have changed.
+    """
+    try:
+        from constants import constants
+        supported_audio_languages_for_current_release = constants[
+            'SUPPORTED_AUDIO_LANGUAGES']
+
+        common.run_cmd([
+            'git', 'checkout',
+            '%s/release-%s' % (remote_alias, previous_release_version),
+            '--', 'assets/constants.ts'])
+        from constants import constants
+        supported_audio_languages_for_previous_release = constants[
+            'SUPPORTED_AUDIO_LANGUAGES']
+    finally:
+        common.run_cmd(['git', 'reset', 'assets/constants.ts'])
+        common.run_cmd(['git', 'checkout', '--', 'assets/constants.ts'])
+
+    return (
+        sorted(supported_audio_languages_for_current_release) != sorted(
+            supported_audio_languages_for_previous_release))
+
+
 def main():
     """Performs task to initiate the release."""
     common.require_cwd_to_be_oppia()
@@ -144,6 +215,22 @@ def main():
         raise Exception(
             'Please ensure a new doc is created for the '
             'release before starting with the release process.')
+
+    remote_alias = common.get_remote_alias(release_constants.REMOTE_URL)
+    python_utils.PRINT('Enter version of previous release.')
+    previous_release_version = python_utils.INPUT()
+    assert re.match(r'^\d+\.\d+\.\d+$', previous_release_version)
+
+    extra_jobs_to_run = get_extra_jobs_due_to_schema_changes(
+        remote_alias, previous_release_version)
+    if check_changes_in_supported_audio_languages(
+            remote_alias, previous_release_version):
+        extra_jobs_to_run.append(
+            'ExplorationOpportunitySummaryModelRegenerationJob')
+    if extra_jobs_to_run:
+        common.ask_user_to_confirm(
+            'Please add the following jobs to release journal and '
+            'run them after deployment:\n%s' % '\n'.join(extra_jobs_to_run))
     try:
         # The file here is opened and closed just to create an empty
         # file where the release co-ordinator can enter the credentials.
