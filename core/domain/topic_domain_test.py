@@ -413,6 +413,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_language_code('bn')
         self.assertEqual(self.topic.language_code, 'bn')
 
+    def test_update_abbreviated_name(self):
+        self.assertEqual(self.topic.abbreviated_name, '')
+        self.topic.update_abbreviated_name('name')
+        self.assertEqual(self.topic.abbreviated_name, 'name')
+
+    def test_update_thumbnail_data_url(self):
+        self.assertEqual(self.topic.thumbnail_data_url, '')
+        self.topic.update_thumbnail_data_url('data url')
+        self.assertEqual(self.topic.thumbnail_data_url, 'data url')
+
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
             self):
         self.assertEqual(self.topic.uncategorized_skill_ids, [])
