@@ -33,28 +33,28 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
 
     var _getSkillOpportunities = function(cursor, successCallback) {
       ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
-        cursor, function(data) {
-          moreSkillOpportunitiesAvailable = data.more;
-          skillOpportunitiesCursor = data.next_cursor;
-          successCallback(data.opportunities, data.more);
+        cursor, function(opportunities, nextCursor, more) {
+          skillOpportunitiesCursor = nextCursor;
+          moreSkillOpportunitiesAvailable = more;
+          successCallback(opportunities, more);
         });
     };
     var _getTranslationOpportunities = function(
         languageCode, cursor, successCallback) {
       ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-        languageCode, cursor, function(data) {
-          moreTranslationOpportunitiesAvailable = data.more;
-          translationOpportunitiesCursor = data.next_cursor;
-          successCallback(data.opportunities, data.more);
+        languageCode, cursor, function(opportunities, nextCursor, more) {
+          translationOpportunitiesCursor = nextCursor;
+          moreTranslationOpportunitiesAvailable = more;
+          successCallback(opportunities, more);
         });
     };
     var _getVoiceoverOpportunities = function(
         languageCode, cursor, successCallback) {
       ContributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-        languageCode, cursor, function(data) {
-          moreVoiceoverOpportunitiesAvailable = data.more;
-          voiceoverOpportunitiesCursor = data.next_cursor;
-          successCallback(data.opportunities, data.more);
+        languageCode, cursor, function(opportunities, nextCursor, more) {
+          voiceoverOpportunitiesCursor = nextCursor;
+          moreVoiceoverOpportunitiesAvailable = more;
+          successCallback(opportunities, more);
         });
     };
 
