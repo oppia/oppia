@@ -195,7 +195,8 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'isfile_is_called': False,
             'remove_is_called': False,
             'get_extra_jobs_due_to_schema_changes_is_called': False,
-            'check_changes_in_supported_audio_languages_is_called': False
+            'check_changes_in_supported_audio_languages_is_called': False,
+            'get_remote_alias_is_called': False
         }
         expected_check_function_calls = {
             'get_all_records_is_called': True,
@@ -210,7 +211,8 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'isfile_is_called': True,
             'remove_is_called': True,
             'get_extra_jobs_due_to_schema_changes_is_called': True,
-            'check_changes_in_supported_audio_languages_is_called': True
+            'check_changes_in_supported_audio_languages_is_called': True,
+            'get_remote_alias_is_called': True
         }
         class MockWorksheet(python_utils.OBJECT):
             def get_all_records(self):
@@ -279,6 +281,8 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             check_function_calls[
                 'check_changes_in_supported_audio_languages_is_called'] = True
             return True
+        def mock_get_remote_alias(unused_remote_url):
+            check_function_calls['get_remote_alias_is_called'] = True
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
@@ -302,10 +306,12 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
         check_changes_swap = self.swap(
             initial_release_prep, 'check_changes_in_supported_audio_languages',
             mock_check_changes_in_supported_audio_languages)
+        get_alias_swap = self.swap(
+            common, 'get_remote_alias', mock_get_remote_alias)
 
         with open_tab_swap, ask_user_swap, input_swap, print_swap:
             with job_details_swap, mail_msg_swap, open_file_swap:
-                with authorize_swap, isfile_swap, remove_swap:
+                with authorize_swap, isfile_swap, remove_swap, get_alias_swap:
                     with get_extra_jobs_swap, check_changes_swap:
                         initial_release_prep.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)

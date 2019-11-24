@@ -29,8 +29,6 @@ from core.tests import test_utils
 
 import python_utils
 
-import requests
-
 from . import common
 from . import deploy
 from . import gcloud_adapter
@@ -659,13 +657,9 @@ class DeployTests(test_utils.GenericTestBase):
     def test_check_travis_and_circleci_tests_with_local_travis_not_setup(self):
         def mock_check_output(unused_cmd_tokens):
             return 'sha'
-        def mock_get(url):
-            res = requests.models.Response()
+        def mock_url_open(url):
             if 'travis' in url:
-                res.status_code = 404
-            else:
-                res.status_code = 200
-            return res
+                raise Exception('Not found.')
         def mock_input():
             if 'username' in self.print_arr[-1]:
                 return 'username'
@@ -673,9 +667,9 @@ class DeployTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        get_swap = self.swap(requests, 'get', mock_get)
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.get_remote_alias_swap, self.open_tab_swap, get_swap:
+        with self.get_remote_alias_swap, self.open_tab_swap, url_open_swap:
             with self.print_swap, check_output_swap, input_swap:
                 deploy.check_travis_and_circleci_tests('test-branch')
         self.assertEqual(
@@ -687,13 +681,9 @@ class DeployTests(test_utils.GenericTestBase):
             self):
         def mock_check_output(unused_cmd_tokens):
             return 'sha'
-        def mock_get(url):
-            res = requests.models.Response()
+        def mock_url_open(url):
             if 'circleci' in url:
-                res.status_code = 404
-            else:
-                res.status_code = 200
-            return res
+                raise Exception('Not found.')
         def mock_input():
             if 'username' in self.print_arr[-1]:
                 return 'username'
@@ -701,9 +691,9 @@ class DeployTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        get_swap = self.swap(requests, 'get', mock_get)
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.get_remote_alias_swap, self.open_tab_swap, get_swap:
+        with self.get_remote_alias_swap, self.open_tab_swap, url_open_swap:
             with self.print_swap, check_output_swap, input_swap:
                 deploy.check_travis_and_circleci_tests('test-branch')
         self.assertEqual(
@@ -714,10 +704,8 @@ class DeployTests(test_utils.GenericTestBase):
     def test_check_travis_and_circleci_tests_with_travis_tests_failing(self):
         def mock_check_output(unused_cmd_tokens):
             return 'sha'
-        def mock_get(unused_url):
-            res = requests.models.Response()
-            res.status_code = 200
-            return res
+        def mock_url_open(unused_url):
+            pass
         def mock_input():
             if 'username' in self.print_arr[-1]:
                 return 'username'
@@ -727,9 +715,9 @@ class DeployTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        get_swap = self.swap(requests, 'get', mock_get)
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.get_remote_alias_swap, check_output_swap, get_swap:
+        with self.get_remote_alias_swap, check_output_swap, url_open_swap:
             with self.open_tab_swap, self.print_swap, input_swap:
                 with self.assertRaisesRegexp(
                     Exception, 'Please fix the travis tests before deploying.'):
@@ -741,10 +729,8 @@ class DeployTests(test_utils.GenericTestBase):
     def test_check_travis_and_circleci_tests_with_circleci_tests_failing(self):
         def mock_check_output(unused_cmd_tokens):
             return 'sha'
-        def mock_get(unused_url):
-            res = requests.models.Response()
-            res.status_code = 200
-            return res
+        def mock_url_open(unused_url):
+            pass
         def mock_input():
             if 'username' in self.print_arr[-1]:
                 return 'username'
@@ -754,9 +740,9 @@ class DeployTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        get_swap = self.swap(requests, 'get', mock_get)
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.get_remote_alias_swap, check_output_swap, get_swap:
+        with self.get_remote_alias_swap, check_output_swap, url_open_swap:
             with self.open_tab_swap, self.print_swap, input_swap:
                 with self.assertRaisesRegexp(
                     Exception,

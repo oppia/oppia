@@ -32,8 +32,6 @@ import sys
 import python_utils
 import release_constants
 
-import requests
-
 from . import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -176,7 +174,9 @@ def main():
     common.require_cwd_to_be_oppia()
     assert common.is_current_branch_a_release_branch()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
-    if requests.get(TERMS_PAGE_URL).status_code != 200:
+    try:
+        python_utils.url_open(TERMS_PAGE_URL)
+    except Exception:
         raise Exception('Terms mainpage does not exist on Github.')
 
     try:

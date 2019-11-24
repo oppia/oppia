@@ -27,8 +27,6 @@ import tempfile
 from core.tests import test_utils
 import python_utils
 
-import requests
-
 from . import common
 from . import update_configs
 
@@ -76,10 +74,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         def mock_getpass(prompt):
             return 'test-token'
         # pylint: enable=unused-argument
-        def mock_get(unused_url):
-            res = requests.models.Response()
-            res.status_code = 200
-            return res
+        def mock_url_open(unused_url):
+            pass
 
         self.release_scripts_exist_swap = self.swap(
             common, 'ensure_release_scripts_folder_exists_and_is_up_to_date',
@@ -96,7 +92,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         self.feconf_swap = self.swap(
             update_configs, 'LOCAL_FECONF_PATH',
             MOCK_LOCAL_FECONF_PATH)
-        self.get_swap = self.swap(requests, 'get', mock_get)
+        self.url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
 
     def test_invalid_branch_name(self):
         def mock_get_current_branch_name():
@@ -107,11 +103,11 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs.main()
 
     def test_missing_terms_page(self):
-        terms_page_swap = self.swap(
-            update_configs, 'TERMS_PAGE_URL',
-            '%s-invalid' % update_configs.TERMS_PAGE_URL)
+        def mock_url_open(unused_url):
+            raise Exception('Not found.')
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         with self.branch_name_swap, self.release_scripts_exist_swap:
-            with terms_page_swap, self.assertRaisesRegexp(
+            with url_open_swap, self.assertRaisesRegexp(
                 Exception, 'Terms mainpage does not exist on Github.'):
                 update_configs.main()
 
@@ -319,7 +315,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             mock_check_updates)
         run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         with self.branch_name_swap, self.release_scripts_exist_swap:
-            with self.get_swap, check_updates_swap, run_cmd_swap:
+            with self.url_open_swap, check_updates_swap, run_cmd_swap:
                 with self.assertRaisesRegexp(Exception, 'Testing'):
                     update_configs.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -354,7 +350,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
         with self.branch_name_swap, self.release_scripts_exist_swap:
-            with self.get_swap, check_updates_swap, add_mailgun_api_key_swap:
-                with apply_changes_swap:
+            with self.url_open_swap, check_updates_swap:
+                with add_mailgun_api_key_swap, apply_changes_swap:
                     update_configs.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)

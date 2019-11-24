@@ -50,8 +50,6 @@ import sys
 import python_utils
 import release_constants
 
-import requests
-
 from . import common
 from . import gcloud_adapter
 from . import install_third_party_libs
@@ -372,10 +370,14 @@ def check_travis_and_circleci_tests(current_branch_name):
     circleci_url = 'https://circleci.com/gh/%s/workflows/oppia' % (
         github_username)
 
-    if requests.get(travis_url).status_code != 200:
+    try:
+        python_utils.url_open(travis_url)
+    except Exception:
         travis_url = 'https://travis-ci.org/oppia/oppia/branches'
 
-    if requests.get(circleci_url).status_code != 200:
+    try:
+        python_utils.url_open(circleci_url)
+    except Exception:
         circleci_url = 'https://circleci.com/gh/oppia/workflows/oppia'
 
     common.open_new_tab_in_browser_if_possible(travis_url)
