@@ -1115,6 +1115,19 @@ angular.module('oppia').directive('conversationSkin', [
             TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
             TIME_PADDING_MSEC);
 
+            var index = PlayerPositionService.getDisplayedCardIndex();
+            var displayedCard = PlayerTranscriptService.getCard(index);
+            if ($window.sequenceOfInteractions) {
+              $window.sequenceOfInteractions.push({
+                interactionId: displayedCard.getInteractionId(),
+                cardIndex: index
+              });
+            } else {
+              $window.sequenceOfInteractions = [{
+                interactionId: displayedCard.getInteractionId(),
+                cardIndex: index
+              }];
+            }
             $rootScope.$broadcast(EVENT_NEW_CARD_OPENED, $scope.nextCard);
           };
 

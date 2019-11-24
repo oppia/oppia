@@ -219,6 +219,7 @@ angular.module('oppia').factory('RouterService', [
         return _getCurrentStateFromLocationPath();
       },
       navigateToMainTab: function(stateName) {
+        $window.sequenceOfInteractions = [];
         _savePendingChanges();
         if (_getCurrentStateFromLocationPath() === stateName) {
           return;

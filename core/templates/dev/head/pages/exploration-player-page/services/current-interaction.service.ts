@@ -29,8 +29,10 @@ require('pages/exploration-player-page/services/' +
   'player-transcript.service.ts');
 
 angular.module('oppia').factory('CurrentInteractionService', [
-  'ContextService', 'PlayerPositionService', 'PlayerTranscriptService',
-  function(ContextService, PlayerPositionService, PlayerTranscriptService) {
+  '$window', 'ContextService', 'PlayerPositionService',
+  'PlayerTranscriptService',
+  function($window, ContextService, PlayerPositionService,
+    PlayerTranscriptService) {
     var _submitAnswerFn = null;
     var _onSubmitFn = null;
     var _validityCheckFn = null;
@@ -89,9 +91,15 @@ angular.module('oppia').factory('CurrentInteractionService', [
         if (_submitAnswerFn === null) {
           var index = PlayerPositionService.getDisplayedCardIndex();
           var displayedCard = PlayerTranscriptService.getCard(index);
+          var sequenceOfInteractions = (
+            JSON.stringify($window.sequenceOfInteractions));
           var additionalInfo = ('\nUndefined submit answer debug logs:' +
             '\nInteraction ID: ' + displayedCard.getInteractionId() +
-            '\nExploration ID: ' + ContextService.getExplorationId());
+            '\nExploration ID: ' + ContextService.getExplorationId() +
+            '\nState Name: ' + displayedCard.getStateName() +
+            '\nContext: ' + ContextService.getPageContext() +
+            '\nSequence of steps: ' + sequenceOfInteractions +
+            '\nErrored at index: ' + index);
           throw Error('The current interaction did not ' +
                       'register a _submitAnswerFn.' + additionalInfo);
         } else {
