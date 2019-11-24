@@ -15,5 +15,7 @@ jobs:
           architecture: 'x64'
       - name: Install third party
         run: python -m scripts.install_third_party_libs
+      - name: Third party size check
+        run: python -m scripts.third_party_size_check
       - name: run lint
-        run: python -m scripts.pre_commit_linter --verbose --path=core/domain/cron_services.py
+        run: python -m scripts.pre_commit_linter --path=. --verbose
