@@ -490,8 +490,7 @@ def main():
         'correct through welcome emails sent from welcome@oppia.org '
         '(Confirm from Sean in case of doubt).')
     common.open_new_tab_in_browser_if_possible(
-        'https://docs.google.com/forms/d/'
-        '1yH6ZO2UiD_VspgKJR40byRSjUP1AaBF9ARSe814p8K0/edit#responses')
+        release_constants.CREDITS_FORM_URL)
     common.ask_user_to_confirm(
         'Check the credits form and add any non technical contributors '
         'to the contributor list in release summary file.')

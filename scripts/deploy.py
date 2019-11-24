@@ -319,7 +319,6 @@ def check_breakage(app_name, current_release_version):
     test_server_error_logs_url = (
         'https://console.cloud.google.com/logs/viewer?'
         'project=%s&key1=default&minLogLevel=500') % app_name
-    issue_filing_url = 'https://github.com/oppia/oppia/milestone/39'
 
     currently_served_version = (
         gcloud_adapter.get_currently_served_version(app_name))
@@ -330,7 +329,8 @@ def check_breakage(app_name, current_release_version):
         if major_breakage:
             common.open_new_tab_in_browser_if_possible(
                 release_constants.RELEASE_DRIVE_URL)
-            common.open_new_tab_in_browser_if_possible(issue_filing_url)
+            common.open_new_tab_in_browser_if_possible(
+                release_constants.ISSUE_FILING_URL)
             raise Exception(
                 'Please note the issue in the release journal for this month, '
                 'file a blocking bug and switch to the last known good '

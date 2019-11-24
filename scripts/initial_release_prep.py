@@ -145,6 +145,8 @@ def main():
             'Please ensure a new doc is created for the '
             'release before starting with the release process.')
     try:
+        # The file here is opened and closed just to create an empty
+        # file where the release co-ordinator can enter the credentials.
         f = python_utils.open_file(RELEASE_CREDENTIALS_FILEPATH, 'w')
         f.close()
         common.ask_user_to_confirm(

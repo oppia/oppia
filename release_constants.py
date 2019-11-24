@@ -54,3 +54,8 @@ EXISTING_JOB_SPREADSHEETS_URL = (
 NEW_JOBS_SPREADSHEET_URL = (
     'https://docs.google.com/spreadsheets/d/'
     '1Wegd0rZhVOm3Q3VCIw0xMbLC7IWtRyrEahiPn61Fhoo/edit#gid=948463314')
+
+ISSUE_FILING_URL = 'https://github.com/oppia/oppia/milestone/39'
+CREDITS_FORM_URL = (
+    'https://docs.google.com/forms/d/'
+    '1yH6ZO2UiD_VspgKJR40byRSjUP1AaBF9ARSe814p8K0/edit#responses')
