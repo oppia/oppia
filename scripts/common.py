@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import contextlib
 import getpass
 import os
+import platform
 import re
 import socket
 import subprocess
@@ -38,9 +39,13 @@ NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-v1.17.3')
+OS_NAME = platform.uname()[0]
+ARCHITECTURE = platform.uname()[4]
 # Add path for node which is required by the node_modules.
-os.environ['PATH'] = (
-    '%s/bin:' % NODE_PATH + '%s/bin:' % YARN_PATH + os.environ['PATH'])
+
+os.environ['PATH'] = os.pathsep.join([
+    NODE_PATH, os.path.join(NODE_PATH, 'bin'),
+    os.path.join(YARN_PATH, 'bin'), os.environ['PATH']])
 
 
 def run_cmd(cmd_tokens):

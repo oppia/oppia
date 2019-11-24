@@ -134,15 +134,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.rubrics[0].explanation = 0
         self._assert_validation_error('Expected explanation to be a string')
 
-    def test_non_empty_rubric_explanation(self):
-        self.skill.rubrics = [
-            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], '')]
-        self._assert_validation_error('Explanation should be non empty')
-
-        self.skill.rubrics = [
-            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], '<p></p>')]
-        self._assert_validation_error('Explanation should be non empty')
-
     def test_rubric_present_for_all_difficulties(self):
         self.skill.validate()
         self.skill.rubrics = [
