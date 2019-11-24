@@ -14,12 +14,25 @@
       attached to it. Please link a skill to this topic before adding questions.
     </div>
     <div class="list-group">
-      <a class="list-group-item protractor-test-skill-item"
-         ng-repeat="skillSummary in skillSummaries track by $index"
-         ng-click="selectOrDeselectSkill(skillSummary.getId(), $index)"
-         ng-class="{'list-group-item-success': skillSummary.isSelected}">
-        <label class="list-group-item-heading" style="font-size: 1em;"><[skillSummary.getDescription()]></label>
-      </a>
+      <md-card layout="row" class="list-view-item">
+        Search By Skill
+        <input type="text" class="form-control" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
+      </md-card>
+      <div style="max-height: 50vh; overflow-y: auto;">
+        <a class="list-group-item protractor-test-skill-item"
+           ng-repeat="skillSummary in skillSummariesInitial | filter:skillFilterText"
+           ng-click="selectOrDeselectSkill(skillSummary)"
+           ng-class="{'list-group-item-success': (skillSummary.isSelected)}">
+          <label class="list-group-item-heading"><[skillSummary.description]></label>
+        </a>
+        <hr ng-if="skillSummariesInitial.length > 0">
+        <a class="list-group-item protractor-test-skill-item"
+           ng-repeat="skillSummary in skillSummariesFinal | filter:skillFilterText"
+           ng-click="selectOrDeselectSkill(skillSummary)"
+           ng-class="{'list-group-item-success': (skillSummary.isSelected)}">
+          <label class="list-group-item-heading"><[skillSummary.description]></label>
+        </a>
+      </div>
     </div>
   </div>
   <div class="modal-footer" ng-switch="skillSummaries.length > 0">
@@ -54,21 +67,30 @@
         <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty.getDescription()]></label>
         <md-radio-group ng-model="skillWithDifficulty._difficulty">
           <md-radio-button value="0.3">
-            Easy:
+            <strong> Easy </strong>
             <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][0].getExplanation()">
             </angular-html-bind>
+            <div ng-if="skillIdToRubricsObject[skillWithDifficulty.getId()][0].getExplanation() === ''">
+              <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+            </div>
           </md-radio-button>
 
           <md-radio-button value="0.6">
-            Medium:
+            <strong> Medium </strong>
             <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][1].getExplanation()">
             </angular-html-bind>
+            <div ng-if="skillIdToRubricsObject[skillWithDifficulty.getId()][1].getExplanation() === ''">
+              <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+            </div>
           </md-radio-button>
 
           <md-radio-button value="0.9">
-            Hard:
+            <strong> Hard </strong>
             <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][2].getExplanation()">
             </angular-html-bind>
+            <div ng-if="skillIdToRubricsObject[skillWithDifficulty.getId()][2].getExplanation() === ''">
+              <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+            </div>
           </md-radio-button>
         </md-radio-group>
       </div>

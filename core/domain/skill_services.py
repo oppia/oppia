@@ -240,7 +240,8 @@ def get_multi_skill_summaries(skill_ids):
     skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
     skill_summaries = [
         get_skill_summary_from_model(skill_summary_model)
-        for skill_summary_model in skill_summaries_models]
+        for skill_summary_model in skill_summaries_models
+        if skill_summary_model is not None]
     return skill_summaries
 
 

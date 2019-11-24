@@ -231,6 +231,7 @@ describe('Topic editor state service', function() {
         subtopic_schema_version: '1',
         version: '1'
       },
+      groupedSkillSummaries: {},
       skillIdToDescriptionDict: {
         skill_1: 'Description 1'
       },
@@ -278,6 +279,7 @@ describe('Topic editor state service', function() {
         subtopic_schema_version: '1',
         version: '1'
       },
+      groupedSkillSummaries: {},
       skillIdToDescriptionDict: {
         skill_2: 'Description 2',
         skill_3: 'Description 3',

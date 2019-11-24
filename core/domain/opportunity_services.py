@@ -273,6 +273,31 @@ def update_exploration_opportunities_with_story_changes(story, exp_ids):
         exploration_opportunity_summary_list)
 
 
+def update_exploration_voiceover_opportunities(
+        exp_id, assigned_voice_artist_in_language_code):
+    """Updates the assigned_voice_artist_in_language_codes of exploration
+    opportunity model.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+        assigned_voice_artist_in_language_code: str. The language code in which
+            a voice artist is assigned to the exploration.
+    """
+    model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
+    exploration_opportunity_summary = (
+        get_exploration_opportunity_summary_from_model(model))
+
+    exploration_opportunity_summary.need_voice_artist_in_language_codes.remove(
+        assigned_voice_artist_in_language_code)
+    (
+        exploration_opportunity_summary
+        .assigned_voice_artist_in_language_codes.append(
+            assigned_voice_artist_in_language_code))
+    exploration_opportunity_summary.validate()
+    _save_multi_exploration_opportunity_summary(
+        [exploration_opportunity_summary])
+
+
 def delete_exploration_opportunities(exp_ids):
     """Deletes the ExplorationOpportunitySummaryModel models corresponding to
     the given exp_ids.
@@ -348,7 +373,8 @@ def get_translation_opportunities(language_code, cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(ExplorationOpportunitySummary). A list of
+                ExplorationOpportunitySummary domain objects.
             cursor: str or None. A query cursor pointing to the next batch of
                 results. If there are no more results, this might be None.
             more: bool. If True, there are (probably) more results after this
@@ -364,7 +390,7 @@ def get_translation_opportunities(language_code, cursor):
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary.to_dict())
+        opportunities.append(exp_opportunity_summary)
     return opportunities, cursor, more
 
 
@@ -381,7 +407,8 @@ def get_voiceover_opportunities(language_code, cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(ExplorationOpportunitySummary). A list of
+                ExplorationOpportunitySummary domain objects.
             cursor: str or None. A query cursor pointing to the next
                 batch of results. If there are no more results, this might
                 be None.
@@ -398,7 +425,7 @@ def get_voiceover_opportunities(language_code, cursor):
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary.to_dict())
+        opportunities.append(exp_opportunity_summary)
     return opportunities, cursor, more
 
 
@@ -407,21 +434,21 @@ def get_exploration_opportunity_summaries_by_ids(ids):
     the given list of ids.
 
     Args:
-        ids: list(str). A list of the opportunity ids.
+        ids: list(str). A list of opportunity ids.
 
     Returns:
-        dict(str, ExplorationOpportunitySummary). A dict with key as an ID and
-        value as corresponding ExplorationOpportunitySummary object.
+        list(ExplorationOpportunitySummary). A list of
+            ExplorationOpportunitySummary domain objects corresponding to the
+            supplied ids.
     """
     exp_opportunity_summary_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
-    opportunities = {}
+    opportunities = []
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities[exp_opportunity_summary.id] = exp_opportunity_summary
-
+        opportunities.append(exp_opportunity_summary)
     return opportunities
 
 
@@ -474,7 +501,8 @@ def get_skill_opportunities(cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(SkillOpportunity). A list of SkillOpportunity
+                domain objects.
             cursor: str or None. A query cursor pointing to the next
                 batch of results. If there are no more results, this might
                 be None.
@@ -489,9 +517,8 @@ def get_skill_opportunities(cursor):
     opportunities = []
     for skill_opportunity_model in skill_opportunity_models:
         skill_opportunity = (
-            get_skill_opportunity_from_model(
-                skill_opportunity_model))
-        opportunities.append(skill_opportunity.to_dict())
+            get_skill_opportunity_from_model(skill_opportunity_model))
+        opportunities.append(skill_opportunity)
     return opportunities, cursor, more
 
 
