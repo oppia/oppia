@@ -30,8 +30,8 @@ angular.module('oppia').directive('suggestionImprovementTask', [
         'suggestion-improvement-task/' +
         'suggestion-improvement-task.directive.html'),
       controller: [
-        '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
-        function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
+        '$scope', 'DateTimeFormatService',
+        function($scope, DateTimeFormatService) {
           $scope.getLocaleAbbreviatedDatetimeString = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getData().lastUpdated);
