@@ -289,7 +289,7 @@ describe('Feedback Improvements', function() {
 });
 
 
-fdescribe('Suggestions Improvements', function() {
+describe('Suggestions Improvements', function() {
   var EXPLORATION_TITLE = 'Exploration with Suggestion';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
@@ -329,7 +329,7 @@ fdescribe('Suggestions Improvements', function() {
       'Boolean', (element) => element.setValue(true));
   });
 
-  fit('accepts & rejects a suggestion on a published exploration', function() {
+  it('accepts & rejects a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
