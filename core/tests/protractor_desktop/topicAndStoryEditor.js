@@ -62,7 +62,7 @@ describe('Topic editor functionality', function() {
     topicEditorPage.get(topicId);
   });
 
-  fit('should edit topic name, abbreviated topic name, ' +
+  it('should edit topic name, abbreviated topic name, ' +
     'thumbnail and description correctly', function() {
     topicEditorPage.changeTopicName('Topic 1 edited');
     expect(topicEditorPage.getTopicThumbnailSource())
