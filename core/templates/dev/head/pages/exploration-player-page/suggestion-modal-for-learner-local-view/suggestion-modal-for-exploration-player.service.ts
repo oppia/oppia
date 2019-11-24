@@ -62,8 +62,8 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
               $scope.showEditor = true;
             }, 500);
             $scope.detectChange = function(e) {
-               if(($($scope.suggestionData.suggestionHtml).html() == (
-                  $($scope.originalHtml).html())){
+               if(($($scope.suggestionData.suggestionHtml).html() == 
+               ($($scope.originalHtml).html())){
                      return true;
                }
                else {
