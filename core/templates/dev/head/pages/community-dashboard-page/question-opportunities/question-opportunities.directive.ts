@@ -13,78 +13,64 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the voiceover opportunities.
+ * @fileoverview Directive for question opportunities.
  */
 
 require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
-
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
-require(
-  'pages/exploration-editor-page/translation-tab/services/' +
-  'translation-language.service.ts');
 
-angular.module('oppia').directive('voiceoverOpportunities', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+angular.module('oppia').directive('questionOpportunities', [
+  'UrlInterpolationService', 'MAX_QUESTIONS_PER_SKILL',
+  function(UrlInterpolationService, MAX_QUESTIONS_PER_SKILL) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/community-dashboard-page/translation-opportunities/' +
-      'translation-opportunities.directive.html'),
+        '/pages/community-dashboard-page/question-opportunities/' +
+      'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ContributionOpportunitiesService',
-        'TranslationLanguageService', function(
-            $scope, ContributionOpportunitiesService,
-            TranslationLanguageService) {
+        'ContributionOpportunitiesService',
+        function(ContributionOpportunitiesService) {
           var ctrl = this;
           ctrl.opportunities = [];
           ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
-          ctrl.progressBarRequired = false;
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
               var opportunity = opportunities[index];
-              var subheading = opportunity.getOpportunitySubheading();
               var heading = opportunity.getOpportunityHeading();
-
+              var subheading = opportunity.getOpportunitySubheading();
+              var progressPercentage = (
+                (opportunity.getQuestionCount() / MAX_QUESTIONS_PER_SKILL) *
+                100).toFixed(2);
               ctrl.opportunities.push({
                 heading: heading,
                 subheading: subheading,
-                actionButtonTitle: 'Request to Voiceover'
+                progressPercentage: progressPercentage,
+                actionButtonTitle: 'Suggest Question'
               });
             }
             ctrl.moreOpportunitiesAvailable = more;
             ctrl.opportunitiesAreLoading = false;
           };
 
-          $scope.$on('activeLanguageChanged', function() {
-            ctrl.opportunities = [];
-            ctrl.opportunitiesAreLoading = true;
-            ContributionOpportunitiesService.getVoiceoverOpportunities(
-              TranslationLanguageService.getActiveLanguageCode(),
-              updateWithNewOpportunities);
-          });
-
           ctrl.onLoadMoreOpportunities = function() {
             if (
               !ctrl.opportunitiesAreLoading &&
-              ctrl.moreOpportunitiesAvailable) {
+                ctrl.moreOpportunitiesAvailable) {
               ctrl.opportunitiesAreLoading = true;
-              ContributionOpportunitiesService.getMoreVoiceoverOpportunities(
-                TranslationLanguageService.getActiveLanguageCode(),
+              ContributionOpportunitiesService.getMoreSkillOpportunities(
                 updateWithNewOpportunities);
             }
           };
 
-          ContributionOpportunitiesService.getVoiceoverOpportunities(
-            TranslationLanguageService.getActiveLanguageCode(),
+          ContributionOpportunitiesService.getSkillOpportunities(
             updateWithNewOpportunities);
         }
       ]

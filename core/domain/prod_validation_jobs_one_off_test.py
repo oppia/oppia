@@ -815,7 +815,7 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated CollectionModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -3345,7 +3345,7 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated ExplorationModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -6325,7 +6325,7 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated QuestionModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -8079,7 +8079,7 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated SkillModel\', 4]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -9500,7 +9500,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated StoryModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -10649,7 +10649,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated TopicModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -12342,7 +12342,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
