@@ -17,7 +17,10 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient, HttpEvent, HttpHandler, HttpRequest }
+  from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from
@@ -121,7 +124,13 @@ import { WrittenTranslationsObjectFactory } from
 })
 export class UpgradedServices {
   getUpgradedServices() {
-    var upgradedServices = {};
+    let upgradedServices = {};
+    let HttpClientDependency = new HttpClient(
+        <HttpHandler> new class extends HttpHandler {
+          handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+            return undefined;
+          }
+        });
     /* eslint-disable dot-notation */
 
     // Group 1: Services without dependencies.
@@ -132,7 +141,6 @@ export class UpgradedServices {
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
-    upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['EditabilityService'] = new EditabilityService();
@@ -180,6 +188,8 @@ export class UpgradedServices {
     // Group 2: Services depending only on group 1.
     upgradedServices['AlertsService'] =
       new AlertsService(upgradedServices['LoggerService']);
+    upgradedServices['CsrfTokenService'] =
+        new CsrfTokenService(HttpClientDependency);
     upgradedServices['ChangesInHumanReadableFormService'] =
       new ChangesInHumanReadableFormService(
         upgradedServices['UtilsService'], document);
