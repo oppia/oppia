@@ -108,7 +108,11 @@ def gather_logs(start, stop='HEAD'):
     """
     get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
         GROUP_SEP, start, stop)
-    out = common.run_cmd(get_logs_cmd.split(' ')).split('\x00')
+    # The unicode conversion is required because there can be non-ascii
+    # characters in the logs and it can result in breaking the flow
+    # of release summary generation.
+    out = python_utils.UNICODE(
+        common.run_cmd(get_logs_cmd.split(' ')), 'utf-8').split('\x00')
     if len(out) == 1 and out[0] == '':
         return []
     else:
