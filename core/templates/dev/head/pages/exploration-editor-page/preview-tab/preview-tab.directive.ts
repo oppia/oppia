@@ -45,6 +45,7 @@ require(
   'state-editor.service.ts');
 require('services/context.service.ts');
 require('services/exploration-features.service.ts');
+require('services/tracker.service.ts');
 
 angular.module('oppia').directive('previewTab', [
   'UrlInterpolationService', function(
@@ -58,23 +59,23 @@ angular.module('oppia').directive('previewTab', [
         'preview-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$q', '$scope', '$timeout', '$uibModal', '$window', 'ContextService',
+        '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
         'EditableExplorationBackendApiService',
         'ExplorationDataService', 'ExplorationEngineService',
         'ExplorationFeaturesService', 'ExplorationInitStateNameService',
         'LearnerParamsService', 'NumberAttemptsService',
         'ParamChangeObjectFactory', 'ParameterMetadataService',
         'PlayerCorrectnessFeedbackEnabledService', 'StateEditorService',
-        'UrlInterpolationService',
+        'TrackerService', 'UrlInterpolationService',
         function(
-            $q, $scope, $timeout, $uibModal, $window, ContextService,
+            $q, $scope, $timeout, $uibModal, ContextService,
             EditableExplorationBackendApiService,
             ExplorationDataService, ExplorationEngineService,
             ExplorationFeaturesService, ExplorationInitStateNameService,
             LearnerParamsService, NumberAttemptsService,
             ParamChangeObjectFactory, ParameterMetadataService,
             PlayerCorrectnessFeedbackEnabledService, StateEditorService,
-            UrlInterpolationService) {
+            TrackerService, UrlInterpolationService) {
           var ctrl = this;
           ctrl.isExplorationPopulated = false;
           ExplorationDataService.getData().then(function() {
@@ -165,8 +166,8 @@ angular.module('oppia').directive('previewTab', [
           };
 
           ctrl.resetPreview = function() {
-            if ($window.sequenceOfInteractions) {
-              $window.sequenceOfInteractions.push('Preview Reset');
+            if (TrackerService.getSequenceOfActions()) {
+              TrackerService.addAction('Preview Reset');
             }
             ctrl.previewWarning = '';
             ctrl.isExplorationPopulated = false;

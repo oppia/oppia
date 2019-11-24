@@ -95,7 +95,7 @@ require('services/user.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/focus-manager.service.ts');
-
+require('services/tracker.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
@@ -359,7 +359,8 @@ angular.module('oppia').directive('conversationSkin', [
         'RefresherExplorationConfirmationModalService',
         'StateClassifierMappingService', 'SiteAnalyticsService',
         'StateCardObjectFactory', 'StatsReportingService',
-        'StoryViewerBackendApiService', 'UrlService', 'UserService',
+        'StoryViewerBackendApiService', 'TrackerService',
+        'UrlService', 'UserService',
         'WindowDimensionsService', 'COMPONENT_NAME_FEEDBACK',
         'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
@@ -394,7 +395,8 @@ angular.module('oppia').directive('conversationSkin', [
             RefresherExplorationConfirmationModalService,
             StateClassifierMappingService, SiteAnalyticsService,
             StateCardObjectFactory, StatsReportingService,
-            StoryViewerBackendApiService, UrlService, UserService,
+            StoryViewerBackendApiService, TrackerService,
+            UrlService, UserService,
             WindowDimensionsService, COMPONENT_NAME_FEEDBACK,
             CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
@@ -1117,17 +1119,10 @@ angular.module('oppia').directive('conversationSkin', [
 
             var index = PlayerPositionService.getDisplayedCardIndex();
             var displayedCard = PlayerTranscriptService.getCard(index);
-            if ($window.sequenceOfInteractions) {
-              $window.sequenceOfInteractions.push({
-                interactionId: displayedCard.getInteractionId(),
-                cardIndex: index
-              });
-            } else {
-              $window.sequenceOfInteractions = [{
-                interactionId: displayedCard.getInteractionId(),
-                cardIndex: index
-              }];
-            }
+            TrackerService.addAction({
+              interactionId: displayedCard.getInteractionId(),
+              cardIndex: index
+            });
             $rootScope.$broadcast(EVENT_NEW_CARD_OPENED, $scope.nextCard);
           };
 

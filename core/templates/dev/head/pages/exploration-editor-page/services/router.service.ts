@@ -24,15 +24,16 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/exploration-features.service.ts');
+require('services/tracker.service.ts');
 
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
   'ExplorationFeaturesService', 'ExplorationInitStateNameService',
-  'ExplorationStatesService', 'StateEditorService',
+  'ExplorationStatesService', 'StateEditorService', 'TrackerService',
   function(
       $interval, $location, $rootScope, $timeout, $window,
       ExplorationFeaturesService, ExplorationInitStateNameService,
-      ExplorationStatesService, StateEditorService) {
+      ExplorationStatesService, StateEditorService, TrackerService) {
     var TABS = {
       MAIN: {name: 'main', path: '/main'},
       TRANSLATION: {name: 'translation', path: '/translation'},
@@ -219,7 +220,7 @@ angular.module('oppia').factory('RouterService', [
         return _getCurrentStateFromLocationPath();
       },
       navigateToMainTab: function(stateName) {
-        $window.sequenceOfInteractions = [];
+        TrackerService.reset();
         _savePendingChanges();
         if (_getCurrentStateFromLocationPath() === stateName) {
           return;

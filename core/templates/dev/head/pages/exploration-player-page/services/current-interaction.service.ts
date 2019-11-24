@@ -27,12 +27,13 @@ require('pages/exploration-player-page/services/' +
   'player-position.service.ts');
 require('pages/exploration-player-page/services/' +
   'player-transcript.service.ts');
+require('services/tracker.service.ts');
 
 angular.module('oppia').factory('CurrentInteractionService', [
-  '$window', 'ContextService', 'PlayerPositionService',
-  'PlayerTranscriptService',
-  function($window, ContextService, PlayerPositionService,
-      PlayerTranscriptService) {
+  'ContextService', 'PlayerPositionService',
+  'PlayerTranscriptService', 'TrackerService',
+  function(ContextService, PlayerPositionService,
+      PlayerTranscriptService, TrackerService) {
     var _submitAnswerFn = null;
     var _onSubmitFn = null;
     var _validityCheckFn = null;
@@ -92,7 +93,7 @@ angular.module('oppia').factory('CurrentInteractionService', [
           var index = PlayerPositionService.getDisplayedCardIndex();
           var displayedCard = PlayerTranscriptService.getCard(index);
           var sequenceOfInteractions = (
-            JSON.stringify($window.sequenceOfInteractions));
+            JSON.stringify(TrackerService.getSequenceOfActions()));
           var additionalInfo = ('\nUndefined submit answer debug logs:' +
             '\nInteraction ID: ' + displayedCard.getInteractionId() +
             '\nExploration ID: ' + ContextService.getExplorationId() +
