@@ -438,19 +438,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
             'old_value': 'Description',
             'new_value': 'New Description'
-        }),
-        topic_domain.TopicChange({
+        }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME,
             'old_value': '',
             'new_value': 'short name'
-        }),
-        topic_domain.TopicChange({
+        }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_DATA_URL,
             'old_value': '',
             'new_value': 'thumbnail url'
-        }),]
+        })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated Description.')
