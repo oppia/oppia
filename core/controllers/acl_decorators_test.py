@@ -3073,7 +3073,7 @@ class SubmitVoiceoverApplicationDecoratorTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        @acl_decorators.can_submit_voiceover_application
+        @acl_decorators.can_submit_new_voiceover_application
         def post(self):
             self.render_json({'success': True})
 
@@ -3129,7 +3129,7 @@ class SubmitVoiceoverApplicationDecoratorTests(test_utils.GenericTestBase):
                 '/createvoiceoverapplicationhandler', {}, csrf_token=csrf_token,
                 expected_status_int=401)
 
-    def test_user_can_submit_voiceover_application(self):
+    def test_user_can_submit_new_voiceover_application(self):
         self.login(self.applicant_email)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):

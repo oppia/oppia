@@ -2691,7 +2691,7 @@ def can_review_voiceover_application(handler):
     return test_can_review_voiceover_application
 
 
-def can_submit_voiceover_application(handler):
+def can_submit_new_voiceover_application(handler):
     """Decorator to check whether a user can submit voiceover application.
 
     Args:
@@ -2702,7 +2702,7 @@ def can_submit_voiceover_application(handler):
             if the user has permission to submit voiceover application.
     """
 
-    def test_can_submit_voiceover_application(self, **kwargs):
+    def test_can_submit_new_voiceover_application(self, **kwargs):
         """Checks if the user can submit voiceover application.
 
         Args:
@@ -2751,6 +2751,6 @@ def can_submit_voiceover_application(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You must be logged in to submit voiceover application.')
-    test_can_submit_voiceover_application.__wrapped__ = True
+    test_can_submit_new_voiceover_application.__wrapped__ = True
 
-    return test_can_submit_voiceover_application
+    return test_can_submit_new_voiceover_application

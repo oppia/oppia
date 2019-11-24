@@ -395,7 +395,7 @@ class VoiceoverApplicationHandlerUnitTest(test_utils.GenericTestBase):
             response['error'],
             'You must be logged in to submit voiceover application.')
 
-    def test_users_can_submit_voiceover_application(self):
+    def test_users_can_submit_new_voiceover_application(self):
         self.signup('contributor@community.com', 'contributor')
         self.login('contributor@community.com')
         csrf_token = self.get_new_csrf_token()

@@ -205,7 +205,7 @@ class VoicoverApplicationHandler(base.BaseHandler):
 
         self.render_json({})
 
-    @acl_decorators.can_submit_voiceover_application
+    @acl_decorators.can_submit_new_voiceover_application
     def post(self):
         raw_audio_file = self.request.get('raw_audio_file')
 
@@ -239,7 +239,7 @@ class VoiceoverApplicationTextHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_submit_voiceover_application
+    @acl_decorators.can_submit_new_voiceover_application
     def get(self, target_type, target_id):
         language_code = self.request.get('language_code')
 
