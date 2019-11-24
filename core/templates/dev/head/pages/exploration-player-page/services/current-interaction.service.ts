@@ -32,7 +32,7 @@ angular.module('oppia').factory('CurrentInteractionService', [
   '$window', 'ContextService', 'PlayerPositionService',
   'PlayerTranscriptService',
   function($window, ContextService, PlayerPositionService,
-    PlayerTranscriptService) {
+      PlayerTranscriptService) {
     var _submitAnswerFn = null;
     var _onSubmitFn = null;
     var _validityCheckFn = null;
