@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for the csrf service
  */
 
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-fdescribe('Csrf Token Service', () => {
+import { CsrfTokenService } from 'services/csrf-token.service';
+
+describe('Csrf Token Service', () => {
   let csrfTokenService: CsrfTokenService = null;
   let httpTestingController: HttpTestingController = null;
 
