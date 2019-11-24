@@ -19,7 +19,7 @@
 import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 
-fdescribe('Skill opportunity object factory', () => {
+describe('Skill opportunity object factory', () => {
   describe('SkillOpportunityObjectFactory', () => {
     let skillOpportunityObjectFactory: (
       SkillOpportunityObjectFactory);

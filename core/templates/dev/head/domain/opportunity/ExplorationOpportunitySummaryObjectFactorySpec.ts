@@ -19,7 +19,7 @@
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 
-fdescribe('Exploration opportunity summary object factory', () => {
+describe('Exploration opportunity summary object factory', () => {
   describe('ExplorationOpportunitySummaryObjectFactory', () => {
     let explorationOpportunitySummaryObjectFactory: (
       ExplorationOpportunitySummaryObjectFactory);
