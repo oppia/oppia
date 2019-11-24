@@ -36,8 +36,9 @@ angular.module('oppia').factory('ContributionAndReviewService', [
     var _SUGGESTION_ACTION_HANDLER_URL = (
       '/suggestionactionhandler/exploration/<exp_id>/<thread_id>');
 
-    var _APPLICATION_LIST_HANDLER_URL_TEMPLATE = (
-      '/getsubmittedvoiceoverapplication/<purpose>');
+    var _REVIEWABLE_VOIEOVER_APPLICATIONS_HANDLER_URL = (
+      '/reviewablevoiceoverapplications');
+    var _USER_VOICEOVER_APPLICATIONS_HANDLER_URL = '/uservoiceoverapplications';
     var _VOICEOVER_APPLICATION_ACTION_HANDLER_URL = (
       '/voiceoverappplicationactionhandler/<voiceover_application_id>');
 
@@ -87,17 +88,11 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         return _fetchSuggestions(url, onSuccess);
       },
       getUserSubmittedVoiceoverApplications: function(onSuccess) {
-        var url = UrlInterpolationService.interpolateUrl(
-          _APPLICATION_LIST_HANDLER_URL_TEMPLATE, {
-            purpose: 'status'
-          });
+        var url = _USER_VOICEOVER_APPLICATIONS_HANDLER_URL;
         return _fetchApplications(url, onSuccess);
       },
       getReviewableVoiceoverApplications: function(onSuccess) {
-        var url = UrlInterpolationService.interpolateUrl(
-          _APPLICATION_LIST_HANDLER_URL_TEMPLATE, {
-            purpose: 'review'
-          });
+        var url = _REVIEWABLE_VOIEOVER_APPLICATIONS_HANDLER_URL;
         return _fetchApplications(url, onSuccess);
       },
       resolveSuggestion: function(
