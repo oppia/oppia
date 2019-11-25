@@ -24,7 +24,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import os
 
-from . import common
+from scripts import common
+
 from . import gcloud_adapter
 
 _PARSER = argparse.ArgumentParser()

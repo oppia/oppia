@@ -26,8 +26,8 @@ import tempfile
 
 from core.tests import test_utils
 import python_utils
+from scripts import common
 
-from . import common
 from . import update_configs
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

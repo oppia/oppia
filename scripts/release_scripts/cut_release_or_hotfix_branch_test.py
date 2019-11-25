@@ -25,10 +25,9 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-
 import python_utils
+from scripts import common
 
-from . import common
 from . import cut_release_or_hotfix_branch
 
 

@@ -111,8 +111,6 @@
 /scripts/create_expression_parser.py @kevinlee12
 /scripts/create_topological_sort_of_all_services.py @bansalnitish @kevinlee12
 /scripts/create_topological_sort_of_all_services_test.py @bansalnitish @kevinlee12
-/scripts/deploy.py @ankita240796 @kevinlee12
-/scripts/deploy_test.py @ankita24079 @kevinlee12
 /scripts/docstrings_checker.py @kevinlee12
 /scripts/docstrings_checker_test.py @kevinlee12
 /scripts/install_chrome_on_travis.py @kevinlee12
@@ -130,6 +128,8 @@
 /scripts/pre_push_hook_test.py @kevinlee12
 /scripts/pylint_extensions.py @kevinlee12
 /scripts/pylint_extensions_test.py @kevinlee12
+/scripts/release_scripts/deploy.py @ankita240796 @kevinlee12
+/scripts/release_scripts/deploy_test.py @ankita24079 @kevinlee12
 /scripts/run_backend_tests.py @kevinlee12
 /scripts/run_e2e_tests.sh @kevinlee12
 /scripts/run_frontend_tests.py @kevinlee12
@@ -435,28 +435,7 @@
 
 
 # Release team.
-/scripts/cut_release_or_hotfix_branch.py @ankita240796
-/scripts/cut_release_or_hotfix_branch_test.py @ankita240796
-/scripts/deploy.py @ankita240796
-/scripts/deploy_test.py @ankita240796
-/scripts/gcloud_adapter.py @ankita240796
-/scripts/gcloud_adapter_test.py @ankita240796
-/scripts/generate_release_updates.py @ankita240796
-/scripts/generate_release_updates_test.py @ankita240796
-/scripts/initial_release_prep.py @ankita240796
-/scripts/initial_release_prep_test.py @ankita240796
-/scripts/release_info.py @ankita240796
-/scripts/release_info_test.py @ankita240796
-/scripts/restore_backup.py @ankita240796
-/scripts/restore_backup_test.py @ankita240796
-/scripts/update_changelog_and_credits.py @ankita240796
-/scripts/update_changelog_and_credits_test.py @ankita240796
-/scripts/update_configs.py @ankita240796
-/scripts/update_configs_test.py @ankita240796
-/scripts/update_indexes.py @ankita240796
-/scripts/update_indexes_test.py @ankita240796
-/scripts/wrap_up_release.py @ankita240796
-/scripts/wrap_up_release_test.py @ankita240796
+/scripts/release_scripts/ @ankita240796
 
 
 # Rich text editor team.

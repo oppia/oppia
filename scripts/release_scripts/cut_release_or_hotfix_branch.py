@@ -46,8 +46,7 @@ import sys
 
 import python_utils
 import release_constants
-
-from . import common
+from scripts import common
 
 
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):

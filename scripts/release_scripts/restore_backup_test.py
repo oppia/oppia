@@ -22,10 +22,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 
 from core.tests import test_utils
-
 import python_utils
+from scripts import common
 
-from . import common
 from . import restore_backup
 
 

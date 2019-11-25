@@ -27,8 +27,8 @@ import sys
 from core.tests import test_utils
 import python_utils
 import release_constants
+from scripts import common
 
-from . import common
 from . import release_info
 from . import update_changelog_and_credits
 

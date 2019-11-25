@@ -26,8 +26,7 @@ import sys
 
 import python_utils
 import release_constants
-
-from . import common
+from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _APPENGINE_PATH = os.path.join(

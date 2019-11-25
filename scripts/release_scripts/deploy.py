@@ -49,10 +49,10 @@ import sys
 
 import python_utils
 import release_constants
+from scripts import common
+from scripts import install_third_party_libs
 
-from . import common
 from . import gcloud_adapter
-from . import install_third_party_libs
 from . import update_configs
 # pylint: enable=wrong-import-order
 

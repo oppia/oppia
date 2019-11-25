@@ -22,8 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import sys
 
 from core.tests import test_utils
+from scripts import common
 
-from . import common
 from . import gcloud_adapter
 from . import update_indexes
 

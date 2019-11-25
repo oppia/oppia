@@ -43,7 +43,7 @@ class GcloudAdapterImportTests(test_utils.GenericTestBase):
             'google_appengine_1.9.67', 'google_appengine')
         with exists_swap, self.assertRaisesRegexp(
             Exception, 'Directory %s does not exist.' % gae_dir):
-            from . import gcloud_adapter # pylint: disable=unused-variable
+            from scripts.release_scripts import gcloud_adapter # pylint: disable=unused-variable
 
 
 class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):

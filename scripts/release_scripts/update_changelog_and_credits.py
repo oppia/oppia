@@ -33,8 +33,8 @@ import sys
 
 import python_utils
 import release_constants
+from scripts import common
 
-from . import common
 from . import release_info
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

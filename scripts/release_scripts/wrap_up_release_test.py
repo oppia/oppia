@@ -25,8 +25,8 @@ import sys
 
 from core.tests import test_utils
 import release_constants
+from scripts import common
 
-from . import common
 from . import wrap_up_release
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

@@ -24,10 +24,9 @@ import os
 import sys
 
 from core.tests import test_utils
-
 import python_utils
+from scripts import common
 
-from . import common
 from . import initial_release_prep
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
