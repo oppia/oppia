@@ -423,7 +423,7 @@ def _get_last_two_messages_of_threads(threads):
     """Returns the last two messages of each given thread.
 
     Args:
-        thread: FeedbackThread.
+        threads: list(FeedbackThread). The list of threads to query.
 
     Returns:
         list(tuple(FeedbackMessageModel | None)). A list of references to the
@@ -470,17 +470,13 @@ def get_thread_summaries(user_id, thread_ids):
                 exploration belongs.
         int. The number of threads not read by the user.
     """
-    thread_exp_ids = (
-        [get_exp_id_from_thread_id(thread_id) for thread_id in thread_ids])
     thread_user_model_ids = (
         [feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
             user_id, thread_id) for thread_id in thread_ids])
-
-    thread_models, thread_user_models, thread_exps = (
+    thread_models, thread_user_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models([
             ('GeneralFeedbackThreadModel', thread_ids),
             ('GeneralFeedbackThreadUserModel', thread_user_model_ids),
-            ('ExplorationModel', thread_exp_ids),
         ]))
 
     threads = [_get_thread_from_model(m) for m in thread_models]
@@ -488,9 +484,8 @@ def get_thread_summaries(user_id, thread_ids):
 
     thread_summaries = []
     number_of_unread_threads = 0
-    for thread, thread_user_model, exp, (last_message, second_last_message) in (
-            python_utils.ZIP(
-                threads, thread_user_models, thread_exps, last_two_messages)):
+    for thread, thread_user_model, (last_message, second_last_message) in (
+            python_utils.ZIP(threads, thread_user_models, last_two_messages)):
         if last_message is not None:
             last_message_is_read = (
                 thread_user_model is not None and
@@ -515,9 +510,7 @@ def get_thread_summaries(user_id, thread_ids):
             second_last_message_is_read = False
             author_second_last_message = None
 
-        if not last_message_is_read:
-            number_of_unread_threads += 1
-        thread_summaries.append({
+        thread_summary = {
             'status': thread.status,
             'original_author_id': thread.original_author_id,
             'last_updated': utils.get_time_in_millisecs(thread.last_updated),
@@ -527,10 +520,12 @@ def get_thread_summaries(user_id, thread_ids):
             'second_last_message_is_read': second_last_message_is_read,
             'author_last_message': author_last_message,
             'author_second_last_message': author_second_last_message,
-            'exploration_title': exp.title,
-            'exploration_id': exp.id,
             'thread_id': thread.id,
-        })
+        }
+
+        thread_summaries.append(thread_summary)
+        if not last_message_is_read:
+            number_of_unread_threads += 1
 
     return thread_summaries, number_of_unread_threads
 
