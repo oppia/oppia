@@ -46,7 +46,7 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
     /* eslint-enable dot-notation */
         suggestionThreadBackendDict, suggestionBackendDict) {
       var suggestion;
-      if (suggestionBackendDict.suggestion_type ===
+      if (suggestionBackendDict && suggestionBackendDict.suggestion_type ===
           'edit_exploration_state_content') {
         suggestion = SuggestionObjectFactory.createFromBackendDict(
           suggestionBackendDict);
