@@ -98,7 +98,9 @@ angular.module('oppia').directive('preferencesPage', [
             $rootScope.loadingMessage = '';
           });
 
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
 
           var _saveDataItem = function(updateType, data) {
             $http.put(_PREFERENCES_DATA_URL, {
