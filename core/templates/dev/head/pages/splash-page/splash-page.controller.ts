@@ -22,6 +22,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 
+<<<<<<< HEAD
 angular.module('oppia').directive('splashPage', [
   'UrlInterpolationService', function(
       UrlInterpolationService) {
@@ -76,7 +77,7 @@ angular.module('oppia').directive('splashPage', [
             }, 150);
             return false;
           };
-        }
-      ]
-    };
-  }]);
+      }
+    ]
+  };
+}]);

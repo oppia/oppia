@@ -13,21 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the footer.
+ * @fileoverview Constants for review test domain.
  */
 
-
-angular.module('oppia').directive('oppiaFooter', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('!html-loader!./oppia_footer_directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        function() {}
-      ]
-    };
-  }
-]);
+export class ReviewTestDomainConstants {
+  public static REVIEW_TEST_DATA_URL = '/review_test_handler/data/<story_id>';
+}
