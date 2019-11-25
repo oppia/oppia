@@ -17,6 +17,7 @@ from __future__ import absolute_import # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
+from core.domain import feedback_services
 from core.platform import models
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -44,4 +45,41 @@ class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
+        yield (key, len(values))
+
+
+class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate message data cache of threads."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [feedback_models.GeneralFeedbackThreadModel]
+
+    @staticmethod
+    def map(thread_model):
+        """Implements the map function for this job."""
+        messages = feedback_services.get_messages(thread_model.id)
+        if len(messages) > 0:
+            thread_model.last_message_id = messages[-1].message_id
+            thread_model.last_message_author_id = messages[-1].author_id
+            thread_model.last_message_text = messages[-1].text
+        else:
+            thread_model.last_message_id = None
+            thread_model.last_message_author_id = None
+            thread_model.last_message_text = None
+        if len(messages) > 1:
+            thread_model.second_last_message_id = messages[-2].message_id
+            thread_model.second_last_message_author_id = messages[-2].author_id
+            thread_model.second_last_message_text = messages[-2].text
+        else:
+            thread_model.second_last_message_id = None
+            thread_model.second_last_message_author_id = None
+            thread_model.second_last_message_text = None
+        thread_model.put()
+        yield (thread_model.id, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
         yield (key, len(values))

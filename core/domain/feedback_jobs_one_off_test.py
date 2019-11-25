@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 
 from core.domain import feedback_jobs_one_off
+from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -128,3 +129,77 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
 
         self._check_model_validity(user_id1, thread_id1, user_feedback_model1)
         self._check_model_validity(user_id2, thread_id2, user_feedback_model2)
+
+
+class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
+    """Tests for GeneralFeedbackThreadUser migration."""
+
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        feedback_jobs_one_off.GeneralFeedbackThreadOneOffJob]
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            feedback_jobs_one_off.GeneralFeedbackThreadOneOffJob.create_new())
+        feedback_jobs_one_off.GeneralFeedbackThreadOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            feedback_jobs_one_off.GeneralFeedbackThreadOneOffJob
+            .get_output(job_id))
+
+        eval_output = [ast.literal_eval(stringified_item)
+                       for stringified_item in stringified_output]
+        output = [(eval_item[0], int(eval_item[1]))
+                  for eval_item in eval_output]
+        return output
+
+    def setUp(self):
+        super(GeneralFeedbackThreadOneOffJobTest, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+    def test_successful_population_with_one_message(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'initial text')
+
+        self.assertEqual(self._run_one_off_job(), [(thread_id, 1)])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.last_message_text, 'initial text')
+        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        self.assertEqual(thread.second_last_message_text, None)
+        self.assertEqual(thread.second_last_message_author_id, None)
+
+    def test_successful_population_with_two_messages(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, None, None, 'second text')
+
+        self.assertEqual(self._run_one_off_job(), [(thread_id, 1)])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.last_message_text, 'second text')
+        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        self.assertEqual(thread.second_last_message_text, 'first text')
+        self.assertEqual(thread.second_last_message_author_id, self.editor_id)
+
+    def test_successful_population_with_three_messages(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, None, None, 'second text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, None, None, 'third text')
+
+        self.assertEqual(self._run_one_off_job(), [(thread_id, 1)])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.last_message_text, 'third text')
+        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        self.assertEqual(thread.second_last_message_text, 'second text')
+        self.assertEqual(thread.second_last_message_author_id, self.editor_id)
