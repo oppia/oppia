@@ -41,11 +41,11 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
+    // eslint-disable-next-line dot-notation
     SuggestionThread['createFromBackendDicts'] = function(
-    /* eslint-enable dot-notation */
-        suggestionThreadBackendDict, suggestionBackendDict) {
+        suggestionThreadBackendDict) {
       var suggestion;
+      var suggestionBackendDict = suggestionThreadBackendDict.suggestion_dict;
       if (suggestionBackendDict && suggestionBackendDict.suggestion_type ===
           'edit_exploration_state_content') {
         suggestion = SuggestionObjectFactory.createFromBackendDict(
