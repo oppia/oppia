@@ -508,8 +508,7 @@ def get_thread_summaries(user_id, thread_ids):
 
         if not last_message_is_read:
             number_of_unread_threads += 1
-
-        thread_summary = {
+        thread_summaries.append({
             'status': thread.status,
             'original_author_id': thread.original_author_id,
             'last_updated': utils.get_time_in_millisecs(thread.last_updated),
@@ -524,7 +523,6 @@ def get_thread_summaries(user_id, thread_ids):
             'thread_id': thread.id,
         }
 
-        thread_summaries.append(thread_summary)
     return thread_summaries, number_of_unread_threads
 
 
