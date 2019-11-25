@@ -100,10 +100,6 @@ angular.module('oppia').factory('ThreadDataService', [
 
         return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(response => {
           thread.setMessages(response.data.messages);
-          thread.messages.slice(-2).forEach(message => {
-            thread.threadSummary.appendNewMessage(
-              message.text, message.author_username);
-          });
         });
       },
       fetchFeedbackStats: function() {
@@ -135,7 +131,7 @@ angular.module('oppia').factory('ThreadDataService', [
 
         return $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
           thread_id: threadId,
-        }).then(thread.threadSummary.markTheLastTwoMessagesAsRead);
+        });
       },
       addNewMessage: function(threadId, newMessage, newStatus) {
         var thread = this.getThread(threadId);
