@@ -41,12 +41,16 @@ class FeedbackThread(python_utils.OBJECT):
             created.
         last_updated: datetime.datetime. The time when the feedback thread
             was last updated.
-        last_message_id: int.
-        last_message_text: str.
-        last_message_author_id: str.
-        second_last_message_id: int.
-        second_last_message_text: str.
-        second_last_message_author_id: str.
+        last_message_id: int. The id of the last message in the thread.
+        last_message_text: str. The text of the last message in the thread.
+        last_message_author_id: str. The author id of the last message in the
+            thread.
+        second_last_message_id: int. The id of the second-to-last message in the
+            thread.
+        second_last_message_text: str. The text of the second-to-last message in
+            the thread.
+        second_last_message_author_id: str. The author id of the second-to-last
+            message in the thread.
     """
 
     def __init__(
