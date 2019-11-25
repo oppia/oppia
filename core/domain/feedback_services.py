@@ -18,8 +18,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import itertools
 import datetime
+import itertools
 
 from core.domain import email_manager
 from core.domain import feedback_domain
@@ -420,6 +420,15 @@ def _get_thread_from_model(thread_model):
 
 
 def _get_last_two_messages_of_threads(threads):
+    """Returns the last two messages of each given thread.
+
+    Args:
+        thread: FeedbackThread.
+
+    Returns:
+        list(tuple(FeedbackMessageModel | None)). A list of references to the
+            last two message models of each thread, or None if they don't exist.
+    """
     flattened_last_two_messages = (
         feedback_models.GeneralFeedbackMessageModel.get_multi(
             itertools.chain.from_iterable(
