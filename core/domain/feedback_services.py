@@ -449,42 +449,54 @@ def get_thread_summaries(user_id, thread_ids):
 
     Returns:
         list(dict), int. A list of dictionaries containing the summaries of the
-            requested threads. Each dict uses the following key-values:
-                - 'status': str. The status of the thread.
-                - 'original_author_id': str. The id of the original author of
-                  the thread.
-                - 'last_updated': datetime.datetime. When was the thread last
-                  updated.
-                - 'last_message_text': str. The text of the last message.
-                - 'total_message_count': int. The total number of messages in
-                  the thread.
-                - 'last_message_is_read': boolean. Whether the last message is
-                  read by the user.
-                - 'second_last_message_is_read': boolean. Whether the second
-                  last message is read by the user,
-                - 'author_last_message': str. The name of the author of the last
-                  message.
-                - 'author_second_last_message': str. The name of the author of
-                  the second last message.
-                - 'thread_id': str. The id of the thread being summarized.
-            Additionally returns the number of threads still unread by the user.
+            requested threads, and the total number of threads unread by the
+            user.
+
+            Each dict uses the following key-values:
+                  status: str. The status of the thread.
+                  original_author_id: str. The id of the original author of
+                      the thread.
+                  last_updated: datetime.datetime. When was the thread last
+                      updated.
+                  last_message_text: str. The text of the last message.
+                  total_message_count: int. The total number of messages in
+                      the thread.
+                  last_message_is_read: bool. Whether the last message is read
+                      by the user.
+                  second_last_message_is_read: bool. Whether the second last
+                      message is read by the user,
+                  author_last_message: str. The name of the author of the last
+                      message.
+                  author_second_last_message: str. The name of the author of
+                      the second last message.
+                  thread_id: str. The id of the thread being summarized.
+                  exploration_id: str. The id of the exploration the thread
+                      belongs to.
+                  exploration_title: str. The title of the exploration the
+                      thread belongs to.
     """
     thread_user_model_ids = (
         [feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
             user_id, thread_id) for thread_id in thread_ids])
-    thread_models, thread_user_models = (
+    thread_exp_model_ids = [get_exp_id_from_thread_id(i) for i in thread_ids]
+
+    thread_models, thread_user_models, thread_exp_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models([
             ('GeneralFeedbackThreadModel', thread_ids),
             ('GeneralFeedbackThreadUserModel', thread_user_model_ids),
+            ('ExplorationModel', thread_exp_model_ids),
         ]))
 
     threads = [_get_thread_from_model(m) for m in thread_models]
-    last_two_messages = _get_last_two_messages_of_threads(threads)
+    all_last_two_messages = _get_last_two_messages_of_threads(threads)
 
     thread_summaries = []
     number_of_unread_threads = 0
-    for thread, thread_user_model, (last_message, second_last_message) in (
-            python_utils.ZIP(threads, thread_user_models, last_two_messages)):
+    for thread, thread_user_model, thread_exp_model, last_two_messages in (
+            python_utils.ZIP(threads, thread_user_models, thread_exp_models,
+                             all_last_two_messages)):
+        last_message, second_last_message = last_two_messages
+
         if last_message is not None:
             last_message_is_read = (
                 thread_user_model is not None and
@@ -520,6 +532,8 @@ def get_thread_summaries(user_id, thread_ids):
             'author_last_message': author_last_message,
             'author_second_last_message': author_second_last_message,
             'thread_id': thread.id,
+            'exploration_id': thread_exp_model.id,
+            'exploration_title': thread_exp_model.title,
         }
 
         thread_summaries.append(thread_summary)
