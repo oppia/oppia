@@ -17,15 +17,14 @@
    thread domain objects.
  */
 
-require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');
 
 angular.module('oppia').factory('SuggestionThreadObjectFactory', [
-  'FeedbackThreadSummaryObjectFactory', 'SuggestionObjectFactory',
-  function(FeedbackThreadSummaryObjectFactory, SuggestionObjectFactory) {
+  'SuggestionObjectFactory', function(SuggestionObjectFactory) {
     var SuggestionThread = function(
         status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-        threadId, threadSummary, suggestion) {
+        threadId, lastMessageText, lastMessageAuthor, secondLastMessageText,
+        secondLastMessageAuthor, suggestion) {
       this.status = status;
       this.subject = subject;
       this.summary = summary;
@@ -34,34 +33,52 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
       this.messageCount = messageCount;
       this.threadId = threadId;
       this.suggestion = suggestion;
-      this.threadSummary = threadSummary;
       this.messages = [];
+      this.lastMessageText = lastMessageText;
+      this.lastMessageAuthor = lastMessageAuthor;
+      this.secondLastMessageText = secondLastMessageText;
+      this.secondLastMessageAuthor = secondLastMessageAuthor;
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    // eslint-disable-next-line dot-notation
-    SuggestionThread['createFromBackendDict'] = function(
-        suggestionThreadBackendDict) {
-      var threadSummary =
-        FeedbackThreadSummaryObjectFactory.createFromBackendDict(
-          suggestionThreadBackendDict.thread_summary_dict);
+    /* eslint-disable dot-notation */
+    SuggestionThread['createFromBackendDicts'] = function(
+    /* eslint-enable dot-notation */
+        suggestionThreadBackendDict, suggestionBackendDict) {
       var suggestion;
-      if (suggestionThreadBackendDict.suggestion_dict.suggestion_type ===
+      if (suggestionBackendDict.suggestion_type ===
           'edit_exploration_state_content') {
         suggestion = SuggestionObjectFactory.createFromBackendDict(
-          suggestionThreadBackendDict.suggestion_dict);
+          suggestionBackendDict);
       }
+      suggestionThreadBackendDict.last_message_text;
       return new SuggestionThread(
         suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
         suggestionThreadBackendDict.summary,
         suggestionThreadBackendDict.original_author_username,
         suggestionThreadBackendDict.last_updated,
         suggestionThreadBackendDict.message_count,
-        suggestionThreadBackendDict.thread_id, threadSummary, suggestion);
+        suggestionThreadBackendDict.thread_id,
+        suggestionThreadBackendDict.last_message_text,
+        suggestionThreadBackendDict.last_message_author,
+        suggestionThreadBackendDict.second_last_message_text,
+        suggestionThreadBackendDict.second_last_message_author,
+        suggestion);
     };
 
     SuggestionThread.prototype.setMessages = function(messages) {
       this.messages = messages;
+      this.messageCount = messages.length;
+      this.secondLastMessageText = null;
+      this.secondLastMessageAuthor = null;
+      this.lastMessageText = null;
+      this.lastMessageAuthor = null;
+      for (let message of messages.slice(-2)) {
+        this.secondLastMessageText = this.lastMessageText;
+        this.secondLastMessageAuthor = this.lastMessageAuthor;
+        this.lastMessageText = message.text;
+        this.lastMessageAuthor = message.author_username;
+      }
     };
 
     SuggestionThread.prototype.isSuggestionHandled = function() {

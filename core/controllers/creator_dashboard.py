@@ -287,26 +287,6 @@ class CreatorDashboardHandler(base.BaseHandler):
             [t.to_dict() for t in feedback_services.get_multiple_threads(
                 ids_of_suggestions_which_can_be_reviewed)])
 
-        thread_summaries_linked_to_suggestions_by_user, _ = (
-            feedback_services.get_thread_summaries(
-                self.user_id, ids_of_suggestions_created_by_user))
-        thread_summaries_linked_to_suggestions_which_can_be_reviewed, _ = (
-            feedback_services.get_thread_summaries(
-                self.user_id, ids_of_suggestions_which_can_be_reviewed))
-
-        for thread_dict, summary_dict, suggestion_dict in python_utils.ZIP(
-                threads_linked_to_suggestions_by_user,
-                thread_summaries_linked_to_suggestions_by_user,
-                suggestion_dicts_created_by_user):
-            thread_dict['suggestion_dict'] = suggestion_dict
-            thread_dict['thread_summary_dict'] = summary_dict
-        for thread_dict, summary_dict, suggestion_dict in python_utils.ZIP(
-                threads_linked_to_suggestions_which_can_be_reviewed,
-                thread_summaries_linked_to_suggestions_which_can_be_reviewed,
-                suggestion_dicts_which_can_be_reviewed):
-            thread_dict['suggestion_dict'] = suggestion_dict
-            thread_dict['thread_summary_dict'] = summary_dict
-
         self.values.update({
             'explorations_list': exp_summary_dicts,
             'collections_list': collection_summary_dicts,
@@ -318,6 +298,8 @@ class CreatorDashboardHandler(base.BaseHandler):
                 threads_linked_to_suggestions_by_user),
             'threads_for_suggestions_to_review_list': (
                 threads_linked_to_suggestions_which_can_be_reviewed),
+            'created_suggestions_list': suggestion_dicts_created_by_user,
+            'suggestions_to_review_list': suggestion_dicts_which_can_be_reviewed
         })
         if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             self.values.update({

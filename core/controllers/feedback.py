@@ -34,41 +34,13 @@ class ThreadListHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
-        feedback_thread_dicts = [
-            thread.to_dict() for thread in feedback_services.get_all_threads(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]
-        feedback_thread_ids = [
-            thread_dict['thread_id'] for thread_dict in feedback_thread_dicts]
-        feedback_thread_summary_dicts, total_unread_feedback_threads = (
-            feedback_services.get_thread_summaries(
-                self.user_id, feedback_thread_ids))
-        for thread_dict, summary_dict in python_utils.ZIP(
-                feedback_thread_dicts, feedback_thread_summary_dicts):
-            thread_dict['thread_summary_dict'] = summary_dict
-
-        suggestion_thread_dicts = [
-            thread.to_dict() for thread in feedback_services.get_all_threads(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)]
-        suggestion_thread_ids = [
-            thread_dict['thread_id'] for thread_dict in suggestion_thread_dicts]
-        suggestion_thread_summary_dicts, total_unread_suggestion_threads = (
-            feedback_services.get_thread_summaries(
-                self.user_id, suggestion_thread_ids))
-        suggestion_dicts = [
-            suggestion.to_dict() if suggestion is not None else None
-            for suggestion in suggestion_services.get_suggestions_by_ids(
-                suggestion_thread_ids)]
-        for thread_dict, summary_dict, suggestion_dict in python_utils.ZIP(
-                suggestion_thread_dicts, suggestion_thread_summary_dicts,
-                suggestion_dicts):
-            thread_dict['thread_summary_dict'] = summary_dict
-            thread_dict['suggestion_dict'] = suggestion_dict
-
         self.values.update({
-            'feedback_thread_dicts': feedback_thread_dicts,
-            'total_unread_feedback_threads': total_unread_feedback_threads,
-            'suggestion_thread_dicts': suggestion_thread_dicts,
-            'total_unread_suggestion_threads': total_unread_suggestion_threads,
+            'feedback_thread_dicts': [
+                t.to_dict() for t in feedback_services.get_all_threads(
+                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)],
+            'suggestion_thread_dicts': [
+                t.to_dict() for t in feedback_services.get_all_threads(
+                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)],
         })
         self.render_json(self.values)
 

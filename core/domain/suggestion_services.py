@@ -54,9 +54,6 @@ def create_suggestion(
         description: str. The description of the changes provided by the author.
         final_reviewer_id: str|None. The ID of the reviewer who has
             accepted/rejected the suggestion.
-
-    Returns:
-        str. The ID of the new suggestion model.
     """
     if description is None:
         description = DEFAULT_SUGGESTION_THREAD_SUBJECT
@@ -93,7 +90,6 @@ def create_suggestion(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
         final_reviewer_id, change, score_category, thread_id)
-    return thread_id
 
 
 def get_suggestion_from_model(suggestion_model):
@@ -129,21 +125,6 @@ def get_suggestion_by_id(suggestion_id):
     model = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
 
     return get_suggestion_from_model(model) if model else None
-
-
-def get_suggestions_by_ids(suggestion_ids):
-    """Finds suggestions by their suggestion IDs.
-
-    Args:
-        suggestion_ids: list(str). The ID of the suggestion.
-
-    Returns:
-        list(Suggestion|None). The corresponding suggestion, or None if no
-            suggestion is found.
-    """
-    return [get_suggestion_from_model(s) if s is not None else None
-            for s in suggestion_models.GeneralSuggestionModel.get_multi(
-                suggestion_ids)]
 
 
 def query_suggestions(query_fields_and_values):

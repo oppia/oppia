@@ -20,9 +20,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { FeedbackThreadSummary, FeedbackThreadSummaryObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
-
 export class FeedbackThread {
   status: string;
   subject: string;
@@ -32,7 +29,10 @@ export class FeedbackThread {
   messageCount: number;
   stateName: string;
   threadId: string;
-  threadSummary: FeedbackThreadSummary;
+  lastMessageText: string;
+  lastMessageAuthor: string;
+  secondLastMessageText: string;
+  secondLastMessageAuthor: string;
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'messages' is an array of dicts with underscore_cased keys
   // which give tslint errors against underscore_casing in favor of camelCasing.
@@ -41,8 +41,9 @@ export class FeedbackThread {
   constructor(
       status: string, subject: string, summary: string,
       originalAuthorName: string, lastUpdated: number, messageCount: number,
-      stateName: string, threadId: string,
-      threadSummary: FeedbackThreadSummary) {
+      stateName: string, threadId: string, lastMessageText: string,
+      lastMessageAuthor: string, secondLastMessageText: string,
+      secondLastMessageAuthor: string) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -51,7 +52,10 @@ export class FeedbackThread {
     this.messageCount = messageCount;
     this.stateName = stateName;
     this.threadId = threadId;
-    this.threadSummary = threadSummary;
+    this.lastMessageText = lastMessageText;
+    this.lastMessageAuthor = lastMessageAuthor;
+    this.secondLastMessageText = secondLastMessageText;
+    this.secondLastMessageAuthor = secondLastMessageAuthor;
     this.messages = [];
   }
 
@@ -60,6 +64,17 @@ export class FeedbackThread {
   // which give tslint errors against underscore_casing in favor of camelCasing.
   setMessages(messages: any[]): void {
     this.messages = messages;
+    this.messageCount = messages.length;
+    this.secondLastMessageText = null;
+    this.secondLastMessageAuthor = null;
+    this.lastMessageText = null;
+    this.lastMessageAuthor = null;
+    for (let message of messages.slice(-2)) {
+      this.secondLastMessageText = this.lastMessageText;
+      this.secondLastMessageAuthor = this.lastMessageAuthor;
+      this.lastMessageText = message.text;
+      this.lastMessageAuthor = message.author_username;
+    }
   }
 
   isSuggestionThread(): boolean {
@@ -71,10 +86,6 @@ export class FeedbackThread {
   providedIn: 'root'
 })
 export class FeedbackThreadObjectFactory {
-  constructor(
-    private feedbackThreadSummaryObjectFactory:
-      FeedbackThreadSummaryObjectFactory) {}
-
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'feedbackThreadBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
@@ -88,8 +99,10 @@ export class FeedbackThreadObjectFactory {
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
       feedbackThreadBackendDict.thread_id,
-      this.feedbackThreadSummaryObjectFactory.createFromBackendDict(
-        feedbackThreadBackendDict.thread_summary_dict));
+      feedbackThreadBackendDict.last_message_text,
+      feedbackThreadBackendDict.last_message_author,
+      feedbackThreadBackendDict.second_last_message_text,
+      feedbackThreadBackendDict.second_last_message_author);
   }
 }
 angular.module('oppia').factory(

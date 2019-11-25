@@ -16,22 +16,35 @@
  * @fileoverview Unit tests for SuggestionThreadObjectFactory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// SuggestionThreadObjectFactory.ts is upgraded to Angular 8.
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
-require('domain/suggestion/SuggestionThreadObjectFactory');
+require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 
 describe('Suggestion thread object factory', function() {
-  var SuggestionThreadObjectFactory = null;
-
+  beforeEach(function() {
+    angular.mock.module('oppia');
+  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
+  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
+  var SuggestionThreadObjectFactory = null;
+  var suggestionObjectFactory = null;
 
-  beforeEach(angular.mock.inject(function(_SuggestionThreadObjectFactory_) {
-    SuggestionThreadObjectFactory = _SuggestionThreadObjectFactory_;
+  beforeEach(angular.mock.inject(function($injector) {
+    SuggestionThreadObjectFactory = $injector.get(
+      'SuggestionThreadObjectFactory');
+    suggestionObjectFactory = $injector.get('SuggestionObjectFactory');
   }));
 
   it('should create a new suggestion thread from a backend dict.', function() {
@@ -44,41 +57,35 @@ describe('Suggestion thread object factory', function() {
       message_count: 10,
       state_name: 'state 1',
       thread_id: 'exploration.exp1.thread1',
-      thread_summary_dict: {
-        status: 'accepted',
-        original_author_id: 'usr1',
-        last_updated: 1000,
-        last_message_text: 'last message',
-        total_message_count: 2,
-        last_message_is_read: false,
-        second_last_message_is_read: true,
-        author_last_message: 'Test user 2',
-        author_second_last_message: 'Test user 1',
-        exploration_title: 'Sample exploration 1',
-        exploration_id: 'exploration.exp1',
-        thread_id: 'exploration.exp1.thread1',
-      },
-      suggestion_dict: {
-        suggestion_id: 'exploration.exp1.thread1',
-        suggestion_type: 'edit_exploration_state_content',
-        target_type: 'exploration',
-        target_id: 'exp1',
-        target_version_at_submission: 1,
-        status: 'accepted',
-        author_name: 'author',
-        change: {
-          cmd: 'edit_state_property',
-          property_name: 'content',
-          state_name: 'state_1',
-          new_value: {html: 'new suggestion content'},
-          old_value: {html: 'old suggestion content'},
-        },
-        last_updated: 1000,
-      },
+      last_message_text: 'message 2',
+      last_message_author: 'author',
+      second_last_message_text: 'message 1',
+      second_last_message_author: 'author',
     };
 
-    var suggestionThread = SuggestionThreadObjectFactory.createFromBackendDict(
-      suggestionThreadBackendDict);
+    var suggestionBackendDict = {
+      suggestion_id: 'exploration.exp1.thread1',
+      suggestion_type: 'edit_exploration_state_content',
+      target_type: 'exploration',
+      target_id: 'exp1',
+      target_version_at_submission: 1,
+      status: 'accepted',
+      author_name: 'author',
+      change: {
+        cmd: 'edit_state_property',
+        property_name: 'content',
+        state_name: 'state_1',
+        new_value: {
+          html: 'new suggestion content'
+        },
+        old_value: {
+          html: 'old suggestion content'
+        }
+      },
+      last_updated: 1000
+    };
+    var suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
+      suggestionThreadBackendDict, suggestionBackendDict);
     expect(suggestionThread.status).toEqual('accepted');
     expect(suggestionThread.subject).toEqual('sample subject');
     expect(suggestionThread.summary).toEqual('sample summary');
@@ -86,8 +93,11 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.lastUpdated).toEqual(1000);
     expect(suggestionThread.messageCount).toEqual(10);
     expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
-    expect(suggestionThread.threadSummary.threadId).toEqual(
-      'exploration.exp1.thread1');
+    expect(suggestionThread.lastMessageText).toEqual('message 2');
+    expect(suggestionThread.lastMessageAuthor).toEqual('author');
+    expect(suggestionThread.secondLastMessageText).toEqual('message 1');
+    expect(suggestionThread.secondLastMessageAuthor).toEqual('author');
+    expect(suggestionThread.isSuggestionThread()).toEqual(false);
     expect(suggestionThread.suggestion.suggestionType).toEqual(
       'edit_exploration_state_content');
     expect(suggestionThread.suggestion.targetType).toEqual('exploration');
@@ -112,10 +122,11 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
       'new suggestion content');
 
-    var messages = [
-      {text: 'message1'},
-      {text: 'message2'},
-    ];
+    var messages = [{
+      text: 'message1'
+    }, {
+      text: 'message2'
+    }];
     suggestionThread.setMessages(messages);
     expect(suggestionThread.messages).toEqual(messages);
   });
