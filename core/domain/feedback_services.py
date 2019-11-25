@@ -419,7 +419,7 @@ def _get_thread_from_model(thread_model):
         thread_model.last_updated)
 
 
-def _get_last_two_messages_of_threads(threads):
+def _fetch_last_two_messages_of_threads(threads):
     """Returns the last two messages of each given thread.
 
     Args:
@@ -429,12 +429,12 @@ def _get_last_two_messages_of_threads(threads):
         list(tuple(FeedbackMessageModel | None)). A list of references to the
             last two message models of each thread, or None if they don't exist.
     """
-    flattened_last_two_messages = (
+    flat_last_two_messages = (
         feedback_models.GeneralFeedbackMessageModel.get_multi(
             itertools.chain.from_iterable(
                 t.get_last_two_message_ids() for t in threads)))
-    return [(flattened_last_two_messages[i], flattened_last_two_messages[i + 1])
-            for i in python_utils.RANGE(0, len(flattened_last_two_messages), 2)]
+    return [(flat_last_two_messages[i], flat_last_two_messages[i + 1])
+            for i in python_utils.RANGE(0, len(flat_last_two_messages), 2)]
 
 
 def get_thread_summaries(user_id, thread_ids):
@@ -488,13 +488,14 @@ def get_thread_summaries(user_id, thread_ids):
         ]))
 
     threads = [_get_thread_from_model(m) for m in thread_models]
-    all_last_two_messages = _get_last_two_messages_of_threads(threads)
+    all_last_two_messages = _fetch_last_two_messages_of_threads(threads)
 
     thread_summaries = []
     number_of_unread_threads = 0
     for thread, thread_user_model, thread_exp_model, last_two_messages in (
-            python_utils.ZIP(threads, thread_user_models, thread_exp_models,
-                             all_last_two_messages)):
+            python_utils.ZIP(
+                threads, thread_user_models, thread_exp_models,
+                all_last_two_messages)):
         last_message, second_last_message = last_two_messages
 
         if last_message is not None:
