@@ -30,7 +30,7 @@ describe('DebugInfoTrackerService', function() {
       $provide.value(key, value);
     }
   }));
-  
+
   beforeEach(angular.mock.inject(function($injector) {
     DebugInfoTrackerService = $injector.get('DebugInfoTrackerService');
   }));
