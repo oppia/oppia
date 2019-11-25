@@ -44,8 +44,6 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
-require('interactions/TextInput/directives/text-input-validation.service.ts');
-require('pages/interaction-specs.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');

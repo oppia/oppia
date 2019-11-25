@@ -15,16 +15,21 @@
 /**
  * @fileoverview Directive for showing and reviewing contributions.
  */
+
+require('base-components/base-content.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require('directives/angular-html-bind.directive.ts');
+require('filters/format-rte-preview.filter.ts');
+require('interactions/interactionsQuestionsRequires.ts');
+require('objects/objectComponentsRequires.ts');
 require(
   'pages/community-dashboard-page/login-required-message/' +
   'login-required-message.directive.ts');
-
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-and-review.services.ts');
 require('services/suggestion-modal.service.ts');
-
-require('filters/format-rte-preview.filter.ts');
 
 angular.module('oppia').directive('contributionsAndReview', [
   'UrlInterpolationService', function(

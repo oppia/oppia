@@ -17,8 +17,6 @@
  * domain object.
  */
 
-require('domain/editor/undo_redo/base-undo-redo.service.ts');
-
 angular.module('oppia').factory('QuestionUndoRedoService', [
   'BaseUndoRedoService', function(BaseUndoRedoService) {
     var child = Object.create(BaseUndoRedoService);

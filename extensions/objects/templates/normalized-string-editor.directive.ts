@@ -18,8 +18,6 @@
 
 // This is a copy of the UnicodeStringEditor.
 
-require('objects/templates/unicode-string-editor.directive.ts');
-
 angular.module('oppia').directive('normalizedStringEditor', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {

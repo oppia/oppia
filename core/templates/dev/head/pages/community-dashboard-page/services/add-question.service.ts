@@ -24,7 +24,7 @@ angular.module('oppia').factory('AddQuestionService', [
 
       return {
         init: function(expId, languageCode, successCallback) {
-=          questionDict = {};
+          questionDict = {};
           activeSkillId = expId;
           activeSkillVersion = null;
           $http.get(
@@ -35,17 +35,14 @@ angular.module('oppia').factory('AddQuestionService', [
               }
             }).then(
             function(response) {
-              stateWiseContents = response.data.state_names_to_content_id_mapping;
+              questionDict = response.data.state_names_to_content_id_mapping;
               activeSkillVersion = response.data.version;
-              for (var stateName in stateWiseContents) {
-                stateNamesList.push(stateName);
+              for (var stateName in questionDict) {
                 var contentIds = [];
-                for (var contentId in stateWiseContents[stateName]) {
+                for (var contentId in questionDict[stateName]) {
                   contentIds.push(contentId);
                 }
-                stateWiseContentIds[stateName] = contentIds;
               }
-              activeStateName = stateNamesList[0];
               successCallback();
             });
         },

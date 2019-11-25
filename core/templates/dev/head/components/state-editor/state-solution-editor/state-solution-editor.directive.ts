@@ -35,7 +35,6 @@ require(
   'solution-verification.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('pages/interaction-specs.constants.ajs.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-customization-args.service.ts');
@@ -58,8 +57,6 @@ require('services/exploration-html-formatter.service.ts');
 require('services/generate-content-id.service.ts');
 
 require('components/state-editor/state-editor.constants.ajs.ts');
-require('directives/angular-html-bind.directive.ts');
-require('interactions/TextInput/directives/oppia-interactive-text-input.directive.ts');
 
 angular.module('oppia').directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
