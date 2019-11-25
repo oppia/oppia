@@ -250,10 +250,10 @@ angular.module('oppia').directive('stateInteractionEditor', [
                       StateCustomizationArgsService);
 
                     $scope.getInteractionThumbnailImageUrl = function(
-                      interactionId) {
+                        interactionId) {
                       return (
                         UrlInterpolationService.getInteractionThumbnailImageUrl(
-                        interactionId));
+                          interactionId));
                     };
 
                     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
