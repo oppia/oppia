@@ -103,11 +103,14 @@ def apply_changes_based_on_config(
         writable_local_file.write('\n'.join(local_lines) + '\n')
 
 
-def check_updates_to_terms_of_service():
+def check_updates_to_terms_of_service(personal_access_token):
     """Checks if updates are made to terms of service and updates
     REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
+
+    Args:
+        personal_access_token: str. The personal access token for the
+            GitHub id of user.
     """
-    personal_access_token = common.get_personal_access_token()
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
@@ -166,7 +169,7 @@ def add_mailgun_api_key():
             f.write(line)
 
 
-def main():
+def main(personal_access_token):
     """Updates the files corresponding to LOCAL_FECONF_PATH and
     LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
     """
@@ -180,7 +183,7 @@ def main():
         raise Exception('Terms mainpage does not exist on Github.')
 
     try:
-        check_updates_to_terms_of_service()
+        check_updates_to_terms_of_service(personal_access_token)
         add_mailgun_api_key()
 
         apply_changes_based_on_config(
@@ -192,5 +195,5 @@ def main():
             'git', 'checkout', '--', LOCAL_FECONF_PATH, LOCAL_CONSTANTS_PATH])
         raise Exception(e)
 
-    python_utils.PRINT(
+    common.ask_user_to_confirm(
         'Done! Please check manually to ensure all the changes are correct.')

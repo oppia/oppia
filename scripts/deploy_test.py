@@ -200,7 +200,7 @@ class DeployTests(test_utils.GenericTestBase):
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
         feconf_swap = self.swap(
             deploy, 'FECONF_PATH', MOCK_FECONF_FILEPATH)
-        def mock_main():
+        def mock_main(unused_personal_access_token):
             pass
         def mock_get_personal_access_token():
             return 'test'

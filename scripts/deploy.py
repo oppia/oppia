@@ -363,7 +363,7 @@ def check_travis_and_circleci_tests(current_branch_name):
             'The latest commit on release branch locally does '
             'not match the latest commit on Oppia repo.')
 
-    python_utils.PRINT('Enter your GitHub username.\n')
+    python_utils.PRINT('\nEnter your GitHub username.\n')
     github_username = python_utils.INPUT().lower()
 
     travis_url = 'https://travis-ci.org/%s/oppia/branches' % github_username
@@ -489,7 +489,7 @@ def execute_deployment():
             repo = g.get_organization('oppia').get_repo('oppia')
             common.check_blocking_bug_issue_count(repo)
             common.check_prs_for_current_release_are_released(repo)
-            update_configs.main()
+            update_configs.main(personal_access_token)
             with python_utils.open_file(FECONF_PATH, 'r') as f:
                 feconf_contents = f.read()
                 if ('MAILGUN_API_KEY' not in feconf_contents or
