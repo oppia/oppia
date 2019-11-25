@@ -102,9 +102,9 @@ class FeedbackThread(python_utils.OBJECT):
             list(str|None). The ids of the last two messages of the thread. If
                 the message does not exist, None is returned.
         """
-        return reversed([
-            self.get_full_message_id(i) if i >= 0 else None
-            for i in range(self.message_count - 2, self.message_count)])
+        return [self.get_full_message_id(i) if i >= 0 else None
+                for i in range(
+                    self.message_count - 1, self.message_count - 3, -1)]
 
 
 class FeedbackMessage(python_utils.OBJECT):
