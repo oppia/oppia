@@ -230,6 +230,10 @@ def main():
         remote_alias, previous_release_version)
     if check_changes_in_supported_audio_languages(
             remote_alias, previous_release_version):
+        # This job is run so that an opportunity is created for
+        # contributors to translate and voiceover an exploration
+        # whenever a new audio language is added.
+        # Refer: https://github.com/oppia/oppia/issues/8027.
         extra_jobs_to_run.append(
             'ExplorationOpportunitySummaryModelRegenerationJob')
     if extra_jobs_to_run:
@@ -248,52 +252,53 @@ def main():
                 RELEASE_CREDENTIALS_FILEPATH))
         client = pygsheets.authorize(client_secret=RELEASE_CREDENTIALS_FILEPATH)
 
-        existing_jobs_sheet = client.open(
+        repeatable_jobs_sheet = client.open(
             'Oppia release team: Submitting an existing job for '
             'testing on the Oppia test server (Responses)').sheet1
-        existing_job_details = get_job_details_for_current_release(
-            existing_jobs_sheet.get_all_records(),
+        repeatable_job_details = get_job_details_for_current_release(
+            repeatable_jobs_sheet.get_all_records(),
             'Select the job you want to test',
             'Which upcoming release are you targeting this job for? ',
             'Email Address',
             'What is your name? ',
             'Please give a clear description of why you want to '
             'run this job on the test server')
-        existing_job_names = [
-            job_detail['job_name'] for job_detail in existing_job_details]
+        repeatable_job_names = [
+            job_detail['job_name'] for job_detail in repeatable_job_details]
 
-        new_jobs_sheet = client.open(
+        one_time_jobs_sheet = client.open(
             'Oppia release team: Submitting a job for testing (Responses)'
             ).sheet1
-        new_job_details = get_job_details_for_current_release(
-            new_jobs_sheet.get_all_records(),
+        one_time_job_details = get_job_details_for_current_release(
+            one_time_jobs_sheet.get_all_records(),
             'What is the name of the job to be run?',
             'Which upcoming release are you targeting this job for?',
             'Email Address',
             'What is your name?',
             'URL of a Google Doc with clear instructions on what the tester '
             'needs to do:')
-        new_job_names = [
-            job_detail['job_name'] for job_detail in new_job_details]
+        one_time_job_names = [
+            job_detail['job_name'] for job_detail in one_time_job_details]
 
         python_utils.PRINT(
-            'Existing jobs to run:\n%s\n' % ('\n').join(existing_job_names))
+            'Repeatable jobs to run:\n%s\n' % ('\n').join(repeatable_job_names))
         python_utils.PRINT(
-            'New jobs to run:\n%s\n' % ('\n').join(new_job_names))
+            'One time jobs to run:\n%s\n' % ('\n').join(one_time_job_names))
         common.open_new_tab_in_browser_if_possible(
             release_constants.RELEASE_DRIVE_URL)
         common.ask_user_to_confirm(
             'Please enter the above job names to release journal.')
 
         common.open_new_tab_in_browser_if_possible(
-            release_constants.EXISTING_JOB_SPREADSHEETS_URL)
+            release_constants.REPEATABLE_JOBS_SPREADSHEETS_URL)
         common.open_new_tab_in_browser_if_possible(
-            release_constants.NEW_JOBS_SPREADSHEET_URL)
+            release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
         python_utils.PRINT(
-            get_mail_message_template(existing_job_details + new_job_details))
+            get_mail_message_template(
+                repeatable_job_details + one_time_job_details))
         author_mail_ids = [
             job_details['author_email'] for job_details in (
-                existing_job_details + new_job_details)]
+                repeatable_job_details + one_time_job_details)]
         common.ask_user_to_confirm(
             'Note: Send the mail only after deploying to backup server.\n\n'
             'Note: Add author email ids: %s to the cc list when you send '

@@ -53,7 +53,9 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             (
                 'Which upcoming release are you '
                 'targeting this job for?'): short_current_month_name,
-            'Instructions': 'Instructions for job 1',
+            'Instructions': (
+                'https://docs.google.com/document/d/'
+                'instructionsforjob1'),
             '(Optional) Anything else you\'d like to tell us?': 'No'
         }, {
             'Timestamp': '11/8/2019 12:31:32',
@@ -63,7 +65,9 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             (
                 'Which upcoming release are you '
                 'targeting this job for?'): full_current_month_name,
-            'Instructions': 'Instructions for job 2',
+            'Instructions': (
+                'https://docs.google.com/document/d/'
+                'instructionsforjob2'),
             '(Optional) Anything else you\'d like to tell us?': 'Test-job'
         }, {
             'Timestamp': '11/9/2019 12:31:32',
@@ -73,19 +77,25 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             (
                 'Which upcoming release are you '
                 'targeting this job for?'): 'Random month',
-            'Instructions': 'Instructions for job 3',
+            'Instructions': (
+                'https://docs.google.com/document/d/'
+                'instructionsforjob3'),
             '(Optional) Anything else you\'d like to tell us?': 'No'
         }]
         expected_job_details = [{
             'job_name': 'Job1',
             'author_email': 'bob@email.com',
             'author_name': 'Bob',
-            'instruction_doc': 'Instructions for job 1'
+            'instruction_doc': (
+                'https://docs.google.com/document/d/'
+                'instructionsforjob1')
         }, {
             'job_name': 'Job2',
             'author_email': 'alice@email.com',
             'author_name': 'Alice',
-            'instruction_doc': 'Instructions for job 2'
+            'instruction_doc': (
+                'https://docs.google.com/document/d/'
+                'instructionsforjob2')
         }]
         self.assertEqual(
             initial_release_prep.get_job_details_for_current_release(
@@ -99,18 +109,24 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'job_name': 'Job1',
             'author_email': 'bob@email.com',
             'author_name': 'Bob',
-            'instruction_doc': 'Instructions for job 1'
+            'instruction_doc': (
+                'https://docs.google.com/document/d/'
+                'instructionsforjob1')
         }, {
             'job_name': 'Job2',
             'author_email': 'alice@email.com',
             'author_name': 'Alice',
-            'instruction_doc': 'Instructions for job 2'
+            'instruction_doc': (
+                'https://docs.google.com/document/d/'
+                'instructionsforjob2')
         }]
         expected_mail_message_template = (
             'Hi Sean,\n\n'
             'You will need to run these jobs on the backup server:\n\n'
-            'Job1 (Instructions: Instructions for job 1) (Author: Bob)\n'
-            'Job2 (Instructions: Instructions for job 2) (Author: Alice)\n\n'
+            'Job1 (Instructions: https://docs.google.com/document/d/'
+            'instructionsforjob1) (Author: Bob)\n'
+            'Job2 (Instructions: https://docs.google.com/document/d/'
+            'instructionsforjob2) (Author: Alice)\n\n'
             'The specific instructions for jobs are linked with them. '
             'The general instructions are as follows:\n\n'
             '1. Login as admin\n'
