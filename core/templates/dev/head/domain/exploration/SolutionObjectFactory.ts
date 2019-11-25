@@ -29,25 +29,38 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
-import { SubtitledHtmlObjectFactory } from
+import { SubtitledHtml, SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 
+export interface Explanation {
+  content_id: string;
+  html: string;
+}
+
+export interface SolutionDict {
+  answer_is_exclusive: boolean;
+  correct_answer: string;
+  explanation: Explanation;
+}
+
 export class Solution {
-  explorationHtml: ExplorationHtmlFormatterService;
+  ehfs: ExplorationHtmlFormatterService;
+  shof: SubtitledHtmlObjectFactory;
   answerIsExclusive: boolean;
   correctAnswer: any;
-  explanation: any;
+  explanation: SubtitledHtml;
   constructor(
-      explorations: any, answerisexclusive: any, correctanswer: any,
-      _explanation: any) {
-    this.explorationHtml = explorations;
+      ehfs: ExplorationHtmlFormatterService,
+      shof: SubtitledHtmlObjectFactory,
+      answerisexclusive: boolean, correctanswer: any,
+      explanation: SubtitledHtml) {
     this.answerIsExclusive = answerisexclusive;
     this.correctAnswer = correctanswer;
-    this.explanation = _explanation;
+    this.explanation = explanation;
   }
 
-  toBackendDict() {
+  toBackendDict(): SolutionDict {
     return {
       answer_is_exclusive: this.answerIsExclusive,
       correct_answer: this.correctAnswer,
@@ -93,14 +106,14 @@ export class Solution {
     this.correctAnswer = correctAnswer;
   }
 
-  setExplanation(explanation: string): void {
+  setExplanation(explanation: SubtitledHtml): void {
     this.explanation = explanation;
   }
   // TODO(#7165): Replace any with correct type.
   getOppiaShortAnswerResponseHtml(interaction: any) {
     return {
       prefix: (this.answerIsExclusive ? 'The only' : 'One'),
-      answer: this.explorationHtml.getShortAnswerHtml(
+      answer: this.ehfs.getShortAnswerHtml(
         this.correctAnswer, interaction.id, interaction.customizationArgs)};
   }
 
@@ -114,15 +127,16 @@ export class Solution {
 })
 export class SolutionObjectFactory {
   constructor(
-    private subtitledHtml: SubtitledHtmlObjectFactory,
-    private ehf: ExplorationHtmlFormatterService) {}
+    private ehfs: ExplorationHtmlFormatterService,
+    private shof: SubtitledHtmlObjectFactory) {}
   createFromBackendDict(solutionBackendDict: any): Solution {
   /* eslint-enable dot-notation */
     return new Solution(
-      this.ehf,
+      this.ehfs,
+      this.shof,
       solutionBackendDict.answer_is_exclusive,
       solutionBackendDict.correct_answer,
-      this.subtitledHtml.createFromBackendDict(
+      this.shof.createFromBackendDict(
         solutionBackendDict.explanation));
   }
 
@@ -130,14 +144,14 @@ export class SolutionObjectFactory {
   /* eslint-disable dot-notation */
   createNew(
   /* eslint-enable dot-notation */
-      answerIsExclusive, correctAnswer, explanationHtml,
-      explanationId): Solution {
+      answerIsExclusive: boolean, correctAnswer: any, explanationHtml: string,
+      explanationId: string): Solution {
     return new Solution(
-      this.ehf,
+      this.ehfs,
       answerIsExclusive,
       correctAnswer,
-      this.subtitledHtml.createDefault(explanationHtml,
-        explanationId));
+      this.shof.createDefault(
+        explanationHtml, explanationId));
   }
 }
 
