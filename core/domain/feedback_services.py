@@ -521,7 +521,7 @@ def get_thread_summaries(user_id, thread_ids):
             'exploration_title': exp.title,
             'exploration_id': exp.id,
             'thread_id': thread.id,
-        }
+        })
 
     return thread_summaries, number_of_unread_threads
 
