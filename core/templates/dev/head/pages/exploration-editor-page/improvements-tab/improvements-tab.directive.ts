@@ -58,12 +58,12 @@ angular.module('oppia').directive('improvementsTab', [
 
           $scope.onlyShowOpenTasks = true;
 
-          $scope.getStatusCssClass = function() {
-            ImprovementsDisplayService.getStatusCssClass;
+          $scope.getStatusCssClass = function(status) {
+            return ImprovementsDisplayService.getStatusCssClass(status);
           };
 
-          $scope.getHumanReadableStatus = function() {
-            ImprovementsDisplayService.getHumanReadableStatus;
+          $scope.getHumanReadableStatus = function(status) {
+            return ImprovementsDisplayService.getHumanReadableStatus(status);
           };
 
           $scope.getTasks = function() {
