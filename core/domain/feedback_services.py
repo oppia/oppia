@@ -18,6 +18,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import itertools
 import datetime
 
 from core.domain import email_manager
@@ -169,7 +170,8 @@ def create_message(
     msg.received_via_email = received_via_email
     msg.put()
 
-    # Update the message count in the thread.
+    # Update the message data in the thread.
+    thread.latest_message_text = text
     if thread.message_count is not None:
         thread.message_count += 1
     else:
@@ -417,6 +419,15 @@ def _get_thread_from_model(thread_model):
         thread_model.last_updated)
 
 
+def _get_last_two_messages_of_threads(threads):
+    flattened_last_two_messages = (
+        feedback_models.GeneralFeedbackMessageModel.get_multi(
+            itertools.chain.from_iterable(
+                t.get_last_two_message_ids() for t in threads)))
+    return [flattened_last_two_messages[i:i + 2]
+            for i in python_utils.RANGE(0, len(flattened_last_two_messages), 2)]
+
+
 def get_thread_summaries(user_id, thread_ids):
     """Returns a list of summaries corresponding to each of the threads given.
     It also returns the number of threads that are currently not read by the
@@ -450,85 +461,67 @@ def get_thread_summaries(user_id, thread_ids):
                 exploration belongs.
         int. The number of threads not read by the user.
     """
-    feedback_thread_user_model_ids = (
+    thread_exp_ids = (
+        [get_exp_id_from_thread_id(thread_id) for thread_id in thread_ids])
+    thread_user_model_ids = (
         [feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
             user_id, thread_id) for thread_id in thread_ids])
-    exploration_ids = [thread_id.split('.')[1] for thread_id in thread_ids]
-    multiple_models = (
-        datastore_services.fetch_multiple_entities_by_ids_and_models(
-            [
-                ('GeneralFeedbackThreadModel', thread_ids),
-                (
-                    'GeneralFeedbackThreadUserModel',
-                    feedback_thread_user_model_ids),
-                ('ExplorationModel', exploration_ids),
-            ]))
 
-    thread_models = multiple_models[0]
-    feedback_thread_user_models = multiple_models[1]
-    explorations = multiple_models[2]
+    thread_models, thread_user_models, thread_exps = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models([
+            ('GeneralFeedbackThreadModel', thread_ids),
+            ('GeneralFeedbackThreadUserModel', thread_user_model_ids),
+            ('ExplorationModel', thread_exp_ids),
+        ]))
 
-    threads = [_get_thread_from_model(thread_model)
-               for thread_model in thread_models]
-
-    last_two_messages_ids = []
-    for thread in threads:
-        last_two_messages_ids += thread.get_last_two_message_ids()
-
-    messages = feedback_models.GeneralFeedbackMessageModel.get_multi(
-        last_two_messages_ids)
-
-    last_two_messages = [
-        messages[i:i + 2] for i in python_utils.RANGE(0, len(messages), 2)]
-    last_message_is_read = False
+    threads = [_get_thread_from_model(m) for m in thread_models]
+    last_two_messages = _get_last_two_messages_of_threads(threads)
 
     thread_summaries = []
     number_of_unread_threads = 0
-    for index, thread in enumerate(threads):
-        feedback_thread_user_model_exists = (
-            feedback_thread_user_models[index] is not None)
-        if feedback_thread_user_model_exists:
+    for thread, thread_user_model, exp, (last_message, second_last_message) in (
+            python_utils.ZIP(
+                threads, thread_user_models, thread_exps, last_two_messages)):
+        if last_message is not None:
             last_message_is_read = (
-                last_two_messages[index][0].message_id
-                in feedback_thread_user_models[index].message_ids_read_by_user)
-
-        if last_two_messages[index][0].author_id is None:
-            author_last_message = None
+                thread_user_model is not None and
+                last_message.message_id in (
+                    thread_user_model.message_ids_read_by_user))
+            author_last_message = (
+                user_services.get_username(last_message.author_id)
+                if last_message.author_id is not None else None)
         else:
-            author_last_message = user_services.get_username(
-                last_two_messages[index][0].author_id)
+            last_message_is_read = False
+            author_last_message = None
 
-        second_last_message_is_read = False
-        author_second_last_message = None
+        if second_last_message is not None:
+            second_last_message_is_read = (
+                thread_user_model is not None and
+                second_last_message.message_id in (
+                    thread_user_model.message_ids_read_by_user))
+            author_second_last_message = (
+                user_services.get_username(second_last_message.author_id)
+                if second_last_message.author_id is not None else None)
+        else:
+            second_last_message_is_read = False
+            author_second_last_message = None
 
-        does_second_message_exist = (last_two_messages[index][1] is not None)
-        if does_second_message_exist:
-            if feedback_thread_user_model_exists:
-                second_last_message_is_read = (
-                    last_two_messages[index][1].message_id
-                    in feedback_thread_user_models[index].message_ids_read_by_user) # pylint: disable=line-too-long
-
-            if last_two_messages[index][1].author_id is not None:
-                author_second_last_message = user_services.get_username(
-                    last_two_messages[index][1].author_id)
         if not last_message_is_read:
             number_of_unread_threads += 1
-
-        total_message_count = thread.message_count
 
         thread_summary = {
             'status': thread.status,
             'original_author_id': thread.original_author_id,
             'last_updated': utils.get_time_in_millisecs(thread.last_updated),
-            'last_message_text': last_two_messages[index][0].text,
-            'total_message_count': total_message_count,
+            'last_message_text': last_message.text,
+            'total_message_count': thread.message_count,
             'last_message_is_read': last_message_is_read,
             'second_last_message_is_read': second_last_message_is_read,
             'author_last_message': author_last_message,
             'author_second_last_message': author_second_last_message,
-            'exploration_title': explorations[index].title,
-            'exploration_id': exploration_ids[index],
-            'thread_id': thread_ids[index]
+            'exploration_title': exp.title,
+            'exploration_id': exp.id,
+            'thread_id': thread.id,
         }
 
         thread_summaries.append(thread_summary)
