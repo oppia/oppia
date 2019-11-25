@@ -21,7 +21,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
-const extras = require('./webpack.extras.ts');
+const macros = require('./webpack.macros.ts');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -624,8 +624,9 @@ module.exports = {
     new webpack.LoaderOptionsPlugin({
       options: {
         macros: {
-          load: extras.load,
-          loadExtensions: extras.loadExtensions
+          load: macros.load,
+          loadExtensions: macros.loadExtensions,
+          loadHeader: macros.loadHeader
         },
       },
     }),

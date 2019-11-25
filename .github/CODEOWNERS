@@ -455,7 +455,7 @@
 /webpack.common.config.ts @jamesjay4199 @vojtechjelinek
 /webpack.dev.config.ts @jamesjay4199 @vojtechjelinek
 /webpack.prod.config.ts @jamesjay4199 @vojtechjelinek
-/webpack.extras.ts @jamesjay4199 @vojtechjelinek
+/webpack.macros.ts @jamesjay4199 @vojtechjelinek
 
 
 # Typings.

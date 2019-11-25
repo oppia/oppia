@@ -8,7 +8,6 @@ const objExtend = function(args, obj) {
   return _a;
 };
 
-
 module.exports = {
   load: function(resourcePath, args) {
     resourcePath = `/${resourcePath}`;
@@ -20,13 +19,11 @@ module.exports = {
       resourcePath, root)) + ').apply(null,' + argsExpr + ')';
   },
 
-  loadExtensions: function(resourcePath, args) {
+  loadExtensions: function(resourcePath) {
     resourcePath = `/${resourcePath}`;
     const root = path.resolve(__dirname, 'extensions');
-    const argsExpr = args ? '(' + objExtend + ')' + '(arguments, ' +
-      JSON.stringify(args) + ')' : 'arguments';
 
     return 'require(' + JSON.stringify(loaderUtils.urlToRequest(
-      resourcePath, root)) + ').apply(null,' + argsExpr + ')';
-  }
-}
+      resourcePath, root)) + ').apply(null)';
+  },
+};
