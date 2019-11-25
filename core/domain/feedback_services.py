@@ -497,27 +497,26 @@ def get_thread_summaries(user_id, thread_ids):
                 threads, thread_user_models, thread_exp_models,
                 all_last_two_messages)):
         last_message, second_last_message = last_two_messages
+        message_ids_read_by_user = (
+            () if thread_user_model is None else
+            thread_user_model.message_ids_read_by_user)
 
         if last_message is not None:
             last_message_is_read = (
-                thread_user_model is not None and
-                last_message.message_id in (
-                    thread_user_model.message_ids_read_by_user))
+                last_message.message_id in message_ids_read_by_user)
             author_last_message = (
-                user_services.get_username(last_message.author_id)
-                if last_message.author_id is not None else None)
+                None if last_message.author_id is None else
+                user_services.get_username(last_message.author_id))
         else:
             last_message_is_read = False
             author_last_message = None
 
         if second_last_message is not None:
             second_last_message_is_read = (
-                thread_user_model is not None and
-                second_last_message.message_id in (
-                    thread_user_model.message_ids_read_by_user))
+                second_last_message.message_id in message_ids_read_by_user)
             author_second_last_message = (
-                user_services.get_username(second_last_message.author_id)
-                if second_last_message.author_id is not None else None)
+                None if second_last_message.author_id is None else
+                user_services.get_username(second_last_message.author_id))
         else:
             second_last_message_is_read = False
             author_second_last_message = None
