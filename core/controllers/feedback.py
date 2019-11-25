@@ -22,7 +22,6 @@ from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
-import python_utils
 
 transaction_services = models.Registry.import_transaction_services()
 
