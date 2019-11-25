@@ -1,4 +1,4 @@
-name: Setup
+name: lint
 on: [push]
 
 jobs:
@@ -13,9 +13,9 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
-      - name: Install third party
+      - name: Install Third Party Dependencies
         run: python -m scripts.install_third_party_libs
-      - name: Third party size check
+      - name: Third Party Size Check
         run: python -m scripts.third_party_size_check
-      - name: run lint
+      - name: Run Lint Checks
         run: python -m scripts.pre_commit_linter --path=. --verbose
