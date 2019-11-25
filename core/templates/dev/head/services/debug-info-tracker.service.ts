@@ -16,7 +16,7 @@
  * @fileoverview Service for tracking the sequence of learner actions.
  */
 
-angular.module('oppia').factory('TrackerService', [
+angular.module('oppia').factory('DebugInfoTrackerService', [
   function() {
     var _sequenceOfActions = [];
 
