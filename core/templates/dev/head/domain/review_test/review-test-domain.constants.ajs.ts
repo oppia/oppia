@@ -13,21 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the footer.
+ * @fileoverview Constants for review test domain.
  */
 
+/* eslint-disable max-len */
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
+import { ReviewTestDomainConstants } from
+  'domain/review_test/review-test-domain.constants';
+/* eslint-enable max-len */
 
-angular.module('oppia').directive('oppiaFooter', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('!html-loader!./oppia_footer_directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        function() {}
-      ]
-    };
-  }
-]);
+angular.module('oppia').constant(
+  'REVIEW_TEST_DATA_URL',
+  ReviewTestDomainConstants.REVIEW_TEST_DATA_URL);
