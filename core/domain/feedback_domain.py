@@ -93,12 +93,14 @@ class FeedbackThread(python_utils.OBJECT):
             'summary': self.summary,
             'thread_id': self.id,
             'message_count': self.message_count,
-            'last_message_id': self.last_message_id,
             'last_message_text': self.last_message_text,
-            'last_message_author_id': self.last_message_author_id,
-            'second_last_message_id': self.second_last_message_id,
+            'last_message_author': (
+                user_services.get_username(self.last_message_author_id)
+                if self.last_message_author_id else None),
             'second_last_message_text': self.second_last_message_text,
-            'second_last_message_author_id': self.second_last_message_author_id,
+            'second_last_message_author': (
+                user_services.get_username(self.second_last_message_author_id)
+                if self.second_last_message_author_id else None),
         }
 
     def get_full_message_id(self, message_id):
