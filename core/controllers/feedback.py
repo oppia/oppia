@@ -39,7 +39,7 @@ class ThreadListHandler(base.BaseHandler):
                     feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]),
             'suggestion_thread_dicts': (
                 [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)]),
+                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
         })
         self.render_json(self.values)
 
