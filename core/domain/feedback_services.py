@@ -433,7 +433,7 @@ def _get_last_two_messages_of_threads(threads):
         feedback_models.GeneralFeedbackMessageModel.get_multi(
             itertools.chain.from_iterable(
                 t.get_last_two_message_ids() for t in threads)))
-    return [flattened_last_two_messages[i:i + 2]
+    return [(flattened_last_two_messages[i], flattened_last_two_messages[i + 1])
             for i in python_utils.RANGE(0, len(flattened_last_two_messages), 2)]
 
 
