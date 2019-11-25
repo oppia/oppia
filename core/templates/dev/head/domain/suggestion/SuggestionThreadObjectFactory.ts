@@ -51,7 +51,6 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
         suggestion = SuggestionObjectFactory.createFromBackendDict(
           suggestionBackendDict);
       }
-      suggestionThreadBackendDict.last_message_text;
       return new SuggestionThread(
         suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
         suggestionThreadBackendDict.summary,
