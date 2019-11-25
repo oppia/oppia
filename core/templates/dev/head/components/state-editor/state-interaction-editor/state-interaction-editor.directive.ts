@@ -249,8 +249,12 @@ angular.module('oppia').directive('stateInteractionEditor', [
                     $scope.StateCustomizationArgsService = (
                       StateCustomizationArgsService);
 
-                    $scope.getInteractionThumbnailImageUrl = (
-                      UrlInterpolationService.getInteractionThumbnailImageUrl);
+                    $scope.getInteractionThumbnailImageUrl = function(
+                      interactionId) {
+                      return (
+                        UrlInterpolationService.getInteractionThumbnailImageUrl(
+                        interactionId));
+                    };
 
                     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
 
