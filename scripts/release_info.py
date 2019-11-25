@@ -47,7 +47,7 @@ GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
 GIT_CMD_SHOW_FORMAT_STRING = 'git show %s:feconf.py'
 ISSUE_URL_FORMAT_STRING = 'https://github.com/oppia/oppia/issues/%s'
 ISSUE_REGEX = re.compile(r'#(\d+)')
-PR_NUMBER_REGEX = re.compile(r'\(#(\d+)\)')
+PR_NUMBER_REGEX = re.compile(r'\(#(\d+)\)$')
 GROUP_SEP = '\x1D'
 VERSION_RE_FORMAT_STRING = r'%s\s*=\s*(\d+|\.)+'
 FECONF_VAR_NAMES = ['CURRENT_STATE_SCHEMA_VERSION',
@@ -142,8 +142,9 @@ def extract_pr_numbers(logs):
     Returns:
         set(int): Set of PR numbers extracted from the log.
     """
-    pr_numbers = PR_NUMBER_REGEX.findall(
-        ' '.join([log.message.split('\n')[0] for log in logs]))
+    pr_numbers = []
+    for log in logs:
+        pr_numbers.extend(PR_NUMBER_REGEX.findall(log.message.split('\n')[0]))
     # Delete duplicates.
     pr_numbers = list(set(pr_numbers))
     pr_numbers.sort(reverse=True)

@@ -79,9 +79,9 @@ def get_job_details_for_current_release(
     """
     job_details_for_current_release = []
     # First three letters of the release month. Eg: Nov, Dec etc.
-    current_release_month = datetime.datetime.utcnow().strftime('%h')
+    current_release_month = datetime.datetime.utcnow().strftime('%h').lower()
     for job_detail in job_details:
-        if current_release_month in job_detail[month_header]:
+        if current_release_month in job_detail[month_header].lower():
             job_details_for_current_release.append({
                 'job_name': job_detail[job_name_header],
                 'author_email': job_detail[author_email_header],
