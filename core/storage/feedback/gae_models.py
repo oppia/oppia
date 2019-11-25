@@ -75,8 +75,16 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         indexed=True, default=False, required=True)
     # The number of messages in the thread.
     message_count = ndb.IntegerProperty(indexed=True, default=0)
-    # The latest message of the thread.
-    latest_message_text = ndb.StringProperty(indexed=False, default=None)
+
+    # Details about the last message in the thread.
+    last_message_id = ndb.IntegerProperty(indexed=False, default=None)
+    last_message_text = ndb.StringProperty(indexed=False, default=None)
+    last_message_author_id = ndb.StringProperty(indexed=False, default=None)
+    # Details about the second-to-last message in the thread.
+    second_last_message_id = ndb.IntegerProperty(indexed=False, default=None)
+    second_last_message_text = ndb.StringProperty(indexed=False, default=None)
+    second_last_message_author_id = (
+        ndb.StringProperty(indexed=False, default=None))
 
     @staticmethod
     def get_deletion_policy():
