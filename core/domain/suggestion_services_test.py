@@ -683,39 +683,36 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
             self.mock_get_exploration_by_id):
-
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description',
-                self.reviewer_id_1)
-
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description', None)
-
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description', None)
-
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id_1, self.target_version_at_submission,
-                self.author_id_2, self.change, 'test description',
-                self.reviewer_id_2)
-
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id_2, self.target_version_at_submission,
-                self.author_id_2, self.change, 'test description',
-                self.reviewer_id_2)
+            self.suggestion_ids = [
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, self.target_version_at_submission,
+                    self.author_id_1, self.change, 'test description',
+                    self.reviewer_id_1),
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, self.target_version_at_submission,
+                    self.author_id_1, self.change, 'test description', None),
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, self.target_version_at_submission,
+                    self.author_id_1, self.change, 'test description', None),
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, self.target_version_at_submission,
+                    self.author_id_2, self.change, 'test description',
+                    self.reviewer_id_2),
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_2, self.target_version_at_submission,
+                    self.author_id_2, self.change, 'test description',
+                    self.reviewer_id_2),
+            ]
 
     def test_get_by_author(self):
         queries = [('author_id', self.author_id_1)]
@@ -750,6 +747,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'suggestion_type',
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 5)
+
+    def test_get_by_ids(self):
+        self.assertEqual(
+            self.suggestion_ids,
+            [m.suggestion_id
+             for m in suggestion_services.get_suggestions_by_ids(
+                self.suggestion_ids)])
 
     def test_query_suggestions(self):
         queries = [

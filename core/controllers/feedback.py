@@ -36,7 +36,7 @@ class ThreadListHandler(base.BaseHandler):
         suggestion_thread_dicts = (
             [t.to_dict() for t in feedback_services.get_all_threads(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
-        suggestions = suggestion_models.GeneralSuggestionModel.get_multi(
+        suggestions = suggestion_services.get_suggestions_by_ids(
             d['thread_id'] for d in suggestion_thread_dicts)
         for thread_dict, suggestion in zip(
                 suggestion_thread_dicts, suggestions):
