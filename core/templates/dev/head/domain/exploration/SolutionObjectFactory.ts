@@ -34,13 +34,17 @@ import { SubtitledHtml, SubtitledHtmlObjectFactory } from
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 
 export interface Explanation {
+  /* eslint-disable camelcase */
   content_id: string;
+  /* eslint-enable camelcase */
   html: string;
 }
 
 export interface SolutionDict {
+  /* eslint-disable camelcase */
   answer_is_exclusive: boolean;
   correct_answer: string;
+  /* eslint-enable camelcase */
   explanation: Explanation;
 }
 
@@ -127,8 +131,8 @@ export class Solution {
 })
 export class SolutionObjectFactory {
   constructor(
-    private ehfs: ExplorationHtmlFormatterService,
-    private shof: SubtitledHtmlObjectFactory) {}
+    private shof: SubtitledHtmlObjectFactory,
+    private ehfs: ExplorationHtmlFormatterService) {}
   createFromBackendDict(solutionBackendDict: any): Solution {
   /* eslint-enable dot-notation */
     return new Solution(
@@ -148,6 +152,7 @@ export class SolutionObjectFactory {
       explanationId: string): Solution {
     return new Solution(
       this.ehfs,
+      this.shof,
       answerIsExclusive,
       correctAnswer,
       this.shof.createDefault(
