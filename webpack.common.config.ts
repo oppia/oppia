@@ -20,6 +20,8 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const loaderUtils = require('loader-utils');
+const webpack = require('webpack');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -617,7 +619,29 @@ module.exports = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true
-    })
+    }),
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        macros: {
+          load: function(resourcePath, args, root) {
+            if (root === undefined) {
+              root = path.resolve(__dirname, 'core/templates/dev/head');
+            }
+            var objExtend = function(args, obj) {
+              args = Array.prototype.slice.call(args);
+              var _a = args.slice(1);
+              _a.unshift(Object.assign(obj, args[0]));
+              return _a;
+            };
+            var argsExpr = args ? '(' + objExtend + ')' + '(arguments, ' +
+              JSON.stringify(args) + ')' : 'arguments';
+
+            return 'require(' + JSON.stringify(loaderUtils.urlToRequest(
+              resourcePath, root)) + ').apply(null,' + argsExpr + ')';
+          }
+        },
+      },
+    }),
   ],
   module: {
     rules: [{
@@ -642,7 +666,12 @@ module.exports = {
     },
     {
       test: /\.html$/,
-      loader: 'underscore-template-loader'
+      loader: 'underscore-template-loader',
+      options: {
+        macros: {
+
+        }
+      }
     },
     {
       test: /\.css$/,
