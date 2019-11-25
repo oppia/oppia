@@ -104,12 +104,16 @@ def get_mail_message_template(job_details):
         string. The mail message template.
     """
     job_names_with_instructions_and_author = ''
-
+    author_names_and_mail_ids = []
     for job_detail in job_details:
         job_names_with_instructions_and_author += (
             '%s (Instructions: %s) (Author: %s)\n' % (
                 job_detail['job_name'], job_detail['instruction_doc'],
                 job_detail['author_name']))
+        author_names_and_mail_ids.append(
+            '%s: %s' % (
+                job_detail['author_name'], job_detail['author_email']))
+    author_names_and_mail_ids = list(set(author_names_and_mail_ids))
     mail_message_template = (
         'Hi Sean,\n\n'
         'You will need to run these jobs on the backup server:\n\n'
@@ -120,8 +124,9 @@ def get_mail_message_template(job_details):
         '2. Navigate to the admin panel and then the jobs tab\n'
         '3. Run the above jobs\n'
         '4. In case of failure/success, please send the output logs for '
-        'the job to me and the job author:\n\n'
-        'Thanks!\n') % job_names_with_instructions_and_author
+        'the job to me and the job authors: %s\n\n'
+        'Thanks!\n') % (
+            job_names_with_instructions_and_author, author_names_and_mail_ids)
     return mail_message_template
 
 

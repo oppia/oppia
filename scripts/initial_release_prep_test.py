@@ -117,7 +117,8 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             '2. Navigate to the admin panel and then the jobs tab\n'
             '3. Run the above jobs\n'
             '4. In case of failure/success, please send the output logs for '
-            'the job to me and the job author:\n\n'
+            'the job to me and the job authors: '
+            '[u\'Bob: bob@email.com\', u\'Alice: alice@email.com\']\n\n'
             'Thanks!\n')
         self.assertEqual(
             initial_release_prep.get_mail_message_template(job_details),
