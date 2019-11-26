@@ -124,6 +124,29 @@ class StoryPageTests(BaseStoryViewerControllerTests):
             self.get_html_response(
                 '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
 
+    def test_accessibility_of_unpublished_story_viewer_page(self):
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.STORY_ID_1, self.admin_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1),
+                expected_status_int=404)
+            self.login(self.ADMIN_EMAIL)
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
+            self.logout()
+
+    def test_accessibility_of_story_viewer_in_unpublished_topic(self):
+        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1),
+                expected_status_int=404)
+            self.login(self.ADMIN_EMAIL)
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
+            self.logout()
+
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response(
