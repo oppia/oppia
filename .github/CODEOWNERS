@@ -453,9 +453,9 @@
 /gulpfile.js @jamesjay4199 @vojtechjelinek
 /jinja_utils*.py @jamesjay4199 @vojtechjelinek
 /webpack.common.config.ts @jamesjay4199 @vojtechjelinek
+/webpack.common.macros.ts @jamesjay4199 @vojtechjelinek
 /webpack.dev.config.ts @jamesjay4199 @vojtechjelinek
 /webpack.prod.config.ts @jamesjay4199 @vojtechjelinek
-/webpack.macros.ts @jamesjay4199 @vojtechjelinek
 
 
 # Typings.

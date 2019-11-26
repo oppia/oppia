@@ -21,7 +21,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
-const macros = require('./webpack.macros.ts');
+const macros = require('./webpack.common.macros.ts');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -29,7 +29,6 @@ var htmlMinifyConfig = {
     /<\{%[\s\S]*?%\}/,
     /<\[[\s\S]*?\]>/]
 };
-
 var commonPrefix = './core/templates/dev/head';
 var defaultMeta = {
   name: 'Personalized Online Learning from Oppia',
@@ -654,7 +653,7 @@ module.exports = {
     },
     {
       test: /\.html$/,
-      loader: 'underscore-template-loader',
+      loader: 'underscore-template-loader'
     },
     {
       test: /\.css$/,

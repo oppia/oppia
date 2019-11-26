@@ -31,18 +31,18 @@ module.exports = {
   load: function(resourcePath, args) {
     resourcePath = `/${resourcePath}`;
     const root = path.resolve(__dirname, 'core/templates/dev/head');
-    const argsExpr = args ? '(' + objExtend + ')' + '(arguments, ' +
-      JSON.stringify(args) + ')' : 'arguments';
+    const argsExpr = args ? `(${objExtend})(arguments,
+      ${JSON.stringify(args)})` : 'arguments';
 
-    return 'require(' + JSON.stringify(loaderUtils.urlToRequest(
-      resourcePath, root)) + ').apply(null,' + argsExpr + ')';
+    return `require(${JSON.stringify(loaderUtils.urlToRequest(
+      resourcePath, root))}).apply(null,${argsExpr})`;
   },
 
   loadExtensions: function(resourcePath) {
     resourcePath = `/${resourcePath}`;
     const root = path.resolve(__dirname, 'extensions');
 
-    return 'require(' + JSON.stringify(loaderUtils.urlToRequest(
-      resourcePath, root)) + ').apply(null)';
+    return `require(${JSON.stringify(loaderUtils.urlToRequest(
+      resourcePath, root))})()`;
   },
 };
