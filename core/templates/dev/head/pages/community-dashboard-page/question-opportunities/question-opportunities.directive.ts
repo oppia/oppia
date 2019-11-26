@@ -32,6 +32,7 @@ require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/SkillObjectFactory.ts');
 require('interactions/codemirrorRequires.ts');
 require(
   'pages/community-dashboard-page/opportunities-list/' +
@@ -57,30 +58,17 @@ angular.module('oppia').directive('questionOpportunities', [
         '$scope', '$uibModal', 'AddQuestionService', 'AlertsService',
         'ContributionOpportunitiesService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'QuestionUndoRedoService', 'UserService',
+        'QuestionUndoRedoService', 'SkillObjectFactory',
         function(
             $scope, $uibModal, AddQuestionService, AlertsService,
             ContributionOpportunitiesService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
-            QuestionUndoRedoService, UserService) {
+            QuestionUndoRedoService, SkillObjectFactory) {
           var ctrl = this;
-          var userIsLoggedIn = false;
           ctrl.opportunities = [];
           ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
           ctrl.progressBarRequired = true;
-
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            userIsLoggedIn = userInfo.isLoggedIn();
-          });
-
-          var getOpportunity = function(skillId) {
-            for (var index in ctrl.opportunities) {
-              if (ctrl.opportunities[index].id === skillId) {
-                return ctrl.opportunities[index];
-              }
-            }
-          };
 
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
@@ -111,32 +99,35 @@ angular.module('oppia').directive('questionOpportunities', [
             }
           };
 
-          ctrl.populateMisconceptions = function(skillIds) {
-            var misconceptionsBySkill = {};
-            EditableSkillBackendApiService.fetchMultiSkills(
-              skillIds).then(
-              function(skillDicts) {
-                skillDicts.forEach(function(skillDict) {
-                  misconceptionsBySkill[skillDict.id] =
-                    skillDict.misconceptions.map(
-                      function(misconceptionsBackendDict) {
-                        return MisconceptionObjectFactory
-                          .createFromBackendDict(misconceptionsBackendDict);
-                      });
-                });
+          ctrl.getSkill = function(skillId, successCallback) {
+            var skill = {};
+            EditableSkillBackendApiService.fetchSkill(skillId)
+              .then(function(backendSkillObject) {
+                skill = SkillObjectFactory.createFromBackendDict(
+                  backendSkillObject.skill);
+                successCallback(skill);
               }, function(error) {
                 AlertsService.addWarning();
               });
-            return misconceptionsBySkill;
+            return skill;
           };
 
           ctrl.onClickButton = function(skillId) {
-            var opportunity = getOpportunity(skillId);
             var question =
               QuestionObjectFactory.createDefaultQuestion([skillId]);
             var questionId = question.getId();
             var questionStateData = question.getStateData();
-            var misconceptionsBySkill = ctrl.populateMisconceptions([skillId]);
+            var misconceptionsBySkill = {};
+            var associatedSkill = ctrl.getSkill(
+              skillId,
+              function(skill) {
+                misconceptionsBySkill[skill._id] =
+                skill._misconceptions.map(
+                  function(misconceptionsBackendDict) {
+                    return MisconceptionObjectFactory
+                      .createFromBackendDict(misconceptionsBackendDict);
+                  });
+              });
             QuestionUndoRedoService.clearChanges();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -146,14 +137,14 @@ angular.module('oppia').directive('questionOpportunities', [
               keyboard: false,
               controller: [
                 '$scope', '$uibModalInstance', 'StateEditorService',
-                'UndoRedoService',
                 function(
-                    $scope, $uibModalInstance, StateEditorService,
-                    UndoRedoService) {
+                    $scope, $uibModalInstance, StateEditorService) {
                   $scope.canEditQuestion = true;
+                  $scope.newQuestionIsBeingCreated = true;
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
                   $scope.questionId = questionId;
+                  $scope.associatedSkill = associatedSkill;
                   $scope.misconceptionsBySkill = misconceptionsBySkill;
                   $scope.removeErrors = function() {
                     $scope.validationError = null;
@@ -173,10 +164,11 @@ angular.module('oppia').directive('questionOpportunities', [
                         'correspond to a correct answer';
                       return;
                     }
-                    AddQuestionService.addQuestion();
+                    AddQuestionService.addQuestion(
+                      $scope.question, $scope.associatedSkillDict);
                     $uibModalInstance.close();
                   };
-                  // Checking if Question contains all requirement to enable
+                  // Checking if Question contains all requirements to enable
                   // Save and Publish Question
                   $scope.isSaveButtonDisabled = function() {
                     return $scope.question.validate(

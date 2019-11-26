@@ -18,48 +18,21 @@
 
 angular.module('oppia').factory('AddQuestionService', [
     '$http', function($http) {
-      var questionDict = {};
-      var activeSkillId = null;
-      var activeSkillVersion = null;
-
       return {
-        init: function(expId, languageCode, successCallback) {
-          questionDict = {};
-          activeSkillId = expId;
-          activeSkillVersion = null;
-          $http.get(
-            '/gettranslatabletexthandler', {
-              params: {
-                exp_id: expId,
-                language_code: languageCode
-              }
-            }).then(
-            function(response) {
-              questionDict = response.data.state_names_to_content_id_mapping;
-              activeSkillVersion = response.data.version;
-              for (var stateName in questionDict) {
-                var contentIds = [];
-                for (var contentId in questionDict[stateName]) {
-                  contentIds.push(contentId);
-                }
-              }
-              successCallback();
-            });
-        },
-        addQuestion: function() {
+        addQuestion: function(question, associatedSkill) {
           var url = '/suggestionhandler/';
           var data = {
             suggestion_type: 'add_question',
             target_type: 'skill',
             description: 'Add new question',
-            target_id: activeSkillId,
-            target_version_at_submission: activeSkillVersion,
+            target_id: associatedSkill.id,
+            target_version_at_submission: associatedSkill.version,
             assigned_reviewer_id: null,
             final_reviewer_id: null,
             change: {
               cmd: 'create_new_fully_specified_question',
-              question_dict: ctrl.question.toBackendDict(true),
-              skill_id: activeSkillVersion
+              question_dict: question.toBackendDict(true),
+              skill_id: associatedSkill.id
             }
           };
           $http.post(url, data);
