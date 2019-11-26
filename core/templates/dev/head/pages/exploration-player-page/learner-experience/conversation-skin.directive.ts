@@ -505,8 +505,9 @@ angular.module('oppia').directive('conversationSkin', [
           $scope.OPPIA_AVATAR_IMAGE_URL = (
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg'));
-          $scope.getStaticImageUrl = (
-            UrlInterpolationService.getStaticImageUrl);
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
 
           $scope.displayedCard = null;
           var explorationActuallyStarted = false;

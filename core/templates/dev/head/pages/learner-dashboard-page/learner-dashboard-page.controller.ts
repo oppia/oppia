@@ -87,7 +87,9 @@ angular.module('oppia').directive('learnerDashboardPage', [
             LEARNER_DASHBOARD_SECTION_I18N_IDS);
           ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
             LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.PAGE_SIZE = 8;
           ctrl.Math = window.Math;
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {

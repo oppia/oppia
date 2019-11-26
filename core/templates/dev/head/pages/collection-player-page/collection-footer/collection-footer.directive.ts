@@ -37,7 +37,9 @@ angular.module('oppia').directive('collectionFooter', [
         var ctrl = this;
         ctrl.collectionId = UrlService.getCollectionIdFromUrl();
 
-        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
       }]
     };
   }]);

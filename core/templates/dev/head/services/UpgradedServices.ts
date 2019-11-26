@@ -102,6 +102,8 @@ import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
@@ -233,6 +235,9 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
+      upgradedServices['AlertsService'], upgradedServices['UrlService'],
+      upgradedServices['UtilsService']);
 
     /* eslint-enable dot-notation */
     return upgradedServices;

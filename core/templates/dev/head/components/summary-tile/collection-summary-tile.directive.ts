@@ -85,8 +85,8 @@ angular.module('oppia').directive('collectionSummaryTile', [
               ctrl.getThumbnailIconUrl());
           };
 
-          ctrl.getStaticImageUrl = function(url) {
-            return UrlInterpolationService.getStaticImageUrl(url);
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
 
           ctrl.setHoverState = function(hoverState) {

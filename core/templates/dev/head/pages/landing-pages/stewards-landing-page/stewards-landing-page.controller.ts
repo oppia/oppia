@@ -106,7 +106,9 @@ angular.module('oppia').directive('stewardsLandingPage', [
             }
           };
 
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
 
           ctrl.getStaticSubjectImageUrl = function(subjectName) {
             return UrlInterpolationService.getStaticImageUrl('/subjects/' +

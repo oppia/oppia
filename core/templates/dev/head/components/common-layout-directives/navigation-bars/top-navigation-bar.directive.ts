@@ -96,7 +96,9 @@ angular.module('oppia').directive('topNavigationBar', [
             'story_editor'];
           ctrl.currentUrl = window.location.pathname.split('/')[1];
           ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.logoutUrl = LOGOUT_URL;
           ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
           ctrl.standardNavIsShown = (

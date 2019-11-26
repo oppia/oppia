@@ -80,7 +80,9 @@ angular.module('oppia').directive('teachPage', [
             activateTab(tabName);
           };
 
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
 
           ctrl.onApplyToTeachWithOppia = function() {
             SiteAnalyticsService.registerApplyToTeachWithOppiaEvent();

@@ -41,7 +41,9 @@ angular.module('oppia').directive('splashPage', [function() {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           $rootScope.loadingMessage = '';
         });
-        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
         ctrl.getStaticSubjectImageUrl = function(subjectName) {
           return UrlInterpolationService.getStaticImageUrl('/subjects/' +
             subjectName + '.svg');

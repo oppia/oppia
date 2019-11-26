@@ -41,7 +41,9 @@ angular.module('oppia').directive('explorationFooter', [
             ExplorationSummaryBackendApiService, UrlService,
             WindowDimensionsService) {
           $scope.explorationId = ContextService.getExplorationId();
-          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           $scope.iframed = UrlService.isIframed();
 
           $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();

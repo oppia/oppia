@@ -100,7 +100,9 @@ angular.module('oppia').directive('preferencesPage', [
             $rootScope.loadingMessage = '';
           });
 
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
 
           ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
 
