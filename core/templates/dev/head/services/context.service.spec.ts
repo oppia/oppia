@@ -194,7 +194,7 @@ describe('Context service', function() {
     });
   });
 
-  fdescribe('behavior in question editor modal', function() {
+  describe('behavior in question editor modal', function() {
     var provide = null;
     var injector = null;
 
