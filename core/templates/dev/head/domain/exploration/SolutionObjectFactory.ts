@@ -40,7 +40,7 @@ export interface Explanation {
   html: string;
 }
 
-export interface SolutionDict {
+export interface SolutionBackendDict {
   /* eslint-disable camelcase */
   answer_is_exclusive: boolean;
   correct_answer: string;
@@ -59,12 +59,14 @@ export class Solution {
       shof: SubtitledHtmlObjectFactory,
       answerisexclusive: boolean, correctanswer: any,
       explanation: SubtitledHtml) {
+    this.ehfs = ehfs;
+    this.shof = shof;
     this.answerIsExclusive = answerisexclusive;
     this.correctAnswer = correctanswer;
     this.explanation = explanation;
   }
 
-  toBackendDict(): SolutionDict {
+  toBackendDict(): SolutionBackendDict {
     return {
       answer_is_exclusive: this.answerIsExclusive,
       correct_answer: this.correctAnswer,
@@ -133,7 +135,7 @@ export class SolutionObjectFactory {
   constructor(
     private shof: SubtitledHtmlObjectFactory,
     private ehfs: ExplorationHtmlFormatterService) {}
-  createFromBackendDict(solutionBackendDict: any): Solution {
+  createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
   /* eslint-enable dot-notation */
     return new Solution(
       this.ehfs,
