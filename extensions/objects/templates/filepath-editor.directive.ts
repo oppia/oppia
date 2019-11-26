@@ -769,6 +769,8 @@ angular.module('oppia').directive('filepathEditor', [
             filename: ctrl.generateImageFilename(
               dimensions.height, dimensions.width, imageType)
           }));
+          ctrl.entityType = ContextService.getEntityType();
+          ctrl.entityId = ContextService.getEntityId();
           var imageUploadUrlTemplate = '/createhandler/imageupload/' +
             '<entity_type>/<entity_id>';
           CsrfTokenService.getTokenAsync().then(function(token) {
