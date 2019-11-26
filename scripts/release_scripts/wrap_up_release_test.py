@@ -26,8 +26,7 @@ import sys
 from core.tests import test_utils
 import release_constants
 from scripts import common
-
-from . import wrap_up_release
+from scripts.release_scripts import wrap_up_release
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')

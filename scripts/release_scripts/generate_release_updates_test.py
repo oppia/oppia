@@ -26,8 +26,7 @@ from core.tests import test_utils
 import python_utils
 import release_constants
 from scripts import common
-
-from . import generate_release_updates
+from scripts.release_scripts import generate_release_updates
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 

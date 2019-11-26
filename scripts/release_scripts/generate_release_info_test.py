@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/release_info.py."""
+"""Unit tests for scripts/generate_release_info.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -28,9 +28,8 @@ from core.tests import test_utils
 import python_utils
 import release_constants
 from scripts import common
-
-from . import release_info
-from . import update_changelog_and_credits
+from scripts.release_scripts import generate_release_info
+from scripts.release_scripts import update_changelog_and_credits
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -47,11 +46,11 @@ GENERATED_RELEASE_SUMMARY_FILEPATH = os.path.join(
 MOCK_FECONF_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
 
 
-class ReleaseInfoTests(test_utils.GenericTestBase):
+class GenerateReleaseInfoTests(test_utils.GenericTestBase):
     """Test the methods for generation of release summary."""
 
     def setUp(self):
-        super(ReleaseInfoTests, self).setUp()
+        super(GenerateReleaseInfoTests, self).setUp()
         self.mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
         def mock_get_current_branch_name():
@@ -87,13 +86,13 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             Exception, (
                 'This script should only be run from the latest release '
                 'branch.')):
-            release_info.main('test-token')
+            generate_release_info.main('test-token')
 
     def test_get_current_version_tag(self):
         def mock_get_tags(unused_self):
             return ['tags']
         with self.swap(github.Repository.Repository, 'get_tags', mock_get_tags):
-            tags = release_info.get_current_version_tag(self.mock_repo)
+            tags = generate_release_info.get_current_version_tag(self.mock_repo)
         self.assertEqual(tags, 'tags')
 
     def test_get_extra_commits_in_new_release(self):
@@ -105,8 +104,9 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
         get_commit_swap = self.swap(
             github.Repository.Repository, 'get_commit', mock_get_commit)
         with run_cmd_swap, get_commit_swap:
-            actual_commits = release_info.get_extra_commits_in_new_release(
-                'base_commit', self.mock_repo)
+            actual_commits = (
+                generate_release_info.get_extra_commits_in_new_release(
+                    'base_commit', self.mock_repo))
         self.assertEqual(actual_commits, ['sha1', 'sha2'])
 
     def test_gather_logs_with_no_logs(self):
@@ -114,30 +114,51 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             return ''
         run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         with run_cmd_swap:
-            actual_logs = release_info.gather_logs('start')
+            actual_logs = generate_release_info.gather_logs('start')
         self.assertEqual(actual_logs, [])
 
     def test_gather_logs_with_logs(self):
         def mock_run_cmd(unused_cmd):
             log1 = 'sha1{0}author1{0}email1{0}msg1'.format(
-                release_info.GROUP_SEP)
+                generate_release_info.GROUP_SEP)
             log2 = 'sha2{0}author2{0}email2{0}msg2'.format(
-                release_info.GROUP_SEP)
+                generate_release_info.GROUP_SEP)
             return '%s\x00%s' % (log1, log2)
         run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         with run_cmd_swap:
-            actual_logs = release_info.gather_logs('start')
+            actual_logs = generate_release_info.gather_logs('start')
         expected_logs = [
-            release_info.Log('sha1', 'author1', 'email1', 'msg1'),
-            release_info.Log('sha2', 'author2', 'email2', 'msg2')]
+            generate_release_info.Log('sha1', 'author1', 'email1', 'msg1'),
+            generate_release_info.Log('sha2', 'author2', 'email2', 'msg2')]
+        self.assertEqual(actual_logs, expected_logs)
+
+    def test_gather_logs_with_unicode_characters_in_logs(self):
+        def mock_run_cmd(unused_cmd):
+            log1 = 'sha1{0}author1{0}email1{0}normal-message'.format(
+                generate_release_info.GROUP_SEP)
+            log2 = 'sha2{0}author2{0}email2{0}message-with-unicode-â'.format(
+                generate_release_info.GROUP_SEP)
+            return '%s\x00%s' % (log1, log2)
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        with run_cmd_swap:
+            actual_logs = generate_release_info.gather_logs('start')
+        expected_logs = [
+            generate_release_info.Log(
+                'sha1', 'author1', 'email1', 'normal-message'),
+            generate_release_info.Log(
+                'sha2', 'author2', 'email2', 'message-with-unicode-â')]
         self.assertEqual(actual_logs, expected_logs)
 
     def test_extract_issues(self):
-        log1 = release_info.Log('sha1', 'author1', 'email1', 'msg#1234')
-        log2 = release_info.Log('sha2', 'author2', 'email2', 'msg#6789')
-        log3 = release_info.Log('sha2', 'author2', 'email2', 'msg(#4588)')
-        log4 = release_info.Log('sha2', 'author2', 'email2', 'msg1')
-        actual_issues = release_info.extract_issues([log1, log2, log3, log4])
+        log1 = generate_release_info.Log(
+            'sha1', 'author1', 'email1', 'msg#1234')
+        log2 = generate_release_info.Log(
+            'sha2', 'author2', 'email2', 'msg#6789')
+        log3 = generate_release_info.Log(
+            'sha2', 'author2', 'email2', 'msg(#4588)')
+        log4 = generate_release_info.Log('sha2', 'author2', 'email2', 'msg1')
+        actual_issues = generate_release_info.extract_issues([
+            log1, log2, log3, log4])
         expected_issues = {
             'https://github.com/oppia/oppia/issues/1234',
             'https://github.com/oppia/oppia/issues/4588',
@@ -145,12 +166,15 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
         self.assertEqual(actual_issues, expected_issues)
 
     def test_extract_pr_numbers(self):
-        log1 = release_info.Log('sha1', 'author1', 'email1', 'msg(#1234)')
-        log2 = release_info.Log('sha2', 'author2', 'email2', 'msg#6789')
-        log3 = release_info.Log(
+        log1 = generate_release_info.Log(
+            'sha1', 'author1', 'email1', 'msg(#1234)')
+        log2 = generate_release_info.Log(
+            'sha2', 'author2', 'email2', 'msg#6789')
+        log3 = generate_release_info.Log(
             'sha2', 'author2', 'email2', 'msg(#4588)\n\n* Issue fixed(#5699)\n')
-        log4 = release_info.Log('sha2', 'author2', 'email2', 'msg1')
-        actual_prs = release_info.extract_pr_numbers([log1, log2, log3, log4])
+        log4 = generate_release_info.Log('sha2', 'author2', 'email2', 'msg1')
+        actual_prs = generate_release_info.extract_pr_numbers([
+            log1, log2, log3, log4])
         expected_prs = ['4588', '1234']
         self.assertEqual(actual_prs, expected_prs)
 
@@ -158,7 +182,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
         def mock_get_pull(unused_self, pull_num):
             return 'pull-%s' % pull_num
         with self.swap(github.Repository.Repository, 'get_pull', mock_get_pull):
-            actual_prs = release_info.get_prs_from_pr_numbers(
+            actual_prs = generate_release_info.get_prs_from_pr_numbers(
                 ['1234', '4588'], self.mock_repo)
         expected_prs = ['pull-1234', 'pull-4588']
         self.assertEqual(set(actual_prs), set(expected_prs))
@@ -185,7 +209,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             attributes={
                 'title': 'PR4', 'number': 4,
                 'labels': [{'name': 'Test-label'}]}, completed='')
-        actual_categories = release_info.get_changelog_categories([
+        actual_categories = generate_release_info.get_changelog_categories([
             pull1, pull2, pull3, pull4])
         expected_categories = {
             'Test-changes-1': ['PR1 (#1)', 'PR2 (#2)'],
@@ -200,9 +224,9 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                 '\nCURRENT_COLLECTION_SCHEMA_VERSION = 4\n')
         run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         feconf_swap = self.swap(
-            release_info, 'FECONF_FILEPATH', MOCK_FECONF_FILEPATH)
+            generate_release_info, 'FECONF_FILEPATH', MOCK_FECONF_FILEPATH)
         with run_cmd_swap, feconf_swap:
-            actual_version_changes = release_info.check_versions(
+            actual_version_changes = generate_release_info.check_versions(
                 'current_release')
         self.assertEqual(actual_version_changes, [])
 
@@ -213,9 +237,9 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                 '\nCURRENT_COLLECTION_SCHEMA_VERSION = 4\n')
         run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         feconf_swap = self.swap(
-            release_info, 'FECONF_FILEPATH', MOCK_FECONF_FILEPATH)
+            generate_release_info, 'FECONF_FILEPATH', MOCK_FECONF_FILEPATH)
         with run_cmd_swap, feconf_swap:
-            actual_version_changes = release_info.check_versions(
+            actual_version_changes = generate_release_info.check_versions(
                 'current_release')
         self.assertEqual(
             actual_version_changes, ['CURRENT_STATE_SCHEMA_VERSION'])
@@ -224,7 +248,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
         def mock_run_cmd(unused_cmd):
             return 'scripts/setup.py\nscripts/setup_gae.py'
         with self.swap(common, 'run_cmd', mock_run_cmd):
-            actual_scripts = release_info.check_setup_scripts(
+            actual_scripts = generate_release_info.check_setup_scripts(
                 'release_tag')
         expected_scripts = {
             'scripts/setup.py': True,
@@ -236,7 +260,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
         def mock_run_cmd(unused_cmd):
             return 'scripts/setup.py\nscripts/setup_gae.py'
         with self.swap(common, 'run_cmd', mock_run_cmd):
-            actual_scripts = release_info.check_setup_scripts(
+            actual_scripts = generate_release_info.check_setup_scripts(
                 'release_tag', changed_only=False)
         expected_scripts = {
             'scripts/setup.py': True,
@@ -253,7 +277,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                 'core/storage/activity/gae_models.py\n'
                 'core/storage/user/gae_models.py')
         with self.swap(common, 'run_cmd', mock_run_cmd):
-            actual_storgae_models = release_info.check_storage_models(
+            actual_storgae_models = generate_release_info.check_storage_models(
                 'current_release')
         expected_storage_models = [
             'core/storage/activity/gae_models.py',
@@ -282,10 +306,13 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                     requester='', headers='', attributes={'sha': 'sha3'},
                     completed='')]
         def mock_gather_logs(unused_start, stop='HEAD'):
-            new_log1 = release_info.Log('sha1', 'author1', 'email1', 'message1')
-            new_log2 = release_info.Log('sha2', 'author2', 'email2', 'message2')
-            old_log = release_info.Log('sha3', 'author3', 'email3', 'message3')
-            cherrypick_log = release_info.Log(
+            new_log1 = generate_release_info.Log(
+                'sha1', 'author1', 'email1', 'message1')
+            new_log2 = generate_release_info.Log(
+                'sha2', 'author2', 'email2', 'message2')
+            old_log = generate_release_info.Log(
+                'sha3', 'author3', 'email3', 'message3')
+            cherrypick_log = generate_release_info.Log(
                 'sha4', 'author4', 'email4', 'message4')
             if stop == 'HEAD':
                 return [new_log1, new_log2, old_log, cherrypick_log]
@@ -313,28 +340,31 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
             common, 'check_prs_for_current_release_are_released',
             mock_check_prs_for_current_release_are_released)
         version_tag_swap = self.swap(
-            release_info, 'get_current_version_tag',
+            generate_release_info, 'get_current_version_tag',
             mock_get_current_version_tag)
         extra_commits_swap = self.swap(
-            release_info, 'get_extra_commits_in_new_release',
+            generate_release_info, 'get_extra_commits_in_new_release',
             mock_get_extra_commits_in_new_release)
         gather_logs_swap = self.swap(
-            release_info, 'gather_logs', mock_gather_logs)
+            generate_release_info, 'gather_logs', mock_gather_logs)
         extract_issues_swap = self.swap(
-            release_info, 'extract_issues', mock_extract_issues)
+            generate_release_info, 'extract_issues', mock_extract_issues)
         check_versions_swap = self.swap(
-            release_info, 'check_versions', mock_check_versions)
+            generate_release_info, 'check_versions', mock_check_versions)
         setup_scripts_swap = self.swap(
-            release_info, 'check_setup_scripts', mock_check_setup_scripts)
+            generate_release_info, 'check_setup_scripts',
+            mock_check_setup_scripts)
         storage_models_swap = self.swap(
-            release_info, 'check_storage_models', mock_check_storage_models)
+            generate_release_info, 'check_storage_models',
+            mock_check_storage_models)
         extract_prs_swap = self.swap(
-            release_info, 'extract_pr_numbers', mock_extract_pr_numbers)
+            generate_release_info, 'extract_pr_numbers',
+            mock_extract_pr_numbers)
         get_prs_swap = self.swap(
-            release_info, 'get_prs_from_pr_numbers',
+            generate_release_info, 'get_prs_from_pr_numbers',
             mock_get_prs_from_pr_numbers)
         get_changelog_swap = self.swap(
-            release_info, 'get_changelog_categories',
+            generate_release_info, 'get_changelog_categories',
             mock_get_changelog_categories)
 
         tmp_file = tempfile.NamedTemporaryFile()
@@ -349,7 +379,7 @@ class ReleaseInfoTests(test_utils.GenericTestBase):
                             with check_versions_swap, setup_scripts_swap:
                                 with storage_models_swap, release_summary_swap:
                                     with get_changelog_swap, extract_prs_swap:
-                                        release_info.main('test-token')
+                                        generate_release_info.main('test-token')
         with python_utils.open_file(
             GENERATED_RELEASE_SUMMARY_FILEPATH, 'r') as f:
             expected_lines = f.readlines()

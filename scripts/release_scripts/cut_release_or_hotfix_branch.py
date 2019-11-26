@@ -107,7 +107,7 @@ def verify_target_branch_does_not_already_exist(remote_alias, new_branch_name):
             'ERROR: The target branch name already exists on the remote repo.')
 
 
-def verify_target_version_is_consistent_with_latest_released_version(
+def verify_target_version_compatible_with_latest_release(
         target_version):
     """Checks that the target version is consistent with the latest released
     version on GitHub.
@@ -194,6 +194,36 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
     assert hotfix_number == last_hotfix_number + 1
 
 
+def _get_release_branch_type_and_name(target_version):
+    """Returns type and name of release branch for a target version.
+
+    Args:
+        target_version: str. The release version.
+
+    Returns:
+        tuple(str, str). The type and name of release branch.
+    """
+    return (
+        release_constants.RELEASE_BRANCH_TYPE, '%s-%s' % (
+            release_constants.RELEASE_BRANCH_TYPE, target_version))
+
+
+def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
+    """Returns type and name of hotfix branch for a target version.
+
+    Args:
+        target_version: str. The release version.
+        hotfix_number: int. The number for the hotfix branch.
+
+    Returns:
+        tuple(str, str). The type and name of hotfix branch.
+    """
+    return (
+        release_constants.HOTFIX_BRANCH_TYPE, '%s-%s-%s-%s' % (
+            release_constants.RELEASE_BRANCH_TYPE, target_version,
+            release_constants.HOTFIX_BRANCH_TYPE, hotfix_number))
+
+
 def execute_branch_cut():
     """Pushes the new release branch to Github."""
 
@@ -206,14 +236,11 @@ def execute_branch_cut():
     # Construct the new branch name.
     hotfix_number = int(parsed_args.hotfix_number)
     if not hotfix_number:
-        new_branch_name = '%s-%s' % (
-            release_constants.RELEASE_BRANCH_TYPE, target_version)
-        new_branch_type = release_constants.RELEASE_BRANCH_TYPE
+        new_branch_type, new_branch_name = _get_release_branch_type_and_name(
+            target_version)
     else:
-        new_branch_name = '%s-%s-%s-%s' % (
-            release_constants.RELEASE_BRANCH_TYPE, target_version,
-            release_constants.HOTFIX_BRANCH_TYPE, hotfix_number)
-        new_branch_type = release_constants.HOTFIX_BRANCH_TYPE
+        new_branch_type, new_branch_name = _get_hotfix_branch_type_and_name(
+            target_version, hotfix_number)
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
@@ -267,7 +294,7 @@ def execute_branch_cut():
         subprocess.check_call([
             'git', 'checkout', '-b', new_branch_name, branch_to_cut_from])
     else:
-        verify_target_version_is_consistent_with_latest_released_version(
+        verify_target_version_compatible_with_latest_release(
             target_version)
         python_utils.PRINT('Cutting a new release branch: %s' % new_branch_name)
         subprocess.check_call(['git', 'checkout', '-b', new_branch_name])

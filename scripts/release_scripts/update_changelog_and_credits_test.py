@@ -28,9 +28,8 @@ from core.tests import test_utils
 import python_utils
 import release_constants
 from scripts import common
-
-from . import release_info
-from . import update_changelog_and_credits
+from scripts.release_scripts import generate_release_info
+from scripts.release_scripts import update_changelog_and_credits
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -121,7 +120,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         self.run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         self.get_git_ref_swap = self.swap(
             github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
-        self.main_swap = self.swap(release_info, 'main', mock_main)
+        self.main_swap = self.swap(generate_release_info, 'main', mock_main)
         self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
     def test_get_previous_release_version_without_hotfix(self):
@@ -378,7 +377,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(
                 Exception, (
                     'No GitHub username provided. Please re-run the script '
-                    'specifying a username using --username=<Your username>')):
+                    'specifying a username using --github_username='
+                    '<Your username>')):
                 update_changelog_and_credits.main()
 
     def test_missing_personal_access_token(self):

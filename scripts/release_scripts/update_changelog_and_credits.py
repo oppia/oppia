@@ -16,9 +16,6 @@
 
 """Script that automatically makes updates to changelog and authors
 using release_summary.md.
-
-This script should only be run after release_info.py script is run
-successfully.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -34,8 +31,7 @@ import sys
 import python_utils
 import release_constants
 from scripts import common
-
-from . import release_info
+from scripts.release_scripts import generate_release_info
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -435,7 +431,8 @@ def create_branch(
     common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia/compare/develop...%s:%s?'
-        'expand=1' % (github_username, target_branch))
+        'expand=1&title=Update authors and changelog for v%s' % (
+            github_username, target_branch, current_release_version))
     python_utils.PRINT(
         'Pushed changes to Github. '
         'Please create a pull request from the %s branch\n\n'
@@ -456,13 +453,14 @@ def main():
     if parsed_args.github_username is None:
         raise Exception(
             'No GitHub username provided. Please re-run the '
-            'script specifying a username using --username=<Your username>')
+            'script specifying a username using '
+            '--github_username=<Your username>')
     github_username = parsed_args.github_username
 
     personal_access_token = common.get_personal_access_token()
 
     python_utils.PRINT('Generating release summary...')
-    release_info.main(personal_access_token)
+    generate_release_info.main(personal_access_token)
 
     if not os.path.exists(release_constants.RELEASE_SUMMARY_FILEPATH):
         raise Exception(
@@ -488,17 +486,18 @@ def main():
         'Check emails and names for authors and contributors and '
         'verify that the emails are '
         'correct through welcome emails sent from welcome@oppia.org '
-        '(Confirm from Sean in case of doubt).')
+        '(confirm with Sean in case of doubt).')
     common.open_new_tab_in_browser_if_possible(
         release_constants.CREDITS_FORM_URL)
     common.ask_user_to_confirm(
-        'Check the credits form and add any non technical contributors '
+        'Check the credits form and add any additional contributors '
         'to the contributor list in release summary file.')
     common.ask_user_to_confirm(
-        'Categorize the terms in uncategorized section and arrange '
-        'the changelog to have user facing categories on top.')
+        'Categorize the PR titles in the Uncategorized section of the '
+        'changelog, and arrange the changelog to have user-facing '
+        'categories on top.')
     common.ask_user_to_confirm(
-        'Verify each item is in correct section and remove '
+        'Verify each item is in the correct section and remove '
         'trivial changes like "Fix lint errors" from the changelog.')
     common.ask_user_to_confirm(
         'Ensure that all items in changelog start with a '

@@ -27,8 +27,7 @@ import sys
 from core.tests import test_utils
 import python_utils
 from scripts import common
-
-from . import cut_release_or_hotfix_branch
+from scripts.release_scripts import cut_release_or_hotfix_branch
 
 
 class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
@@ -44,7 +43,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'check_call_is_called': False,
             'verify_target_branch_does_not_already_exist_is_called': False,
             (
-                'verify_target_version_is_consistent_with_latest_'
+                'verify_target_version_compatible_with_latest_'
                 'released_version_is_called'): False,
             (
                 'verify_hotfix_number_is_one_ahead_of_'
@@ -58,7 +57,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'check_call_is_called': True,
             'verify_target_branch_does_not_already_exist_is_called': True,
             (
-                'verify_target_version_is_consistent_with_latest_'
+                'verify_target_version_compatible_with_latest_'
                 'released_version_is_called'): True,
             (
                 'verify_hotfix_number_is_one_ahead_of_'
@@ -90,7 +89,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                 'verify_target_branch_does_not_already_exist_is_called'] = True
         def mock_verify_target_version(unused_target_version):
             self.check_function_calls[
-                'verify_target_version_is_consistent_with_'
+                'verify_target_version_compatible_with_'
                 'latest_released_version_is_called'] = True
         def mock_verify_hotfix_number(
                 unused_remote_alias, unused_target_version,
@@ -121,7 +120,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             mock_verify_target_branch)
         self.verify_target_version_swap = self.swap(
             cut_release_or_hotfix_branch,
-            'verify_target_version_is_consistent_with_latest_released_version',
+            'verify_target_version_compatible_with_latest_release',
             mock_verify_target_version)
         self.verify_hotfix_number_swap = self.swap(
             cut_release_or_hotfix_branch,
@@ -181,7 +180,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'ERROR: Failed to fetch latest release info from GitHub.'):
             (
                 cut_release_or_hotfix_branch
-                .verify_target_version_is_consistent_with_latest_released_version( # pylint: disable=line-too-long
+                .verify_target_version_compatible_with_latest_release(
                     '1.2.3'))
 
     def test_invalid_last_version_tag(self):
@@ -194,7 +193,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'ERROR: Could not parse version number of latest GitHub release.'):
             (
                 cut_release_or_hotfix_branch
-                .verify_target_version_is_consistent_with_latest_released_version( # pylint: disable=line-too-long
+                .verify_target_version_compatible_with_latest_release(
                     '1.2.3'))
 
     def test_unexpected_major_version_change(self):
@@ -206,7 +205,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             AssertionError, 'Unexpected major version change.'):
             (
                 cut_release_or_hotfix_branch
-                .verify_target_version_is_consistent_with_latest_released_version( # pylint: disable=line-too-long
+                .verify_target_version_compatible_with_latest_release(
                     '1.2.3'))
 
     def test_invalid_difference_between_patch_versions(self):
@@ -217,7 +216,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         with self.url_open_swap, load_swap, self.assertRaises(AssertionError):
             (
                 cut_release_or_hotfix_branch
-                .verify_target_version_is_consistent_with_latest_released_version( # pylint: disable=line-too-long
+                .verify_target_version_compatible_with_latest_release(
                     '1.2.3'))
 
     def test_invalid_difference_between_minor_versions(self):
@@ -228,7 +227,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         with self.url_open_swap, load_swap, self.assertRaises(AssertionError):
             (
                 cut_release_or_hotfix_branch
-                .verify_target_version_is_consistent_with_latest_released_version( # pylint: disable=line-too-long
+                .verify_target_version_compatible_with_latest_release(
                     '1.2.0'))
 
     def test_invalid_patch_version_with_valid_difference_between_minor_versions(
@@ -240,7 +239,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         with self.url_open_swap, load_swap, self.assertRaises(AssertionError):
             (
                 cut_release_or_hotfix_branch
-                .verify_target_version_is_consistent_with_latest_released_version( # pylint: disable=line-too-long
+                .verify_target_version_compatible_with_latest_release(
                     '1.2.1'))
 
     def test_no_exception_is_raised_for_valid_target_version(self):
@@ -251,7 +250,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         with self.url_open_swap, load_swap:
             (
                 cut_release_or_hotfix_branch
-                .verify_target_version_is_consistent_with_latest_released_version( # pylint: disable=line-too-long
+                .verify_target_version_compatible_with_latest_release(
                     '1.2.0'))
 
     def test_exception_is_raised_for_invalid_new_hotfix_number(self):
@@ -335,7 +334,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'verify_hotfix_number_is_one_ahead_of_previous_'
             'hotfix_number_is_called'] = False
         self.expected_check_function_calls[
-            'verify_target_version_is_consistent_with_'
+            'verify_target_version_compatible_with_'
             'latest_released_version_is_called'] = False
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
@@ -370,7 +369,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                         with self.verify_hotfix_number_swap, self.input_swap:
                             cut_release_or_hotfix_branch.execute_branch_cut()
         self.expected_check_function_calls[
-            'verify_target_version_is_consistent_with_'
+            'verify_target_version_compatible_with_'
             'latest_released_version_is_called'] = False
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
@@ -389,7 +388,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                         with self.verify_hotfix_number_swap, self.input_swap:
                             cut_release_or_hotfix_branch.execute_branch_cut()
         self.expected_check_function_calls[
-            'verify_target_version_is_consistent_with_'
+            'verify_target_version_compatible_with_'
             'latest_released_version_is_called'] = False
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)

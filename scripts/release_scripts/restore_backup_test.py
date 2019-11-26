@@ -24,8 +24,7 @@ import os
 from core.tests import test_utils
 import python_utils
 from scripts import common
-
-from . import restore_backup
+from scripts.release_scripts import restore_backup
 
 
 class RestoreBackupTests(test_utils.GenericTestBase):

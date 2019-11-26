@@ -51,9 +51,8 @@ import python_utils
 import release_constants
 from scripts import common
 from scripts import install_third_party_libs
-
-from . import gcloud_adapter
-from . import update_configs
+from scripts.release_scripts import gcloud_adapter
+from scripts.release_scripts import update_configs
 # pylint: enable=wrong-import-order
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

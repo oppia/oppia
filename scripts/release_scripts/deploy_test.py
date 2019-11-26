@@ -29,10 +29,9 @@ from core.tests import test_utils
 import python_utils
 from scripts import common
 from scripts import install_third_party_libs
-
-from . import deploy
-from . import gcloud_adapter
-from . import update_configs
+from scripts.release_scripts import deploy
+from scripts.release_scripts import gcloud_adapter
+from scripts.release_scripts import update_configs
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')

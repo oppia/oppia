@@ -25,8 +25,7 @@ import argparse
 import os
 
 from scripts import common
-
-from . import gcloud_adapter
+from scripts.release_scripts import gcloud_adapter
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(

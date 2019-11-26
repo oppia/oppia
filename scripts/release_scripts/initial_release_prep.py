@@ -86,7 +86,7 @@ def get_job_details_for_current_release(
                 'author_email': job_detail[author_email_header],
                 'author_name': job_detail[author_name_header],
                 'instruction_doc': job_detail[instruction_doc_header]
-                })
+            })
     return job_details_for_current_release
 
 
@@ -166,7 +166,7 @@ def get_extra_jobs_due_to_schema_changes(
     return list(set(jobs_to_run))
 
 
-def check_changes_in_supported_audio_languages(
+def did_supported_audio_languages_change(
         remote_alias, previous_release_version):
     """Checks changes in constants.SUPPORTED_AUDIO_LANGUAGES between
     the current and previous release.
@@ -205,8 +205,8 @@ def main():
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_NOTES_URL)
     common.ask_user_to_confirm(
-        'Please check if anything extra is required for the release '
-        'and keep a track of this and do it at the appropriate point.')
+        'Please check if anything extra is required for the release. '
+        'If so, keep track of this and do it at the appropriate point.')
 
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_DRIVE_URL)
@@ -227,7 +227,7 @@ def main():
 
     extra_jobs_to_run = get_extra_jobs_due_to_schema_changes(
         remote_alias, previous_release_version)
-    if check_changes_in_supported_audio_languages(
+    if did_supported_audio_languages_change(
             remote_alias, previous_release_version):
         # This job is run so that an opportunity is created for
         # contributors to translate and voiceover an exploration

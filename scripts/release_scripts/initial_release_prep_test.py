@@ -26,8 +26,7 @@ import sys
 from core.tests import test_utils
 import python_utils
 from scripts import common
-
-from . import initial_release_prep
+from scripts.release_scripts import initial_release_prep
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYGSHEETS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pygsheets-2.0.2')
@@ -179,7 +178,7 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
                 initial_release_prep.get_extra_jobs_due_to_schema_changes(
                     'upstream', '1.2.3'), ['SkillMigrationOneOffJob'])
 
-    def test_check_changes_in_supported_audio_languages(self):
+    def test_did_supported_audio_languages_change(self):
         all_cmd_tokens = []
         def mock_run_cmd(cmd_tokens):
             all_cmd_tokens.append(cmd_tokens)
@@ -187,7 +186,7 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
 
         with run_cmd_swap:
             self.assertFalse(
-                initial_release_prep.check_changes_in_supported_audio_languages(
+                initial_release_prep.did_supported_audio_languages_change(
                     'upstream', '1.2.3'))
         self.assertEqual(
             all_cmd_tokens, [
@@ -211,7 +210,7 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'isfile_is_called': False,
             'remove_is_called': False,
             'get_extra_jobs_due_to_schema_changes_is_called': False,
-            'check_changes_in_supported_audio_languages_is_called': False,
+            'did_supported_audio_languages_change_is_called': False,
             'get_remote_alias_is_called': False
         }
         expected_check_function_calls = {
@@ -227,7 +226,7 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'isfile_is_called': True,
             'remove_is_called': True,
             'get_extra_jobs_due_to_schema_changes_is_called': True,
-            'check_changes_in_supported_audio_languages_is_called': True,
+            'did_supported_audio_languages_change_is_called': True,
             'get_remote_alias_is_called': True
         }
         class MockWorksheet(python_utils.OBJECT):
@@ -292,10 +291,10 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             check_function_calls[
                 'get_extra_jobs_due_to_schema_changes_is_called'] = True
             return []
-        def mock_check_changes_in_supported_audio_languages(
+        def mock_did_supported_audio_languages_change(
                 unused_remote_alias, unused_previous_release_version):
             check_function_calls[
-                'check_changes_in_supported_audio_languages_is_called'] = True
+                'did_supported_audio_languages_change_is_called'] = True
             return True
         def mock_get_remote_alias(unused_remote_url):
             check_function_calls['get_remote_alias_is_called'] = True
@@ -320,8 +319,8 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             initial_release_prep, 'get_extra_jobs_due_to_schema_changes',
             mock_get_extra_jobs_due_to_schema_changes)
         check_changes_swap = self.swap(
-            initial_release_prep, 'check_changes_in_supported_audio_languages',
-            mock_check_changes_in_supported_audio_languages)
+            initial_release_prep, 'did_supported_audio_languages_change',
+            mock_did_supported_audio_languages_change)
         get_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
 

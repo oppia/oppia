@@ -171,6 +171,10 @@ def add_mailgun_api_key():
 def main(personal_access_token):
     """Updates the files corresponding to LOCAL_FECONF_PATH and
     LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
+
+    Args:
+        personal_access_token: str. The personal access token for the
+            GitHub id of user.
     """
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()

@@ -23,9 +23,8 @@ import sys
 
 from core.tests import test_utils
 from scripts import common
-
-from . import gcloud_adapter
-from . import update_indexes
+from scripts.release_scripts import gcloud_adapter
+from scripts.release_scripts import update_indexes
 
 
 class UpdateIndexesTests(test_utils.GenericTestBase):

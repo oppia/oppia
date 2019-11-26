@@ -270,7 +270,12 @@ def check_storage_models(current_release):
 
 
 def main(personal_access_token):
-    """Collects necessary info and dumps it to disk."""
+    """Collects necessary info and dumps it to disk.
+
+    Args:
+        personal_access_token: str. The personal access token for the
+            GitHub id of user.
+    """
     if not common.is_current_branch_a_release_branch():
         raise Exception(
             'This script should only be run from the latest release branch.')
