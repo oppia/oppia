@@ -176,7 +176,7 @@ module.exports = function(config) {
             loader: 'underscore-template-loader'
           },
           {
-            test: /\.ts$/,
+            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
             enforce: 'post',
             use: {
               loader: 'istanbul-instrumenter-loader',

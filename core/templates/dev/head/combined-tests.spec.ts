@@ -46,12 +46,14 @@ getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting()
 );
-// Then we find all the tests. Note that known failing files are exempted;
+// Then we find all the tests and controllers,
+// directives, services and factories files.
+// Note that known failing and useless files are exempted;
 // corresponding issue -> https://github.com/oppia/oppia/issues/6960).
 // TODO(YashJipkate): Fix the tests that broke down after introduction of
 // Webpack due to templateCache.
 /* eslint-disable max-len */
-const context = require.context('../../../../', true, /(((\.s|S)pec)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!state-name-editor\.directive\.spec\.ts)(?<!solution-verification\.service\.spec\.ts)/);
+const context = require.context('../../../../', true, /((((\.s|S)pec)\.ts$)|(^.*(controller|directive|service|Factory)\.ts$))(?<!ATestFactory\.ts)(?<!BTestService\.ts)(?<!CTest\.service\.ts)(?<!DTest\.service\.ts)(?<!ETestFactory\.ts)(?<!F\.directive\.ts)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!state-name-editor\.directive\.spec\.ts)(?<!solution-verification\.service\.spec\.ts)/);
 /* eslint-enable max-len */
 // And load the modules.
 context.keys().map(context);
