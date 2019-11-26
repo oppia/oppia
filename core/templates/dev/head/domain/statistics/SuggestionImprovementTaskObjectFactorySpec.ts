@@ -275,6 +275,13 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
       });
     });
 
+    describe('.getLastUpdatedTime', function() {
+      it('returns the time when this task was last updated', function() {
+        expect(this.task.getLastUpdatedTime())
+          .toBe(this.mockThread.last_updated);
+      });
+    });
+
     describe('.getActionButtons', function() {
       it('contains one button', function() {
         expect(this.task.getActionButtons().length).toEqual(1);

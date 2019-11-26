@@ -224,11 +224,15 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
           answer: 'fakeAnswer',
           answer_details: 'fakeAnswerDetails',
           created_on: 1441870501230.642,
-        }]
+        }],
+        _lastUpdatedTime: 1441870501230.642,
+        getLastUpdatedTime: function() {
+          return this._lastUpdatedTime;
+        }
       };
-      this.task =
-        AnswerDetailsImprovementTaskObjectFactory.createNew(
-          this.mockLearnerAnswerDetails);
+
+      this.task = AnswerDetailsImprovementTaskObjectFactory
+        .createNew(this.mockLearnerAnswerDetails);
     });
 
     describe('.getStatus', function() {
@@ -277,6 +281,13 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
     describe('.getActionButtons', function() {
       it('contains one button', function() {
         expect(this.task.getActionButtons().length).toEqual(1);
+      });
+    });
+
+    describe('.getLastUpdatedTime', function() {
+      it('returns the time when this task was last updated', function() {
+        expect(this.task.getLastUpdatedTime())
+          .toBe(this.mockLearnerAnswerDetails._lastUpdatedTime);
       });
     });
 
