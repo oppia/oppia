@@ -325,12 +325,6 @@ describe('Context service', function() {
       }
     );
 
-    it('should throw an error when trying to retrieve the question id',
-      function() {
-        expect(ecs.getQuestionId).toThrow();
-      }
-    );
-
     it('should retrieve other as page context',
       function() {
         expect(ecs.getPageContext()).toBe('other');
