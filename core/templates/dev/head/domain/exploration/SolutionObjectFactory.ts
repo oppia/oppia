@@ -33,7 +33,7 @@ import { SubtitledHtml, SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 
-export interface Explanation {
+export interface ExplanationBackendDict {
   /* eslint-disable camelcase */
   content_id: string;
   /* eslint-enable camelcase */
@@ -45,7 +45,7 @@ export interface SolutionBackendDict {
   answer_is_exclusive: boolean;
   correct_answer: string;
   /* eslint-enable camelcase */
-  explanation: Explanation;
+  explanation: ExplanationBackendDict;
 }
 
 export class Solution {
