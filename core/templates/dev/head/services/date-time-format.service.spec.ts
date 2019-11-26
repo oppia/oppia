@@ -49,7 +49,7 @@ describe('datetimeformatter', () => {
 
   it('should provide correct locale abbreviated datetime string', () => {
     expect(
-      df.getLocaleAbbreviatedDatetimeString(NOW_MILLIS - 1)).toBe('3:14 pm');
+      df.getLocaleAbbreviatedDatetimeString(NOW_MILLIS - 1)).toBe('9:44 AM');
     expect(
       df.getLocaleAbbreviatedDatetimeString(
         NOW_MILLIS + 48 * 60 * 60 * 1000)).toBe('Nov 23');
