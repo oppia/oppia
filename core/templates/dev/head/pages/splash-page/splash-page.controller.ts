@@ -29,7 +29,7 @@ angular.module('oppia').directive('splashPage', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      template: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/splash-page/splash-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
