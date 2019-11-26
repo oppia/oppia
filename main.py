@@ -385,6 +385,7 @@ URLS = MAPREDUCE_HANDLERS + [
         profile.ProfilePictureHandlerByUsernameHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
+    get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
