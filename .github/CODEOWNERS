@@ -475,6 +475,7 @@
 /core/controllers/pages*.py @jamesjay4199 @vojtechjelinek
 /core/controllers/custom_landing_pages*.py @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/contact-page/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/delete-account-page/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/donate-page/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/error-pages/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/get-started-page/ @jamesjay4199 @vojtechjelinek

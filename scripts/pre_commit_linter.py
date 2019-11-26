@@ -63,9 +63,8 @@ import threading
 import time
 
 # Install third party dependencies before proceeding.
-from scripts import install_third_party_libs
-from scripts import build # isort:skip
-from scripts import docstrings_checker  # isort:skip
+from . import install_third_party_libs
+install_third_party_libs.main(args=[])
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
@@ -597,16 +596,17 @@ import isort  # isort:skip
 import pycodestyle  # isort:skip
 import esprima  # isort:skip
 from pylint import lint  # isort:skip
+from . import build  # isort:skip
+from . import docstrings_checker  # isort:skip
 import html.parser  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
-
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 _TARGET_STDOUT = python_utils.string_io()
-_STDOUT_LIST = None
-_FILES = None
+_STDOUT_LIST = multiprocessing.Manager().list()
+_FILES = multiprocessing.Manager().dict()
 
 
 class FileCache(python_utils.OBJECT):
@@ -869,7 +869,7 @@ def _walk_with_gitignore(root, exclude_dirs):
         # Adding "/" in the end of the dir path according to the git dir path
         # structure.
         if (not _is_path_ignored(dir_path + '/')) and (
-                dir_path.replace('\\', '/') not in exclude_dirs):
+                dir_path not in exclude_dirs):
             for x in _walk_with_gitignore(dir_path, exclude_dirs):
                 yield x
 
@@ -1298,6 +1298,129 @@ def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
     return failed
 
 
+def _check_codeowner_file(verbose_mode_enabled):
+    """Checks the CODEOWNERS file for any uncovered dirs/files and also
+    checks that every pattern in the CODEOWNERS file matches at least one
+    file/dir. Note that this checks the CODEOWNERS file according to the
+    glob patterns supported by Python2.7 environment. For more information
+    please refer https://docs.python.org/2/library/glob.html.
+    This function also ensures that the most important rules are at the
+    bottom of the CODEOWNERS file.
+    """
+    if verbose_mode_enabled:
+        python_utils.PRINT('Starting CODEOWNERS file check')
+        python_utils.PRINT('----------------------------------------')
+
+    with _redirect_stdout(_TARGET_STDOUT):
+        failed = False
+        summary_messages = []
+        # Checks whether every pattern in the CODEOWNERS file matches at
+        # least one dir/file.
+        critical_file_section_found = False
+        important_rules_in_critical_section = []
+        file_patterns = []
+        dir_patterns = []
+        for line_num, line in enumerate(FILE_CACHE.readlines(
+                CODEOWNER_FILEPATH)):
+            stripped_line = line.strip()
+            if '# Critical files' in line:
+                critical_file_section_found = True
+            if stripped_line and stripped_line[0] != '#':
+                if '@' not in line:
+                    python_utils.PRINT(
+                        '%s --> Pattern on line %s doesn\'t have '
+                        'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))
+                    failed = True
+                else:
+                    # Extract the file pattern from the line.
+                    line_in_concern = line.split('@')[0].strip()
+                    # This is being populated for the important rules
+                    # check.
+                    if critical_file_section_found:
+                        important_rules_in_critical_section.append(
+                            line_in_concern)
+                    # Checks if the path is the full path relative to the
+                    # root oppia directory.
+                    if not line_in_concern.startswith('/'):
+                        python_utils.PRINT(
+                            '%s --> Pattern on line %s is invalid. Use '
+                            'full path relative to the root directory'
+                            % (CODEOWNER_FILEPATH, line_num + 1))
+                        failed = True
+
+                    # The double asterisks pattern is supported by the
+                    # CODEOWNERS syntax but not the glob in Python 2.
+                    # The following condition checks this.
+                    if '**' in line_in_concern:
+                        python_utils.PRINT(
+                            '%s --> Pattern on line %s is invalid. '
+                            '\'**\' wildcard not allowed' % (
+                                CODEOWNER_FILEPATH, line_num + 1))
+                        failed = True
+                    # Adjustments to the dir paths in CODEOWNERS syntax
+                    # for glob-style patterns to match correctly.
+                    if line_in_concern.endswith('/'):
+                        line_in_concern = line_in_concern[:-1]
+                    # The following condition checks whether the specified
+                    # path exists in the codebase or not. The CODEOWNERS
+                    # syntax has paths starting with '/' which refers to
+                    # full path relative to root, but python glob module
+                    # does not conform to this logic and literally matches
+                    # the '/' character. Therefore the leading '/' has to
+                    # be changed to './' for glob patterns to match
+                    # correctly.
+                    line_in_concern = line_in_concern.replace('/', './', 1)
+                    if not glob.glob(line_in_concern):
+                        python_utils.PRINT(
+                            '%s --> Pattern on line %s doesn\'t match '
+                            'any file or directory' % (
+                                CODEOWNER_FILEPATH, line_num + 1))
+                        failed = True
+                    # The following list is being populated with the
+                    # paths in the CODEOWNERS file with the removal of the
+                    # leading '/' to aid in the glob pattern matching in
+                    # the next part of the check wherein the valid patterns
+                    # are used to check if they cover the entire codebase.
+                    if os.path.isdir(line_in_concern):
+                        dir_patterns.append(line_in_concern)
+                    else:
+                        file_patterns.append(line_in_concern)
+
+        # Checks that every file (except those under the dir represented by
+        # the dir_patterns) is covered under CODEOWNERS.
+        for file_paths in _walk_with_gitignore('.', dir_patterns):
+            for file_path in file_paths:
+                match = False
+                for file_pattern in file_patterns:
+                    if file_path in glob.glob(file_pattern):
+                        match = True
+                        break
+                if not match:
+                    python_utils.PRINT(
+                        '%s is not listed in the .github/CODEOWNERS file.' % (
+                            file_path))
+                    failed = True
+
+        failed = failed or (
+            check_for_important_patterns_at_bottom_of_codeowners(
+                important_rules_in_critical_section))
+
+        if failed:
+            summary_message = (
+                '%s   CODEOWNERS file coverage check failed, see messages '
+                'above for files that need to be added or patterns that need '
+                'to be fixed.' % _MESSAGE_TYPE_FAILED)
+        else:
+            summary_message = '%s  CODEOWNERS file coverage check passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+
+        summary_messages.append(summary_message)
+        python_utils.PRINT(summary_message)
+        python_utils.PRINT('')
+
+    return summary_messages
+
+
 def _lint_css_files(
         node_path, stylelint_path, config_path, files_to_lint, stdout, result,
         verbose_mode_enabled):
@@ -1563,7 +1686,7 @@ def _check_codeowner_file(verbose_mode_enabled):
         python_utils.PRINT('Starting CODEOWNERS file check')
         python_utils.PRINT('----------------------------------------')
 
-    with _redirect_stdout(sys.stdout):
+    with _redirect_stdout(_TARGET_STDOUT):
         failed = False
         summary_messages = []
         # Checks whether every pattern in the CODEOWNERS file matches at
@@ -1640,17 +1763,13 @@ def _check_codeowner_file(verbose_mode_enabled):
 
         # Checks that every file (except those under the dir represented by
         # the dir_patterns) is covered under CODEOWNERS.
-        file_lists = []
-        for file_pattern in file_patterns:
-            file_lists.extend(glob.glob(file_pattern))
-        target_files = {file.replace('\\', '/') for file in file_lists}
-
         for file_paths in _walk_with_gitignore('.', dir_patterns):
             for file_path in file_paths:
-                file_path = file_path.replace('\\', '/')
                 match = False
-                if file_path in target_files:
-                    match = True
+                for file_pattern in file_patterns:
+                    if file_path in glob.glob(file_pattern):
+                        match = True
+                        break
                 if not match:
                     python_utils.PRINT(
                         '%s is not listed in the .github/CODEOWNERS file.' % (
@@ -1713,8 +1832,8 @@ class LintChecksManager( # pylint: disable=inherit-non-class
     def _run_multiple_checks(self, *checks):
         """Run multiple checks in parallel."""
         processes = []
-        for check, args in checks:
-            p = multiprocessing.Process(target=check, args=args)
+        for check in checks:
+            p = multiprocessing.Process(target=check)
             processes.append(p)
             p.start()
 
@@ -1764,8 +1883,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
 
         return failed
 
-    def _check_mandatory_patterns(
-            self, all_filepaths, global_stdout, process_manager):
+    def _check_mandatory_patterns(self):
         """This function checks that all files contain the mandatory
         patterns.
         """
@@ -1779,7 +1897,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         with _redirect_stdout(stdout):
             sets_of_patterns_to_match = [
                 MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
-            for filepath in all_filepaths:
+            for filepath in self.all_filepaths:
                 for pattern_list in sets_of_patterns_to_match:
                     failed = self._check_for_mandatory_pattern_in_file(
                         pattern_list, filepath, failed)
@@ -1797,11 +1915,10 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         python_utils.PRINT('')
 
         summary_messages.append(summary_message)
-        process_manager['mandatory'] = summary_messages
-        global_stdout.append(stdout)
+        self.process_manager['mandatory'] = summary_messages
+        _STDOUT_LIST.append(stdout)
 
-    def _check_bad_patterns(
-            self, origin_all_filepaths, global_stdout, process_manager):
+    def _check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting Pattern Checks')
@@ -1810,7 +1927,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         total_error_count = 0
         summary_messages = []
         all_filepaths = [
-            filepath for filepath in origin_all_filepaths if not (
+            filepath for filepath in self.all_filepaths if not (
                 filepath.endswith('pre_commit_linter.py') or
                 any(
                     fnmatch.fnmatch(filepath, pattern)
@@ -1870,16 +1987,12 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                 python_utils.PRINT('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
                 python_utils.PRINT(summary_message)
-        process_manager['bad_pattern'] = summary_messages
-        global_stdout.append(stdout)
+        self.process_manager['bad_pattern'] = summary_messages
+        _STDOUT_LIST.append(stdout)
 
     def _check_patterns(self):
         """Run checks relate to bad patterns."""
-        args = (
-            (_FILES['.js'] + _FILES['.ts']), _STDOUT_LIST, self.process_manager)
-        methods = [
-            (self._check_bad_patterns, args),
-            (self._check_mandatory_patterns, args)]
+        methods = [self._check_bad_patterns, self._check_mandatory_patterns]
         self._run_multiple_checks(*methods)
 
     def perform_all_lint_checks(self):
@@ -1892,6 +2005,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         self._check_patterns()
         mandatory_patterns_messages = self.process_manager['mandatory']
         pattern_messages = self.process_manager['bad_pattern']
+
         return (
             mandatory_patterns_messages + pattern_messages)
 
@@ -2033,8 +2147,7 @@ class JsTsLintChecksManager(LintChecksManager):
             dir_path, os.path.basename(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
 
-    def _check_extra_js_files(
-            self, js_files_to_check, global_stdout, process_manager):
+    def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
         or extensions folder which are not specified in
         build.JS_FILEPATHS_NOT_TO_BUILD.
@@ -2047,6 +2160,8 @@ class JsTsLintChecksManager(LintChecksManager):
         failed = False
         stdout = python_utils.string_io()
         with _redirect_stdout(stdout):
+            js_files_to_check = self.js_filepaths
+
             for filepath in js_files_to_check:
                 if filepath.startswith(('core/templates', 'extensions')) and (
                         filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
@@ -2073,11 +2188,10 @@ class JsTsLintChecksManager(LintChecksManager):
             summary_messages.append(summary_message)
             python_utils.PRINT(summary_message)
             python_utils.PRINT('')
-        process_manager['extra'] = summary_messages
-        global_stdout.append(stdout)
+        self.process_manager['extra'] = summary_messages
+        _STDOUT_LIST.append(stdout)
 
-    def _check_js_and_ts_component_name_and_count(
-            self, all_filepaths, global_stdout, process_manager):
+    def _check_js_and_ts_component_name_and_count(self):
         """This function ensures that all JS/TS files have exactly
         one component and and that the name of the component
         matches the filename.
@@ -2087,7 +2201,7 @@ class JsTsLintChecksManager(LintChecksManager):
             python_utils.PRINT('----------------------------------------')
         # Select JS files which need to be checked.
         files_to_check = [
-            filepath for filepath in all_filepaths if not
+            filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)
             and (not filepath.endswith('App.ts'))]
@@ -2131,11 +2245,10 @@ class JsTsLintChecksManager(LintChecksManager):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
-            process_manager['component'] = summary_messages
-            global_stdout.append(stdout)
+            self.process_manager['component'] = summary_messages
+            _STDOUT_LIST.append(stdout)
 
-    def _check_directive_scope(
-            self, all_filepaths, global_stdout, process_manager):
+    def _check_directive_scope(self):
         """This function checks that all directives have an explicit
         scope: {} and it should not be scope: true.
         """
@@ -2144,7 +2257,7 @@ class JsTsLintChecksManager(LintChecksManager):
             python_utils.PRINT('----------------------------------------')
         # Select JS and TS files which need to be checked.
         files_to_check = [
-            filepath for filepath in all_filepaths if
+            filepath for filepath in self.all_filepaths if
             not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                     EXCLUDED_PATHS)]
         failed = False
@@ -2267,11 +2380,10 @@ class JsTsLintChecksManager(LintChecksManager):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
-            process_manager['directive'] = summary_messages
-            global_stdout.append(stdout)
+            self.process_manager['directive'] = summary_messages
+            _STDOUT_LIST.append(stdout)
 
-    def _check_sorted_dependencies(
-            self, all_filepaths, global_stdout, process_manager):
+    def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
         imported in the controllers/directives/factories in JS
         files are in following pattern: dollar imports, regular
@@ -2281,7 +2393,7 @@ class JsTsLintChecksManager(LintChecksManager):
             python_utils.PRINT('Starting sorted dependencies check')
             python_utils.PRINT('----------------------------------------')
         files_to_check = [
-            filepath for filepath in all_filepaths if
+            filepath for filepath in self.all_filepaths if
             not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                     EXCLUDED_PATHS)]
         components_to_check = ['controller', 'directive', 'factory']
@@ -2364,11 +2476,10 @@ class JsTsLintChecksManager(LintChecksManager):
         python_utils.PRINT(summary_message)
         if self.verbose_mode_enabled:
             python_utils.PRINT('----------------------------------------')
-        process_manager['sorted'] = summary_messages
-        global_stdout.append(stdout)
+        self.process_manager['sorted'] = summary_messages
+        _STDOUT_LIST.append(stdout)
 
-    def _match_line_breaks_in_controller_dependencies(
-            self, all_filepaths, global_stdout, process_manager):
+    def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
         listed in the controller of a directive or service exactly match those
         between the arguments of the controller function.
@@ -2378,7 +2489,7 @@ class JsTsLintChecksManager(LintChecksManager):
                 'Starting controller dependency line break check')
             python_utils.PRINT('----------------------------------------')
         files_to_check = [
-            filepath for filepath in all_filepaths if not
+            filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)]
         failed = False
@@ -2429,8 +2540,8 @@ class JsTsLintChecksManager(LintChecksManager):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
-        process_manager['line_breaks'] = summary_messages
-        global_stdout.append(stdout)
+        self.process_manager['line_breaks'] = summary_messages
+        _STDOUT_LIST.append(stdout)
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
@@ -2615,10 +2726,9 @@ class JsTsLintChecksManager(LintChecksManager):
         _match_line_breaks_in_controller_dependencies
         in parallel.
         """
-        arg = (self.all_filepaths, _STDOUT_LIST, self.process_manager)
         methods = [
-            (self._check_sorted_dependencies, arg),
-            (self._match_line_breaks_in_controller_dependencies, arg)
+            self._check_sorted_dependencies,
+            self._match_line_breaks_in_controller_dependencies
         ]
         super(JsTsLintChecksManager, self)._run_multiple_checks(*methods)
 
@@ -2636,13 +2746,11 @@ class JsTsLintChecksManager(LintChecksManager):
 
         common_messages = super(
             JsTsLintChecksManager, self).perform_all_lint_checks()
-        arg1 = (self.js_filepaths, _STDOUT_LIST, self.process_manager)
-        arg2 = (self.all_filepaths, _STDOUT_LIST, self.process_manager)
 
         super(JsTsLintChecksManager, self)._run_multiple_checks(
-            (self._check_extra_js_files, arg1),
-            (self._check_js_and_ts_component_name_and_count, arg2),
-            (self._check_directive_scope, arg2)
+            self._check_extra_js_files,
+            self._check_js_and_ts_component_name_and_count,
+            self._check_directive_scope
         )
         self._check_dependencies()
         extra_js_files_messages = self.process_manager['extra']
@@ -2760,8 +2868,7 @@ class OtherLintChecksManager(LintChecksManager):
             self.css_filepaths + self.html_filepaths +
             self.other_filepaths + self.py_filepaths)
 
-    def _check_import_order(
-            self, py_filepaths, global_stdout, process_manager):
+    def _check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
         """
@@ -2770,7 +2877,7 @@ class OtherLintChecksManager(LintChecksManager):
             python_utils.PRINT('----------------------------------------')
         summary_messages = []
         files_to_check = [
-            filepath for filepath in py_filepaths if not
+            filepath for filepath in self.py_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)]
         failed = False
@@ -2800,27 +2907,21 @@ class OtherLintChecksManager(LintChecksManager):
                     '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
-        process_manager['import'] = summary_messages
-        global_stdout.append(stdout)
+        self.process_manager['import'] = summary_messages
+        _STDOUT_LIST.append(stdout)
 
 
     def _check_import(self):
         """Run checks relates to import order."""
-        arg = (self.py_filepaths, _STDOUT_LIST, self.process_manager)
-        methods = [(self._check_import_order, arg)]
+        methods = [self._check_import_order]
         super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
 
     def _check_docstrings_and_comments(self):
         """Run checks relates to docstring and comments."""
-        arg = (
-            self.py_filepaths, _STDOUT_LIST, self.process_manager, FILE_CACHE)
-        methods = [
-            (self._check_docstrings, arg),
-            (self._check_comments, arg)]
+        methods = [self._check_docstrings, self._check_comments]
         super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
 
-    def _check_docstrings(
-            self, py_filepaths, global_stdout, process_manager, file_cache):
+    def _check_docstrings(self):
         """This function ensures that docstrings end in a period and the arg
         order in the function definition matches the order in the doc string.
 
@@ -2833,7 +2934,7 @@ class OtherLintChecksManager(LintChecksManager):
             python_utils.PRINT('----------------------------------------')
         summary_messages = []
         files_to_check = [
-            filepath for filepath in py_filepaths if not
+            filepath for filepath in self.py_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)]
         missing_period_message = (
@@ -2855,7 +2956,7 @@ class OtherLintChecksManager(LintChecksManager):
         stdout = python_utils.string_io()
         with _redirect_stdout(stdout):
             for filepath in files_to_check:
-                file_content = file_cache.readlines(filepath)
+                file_content = FILE_CACHE.readlines(filepath)
                 file_length = len(file_content)
                 for line_num in python_utils.RANGE(file_length):
                     line = file_content[line_num].strip()
@@ -2949,7 +3050,7 @@ class OtherLintChecksManager(LintChecksManager):
                 ast_file = ast.walk(
                     ast.parse(
                         python_utils.convert_to_bytes(
-                            file_cache.read(filepath))))
+                            FILE_CACHE.read(filepath))))
                 func_defs = [n for n in ast_file if isinstance(
                     n, ast.FunctionDef)]
                 for func in func_defs:
@@ -2975,18 +3076,17 @@ class OtherLintChecksManager(LintChecksManager):
                     '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
-        process_manager['docstrings'] = summary_messages
-        global_stdout.append(stdout)
+        self.process_manager['docstrings'] = summary_messages
+        _STDOUT_LIST.append(stdout)
 
-    def _check_comments(
-            self, py_filepaths, global_stdout, process_manager, file_cache):
+    def _check_comments(self):
         """This function ensures that comments follow correct style."""
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting comment checks')
             python_utils.PRINT('----------------------------------------')
         summary_messages = []
         files_to_check = [
-            filepath for filepath in py_filepaths if not
+            filepath for filepath in self.py_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)]
         message = 'There should be a period at the end of the comment.'
@@ -2996,7 +3096,7 @@ class OtherLintChecksManager(LintChecksManager):
         stdout = python_utils.string_io()
         with _redirect_stdout(stdout):
             for filepath in files_to_check:
-                file_content = file_cache.readlines(filepath)
+                file_content = FILE_CACHE.readlines(filepath)
                 file_length = len(file_content)
                 for line_num in python_utils.RANGE(file_length):
                     line = file_content[line_num].strip()
@@ -3056,8 +3156,8 @@ class OtherLintChecksManager(LintChecksManager):
                     '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
-        process_manager['comments'] = summary_messages
-        global_stdout.append(stdout)
+        self.process_manager['comments'] = summary_messages
+        _STDOUT_LIST.append(stdout)
 
 
     def _check_html_tags_and_attributes(self, debug=False):
@@ -3262,8 +3362,6 @@ def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
     """
-    install_third_party_libs.main(args=[])
-
     parsed_args = _PARSER.parse_args(args=args)
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
@@ -3310,21 +3408,11 @@ def main(args=None):
         python_utils.PRINT('---------------------------')
 
 
-NAME_SPACE = None
-PROCESSES = None
-FILE_CACHE = None
-
+NAME_SPACE = multiprocessing.Manager().Namespace()
+PROCESSES = multiprocessing.Manager().dict()
+NAME_SPACE.files = FileCache()
+FILE_CACHE = NAME_SPACE.files
 
 
 if __name__ == '__main__':
-    multiprocessing.freeze_support()
-    _STDOUT_LIST = multiprocessing.Manager().list()
-    _FILES = multiprocessing.Manager().dict()
-    NAME_SPACE = multiprocessing.Manager().Namespace()
-    PROCESSES = multiprocessing.Manager().dict()
-    NAME_SPACE.files = FileCache()
-    FILE_CACHE = NAME_SPACE.files
-    _FILES = multiprocessing.Manager().dict()
-
-
     main()
