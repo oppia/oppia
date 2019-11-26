@@ -259,7 +259,8 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return (
                 'branch1\nupstream/branch2\nupstream/release-1.2.3-hotfix-2\n'
                 'upstream/release-1.2.3-hotfix-1\n'
-                'upstream/release-1.2.2-hotfix-3\n')
+                'upstream/release-1.2.2-hotfix-3\n'
+                'upstream/release-1.2.3\n')
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -269,12 +270,28 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                 .verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
                     'upstream', '1.2.3', 4))
 
-    def test_no_exception_is_raised_for_invalid_new_hotfix_number(self):
+    def test_exception_is_raised_for_missing_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return (
                 'branch1\nupstream/branch2\nupstream/release-1.2.3-hotfix-2\n'
                 'upstream/release-1.2.3-hotfix-1\n'
-                'upstream/release-1.2.2-hotfix-3\n')
+                'upstream/release-1.2.3-hotfix-3\n')
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        with check_output_swap, self.assertRaises(AssertionError):
+            (
+                cut_release_or_hotfix_branch
+                .verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
+                    'upstream', '1.2.3', 4))
+
+    def test_no_exception_is_raised_for_valid_new_hotfix_number(self):
+        def mock_check_output(unused_cmd_tokens):
+            return (
+                'branch1\nupstream/branch2\nupstream/release-1.2.3-hotfix-2\n'
+                'upstream/release-1.2.3-hotfix-1\n'
+                'upstream/release-1.2.2-hotfix-3\n'
+                'upstream/release-1.2.3\n')
 
         with self.swap(subprocess, 'check_output', mock_check_output):
             (
@@ -317,6 +334,9 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         self.expected_check_function_calls[
             'verify_hotfix_number_is_one_ahead_of_previous_'
             'hotfix_number_is_called'] = False
+        self.expected_check_function_calls[
+            'verify_target_version_is_consistent_with_'
+            'latest_released_version_is_called'] = False
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
 
@@ -349,6 +369,9 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                     with self.verify_target_version_swap, self.open_tab_swap:
                         with self.verify_hotfix_number_swap, self.input_swap:
                             cut_release_or_hotfix_branch.execute_branch_cut()
+        self.expected_check_function_calls[
+            'verify_target_version_is_consistent_with_'
+            'latest_released_version_is_called'] = False
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
 
@@ -365,5 +388,8 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                     with self.verify_target_version_swap, self.open_tab_swap:
                         with self.verify_hotfix_number_swap, self.input_swap:
                             cut_release_or_hotfix_branch.execute_branch_cut()
+        self.expected_check_function_calls[
+            'verify_target_version_is_consistent_with_'
+            'latest_released_version_is_called'] = False
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)

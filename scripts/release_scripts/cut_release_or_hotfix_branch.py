@@ -175,16 +175,22 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
         'git', 'branch', '-a'])[:-1].split('\n')
 
     last_hotfix_number = 0
+    release_branch_exists = False
     hotfix_branch_name_regex = '^%s/%s-%s-%s-\\d*$' % (
         remote_alias, release_constants.RELEASE_BRANCH_TYPE, target_version,
         release_constants.HOTFIX_BRANCH_TYPE)
     for branch_name in all_branches:
         branch_name = branch_name.lstrip().rstrip()
+        if branch_name == '%s/%s-%s' % (
+                remote_alias, release_constants.RELEASE_BRANCH_TYPE,
+                target_version):
+            release_branch_exists = True
         if re.match(hotfix_branch_name_regex, branch_name):
             branch_hotfix_number = int(branch_name[branch_name.rfind('-') + 1:])
             if branch_hotfix_number > last_hotfix_number:
                 last_hotfix_number = branch_hotfix_number
 
+    assert release_branch_exists
     assert hotfix_number == last_hotfix_number + 1
 
 
@@ -216,11 +222,9 @@ def execute_branch_cut():
 
     # Update the local repo.
     remote_alias = common.get_remote_alias(release_constants.REMOTE_URL)
-    subprocess.check_call(['git', 'pull', remote_alias])
+    subprocess.check_call(['git', 'pull', remote_alias, 'develop'])
 
     verify_target_branch_does_not_already_exist(remote_alias, new_branch_name)
-    verify_target_version_is_consistent_with_latest_released_version(
-        target_version)
 
     # The release coordinator should verify that tests are passing on develop
     # before checking out the release branch.
@@ -263,6 +267,8 @@ def execute_branch_cut():
         subprocess.check_call([
             'git', 'checkout', '-b', new_branch_name, branch_to_cut_from])
     else:
+        verify_target_version_is_consistent_with_latest_released_version(
+            target_version)
         python_utils.PRINT('Cutting a new release branch: %s' % new_branch_name)
         subprocess.check_call(['git', 'checkout', '-b', new_branch_name])
 
