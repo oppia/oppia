@@ -1874,7 +1874,8 @@ class LintChecksManager( # pylint: disable=inherit-non-class
 
     def _check_patterns(self):
         """Run checks relate to bad patterns."""
-        args = ((_FILES['.js'] + _FILES['.ts']), [], self.process_manager)
+        args = (
+            (_FILES['.js'] + _FILES['.ts']), _STDOUT_LIST, self.process_manager)
         methods = [
             (self._check_bad_patterns, args),
             (self._check_mandatory_patterns, args)]
