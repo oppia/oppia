@@ -43,7 +43,7 @@ describe('Context service', function() {
             return '/explore/123';
           },
           getHash: function() {
-            return ''
+            return '';
           }
         });
       });
@@ -84,7 +84,7 @@ describe('Context service', function() {
             return '/embed/exploration/123';
           },
           getHash: function() {
-            return ''
+            return '';
           }
         });
       });
@@ -166,7 +166,7 @@ describe('Context service', function() {
             return '/topic_editor/123';
           },
           getHash: function() {
-            return ''
+            return '';
           }
         });
       });
@@ -194,6 +194,50 @@ describe('Context service', function() {
     });
   });
 
+  fdescribe('behavior in question editor modal', function() {
+    var provide = null;
+    var injector = null;
+
+    beforeEach(function() {
+      angular.mock.module(function($provide) {
+        provide = $provide;
+      });
+    });
+
+    beforeEach(angular.mock.inject(function($injector) {
+      injector = $injector;
+    }));
+
+    it('should correctly retrieve the values in topic editor', function() {
+      provide.value('UrlService', {
+        getPathname: function() {
+          return '/topic_editor/123';
+        },
+        getHash: function() {
+          return '#/questions#questionId';
+        }
+      });
+      var ecs = injector.get('ContextService');
+      expect(ecs.getEntityType()).toBe('question');
+      expect(ecs.getEntityId()).toBe('questionId');
+    });
+
+    it('should correctly retrieve the values in skill editor', function() {
+      provide.value('UrlService', {
+        getPathname: function() {
+          return '/skill_editor/123';
+        },
+        getHash: function() {
+          return '#/questions#questionId';
+        }
+      });
+      var ecs = injector.get('ContextService');
+      expect(ecs.getEntityType()).toBe('question');
+      expect(ecs.getEntityId()).toBe('questionId');
+    });
+  });
+
+
   describe('behavior in the subtopic viewer view', function() {
     var ecs = null;
 
@@ -204,7 +248,7 @@ describe('Context service', function() {
             return '/subtopic/topic_id/1';
           },
           getHash: function() {
-            return ''
+            return '';
           }
         });
       });
@@ -233,7 +277,7 @@ describe('Context service', function() {
             return '/story_editor/123';
           },
           getHash: function() {
-            return ''
+            return '';
           }
         });
       });
@@ -271,7 +315,7 @@ describe('Context service', function() {
             return '/skill_editor/123';
           },
           getHash: function() {
-            return ''
+            return '';
           }
         });
       });
@@ -309,7 +353,7 @@ describe('Context service', function() {
             return '/about';
           },
           getHash: function() {
-            return ''
+            return '';
           }
         });
       });
