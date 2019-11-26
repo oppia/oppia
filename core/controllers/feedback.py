@@ -38,7 +38,7 @@ class ThreadListHandler(base.BaseHandler):
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
         suggestions = suggestion_services.get_suggestions_by_ids(
             d['thread_id'] for d in suggestion_thread_dicts)
-        for thread_dict, suggestion in zip(
+        for thread_dict, suggestions in zip(
                 suggestion_thread_dicts, suggestions):
             thread_dict['suggestion_dict'] = (
                 None if suggestion is None else suggestion.to_dict())

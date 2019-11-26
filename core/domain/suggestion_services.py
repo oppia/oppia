@@ -141,7 +141,7 @@ def get_suggestions_by_ids(suggestion_ids):
         list(Suggestion|None). The corresponding suggestions, or None if no
             suggestion is found.
     """
-    return [get_suggestion_from_model(model) if model else None
+    return [get_suggestion_from_model(model) if model is not None else None
             for model in suggestion_models.GeneralSuggestionModel.get_multi(
                 suggestion_ids)]
 
