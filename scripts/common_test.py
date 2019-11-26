@@ -228,8 +228,7 @@ class CommonTests(test_utils.GenericTestBase):
             common.verify_current_branch_name('test')
 
     def test_ensure_release_scripts_folder_exists_with_invalid_access(self):
-        process = subprocess.Popen(
-            ['python', '--version'], stdout=subprocess.PIPE)
+        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         def mock_isdir(unused_dirpath):
             return False
         def mock_chdir(unused_dirpath):
@@ -256,8 +255,7 @@ class CommonTests(test_utils.GenericTestBase):
                 common.ensure_release_scripts_folder_exists_and_is_up_to_date()
 
     def test_ensure_release_scripts_folder_exists_with_valid_access(self):
-        process = subprocess.Popen(
-            ['python', '--version'], stdout=subprocess.PIPE)
+        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         def mock_isdir(unused_dirpath):
             return False
         def mock_chdir(unused_dirpath):

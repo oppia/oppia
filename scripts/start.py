@@ -131,19 +131,14 @@ def main(args=None):
     # spam people accidentally.
     background_processes = []
     if not parsed_args.prod_env:
-        if common.OS_NAME == 'Windows':
-            node_bin_path = [common.NODE_PATH, 'node']
-        else:
-            node_bin_path = [common.NODE_PATH, 'bin', 'node']
         background_processes.append(subprocess.Popen([
-            os.path.join(*node_bin_path),
+            os.path.join(common.NODE_PATH, 'bin', 'node'),
             os.path.join(common.NODE_MODULES_PATH, 'gulp', 'bin', 'gulp.js'),
             'watch']))
 
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
         background_processes.append(subprocess.Popen([
-            'node',
             os.path.join(
                 common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
             '--config', 'webpack.dev.config.ts', '--watch']))
@@ -163,8 +158,9 @@ def main(args=None):
     while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
 
+    os_info = os.uname()
     # Launch a browser window.
-    if common.OS_NAME == 'Linux' and not parsed_args.no_browser:
+    if os_info[0] == 'Linux' and not parsed_args.no_browser:
         detect_virtualbox_pattern = re.compile('.*VBOX.*')
         if list(filter(
                 detect_virtualbox_pattern.match,
@@ -186,7 +182,7 @@ def main(args=None):
                 subprocess.Popen([
                     'xdg-open', 'http://localhost:%s/'
                     % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
-    elif common.OS_NAME == 'Darwin' and not parsed_args.no_browser:
+    elif os_info[0] == 'Darwin' and not parsed_args.no_browser:
         common.print_each_string_after_two_new_lines([
             'INFORMATION',
             'Setting up a local development server at localhost:%s. '

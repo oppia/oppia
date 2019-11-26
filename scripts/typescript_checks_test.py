@@ -33,9 +33,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TypescriptChecksTests, self).setUp()
-        process = subprocess.Popen(
-            ['python', '--version'],
-            stdout=subprocess.PIPE)
+        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         # pylint: disable=unused-argument
         def mock_popen(unused_cmd, stdout):
             return process
@@ -87,8 +85,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         """Test that compiled_js_dir is deleted before a fresh compilation."""
         def mock_validate_compiled_js_dir():
             pass
-        process = subprocess.Popen(
-            ['python', '--version'], stdout=subprocess.PIPE)
+        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         # pylint: disable=unused-argument
         def mock_popen_for_deletion(unused_cmd, stdout):
             os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
@@ -116,8 +113,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
     def test_error_is_produced_for_invalid_compilation(self):
         """Test that error is produced if stdout is not empty."""
-        process = subprocess.Popen(
-            ['python', '-c', 'print \"test\"'], stdout=subprocess.PIPE)
+        process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
         # pylint: disable=unused-argument
         def mock_popen_for_errors(unused_cmd, stdout):
             return process
