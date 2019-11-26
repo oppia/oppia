@@ -61,31 +61,31 @@ describe('Suggestion thread object factory', function() {
       last_message_author: 'author',
       second_last_message_text: 'message 1',
       second_last_message_author: 'author',
+      suggestion_dict: {
+        suggestion_id: 'exploration.exp1.thread1',
+        suggestion_type: 'edit_exploration_state_content',
+        target_type: 'exploration',
+        target_id: 'exp1',
+        target_version_at_submission: 1,
+        status: 'accepted',
+        author_name: 'author',
+        change: {
+          cmd: 'edit_state_property',
+          property_name: 'content',
+          state_name: 'state_1',
+          new_value: {
+            html: 'new suggestion content'
+          },
+          old_value: {
+            html: 'old suggestion content'
+          }
+        },
+        last_updated: 1000
+      },
     };
 
-    var suggestionBackendDict = {
-      suggestion_id: 'exploration.exp1.thread1',
-      suggestion_type: 'edit_exploration_state_content',
-      target_type: 'exploration',
-      target_id: 'exp1',
-      target_version_at_submission: 1,
-      status: 'accepted',
-      author_name: 'author',
-      change: {
-        cmd: 'edit_state_property',
-        property_name: 'content',
-        state_name: 'state_1',
-        new_value: {
-          html: 'new suggestion content'
-        },
-        old_value: {
-          html: 'old suggestion content'
-        }
-      },
-      last_updated: 1000
-    };
     var suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
-      suggestionThreadBackendDict, suggestionBackendDict);
+      suggestionThreadBackendDict);
     expect(suggestionThread.status).toEqual('accepted');
     expect(suggestionThread.subject).toEqual('sample subject');
     expect(suggestionThread.summary).toEqual('sample summary');
