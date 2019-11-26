@@ -32,12 +32,11 @@ export class DateTimeFormatService {
   getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-      v = date.toLocaleTimeString([], {
+      return date.toLocaleTimeString([], {
         hour: 'numeric',
         minute: 'numeric',
         hour12: true
       });
-      return v;
     } else if (date.getFullYear() === new Date().getFullYear()) {
       // moment will return Oct 10
       return moment(date).format('MMM D');
