@@ -23,6 +23,7 @@ import { SkillSummaryObjectFactory } from
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/topic/TopicObjectFactory.ts');
@@ -40,6 +41,12 @@ describe('Topic object factory', function() {
     $provide.value(
       'SubtopicObjectFactory',
       new SubtopicObjectFactory(new SkillSummaryObjectFactory()));
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
   beforeEach(angular.mock.inject(function($injector) {
     TopicObjectFactory = $injector.get('TopicObjectFactory');

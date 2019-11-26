@@ -3,11 +3,13 @@
         style="float: right;">
   Create Question
 </button>
-<table class="dashboard-table" ng-if="$ctrl.questionSummaries.length > 0">
+<table class="dashboard-table" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
   <colgroup>
     <col style="width: 5%;">
-    <col style="width: 60%;">
+    <col style="width: 40%;">
     <col style="width: 35%;">
+    <col style="width: 10%;">
+    <col style="width: 10%;">
   </colgroup>
   <tr>
     <th class="dashboard-table-headings">
@@ -16,29 +18,57 @@
     <th class="dashboard-table-headings">
       <p> Question Content </p>
     </th>
+    <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
+      <p> Difficulty</p>
+    </th>
     <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
-      <p> Skill Description </p>
+      <p> Difficulty corresponding to selected skill </p>
+    </th>
+    <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
+      <p> Edit Question Difficulty </p>
+    </th>
+    <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
+      <p> Edit question difficulty with respect to selected skill </p>
+    </th>
+    <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
+      <p> Unlink questions from skill(s) </p>
+    </th>
+    <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
+      <p> Unlink question from skill </p>
     </th>
   </tr>
-  <tr ng-repeat="questionSummary in $ctrl.questionSummaries"
+  <tr ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill()"
       class="list-item protractor-test-question-list-item"
       style="height: 4em;"
-      ng-click="$ctrl.editQuestion(questionSummary.summary)">
+      ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDifficulty())"
+      ng-dblclick="$event.stopPropagation()">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
-    <td> <[$ctrl.truncatedQuestionSummaries[$index]]> </td>
-    <td ng-if="$ctrl.skillDescriptionsAreShown()"> <[$ctrl.getSkillDescription(questionSummary.skill_descriptions)]> </td>
+    <td class="question-content"> <[questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()]> </td>
+    <td> <[$ctrl.getDifficultyString(questionSummaryForOneSkill.getSkillDifficulty())]> </td>
+    <td class="edit-icon" ng-click="$event.stopPropagation()">
+      <span ng-click="$ctrl.changeDifficulty(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())"
+            class="list-summary">
+        <i class="material-icons">edit</i>
+      </span>
+    </td>
+    <td class="delete-icon" ng-click="$event.stopPropagation()">
+      <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription())"
+            class="list-summary">
+        <i class="material-icons">link_off</i>
+      </span>
+    </td>
   </tr>
 </table>
-<h4 ng-if="$ctrl.questionSummaries.length === 0" style="color: gray;">
+<h4 ng-if="$ctrl.getQuestionSummariesForOneSkill().length === 0" style="color: gray;">
   Click on Create Question to create a new question.
 </h4>
 
-<div class="page-navigation-arrows" ng-if="$ctrl.questionSummaries.length > 0">
+<div class="page-navigation-arrows" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
   <i class="material-icons md-18"
-     ng-if="$ctrl.currentPage !== 0"
+     ng-if="$ctrl.getCurrentPageNumber() !== 0"
      ng-click="$ctrl.goToPreviousPage()">&#xE5C4;
-  </i> Page <[$ctrl.currentPage + 1]>
-  <i class="material-icons md-18" ng-if="!$ctrl.isLastPage($ctrl.currentPage)" ng-click="$ctrl.goToNextPage()">&#xE5C8;</i>
+  </i> Page <[$ctrl.getCurrentPageNumber() + 1]>
+  <i class="material-icons md-18" ng-if="!$ctrl.isLastPage()" ng-click="$ctrl.goToNextPage()">&#xE5C8;</i>
 </div>
 <style>
   questions-list .oppia-editor-publish-button {
@@ -68,6 +98,10 @@
     border-bottom: 2px solid #bbb;
     padding-bottom: 0.7em;
     text-align: center;
+  }
+
+  questions-list .dashboard-table .question-content {
+    text-align: left;
   }
 
   questions-list .dashboard-table .dashboard-table-headings p {

@@ -81,6 +81,11 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_from_model(topic_model)
         self.assertEqual(topic.to_dict(), self.topic.to_dict())
 
+    def test_get_all_topics(self):
+        topics = topic_fetchers.get_all_topics()
+        self.assertEqual(len(topics), 1)
+        self.assertEqual(topics[0].id, self.topic.id)
+
     def test_cannot_get_topic_from_model_with_invalid_schema_version(self):
         topic_services.create_new_topic_rights('topic_id', self.user_id_a)
         commit_cmd = topic_domain.TopicChange({
@@ -169,6 +174,12 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topics[0].to_dict(), expected_topic)
         self.assertIsNone(topics[1])
         self.assertEqual(len(topics), 2)
+
+    def test_get_all_topics_with_skills(self):
+        expected_topic = self.topic.to_dict()
+        topics = topic_fetchers.get_all_topics_with_skills()
+        self.assertEqual(topics[0].to_dict(), expected_topic)
+        self.assertEqual(len(topics), 1)
 
     def test_commit_log_entry(self):
         topic_commit_log_entry = (

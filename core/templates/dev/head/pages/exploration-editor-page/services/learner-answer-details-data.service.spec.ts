@@ -16,9 +16,18 @@
  * @fileoverview Unit tests for LearnerAnswerDetailsDataService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// learner-answer-details-data.service.ts is upgraded to Angular 8.
+import { LearnerAnswerDetailsObjectFactory } from
+  'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerInfoObjectFactory } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('pages/exploration-editor-page/services/' +
   'learner-answer-details-data.service.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 describe('Learner answer details service', function() {
   var expId = '12345';
@@ -33,8 +42,19 @@ describe('Learner answer details service', function() {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
+      $provide.value(
+        'LearnerAnswerDetailsObjectFactory',
+        new LearnerAnswerDetailsObjectFactory());
+      $provide.value(
+        'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
     });
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.inject(function($injector, $q) {
     LearnerAnswerDetailsDataService = $injector.get(

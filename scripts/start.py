@@ -60,6 +60,12 @@ _PARSER.add_argument(
     '--no_browser',
     help='optional; if specified, does not open a browser.',
     action='store_true')
+_PARSER.add_argument(
+    '--no_auto_restart',
+    help=(
+        'optional; if specified, does not automatically restart when files are '
+        'changed.'),
+    action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
@@ -92,27 +98,29 @@ def main(args=None):
         '' if parsed_args.save_datastore else '--clear_datastore=true')
     enable_console_arg = (
         '--enable_console=true' if parsed_args.enable_console else '')
+    no_auto_restart = (
+        '--automatic_restart=no' if parsed_args.no_auto_restart else '')
 
     if parsed_args.prod_env:
-        constants_env_variable = '\'DEV_MODE\': false'
+        constants_env_variable = '"DEV_MODE": false'
         for line in fileinput.input(
                 files=[os.path.join('assets', 'constants.ts')], inplace=True):
             # Inside this loop the STDOUT will be redirected to the file,
             # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
-                    r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
+                    r'"DEV_MODE": .*', constants_env_variable, line), end='')
         build.main(args=['--prod_env', '--enable_watcher'])
         app_yaml_filepath = 'app.yaml'
     else:
-        constants_env_variable = '\'DEV_MODE\': true'
+        constants_env_variable = '"DEV_MODE": true'
         for line in fileinput.input(
                 files=[os.path.join('assets', 'constants.ts')], inplace=True):
             # Inside this loop the STDOUT will be redirected to the file,
             # constants.ts. The end='' is needed to avoid double line breaks.
             python_utils.PRINT(
                 re.sub(
-                    r'\'DEV_MODE\': .*', constants_env_variable, line), end='')
+                    r'"DEV_MODE": .*', constants_env_variable, line), end='')
         build.main(args=['--enable_watcher'])
         app_yaml_filepath = 'app_dev.yaml'
 
@@ -123,14 +131,19 @@ def main(args=None):
     # spam people accidentally.
     background_processes = []
     if not parsed_args.prod_env:
+        if common.OS_NAME == 'Windows':
+            node_bin_path = [common.NODE_PATH, 'node']
+        else:
+            node_bin_path = [common.NODE_PATH, 'bin', 'node']
         background_processes.append(subprocess.Popen([
-            os.path.join(common.NODE_PATH, 'bin', 'node'),
+            os.path.join(*node_bin_path),
             os.path.join(common.NODE_MODULES_PATH, 'gulp', 'bin', 'gulp.js'),
             'watch']))
 
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
         background_processes.append(subprocess.Popen([
+            'node',
             os.path.join(
                 common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
             '--config', 'webpack.dev.config.ts', '--watch']))
@@ -139,10 +152,10 @@ def main(args=None):
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
-        'python %s/dev_appserver.py %s %s --admin_host 0.0.0.0 --admin_port '
+        'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 --admin_port '
         '8000 --host 0.0.0.0 --port %s --skip_sdk_update_check true %s' % (
             common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
-            enable_console_arg,
+            enable_console_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             app_yaml_filepath), shell=True))
 
@@ -150,9 +163,8 @@ def main(args=None):
     while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
 
-    os_info = os.uname()
     # Launch a browser window.
-    if os_info[0] == 'Linux' and not parsed_args.no_browser:
+    if common.OS_NAME == 'Linux' and not parsed_args.no_browser:
         detect_virtualbox_pattern = re.compile('.*VBOX.*')
         if list(filter(
                 detect_virtualbox_pattern.match,
@@ -168,20 +180,18 @@ def main(args=None):
                 'INFORMATION',
                 'Setting up a local development server at localhost:%s. '
                 % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-                'Opening a',
-                'default browser window pointing to this server'])
+                'Opening a default browser window pointing to this server'])
             time.sleep(5)
             background_processes.append(
                 subprocess.Popen([
                     'xdg-open', 'http://localhost:%s/'
                     % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
-    elif os_info[0] == 'Darwin' and not parsed_args.no_browser:
+    elif common.OS_NAME == 'Darwin' and not parsed_args.no_browser:
         common.print_each_string_after_two_new_lines([
             'INFORMATION',
             'Setting up a local development server at localhost:%s. '
             % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            'Opening a',
-            'default browser window pointing to this server.'])
+            'Opening a default browser window pointing to this server.'])
         time.sleep(5)
         background_processes.append(
             subprocess.Popen([

@@ -57,7 +57,7 @@
   <div class="oppia-response-header">
     <span ng-if="$ctrl.showWarning()">⚠</span>
     <i class="material-icons md-18 oppia-response-tick-cross" ng-if="!$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#x2718;</i>
-    <i class="material-icons md-18 oppia-response-tick-cross" ng-if="$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#10004;</i>
+    <i class="material-icons md-18 oppia-response-tick-cross  protractor-test-correct-tick-mark" ng-if="$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#10004;</i>
     <span ng-if="!$ctrl.isActive()" ng-attr-title="<[$ctrl.getSummary()]>">
       <[$ctrl.getShortSummary()]>
       <span ng-if="$ctrl.getNumRules() > 1" class="badge badge-primary" style="position: relative; bottom: 4px;">

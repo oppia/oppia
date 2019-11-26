@@ -599,8 +599,28 @@ def is_valid_language_code(language_code):
     Returns:
         bool. Whether the language code is valid or not.
     """
-    language_codes = [lc['code'] for lc in constants.ALL_LANGUAGE_CODES]
+    language_codes = [
+        lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES]
     return language_code in language_codes
+
+
+def get_supported_audio_language_description(language_code):
+    """Returns the language description for the given language code.
+
+    Args:
+        language_code: str. The language code for which the description is
+            required.
+
+    Returns:
+        str. The language description for the given language code.
+
+    Raises:
+        Exception: If the given language code is unsupported.
+    """
+    for language in constants.SUPPORTED_AUDIO_LANGUAGES:
+        if language['id'] == language_code:
+            return language['description']
+    raise Exception('Unsupported audio language code: %s' % language_code)
 
 
 def unescape_encoded_uri_component(escaped_string):

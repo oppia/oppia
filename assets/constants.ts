@@ -100,10 +100,10 @@ export = {
     "Welcome": "#992a2b"
   },
 
-  // List of supported language codes. Each description has a
-  // parenthetical part that may be stripped out to give a shorter
-  // description.
-  "ALL_LANGUAGE_CODES": [{
+  // List of supported content languages in which we can create explorations or
+  // other entities. Each description has a parenthetical part that may be
+  // stripped out to give a shorter description.
+  "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
     "description": "English"
   }, {
@@ -227,6 +227,7 @@ export = {
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
   // languages are in alphabetical order.
+  // List of supported site languages in which the platform is offered.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "id",
     "text": "Bahasa Indonesia"
@@ -262,6 +263,8 @@ export = {
     "text": "中文(繁體)"
   }],
 
+  // List of supported audio languages in which we have audio and translations
+  // for explorations or other entities.
   // Related languages are used to prioritize an exploration's language when
   // setting the default audio language.
   "SUPPORTED_AUDIO_LANGUAGES": [{
@@ -304,6 +307,10 @@ export = {
     "id": "nl",
     "description": "Dutch",
     "relatedLanguages": ["nl"]
+  }, {
+    "id": "ee",
+    "description": "Ewe",
+    "relatedLanguages": ["ee"]
   }, {
     "id": "tl",
     "description": "Filipino",
@@ -447,12 +454,16 @@ export = {
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
     "name": "General",
     "interaction_ids": [
+      "ImageClickInput",
+      "ItemSelectionInput",
       "MultipleChoiceInput",
       "TextInput"
     ]
   }, {
     "name": "Math",
     "interaction_ids": [
+      "FractionInput",
+      "NumberWithUnits",
       "NumericInput"
     ]
   }],
@@ -533,11 +544,20 @@ export = {
 
   "ENABLE_PREREQUISITE_SKILLS": false,
 
-  "ENABLE_NEW_STRUCTURE_PLAYERS": false,
+  // For the full new structures viewer features, both
+  // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has
+  // to be true. Only ENABLE_NEW_STRUCTURE_PLAYERS can be true if just the
+  // players need to be accessed, but without story progress updation.
+  // This is split up so as to access the viewers in production without
+  // exposing the POST and PUT endpoints just yet.
+  "ENABLE_NEW_STRUCTURE_PLAYERS": true,
+  "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": false,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
 
   "MAX_SKILLS_PER_QUESTION": 3,
+
+  "MAX_QUESTIONS_PER_SKILL": 50,
 
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
@@ -605,6 +625,7 @@ export = {
   // eslint-disable-next-line max-len
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
 
+  "OPPORTUNITY_TYPE_SKILL": "skill",
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
   "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 

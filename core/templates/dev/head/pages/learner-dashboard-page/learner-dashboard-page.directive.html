@@ -28,7 +28,7 @@
     </md-card>
   </div>
 
-  <div class="row"
+  <div class="row no-gutters"
        ng-style="$ctrl.checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
        style="display: flex;"
        ng-if="$ctrl.noActivity">
@@ -803,6 +803,7 @@
     font-weight: normal;
     margin: 0;
     padding: 15px 20px 15px 20px;
+    cursor: pointer;
   }
 
   .oppia-learner-dashboard-main-menu .oppia-learner-dashboard-sub-section-active {
@@ -818,6 +819,7 @@
     background-color: #fff;
     border: 1px solid #d0d0d0;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    cursor: pointer;
   }
 
   .oppia-learner-dashboard-section-active {

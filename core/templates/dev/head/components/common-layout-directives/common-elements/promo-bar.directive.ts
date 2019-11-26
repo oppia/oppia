@@ -18,19 +18,16 @@
  * dismissible.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/PromoBarService.ts');
+require('services/promo-bar.service.ts');
 
 angular.module('oppia').directive('promoBar', [
-  '$window', 'PromoBarService', 'UrlInterpolationService',
-  function($window, PromoBarService, UrlInterpolationService) {
+  '$window', 'PromoBarService',
+  function($window, PromoBarService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'promo-bar.directive.html'),
+      template: require('!html-loader!./promo-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {

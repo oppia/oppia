@@ -1222,6 +1222,53 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exploration.get_content_count(), 7)
 
+    def test_get_content_with_correct_state_name_returns_html(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            exploration.get_content_html(exploration.init_state_name, 'hint_1'),
+            '<p>hint one</p>')
+
+        hints_list[0]['hint_content']['html'] = '<p>Changed hint one</p>'
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            exploration.get_content_html(exploration.init_state_name, 'hint_1'),
+            '<p>Changed hint one</p>')
+
+    def test_get_content_with_incorrect_state_name_raise_error(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>hint one</p>'
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            exploration.get_content_html(exploration.init_state_name, 'hint_1'),
+            '<p>hint one</p>')
+
+        with self.assertRaisesRegexp(
+            ValueError, 'State Invalid state does not exist'):
+            exploration.get_content_html('Invalid state', 'hint_1')
+
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')

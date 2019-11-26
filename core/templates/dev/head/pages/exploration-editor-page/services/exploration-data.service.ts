@@ -17,12 +17,12 @@
  * with the exploration editor backend.
  */
 
-require('domain/exploration/EditableExplorationBackendApiService.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/LocalStorageService.ts');
-require('services/contextual/UrlService.ts');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/local-storage.service.ts');
+require('services/contextual/url.service.ts');
 
 require('services/services.constants.ajs.ts');
 
@@ -129,7 +129,9 @@ angular.module('oppia').factory('ExplorationDataService', [
                     $window.location.reload();
                   });
                 } else {
-                  errorCallback(explorationId, draft.getChanges());
+                  if (errorCallback) {
+                    errorCallback(explorationId, draft.getChanges());
+                  }
                 }
               }
               return response;

@@ -407,6 +407,10 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.WrittenTranslations.from_dict(
                             change.new_value))
                     state.update_written_translations(written_translations)
+            elif change.cmd == exp_domain.CMD_ADD_TRANSLATION:
+                exploration.states[change.state_name].add_translation(
+                    change.content_id, change.language_code,
+                    change.translation_html)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -517,7 +521,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.commit(committer_id, commit_message, change_list_dict)
     exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
     memcache_services.delete(exp_memcache_key)
-    index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
 
@@ -1037,6 +1040,12 @@ def save_exploration_summary(exp_summary):
     )
 
     exp_summary_model.put()
+
+    # The index should be updated after saving the exploration
+    # summary instead of after saving the exploration since the
+    # index contains documents computed on basis of exploration
+    # summary.
+    index_explorations_given_ids([exp_summary.id])
 
 
 def delete_exploration_summary(exploration_id):

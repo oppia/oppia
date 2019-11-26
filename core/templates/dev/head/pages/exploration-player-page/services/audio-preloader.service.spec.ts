@@ -56,15 +56,16 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/audio-preloader.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-language.service.ts');
-require('services/ContextService.ts');
+require('services/context.service.ts');
 
 describe('Audio preloader service', function() {
   beforeEach(function() {
@@ -136,6 +137,12 @@ describe('Audio preloader service', function() {
       });
     });
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   var aps, atls, eof, ecs;
   var $httpBackend = null;

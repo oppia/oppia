@@ -46,6 +46,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/OutcomeObjectFactory.ts');
@@ -95,6 +96,12 @@ describe('Answer classification service with string classifier disabled',
         'WrittenTranslationsObjectFactory',
         new WrittenTranslationsObjectFactory(
           new WrittenTranslationObjectFactory()));
+    }));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
     }));
     beforeEach(function() {
       angular.mock.module(function($provide) {
@@ -373,7 +380,12 @@ describe('Answer classification service with string classifier enabled',
         new WrittenTranslationsObjectFactory(
           new WrittenTranslationObjectFactory()));
     }));
-
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
     beforeEach(function() {
       angular.mock.module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
@@ -596,6 +608,12 @@ describe('Answer classification service with training data classification',
         'WrittenTranslationsObjectFactory',
         new WrittenTranslationsObjectFactory(
           new WrittenTranslationObjectFactory()));
+    }));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
     }));
     beforeEach(function() {
       angular.mock.module(function($provide) {

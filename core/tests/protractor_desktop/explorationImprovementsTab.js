@@ -57,15 +57,12 @@ describe('Answer Details Improvements', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    explorationPlayerPage =
-      new ExplorationPlayerPage.ExplorationPlayerPage();
 
     improvementsTab = explorationEditorPage.getImprovementsTab();
 
-    users.createUser(
-      'learner@user.com', 'learnerUser');
+    users.createUser('learner@ExplorationAnswerDetails.com', 'learnerUser');
     users.createAndLoginAdminUser(
-      'creator@user.com', 'creatorUser');
+      'creator@ExplorationAnswerDetails.com', 'creatorUser');
 
     adminPage.editConfigProperty(
       'Always ask learners for answer details. For testing -- do not use',
@@ -77,6 +74,7 @@ describe('Answer Details Improvements', function() {
 
     // Creator creates and publishes an exploration.
     workflow.createExplorationAsAdmin();
+    general.getExplorationIdFromEditor().then(expId => this.expId = expId);
     explorationEditorMainTab.exitTutorial();
 
     explorationEditorPage.navigateToSettingsTab();
@@ -100,30 +98,46 @@ describe('Answer Details Improvements', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
+    users.logout();
   });
 
-  it('checks solicit answer details feature', function() {
-    users.login('learner@user.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.submitAnswer('TextInput', 'One');
-    explorationPlayerPage.submitAnswerDetails('I liked this choice of answer');
-    explorationPlayerPage.expectExplorationToNotBeOver();
+  describe('Solicit answer details', function() {
+    beforeAll(function() {
+      users.login('learner@ExplorationAnswerDetails.com');
+      libraryPage.get();
+      libraryPage.findExploration(EXPLORATION_TITLE);
+      libraryPage.playExploration(EXPLORATION_TITLE);
+      explorationPlayerPage.submitAnswer('TextInput', 'One');
+      explorationPlayerPage.submitAnswerDetails(
+        'I liked this choice of answer');
+      explorationPlayerPage.expectExplorationToNotBeOver();
+      oppiaLogo.click();
+      general.acceptAlert();
+      users.logout();
+    });
 
-    oppiaLogo.click();
-    general.acceptAlert();
-    users.logout();
-    users.login('creator@user.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.navigateToExplorationEditor();
-    explorationEditorPage.navigateToImprovementsTab();
+    it('is visible for creators', function() {
+      users.login('creator@ExplorationAnswerDetails.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.navigateToExplorationEditor();
+      explorationEditorPage.navigateToImprovementsTab();
 
-    var card = improvementsTab.getAnswerDetailsCard('One');
-    improvementsTab.clickCardActionButton(card, 'Review Answer Details');
-    improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
-    improvementsTab.closeModal();
-    users.logout();
+      var task = improvementsTab.getAnswerDetailsTask('One');
+      improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
+      improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
+      improvementsTab.closeModal();
+      users.logout();
+    });
+
+    it('is visible for guests as read-only', function() {
+      general.openEditor(this.expId);
+      explorationEditorPage.navigateToImprovementsTab();
+
+      var task = improvementsTab.getAnswerDetailsTask('One');
+      improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
+      improvementsTab.verifyReadOnlyAnswerDetails('I liked this choi...', 1);
+      improvementsTab.closeModal();
+    });
   });
 
   afterAll(function() {
@@ -197,13 +211,13 @@ describe('Feedback Improvements', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
-    var card = improvementsTab.getFeedbackCard(feedback);
-    improvementsTab.clickCardActionButton(card, 'Review Thread');
+    var task = improvementsTab.getFeedbackTask(feedback);
+    improvementsTab.clickTaskActionButton(task, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual([feedback]);
     improvementsTab.sendResponseAndCloseModal(feedbackResponse);
 
-    card = improvementsTab.getFeedbackCard(feedbackResponse);
-    improvementsTab.clickCardActionButton(card, 'Review Thread');
+    task = improvementsTab.getFeedbackTask(feedbackResponse);
+    improvementsTab.clickTaskActionButton(task, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [feedback, feedbackResponse]);
     improvementsTab.closeModal();
@@ -229,7 +243,6 @@ describe('Feedback Improvements', function() {
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    creatorDashboardPage.get();
     users.logout();
 
     // Learner plays the exploration and submits a feedback.
@@ -247,25 +260,25 @@ describe('Feedback Improvements', function() {
     explorationEditorPage.navigateToImprovementsTab();
 
     // Mark thread as fixed.
-    var card = improvementsTab.getFeedbackCard(feedback);
-    expect(improvementsTab.getCardStatus(card)).toEqual('Open');
-    improvementsTab.clickCardActionButton(card, 'Review Thread');
+    var task = improvementsTab.getFeedbackTask(feedback);
+    expect(improvementsTab.getTaskStatus(task)).toEqual('Open');
+    improvementsTab.clickTaskActionButton(task, 'Review Thread');
     improvementsTab.sendResponseAndCloseModal(feedbackResponse, 'Fixed');
 
     improvementsTab.setShowOnlyOpenTasks(false);
-    card = improvementsTab.getFeedbackCard(feedbackResponse);
-    expect(improvementsTab.getCardStatus(card)).toEqual('Fixed');
+    task = improvementsTab.getFeedbackTask(feedbackResponse);
+    expect(improvementsTab.getTaskStatus(task)).toEqual('Fixed');
 
     browser.driver.navigate().refresh();
 
     // Re-open the thread.
     improvementsTab.setShowOnlyOpenTasks(false);
-    card = improvementsTab.getFeedbackCard(feedbackResponse);
-    expect(improvementsTab.getCardStatus(card)).toEqual('Fixed');
-    improvementsTab.clickCardActionButton(card, 'Review Thread');
+    task = improvementsTab.getFeedbackTask(feedbackResponse);
+    expect(improvementsTab.getTaskStatus(task)).toEqual('Fixed');
+    improvementsTab.clickTaskActionButton(task, 'Review Thread');
     improvementsTab.sendResponseAndCloseModal(feedbackResponse, 'Open');
     improvementsTab.setShowOnlyOpenTasks(true);
-    expect(improvementsTab.getCardStatus(card)).toEqual('Open');
+    expect(improvementsTab.getTaskStatus(task)).toEqual('Open');
 
     users.logout();
   });
@@ -276,7 +289,7 @@ describe('Feedback Improvements', function() {
 });
 
 
-describe('Suggestions on Explorations', function() {
+describe('Suggestions Improvements', function() {
   var EXPLORATION_TITLE = 'Exploration with Suggestion';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
@@ -349,21 +362,29 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
 
-    var cardToAccept = improvementsTab.getSuggestionCard(
+    var taskToAccept = improvementsTab.getSuggestionTask(
       suggestionDescription1);
-    improvementsTab.clickCardActionButton(cardToAccept, 'Review Thread');
+    improvementsTab.clickTaskActionButton(taskToAccept, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription1]);
     improvementsTab.acceptSuggestion();
     improvementsTab.closeModal();
 
-    var cardToReject = improvementsTab.getSuggestionCard(
+    var taskToReject = improvementsTab.getSuggestionTask(
       suggestionDescription2);
-    improvementsTab.clickCardActionButton(cardToReject, 'Review Thread');
+    improvementsTab.clickTaskActionButton(taskToReject, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription2]);
     improvementsTab.rejectSuggestion();
     improvementsTab.closeModal();
+
+    improvementsTab.setShowOnlyOpenTasks(false);
+    var acceptedTask = improvementsTab.getSuggestionTask(
+      suggestionDescription1);
+    var rejectedTask = improvementsTab.getSuggestionTask(
+      suggestionDescription2);
+    expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
+    expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
 
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
@@ -381,5 +402,155 @@ describe('Suggestions on Explorations', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
+  });
+});
+
+describe('Playthrough Improvements', function() {
+  var EXPLORATION_TITLE = 'Exploration with Early Quit Playthroughs';
+  var EXPLORATION_CATEGORY = 'Algorithms';
+  var EXPLORATION_OBJECTIVE = 'To explore something new';
+  var EXPLORATION_LANGUAGE = 'English';
+  var CREATOR_EMAIL = 'creator@ExplorationEarlyQuit.com';
+  var LEARNER_EMAIL = 'learner@ExplorationEarlyQuit.com';
+
+  var adminPage = null;
+  var creatorDashboardPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
+  var explorationPlayerPage = null;
+  var libraryPage = null;
+  var oppiaLogo = $('.protractor-test-oppia-main-logo');
+
+  var improvementsTab = null;
+
+  beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    libraryPage = new LibraryPage.LibraryPage();
+
+    improvementsTab = explorationEditorPage.getImprovementsTab();
+
+    users.createUser(LEARNER_EMAIL, 'learnerEarlyQuit');
+    users.createAndLoginAdminUser(CREATOR_EMAIL, 'creatorEarlyQuit');
+
+    workflow.createExplorationAsAdmin();
+    explorationEditorMainTab.exitTutorial();
+
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
+    explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
+    explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
+    explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
+
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.setStateName('One');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 1 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'Two', true, 'Equals',
+      'One');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('Two');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 2 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'Three', true, 'Equals',
+      'Two');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('Three');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 3 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
+      'Three');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Try 2 again'), 'Two', false, 'Equals',
+      'Two');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+    general.getExplorationIdFromEditor().then(expId => this.expId = expId);
+
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor.',
+      'Boolean', element => element.setValue(true));
+    adminPage.editConfigProperty(
+      'The set of exploration IDs for recording playthrough issues',
+      'List', element => element.addItem('Unicode').setValue(this.expId));
+    adminPage.editConfigProperty(
+      'The probability of recording playthroughs',
+      'Real', element => element.setValue(1.0));
+  });
+
+  describe('Early Quit playthroughs', function() {
+    describe('resolving the task', function() {
+      it('disappears from the improvements tab', function() {
+        users.login(LEARNER_EMAIL);
+        libraryPage.get();
+        libraryPage.findExploration(EXPLORATION_TITLE);
+        libraryPage.playExploration(EXPLORATION_TITLE);
+
+        explorationPlayerPage.submitAnswer('TextInput', 'One');
+        explorationPlayerPage.clickThroughToNextCard();
+        explorationPlayerPage.expectExplorationToNotBeOver();
+        oppiaLogo.click();
+        general.acceptAlert();
+        users.logout();
+
+        users.login(CREATOR_EMAIL);
+        creatorDashboardPage.get();
+        creatorDashboardPage.navigateToExplorationEditor();
+        explorationEditorPage.navigateToImprovementsTab();
+
+        var task = improvementsTab.getPlaythroughTask(
+          'learners exited the exploration in less than a minute');
+        improvementsTab.clickTaskActionButton(task, 'Mark as Resolved');
+        improvementsTab.confirmAction();
+
+        expect(improvementsTab.getTasks().count()).toEqual(0);
+      });
+    });
+
+    describe('viewing the task', function() {
+      beforeAll(function() {
+        users.login(LEARNER_EMAIL);
+        libraryPage.get();
+        libraryPage.findExploration(EXPLORATION_TITLE);
+        libraryPage.playExploration(EXPLORATION_TITLE);
+
+        explorationPlayerPage.submitAnswer('TextInput', 'One');
+        explorationPlayerPage.clickThroughToNextCard();
+        explorationPlayerPage.expectExplorationToNotBeOver();
+        oppiaLogo.click();
+        general.acceptAlert();
+        users.logout();
+      });
+
+      it('hides the mark as resolve button from guests', function() {
+        users.logout();
+        general.openEditor(this.expId);
+        explorationEditorPage.navigateToImprovementsTab();
+        var task = improvementsTab.getPlaythroughTask(
+          'learners exited the exploration in less than a minute');
+
+        expect(improvementsTab.getTaskActionButtons(task).count()).toEqual(0);
+      });
+    });
   });
 });

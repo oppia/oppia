@@ -21,9 +21,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/PageTitleService.ts');
-require('services/SiteAnalyticsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/page-title.service.ts');
+require('services/site-analytics.service.ts');
 
 require(
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ajs.ts');

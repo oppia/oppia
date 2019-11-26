@@ -16,6 +16,12 @@
  * @fileoverview Directive for the translation opportunities.
  */
 
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require('directives/angular-html-bind.directive.ts');
+require('directives/mathjax-bind.directive.ts');
 require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
@@ -23,6 +29,7 @@ require(
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
+require('pages/community-dashboard-page/services/translate-text.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
@@ -39,37 +46,48 @@ angular.module('oppia').directive(
       'translation-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ContributionOpportunitiesService',
-        'TranslationLanguageService', function(
-            $scope, ContributionOpportunitiesService,
-            TranslationLanguageService) {
+        '$scope', '$uibModal', 'ContributionOpportunitiesService',
+        'TranslateTextService', 'TranslationLanguageService', 'UserService',
+        function(
+            $scope, $uibModal, ContributionOpportunitiesService,
+            TranslateTextService, TranslationLanguageService, UserService) {
           var ctrl = this;
+          var userIsLoggedIn = false;
           ctrl.opportunities = [];
           ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
+          ctrl.progressBarRequired = true;
+
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            userIsLoggedIn = userInfo.isLoggedIn();
+          });
+
+          var getOpportunitySummary = function(expId) {
+            for (var index in ctrl.opportunities) {
+              if (ctrl.opportunities[index].id === expId) {
+                return ctrl.opportunities[index];
+              }
+            }
+          };
+
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
               var opportunity = opportunities[index];
-              var subheading = (
-                opportunity.topic_name + ' - ' + opportunity.story_title);
-              var heading = opportunity.chapter_title;
-              var progressPercentage = '0.00';
-              var totalContentCount = opportunity.content_count;
+              var subheading = opportunity.getOpportunitySubheading();
+              var heading = opportunity.getOpportunityHeading();
+              var totalContentCount = opportunity.getContentCount();
               var languageCode = (
                 TranslationLanguageService.getActiveLanguageCode());
               var languageDescription = (
                 TranslationLanguageService.getActiveLanguageDescription());
-              if (
-                opportunity.translation_counts.hasOwnProperty(languageCode) && (
-                  totalContentCount > 0)) {
-                var progressPercentage = (
-                  (opportunity.translation_counts[languageCode] /
-                    totalContentCount) * 100).toFixed(2);
-              }
+              var progressPercentage = (
+                opportunity.getTranslationProgressPercentage(languageCode));
+
               ctrl.opportunities.push({
+                id: opportunity.getExplorationId(),
                 heading: heading,
                 subheading: subheading,
-                progressPercentage: progressPercentage,
+                progressPercentage: progressPercentage.toFixed(2),
                 actionButtonTitle: 'Translate'
               });
             }
@@ -95,6 +113,95 @@ angular.module('oppia').directive(
                 TranslationLanguageService.getActiveLanguageCode(),
                 updateWithNewOpportunities);
             }
+          };
+
+          ctrl.onClickButton = function(expId) {
+            var opportunity = getOpportunitySummary(expId);
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/community-dashboard-page/modal-templates/' +
+                'translation-modal.directive.html'),
+              backdrop: 'static',
+              size: 'lg',
+              resolve: {
+                opportunity: function() {
+                  return opportunity;
+                },
+                userIsLoggedIn: function() {
+                  return userIsLoggedIn;
+                }
+              },
+              controller: [
+                '$scope', '$uibModalInstance', 'opportunity', 'userIsLoggedIn',
+                function(
+                    $scope, $uibModalInstance, opportunity, userIsLoggedIn) {
+                  $scope.userIsLoggedIn = userIsLoggedIn;
+                  $scope.uploadingTranslation = false;
+                  $scope.activeWrittenTranslation = {};
+                  $scope.activeWrittenTranslation.html = '';
+                  $scope.HTML_SCHEMA = {
+                    type: 'html',
+                    ui_config: {
+                      hide_complex_extensions: 'true'
+                    }
+                  };
+                  $scope.subheading = opportunity.subheading;
+                  $scope.heading = opportunity.heading;
+                  $scope.loadingData = true;
+                  $scope.moreAvailable = false;
+                  $scope.textToTranslate = '';
+                  $scope.languageDescription = (
+                    TranslationLanguageService.getActiveLanguageDescription());
+                  TranslateTextService.init(
+                    opportunity.id,
+                    TranslationLanguageService.getActiveLanguageCode(),
+                    function() {
+                      var textAndAvailability = (
+                        TranslateTextService.getTextToTranslate());
+                      $scope.textToTranslate = textAndAvailability.text;
+                      $scope.moreAvailable = textAndAvailability.more;
+                      $scope.loadingData = false;
+                    });
+                  $scope.skipActiveTranslation = function() {
+                    $scope.textToTranslate = (
+                      TranslateTextService.getTextToTranslate().text);
+                    $scope.activeWrittenTranslation.html = '';
+                  };
+                  $scope.suggestTranslatedText = function() {
+                    if (!$scope.uploadingTranslation && !$scope.loadingData) {
+                      $scope.uploadingTranslation = true;
+                      TranslateTextService.suggestTranslatedText(
+                        $scope.activeWrittenTranslation.html,
+                        TranslationLanguageService.getActiveLanguageCode(),
+                        function() {
+                          if ($scope.moreAvailable) {
+                            var textAndAvailability = (
+                              TranslateTextService.getTextToTranslate());
+                            $scope.textToTranslate = textAndAvailability.text;
+                            $scope.moreAvailable = textAndAvailability.more;
+                          }
+                          $scope.activeWrittenTranslation.html = '';
+                          $scope.uploadingTranslation = false;
+                        });
+                    }
+                    if (!$scope.moreAvailable) {
+                      $uibModalInstance.dismiss('ok');
+                    }
+                  };
+                  $scope.done = function() {
+                    $uibModalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.ok = function() {
+                    $uibModalInstance.dismiss('ok');
+                  };
+                }
+              ]
+            });
           };
 
           ContributionOpportunitiesService.getTranslationOpportunities(

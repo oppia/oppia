@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import copy
+import datetime
 import inspect
 import itertools
 import json
@@ -66,6 +67,9 @@ current_user_services = models.Registry.import_current_user_services()
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
 LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
+
+# Used when swap an attribute that does not exist.
+NO_ATTRIBUTE = 'NO SUCH ATTRIBUTE'
 
 
 def empty_environ():
@@ -585,6 +589,7 @@ tags: []
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
 
+    # pylint: enable=invalid-name
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
@@ -1583,21 +1588,24 @@ tags: []
     def save_new_skill(
             self, skill_id, owner_id,
             description, misconceptions=None, rubrics=None, skill_contents=None,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            prerequisite_skill_ids=None):
         """Creates an Oppia Skill and saves it.
 
         Args:
             skill_id: str. ID for the skill to be created.
             owner_id: str. The user_id of the creator of the skill.
             description: str. The description of the skill.
-            misconceptions: list(Misconception). A list of Misconception objects
-                that contains the various misconceptions of the skill.
-            rubrics: list(Rubric). A list of Rubric objects that contain the
-                rubric for each difficulty of the skill.
-            skill_contents: SkillContents. A SkillContents object containing the
-                explanation and examples of the skill.
+            misconceptions: list(Misconception)|None. A list of Misconception
+                objects that contains the various misconceptions of the skill.
+            rubrics: list(Rubric)|None. A list of Rubric objects that contain
+                the rubric for each difficulty of the skill.
+            skill_contents: SkillContents|None. A SkillContents object
+                containing the explanation and examples of the skill.
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
+            prerequisite_skill_ids: list(str)|None. The prerequisite skill IDs
+                for the skill.
 
         Returns:
             Skill. A newly-created skill.
@@ -1609,6 +1617,8 @@ tags: []
             skill.next_misconception_id = len(misconceptions) + 1
         if skill_contents is not None:
             skill.skill_contents = skill_contents
+        if prerequisite_skill_ids is not None:
+            skill.prerequisite_skill_ids = prerequisite_skill_ids
         if rubrics is not None:
             skill.rubrics = rubrics
         else:
@@ -1726,6 +1736,56 @@ tags: []
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
     @contextlib.contextmanager
+    def mock_datetime_utcnow(self, mocked_datetime):
+        """Mocks response from datetime.datetime.utcnow method.
+
+        Example usage:
+            import datetime
+            mocked_datetime_utcnow = datetime.datetime.utcnow() -
+                datetime.timedelta(days=1)
+            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+                print datetime.datetime.utcnow() # prints time reduced by 1 day
+            print datetime.datetime.utcnow()  # prints current time.
+
+        Args:
+            mocked_datetime: datetime.datetime.
+                The datetime which will be used instead of
+                the current UTC datetime.
+
+        Yields:
+            nothing.
+        """
+        if not isinstance(mocked_datetime, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected mocked_datetime to be datetime.datetime, got %s' % (
+                    type(mocked_datetime)))
+
+        original_datetime_type = datetime.datetime
+
+        class PatchedDatetimeType(type):
+            """Validates the datetime instances."""
+            def __instancecheck__(cls, other):
+                """Validates whether the given instance is datetime
+                instance.
+                """
+                return isinstance(other, original_datetime_type)
+
+        class MockDatetime( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
+            @classmethod
+            def utcnow(cls):
+                """Returns the mocked datetime."""
+                return mocked_datetime
+
+        setattr(datetime, 'datetime', MockDatetime)
+
+        try:
+            yield
+        finally:
+            setattr(datetime, 'datetime', original_datetime_type)
+
+    @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a
         'with' statement. The object can be anything that supports
@@ -1752,12 +1812,15 @@ tags: []
         the generator will immediately raise StopIteration, and contextlib will
         raise a RuntimeError.
         """
-        original = getattr(obj, attr)
+        original = getattr(obj, attr, NO_ATTRIBUTE)
         setattr(obj, attr, newvalue)
         try:
             yield
         finally:
-            setattr(obj, attr, original)
+            if original == NO_ATTRIBUTE:
+                delattr(obj, attr)
+            else:
+                setattr(obj, attr, original)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):

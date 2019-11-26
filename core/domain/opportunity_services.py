@@ -18,9 +18,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from constants import constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
+from core.domain import question_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.platform import models
@@ -57,11 +60,29 @@ def get_exploration_opportunity_summary_from_model(model):
         ExplorationOpportunitySummary. The corresponding
         ExplorationOpportunitySummary object.
     """
+    # We're making sure that the audio language codes in any exploration
+    # opportunity domain object match the ones in
+    # constants.SUPPORTED_AUDIO_LANGUAGES.
+    set_of_all_languages = set(
+        model.incomplete_translation_language_codes +
+        model.need_voice_artist_in_language_codes +
+        model.assigned_voice_artist_in_language_codes)
+    supported_language_codes = set([language['id'] for language in (
+        constants.SUPPORTED_AUDIO_LANGUAGES)])
+    missing_language_codes = list(
+        supported_language_codes - set_of_all_languages)
+    if missing_language_codes:
+        logging.info(
+            'Missing language codes %s in exploration opportunity model with '
+            'id %s' % (missing_language_codes, model.id))
+
+    new_incomplete_translation_language_codes = (
+        model.incomplete_translation_language_codes + missing_language_codes)
 
     return opportunity_domain.ExplorationOpportunitySummary(
         model.id, model.topic_id, model.topic_name, model.story_id,
         model.story_title, model.chapter_title, model.content_count,
-        model.incomplete_translation_language_codes, model.translation_counts,
+        new_incomplete_translation_language_codes, model.translation_counts,
         model.need_voice_artist_in_language_codes,
         model.assigned_voice_artist_in_language_codes)
 
@@ -252,6 +273,31 @@ def update_exploration_opportunities_with_story_changes(story, exp_ids):
         exploration_opportunity_summary_list)
 
 
+def update_exploration_voiceover_opportunities(
+        exp_id, assigned_voice_artist_in_language_code):
+    """Updates the assigned_voice_artist_in_language_codes of exploration
+    opportunity model.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+        assigned_voice_artist_in_language_code: str. The language code in which
+            a voice artist is assigned to the exploration.
+    """
+    model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
+    exploration_opportunity_summary = (
+        get_exploration_opportunity_summary_from_model(model))
+
+    exploration_opportunity_summary.need_voice_artist_in_language_codes.remove(
+        assigned_voice_artist_in_language_code)
+    (
+        exploration_opportunity_summary
+        .assigned_voice_artist_in_language_codes.append(
+            assigned_voice_artist_in_language_code))
+    exploration_opportunity_summary.validate()
+    _save_multi_exploration_opportunity_summary(
+        [exploration_opportunity_summary])
+
+
 def delete_exploration_opportunities(exp_ids):
     """Deletes the ExplorationOpportunitySummaryModel models corresponding to
     the given exp_ids.
@@ -327,7 +373,8 @@ def get_translation_opportunities(language_code, cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(ExplorationOpportunitySummary). A list of
+                ExplorationOpportunitySummary domain objects.
             cursor: str or None. A query cursor pointing to the next batch of
                 results. If there are no more results, this might be None.
             more: bool. If True, there are (probably) more results after this
@@ -343,7 +390,7 @@ def get_translation_opportunities(language_code, cursor):
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary.to_dict())
+        opportunities.append(exp_opportunity_summary)
     return opportunities, cursor, more
 
 
@@ -360,7 +407,8 @@ def get_voiceover_opportunities(language_code, cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(ExplorationOpportunitySummary). A list of
+                ExplorationOpportunitySummary domain objects.
             cursor: str or None. A query cursor pointing to the next
                 batch of results. If there are no more results, this might
                 be None.
@@ -377,8 +425,31 @@ def get_voiceover_opportunities(language_code, cursor):
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary.to_dict())
+        opportunities.append(exp_opportunity_summary)
     return opportunities, cursor, more
+
+
+def get_exploration_opportunity_summaries_by_ids(ids):
+    """Returns a list of ExplorationOpportunitySummary objects corresponding to
+    the given list of ids.
+
+    Args:
+        ids: list(str). A list of opportunity ids.
+
+    Returns:
+        list(ExplorationOpportunitySummary). A list of
+            ExplorationOpportunitySummary domain objects corresponding to the
+            supplied ids.
+    """
+    exp_opportunity_summary_models = (
+        opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
+    opportunities = []
+    for exp_opportunity_summary_model in exp_opportunity_summary_models:
+        exp_opportunity_summary = (
+            get_exploration_opportunity_summary_from_model(
+                exp_opportunity_summary_model))
+        opportunities.append(exp_opportunity_summary)
+    return opportunities
 
 
 def update_opportunities_with_new_topic_name(topic_id, topic_name):
@@ -405,6 +476,235 @@ def update_opportunities_with_new_topic_name(topic_id, topic_name):
 
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
+
+
+def get_skill_opportunity_from_model(model):
+    """Returns a SkillOpportunity domain object from a SkillOpportunityModel.
+
+    Args:
+        model: SkillOpportunityModel. The skill opportunity model.
+
+    Returns:
+        SkillOpportunity. The corresponding SkillOpportunity object.
+    """
+    return opportunity_domain.SkillOpportunity(
+        model.id, model.skill_description, model.question_count)
+
+
+def get_skill_opportunities(cursor):
+    """Returns a list of skill opportunities available for questions.
+
+    Args:
+        cursor: str or None. If provided, the list of returned entities
+            starts from this datastore cursor. Otherwise, the returned
+            entities start from the beginning of the full list of entities.
+
+    Returns:
+        3-tuple(opportunities, cursor, more). where:
+            opportunities: list(SkillOpportunity). A list of SkillOpportunity
+                domain objects.
+            cursor: str or None. A query cursor pointing to the next
+                batch of results. If there are no more results, this might
+                be None.
+            more: bool. If True, there are (probably) more results after
+                this batch. If False, there are no further results after
+                this batch.
+    """
+    page_size = feconf.OPPORTUNITIES_PAGE_SIZE
+    skill_opportunity_models, cursor, more = (
+        opportunity_models.SkillOpportunityModel
+        .get_skill_opportunities(page_size, cursor))
+    opportunities = []
+    for skill_opportunity_model in skill_opportunity_models:
+        skill_opportunity = (
+            get_skill_opportunity_from_model(skill_opportunity_model))
+        opportunities.append(skill_opportunity)
+    return opportunities, cursor, more
+
+
+def get_skill_opportunities_by_ids(ids):
+    """Returns a list of SkillOpportunity domain objects corresponding to the
+    given list of ids.
+
+    Args:
+        ids: list(str). A list of the opportunity ids.
+
+    Returns:
+        list(SkillOpportunity). A list of SkillOpportunity domain objects
+            corresponding to the supplied ids.
+    """
+    skill_opportunity_models = (
+        opportunity_models.SkillOpportunityModel.get_multi(ids))
+    opportunities = []
+    for skill_opportunity_model in skill_opportunity_models:
+        skill_opportunity = (
+            get_skill_opportunity_from_model(skill_opportunity_model))
+        opportunities.append(skill_opportunity)
+    return opportunities
+
+
+def create_skill_opportunity(skill_id, skill_description):
+    """Creates a SkillOpportunityModel entity in the datastore.
+
+    Args:
+        skill_id: str. The skill_id of the opportunity.
+        skill_description: str. The skill_description of the opportunity.
+
+    Raises:
+        Exception: If a SkillOpportunityModel corresponding to the supplied
+            skill_id already exists.
+    """
+    skill_opportunity_model = (
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
+    if skill_opportunity_model is not None:
+        raise Exception(
+            'SkillOpportunity corresponding to skill ID %s already exists.' % (
+                skill_id))
+
+    questions, _, _ = (
+        question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+            constants.MAX_QUESTIONS_PER_SKILL, [skill_id], ''))
+    skill_opportunity = opportunity_domain.SkillOpportunity(
+        skill_id=skill_id,
+        skill_description=skill_description,
+        question_count=len(questions)
+    )
+    _save_skill_opportunities([skill_opportunity])
+
+
+def _save_skill_opportunities(skill_opportunities):
+    """Saves SkillOpportunity domain objects into datastore as
+    SkillOpportunityModel objects.
+
+    Args:
+        skill_opportunities: list(SkillOpportunity). A list of SkillOpportunity
+            domain objects.
+    """
+    skill_opportunity_models = []
+    for skill_opportunity in skill_opportunities:
+        skill_opportunity.validate()
+        model = opportunity_models.SkillOpportunityModel(
+            id=skill_opportunity.id,
+            skill_description=skill_opportunity.skill_description,
+            question_count=skill_opportunity.question_count,
+        )
+        skill_opportunity_models.append(model)
+    opportunity_models.SkillOpportunityModel.put_multi(skill_opportunity_models)
+
+
+def update_skill_opportunity_skill_description(skill_id, new_description):
+    """Updates the skill_description of the SkillOpportunityModel with
+    new_description.
+
+    Args:
+        skill_id: str. The corresponding skill_id of the opportunity.
+        new_description: str. The new skill_description.
+    """
+    skill_opportunity = _get_skill_opportunity(skill_id)
+    if skill_opportunity is not None:
+        skill_opportunity.skill_description = new_description
+        _save_skill_opportunities([skill_opportunity])
+
+
+def _get_skill_opportunity(skill_id):
+    """Returns the SkillOpportunity domain object representing a
+    SkillOpportunityModel with the supplied skill_id in the datastore.
+
+    Args:
+        skill_id: str. The corresponding skill_id of the opportunity.
+
+    Returns:
+        SkillOpportunity or None. The domain object representing a
+            SkillOpportunity with the supplied skill_id, or None if it does not
+            exist.
+    """
+    skill_opportunity_model = (
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
+    if skill_opportunity_model is not None:
+        return get_skill_opportunity_from_model(skill_opportunity_model)
+    return None
+
+
+def delete_skill_opportunity(skill_id):
+    """Deletes the SkillOpportunityModel corresponding to the supplied skill_id.
+
+    Args:
+        skill_id: str. The skill_id corresponding to the to-be-deleted
+            SkillOpportunityModel.
+    """
+    skill_opportunity_model = (
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
+    if skill_opportunity_model is not None:
+        opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
+
+
+def increment_question_counts(skill_ids, delta):
+    """Increments question_count(s) of SkillOpportunityModel(s) with
+    corresponding skill_ids.
+
+    Args:
+        skill_ids: list(str). A list of skill_ids corresponding to
+            SkillOpportunityModel(s).
+        delta: int. The delta for which to increment each question_count.
+    """
+    updated_skill_opportunities = (
+        _get_skill_opportunity_with_updated_question_count(skill_ids, delta))
+    _save_skill_opportunities(updated_skill_opportunities)
+
+
+def update_skill_opportunities_on_question_linked_skills_change(
+        old_skill_ids, new_skill_ids):
+    """Updates question_count(s) of SkillOpportunityModel(s) corresponding to
+    the change in linked skill IDs for a question from old_skill_ids to
+    new_skill_ids, e.g. if skill_id1 is in old_skill_ids, but not in
+    new_skill_ids, the question_count of the SkillOpportunityModel for skill_id1
+    would be decremented.
+
+    NOTE: Since this method is updating the question_counts based on the change
+    of skill_ids from old_skill_ids to new_skill_ids, the input skill_id lists
+    must be related.
+
+    Args:
+        old_skill_ids: list(str). A list of old skill_id(s).
+        new_skill_ids: list(str). A list of new skill_id(s).
+    """
+    old_skill_ids_set = set(old_skill_ids)
+    new_skill_ids_set = set(new_skill_ids)
+    new_skill_ids_added_to_question = new_skill_ids_set - old_skill_ids_set
+    skill_ids_removed_from_question = old_skill_ids_set - new_skill_ids_set
+    updated_skill_opportunities = []
+    updated_skill_opportunities.extend(
+        _get_skill_opportunity_with_updated_question_count(
+            new_skill_ids_added_to_question, 1))
+    updated_skill_opportunities.extend(
+        _get_skill_opportunity_with_updated_question_count(
+            skill_ids_removed_from_question, -1))
+    _save_skill_opportunities(updated_skill_opportunities)
+
+
+def _get_skill_opportunity_with_updated_question_count(skill_ids, delta):
+    """Returns a list of SkillOpportunities with corresponding skill_ids
+    with question_count(s) updated by delta.
+
+    Args:
+        skill_ids: iterable(str). The IDs of the matching SkillOpportunityModels
+            in the datastore.
+        delta: int. The delta by which to update each question_count (can be
+            negative).
+
+    Returns:
+        list(SkillOpportunity). The updated SkillOpportunities.
+    """
+    updated_skill_opportunities = []
+    skill_opportunity_models = (
+        opportunity_models.SkillOpportunityModel.get_multi(skill_ids))
+    for skill_opportunity_model in skill_opportunity_models:
+        if skill_opportunity_model is not None:
+            skill_opportunity = get_skill_opportunity_from_model(
+                skill_opportunity_model)
+            skill_opportunity.question_count += delta
+            updated_skill_opportunities.append(skill_opportunity)
+    return updated_skill_opportunities
 
 
 def regenerate_opportunities_related_to_topic(

@@ -152,6 +152,13 @@ indexes:
   - name: status
   - name: last_updated
 
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: suggestion_type
+  - name: author_id
+
 - kind: InteractionAnswerSummariesRealtimeModel
   properties:
   - name: realtime_layer
@@ -209,6 +216,11 @@ indexes:
   properties:
   - name: email_hash
   - name: sent_datetime
+
+- kind: SkillOpportunityModel
+  properties:
+  - name: deleted
+  - name: created_on
 
 - kind: StatisticsRealtimeModel
   properties:

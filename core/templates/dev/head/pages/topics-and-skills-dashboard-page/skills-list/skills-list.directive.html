@@ -1,9 +1,9 @@
 <md-card layout="row" class="list-view-item">
   Search By Skill
-  <input type="text" class="form-control" placeholder="Enter a skill name" ng-model="skillFilterText">
+  <input type="text" class="form-control protractor-test-search-skill-input" placeholder="Enter a skill name" ng-model="skillFilterText">
 </md-card>
 <md-card layout="row" class="list-view-item">
-  <table class="dashboard-table">
+  <table class="dashboard-table text-break">
     <colgroup>
       <col style="width: 50%;">
       <col style="width: 25%;">
@@ -18,37 +18,37 @@
       </th>
     </tr>
     <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
-        ng-click="isInModal() && selectSkill(skill)"
-        class="list-item protractor-test-skills-list-item"
-        ng-init="skillLink = isInModal() ? '#' : getSkillEditorUrl(skill.id)">
+        ng-click="selectSkill(skill)"
+        class="list-item protractor-test-skills-list-item">
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[skillLink]>" class="list-summary">
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <span class="protractor-test-skill-description"> <[skill.description]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[skillLink]>" class="list-summary">
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <span> <[skill.worked_examples_count]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[skillLink]>" class="list-summary">
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <span> <[skill.misconception_count]> </span>
         </a>
       </td>
       <td ng-if="getMergeableSkillSummaries().length > 0">
-        <button class="btn btn-secondary protractor-test-merge-skills-button" ng-click="mergeSkill(skill)">
+        <button class="btn btn-secondary protractor-test-merge-skills-button skills-list-action-button"
+                ng-click="mergeSkill(skill)">
           <span> Merge Skill </span>
         </button>
       </td>
       <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
-        <button class="btn btn-secondary oppia-assign-skill-to-topic-button
+        <button class="btn btn-secondary skills-list-action-button
         protractor-test-assign-skill-to-topic-button" ng-click="assignSkillToTopic(skill.id)">
           <span> Assign to Topic </span>
         </button>
@@ -93,7 +93,6 @@
   skills-list .list-summary:visited {
     color: inherit;
     display: block;
-    height: 2em;
     text-decoration: none;
   }
 
@@ -127,7 +126,7 @@
     vertical-align: middle;
   }
 
-  skills-list .oppia-assign-skill-to-topic-button {
+  skills-list .skills-list-action-button {
     min-width: 125px;
   }
 

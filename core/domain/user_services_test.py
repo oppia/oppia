@@ -957,6 +957,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
     def setUp(self):
         """Create exploration with two versions."""
         super(LastLoginIntegrationTests, self).setUp()
+
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -964,18 +965,24 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         """Test the case of a user who existed in the system before the
         last-login check was introduced.
         """
-        # Set up a 'previous-generation' user.
-        user_settings = user_services.get_user_settings(self.viewer_id)
-        user_settings.last_logged_in = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
-
-        self.assertIsNone(
+        previous_last_logged_in_datetime = (
             user_services.get_user_settings(self.viewer_id).last_logged_in)
+        self.assertIsNotNone(previous_last_logged_in_datetime)
+
+        current_datetime = datetime.datetime.utcnow()
+        mocked_datetime_utcnow = current_datetime - datetime.timedelta(days=1)
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+            user_services.record_user_logged_in(self.viewer_id)
+
+        user_settings = user_services.get_user_settings(self.viewer_id)
+        last_logged_in = user_settings.last_logged_in
+
         # After logging in and requesting a URL, the last_logged_in property is
-        # set.
+        # changed.
         self.login(self.VIEWER_EMAIL)
         self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        self.assertIsNotNone(
+        self.assertLess(
+            last_logged_in,
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.logout()
 
@@ -986,36 +993,10 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        original_datetime_type = datetime.datetime
         current_datetime = datetime.datetime.utcnow()
 
-        # Without explicitly defining the type of the patched datetimes, NDB
-        # validation checks for datetime.datetime instances fail.
-        class PatchedDatetimeType(type):
-            """Validates the datetime instances."""
-            def __instancecheck__(cls, other):
-                """Validates whether the given instance is a datatime
-                instance.
-                """
-                return isinstance(other, original_datetime_type)
-
-        class MockDatetime11Hours( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
-            @classmethod
-            def utcnow(cls):
-                """Returns the current date and time 11 hours ahead of UTC."""
-                return current_datetime + datetime.timedelta(hours=11)
-
-        class MockDatetime13Hours( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
-            @classmethod
-            def utcnow(cls):
-                """Returns the current date and time 13 hours ahead of UTC."""
-                return current_datetime + datetime.timedelta(hours=13)
-
-        with self.swap(datetime, 'datetime', MockDatetime11Hours):
+        mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=11)
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertEqual(
@@ -1023,7 +1004,8 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
                 previous_last_logged_in_datetime)
             self.logout()
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours):
+        mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=13)
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertGreater(
@@ -1053,11 +1035,6 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         """Test the case of a user who are editing exploration for first time
         after the last edited time check was introduced.
         """
-        # Set up a 'previous-generation' user.
-        user_settings = user_services.get_user_settings(self.editor_id)
-        user_settings.last_edited_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
-
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNone(editor_settings.last_edited_an_exploration)
 
@@ -1081,10 +1058,11 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
         # Decrease last exploration edited time by 13 hours.
         user_settings = user_services.get_user_settings(self.editor_id)
-        user_settings.last_edited_an_exploration = (
+        mocked_datetime_utcnow = (
             user_settings.last_edited_an_exploration -
             datetime.timedelta(hours=13))
-        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+            user_services.record_user_edited_an_exploration(self.editor_id)
 
         editor_settings = user_services.get_user_settings(self.editor_id)
         previous_last_edited_an_exploration = (
@@ -1123,11 +1101,6 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         """Test the case of a user who are creating exploration for first time
         after the last edited time check was introduced.
         """
-        # Set up a 'previous-generation' user.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        user_settings.last_created_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
-
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertIsNone(owner_settings.last_created_an_exploration)
 
@@ -1143,10 +1116,10 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
 
         # Decrease last exploration created time by 13 hours.
         user_settings = user_services.get_user_settings(self.owner_id)
-        user_settings.last_created_an_exploration = (
+        with self.mock_datetime_utcnow(
             user_settings.last_created_an_exploration -
-            datetime.timedelta(hours=13))
-        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+            datetime.timedelta(hours=13)):
+            user_services.record_user_created_an_exploration(self.owner_id)
 
         owner_settings = user_services.get_user_settings(self.owner_id)
         previous_last_created_an_exploration = (
@@ -1176,9 +1149,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
-    def test_gae_user_id_is_user_id(self):
+    def test_gae_id_is_user_id(self):
         self.assertEqual(
-            self.user_settings.user_id, self.user_settings.gae_user_id
+            self.user_settings.user_id, self.user_settings.gae_id
         )
 
     def test_validate_non_str_user_id(self):
@@ -1188,10 +1161,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_gae_user_id(self):
-        self.user_settings.gae_user_id = 0
+    def test_validate_non_str_gae_id(self):
+        self.user_settings.gae_id = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected gae_user_id to be a string'
+            utils.ValidationError, 'Expected gae_id to be a string'
         ):
             self.user_settings.validate()
 

@@ -6,7 +6,7 @@
     <i class="material-icons oppia-navbar-close-icon" ng-if="$ctrl.isSidebarShown()" >&#10005;</i>
   </a>
 
-  <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo" href="/"
+  <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-none d-sm-block" href="/"
      focus-on="<[::$ctrl.LABEL_FOR_CLEARING_FOCUS]>">
     <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo"
          ng-class="$ctrl.windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'" alt="Oppia Home">
@@ -91,8 +91,8 @@
              from appearing off-center because 'A' is slightly thinner than 'M' in
              this font.
             -->
-            <span ng-if="$ctrl.isAdmin" class="oppia-navbar-role-text" style="right: 4px;">A</span>
-            <span ng-if="$ctrl.isModerator && !$ctrl.isAdmin" class="oppia-navbar-role-text">M</span>
+            <span ng-if="$ctrl.isAdmin" class="oppia-navbar-role-text protractor-test-admin-text" style="right: 4px;">A</span>
+            <span ng-if="$ctrl.isModerator && !$ctrl.isAdmin" class="oppia-navbar-role-text protract-test-moderator-text">M</span>
           </div>
         </div>
       </a>
@@ -295,4 +295,7 @@
     letter-spacing: .21px;
     line-height: 38px;
   }
+  .oppia-navbar-profile > li:hover {
+    background-color: #fff;
+   }
 </style>

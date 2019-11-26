@@ -19,6 +19,7 @@
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 /* eslint-enable max-len */
 
 describe('Solution Validity Service', function() {
@@ -28,6 +29,12 @@ describe('Solution Validity Service', function() {
     beforeEach(() => {
       svs = new SolutionValidityService();
     });
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
 
     it('should store validity of the solution correctly',
       function() {

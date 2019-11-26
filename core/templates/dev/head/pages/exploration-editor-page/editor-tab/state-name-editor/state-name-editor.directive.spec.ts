@@ -16,8 +16,13 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 require('App.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/state-name-editor/' +
@@ -25,7 +30,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/stateful/focus-manager.service.ts');
 
 describe('Sidebar state name controller', function() {
   describe('SidebarStateName', function() {
@@ -42,6 +47,12 @@ describe('Sidebar state name controller', function() {
     beforeEach(function() {
       angular.mock.module('oppia');
     });
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
 
     beforeEach(function() {
       mockExplorationData = {

@@ -16,6 +16,10 @@
  * @fileoverview Requires for question only interactions.
  */
 
+require('interactions/FractionInput/FractionInput.ts');
+require('interactions/ImageClickInput/ImageClickInput.ts');
+require('interactions/ItemSelectionInput/ItemSelectionInput.ts');
 require('interactions/MultipleChoiceInput/MultipleChoiceInput.ts');
+require('interactions/NumberWithUnits/NumberWithUnits.ts');
 require('interactions/NumericInput/NumericInput.ts');
 require('interactions/TextInput/TextInput.ts');
