@@ -385,6 +385,7 @@ URLS = MAPREDUCE_HANDLERS + [
         profile.ProfilePictureHandlerByUsernameHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
+    get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
@@ -563,9 +564,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/resubmit/<suggestion_id>' % feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.ResubmitSuggestionHandler),
     get_redirect_route(
-        r'%s/topic/<target_id>/<suggestion_id>' %
+        r'%s/skill/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,
-        suggestion.SuggestionToTopicActionHandler),
+        suggestion.SuggestionToSkillActionHandler),
     get_redirect_route(
         r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),

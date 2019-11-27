@@ -17,12 +17,30 @@
  * contributors to contribute.
  */
 
+require('domain/opportunity/ExplorationOpportunitySummaryObjectFactory.ts');
+require('domain/opportunity/SkillOpportunityObjectFactory.ts');
+
 angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
-  '$http', 'UrlInterpolationService', 'OPPORTUNITY_TYPE_SKILL',
-  'OPPORTUNITY_TYPE_TRANSLATION', 'OPPORTUNITY_TYPE_VOICEOVER',
-  function($http, UrlInterpolationService, OPPORTUNITY_TYPE_SKILL,
-      OPPORTUNITY_TYPE_TRANSLATION, OPPORTUNITY_TYPE_VOICEOVER) {
+  '$http', 'ExplorationOpportunitySummaryObjectFactory',
+  'SkillOpportunityObjectFactory', 'UrlInterpolationService',
+  'OPPORTUNITY_TYPE_SKILL', 'OPPORTUNITY_TYPE_TRANSLATION',
+  'OPPORTUNITY_TYPE_VOICEOVER',
+  function($http, ExplorationOpportunitySummaryObjectFactory,
+      SkillOpportunityObjectFactory, UrlInterpolationService,
+      OPPORTUNITY_TYPE_SKILL, OPPORTUNITY_TYPE_TRANSLATION,
+      OPPORTUNITY_TYPE_VOICEOVER) {
     var urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
+    var _getOpportunityFromDict = function(opportunityType, opportunityDict) {
+      if (
+        opportunityType === OPPORTUNITY_TYPE_VOICEOVER ||
+        opportunityType === OPPORTUNITY_TYPE_TRANSLATION) {
+        return ExplorationOpportunitySummaryObjectFactory.createFromBackendDict(
+          opportunityDict);
+      } else if (opportunityType === OPPORTUNITY_TYPE_SKILL) {
+        return SkillOpportunityObjectFactory.createFromBackendDict(
+          opportunityDict);
+      }
+    };
     var _fetchOpportunities = function(
         opportunityType, params, successCallback) {
       return $http.get(
@@ -31,7 +49,13 @@ angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
         ), {
           params: params
         }).then(function(response) {
-        successCallback(response.data);
+        var data = response.data;
+        var opportunities = [];
+        for (var index in data.opportunities) {
+          opportunities.push(_getOpportunityFromDict(
+            opportunityType, data.opportunities[index]));
+        }
+        successCallback(opportunities, data.next_cursor, data.more);
       });
     };
     return {
