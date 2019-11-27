@@ -23,7 +23,8 @@ import feconf
 
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 # Constants defining types of entities to which suggestions can be created.
 TARGET_TYPE_EXPLORATION = 'exploration'
@@ -358,6 +359,15 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         return user_data
 
+    def verify_model(self):
+        """Check if UserSettingsModel exists for author_id and
+        final_reviewer_id.
+        """
+        return (user_models.UserSettingsModel.get_by_id(
+                    self.author_id) is not None and
+                user_models.UserSettingsModel.get_by_id(
+                    self.final_reviewer_id) is not None)
+
 
 class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     """A general model for voiceover application of an entity.
@@ -490,3 +500,12 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         return cls.query(ndb.AND(
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
+
+    def verify_model(self):
+        """Check if UserSettingsModel exists for author_id and
+        final_reviewer_id.
+        """
+        return (user_models.UserSettingsModel.get_by_id(
+                    self.author_id) is not None and
+                user_models.UserSettingsModel.get_by_id(
+                    self.final_reviewer_id) is not None)

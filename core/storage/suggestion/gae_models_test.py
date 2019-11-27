@@ -20,9 +20,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
-(base_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.suggestion])
+(base_models, suggestion_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.suggestion, models.NAMES.user])
 
 
 class SuggestionModelUnitTests(test_utils.GenericTestBase):
@@ -485,6 +486,37 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(user_data, test_data)
 
+    def test_verify_model(self):
+        user_models.UserSettingsModel(
+            id='author_1',
+            gae_id='gae_1_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id='reviewer_1',
+            gae_id='gae_2_id',
+            email='some_other@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_1',
+            'reviewer_1', self.change_cmd, 'category1',
+            'exploration.exp1.thread_11')
+        model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            'exploration.exp1.thread_11')
+        self.assertTrue(model.verify_model())
+
+        model.author_id = 'user_non_id'
+        self.assertFalse(model.verify_model())
+
+        model.author_id = 'author_1'
+        model.final_reviewer_id = 'user_non_id'
+        self.assertFalse(model.verify_model())
+
 
 class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
     """Tests for the GeneralVoiceoverApplicationModel class."""
@@ -678,3 +710,36 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralVoiceoverApplicationModel
             .get_voiceover_applications('exploration', 'exp_id', 'hi'))
         self.assertEqual(len(applicant_models), 0)
+
+    def test_verify_model(self):
+        user_models.UserSettingsModel(
+            id='author_1',
+            gae_id='gae_1_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id='reviewer_1',
+            gae_id='gae_2_id',
+            email='some_other@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        model = suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='author_1',
+            final_reviewer_id='reviewer_1',
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None)
+        self.assertTrue(model.verify_model())
+
+        model.author_id = 'user_non_id'
+        self.assertFalse(model.verify_model())
+
+        model.author_id = 'author_1'
+        model.final_reviewer_id = 'user_non_id'
+        self.assertFalse(model.verify_model())

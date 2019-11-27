@@ -280,9 +280,7 @@ class SentEmailModel(base_models.BaseModel):
         return False
 
     def verify_model(self):
-        """Check if UserSettingsModel exists for recipient_id and sender_id
-        contains user_id.
-        """
+        """Check if UserSettingsModel exists for recipient_id and sender_id."""
         return (user_models.UserSettingsModel.get_by_id(
                     self.recipient_id) is not None and
                 user_models.UserSettingsModel.get_by_id(
