@@ -54,7 +54,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1
         })]
         self.save_new_topic(
-            self.TOPIC_ID, self.user_id, 'Name', '', None, 'Description',
+            self.TOPIC_ID, self.user_id, 'Name', 'abbrev', None, 'Description',
             [self.story_id_1, self.story_id_2], [self.story_id_3],
             [self.skill_id_1, self.skill_id_2], [], 1
         )
@@ -224,7 +224,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'Moved skill to subtopic.')
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.user_id, 'Name 2', '', None, 'Description',
+            topic_id, self.user_id, 'Name 2', 'abbrev', None, 'Description',
             [], [], [self.skill_id_1, 'skill_3'], [], 1
         )
         self.assertEqual(
@@ -1049,8 +1049,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Topic with name \'Name\' already exists'):
             self.save_new_topic(
-                'topic_2', self.user_id, 'Name', '', None, 'Description 2',
-                [], [], [], [], 1)
+                'topic_2', self.user_id, 'Name', 'abbrev', None,
+                'Description 2', [], [], [], [], 1)
 
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
@@ -1155,10 +1155,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
-            'topic_2', self.user_id, 'Name 2', '', None, 'Description 2',
+            'topic_2', self.user_id, 'Name 2', 'abbrev', None, 'Description 2',
             [], [], [], [], 1)
         self.save_new_topic(
-            'topic_3', self.user_id, 'Name 3', '', None, 'Description 3',
+            'topic_3', self.user_id, 'Name 3', 'abbrev', None, 'Description 3',
             [], [], [], [], 1)
 
         topic_services.assign_role(

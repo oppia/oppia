@@ -43,7 +43,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.save_new_topic(
-            'topic_id', 'owner_id', 'name', '', None,
+            'topic_id', 'owner_id', 'name', 'abbrev', None,
             'description', [], [], [], [], 0)
         self.assertTrue(
             topic_models.TopicModel.has_reference_to_user_id('owner_id'))

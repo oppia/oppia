@@ -51,9 +51,10 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.skill_id_1 = 'skill_id_1'
         self.skill_id_2 = 'skill_id_2'
         self.save_new_topic(
-            self.TOPIC_ID, self.albert_id, 'Name', '', None, 'Description',
-            [self.story_id_1, self.story_id_2], [self.story_id_3],
-            [self.skill_id_1, self.skill_id_2], [], 1
+            self.TOPIC_ID, self.albert_id, 'Name', 'abbrev', None,
+            'Description', [self.story_id_1, self.story_id_2],
+            [self.story_id_3], [self.skill_id_1, self.skill_id_2],
+            [], 1
         )
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.process_and_flush_pending_tasks()

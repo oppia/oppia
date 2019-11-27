@@ -55,7 +55,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
             self.skill_id_2, self.admin_id, 'Skill Description 2')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', '', None,
+            self.topic_id, self.admin_id, 'Name', 'abbrev', None,
             'Description', [], [], [self.skill_id, self.skill_id_2], [], 1)
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
@@ -84,8 +84,9 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.assertEqual(response['additional_story_summary_dicts'], [])
 
         self.save_new_topic(
-            topic_id, self.admin_id, 'New name', '', None, 'New description',
-            [canonical_story_id], [additional_story_id], [self.skill_id],
+            topic_id, self.admin_id, 'New name', 'abbrev', None,
+            'New description', [canonical_story_id],
+            [additional_story_id], [self.skill_id],
             [], 1)
 
         self.save_new_story(
@@ -519,8 +520,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id_1, self.admin_id, 'Name 1', '', None, 'Description 1',
-            [], [], [self.skill_id], [], 1)
+            topic_id_1, self.admin_id, 'Name 1', 'abbrev', None,
+            'Description 1', [], [], [self.skill_id], [], 1)
 
         json_response = self.put_json(
             '%s/%s' % (
