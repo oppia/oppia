@@ -753,7 +753,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_ids,
             [m.suggestion_id
              for m in suggestion_services.get_suggestions_by_ids(
-                self.suggestion_ids)])
+                 self.suggestion_ids)])
 
     def test_query_suggestions(self):
         queries = [

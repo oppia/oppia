@@ -135,7 +135,7 @@ def get_suggestions_by_ids(suggestion_ids):
     """Finds suggestions by their suggestion IDs.
 
     Args:
-        suggestion_id: list(str). The IDs of the suggestions.
+        suggestion_ids: list(str). The IDs of the suggestions.
 
     Returns:
         list(Suggestion|None). The corresponding suggestions, or None if no
