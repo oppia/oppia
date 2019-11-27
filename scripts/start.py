@@ -60,6 +60,12 @@ _PARSER.add_argument(
     '--no_browser',
     help='optional; if specified, does not open a browser.',
     action='store_true')
+_PARSER.add_argument(
+    '--no_auto_restart',
+    help=(
+        'optional; if specified, does not automatically restart when files are '
+        'changed.'),
+    action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
@@ -92,6 +98,8 @@ def main(args=None):
         '' if parsed_args.save_datastore else '--clear_datastore=true')
     enable_console_arg = (
         '--enable_console=true' if parsed_args.enable_console else '')
+    no_auto_restart = (
+        '--automatic_restart=no' if parsed_args.no_auto_restart else '')
 
     if parsed_args.prod_env:
         constants_env_variable = '"DEV_MODE": false'
@@ -139,10 +147,10 @@ def main(args=None):
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
-        'python %s/dev_appserver.py %s %s --admin_host 0.0.0.0 --admin_port '
+        'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 --admin_port '
         '8000 --host 0.0.0.0 --port %s --skip_sdk_update_check true %s' % (
             common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
-            enable_console_arg,
+            enable_console_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             app_yaml_filepath), shell=True))
 

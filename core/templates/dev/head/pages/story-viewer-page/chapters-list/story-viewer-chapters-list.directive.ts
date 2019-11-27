@@ -65,7 +65,9 @@ angular.module('oppia').directive('storyViewerChaptersList', [
             ctrl.isLoggedIn = userInfo.isLoggedIn();
           });
           ctrl.explorationCardIsShown = false;
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           // The pathIconParameters is an array containing the co-ordinates,
           // background color and icon url for the icons generated on the path.
           ctrl.pathIconParameters = [];

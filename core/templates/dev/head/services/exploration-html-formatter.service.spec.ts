@@ -17,37 +17,25 @@
  * by both the learner and editor views
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('services/exploration-html-formatter.service.ts');
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ExplorationHtmlFormatterService } from
+  'services/exploration-html-formatter.service';
 
-describe('Exploration Html Formatter Service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  var ehfs = null;
+describe('Exploration Html Formatter Service', () => {
+  let ehfs: ExplorationHtmlFormatterService = null;
 
-  beforeEach(angular.mock.module(function($provide) {
-    $provide.constant('INTERACTION_SPECS', {
-      sampleId: {
-        show_generic_submit_button: true
-      },
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe]
     });
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    ehfs = $injector.get('ExplorationHtmlFormatterService');
-  }));
+    ehfs = TestBed.get(ExplorationHtmlFormatterService);
+  });
 
   it('should correctly set interaction HTML when it is in editor mode',
-    function() {
+    () => {
       var interactionId = 'sampleId';
       var expectedHtmlTag = '<oppia-interactive-sample-id ' +
         'last-answer="lastAnswer"' +
@@ -57,7 +45,7 @@ describe('Exploration Html Formatter Service', function() {
     });
 
   it('should correctly set interaction HTML when it is in player mode',
-    function() {
+    () => {
       var interactionId = 'sampleId';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-sample-id ' +
@@ -67,7 +55,7 @@ describe('Exploration Html Formatter Service', function() {
       ).toBe(expectedHtmlTag);
     });
 
-  it('should set answer HTML correctly', function() {
+  it('should set answer HTML correctly', () => {
     var interactionId = 'sampleId';
     var answer = 'sampleAnswer';
     var interactionCustomizationArgs = {
@@ -84,7 +72,7 @@ describe('Exploration Html Formatter Service', function() {
     ).toBe(expectedHtmlTag);
   });
 
-  it('should set short answer HTML correctly', function() {
+  it('should set short answer HTML correctly', () => {
     var interactionId = 'sampleId';
     var answer = 'sampleAnswer';
     var interactionCustomizationArgs = {

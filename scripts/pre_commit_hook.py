@@ -66,8 +66,11 @@ def install_hook():
     if os.path.islink(pre_commit_file):
         python_utils.PRINT('Symlink already exists')
     else:
+        # This is needed, because otherwise some systems symlink/copy the .pyc
+        # file instead of the .py file.
+        this_file = __file__.replace('pyc', 'py')
         try:
-            os.symlink(os.path.abspath(__file__), pre_commit_file)
+            os.symlink(os.path.abspath(this_file), pre_commit_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
         except (OSError, AttributeError):

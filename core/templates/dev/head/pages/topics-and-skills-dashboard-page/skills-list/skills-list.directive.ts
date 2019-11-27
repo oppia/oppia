@@ -165,15 +165,14 @@ angular.module('oppia').directive('skillsList', [
             var skillSummaries = $scope.getMergeableSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard-page/templates/' +
-                'merge-skill-modal.template.html'),
+                '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = '';
-                  $scope.done = function() {
+                  $scope.save = function() {
                     $uibModalInstance.close(
                       {skill: skill,
                         supersedingSkillId: $scope.selectedSkillId

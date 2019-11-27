@@ -65,6 +65,8 @@ angular.module('oppia').directive('questionsTab', [
             EVENT_TOPIC_REINITIALIZED) {
           $scope.getQuestionSummariesAsync =
             QuestionsListService.getQuestionSummariesAsync;
+          $scope.getGroupedSkillSummaries =
+            TopicEditorStateService.getGroupedSkillSummaries;
           $scope.isLastQuestionBatch =
             QuestionsListService.isLastQuestionBatch;
           $scope.selectedSkillId = null;
