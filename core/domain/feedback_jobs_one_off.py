@@ -88,7 +88,7 @@ class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 thread.second_last_message_text = messages[-2].text
                 thread.second_last_message_author_id = messages[-2].author_id
 
-        if action_taken is not None:
+        if action_taken:
             thread.put()
             yield (action_taken, 1)
 
