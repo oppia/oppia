@@ -159,6 +159,18 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CollectionRightsModelUnitTest, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id='gae_1_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_2,
+            gae_id='gae_2_id',
+            email='some_other@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_1,
             owner_ids=[self.USER_ID_1],
@@ -308,6 +320,35 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             [self.USER_ID_6_NEW], migrated_model_3.voice_artist_ids)
         self.assertEqual([], migrated_model_3.viewer_ids)
+
+    def test_verify_model(self):
+        model = collection_models.CollectionRightsModel(
+            id=self.COLLECTION_ID_1,
+            owner_ids=[self.USER_ID_1, self.USER_ID_2],
+            editor_ids=[self.USER_ID_1, self.USER_ID_2],
+            voice_artist_ids=[self.USER_ID_1, self.USER_ID_2],
+            viewer_ids=[self.USER_ID_1, self.USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        self.assertTrue(model.verify_model())
+
+        model.owner_ids = [self.USER_ID_1, 'user_non_id']
+        self.assertFalse(model.verify_model())
+
+        model.owner_ids = [self.USER_ID_1, self.USER_ID_2]
+        model.editor_ids = [self.USER_ID_1, 'user_non_id']
+        self.assertFalse(model.verify_model())
+
+        model.editor_ids = [self.USER_ID_1, self.USER_ID_2]
+        model.voice_artist_ids = [self.USER_ID_1, 'user_non_id']
+        self.assertFalse(model.verify_model())
+
+        model.voice_artist_ids = [self.USER_ID_1, self.USER_ID_2]
+        model.viewer_ids = [self.USER_ID_1, 'user_non_id']
+        self.assertFalse(model.verify_model())
 
     def test_save(self):
         collection_models.CollectionRightsModel(
@@ -476,6 +517,21 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     USER_ID_2_NEW = 'id_2_new'
     USER_ID_3_OLD = 'id_3_old'
     USER_ID_3_NEW = 'id_3_new'
+
+    def setUp(self):
+        super(CollectionSummaryModelUnitTest, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1_NEW,
+            gae_id='gae_1_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_2_NEW,
+            gae_id='gae_2_id',
+            email='some_other@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -748,3 +804,33 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionSummaryModel
             .get_at_least_editable('viewer_ids'))
         self.assertEqual(0, len(collection_summary_models))
+
+    def test_verify_model(self):
+        model = collection_models.CollectionSummaryModel(
+            id=self.COLLECTION_ID_1,
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            owner_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
+            editor_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
+            viewer_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
+            contributor_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
+        )
+        self.assertTrue(model.verify_model())
+
+        model.owner_ids = [self.USER_ID_1_NEW, 'user_non_id']
+        self.assertFalse(model.verify_model())
+
+        model.owner_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
+        model.editor_ids = [self.USER_ID_1_NEW, 'user_non_id']
+        self.assertFalse(model.verify_model())
+
+        model.editor_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
+        model.viewer_ids = [self.USER_ID_1_NEW, 'user_non_id']
+        self.assertFalse(model.verify_model())
+
+        model.viewer_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
+        model.contributor_ids = [self.USER_ID_1_NEW, 'user_non_id']
+        self.assertFalse(model.verify_model())

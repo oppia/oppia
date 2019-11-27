@@ -270,6 +270,21 @@ class CollectionRightsModel(base_models.VersionedModel):
         cls.put_multi(
             migrated_models, update_last_updated_time=False)
 
+    def verify_model(self):
+        """Check if UserSettingsModel exists for all the ids in owner_ids,
+        editor_ids, voice_artist_ids and viewer_ids.
+        """
+        return all((
+            all(user_models.UserSettingsModel.get_by_id(owner_id) is not None
+                for owner_id in self.owner_ids),
+            all(user_models.UserSettingsModel.get_by_id(editor_id) is not None
+                for editor_id in self.editor_ids),
+            all(user_models.UserSettingsModel.get_by_id(v_artist_id) is not None
+                for v_artist_id in self.voice_artist_ids),
+            all(user_models.UserSettingsModel.get_by_id(viewer_id) is not None
+                for viewer_id in self.viewer_ids)))
+
+
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
@@ -622,3 +637,17 @@ class CollectionSummaryModel(base_models.BaseModel):
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    def verify_model(self):
+        """Check if UserSettingsModel exists for all the ids in owner_ids,
+        editor_ids, viewer_ids and contributor_ids.
+        """
+        return all((
+            all(user_models.UserSettingsModel.get_by_id(owner_id) is not None
+                for owner_id in self.owner_ids),
+            all(user_models.UserSettingsModel.get_by_id(editor_id) is not None
+                for editor_id in self.editor_ids),
+            all(user_models.UserSettingsModel.get_by_id(viewer_id) is not None
+                for viewer_id in self.viewer_ids),
+            all(user_models.UserSettingsModel.get_by_id(contrib_id) is not None
+                for contrib_id in self.contributor_ids)))
