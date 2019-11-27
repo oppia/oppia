@@ -1,0 +1,21 @@
+name: CI Tests
+on: [push]
+
+jobs:
+  backend:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '2.x'
+          architecture: 'x64'
+      - name: install pre
+        run: sudo apt-get install -y curl python-setuptools git python-dev python-pip python-yaml
+      - name: Install third party
+        run: python -m scripts.install_third_party_libs
+      - name: run backend
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
