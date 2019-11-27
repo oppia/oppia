@@ -54,6 +54,7 @@ describe('Topic object factory', function() {
     var sampleTopicBackendObject = {
       id: 'sample_topic_id',
       name: 'Topic name',
+      thumbnail: 'img.png',
       description: 'Topic description',
       version: 1,
       uncategorized_skill_ids: ['skill_1', 'skill_2'],
@@ -94,11 +95,13 @@ describe('Topic object factory', function() {
 
   it('should validate the topic', function() {
     _sampleTopic.setName('');
+    _sampleTopic.setThumbnail(null);
     _sampleTopic.addCanonicalStory('story_2');
     _sampleTopic.getSubtopics()[0].addSkill('skill_1');
 
     expect(_sampleTopic.validate()).toEqual([
       'Topic name should not be empty.',
+      'Topic should have a thumbnail.',
       'The story with id story_2 is present in both canonical ' +
       'and additional stories.',
       'The skill with id skill_1 is duplicated in the topic'
