@@ -50,12 +50,15 @@ import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
+import { ExplorationHtmlFormatterService } from
+  'services/exploration-html-formatter.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FeedbackThreadSummaryObjectFactory } from
   'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
+import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
@@ -63,6 +66,8 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { LearnerAnswerDetailsObjectFactory } from
@@ -72,6 +77,8 @@ import { LearnerAnswerInfoObjectFactory } from
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -88,6 +95,8 @@ import { RecordedVoiceoversObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { SolutionObjectFactory } from
+  'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateClassifierMappingService } from
@@ -104,9 +113,12 @@ import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
+import { ValidatorsService } from 'services/validators.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WindowDimensionsService } from
@@ -200,6 +212,8 @@ export class UpgradedServices {
       new NumberWithUnitsObjectFactory(
         upgradedServices['UnitsObjectFactory'],
         upgradedServices['FractionObjectFactory']);
+    upgradedServices['NormalizeWhitespacePipe'] = new NormalizeWhitespacePipe(
+      upgradedServices['UtilsService']);
     upgradedServices['OutcomeObjectFactory'] =
       new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['ParamChangesObjectFactory'] =
@@ -222,6 +236,9 @@ export class UpgradedServices {
       new StateEditorService(upgradedServices['SolutionValidityService']);
     upgradedServices['UrlService'] =
       new UrlService(upgradedServices['WindowRef']);
+    upgradedServices['ValidatorsService'] = new ValidatorsService(
+      upgradedServices['AlertsService'],
+      upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['WrittenTranslationsObjectFactory'] =
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
@@ -238,7 +255,30 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
+      upgradedServices['AlertsService'], upgradedServices['UrlService'],
+      upgradedServices['UtilsService']);
 
+    // Group 4: Services depending on groups 1,2 and 3.
+    upgradedServices['ExplorationHtmlFormatterService'] =
+      new ExplorationHtmlFormatterService(
+        upgradedServices['CamelCaseToHyphensPipe'],
+        upgradedServices['ExtensionTagAssemblerService'],
+        upgradedServices['HtmlEscaperService']);
+
+    // Group 5: Services depending on groups 1-4.
+    upgradedServices['SolutionObjectFactory'] =
+      new SolutionObjectFactory(
+        upgradedServices['SubtitledHtmlObjectFactory'],
+        upgradedServices['ExplorationHtmlFormatterService']);
+
+    // Group 6: Services depending on groups 1-5.
+    upgradedServices['InteractionObjectFactory'] =
+      new InteractionObjectFactory(
+        upgradedServices['AnswerGroupObjectFactory'],
+        upgradedServices['HintObjectFactory'],
+        upgradedServices['SolutionObjectFactory'],
+        upgradedServices['OutcomeObjectFactory']);
     /* eslint-enable dot-notation */
     return upgradedServices;
   }

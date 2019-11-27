@@ -105,7 +105,9 @@ angular.module('oppia').directive('aboutPage', [
           ctrl.listOfNames = listOfNamesToThank
             .slice(0, listOfNamesToThank.length - 1).join(', ') +
             ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.aboutPageMascotImgUrl = UrlInterpolationService
             .getStaticImageUrl('/general/about_page_mascot.png');
         }
