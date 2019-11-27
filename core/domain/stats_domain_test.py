@@ -579,7 +579,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             })
 
     def test_from_dict_raises_exception_when_miss_exp_id(self):
-        """Test the from_backend_dict() method."""
+        """Test the from_dict() method."""
         # Test that a playthrough dict without 'exp_id' key raises exception.
         playthrough_dict = {
             'exp_version': 1,
