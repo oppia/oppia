@@ -808,7 +808,7 @@ class BaseMapReduceJobManagerForContinuousComputationsTests(
             (
                 jobs.BaseMapReduceJobManagerForContinuousComputations.  # pylint: disable=protected-access
                 _get_continuous_computation_class()
-                # Access of private attribute OK because testing class structure
+                # Access of private attribute OK because testing class structure.
             )
 
     def test_raise_error_with_post_cancel_hook(self):
