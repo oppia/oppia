@@ -870,7 +870,7 @@ def _walk_with_gitignore(root, exclude_dirs):
         if (not _is_path_ignored(dir_path + '/')) and (
                 dir_path.replace('\\', '/') not in exclude_dirs):
             for x in _walk_with_gitignore(dir_path, exclude_dirs):
-                yield x
+                yield(x)
 
 
 def _is_path_ignored(path_to_check):

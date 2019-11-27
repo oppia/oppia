@@ -26,8 +26,6 @@ import feconf
 import python_utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
-
-
 class Registry(python_utils.OBJECT):
     """Registry of all actions."""
 
