@@ -109,6 +109,10 @@ angular.module('oppia').factory('TopicObjectFactory', [
         issues.push('Topic name should not be empty.');
       }
 
+      if (this._abbreviatedName === '') {
+        issues.push('Abbreviated name should not be empty');
+      }
+
       if (!this._thumbnail) {
         issues.push('Topic should have a thumbnail.');
       }

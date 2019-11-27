@@ -139,6 +139,9 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.showEditThumbnailModal = function() {
+            if (!$scope.topicRights.canEditTopic()) {
+              return;
+            }
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
