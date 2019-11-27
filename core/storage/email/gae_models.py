@@ -27,7 +27,8 @@ import utils
 
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 
 class SentEmailModel(base_models.BaseModel):
@@ -277,6 +278,15 @@ class SentEmailModel(base_models.BaseModel):
                 return True
 
         return False
+
+    def verify_model(self):
+        """Check if UserSettingsModel exists for recipient_id and sender_id
+        contains user_id.
+        """
+        return (user_models.UserSettingsModel.get_by_id(
+                    self.recipient_id) is not None and
+                user_models.UserSettingsModel.get_by_id(
+                    self.sender_id) is not None)
 
 
 class BulkEmailModel(base_models.BaseModel):

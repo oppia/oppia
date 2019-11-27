@@ -28,8 +28,8 @@ import utils
 
 from google.appengine.ext import ndb
 
-(base_models, email_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.email])
+(base_models, email_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.email, models.NAMES.user])
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
@@ -257,6 +257,39 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                     email_models.GeneralFeedbackEmailReplyToIdModel)):
                 email_models.GeneralFeedbackEmailReplyToIdModel.create(
                     'user', 'exploration.exp0.0')
+
+    def test_verify_model(self):
+        user_models.UserSettingsModel(
+            id='user_1_id',
+            gae_id='gae_1_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id='user_2_id',
+            gae_id='gae_2_id',
+            email='some_other@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        model = email_models.SentEmailModel(
+            id='id_2',
+            recipient_id='user_1_id',
+            recipient_email='user1@email.com',
+            sender_id='user_2_id',
+            sender_email='user2@email.com',
+            intent=feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
+            subject='Email Subject 2',
+            html_body='Email Body 2',
+            sent_datetime=datetime.datetime.utcnow()
+        )
+        self.assertTrue(model.verify_model())
+
+        model.recipient_id = 'user_non_id'
+        self.assertFalse(model.verify_model())
+
+        model.recipient_id = 'user_1_id'
+        model.sender_id = 'user_non_id'
+        self.assertFalse(model.verify_model())
 
 
 class BulkEmailModelUnitTests(test_utils.GenericTestBase):

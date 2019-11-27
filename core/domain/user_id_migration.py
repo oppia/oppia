@@ -176,3 +176,64 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, status):
         """Implements the reduce function for this job."""
         yield (key, status)
+
+
+class ModelsUserIdsHaveUserSettingsVerificationJob(
+    jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for going through all the UserSettingsModels and checking
+    that the gae_id is not mentioned in any of the fields that should contain
+    user_id.
+    """
+
+    @staticmethod
+    def _check_id(model):
+        """Check if UserSettingsModel exists for the model id."""
+        return user_models.UserSettingsModel.get_by_id(model.id) is not None
+
+    @staticmethod
+    def _check_id_and_user_id(model):
+        """Check if UserSettingsModel exists for user_id and model id contains
+        user_id.
+        """
+        return (
+            model.user_id == model.id.split('.')[0] and
+            user_models.UserSettingsModel.get_by_id(model.user_id) is not None)
+
+    @staticmethod
+    def _check_one_field(model, model_class):
+        """Check if UserSettingsModel exists for one field.
+        """
+        verification_field = model_class.get_user_id_migration_field()
+        model_values = model.to_dict()
+        return user_models.UserSettingsModel.get_by_id(
+            model_values[verification_field._name]) is not None  # pylint: disable=protected-access
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return models.Registry.get_all_storage_model_classes()
+
+    @staticmethod
+    def map(model):
+        """Implements the map function for this job."""
+        model_class = model.__class__
+        if (model_class.get_user_id_migration_policy() ==
+              base_models.USER_ID_MIGRATION_POLICY.COPY):
+            ModelsUserIdsHaveUserSettingsVerificationJob._check_id(model)
+        elif (model_class.get_user_id_migration_policy() ==
+              base_models.USER_ID_MIGRATION_POLICY.COPY_PART):
+            ModelsUserIdsHaveUserSettingsVerificationJob._check_id_and_user_id(
+                model)
+        elif (model_class.get_user_id_migration_policy() ==
+              base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
+            ModelsUserIdsHaveUserSettingsVerificationJob._check_one_field(
+                model, model_class)
+        elif (model_class.get_user_id_migration_policy() ==
+              base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
+            model.verify_model()
+        yield ('SUCCESS', '')
+
+    @staticmethod
+    def reduce(key, status):
+        """Implements the reduce function for this job."""
+        yield (key, status)

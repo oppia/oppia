@@ -34,6 +34,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     """Tests for UserSettingsModel class."""
 
     NONEXISTENT_USER_ID = 'id_x'
+    NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_id'
     USER_1_EMAIL = 'user@example.com'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
@@ -1902,3 +1903,30 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+    def test_verify_model(self):
+        user_models.UserSettingsModel(
+            id='user_id',
+            gae_id='gae_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        model = user_models.UserContributionScoringModel(
+            id='category_id.user_id',
+            user_id='user_id',
+            score_category='category_id',
+            score=15
+        )
+        self.assertTrue(model.verify_model())
+
+        model.user_id = 'user_non_id'
+        self.assertFalse(model.verify_model())
+
+        model = user_models.UserContributionScoringModel(
+            id='category_id.user_2_id',
+            user_id='user_1_id',
+            score_category='category_id',
+            score=15
+        )
+        self.assertFalse(model.verify_model())
+

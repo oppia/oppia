@@ -1477,18 +1477,6 @@ class UserQueryModel(base_models.BaseModel):
         return cls.submitter_id
 
     @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the submitter_id.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        for model in cls.query(cls.submitter_id == old_user_id).fetch():
-            model.submitter_id = new_user_id
-            model.put(update_last_updated_time=False)
-
-    @classmethod
     def fetch_page(cls, page_size, cursor):
         """Fetches a list of all query_models sorted by creation date.
 
@@ -1810,3 +1798,10 @@ class UserContributionScoringModel(base_models.BaseModel):
         else:
             model.score += increment_by
             model.put()
+
+    def verify_model(self):
+        """Check if UserSettingsModel exists for user_id and model id contains
+        user_id.
+        """
+        return (self.user_id == self.id.split('.')[1] and
+                UserSettingsModel.get_by_id(self.user_id) is not None)
