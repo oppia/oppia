@@ -145,6 +145,7 @@ def get_suggestions_by_ids(suggestion_ids):
             for model in suggestion_models.GeneralSuggestionModel.get_multi(
                 suggestion_ids)]
 
+
 def query_suggestions(query_fields_and_values):
     """Queries for suggestions.
 
