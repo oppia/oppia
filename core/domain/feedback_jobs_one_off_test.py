@@ -280,7 +280,7 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(thread.second_last_message_text, 'second text')
         self.assertEqual(thread.second_last_message_author_id, self.editor_id)
 
-    def test_cache_updated_for_stale_thread_with_no_messages(self):
+    def test_invalid_cache_updated_for_stale_thread_with_no_messages(self):
         thread_id = (
             feedback_models.GeneralFeedbackThreadModel.generate_new_thread_id(
                 'exploration', 'exp_id'))
