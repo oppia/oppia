@@ -430,6 +430,9 @@ def get_last_two_message_ids(thread):
     If the thread has only one message, the id of the second last message is
     None.
 
+    Args:
+        thread: FeedbackThread. The thread to build the message ids from.
+
     Returns:
         list(str|None). The ids of the last two messages of the thread. If
             the message does not exist, None is returned.
