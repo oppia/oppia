@@ -37,6 +37,7 @@ class FeedbackThread(python_utils.OBJECT):
         summary: str. A summary of the feedback thread.
         has_suggestion: bool. Whether the feedback thread includes a
             suggestion.
+        message_count: int. The number of messages posted onto the thread.
         created_on: datetime.datetime. The time when the feedback thread was
             created.
         last_updated: datetime.datetime. The time when the feedback thread

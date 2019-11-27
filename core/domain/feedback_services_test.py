@@ -309,8 +309,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_1 = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
             u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
-            5, fake_date, fake_date, 'eid1.thread_id.4', 'last message',
-            self.viewer_id, 'eid1.thread_id.3', 'second last', self.viewer_id)
+            5, fake_date, fake_date, 4, 'last message', self.viewer_id, 3,
+            'second last', self.viewer_id)
 
         last_two_message_ids = (
             feedback_services.get_last_two_message_ids(thread_1))
@@ -322,8 +322,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_1 = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
             u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
-            1, fake_date, fake_date, 'eid1.thread_id.0', 'last message',
-            self.viewer_id, None, None, None)
+            1, fake_date, fake_date, 0, 'last message', self.viewer_id, None,
+            None, None)
 
         last_two_message_ids = (
             feedback_services.get_last_two_message_ids(thread_1))

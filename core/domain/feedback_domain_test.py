@@ -56,9 +56,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
-            expected_thread_dict['summary'], False, 1, fake_date, fake_date,
-            'exp0.thread0.4', 'last message', self.viewer_id, 'exp0.thread0.3',
-            'second last', self.viewer_id)
+            expected_thread_dict['summary'], False, 5, fake_date, fake_date,
+            4, 'last message', self.viewer_id, 3, 'second last', self.viewer_id)
         self.assertDictEqual(
             expected_thread_dict, observed_thread.to_dict())
 
