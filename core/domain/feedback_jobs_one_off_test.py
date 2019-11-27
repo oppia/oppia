@@ -230,7 +230,7 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         thread_model = (
             feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
         thread_model.second_last_message_id = 1
-        thread_model.second_last_message_text = 'invalid second text'
+        thread_model.second_last_message_text = 'non-existing second text'
         thread_model.second_last_message_author_id = self.editor_id
         thread_model.put()
 
@@ -257,7 +257,7 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(thread.last_message_id, 1)
         self.assertEqual(thread.last_message_text, 'second text')
         self.assertEqual(thread.last_message_author_id, self.editor_id)
-        self.assertEqual(thread.last_message_id, 0)
+        self.assertEqual(thread.second_last_message_id, 0)
         self.assertEqual(thread.second_last_message_text, 'first text')
         self.assertEqual(thread.second_last_message_author_id, self.editor_id)
 
@@ -276,7 +276,7 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(thread.last_message_id, 2)
         self.assertEqual(thread.last_message_text, 'third text')
         self.assertEqual(thread.last_message_author_id, self.editor_id)
-        self.assertEqual(thread.last_message_id, 1)
+        self.assertEqual(thread.second_last_message_id, 1)
         self.assertEqual(thread.second_last_message_text, 'second text')
         self.assertEqual(thread.second_last_message_author_id, self.editor_id)
 
