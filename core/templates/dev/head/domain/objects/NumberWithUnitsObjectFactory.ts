@@ -27,7 +27,6 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
-
   Simply add currency unit to the dict of CURRENCY_UNITS constant and it will
   be automatically added to the allowed custom units. Following are the keys
   to be defined within the unit dict:
