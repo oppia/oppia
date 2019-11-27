@@ -435,7 +435,7 @@ def get_last_two_message_ids(thread):
             the message does not exist, None is returned.
     """
     return [thread.get_full_message_id(i) if i >= 0 else None
-            for i in range(
+            for i in python_utils.RANGE(
                 thread.message_count - 1, thread.message_count - 3, -1)]
 
 
