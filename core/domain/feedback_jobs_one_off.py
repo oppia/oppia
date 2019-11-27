@@ -57,29 +57,27 @@ class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [feedback_models.GeneralFeedbackThreadModel]
 
     @staticmethod
-    def map(thread_model):
+    def map(thread):
         """Implements the map function for this job."""
-        messages = feedback_services.get_messages(thread_model.id)
-        if len(messages) > 0:
-            thread_model.last_message_id = messages[-1].message_id
-            thread_model.last_message_author_id = messages[-1].author_id
-            thread_model.last_message_text = messages[-1].text
-        else:
-            thread_model.last_message_id = None
-            thread_model.last_message_author_id = None
-            thread_model.last_message_text = None
-        if len(messages) > 1:
-            thread_model.second_last_message_id = messages[-2].message_id
-            thread_model.second_last_message_author_id = messages[-2].author_id
-            thread_model.second_last_message_text = messages[-2].text
-        else:
-            thread_model.second_last_message_id = None
-            thread_model.second_last_message_author_id = None
-            thread_model.second_last_message_text = None
-        thread_model.put()
-        yield (thread_model.id, 1)
+        messages = feedback_services.get_messages(thread.id)
+
+        last_message = messages[-1] if len(messages) > 0 else None
+        thread.last_message_id = last_message and last_message.message_id
+        thread.last_message_text = last_message and last_message.text
+        thread.last_message_author_id = last_message and last_message.author_id
+
+        second_last_message = messages[-2] if len(messages) > 1 else None
+        thread.second_last_message_id = (
+            second_last_message and second_last_message.message_id)
+        thread.second_last_message_text = (
+            second_last_message and second_last_message.text)
+        thread.second_last_message_author_id = (
+            second_last_message and second_last_message.author_id)
+
+        thread.put()
+        yield (thread.id, 1)
 
     @staticmethod
-    def reduce(key, values):
+    def reduce(key, stringified_values):
         """Implements the reduce function for this job."""
-        yield (key, len(values))
+        yield (key, sum(int(s) for s in stringified_values))

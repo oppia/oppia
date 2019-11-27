@@ -33,19 +33,25 @@ class ThreadListHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
+        feedback_thread_dicts = (
+            [feedback_thread.to_dict()
+             for feedback_thread in feedback_services.get_all_threads(
+                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)])
+
         suggestion_thread_dicts = (
-            [t.to_dict() for t in feedback_services.get_all_threads(
-                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
-        suggestions = suggestion_services.get_suggestions_by_ids(
-            d['thread_id'] for d in suggestion_thread_dicts)
-        for thread_dict, suggestions in zip(
-                suggestion_thread_dicts, suggestions):
-            thread_dict['suggestion_dict'] = (
-                None if suggestion is None else suggestion.to_dict())
+            [suggestion_thread.to_dict()
+             for suggestion_thread in feedback_services.get_all_threads(
+                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
+        suggestion_dicts = (
+            [suggestion and suggestion.to_dict()
+             for suggestion in suggestion_services.get_suggestions_by_ids(
+                 [d['thread_id'] for d in suggestion_thread_dicts])])
+        for suggestion_thread_dict, suggestion_dict in zip(
+                suggestion_thread_dicts, suggestion_dicts):
+            suggestion_thread_dict['suggestion_dict'] = suggestion_dict
+
         self.values.update({
-            'feedback_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]),
+            'feedback_thread_dicts': feedback_thread_dicts,
             'suggestion_thread_dicts': suggestion_thread_dicts,
         })
         self.render_json(self.values)
@@ -93,8 +99,8 @@ class ThreadHandler(base.BaseHandler):
         suggestion_id = thread_id
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
-        messages = [m.to_dict() for m in feedback_services.get_messages(
-            thread_id)]
+        messages = (
+            [m.to_dict() for m in feedback_services.get_messages(thread_id)])
         message_ids = [message['message_id'] for message in messages]
         feedback_services.update_messages_read_by_the_user(
             self.user_id, thread_id, message_ids)
