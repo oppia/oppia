@@ -58,6 +58,7 @@ Bug fixes
 * Fix #7855: Change e.message() to e.message (#7866)
 * Fix #7529: Adds a strict check for Outcome object before executing hasNonemptyFeedback (#7856)
 * Fix #7794: Add warning when MIDI is unsupported in the browser (#7840)
+* Fix date formatting (#8084)
 
 Infrastructural changes
 * Rename gae_user_id to gae_id (#7998)
