@@ -46,13 +46,19 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'original_author_username': self.VIEWER_USERNAME,
             'message_count': 1,
             'subject': u'a subject',
-            'last_updated': utils.get_time_in_millisecs(fake_date)
+            'last_updated': utils.get_time_in_millisecs(fake_date),
+            'last_message_text': 'last message',
+            'last_message_author': self.VIEWER_USERNAME,
+            'second_last_message_text': 'second last',
+            'second_last_message_author': self.VIEWER_USERNAME,
         }
         observed_thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
-            expected_thread_dict['summary'], False, 1, fake_date, fake_date)
+            expected_thread_dict['summary'], False, 1, fake_date, fake_date,
+            'exp0.thread0.4', 'last message', self.viewer_id, 'exp0.thread0.3',
+            'second last', self.viewer_id)
         self.assertDictEqual(
             expected_thread_dict, observed_thread.to_dict())
 
@@ -61,7 +67,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         thread_1 = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
-            5, fake_date, fake_date)
+            5, fake_date, fake_date, 'exp0.thread0.4', 'last message',
+            self.viewer_id, 'exp0.thread0.3', 'second last', self.viewer_id)
 
         last_two_message_ids = thread_1.get_last_two_message_ids()
         self.assertEqual(
@@ -72,7 +79,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         thread_1 = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
-            1, fake_date, fake_date)
+            1, fake_date, fake_date, 'exp0.thread0.0', 'last message',
+            self.viewer_id, None, None, None)
 
         last_two_message_ids = thread_1.get_last_two_message_ids()
         # The second last message should be given an id of -1 as it doesn't

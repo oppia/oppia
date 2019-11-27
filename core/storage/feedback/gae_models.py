@@ -73,8 +73,17 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     # Specifies whether this thread has a related suggestion.
     has_suggestion = ndb.BooleanProperty(
         indexed=True, default=False, required=True)
-    # The number of messages in the thread.
+
+    # Cache-data about the messages in the thread.
     message_count = ndb.IntegerProperty(indexed=True, default=0)
+    last_message_id = ndb.IntegerProperty(indexed=False, default=None)
+    last_message_text = ndb.StringProperty(indexed=False, default=None)
+    last_message_author_id = ndb.StringProperty(indexed=False, default=None)
+    # Details about the second-to-last message in the thread.
+    second_last_message_id = ndb.IntegerProperty(indexed=False, default=None)
+    second_last_message_text = ndb.StringProperty(indexed=False, default=None)
+    second_last_message_author_id = (
+        ndb.StringProperty(indexed=False, default=None))
 
     @staticmethod
     def get_deletion_policy():

@@ -17,6 +17,7 @@ from __future__ import absolute_import # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
+from core.domain import feedback_services
 from core.platform import models
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -45,3 +46,53 @@ class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
+
+
+class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate message data cache of threads."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [feedback_models.GeneralFeedbackThreadModel]
+
+    @staticmethod
+    def map(thread):
+        """Implements the map function for this job."""
+        messages = feedback_services.get_messages(thread.id)
+        action_taken = None
+
+        if len(messages) < 1:
+            if thread.last_message_id is not None:
+                action_taken = 'Updated'
+                thread.last_message_id = None
+                thread.last_message_text = None
+                thread.last_message_author_id = None
+        else:
+            if thread.last_message_id != messages[-1].message_id:
+                action_taken = 'Updated'
+                thread.last_message_id = messages[-1].message_id
+                thread.last_message_text = messages[-1].text
+                thread.last_message_author_id = messages[-1].author_id
+
+        if len(messages) < 2:
+            if thread.second_last_message_id is not None:
+                action_taken = 'Updated'
+                thread.second_last_message_id = None
+                thread.second_last_message_text = None
+                thread.second_last_message_author_id = None
+        else:
+            if thread.second_last_message_id != messages[-2].message_id:
+                action_taken = 'Updated'
+                thread.second_last_message_id = messages[-2].message_id
+                thread.second_last_message_text = messages[-2].text
+                thread.second_last_message_author_id = messages[-2].author_id
+
+        if action_taken is not None:
+            thread.put()
+            yield (action_taken, 1)
+
+    @staticmethod
+    def reduce(key, value_strs):
+        """Implements the reduce function for this job."""
+        yield (key, sum(int(s) for s in value_strs))

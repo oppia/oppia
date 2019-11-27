@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 
 from core.domain import feedback_jobs_one_off
+from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -128,3 +129,129 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
 
         self._check_model_validity(user_id1, thread_id1, user_feedback_model1)
         self._check_model_validity(user_id2, thread_id2, user_feedback_model2)
+
+
+class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
+    """Tests for GeneralFeedbackThreadUser migration."""
+
+    ONE_OFF_JOB_CLASS = feedback_jobs_one_off.GeneralFeedbackThreadOneOffJob
+
+    def _run_one_off_job(self):
+        """Runs the one-off job under test."""
+        job_id = self.ONE_OFF_JOB_CLASS.create_new()
+        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        output_strs = self.ONE_OFF_JOB_CLASS.get_output(job_id)
+        outputs = [ast.literal_eval(s) for s in output_strs]
+        return [(key, int(value)) for key, value in outputs]
+
+    def _clear_message_cache(self, thread_id):
+        """Forcibly clears the message cache of the given thread."""
+        thread_model = (
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
+        thread_model.last_message_id = None
+        thread_model.last_message_text = None
+        thread_model.last_message_author_id = None
+        thread_model.second_last_message_id = None
+        thread_model.second_last_message_text = None
+        thread_model.second_last_message_author_id = None
+        thread_model.put()
+
+    def setUp(self):
+        super(GeneralFeedbackThreadOneOffJobTest, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+    def test_no_changes_made_to_fresh_thread(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+
+        self.assertEqual(self._run_one_off_job(), [])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.last_message_text, 'first text')
+        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        self.assertEqual(thread.second_last_message_text, None)
+        self.assertEqual(thread.second_last_message_author_id, None)
+
+    def test_no_changes_made_to_fresh_thread_with_two_messages(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, None, None, 'second text')
+
+        self.assertEqual(self._run_one_off_job(), [])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.last_message_text, 'second text')
+        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        self.assertEqual(thread.second_last_message_text, 'first text')
+        self.assertEqual(thread.second_last_message_author_id, self.editor_id)
+
+    def test_no_changes_made_to_fresh_thread_with_three_messages(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, None, None, 'second text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, None, None, 'third text')
+
+        self.assertEqual(self._run_one_off_job(), [])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.last_message_text, 'third text')
+        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        self.assertEqual(thread.second_last_message_text, 'second text')
+        self.assertEqual(thread.second_last_message_author_id, self.editor_id)
+
+    def test_cache_updated_for_stale_thread_with_one_message(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        self._clear_message_cache(thread_id)
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.last_message_text, 'first text')
+        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        self.assertEqual(thread.second_last_message_text, None)
+        self.assertEqual(thread.second_last_message_author_id, None)
+
+    def test_cache_updated_for_stale_thread_with_two_messages(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, None, None, 'second text')
+        self._clear_message_cache(thread_id)
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.last_message_text, 'second text')
+        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        self.assertEqual(thread.second_last_message_text, 'first text')
+        self.assertEqual(thread.second_last_message_author_id, self.editor_id)
+
+    def test_cache_updated_for_stale_thread_with_three_messages(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, None, None, 'second text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, None, None, 'third text')
+        self._clear_message_cache(thread_id)
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.last_message_text, 'third text')
+        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        self.assertEqual(thread.second_last_message_text, 'second text')
+        self.assertEqual(thread.second_last_message_author_id, self.editor_id)

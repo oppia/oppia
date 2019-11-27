@@ -41,12 +41,24 @@ class FeedbackThread(python_utils.OBJECT):
             created.
         last_updated: datetime.datetime. The time when the feedback thread
             was last updated.
+        last_message_id: int. The id of the last message in the thread.
+        last_message_text: str. The text of the last message in the thread.
+        last_message_author_id: str. The author id of the last message in the
+            thread.
+        second_last_message_id: int. The id of the second-to-last message in the
+            thread.
+        second_last_message_text: str. The text of the second-to-last message in
+            the thread.
+        second_last_message_author_id: str. The author id of the second-to-last
+            message in the thread.
     """
 
     def __init__(
             self, thread_id, entity_type, entity_id, state_name,
             original_author_id, status, subject, summary, has_suggestion,
-            message_count, created_on, last_updated):
+            message_count, created_on, last_updated, last_message_id,
+            last_message_text, last_message_author_id, second_last_message_id,
+            second_last_message_text, second_last_message_author_id):
         """Initializes a FeedbackThread object."""
 
         self.id = thread_id
@@ -62,6 +74,12 @@ class FeedbackThread(python_utils.OBJECT):
 
         self.created_on = created_on
         self.last_updated = last_updated
+        self.last_message_id = last_message_id
+        self.last_message_text = last_message_text
+        self.last_message_author_id = last_message_author_id
+        self.second_last_message_id = second_last_message_id
+        self.second_last_message_text = second_last_message_text
+        self.second_last_message_author_id = second_last_message_author_id
 
     def to_dict(self):
         """Returns a dict representation of this FeedbackThread object.
@@ -78,7 +96,15 @@ class FeedbackThread(python_utils.OBJECT):
             'subject': self.subject,
             'summary': self.summary,
             'thread_id': self.id,
-            'message_count': self.message_count
+            'message_count': self.message_count,
+            'last_message_text': self.last_message_text,
+            'last_message_author': (
+                user_services.get_username(self.last_message_author_id)
+                if self.last_message_author_id else None),
+            'second_last_message_text': self.second_last_message_text,
+            'second_last_message_author': (
+                user_services.get_username(self.second_last_message_author_id)
+                if self.second_last_message_author_id else None),
         }
 
     def get_full_message_id(self, message_id):
@@ -102,15 +128,7 @@ class FeedbackThread(python_utils.OBJECT):
             list(str|None). The ids of the last two messages of the thread. If
                 the message does not exist, None is returned.
         """
-        message_ids = []
-        last_message_id = self.message_count - 1
-        message_ids.append(self.get_full_message_id(last_message_id))
-        if self.message_count > 1:
-            second_last_message_id = self.message_count - 2
-            message_ids.append(self.get_full_message_id(second_last_message_id))
-        else:
-            message_ids.append(None)
-        return message_ids
+        return [self.last_message_id, self.second_last_message_id]
 
 
 class FeedbackMessage(python_utils.OBJECT):

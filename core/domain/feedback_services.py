@@ -169,7 +169,13 @@ def create_message(
     msg.received_via_email = received_via_email
     msg.put()
 
-    # Update the message count in the thread.
+    # Update the message data in the thread.
+    thread.second_last_message_id = thread.last_message_id
+    thread.second_last_message_text = thread.last_message_text
+    thread.second_last_message_author_id = thread.last_message_author_id
+    thread.last_message_id = msg.message_id
+    thread.last_message_text = msg.text
+    thread.last_message_author_id = msg.author_id
     if thread.message_count is not None:
         thread.message_count += 1
     else:
@@ -403,18 +409,20 @@ def _get_thread_from_model(thread_model):
     Returns:
         FeedbackThread. The corresponding FeedbackThread domain object.
     """
-    if not thread_model.message_count:
-        message_count = (
-            feedback_models.GeneralFeedbackMessageModel.get_message_count(
-                thread_model.id))
-    else:
-        message_count = thread_model.message_count
+    message_count = (
+        thread_model.message_count or
+        feedback_models.GeneralFeedbackMessageModel.get_message_count(
+            thread_model.id))
     return feedback_domain.FeedbackThread(
         thread_model.id, thread_model.entity_type, thread_model.entity_id,
         None, thread_model.original_author_id,
         thread_model.status, thread_model.subject, thread_model.summary,
         thread_model.has_suggestion, message_count, thread_model.created_on,
-        thread_model.last_updated)
+        thread_model.last_updated, thread_model.last_message_id,
+        thread_model.last_message_text, thread_model.last_message_author_id,
+        thread_model.second_last_message_id,
+        thread_model.second_last_message_text,
+        thread_model.second_last_message_author_id)
 
 
 def get_thread_summaries(user_id, thread_ids):
