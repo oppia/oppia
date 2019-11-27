@@ -38,7 +38,7 @@ angular.module('oppia').factory('TopicUpdateService', [
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'SUBTOPIC_PROPERTY_TITLE',
   'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
   'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_NAME',
-  'TOPIC_PROPERTY_THUMBNAIL_DATA_URL', function(
+  'TOPIC_PROPERTY_THUMBNAIL', function(
       ChangeObjectFactory, UndoRedoService,
       CMD_ADD_SUBTOPIC, CMD_DELETE_ADDITIONAL_STORY,
       CMD_DELETE_CANONICAL_STORY, CMD_DELETE_SUBTOPIC,
@@ -49,7 +49,7 @@ angular.module('oppia').factory('TopicUpdateService', [
       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML, SUBTOPIC_PROPERTY_TITLE,
       TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
       TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_NAME,
-      TOPIC_PROPERTY_THUMBNAIL_DATA_URL) {
+      TOPIC_PROPERTY_THUMBNAIL) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // topic.
@@ -149,18 +149,18 @@ angular.module('oppia').factory('TopicUpdateService', [
        * Changes the thumbnail data url of a topic and records the change in the
        * undo/redo service.
        */
-      setThumbnailDataUrl: function(topic, thumbnailDataUrl) {
-        var oldThumbnailDataUrl = angular.copy(topic.getThumbnail());
+      setThumbnail: function(topic, thumbnailName) {
+        var oldThumbnailName = angular.copy(topic.getThumbnail());
         _applyTopicPropertyChange(
-          topic, TOPIC_PROPERTY_THUMBNAIL_DATA_URL,
-          thumbnailDataUrl, oldThumbnailDataUrl,
+          topic, TOPIC_PROPERTY_THUMBNAIL,
+          thumbnailName, oldThumbnailName,
           function(changeDict, topic) {
             // Apply
             var thumbnail = _getNewPropertyValueFromChangeDict(changeDict);
             topic.setThumbnail(thumbnail);
           }, function(changeDict, topic) {
             // Undo.
-            topic.setThumbnail(oldThumbnailDataUrl);
+            topic.setThumbnail(oldThumbnailName);
           });
       },
 

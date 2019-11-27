@@ -53,11 +53,11 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title')
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', '', '',
+            self.topic_id, self.admin_id, 'Name', '', None,
             'Description', [], [], [], [subtopic], 2)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_topic(
-            'topic_id_2', self.admin_id, 'Private_Name', '', '',
+            'topic_id_2', self.admin_id, 'Private_Name', '', None,
             'Description', [], [], [], [subtopic], 2)
         self.recorded_voiceovers_dict = {
             'voiceovers_mapping': {

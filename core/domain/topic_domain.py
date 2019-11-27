@@ -42,7 +42,7 @@ ROLE_NONE = 'none'
 # compatibility with previous change dicts.
 TOPIC_PROPERTY_NAME = 'name'
 TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviated_name'
-TOPIC_PROPERTY_THUMBNAIL_DATA_URL = 'thumbnail_data_url'
+TOPIC_PROPERTY_THUMBNAIL = 'thumbnail'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
@@ -100,7 +100,7 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES,
         TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
         TOPIC_PROPERTY_LANGUAGE_CODE,
-        TOPIC_PROPERTY_THUMBNAIL_DATA_URL)
+        TOPIC_PROPERTY_THUMBNAIL)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
@@ -375,7 +375,7 @@ class Topic(python_utils.OBJECT):
     """Domain object for an Oppia Topic."""
 
     def __init__(
-            self, topic_id, name, abbreviated_name, thumbnail_data_url,
+            self, topic_id, name, abbreviated_name, thumbnail,
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids,
             subtopics, subtopic_schema_version,
@@ -388,7 +388,7 @@ class Topic(python_utils.OBJECT):
             topic_id: str. The unique ID of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated topic name.
-            thumbnail_data_url: str. The thumbnail data url of the topic.
+            thumbnail: str|None. The thumbnail of the topic.
             description: str. The description of the topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
@@ -416,7 +416,7 @@ class Topic(python_utils.OBJECT):
         self.id = topic_id
         self.name = name
         self.abbreviated_name = abbreviated_name
-        self.thumbnail_data_url = thumbnail_data_url
+        self.thumbnail = thumbnail
         self.canonical_name = name.lower()
         self.description = description
         self.canonical_story_references = canonical_story_references
@@ -431,6 +431,31 @@ class Topic(python_utils.OBJECT):
         self.version = version
         self.story_reference_schema_version = story_reference_schema_version
 
+    @classmethod
+    def from_dict(cls, topic_dict):
+        """Returns a Topic domain object from a dict.
+
+        Args:
+            topic_dict: dict. The dict representation of Topic object.
+
+        Returns:
+            Topic. The corresponding Topic domain object.
+        """
+        topic = cls(
+            topic_dict['topic_id'], topic_dict['name'],
+            topic_dict['abbreviated_name'],
+            topic_dict['thumbnail'],
+            topic_dict['description'],
+            topic_dict['canonical_story_references'],
+            topic_dict['additional_story_references'],
+            topic_dict['uncategorized_skill_ids'],
+            topic_dict['subtopics'], topic_dict['subtopic_schema_version'],
+            topic_dict['next_subtopic_id'], topic_dict['language_code'],
+            topic_dict['version'],
+            topic_dict['story_reference_schema_version'],
+            topic_dict['created_on'], topic_dict['last_updated'])
+        return topic
+
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
 
@@ -441,7 +466,7 @@ class Topic(python_utils.OBJECT):
             'id': self.id,
             'name': self.name,
             'abbreviated_name': self.abbreviated_name,
-            'thumbnail_data_url': self.thumbnail_data_url,
+            'thumbnail': self.thumbnail,
             'description': self.description,
             'canonical_story_references': [
                 reference.to_dict()
@@ -489,6 +514,24 @@ class Topic(python_utils.OBJECT):
 
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
+
+    @classmethod
+    def require_valid_abbreviated_name(cls, name):
+        """Checks whether the abbreviated name of the topic is a valid one.
+
+        Args:
+            name: str. The abbreviated name to validate.
+        """
+        if not isinstance(name, python_utils.BASESTRING):
+            raise utils.ValidationError('Abbreviated name should be a string.')
+
+        if name == '':
+            raise utils.ValidationError(
+                'Abbreviated name field should not be empty.')
+
+        if len(name) > 12:
+            raise utils.ValidationError(
+                'Abbreviated name field should not exceed 12 characters.')
 
     def get_all_skill_ids(self):
         """Returns all the ids of all the skills present in the topic.
@@ -667,6 +710,12 @@ class Topic(python_utils.OBJECT):
                 valid.
         """
         self.require_valid_name(self.name)
+        self.require_valid_abbreviated_name(self.abbreviated_name)
+        if self.thumbnail is not None and not (
+                isinstance(self.thumbnail, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected thumbnail to be a string, received %s'
+                % self.thumbnail)
         if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
@@ -756,9 +805,7 @@ class Topic(python_utils.OBJECT):
                 % self.uncategorized_skill_ids)
 
     @classmethod
-    def create_default_topic(
-            cls, topic_id, name,
-            abbreviated_name=feconf.DEFAULT_ABBREVIATED_TOPIC_NAME):
+    def create_default_topic(cls, topic_id, name, abbreviated_name):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
@@ -772,8 +819,7 @@ class Topic(python_utils.OBJECT):
             Topic. The Topic domain object with the default values.
         """
         return cls(
-            topic_id, name, abbreviated_name,
-            feconf.DEFAULT_THUMBNAIL_DATA_URL,
+            topic_id, name, abbreviated_name, None,
             feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
@@ -852,14 +898,14 @@ class Topic(python_utils.OBJECT):
         """
         self.abbreviated_name = new_abbreviated_name
 
-    def update_thumbnail_data_url(self, new_thumbnail_data_url):
-        """Updates the thumbnail_data_url of a topic object.
+    def update_thumbnail(self, new_thumbnail):
+        """Updates the thumbnail of a topic object.
 
         Args:
-            new_thumbnail_data_url: str. The updated thumbnail_data_url
+            new_thumbnail: str|None. The updated thumbnail
             for the topic.
         """
-        self.thumbnail_data_url = new_thumbnail_data_url
+        self.thumbnail = new_thumbnail
 
     def update_description(self, new_description):
         """Updates the description of a topic object.

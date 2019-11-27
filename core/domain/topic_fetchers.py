@@ -143,7 +143,7 @@ def get_topic_from_model(topic_model):
     return topic_domain.Topic(
         topic_model.id, topic_model.name,
         topic_model.abbreviated_name,
-        topic_model.thumbnail_data_url,
+        topic_model.thumbnail,
         topic_model.description, [
             topic_domain.StoryReference.from_dict(reference)
             for reference in versioned_canonical_story_references[

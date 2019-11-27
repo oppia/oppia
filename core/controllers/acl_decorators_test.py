@@ -1859,7 +1859,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.save_new_topic(
-            self.topic_id, self.viewer_id, 'Name', '', '',
+            self.topic_id, self.viewer_id, 'Name', '', None,
             'Description', [], [], [], [], 1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         topic_services.assign_role(
@@ -1926,7 +1926,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
             self.topic_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', '', '',
+            self.topic_id, self.admin_id, 'Name', '', None,
             'Description', [self.story_id], [], [], [], 1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
@@ -2015,7 +2015,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.save_new_topic(
-            self.topic_id, self.viewer_id, 'Name', '', '',
+            self.topic_id, self.viewer_id, 'Name', '', None,
             'Description', [], [], [], [], 1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         topic_services.assign_role(
@@ -2099,7 +2099,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
             self.topic_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', '', '',
+            self.topic_id, self.admin_id, 'Name', '', None,
             'Description', [self.story_id], [], [], [], 1)
 
     def test_cannot_access_non_existent_story(self):
@@ -2823,7 +2823,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.admin_id, 'Name', '', '',
+            topic_id, self.admin_id, 'Name', '', None,
             'Description', [], [], [], [], 1)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
@@ -2851,7 +2851,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             story_id, self.admin_id, 'Title', 'Description', 'Notes',
             topic_id)
         self.save_new_topic(
-            topic_id, self.admin_id, 'Name', '', '',
+            topic_id, self.admin_id, 'Name', '', None,
             'Description', [story_id], [], [], [], 1)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (

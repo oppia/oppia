@@ -136,6 +136,7 @@
 /core/templates/dev/head/services/editability.service*.ts @aks681
 /core/templates/dev/head/services/exploration-features*.ts @aks681
 /core/templates/dev/head/services/exploration-html-formatter.service*.ts @aks681
+/core/templates/dev/head/services/image-upload-helper.service*.ts @aks681
 /core/templates/dev/head/services/validators.service*.ts @aks681
 
 

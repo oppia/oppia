@@ -296,8 +296,6 @@ DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
 DEFAULT_TOPIC_DESCRIPTION = ''
 # Default abbreviated name for a newly-minted topic.
 DEFAULT_ABBREVIATED_TOPIC_NAME = ''
-# Default thumbnail data url for a newly-minted topic.
-DEFAULT_THUMBNAIL_DATA_URL = ''
 # Default content id for the subtopic page's content.
 DEFAULT_SUBTOPIC_PAGE_CONTENT_ID = 'content'
 

@@ -1424,7 +1424,7 @@ tags: []
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
-            thumbnail: str. The thumbnail data url of the topic.
+            thumbnail: str|None. The thumbnail of the topic.
             description: str. The desscription of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.

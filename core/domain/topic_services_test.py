@@ -54,7 +54,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1
         })]
         self.save_new_topic(
-            self.TOPIC_ID, self.user_id, 'Name', '', '', 'Description',
+            self.TOPIC_ID, self.user_id, 'Name', '', None, 'Description',
             [self.story_id_1, self.story_id_2], [self.story_id_3],
             [self.skill_id_1, self.skill_id_2], [], 1
         )
@@ -224,7 +224,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'Moved skill to subtopic.')
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.user_id, 'Name 2', '', '', 'Description',
+            topic_id, self.user_id, 'Name 2', '', None, 'Description',
             [], [], [self.skill_id_1, 'skill_3'], [], 1
         )
         self.assertEqual(
@@ -445,9 +445,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'short name'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_DATA_URL,
+            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL,
             'old_value': '',
-            'new_value': 'thumbnail url'
+            'new_value': 'thumbnail.png'
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -456,7 +456,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.description, 'New Description')
         self.assertEqual(topic.abbreviated_name, 'short name')
-        self.assertEqual(topic.thumbnail_data_url, 'thumbnail url')
+        self.assertEqual(topic.thumbnail, 'thumbnail.png')
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic_summary.version, 3)
 
@@ -1049,7 +1049,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Topic with name \'Name\' already exists'):
             self.save_new_topic(
-                'topic_2', self.user_id, 'Name', '', '', 'Description 2',
+                'topic_2', self.user_id, 'Name', '', None, 'Description 2',
                 [], [], [], [], 1)
 
     def test_update_topic_language_code(self):
@@ -1155,10 +1155,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
-            'topic_2', self.user_id, 'Name 2', '', '', 'Description 2',
+            'topic_2', self.user_id, 'Name 2', '', None, 'Description 2',
             [], [], [], [], 1)
         self.save_new_topic(
-            'topic_3', self.user_id, 'Name 3', '', '', 'Description 3',
+            'topic_3', self.user_id, 'Name 3', '', None, 'Description 3',
             [], [], [], [], 1)
 
         topic_services.assign_role(

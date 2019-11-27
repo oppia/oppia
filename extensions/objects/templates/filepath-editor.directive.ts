@@ -24,16 +24,16 @@ require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
+require('services/image-upload-helper.service.ts');
 
 var gifFrames = require('gif-frames');
 var gifshot = require('gifshot');
 
 angular.module('oppia').directive('filepathEditor', [
-  '$sce', 'AlertsService', 'AssetsBackendApiService',
-  'ContextService', 'CsrfTokenService', 'UrlInterpolationService',
-  function(
-      $sce, AlertsService, AssetsBackendApiService,
-      ContextService, CsrfTokenService, UrlInterpolationService) {
+  '$sce', 'AlertsService', 'AssetsBackendApiService', 'ContextService',
+  'CsrfTokenService', 'ImageUploadHelperService', 'UrlInterpolationService',
+  function($sce, AlertsService, AssetsBackendApiService, ContextService,
+      CsrfTokenService, ImageUploadHelperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -177,30 +177,6 @@ angular.module('oppia').directive('filepathEditor', [
           });
         };
 
-
-
-        var convertImageDataToImageFile = function(dataURI) {
-          // Convert base64/URLEncoded data component to raw binary data
-          // held in a string.
-          var byteString = atob(dataURI.split(',')[1]);
-
-          // Separate out the mime component.
-          var mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-          // Write the bytes of the string to a typed array.
-          var ia = new Uint8Array(byteString.length);
-          for (var i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-          }
-
-          var blob = new Blob([ia], { type: mime });
-          if (blob.type.match('image') &&
-            blob.size > 0) {
-            return blob;
-          } else {
-            return null;
-          }
-        };
 
         var getEventCoorindatesRelativeToImageContainer = function(e) {
           // Even though the event listeners are added to the image container,
@@ -552,7 +528,9 @@ angular.module('oppia').directive('filepathEditor', [
                 gifHeight: height,
                 images: frames
               }, function(obj) {
-                newImageFile = convertImageDataToImageFile(obj.image);
+                newImageFile = (
+                  ImageUploadHelperService.convertImageDataToImageFile(
+                    obj.image));
                 ctrl.updateDimensions(newImageFile, obj.image, width, height);
                 document.body.style.cursor = 'default';
               });
@@ -563,7 +541,9 @@ angular.module('oppia').directive('filepathEditor', [
               ctrl.data.metadata.uploadedImageData,
               x1, y1, width, height);
 
-            newImageFile = convertImageDataToImageFile(newImageData);
+            newImageFile = (
+              ImageUploadHelperService.convertImageDataToImageFile(
+                newImageData));
             ctrl.updateDimensions(newImageFile, newImageData, width, height);
           }
         };
@@ -737,7 +717,9 @@ angular.module('oppia').directive('filepathEditor', [
                 images: frames
               }, function(obj) {
                 if (!obj.error) {
-                  resampledFile = convertImageDataToImageFile(obj.image);
+                  resampledFile = (
+                    ImageUploadHelperService.convertImageDataToImageFile(
+                      obj.image));
                   if (resampledFile === null) {
                     AlertsService.addWarning('Could not get resampled file.');
                     return;
@@ -749,10 +731,10 @@ angular.module('oppia').directive('filepathEditor', [
             });
           } else {
             const resampledImageData = getResampledImageData(
-              imageDataURI,
-              dimensions.width,
-              dimensions.height);
-            resampledFile = convertImageDataToImageFile(resampledImageData);
+              imageDataURI, dimensions.width, dimensions.height);
+            resampledFile = (
+              ImageUploadHelperService.convertImageDataToImageFile(
+                resampledImageData));
             if (resampledFile === null) {
               AlertsService.addWarning('Could not get resampled file.');
               return;

@@ -43,8 +43,12 @@ angular.module('oppia').factory('TopicCreationService', [
             function($scope, $uibModalInstance) {
               $scope.topicName = '';
               $scope.abbreviatedTopicName = '';
-              $scope.isTopicNameEmpty = function(topicName) {
-                return (topicName === '');
+              $scope.isTopicValid = function() {
+                return (
+                  $scope.topicName !== '' &&
+                  $scope.abbreviatedTopicName !== '' &&
+                  $scope.topicName.length <= 20 &&
+                  $scope.abbreviatedTopicName.length <= 12);
               };
               $scope.save = function(topicName, abbreviatedTopicName) {
                 $uibModalInstance.close({

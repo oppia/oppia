@@ -37,7 +37,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name')
+            self.topic_id, 'Name', 'abbrev')
         self.topic.subtopics = [
             topic_domain.Subtopic(1, 'Title', ['skill_id_1'])]
         self.topic.next_subtopic_id = 2
@@ -50,12 +50,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_create_default_topic(self):
         """Tests the create_default_topic() function."""
-        topic = topic_domain.Topic.create_default_topic(self.topic_id, 'Name')
+        topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'Name', 'abbrev')
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
             'abbreviated_name': '',
-            'thumbnail_data_url': '',
+            'thumbnail': None,
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_references': [],
             'additional_story_references': [],
@@ -418,10 +419,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_abbreviated_name('name')
         self.assertEqual(self.topic.abbreviated_name, 'name')
 
-    def test_update_thumbnail_data_url(self):
-        self.assertEqual(self.topic.thumbnail_data_url, '')
-        self.topic.update_thumbnail_data_url('data url')
-        self.assertEqual(self.topic.thumbnail_data_url, 'data url')
+    def test_update_thumbnail(self):
+        self.assertEqual(self.topic.thumbnail, None)
+        self.topic.update_thumbnail('img.png')
+        self.assertEqual(self.topic.thumbnail, 'img.png')
 
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
             self):

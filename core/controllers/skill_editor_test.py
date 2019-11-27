@@ -49,7 +49,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         self.save_new_skill(self.skill_id_2, self.admin_id, 'Description')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', '', '', 'Description',
+            self.topic_id, self.admin_id, 'Name', '', None, 'Description',
             [], [], [self.skill_id], [], 1)
 
     def _delete_skill_model_and_memcache(self, user_id, skill_id):

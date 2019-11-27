@@ -24,6 +24,10 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/csrf-token.service.ts');
+require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -33,15 +37,21 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$timeout', 'TopicEditorStateService',
-        'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
-        'StoryCreationService', 'EVENT_STORY_SUMMARIES_INITIALIZED',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+        '$scope', '$uibModal', '$timeout', 'AlertsService',
+        'ContextService', 'CsrfTokenService', 'ImageUploadHelperService',
+        'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
+        'UrlInterpolationService', 'StoryCreationService',
+        'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
+        'EVENT_TOPIC_REINITIALIZED',
         function(
-            $scope, $uibModal, $timeout, TopicEditorStateService,
-            TopicUpdateService, UndoRedoService, UrlInterpolationService,
-            StoryCreationService, EVENT_STORY_SUMMARIES_INITIALIZED,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+            $scope, $uibModal, $timeout, AlertsService,
+            ContextService, CsrfTokenService, ImageUploadHelperService,
+            TopicEditorStateService, TopicUpdateService, UndoRedoService,
+            UrlInterpolationService, StoryCreationService,
+            EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
+            EVENT_TOPIC_REINITIALIZED) {
+          var tempImageName = '';
+
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
@@ -50,9 +60,17 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
             var placeholderImageUrl = '/icons/story-image-icon.png';
-            $scope.editableThumbnailDataUrl = (
-              $scope.topic.getThumbnail() ||
-              UrlInterpolationService.getStaticImageUrl(placeholderImageUrl));
+            if (!$scope.topic.getThumbnail()) {
+              $scope.editableThumbnailDataUrl = (
+                UrlInterpolationService.getStaticImageUrl(
+                  placeholderImageUrl));
+            } else {
+              $scope.editableThumbnailDataUrl = (
+                ImageUploadHelperService.getTrustedResourceUrlForThumbnail(
+                  $scope.topic.getThumbnail(), ContextService.getEntityType(),
+                  ContextService.getEntityId()));
+            }
+
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.topicDescriptionChanged = false;
@@ -65,6 +83,61 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
+          var saveTopicThumbnail = function(imageURI) {
+            let resampledFile = null;
+            resampledFile = (
+              ImageUploadHelperService.convertImageDataToImageFile(
+                imageURI));
+            if (resampledFile === null) {
+              AlertsService.addWarning('Could not get resampled file.');
+              return;
+            }
+            postImageToServer(resampledFile);
+          };
+
+          var postImageToServer = function(resampledFile) {
+            let form = new FormData();
+            form.append('image', resampledFile);
+            form.append('payload', JSON.stringify({
+              filename: tempImageName,
+              filename_prefix: 'thumbnails'
+            }));
+            var imageUploadUrlTemplate = '/createhandler/imageupload/' +
+              '<entity_type>/<entity_id>';
+            CsrfTokenService.getTokenAsync().then(function(token) {
+              form.append('csrf_token', token);
+              $.ajax({
+                url: UrlInterpolationService.interpolateUrl(
+                  imageUploadUrlTemplate, {
+                    entity_type: ContextService.getEntityType(),
+                    entity_id: ContextService.getEntityId()
+                  }
+                ),
+                data: form,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                dataFilter: function(data) {
+                  // Remove the XSSI prefix.
+                  var transformedData = data.substring(5);
+                  return JSON.parse(transformedData);
+                },
+                dataType: 'text'
+              }).done(function(data) {
+                $scope.editableThumbnailDataUrl = (
+                  ImageUploadHelperService.getTrustedResourceUrlForThumbnail(
+                    data.filename, ContextService.getEntityType(),
+                    ContextService.getEntityId()));
+              }).fail(function(data) {
+                // Remove the XSSI prefix.
+                var transformedData = data.responseText.substring(5);
+                var parsedResponse = JSON.parse(transformedData);
+                AlertsService.addWarning(
+                  parsedResponse.error || 'Error communicating with server.');
+              });
+            });
+          };
+
           $scope.showEditThumbnailModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -72,13 +145,15 @@ angular.module('oppia').directive('topicEditorTab', [
                 'edit-topic-thumbnail-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
                   $scope.uploadedImage = null;
                   $scope.croppedImageDataUrl = '';
                   $scope.invalidImageWarningIsShown = false;
 
                   $scope.onFileChanged = function(file) {
+                    tempImageName = (
+                      file.name.split('.').slice(0, -1).join('.') + '.png');
                     $('.oppia-thumbnail-uploader').fadeOut(function() {
                       $scope.invalidImageWarningIsShown = false;
 
@@ -89,7 +164,6 @@ angular.module('oppia').directive('topicEditorTab', [
                         });
                       };
                       reader.readAsDataURL(file);
-
                       $timeout(function() {
                         $('.oppia-thumbnail-uploader').fadeIn();
                       }, 100);
@@ -118,7 +192,8 @@ angular.module('oppia').directive('topicEditorTab', [
               ]
             }).result.then(function(newThumbnailDataUrl) {
               $scope.editableThumbnailDataUrl = newThumbnailDataUrl;
-              $scope.updateTopicThumbnail(newThumbnailDataUrl);
+              $scope.updateTopicThumbnail(tempImageName);
+              saveTopicThumbnail(newThumbnailDataUrl);
             });
           };
 
@@ -165,12 +240,12 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.topic, newAbbreviatedName);
           };
 
-          $scope.updateTopicThumbnail = function(newThumbnailDataUrl) {
-            if (newThumbnailDataUrl === $scope.topic.getThumbnail()) {
+          $scope.updateTopicThumbnail = function(newThumbnailName) {
+            if (newThumbnailName === $scope.topic.getThumbnail()) {
               return;
             }
-            TopicUpdateService.setThumbnailDataUrl(
-              $scope.topic, newThumbnailDataUrl);
+            TopicUpdateService.setThumbnail(
+              $scope.topic, newThumbnailName);
           };
 
           $scope.updateTopicDescription = function(newDescription) {

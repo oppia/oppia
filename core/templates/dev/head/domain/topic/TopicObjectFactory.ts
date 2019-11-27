@@ -30,7 +30,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
         id, name, abbreviatedName, description, languageCode,
         canonicalStoryReferences, additionalStoryReferences,
         uncategorizedSkillIds, nextSubtopicId, version, subtopics,
-        skillIdToDescriptionMap, thumbnailDataUrl) {
+        skillIdToDescriptionMap, thumbnail) {
       this._id = id;
       this._name = name;
       this._abbreviatedName = abbreviatedName;
@@ -46,7 +46,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
       this._nextSubtopicId = nextSubtopicId;
       this._version = version;
       this._subtopics = angular.copy(subtopics);
-      this._thumbnailDataUrl = thumbnailDataUrl;
+      this._thumbnail = thumbnail;
     };
 
     // Instance methods
@@ -71,12 +71,12 @@ angular.module('oppia').factory('TopicObjectFactory', [
       this._abbreviatedName = abbreviatedName;
     };
 
-    Topic.prototype.setThumbnail = function(thumbnailDataUrl) {
-      this._thumbnailDataUrl = thumbnailDataUrl;
+    Topic.prototype.setThumbnail = function(thumbnail) {
+      this._thumbnail = thumbnail;
     };
 
     Topic.prototype.getThumbnail = function() {
-      return this._thumbnailDataUrl;
+      return this._thumbnail;
     };
 
     Topic.prototype.getDescription = function() {
@@ -109,7 +109,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
         issues.push('Topic name should not be empty.');
       }
 
-      if (this._thumbnailDataUrl === '') {
+      if (!this._thumbnail) {
         issues.push('Topic should have a thumbnail.');
       }
 
@@ -414,7 +414,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
         topicBackendDict.language_code, canonicalStoryReferences,
         additionalStoryReferences, topicBackendDict.uncategorized_skill_ids,
         topicBackendDict.next_subtopic_id, topicBackendDict.version,
-        subtopics, skillIdToDescriptionDict, topicBackendDict.thumbnail_data_url
+        subtopics, skillIdToDescriptionDict, topicBackendDict.thumbnail
       );
     };
 

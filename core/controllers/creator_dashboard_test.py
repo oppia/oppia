@@ -709,7 +709,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['topic_summary_dicts']), 0)
             self.save_new_topic(
-                'topic_id', self.owner_id, 'Name', '', '',
+                'topic_id', self.owner_id, 'Name', '', None,
                 'Description', ['story_id_1', 'story_id_2'],
                 ['story_id_3'], ['skill_id_1', 'skill_id_2'], [], 1)
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
