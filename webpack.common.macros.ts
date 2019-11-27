@@ -16,7 +16,6 @@
  * @fileoverview Macros for underscore template loader.
  */
 
-
 const loaderUtils = require('loader-utils');
 const path = require('path');
 
@@ -33,16 +32,16 @@ module.exports = {
     const root = path.resolve(__dirname, 'core/templates/dev/head');
     const argsExpr = args ? `(${objExtend})(arguments,
       ${JSON.stringify(args)})` : 'arguments';
-
-    return `require(${JSON.stringify(loaderUtils.urlToRequest(
-      resourcePath, root))}).apply(null,${argsExpr})`;
+    const resourceURL = JSON.stringify(loaderUtils.urlToRequest(
+      resourcePath, root));
+    return `require(${resourceURL}).apply(null,${argsExpr})`;
   },
 
   loadExtensions: function(resourcePath) {
     resourcePath = `/${resourcePath}`;
     const root = path.resolve(__dirname, 'extensions');
-
-    return `require(${JSON.stringify(loaderUtils.urlToRequest(
-      resourcePath, root))})()`;
+    const resourceURL = JSON.stringify(loaderUtils.urlToRequest(
+      resourcePath, root));
+    return `require(${resourceURL})()`;
   },
 };
