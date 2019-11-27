@@ -48,7 +48,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.linked_skill_id, self.admin_id, 'Description 3')
         skill_services.publish_skill(self.linked_skill_id, self.admin_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', '', None,
+            self.topic_id, self.admin_id, 'Name', 'abbrev', None,
             'Description', [], [], [self.linked_skill_id], [], 1)
 
 

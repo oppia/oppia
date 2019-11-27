@@ -55,7 +55,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
-            'abbreviated_name': '',
+            'abbreviated_name': 'abbrev',
             'thumbnail': None,
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_references': [],
@@ -197,9 +197,25 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_topic_id(topic_id)
 
+    def _assert_valid_abbreviated_name(
+            self, expected_error_substring, name):
+        """Checks that the topic passes strict validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            topic_domain.Topic.require_valid_abbreviated_name(name)
+
     def test_valid_topic_id(self):
         self._assert_valid_topic_id('Topic id should be a string', 10)
         self._assert_valid_topic_id('Topic id abc is invalid', 'abc')
+
+    def test_valid_abbreviated_name(self):
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name should be a string.', 10)
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name field should not be empty.', '')
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name field should not exceed 12 characters.',
+            'this is a lengthy name.')
 
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
@@ -415,7 +431,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.language_code, 'bn')
 
     def test_update_abbreviated_name(self):
-        self.assertEqual(self.topic.abbreviated_name, '')
+        self.assertEqual(self.topic.abbreviated_name, 'abbrev')
         self.topic.update_abbreviated_name('name')
         self.assertEqual(self.topic.abbreviated_name, 'name')
 
