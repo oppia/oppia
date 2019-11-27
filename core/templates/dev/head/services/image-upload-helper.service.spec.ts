@@ -13,17 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for DateTimeFormatService.
+ * @fileoverview Unit test for ImageUploadHelperService.
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
+require('services/assets-backend-api.service.ts');
 require('services/image-upload-helper.service.ts');
 
 describe('ImageUploadHelperService', function() {
   var ImageUploadHelperService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('$sce', {});
+    $provide.value('AssetsBackendApiService', {});
+  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -35,34 +40,11 @@ describe('ImageUploadHelperService', function() {
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
   }));
 
-  it('should add new actions', function() {
-    DebugInfoTrackerService.addAction({
-      index: 1,
-      interactionId: 'Continue'
-    });
-    DebugInfoTrackerService.addAction({
-      index: 2,
-      interactionId: 'MultipleChoiceInput'
-    });
-    expect(DebugInfoTrackerService.getSequenceOfActions()).toEqual([{
-      index: 1,
-      interactionId: 'Continue'
-    }, {
-      index: 2,
-      interactionId: 'MultipleChoiceInput'
-    }]);
-  });
-
-  it('should reset the sequence correctly', function() {
-    DebugInfoTrackerService.addAction({
-      index: 1,
-      interactionId: 'Continue'
-    });
-    expect(DebugInfoTrackerService.getSequenceOfActions()).toEqual([{
-      index: 1,
-      interactionId: 'Continue'
-    }]);
-    DebugInfoTrackerService.reset();
-    expect(DebugInfoTrackerService.getSequenceOfActions()).toEqual([]);
+  it('should convert image data to image file', function() {
+    var imageFile = null;
+    imageFile = (
+      ImageUploadHelperService.convertImageDataToImageFile(
+        'data:image/png;base64,xyz'));
+    expect(imageFile instanceof Blob).toBe(true);
   });
 });

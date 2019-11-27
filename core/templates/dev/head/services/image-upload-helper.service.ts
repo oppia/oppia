@@ -20,10 +20,6 @@ require('services/assets-backend-api.service.ts');
 
 angular.module('oppia').factory('ImageUploadHelperService', [
   '$sce', 'AssetsBackendApiService', function($sce, AssetsBackendApiService) {
-    var OUTPUT_IMAGE_FORMAT = {
-      png: 'png',
-      gif: 'gif'
-    };
     return {
       convertImageDataToImageFile: function(dataURI) {
         // Convert base64/URLEncoded data component to raw binary data
