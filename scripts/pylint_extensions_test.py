@@ -1597,12 +1597,11 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         self.checker_test_object.checker.process_module(
             node_invalid_punctuation)
 
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='invalid-punctuation-used',
-                line=1
-            ),
-        ):
+        message = testutils.Message(
+            msg_id='invalid-punctuation-used',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
     def test_no_space_at_beginning(self):
@@ -1622,12 +1621,11 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         self.checker_test_object.checker.process_module(
             node_no_space_at_beginning)
 
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='no-space-at-beginning',
-                line=1
-            ),
-        ):
+        message = testutils.Message(
+            msg_id='no-space-at-beginning',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
     def test_no_capital_letter_at_beginning(self):
@@ -1647,12 +1645,11 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         self.checker_test_object.checker.process_module(
             node_no_capital_letter_at_beginning)
 
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='no-capital-letter-at-beginning',
-                line=1
-            ),
-        ):
+        message = testutils.Message(
+            msg_id='no-capital-letter-at-beginning',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
     def test_comment_with_excluded_phrase(self):

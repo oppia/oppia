@@ -2809,7 +2809,7 @@ class OtherLintChecksManager(LintChecksManager):
         super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
 
     def _check_docstring(self):
-        """Run checks relates to docstring."""
+        """Run checks related to docstring."""
         arg = (
             self.py_filepaths, _STDOUT_LIST, self.process_manager, FILE_CACHE)
         methods = [
