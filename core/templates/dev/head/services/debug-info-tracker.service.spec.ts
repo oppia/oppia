@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for DateTimeFormatService.
+ * @fileoverview Unit test for DebugInfoTrackerService.
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';
