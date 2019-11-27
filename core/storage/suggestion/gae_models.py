@@ -363,10 +363,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """Check if UserSettingsModel exists for author_id and
         final_reviewer_id.
         """
-        return (user_models.UserSettingsModel.get_by_id(
-                    self.author_id) is not None and
-                user_models.UserSettingsModel.get_by_id(
-                    self.final_reviewer_id) is not None)
+        return (user_models.UserSettingsModel.get_by_id(self.author_id)
+                is not None and
+                user_models.UserSettingsModel.get_by_id(self.final_reviewer_id)
+                is not None)
 
 
 class GeneralVoiceoverApplicationModel(base_models.BaseModel):
@@ -505,7 +505,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         """Check if UserSettingsModel exists for author_id and
         final_reviewer_id.
         """
-        return (user_models.UserSettingsModel.get_by_id(
-                    self.author_id) is not None and
-                user_models.UserSettingsModel.get_by_id(
-                    self.final_reviewer_id) is not None)
+        return (user_models.UserSettingsModel.get_by_id(self.author_id)
+                is not None and
+                user_models.UserSettingsModel.get_by_id(self.final_reviewer_id)
+                is not None)

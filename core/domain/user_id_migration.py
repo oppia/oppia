@@ -21,12 +21,13 @@ import inspect
 from core import jobs
 from core.platform import models
 
-(base_models, collection_models, exploration_models,
- question_models, skill_models, topic_models,
- user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration,
-     models.NAMES.question, models.NAMES.skill, models.NAMES.topic,
-     models.NAMES.user])
+(
+    base_models, collection_models,
+    exploration_models, question_models, skill_models,
+    topic_models, user_models) = models.Registry.import_models(
+        [models.NAMES.base_model, models.NAMES.collection,
+         models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
+         models.NAMES.topic, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -181,7 +182,7 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class ModelsUserIdsHaveUserSettingsVerificationJob(
-    jobs.BaseMapReduceOneOffJobManager):
+        jobs.BaseMapReduceOneOffJobManager):
     """One-off job for going through all the UserSettingsModels and checking
     that the gae_id is not mentioned in any of the fields that should contain
     user_id.
@@ -203,8 +204,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
 
     @staticmethod
     def _check_one_field_exists(model, model_class):
-        """Check if UserSettingsModel exists for one field.
-        """
+        """Check if UserSettingsModel exists for one field."""
         verification_field = model_class.get_user_id_migration_field()
         model_values = model.to_dict()
         return user_models.UserSettingsModel.get_by_id(
@@ -220,7 +220,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
         """Implements the map function for this job."""
         model_class = model.__class__
         if (model_class.get_user_id_migration_policy() ==
-              base_models.USER_ID_MIGRATION_POLICY.COPY):
+                base_models.USER_ID_MIGRATION_POLICY.COPY):
             if (ModelsUserIdsHaveUserSettingsVerificationJob
                     ._check_id_exists(model)):
                 yield ('SUCCESS', model_class.__name__)

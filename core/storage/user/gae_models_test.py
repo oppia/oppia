@@ -1929,4 +1929,3 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             score=15
         )
         self.assertFalse(model.verify_model_user_ids_exist())
-
