@@ -20,4 +20,4 @@ jobs:
       - name: Install coverage
         run: sudo pip install coverage
       - name: run backend
-        run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --exclude_load_tests
