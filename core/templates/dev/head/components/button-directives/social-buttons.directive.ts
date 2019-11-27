@@ -24,12 +24,13 @@ angular.module('oppia').directive('socialButtons', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/button-directives/social-buttons.directive.html'),
+      template: require('!html-loader!./social-buttons.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
       }]
     };
   }]);
