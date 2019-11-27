@@ -88,12 +88,27 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
                 'branch.')):
             generate_release_info.main('test-token')
 
-    def test_get_current_version_tag(self):
+    def test_get_current_version_tag_with_non_hotfix_branch(self):
         def mock_get_tags(unused_self):
-            return ['tags']
-        with self.swap(github.Repository.Repository, 'get_tags', mock_get_tags):
+            return ['tag-0', 'tag-1', 'tag-2']
+        get_tags_swap = self.swap(
+            github.Repository.Repository, 'get_tags', mock_get_tags)
+        with self.branch_name_swap, get_tags_swap:
             tags = generate_release_info.get_current_version_tag(self.mock_repo)
-        self.assertEqual(tags, 'tags')
+        self.assertEqual(tags, 'tag-0')
+
+    def test_get_current_version_tag_with_hotfix_branch(self):
+        def mock_get_tags(unused_self):
+            return ['tag-0', 'tag-1', 'tag-2']
+        def mock_get_current_branch_name():
+            return 'release-1.2.3-hotfix-1'
+        get_tags_swap = self.swap(
+            github.Repository.Repository, 'get_tags', mock_get_tags)
+        branch_name_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_current_branch_name)
+        with branch_name_swap, get_tags_swap:
+            tags = generate_release_info.get_current_version_tag(self.mock_repo)
+        self.assertEqual(tags, 'tag-1')
 
     def test_get_extra_commits_in_new_release(self):
         def mock_run_cmd(unused_cmd):

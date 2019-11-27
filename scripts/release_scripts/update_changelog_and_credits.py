@@ -470,8 +470,7 @@ def main():
     g = github.Github(personal_access_token)
     repo_fork = g.get_repo('%s/oppia' % github_username)
 
-    current_release_version = branch_name[
-        len(common.RELEASE_BRANCH_NAME_PREFIX):]
+    current_release_version = common.get_current_release_version(branch_name)
     target_branch = 'update-changelog-for-releasev%s' % current_release_version
 
     remove_updates_and_delete_branch(repo_fork, target_branch)

@@ -67,7 +67,10 @@ def get_current_version_tag(repo):
     Returns:
         github.Tag.Tag: The most recent version tag.
     """
-    return repo.get_tags()[0]
+    if 'hotfix' in common.get_current_branch_name():
+        return repo.get_tags()[1]
+    else:
+        return repo.get_tags()[0]
 
 
 def get_extra_commits_in_new_release(base_commit, repo):
@@ -260,7 +263,7 @@ def check_storage_models(current_release):
     """Check if files in core/storage have changed and returns them.
 
     Args:
-        current_release: The current release version
+        current_release: The current release version.
 
     Returns:
         list(str): The changed files (if any).

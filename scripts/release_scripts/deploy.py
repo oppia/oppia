@@ -457,8 +457,8 @@ def execute_deployment():
     if not common.is_current_branch_a_release_branch():
         raise Exception(
             'The deployment script must be run from a release branch.')
-    current_release_version = current_branch_name[len(
-        common.RELEASE_BRANCH_NAME_PREFIX):].replace(DOT_CHAR, HYPHEN_CHAR)
+    current_release_version = common.get_current_release_version(
+        current_branch_name).replace(DOT_CHAR, HYPHEN_CHAR)
 
     # This is required to compose the release_version_library_url
     # (defined in switch_version function) correctly.
@@ -472,8 +472,8 @@ def execute_deployment():
     try:
         if app_name == APP_NAME_OPPIASERVER:
             create_release_doc()
-            release_version = current_branch_name[len(
-                common.RELEASE_BRANCH_NAME_PREFIX):]
+            release_version = common.get_current_release_version(
+                current_branch_name)
             last_commit_message = subprocess.check_output(
                 'git log -1 --pretty=%B'.split())
             if not last_commit_message.startswith(
