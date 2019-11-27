@@ -16,6 +16,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import json
 
 from core.domain import email_services
@@ -302,6 +303,34 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(feedback_services.get_total_open_threads(
             feedback_services.get_thread_analytics_multi(
                 [self.EXP_ID_1, self.EXP_ID_2])), 1)
+
+    def test_get_last_two_message_ids(self):
+        fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+        thread_1 = feedback_domain.FeedbackThread(
+            self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
+            u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
+            5, fake_date, fake_date, 'eid1.thread_id.4', 'last message',
+            self.viewer_id, 'eid1.thread_id.3', 'second last', self.viewer_id)
+
+        last_two_message_ids = (
+            feedback_services.get_last_two_message_ids(thread_1))
+        self.assertEqual(
+            last_two_message_ids,
+            [thread_1.get_full_message_id(4), thread_1.get_full_message_id(3)])
+
+        # Check what happens in case the thread has only one message.
+        thread_1 = feedback_domain.FeedbackThread(
+            self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
+            u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
+            1, fake_date, fake_date, 'eid1.thread_id.0', 'last message',
+            self.viewer_id, None, None, None)
+
+        last_two_message_ids = (
+            feedback_services.get_last_two_message_ids(thread_1))
+        # The second last message should be given an id of -1 as it doesn't
+        # exist.
+        self.assertEqual(
+            last_two_message_ids, [thread_1.get_full_message_id(0), None])
 
     def test_get_thread_summaries(self):
         feedback_services.create_thread(

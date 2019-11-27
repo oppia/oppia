@@ -425,6 +425,20 @@ def _get_thread_from_model(thread_model):
         thread_model.second_last_message_author_id)
 
 
+def get_last_two_message_ids(thread):
+    """Returns the full message ids of the last two messages of the thread.
+    If the thread has only one message, the id of the second last message is
+    None.
+
+    Returns:
+        list(str|None). The ids of the last two messages of the thread. If
+            the message does not exist, None is returned.
+    """
+    return [thread.get_full_message_id(i) if i >= 0 else None
+            for i in range(
+                thread.message_count - 1, thread.message_count - 3, -1)]
+
+
 def get_thread_summaries(user_id, thread_ids):
     """Returns a list of summaries corresponding to each of the threads given.
     It also returns the number of threads that are currently not read by the
@@ -481,7 +495,7 @@ def get_thread_summaries(user_id, thread_ids):
 
     last_two_messages_ids = []
     for thread in threads:
-        last_two_messages_ids += thread.get_last_two_message_ids()
+        last_two_messages_ids += get_last_two_message_ids(thread)
 
     messages = feedback_models.GeneralFeedbackMessageModel.get_multi(
         last_two_messages_ids)

@@ -62,32 +62,6 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_thread_dict, observed_thread.to_dict())
 
-    def test_get_last_two_message_ids(self):
-        fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
-        thread_1 = feedback_domain.FeedbackThread(
-            self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
-            u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
-            5, fake_date, fake_date, 'exp0.thread0.4', 'last message',
-            self.viewer_id, 'exp0.thread0.3', 'second last', self.viewer_id)
-
-        last_two_message_ids = thread_1.get_last_two_message_ids()
-        self.assertEqual(
-            last_two_message_ids,
-            [thread_1.get_full_message_id(4), thread_1.get_full_message_id(3)])
-
-        # Check what happens in case the thread has only one message.
-        thread_1 = feedback_domain.FeedbackThread(
-            self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
-            u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
-            1, fake_date, fake_date, 'exp0.thread0.0', 'last message',
-            self.viewer_id, None, None, None)
-
-        last_two_message_ids = thread_1.get_last_two_message_ids()
-        # The second last message should be given an id of -1 as it doesn't
-        # exist.
-        self.assertEqual(
-            last_two_message_ids, [thread_1.get_full_message_id(0), None])
-
 
 class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
