@@ -22,6 +22,7 @@ from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
+import python_utils
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -46,7 +47,7 @@ class ThreadListHandler(base.BaseHandler):
             [suggestion and suggestion.to_dict()
              for suggestion in suggestion_services.get_suggestions_by_ids(
                  [d['thread_id'] for d in suggestion_thread_dicts])])
-        for suggestion_thread_dict, suggestion_dict in zip(
+        for suggestion_thread_dict, suggestion_dict in python_utils.ZIP(
                 suggestion_thread_dicts, suggestion_dicts):
             suggestion_thread_dict['suggestion_dict'] = suggestion_dict
 
