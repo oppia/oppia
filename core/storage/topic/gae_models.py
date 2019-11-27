@@ -469,6 +469,12 @@ class TopicRightsModel(base_models.VersionedModel):
         )
         return topic_rights_models
 
+    def verify_model(self):
+        """Check if UserSettingsModel exists for all the ids in manager_ids."""
+        return all(
+            user_models.UserSettingsModel.get_by_id(manager_id) is not None
+            for manager_id in self.manager_ids)
+
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.

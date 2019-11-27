@@ -363,23 +363,23 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_migrate_model(self):
-        original_mode_1 = topic_models.TopicRightsModel(
+        original_model_1 = topic_models.TopicRightsModel(
             id=self.TOPIC_1_ID, manager_ids=[self.MANAGER_1_ID_OLD])
-        original_mode_1.commit(
+        original_model_1.commit(
             'committer_id',
             'New topic rights',
             [{'cmd': topic_domain.CMD_CREATE_NEW}])
-        original_mode_2 = topic_models.TopicRightsModel(
+        original_model_2 = topic_models.TopicRightsModel(
             id=self.TOPIC_2_ID,
             manager_ids=[self.MANAGER_1_ID_OLD, self.MANAGER_2_ID_OLD])
-        original_mode_2.commit(
+        original_model_2.commit(
             'committer_id',
             'New topic rights',
             [{'cmd': topic_domain.CMD_CREATE_NEW}])
-        original_mode_3 = topic_models.TopicRightsModel(
+        original_model_3 = topic_models.TopicRightsModel(
             id=self.TOPIC_3_ID,
             manager_ids=[self.MANAGER_2_ID_OLD, self.MANAGER_3_ID_OLD])
-        original_mode_3.commit(
+        original_model_3.commit(
             'committer_id',
             'New topic rights',
             [{'cmd': topic_domain.CMD_CREATE_NEW}])
@@ -404,3 +404,27 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             [self.MANAGER_2_ID_NEW, self.MANAGER_3_ID_NEW],
             migrated_model_3.manager_ids)
+
+    def test_verify_model(self):
+        user_models.UserSettingsModel(
+            id=self.MANAGER_1_ID_NEW,
+            gae_id='gae_1_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.MANAGER_2_ID_NEW,
+            gae_id='gae_2_id',
+            email='some_other@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        model = topic_models.TopicRightsModel(
+            id=self.TOPIC_1_ID,
+            manager_ids=[self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_NEW])
+        self.assertTrue(model.verify_model())
+
+        model.manager_ids = [self.MANAGER_1_ID_NEW, 'user_non_id']
+        self.assertFalse(model.verify_model())
+
+        model.manager_ids = ['user_non_id']
+        self.assertFalse(model.verify_model())
