@@ -129,11 +129,17 @@ class RestoreBackupTests(test_utils.GenericTestBase):
             self.all_cmd_tokens,
             [restore_backup.GCLOUD_PATH, 'datastore', 'operations', 'list'])
 
-    def test_cancel_operation(self):
+    def test_cancel_operation_when_user_allows_cancellation_after_warning(self):
+        print_arr = []
+        def mock_print(msg):
+            print_arr.append(msg)
         def mock_input():
+            if 'Cancellation' in print_arr[-1]:
+                return 'y'
             return 'Sample operation'
+        print_swap = self.swap(python_utils, 'PRINT', mock_print)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.exists_swap, self.run_cmd_swap, input_swap:
+        with self.exists_swap, self.run_cmd_swap, print_swap, input_swap:
             restore_backup.main(args=['--cancel_operation'])
         self.assertEqual(
             self.all_cmd_tokens,
@@ -141,3 +147,17 @@ class RestoreBackupTests(test_utils.GenericTestBase):
                 restore_backup.GCLOUD_PATH, 'datastore', 'operations', 'list',
                 restore_backup.GCLOUD_PATH, 'datastore', 'operations', 'cancel',
                 'Sample operation'])
+
+    def test_cancel_operation_when_user_aborts_cancellation_after_warning(self):
+        print_arr = []
+        def mock_print(msg):
+            print_arr.append(msg)
+        def mock_input():
+            if 'Cancellation' in print_arr[-1]:
+                return 'n'
+            return 'Sample operation'
+        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        with self.exists_swap, self.run_cmd_swap, print_swap, input_swap:
+            restore_backup.main(args=['--cancel_operation'])
+        self.assertEqual(self.all_cmd_tokens, [])

@@ -38,6 +38,7 @@ import re
 import sys
 
 import python_utils
+import release_constants
 from scripts import common
 
 GCLOUD_PATH = os.path.join(
@@ -99,10 +100,20 @@ def check_backup_restoration_status():
 
 def cancel_operation():
     """Cancels a datastore operation."""
+    python_utils.PRINT(
+        'Cancellation of operation may corrupt the datastore. '
+        'Refer: https://cloud.google.com/datastore/docs/'
+        'export-import-entities#cancel_an_operation\n'
+        'Do you want to continue?\n')
+    execute_cancellation = python_utils.INPUT().lower()
+    if execute_cancellation not in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        python_utils.PRINT('Aborting Cancellation.')
+        return
+
     python_utils.PRINT('List of operations in progress:\n')
     check_backup_restoration_status()
     python_utils.PRINT(
-        'Enter the name of the operation to cancel.')
+        'Enter the name of the operation to cancel from the above list.')
     operation_name = python_utils.INPUT()
     common.run_cmd([
         GCLOUD_PATH, 'datastore', 'operations', 'cancel', operation_name])

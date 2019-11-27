@@ -204,8 +204,7 @@ def _get_release_branch_type_and_name(target_version):
         tuple(str, str). The type and name of release branch.
     """
     return (
-        release_constants.RELEASE_BRANCH_TYPE, '%s-%s' % (
-            release_constants.RELEASE_BRANCH_TYPE, target_version))
+        release_constants.RELEASE_BRANCH_TYPE, 'release-%s' % target_version)
 
 
 def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
@@ -219,9 +218,8 @@ def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
         tuple(str, str). The type and name of hotfix branch.
     """
     return (
-        release_constants.HOTFIX_BRANCH_TYPE, '%s-%s-%s-%s' % (
-            release_constants.RELEASE_BRANCH_TYPE, target_version,
-            release_constants.HOTFIX_BRANCH_TYPE, hotfix_number))
+        release_constants.HOTFIX_BRANCH_TYPE, 'release-%s-hotfix-%s' % (
+            target_version, hotfix_number))
 
 
 def execute_branch_cut():
@@ -261,12 +259,10 @@ def execute_branch_cut():
         if not hotfix_number:
             branch_to_check = 'develop'
         elif hotfix_number == 1:
-            branch_to_check = '%s-%s' % (
-                release_constants.RELEASE_BRANCH_TYPE, target_version)
+            branch_to_check = 'release-%s' % target_version
         else:
-            branch_to_check = '%s-%s-%s-%s' % (
-                release_constants.RELEASE_BRANCH_TYPE, target_version,
-                release_constants.HOTFIX_BRANCH_TYPE, hotfix_number - 1)
+            branch_to_check = 'release-%s-hotfix-%s' % (
+                target_version, hotfix_number - 1)
         python_utils.PRINT(
             'Please confirm: are Travis checks passing on %s? (y/n) ' % (
                 branch_to_check))
@@ -284,12 +280,10 @@ def execute_branch_cut():
         verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             remote_alias, target_version, hotfix_number)
         if hotfix_number == 1:
-            branch_to_cut_from = '%s-%s' % (
-                release_constants.RELEASE_BRANCH_TYPE, target_version)
+            branch_to_cut_from = 'release-%s' % target_version
         else:
-            branch_to_cut_from = '%s-%s-%s-%s' % (
-                release_constants.RELEASE_BRANCH_TYPE, target_version,
-                release_constants.HOTFIX_BRANCH_TYPE, hotfix_number - 1)
+            branch_to_cut_from = 'release-%s-hotfix-%s' % (
+                target_version, hotfix_number - 1)
         python_utils.PRINT('Cutting a new hotfix branch: %s' % new_branch_name)
         subprocess.check_call([
             'git', 'checkout', '-b', new_branch_name, branch_to_cut_from])
