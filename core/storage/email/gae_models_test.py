@@ -258,7 +258,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 email_models.GeneralFeedbackEmailReplyToIdModel.create(
                     'user', 'exploration.exp0.0')
 
-    def test_verify_model(self):
+    def test_verify_model_user_ids_exist(self):
         user_models.UserSettingsModel(
             id='user_1_id',
             gae_id='gae_1_id',
@@ -282,14 +282,14 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             html_body='Email Body 2',
             sent_datetime=datetime.datetime.utcnow()
         )
-        self.assertTrue(model.verify_model())
+        self.assertTrue(model.verify_model_user_ids_exist())
 
         model.recipient_id = 'user_non_id'
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.recipient_id = 'user_1_id'
         model.sender_id = 'user_non_id'
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
 
 class BulkEmailModelUnitTests(test_utils.GenericTestBase):

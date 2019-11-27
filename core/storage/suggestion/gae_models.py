@@ -359,7 +359,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         return user_data
 
-    def verify_model(self):
+    def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for author_id and
         final_reviewer_id.
         """
@@ -501,7 +501,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
 
-    def verify_model(self):
+    def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for author_id and
         final_reviewer_id.
         """

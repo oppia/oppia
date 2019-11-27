@@ -469,7 +469,7 @@ class TopicRightsModel(base_models.VersionedModel):
         )
         return topic_rights_models
 
-    def verify_model(self):
+    def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in manager_ids."""
         return all(
             user_models.UserSettingsModel.get_by_id(manager_id) is not None

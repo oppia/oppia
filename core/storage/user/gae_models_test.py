@@ -1904,7 +1904,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
 
-    def test_verify_model(self):
+    def test_verify_model_user_ids_exist(self):
         user_models.UserSettingsModel(
             id='user_id',
             gae_id='gae_id',
@@ -1917,10 +1917,10 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             score_category='category_id',
             score=15
         )
-        self.assertTrue(model.verify_model())
+        self.assertTrue(model.verify_model_user_ids_exist())
 
         model.user_id = 'user_non_id'
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model = user_models.UserContributionScoringModel(
             id='category_id.user_2_id',
@@ -1928,5 +1928,5 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             score_category='category_id',
             score=15
         )
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 

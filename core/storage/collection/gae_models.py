@@ -270,7 +270,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         cls.put_multi(
             migrated_models, update_last_updated_time=False)
 
-    def verify_model(self):
+    def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
         editor_ids, voice_artist_ids and viewer_ids.
         """
@@ -638,7 +638,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
-    def verify_model(self):
+    def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
         editor_ids, viewer_ids and contributor_ids.
         """

@@ -302,7 +302,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             migrated_models.append(model)
         cls.put_multi(migrated_models, update_last_updated_time=False)
 
-    def verify_model(self):
+    def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
         editor_ids, voice_artist_ids and viewer_ids.
         """
@@ -744,7 +744,7 @@ class ExpSummaryModel(base_models.BaseModel):
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
 
-    def verify_model(self):
+    def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
         editor_ids, voice_artist_ids, viewer_ids and contributor_ids.
         """

@@ -405,7 +405,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             [self.MANAGER_2_ID_NEW, self.MANAGER_3_ID_NEW],
             migrated_model_3.manager_ids)
 
-    def test_verify_model(self):
+    def test_verify_model_user_ids_exist(self):
         user_models.UserSettingsModel(
             id=self.MANAGER_1_ID_NEW,
             gae_id='gae_1_id',
@@ -421,10 +421,10 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
         model = topic_models.TopicRightsModel(
             id=self.TOPIC_1_ID,
             manager_ids=[self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_NEW])
-        self.assertTrue(model.verify_model())
+        self.assertTrue(model.verify_model_user_ids_exist())
 
         model.manager_ids = [self.MANAGER_1_ID_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.manager_ids = ['user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())

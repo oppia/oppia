@@ -324,7 +324,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             [self.USER_ID_6_NEW], migrated_model_3.voice_artist_ids)
         self.assertEqual([], migrated_model_3.viewer_ids)
 
-    def test_verify_model(self):
+    def test_verify_model_user_ids_exist(self):
         model = exploration_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_1,
             owner_ids=[self.USER_ID_1, self.USER_ID_2],
@@ -336,22 +336,22 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         )
-        self.assertTrue(model.verify_model())
+        self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.owner_ids = [self.USER_ID_1, self.USER_ID_2]
         model.editor_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.editor_ids = [self.USER_ID_1, self.USER_ID_2]
         model.voice_artist_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.voice_artist_ids = [self.USER_ID_1, self.USER_ID_2]
         model.viewer_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
     def test_save(self):
         exploration_models.ExplorationRightsModel(
@@ -896,7 +896,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             .get_at_least_editable('nonexistent_id'))
         self.assertEqual(0, len(exploration_summary_models))
 
-    def test_verify_model(self):
+    def test_verify_model_user_ids_exist(self):
         model = exploration_models.ExpSummaryModel(
             id=self.EXPLORATION_ID_1,
             title='title',
@@ -910,23 +910,23 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             viewer_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
             contributor_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
         )
-        self.assertTrue(model.verify_model())
+        self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.owner_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
         model.editor_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.editor_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
         model.voice_artist_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.voice_artist_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
         model.viewer_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.viewer_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
         model.contributor_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())

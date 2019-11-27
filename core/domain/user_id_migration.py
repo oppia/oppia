@@ -186,12 +186,12 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
     """
 
     @staticmethod
-    def _check_id(model):
+    def _check_id_exists(model):
         """Check if UserSettingsModel exists for the model id."""
         return user_models.UserSettingsModel.get_by_id(model.id) is not None
 
     @staticmethod
-    def _check_id_and_user_id(model):
+    def _check_id_and_user_id_exist(model):
         """Check if UserSettingsModel exists for user_id and model id contains
         user_id.
         """
@@ -200,7 +200,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             user_models.UserSettingsModel.get_by_id(model.user_id) is not None)
 
     @staticmethod
-    def _check_one_field(model, model_class):
+    def _check_one_field_exists(model, model_class):
         """Check if UserSettingsModel exists for one field.
         """
         verification_field = model_class.get_user_id_migration_field()
@@ -219,19 +219,32 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
         model_class = model.__class__
         if (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.COPY):
-            ModelsUserIdsHaveUserSettingsVerificationJob._check_id(model)
+            if (ModelsUserIdsHaveUserSettingsVerificationJob
+                    ._check_id_exists(model)):
+                yield ('SUCCESS', model_class.__name__)
+            else:
+                yield ('FAILURE', model_class.__name__)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.COPY_PART):
-            ModelsUserIdsHaveUserSettingsVerificationJob._check_id_and_user_id(
-                model)
+            if (ModelsUserIdsHaveUserSettingsVerificationJob
+                    ._check_id_and_user_id_exist(model)):
+                yield ('SUCCESS', model_class.__name__)
+            else:
+                yield ('FAILURE', model_class.__name__)
+
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
-            ModelsUserIdsHaveUserSettingsVerificationJob._check_one_field(
-                model, model_class)
+            if (ModelsUserIdsHaveUserSettingsVerificationJob
+                    ._check_one_field_exists(model, model_class)):
+                yield ('SUCCESS', model_class.__name__)
+            else:
+                yield ('FAILURE', model_class.__name__)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
-            model.verify_model()
-        yield ('SUCCESS', '')
+            if model.verify_model_user_ids_exist():
+                yield ('SUCCESS', model_class.__name__)
+            else:
+                yield ('FAILURE', model_class.__name__)
 
     @staticmethod
     def reduce(key, status):

@@ -486,7 +486,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(user_data, test_data)
 
-    def test_verify_model(self):
+    def test_verify_model_user_ids_exist(self):
         user_models.UserSettingsModel(
             id='author_1',
             gae_id='gae_1_id',
@@ -508,14 +508,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp1.thread_11')
         model = suggestion_models.GeneralSuggestionModel.get_by_id(
             'exploration.exp1.thread_11')
-        self.assertTrue(model.verify_model())
+        self.assertTrue(model.verify_model_user_ids_exist())
 
         model.author_id = 'user_non_id'
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.author_id = 'author_1'
         model.final_reviewer_id = 'user_non_id'
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
 
 class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
@@ -711,7 +711,7 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             .get_voiceover_applications('exploration', 'exp_id', 'hi'))
         self.assertEqual(len(applicant_models), 0)
 
-    def test_verify_model(self):
+    def test_verify_model_user_ids_exist(self):
         user_models.UserSettingsModel(
             id='author_1',
             gae_id='gae_1_id',
@@ -735,11 +735,11 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             filename='application_audio.mp3',
             content='<p>Some content</p>',
             rejection_message=None)
-        self.assertTrue(model.verify_model())
+        self.assertTrue(model.verify_model_user_ids_exist())
 
         model.author_id = 'user_non_id'
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())
 
         model.author_id = 'author_1'
         model.final_reviewer_id = 'user_non_id'
-        self.assertFalse(model.verify_model())
+        self.assertFalse(model.verify_model_user_ids_exist())

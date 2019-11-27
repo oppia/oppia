@@ -1799,7 +1799,7 @@ class UserContributionScoringModel(base_models.BaseModel):
             model.score += increment_by
             model.put()
 
-    def verify_model(self):
+    def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for user_id and model id contains
         user_id.
         """
