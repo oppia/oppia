@@ -146,13 +146,15 @@ class ExplorationRightsSnapshotContentModelTests(test_utils.GenericTestBase):
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationRightsModel class."""
-    EXPLORATION_ID_1 = 1
-    EXPLORATION_ID_2 = 2
-    EXPLORATION_ID_3 = 3
+    EXPLORATION_ID_1 = '1'
+    EXPLORATION_ID_2 = '2'
+    EXPLORATION_ID_3 = '3'
+    EXPLORATION_ID_4 = '4'
     USER_ID_1 = 'id_1'  # Related to all three explorations
     USER_ID_2 = 'id_2'  # Related to a subset of the three explorations
     USER_ID_3 = 'id_3'  # Related to no explorations
-    USER_ID_COMMITTER = 'id_4'  # User id used in commits
+    USER_ID_4 = 'id_4'  # Related to one collection and then removed from it
+    USER_ID_COMMITTER = 'id_5'  # User id used in commits
     USER_ID_4_OLD = 'id_4_old'
     USER_ID_4_NEW = 'id_4_new'
     USER_ID_5_OLD = 'id_5_old'
@@ -213,6 +215,19 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        exploration_models.ExplorationRightsModel(
+            id=self.EXPLORATION_ID_4,
+            owner_ids=[self.USER_ID_4],
+            editor_ids=[self.USER_ID_4],
+            voice_artist_ids=[self.USER_ID_4],
+            viewer_ids=[self.USER_ID_4],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.4
+        ).save(
+            self.USER_ID_COMMITTER, 'Created new collection right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -220,18 +235,39 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        self.assertTrue(
-            exploration_models.ExplorationRightsModel
-            .has_reference_to_user_id(self.USER_ID_1))
-        self.assertTrue(
-            exploration_models.ExplorationRightsModel
-            .has_reference_to_user_id(self.USER_ID_1))
-        self.assertTrue(
-            exploration_models.ExplorationRightsModel
-            .has_reference_to_user_id(self.USER_ID_COMMITTER))
-        self.assertFalse(
-            exploration_models.ExplorationRightsModel
-            .has_reference_to_user_id(self.USER_ID_3))
+        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+            self.assertTrue(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_1))
+            self.assertTrue(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_2))
+            self.assertTrue(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_4))
+            self.assertTrue(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_COMMITTER))
+            self.assertFalse(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_3))
+
+            # We remove the USER_ID_4 from the exploration to verify that the
+            # USER_ID_4 is still found in ExplorationRightsSnapshotContentModel.
+            exploration_model = (
+                exploration_models.ExplorationRightsModel.get_by_id(
+                    self.EXPLORATION_ID_4))
+            exploration_model.owner_ids = [self.USER_ID_1]
+            exploration_model.editor_ids = [self.USER_ID_1]
+            exploration_model.voice_artist_ids = [self.USER_ID_1]
+            exploration_model.viewer_ids = [self.USER_ID_1]
+            exploration_model.commit(
+                self.USER_ID_COMMITTER, 'Changed collection rights',
+                [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+
+            self.assertTrue(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_4))
 
     def test_get_user_id_migration_policy(self):
         self.assertEqual(

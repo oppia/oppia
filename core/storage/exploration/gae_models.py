@@ -259,6 +259,19 @@ class ExplorationRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
+        more_results = True
+        cursor = None
+        while more_results:
+            snapshot_content_models, cursor, more_results = (
+                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
+                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
+            for snapshot_content_model in snapshot_content_models:
+                reconstituted_model = cls(**snapshot_content_model.content)
+                if any((user_id in reconstituted_model.owner_ids,
+                        user_id in reconstituted_model.editor_ids,
+                        user_id in reconstituted_model.voice_artist_ids,
+                        user_id in reconstituted_model.viewer_ids)):
+                    return True
         return (
             cls.query(ndb.OR(
                 cls.owner_ids == user_id,
