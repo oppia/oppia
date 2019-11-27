@@ -83,6 +83,8 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(user_model):
         """Implements the map function for this job."""
+        if user_model.id != user_model.gae_id:
+            return
         old_user_id = user_model.id
         new_user_id = user_models.UserSettingsModel.get_new_id('user')
         for model_class in models.Registry.get_all_storage_model_classes():
