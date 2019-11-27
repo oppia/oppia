@@ -624,8 +624,7 @@ module.exports = {
       options: {
         macros: {
           load: macros.load,
-          loadExtensions: macros.loadExtensions,
-          loadHeader: macros.loadHeader
+          loadExtensions: macros.loadExtensions
         },
       },
     }),
