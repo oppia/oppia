@@ -34,6 +34,7 @@ import utils
 
 class ExplorationStatsTests(test_utils.GenericTestBase):
     """Tests the ExplorationStats domain object."""
+
     def setUp(self):
         super(ExplorationStatsTests, self).setUp()
 
@@ -203,6 +204,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
 
 class StateStatsTests(test_utils.GenericTestBase):
     """Tests the StateStats domain object."""
+
     def setUp(self):
         super(StateStatsTests, self).setUp()
 
@@ -338,6 +340,7 @@ class StateStatsTests(test_utils.GenericTestBase):
 
 class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""
+
     def setUp(self):
         super(ExplorationIssuesTests, self).setUp()
 
@@ -451,6 +454,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
 class PlaythroughTests(test_utils.GenericTestBase):
     """Tests the Playthrough domain object."""
+
     def setUp(self):
         super(PlaythroughTests, self).setUp()
 
@@ -525,6 +529,57 @@ class PlaythroughTests(test_utils.GenericTestBase):
 
     def test_from_dict(self):
         """Test the from_dict() method."""
+        playthrough_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            'actions': [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            }],
+        }
+
+        playthrough = stats_domain.Playthrough.from_dict(playthrough_dict)
+
+        self.assertEqual(playthrough.exp_id, 'exp_id1')
+        self.assertEqual(playthrough.exp_version, 1)
+        self.assertEqual(playthrough.issue_type, 'EarlyQuit')
+        self.assertEqual(
+            playthrough.issue_customization_args, {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            })
+        self.assertEqual(
+            playthrough.actions[0].to_dict(),
+            {
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            })
+
+    def test_from_dict_raises_exception_when_miss_exp_id(self):
+        """Test the from_backend_dict() method."""
         # Test that a playthrough dict without 'exp_id' key raises exception.
         playthrough_dict = {
             'exp_version': 1,
@@ -595,6 +650,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
 
 class ExplorationIssueTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssue domain object."""
+
     def setUp(self):
         super(ExplorationIssueTests, self).setUp()
 
@@ -648,7 +704,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             })
 
     def test_from_dict_raises_exception(self):
-        """Test the from_backend_dict() method."""
+        """Test the from_dict() method."""
         # Test that an exploration issue dict without 'issue_type' key raises
         # exception.
         exp_issue_dict = {
@@ -736,6 +792,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
 class LearnerActionTests(test_utils.GenericTestBase):
     """Tests the LearnerAction domain object."""
+
     def setUp(self):
         super(LearnerActionTests, self).setUp()
 

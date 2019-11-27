@@ -545,26 +545,6 @@ class Playthrough(python_utils.OBJECT):
         }
 
     @classmethod
-    def validate_input_data(cls, playthrough_data):
-        """Validates incoming playthrough data
-
-        Args:
-            playthrough_data: dict. A dict mapping of all fields of Playthrough
-                object.
-
-        Raises:
-            ValidationError in case one of required properties is missed.
-        """
-        playthrough_properties = [
-            'exp_id', 'exp_version', 'issue_type',
-            'issue_customization_args', 'actions']
-        for playthrough_property in playthrough_properties:
-            if playthrough_property not in playthrough_data:
-                raise utils.ValidationError(
-                    '%s not in playthrough data dict.' % (
-                        playthrough_property))
-
-    @classmethod
     def get_actions(cls, actions):
         """Generates list of actions from input list
 
@@ -591,7 +571,14 @@ class Playthrough(python_utils.OBJECT):
         Returns:
             Playthrough. The corresponding Playthrough domain object.
         """
-        cls.validate_input_data(playthrough_data)
+        playthrough_properties = [
+            'exp_id', 'exp_version', 'issue_type',
+            'issue_customization_args', 'actions']
+        for playthrough_property in playthrough_properties:
+            if playthrough_property not in playthrough_data:
+                raise utils.ValidationError(
+                    '%s not in playthrough data dict.' % (
+                        playthrough_property))
 
         actions = cls.get_actions(playthrough_data['actions'])
         playthrough = cls(
@@ -603,23 +590,6 @@ class Playthrough(python_utils.OBJECT):
 
         playthrough.validate()
         return playthrough
-
-    @classmethod
-    def from_backend_dict(cls, playthrough_data):
-        """Deprecated, use from_dict instead
-        Checks whether the playthrough dict has the correct keys and then
-        returns a domain object instance.
-
-        Args:
-            playthrough_data: dict. Dict representing a playthrough.
-
-        Returns:
-            Playthrough. A playthrough domain object.
-        """
-        warnings.warn(
-            'Playthrough.from_backend_dict is deprecated ' +
-            '(see https://github.com/oppia/oppia/issues/5145)')
-        return cls.from_dict(playthrough_data)
 
     def validate(self):
         """Validates the Playthrough domain object."""
@@ -708,26 +678,6 @@ class ExplorationIssue(python_utils.OBJECT):
         }
 
     @classmethod
-    def validate_input_data(cls, exp_issue_dict):
-        """Validates incoming ExplorationIssue data
-
-        Args:
-            exp_issue_dict: dict. A dict mapping of all fields of
-                ExplorationIssue object.
-
-        Raises:
-            ValidationError in case one of required properties is missed.
-        """
-        exp_issue_properties = [
-            'issue_type', 'schema_version', 'issue_customization_args',
-            'playthrough_ids', 'is_valid']
-        for exp_issue_property in exp_issue_properties:
-            if exp_issue_property not in exp_issue_dict:
-                raise utils.ValidationError(
-                    '%s not in exploration issue dict.' % (
-                        exp_issue_property))
-
-    @classmethod
     def from_dict(cls, exp_issue_dict):
         """Checks whether the exploration issue dict has the correct keys and
         then returns a domain object instance.
@@ -739,7 +689,15 @@ class ExplorationIssue(python_utils.OBJECT):
         Returns:
             ExplorationIssue. The corresponding ExplorationIssue domain object.
         """
-        cls.validate_input_data(exp_issue_dict)
+        exp_issue_properties = [
+            'issue_type', 'schema_version', 'issue_customization_args',
+            'playthrough_ids', 'is_valid']
+        for exp_issue_property in exp_issue_properties:
+            if exp_issue_property not in exp_issue_dict:
+                raise utils.ValidationError(
+                    '%s not in exploration issue dict.' % (
+                        exp_issue_property))
+
         exp_issue = cls(
             exp_issue_dict['issue_type'],
             exp_issue_dict['issue_customization_args'],
@@ -749,22 +707,6 @@ class ExplorationIssue(python_utils.OBJECT):
 
         exp_issue.validate()
         return exp_issue
-
-    @classmethod
-    def from_backend_dict(cls, exp_issue_dict):
-        """Checks whether the exploration issue dict has the correct keys and
-        then returns a domain object instance.
-
-        Args:
-            exp_issue_dict: dict. Dict representing an exploration issue.
-
-        Returns:
-            ExplorationIssue. The exploration issue domain object.
-        """
-        warnings.warn(
-            'ExplorationIssue.from_backend_dict is deprecated ' +
-            '(see https://github.com/oppia/oppia/issues/5145)')
-        return cls.from_dict(exp_issue_dict)
 
     @classmethod
     def update_exp_issue_from_model(cls, issue_dict):
