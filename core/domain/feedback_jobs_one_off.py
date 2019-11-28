@@ -96,7 +96,7 @@ class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             None if len(messages) < 2 else messages[-1].updated_status)
         if updated_status is not None and all(
                 m.updated_status is None or m.updated_status == updated_status
-                for m in messages):
+                for m in reversed(messages)):
             updated_status = None
 
         if thread.updated_status != updated_status:
