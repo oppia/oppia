@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.domain import email_manager
-from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
@@ -138,6 +137,7 @@ def create_message(
         received_via_email: bool. Whether new message is received via email or
             web.
     """
+    from core.domain import event_services
     # Get the thread at the outset, in order to check that the thread_id passed
     # in is valid.
     thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
