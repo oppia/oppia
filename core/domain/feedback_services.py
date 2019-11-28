@@ -185,11 +185,11 @@ def create_message(
     # last_updated time of the thread reflects the last time a message was
     # added to it.
     old_status = thread.status
+    thread.updated_status = None
     if message_id != 0 and (updated_status or updated_subject):
         if updated_status and updated_status != thread.status:
-            thread.status = thread.updated_status = updated_status
-        else:
-            thread.updated_status = None
+            thread.status = updated_status
+            thread.updated_status = updated_status
         if updated_subject and updated_subject != thread.subject:
             thread.subject = updated_subject
     new_status = thread.status
