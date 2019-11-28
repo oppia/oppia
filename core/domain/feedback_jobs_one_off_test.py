@@ -136,6 +136,12 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
 
     ONE_OFF_JOB_CLASS = feedback_jobs_one_off.GeneralFeedbackThreadOneOffJob
 
+    def setUp(self):
+        super(GeneralFeedbackThreadOneOffJobTest, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
     def _run_one_off_job(self):
         """Runs the one-off job under test."""
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
@@ -162,12 +168,6 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         thread.second_last_message_text = None
         thread.second_last_message_author_id = None
         thread.put()
-
-    def setUp(self):
-        super(GeneralFeedbackThreadOneOffJobTest, self).setUp()
-
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
     def test_no_changes_made_to_fresh_thread(self):
         thread_id = feedback_services.create_thread(
@@ -290,7 +290,7 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         feedback_services.create_message(
             thread_id, self.editor_id, feedback_models.STATUS_CHOICES_IGNORED,
             None, 'second text')
-        thread = feedback_models.GeneralFeedbackThreadModel.create(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         thread.updated_status = None
         thread.put()
 
@@ -306,7 +306,7 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         feedback_services.create_message(
             thread_id, self.editor_id, feedback_models.STATUS_CHOICES_OPEN,
             None, 'second text')
-        thread = feedback_models.GeneralFeedbackThreadModel.create(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         thread.updated_status = feedback_models.STATUS_CHOICES_OPEN
         thread.put()
 
@@ -318,12 +318,11 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
     def test_invalid_cache_updated_for_stale_thread_with_one_message(self):
         thread_id = feedback_services.create_thread(
             'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
-        thread_model = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
-        thread_model.second_last_message_id = 1
-        thread_model.second_last_message_text = 'non-existing second text'
-        thread_model.second_last_message_author_id = self.editor_id
-        thread_model.put()
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        thread.second_last_message_id = 1
+        thread.second_last_message_text = 'non-existing second text'
+        thread.second_last_message_author_id = self.editor_id
+        thread.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
