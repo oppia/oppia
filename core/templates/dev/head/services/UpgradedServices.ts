@@ -57,6 +57,7 @@ import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';

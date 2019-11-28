@@ -29,6 +29,12 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class MessengerService {
+  HEIGHT_CHANGE: 'heightChange';
+  EXPLORATION_LOADED: 'explorationLoaded';
+  STATE_TRANSITION: 'stateTransition';
+  EXPLORATION_RESET: 'explorationReset';
+  EXPLORATION_COMPLETED: 'explorationCompleted';
+
   constructor(private log: LoggerService, private windowRef: WindowRef) {}
 
   isPositiveInteger(n: any): boolean {
@@ -96,83 +102,76 @@ export class MessengerService {
     }
   };
 
-  messenger = {
-    HEIGHT_CHANGE: 'heightChange',
-    EXPLORATION_LOADED: 'explorationLoaded',
-    STATE_TRANSITION: 'stateTransition',
-    EXPLORATION_RESET: 'explorationReset',
-    EXPLORATION_COMPLETED: 'explorationCompleted',
-    sendMessage: (messageTitle, messageData) => {
-      // TODO(sll): For the stateTransition and explorationCompleted events,
-      // we now send paramValues in the messageData. We should broadcast these
-      // to the parent page as well.
-      // TODO(sll): Delete/deprecate 'reset exploration' from the list of
-      // events sent to a container page.
+  sendMessage(messageTitle: string, messageData: any): void {
+    // TODO(sll): For the stateTransition and explorationCompleted events,
+    // we now send paramValues in the messageData. We should broadcast these
+    // to the parent page as well.
+    // TODO(sll): Delete/deprecate 'reset exploration' from the list of
+    // events sent to a container page.
 
-      // Only send a message to the parent if the oppia window is iframed and
-      // a hash is passed in.
-      let rawHash = this.windowRef.nativeWindow.location.hash.substring(1);
-      if (this.windowRef.nativeWindow.parent !== this.windowRef.nativeWindow &&
+    // Only send a message to the parent if the oppia window is iframed and
+    // a hash is passed in.
+    let rawHash = this.windowRef.nativeWindow.location.hash.substring(1);
+    if (this.windowRef.nativeWindow.parent !== this.windowRef.nativeWindow &&
           rawHash && this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
-        // Protractor tests may prepend a / to this hash, which we remove:
-        let hash =
+      // Protractor tests may prepend a / to this hash, which we remove:
+      let hash =
             (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
-        let hashParts = hash.split('&');
-        let hashDict = {
-          version: null,
-          secret: null,
-          tagid: null
-        };
-        for (let i = 0; i < hashParts.length; i++) {
-          if (hashParts[i].indexOf('=') === -1) {
-            this.log.error('Invalid hash for embedding: ' + hash);
-            return;
-          }
-
-          let separatorLocation = hashParts[i].indexOf('=');
-          hashDict[hashParts[i].substring(0, separatorLocation)] = (
-            hashParts[i].substring(separatorLocation + 1));
-        }
-
-        if (!hashDict.version || !hashDict.secret) {
+      let hashParts = hash.split('&');
+      let hashDict = {
+        version: null,
+        secret: null,
+        tagid: null
+      };
+      for (let i = 0; i < hashParts.length; i++) {
+        if (hashParts[i].indexOf('=') === -1) {
           this.log.error('Invalid hash for embedding: ' + hash);
           return;
         }
 
-        if (this.SUPPORTED_HASHDICT_VERSIONS.indexOf(hashDict.version) !== -1) {
-          this.log.info('Posting message to parent: ' + messageTitle);
+        let separatorLocation = hashParts[i].indexOf('=');
+        hashDict[hashParts[i].substring(0, separatorLocation)] = (
+          hashParts[i].substring(separatorLocation + 1));
+      }
 
-          let payload = this.getPayload[messageTitle](messageData);
-          if (!this.MESSAGE_VALIDATORS[messageTitle](payload)) {
-            this.log.error('Error validating payload: ' + payload);
-            return;
-          }
+      if (!hashDict.version || !hashDict.secret) {
+        this.log.error('Invalid hash for embedding: ' + hash);
+        return;
+      }
 
-          this.log.info(payload);
+      if (this.SUPPORTED_HASHDICT_VERSIONS.indexOf(hashDict.version) !== -1) {
+        this.log.info('Posting message to parent: ' + messageTitle);
 
-          let objToSendToParent = {
-            title: messageTitle,
-            payload: payload,
-            sourceTagId: null,
-            secret: null
-          };
-          if (hashDict.version === '0.0.0') {
-            // Ensure backwards-compatibility.
-            objToSendToParent.sourceTagId = hashDict.tagid;
-            objToSendToParent.secret = hashDict.secret;
-          }
-
-          // The targetOrigin needs to be * because any page can iframe an
-          // exploration.
-          this.windowRef.nativeWindow.parent.postMessage(
-            JSON.stringify(objToSendToParent), '*');
-        } else {
-          this.log.error('Unknown version for embedding: ' + hashDict.version);
+        let payload = this.getPayload[messageTitle](messageData);
+        if (!this.MESSAGE_VALIDATORS[messageTitle](payload)) {
+          this.log.error('Error validating payload: ' + payload);
           return;
         }
+
+        this.log.info(payload);
+
+        let objToSendToParent = {
+          title: messageTitle,
+          payload: payload,
+          sourceTagId: null,
+          secret: null
+        };
+        if (hashDict.version === '0.0.0') {
+          // Ensure backwards-compatibility.
+          objToSendToParent.sourceTagId = hashDict.tagid;
+          objToSendToParent.secret = hashDict.secret;
+        }
+
+        // The targetOrigin needs to be * because any page can iframe an
+        // exploration.
+        this.windowRef.nativeWindow.parent.postMessage(
+          JSON.stringify(objToSendToParent), '*');
+      } else {
+        this.log.error('Unknown version for embedding: ' + hashDict.version);
+        return;
       }
     }
-  };
+  }
 }
 
 angular.module('oppia').factory(
