@@ -545,21 +545,6 @@ class Playthrough(python_utils.OBJECT):
         }
 
     @classmethod
-    def get_actions(cls, actions):
-        """Generates list of actions from input list
-
-        Args:
-            actions: dict. A list of dict mappings of all fields of
-                LearnerAction object.
-
-        Returns:
-            list. A list of LearnerAction.
-        """
-        return [
-            LearnerAction.from_dict(action_dict)
-            for action_dict in actions]
-
-    @classmethod
     def from_dict(cls, playthrough_data):
         """Checks whether the playthrough dict has the correct keys and then
         returns a domain object instance.
@@ -580,7 +565,10 @@ class Playthrough(python_utils.OBJECT):
                     '%s not in playthrough data dict.' % (
                         playthrough_property))
 
-        actions = cls.get_actions(playthrough_data['actions'])
+        actions = [
+            LearnerAction.from_dict(action_dict)
+            for action_dict in playthrough_data['actions']]
+
         playthrough = cls(
             playthrough_data['exp_id'],
             playthrough_data['exp_version'],
