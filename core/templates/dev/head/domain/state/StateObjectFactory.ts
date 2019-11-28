@@ -16,101 +16,120 @@
  * @fileoverview Factory for creating new frontend instances of State
  * domain objects.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
-require('domain/exploration/InteractionObjectFactory.ts');
-require('domain/exploration/ParamChangesObjectFactory.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/exploration/WrittenTranslationsObjectFactory.ts');
+import { AppConstants } from 'app.constants';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 
-angular.module('oppia').factory('StateObjectFactory', [
-  'InteractionObjectFactory', 'ParamChangesObjectFactory',
-  'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',
-  'WrittenTranslationsObjectFactory', 'NEW_STATE_TEMPLATE', function(
-      InteractionObjectFactory, ParamChangesObjectFactory,
-      RecordedVoiceoversObjectFactory, SubtitledHtmlObjectFactory,
-      WrittenTranslationsObjectFactory, NEW_STATE_TEMPLATE) {
-    var State = function(name, classifierModelId, content, interaction,
-        paramChanges, recordedVoiceovers, solicitAnswerDetails,
-        writtenTranslations) {
-      this.name = name;
-      this.classifierModelId = classifierModelId;
-      this.content = content;
-      this.interaction = interaction;
-      this.paramChanges = paramChanges;
-      this.recordedVoiceovers = recordedVoiceovers;
-      this.solicitAnswerDetails = solicitAnswerDetails;
-      this.writtenTranslations = writtenTranslations;
-    };
+const CONSTANTS = require('constants.ts');
 
-    State.prototype.setName = function(newName) {
-      this.name = newName;
-    };
-
-    // Instance methods.
-    State.prototype.toBackendDict = function() {
-      return {
-        content: this.content.toBackendDict(),
-        classifier_model_id: this.classifierModelId,
-        interaction: this.interaction.toBackendDict(),
-        param_changes: this.paramChanges.map(function(paramChange) {
-          return paramChange.toBackendDict();
-        }),
-        recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
-        solicit_answer_details: this.solicitAnswerDetails,
-        written_translations: this.writtenTranslations.toBackendDict()
-      };
-    };
-
-    State.prototype.copy = function(otherState) {
-      this.name = otherState.name;
-      this.classifierModelId = otherState.classifierModelId;
-      this.content = angular.copy(otherState.content);
-      this.interaction.copy(otherState.interaction);
-      this.paramChanges = angular.copy(otherState.paramChanges);
-      this.recordedVoiceovers = angular.copy(otherState.recordedVoiceovers);
-      this.solicitAnswerDetails = angular.copy(otherState.solicitAnswerDetails);
-      this.writtenTranslations = angular.copy(otherState.writtenTranslations);
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    State['createDefaultState'] = function(newStateName) {
-    /* eslint-enable dot-notation */
-      var newStateTemplate = angular.copy(NEW_STATE_TEMPLATE);
-      var newState = this.createFromBackendDict(newStateName, {
-        classifier_model_id: newStateTemplate.classifier_model_id,
-        content: newStateTemplate.content,
-        interaction: newStateTemplate.interaction,
-        param_changes: newStateTemplate.param_changes,
-        recorded_voiceovers: newStateTemplate.recorded_voiceovers,
-        solicit_answer_details: newStateTemplate.solicit_answer_details,
-        written_translations: newStateTemplate.written_translations
-      });
-      newState.interaction.defaultOutcome.dest = newStateName;
-      return newState;
-    };
-
-    // Static class methods. Note that "this" is not available in
-    // static contexts.
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    State['createFromBackendDict'] = function(stateName, stateDict) {
-    /* eslint-enable dot-notation */
-      return new State(
-        stateName,
-        stateDict.classifier_model_id,
-        SubtitledHtmlObjectFactory.createFromBackendDict(stateDict.content),
-        InteractionObjectFactory.createFromBackendDict(stateDict.interaction),
-        ParamChangesObjectFactory.createFromBackendList(
-          stateDict.param_changes),
-        RecordedVoiceoversObjectFactory.createFromBackendDict(
-          stateDict.recorded_voiceovers),
-        stateDict.solicit_answer_details,
-        WrittenTranslationsObjectFactory.createFromBackendDict(
-          stateDict.written_translations));
-    };
-
-    return State;
+export class State {
+  name;
+  classifierModelId;
+  content;
+  interaction;
+  paramChanges;
+  recordedVoiceovers;
+  solicitAnswerDetails;
+  writtenTranslations;
+  // TODO(#7165): Replace any with exact type.
+  constructor(
+      name: string, classifierModelId: any, content: any, interaction: any,
+      paramChanges: any, recordedVoiceovers: any, solicitAnswerDetails: any,
+      writtenTranslations: any) {
+    this.name = name;
+    this.classifierModelId = classifierModelId;
+    this.content = content;
+    this.interaction = interaction;
+    this.paramChanges = paramChanges;
+    this.recordedVoiceovers = recordedVoiceovers;
+    this.solicitAnswerDetails = solicitAnswerDetails;
+    this.writtenTranslations = writtenTranslations;
   }
-]);
+  setName(newName: string): void {
+    this.name = newName;
+  }
+
+  // TODO(#7165): Replace any with exact type.
+  toBackendDict(): any {
+    return {
+      content: this.content.toBackendDict(),
+      classifier_model_id: this.classifierModelId,
+      interaction: this.interaction.toBackendDict(),
+      param_changes: this.paramChanges.map((paramChange) => {
+        return paramChange.toBackendDict();
+      }),
+      recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
+      solicit_answer_details: this.solicitAnswerDetails,
+      written_translations: this.writtenTranslations.toBackendDict()
+    };
+  }
+
+  // TODO(#7165): Replace any with exact type.
+  copy(otherState: any): void {
+    this.name = otherState.name;
+    this.classifierModelId = otherState.classifierModelId;
+    this.content = otherState.content;
+    this.interaction.copy(otherState.interaction);
+    this.paramChanges = otherState.paramChanges;
+    this.recordedVoiceovers = otherState.recordedVoiceovers;
+    this.solicitAnswerDetails = otherState.solicitAnswerDetails;
+    this.writtenTranslations = otherState.writtenTranslations;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StateObjectFactory {
+  constructor(
+    private interactionObject: InteractionObjectFactory,
+    private paramchangesObject: ParamChangesObjectFactory,
+    private recordedVoiceoversObject: RecordedVoiceoversObjectFactory,
+    private subtitledHtmlObject: SubtitledHtmlObjectFactory,
+    private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
+
+  createDefaultState(newStateName: string): State {
+    var newStateTemplate = CONSTANTS.NEW_STATE_TEMPLATE;
+    var newState = this.createFromBackendDict(newStateName, {
+      classifier_model_id: newStateTemplate.classifier_model_id,
+      content: newStateTemplate.content,
+      interaction: newStateTemplate.interaction,
+      param_changes: newStateTemplate.param_changes,
+      recorded_voiceovers: newStateTemplate.recorded_voiceovers,
+      solicit_answer_details: newStateTemplate.solicit_answer_details,
+      written_translations: newStateTemplate.written_translations
+    });
+    newState.interaction.defaultOutcome.dest = newStateName;
+    return newState;
+  }
+  // TODO(#7165): Replace any with exact type.
+  createFromBackendDict(stateName: string, stateDict: any): State {
+    return new State(
+      stateName,
+      stateDict.classifier_model_id,
+      this.subtitledHtmlObject.createFromBackendDict(stateDict.content),
+      this.interactionObject.createFromBackendDict(stateDict.interaction),
+      this.paramchangesObject.createFromBackendList(
+        stateDict.param_changes),
+      this.recordedVoiceoversObject.createFromBackendDict(
+        stateDict.recorded_voiceovers),
+      stateDict.solicit_answer_details,
+      this.writtenTranslationsObject.createFromBackendDict(
+        stateDict.written_translations));
+  }
+}
+
+angular.module('oppia').factory(
+  'StateObjectFactory',
+  downgradeInjectable(StateObjectFactory));
