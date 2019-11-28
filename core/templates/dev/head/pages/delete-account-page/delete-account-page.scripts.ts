@@ -13,21 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the footer.
+ * @fileoverview File to import necessary scripts for remove-account page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('./delete-account-page.module.ts');
+require('App.ts');
 
-angular.module('oppia').directive('oppiaFooter', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('!html-loader!./oppia_footer_directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        function() {}
-      ]
-    };
-  }
-]);
+require('./delete-account-page.controller.ts');

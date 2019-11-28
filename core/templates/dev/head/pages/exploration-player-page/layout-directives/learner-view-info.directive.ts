@@ -166,8 +166,9 @@ angular.module('oppia').directive('learnerViewInfo', [
                   };
                   $scope.infoCardBackgroundImageUrl = expInfo
                     .thumbnail_icon_url;
-                  $scope.getStaticImageUrl = (
-                    UrlInterpolationService.getStaticImageUrl);
+                  $scope.getStaticImageUrl = function(imagePath) {
+                    return UrlInterpolationService.getStaticImageUrl(imagePath);
+                  };
                   $scope.lastUpdatedString = getLastUpdatedString(
                     expInfo.last_updated_msec);
                   $scope.numViews = expInfo.num_views;
