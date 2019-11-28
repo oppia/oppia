@@ -22,7 +22,6 @@ import datetime
 import json
 import numbers
 import sys
-import warnings
 
 from constants import constants
 from core.domain import action_registry
