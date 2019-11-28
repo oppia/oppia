@@ -104,7 +104,7 @@ angular.module('oppia').factory('MessengerService', [
             MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
           // Protractor tests may prepend a / to this hash, which we remove:
           var hash =
-              (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
+            (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
           var hashParts = hash.split('&');
           var hashDict = {
             version: null,
